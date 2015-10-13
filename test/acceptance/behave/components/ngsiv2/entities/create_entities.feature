@@ -38,11 +38,18 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
   I would like to  create entities requests using NGSI v2
   So that I can manage and use them in my scripts
 
-  BackgroundFeature:
+  Actions Before the Feature:
   Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-  Setup: update contextBroker config file and restart service
+  Setup: update contextBroker config file
+  Setup: start ContextBroker
   Check: verify contextBroker is installed successfully
   Check: verify mongo is installed successfully
+
+  Actions After each Scenario:
+  Setup: delete database in mongo
+
+  Actions After the Feature:
+  Setup: stop ContextBroker
 
   @happy_path
   Scenario:  create several entities using NGSI v2
@@ -64,6 +71,80 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | metadatas_value  | hot                     |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
+
+  @already_exist @BUG_1158
+  Scenario:  try  to create an entity using NGSI v2 but this entity already exists with only entity id
+    Given  a definition of headers
+      | parameter      | value              |
+      | Fiware-Service | test_already_exist |
+      | Content-Type   | application/json   |
+    And create "1" entities with "2" attributes
+      | parameter        | value       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
+    And verify that receive several "Created" http code
+    When create "1" entities with "2" attributes
+      | parameter        | value       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    Then verify that receive several "Unprocessable Entity" http code
+    And verify several error responses
+      | parameter   | value                 |
+      | error       | InvalidModification   |
+      | description | Entity already exists |
+
+  @already_exist @BUG_1158
+  Scenario:  try  to create an entity using NGSI v2 but this entity already exists with entity id and type
+    Given  a definition of headers
+      | parameter      | value              |
+      | Fiware-Service | test_already_exist |
+      | Content-Type   | application/json   |
+    And create "1" entities with "2" attributes
+      | parameter        | value       |
+      | entities_id      | room2       |
+      | entities_type    | house       |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
+    And verify that receive several "Created" http code
+    When create "1" entities with "2" attributes
+      | parameter        | value       |
+      | entities_id      | room2       |
+      | entities_type    | house       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    Then verify that receive several "Unprocessable Entity" http code
+    And verify several error responses
+      | parameter   | value                 |
+      | error       | InvalidModification   |
+      | description | Entity already exists |
+
+  @already_exist @BUG_1158
+  Scenario:  try  to create an entity using NGSI v2 but this entity already exists with entity id and type and service_path
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_already_exist |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    And create "1" entities with "2" attributes
+      | parameter        | value       |
+      | entities_id      | room2       |
+      | entities_type    | house       |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
+    And verify that receive several "Created" http code
+    When create "1" entities with "2" attributes
+      | parameter        | value       |
+      | entities_id      | room2       |
+      | entities_type    | house       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    Then verify that receive several "Unprocessable Entity" http code
+    And verify several error responses
+      | parameter   | value                 |
+      | error       | InvalidModification   |
+      | description | Entity already exists |
 
   @maximum_size @BUG_1199
     # 8972 is a way of generating a request longer than 1MB (in fact, 1048645 bytes)
@@ -153,6 +234,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   # ---------- Services --------------------------------
+
   @service_without
   Scenario: create entities using NGSI v2 without service header
     Given  a definition of headers
@@ -223,6 +305,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | greater than max length allowed |
 
   # ---------- Services path --------------------------------
+
   @service_path
   Scenario Outline:  create entities using NGSI v2 with several service paths headers
     Given  a definition of headers
@@ -362,6 +445,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are not stored in mongo
 
   # ---------- entities and attributes number --------------------------------
+
   @entities_number
   Scenario Outline:  create several entities using NGSI v2
     Given  a definition of headers
@@ -421,6 +505,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
 
   # ---------- entity type "type" --------------------------------
+
   @entities_type
   Scenario Outline:  create entities using NGSI v2 with several entities type values
     Given  a definition of headers
@@ -567,7 +652,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | ["34", "a", 45] |
       | null            |
 
-    # ---------- entity id "id" --------------------------------
+   # ---------- entity id "id" --------------------------------
+
   @entities_id
   Scenario Outline:  create entities using NGSI v2 with several entities id values
     Given  a definition of headers
@@ -767,6 +853,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | null            |
 
   # ---------- attribute name --------------------------------
+
   @attributes_name @ISSUE_1090
   Scenario Outline:  create entities using NGSI v2 with several attributes names
     Given  a definition of headers
@@ -898,6 +985,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are not stored in mongo
 
   # ---------- attribute value --------------------------------
+
   @attributes_value
   Scenario Outline:  create entities using NGSI v2 with several attributes values
     Given  a definition of headers
@@ -1320,6 +1408,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_14   | "a": "b"}        |
 
   # ---------- attribute type --------------------------------
+
   @attributes_type
   Scenario Outline:  create entities using NGSI v2 with several attributes type
     Given  a definition of headers
@@ -1454,6 +1543,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room7"   | ["34", "a", 45] |
 
   # ---------- attribute metadata --------------------------------
+
   @attributes_metadata_name
   Scenario Outline:  create entities using NGSI v2 with several attributes metadata name without metadata type
     Given  a definition of headers

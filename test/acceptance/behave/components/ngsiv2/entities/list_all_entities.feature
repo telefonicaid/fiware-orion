@@ -33,11 +33,18 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
   I would like to list all entities with get requests using NGSI v2
   So that I can manage and use them in my scripts
 
-  BackgroundFeature:
-  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-  Setup: update contextBroker config file and restart service
-  Check: verify contextBroker is installed successfully
-  Check: verify mongo is installed successfully
+  Actions Before the Feature:
+     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+     Setup: update contextBroker config file
+     Setup: start ContextBroker
+     Check: verify contextBroker is installed successfully
+     Check: verify mongo is installed successfully
+
+  Actions After each Scenario:
+     Setup: delete database in mongo
+
+  Actions After the Feature:
+     Setup: stop ContextBroker
 
   @happy_path
   Scenario:  list all entities using NGSI v2

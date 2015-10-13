@@ -30,14 +30,21 @@
 
 Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - /v2/entities/<entity_id> plus payload
   As a context broker user
-  I would like to uupdate an attribute by entity ID if it exists
+  I would like to update an attribute by entity ID if it exists using NGSI v2
   So that I can manage and use them in my scripts
 
-  BackgroundFeature:
-  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-  Setup: update contextBroker config file and restart service
-  Check: verify contextBroker is installed successfully
-  Check: verify mongo is installed successfully
+  Actions Before the Feature:
+     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+     Setup: update contextBroker config file
+     Setup: start ContextBroker
+     Check: verify contextBroker is installed successfully
+     Check: verify mongo is installed successfully
+
+  Actions After each Scenario:
+     Setup: delete database in mongo
+
+  Actions After the Feature:
+     Setup: stop ContextBroker
 
   @happy_path
   Scenario:  update an attribute by entity ID if it exists using NGSI v2
@@ -294,7 +301,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | attributes_name  | temperature_0 |
       | attributes_value | 80            |
     Then verify that receive an "No Content" http code
-    And verify that entities are stored in mongo
+    And verify that an entity is updated in mongo
     Examples:
       | service_path                                                  |
       |                                                               |
@@ -330,9 +337,9 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | attributes_name  | temperature_0 |
       | attributes_value | 80            |
     Then verify that receive an "No Content" http code
-    And verify that entities are stored in mongo
+    And verify that an entity is updated in mongo
 
-  @service_path_update_update_error @BUG_1280
+  @service_path_update_error @BUG_1280
   Scenario Outline:  try to update attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                          |
@@ -357,7 +364,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | /serv<45>    |
       | /serv(45)    |
 
-  @service_path_update_update_error @BUG_1280
+  @service_path_update_error @BUG_1280
   Scenario Outline:  try to update attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                          |
@@ -378,7 +385,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | sdffsfs      |
       | /service,sr  |
 
-  @service_path_update_update_error @BUG_1280
+  @service_path_update_error @BUG_1280
   Scenario Outline:  try to update attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                          |
@@ -399,7 +406,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | greater than max length allowed                |
       | greater than max length allowed and ten levels |
 
-  @service_path_update_update_error @BUG_1280
+  @service_path_update_error @BUG_1280
   Scenario:  try to update attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                                |
@@ -644,7 +651,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | room_6    | house;flat      |
       | room_8    | house(flat)     |
 
-  @attribute_name_update_update_error
+  @attribute_name_update__error
   Scenario Outline:  try to update attributes by entity ID using NGSI v2 with invalid attribute names
     Given  a definition of headers
       | parameter          | value                            |
@@ -790,10 +797,10 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
   @attribute_value_update_with_metadatas
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute values and with metadatas
     Given  a definition of headers
-      | parameter          | value                                 |
-      | Fiware-Service     | test_update_attr_value_with_attr_type |
-      | Fiware-ServicePath | /test                                 |
-      | Content-Type       | application/json                      |
+      | parameter          | value                                |
+      | Fiware-Service     | test_update_attr_value_with_metadata |
+      | Fiware-ServicePath | /test                                |
+      | Content-Type       | application/json                     |
     And create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | house       |
@@ -1050,10 +1057,10 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
   @attribute_value_update_with_attribute_type_in_update
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute values and without attribute type nor metadatas, but with attribute type in update
     Given  a definition of headers
-      | parameter          | value                                 |
-      | Fiware-Service     | test_update_attr_value_with_attr_type |
-      | Fiware-ServicePath | /test                                 |
-      | Content-Type       | application/json                      |
+      | parameter          | value                                           |
+      | Fiware-Service     | test_update_attr_value_with_attr_type_in_update |
+      | Fiware-ServicePath | /test                                           |
+      | Content-Type       | application/json                                |
     And create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | house       |
@@ -1591,11 +1598,11 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | parameter        | value                  |
       | entities_type    | house                  |
       | entities_id      | room                   |
-      | attributes_name  | <attributes_meta_name> |
+      | attributes_name  | temperature            |
       | attributes_value | 34                     |
       | attributes_type  | celcius                |
       | metadatas_number | 2                      |
-      | metadatas_name   | very_hot               |
+      | metadatas_name   | <attributes_meta_name> |
       | metadatas_type   | alarm                  |
       | metadatas_value  | hot                    |
     And verify that receive several "Created" http code
