@@ -30,6 +30,7 @@
 #include <set>
 
 #include "mongoBackend/MongoCommonUpdate.h"
+#include "mongoBackend/connectionOperations.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -1119,7 +1120,6 @@ static bool addTriggeredSubscriptions
   const std::vector<std::string>&           servicePathV
 )
 {
-  DBClientBase*             connection      = NULL;
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::string               spathRegex      = "";
   std::vector<std::string>  spathV;
@@ -1161,40 +1161,8 @@ static bool addTriggeredSubscriptions
 
   /* Do the query */
   auto_ptr<DBClientCursor> cursor;
-  try
+  if (!collectionQuery(getSubscribeContextCollectionName(tenant), query, &cursor, &err))
   {
-    connection      = getMongoConnection();
-    cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
-
-    /*
-     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-     * exception ourselves
-     */
-    if (cursor.get() == NULL)
-    {
-      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-    }
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-    err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-               " - query(): " + query.toString() +
-               " - exception: " + e.what();
-    LM_E(("Database Error (%s)", err.c_str()));
-    return false;
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-    err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-               " - query(): " + query.toString() +
-               " - exception: " + "generic";
-    LM_E(("Database Error (%s)", err.c_str()));
     return false;
   }
 
@@ -1292,16 +1260,15 @@ static bool processSubscriptions
 (
   const EntityId*                           enP,
   std::map<string, TriggeredSubscription*>& subs,
-  std::string&                              err,
-  std::string                               tenant,
+  std::string*                              err,
+  const std::string&                        tenant,
   const std::string&                        xauthToken,
   std::vector<std::string>                  servicePathV
 )
 {
-  DBClientBase*  connection  = NULL;
-  bool           ret         = true;
+  bool ret = true;
 
-  err = "";
+  *err = "";
 
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
@@ -1343,21 +1310,8 @@ static bool processSubscriptions
       BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) <<
                             "$inc" << BSON(CSUB_COUNT << 1));
 
-
-      try
+      if (collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err))
       {
-        LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getSubscribeContextCollectionName(tenant).c_str(),
-                        query.toString().c_str(),
-                        update.toString().c_str()));
-
-        connection = getMongoConnection();
-        connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
-        releaseMongoConnection(connection);
-
-        LM_I(("Database Operation Successful (update: %s, query: %s)",
-              update.toString().c_str(),
-              query.toString().c_str()));
-
         //
         // Saving lastNotificationTime for cached subscription
         //
@@ -1371,24 +1325,8 @@ static bool processSubscriptions
           }
         }
       }
-      catch (const DBException &e)
+      else
       {
-        releaseMongoConnection(connection);
-
-        err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-          " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
-
-        LM_E(("Database Error (%s)", err.c_str()));
-        ret = false;
-      }
-      catch (...)
-      {
-        releaseMongoConnection(connection);
-
-        err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-          " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
-
-        LM_E(("Database Error (%s)", err.c_str()));
         ret = false;
       }
     }
@@ -1904,8 +1842,6 @@ static bool createEntity
   const std::vector<std::string>&  servicePathV
 )
 {
-  DBClientBase* connection = NULL;
-
   LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
 
   /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
@@ -1986,56 +1922,25 @@ static bool createEntity
       BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
   }
 
-  BSONObjBuilder insertedDocB;
+  BSONObjBuilder insertedDoc;
 
-  insertedDocB.append("_id", bsonId);
-  insertedDocB.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
-  insertedDocB.append(ENT_ATTRS, attrsToAdd.obj());
-  insertedDocB.append(ENT_CREATION_DATE, now);
-  insertedDocB.append(ENT_MODIFICATION_DATE, now);
+  insertedDoc.append("_id", bsonId);
+  insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
+  insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
+  insertedDoc.append(ENT_CREATION_DATE, now);
+  insertedDoc.append(ENT_MODIFICATION_DATE, now);
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)
   {
-    insertedDocB.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+    insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                            ENT_LOCATION_COORDS   <<
                                            BSON("type" << "Point" <<
                                                 "coordinates" << BSON_ARRAY(coordLong << coordLat))));
   }
 
-  BSONObj insertedDoc = insertedDocB.obj();
-  LM_T(LmtMongo, ("insert() in '%s' collection: '%s'",
-                  getEntitiesCollectionName(tenant).c_str(),
-                  insertedDoc.toString().c_str()));
-
-  try
+  if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
   {
-    connection = getMongoConnection();
-    connection->insert(getEntitiesCollectionName(tenant).c_str(), insertedDoc);
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (insert %s)", insertedDoc.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-
-    *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName(tenant).c_str() +
-      " - insert(): " + insertedDoc.toString() +
-      " - exception: " + e.what();
-
-    LM_E(("Database Error (%s)", errDetail->c_str()));
-    return false;
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName(tenant).c_str() +
-      " - insert(): " + insertedDoc.toString() +
-      " - exception: " + "generic";
-
-    LM_E(("Database Error (%s)", errDetail->c_str()));
     return false;
   }
 
@@ -2213,7 +2118,6 @@ void processContextElement
   bool                                 checkEntityExistance
 )
 {
-  DBClientBase* connection                  = NULL;
   bool          attributeAlreadyExistsError = false;
   std::string   attributeAlreadyExistsList  = "[ ";
 
@@ -2309,47 +2213,13 @@ void processContextElement
   // thinking too much about it, but NGSIv1 behaviour now will break backward compatibility)
   if (apiVersion == "v2")
   {
-    int entitiesNumber;
+    unsigned long long entitiesNumber;
+    std::string        err;
 
-    LM_T(LmtMongo, ("count() in '%s' collection: '%s'",
-                    getEntitiesCollectionName(tenant).c_str(),
-                    query.toString().c_str()));
-
-    connection = getMongoConnection();
-    if (connection == NULL)
+    if (!collectionCount(getEntitiesCollectionName(tenant), query, &entitiesNumber, &err))
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, "null DB connection");
-      LM_E(("Fatal Error (null DB connection)"));
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
       return;
-    }
-
-    try
-    {
-      entitiesNumber = connection->count(getEntitiesCollectionName(tenant).c_str(), query);
-      releaseMongoConnection(connection);
-      LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-    }
-    catch (const DBException &e)
-    {
-      releaseMongoConnection(connection);
-
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,
-                                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                                " - count(): " + query.toString() +
-                                " - exception: " + e.what());
-      LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-      return;  // Error already in responseP
-    }
-    catch (...)
-    {
-      releaseMongoConnection(connection);
-
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,
-                                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                                " - count(): " + query.toString() +
-                                " - exception: " + "generic");
-      LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-      return;  // Error already in responseP
     }
 
     if (entitiesNumber > 0 && checkEntityExistance && action == "APPEND_STRICT")
@@ -2365,58 +2235,12 @@ void processContextElement
 
   }
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getEntitiesCollectionName(tenant).c_str(),
-                  query.toString().c_str()));
-
-  connection = getMongoConnection();
-  if (connection == NULL)
+  std::string err;
+  if (!collectionQuery(getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, "null DB connection");
-    LM_E(("Fatal Error (null DB connection)"));
+    buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
     return;
   }
-
-  try
-  {
-    cursor     = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
-
-    /*
-     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-     * exception ourselves
-     */
-    if (cursor.get() == NULL)
-    {
-      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-    }
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-
-    buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,
-                              std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                              " - query(): " + query.toString() +
-                              " - exception: " + e.what());
-    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-    return;  // Error already in responseP
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,
-                              std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                              " - query(): " + query.toString() +
-                              " - exception: " + "generic");
-    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-    return;  // Error already in responseP
-  }
-
 
   //
   // Going through the list of found entities.
@@ -2621,18 +2445,18 @@ void processContextElement
     /* Note that the query that we build for updating is slighty different than the query used
      * for selecting the entities to process. In particular, the "no type" branch in the if
      * sentence selects precisely the entity with no type, using the {$exists: false} clause */
-    BSONObjBuilder bob;
+    BSONObjBuilder query;
 
     // idString, typeString from earlier in this function
-    bob.append(idString, entityId);
+    query.append(idString, entityId);
 
     if (entityType == "")
     {
-      bob.append(typeString, BSON("$exists" << false));
+      query.append(typeString, BSON("$exists" << false));
     }
     else
     {
-      bob.append(typeString, entityType);
+      query.append(typeString, entityType);
     }
 
     // The servicePath of THIS object is entitySPath
@@ -2642,54 +2466,17 @@ void processContextElement
     // servicePathString from earlier in this function
     if (servicePathV.size() == 0)
     {
-      bob.append(servicePathString, BSON("$exists" << false));
+      query.append(servicePathString, BSON("$exists" << false));
     }
     else
     {
-      bob.appendRegex(servicePathString, espath);
+      query.appendRegex(servicePathString, espath);
     }
 
-    BSONObj query = bob.obj();
-
-    try
+    if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
     {
-      LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getEntitiesCollectionName(tenant).c_str(),
-                      query.toString().c_str(),
-                      updatedEntityObj.toString().c_str()));
-
-      connection = getMongoConnection();
-      connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntityObj);
-      releaseMongoConnection(connection);
-
-      LM_I(("Database Operation Successful (update %s)", query.toString().c_str()));
-    }
-    catch (const DBException &e)
-    {
-      releaseMongoConnection(connection);
-
-      cerP->statusCode.fill(SccReceiverInternalError,
-                            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                            " - update() query: " + query.toString() +
-                            " - update() doc: " + updatedEntityObj.toString() +
-                            " - exception: " + e.what());
-
+      cerP->statusCode.fill(SccReceiverInternalError, err);
       responseP->contextElementResponseVector.push_back(cerP);
-      LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
-      releaseTriggeredSubscriptions(subsToNotify);
-      continue;
-    }
-    catch (...)
-    {
-      releaseMongoConnection(connection);
-
-      cerP->statusCode.fill(SccReceiverInternalError,
-                            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                            " - update() query: " + query.toString() +
-                            " - update() doc: " + updatedEntityObj.toString() +
-                            " - exception: " + "generic");
-
-      responseP->contextElementResponseVector.push_back(cerP);
-      LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
       releaseTriggeredSubscriptions(subsToNotify);
       continue;
     }
@@ -2697,7 +2484,7 @@ void processContextElement
     /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
      * previous addTriggeredSubscriptions() invocations */
     std::string err;
-    processSubscriptions(enP, subsToNotify, err, tenant, xauthToken, servicePathV);
+    processSubscriptions(enP, subsToNotify, &err, tenant, xauthToken, servicePathV);
 
     //
     // processSubscriptions cleans up the triggered subscriptions; this call here to
@@ -2803,7 +2590,7 @@ void processContextElement
           }
         }
 
-        processSubscriptions(enP, subsToNotify, errReason, tenant, xauthToken, servicePathV);
+        processSubscriptions(enP, subsToNotify, &errReason, tenant, xauthToken, servicePathV);
       }
 
       responseP->contextElementResponseVector.push_back(cerP);
