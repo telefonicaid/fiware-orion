@@ -28,9 +28,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#if SUB_CACHE_ON
 #include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
 #include "cache/Subscription.h"
+#endif
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
@@ -289,6 +291,7 @@ HttpStatusCode mongoUpdateContextSubscription
 
   servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
 
+#if SUB_CACHE_ON
   subCache->semTake();
 
   Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
@@ -303,6 +306,7 @@ HttpStatusCode mongoUpdateContextSubscription
   subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
 
   subCache->semGive();
+#endif
 
   return SccOk;
 }

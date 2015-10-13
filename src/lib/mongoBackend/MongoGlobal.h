@@ -217,6 +217,12 @@ extern void setDbPrefix(std::string dbPrefix);
 
 /*****************************************************************************
 *
+* dbPrefixGet -
+*/
+extern const char* dbPrefixGet(void);
+
+/*****************************************************************************
+*
 * getOrionDatabases -
 *
 * Return the list of Orion databases (the ones that start with the dbPrefix + "_").
@@ -584,10 +590,17 @@ extern std::string dbDotDecode(std::string fromString);
 
 /* ****************************************************************************
 *
-* subscriptionsTreat -
+* MongoSubCacheTreat - 
+*/
+typedef void (MongoSubCacheTreat)(const char* tenant, BSONObj* subP);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheRefresh - 
 *
 * Lookup all subscriptions in the database and call a treat function for each
 */
-extern void subscriptionsTreat(std::string tenant, MongoTreatFunction treatFunction);
-
+extern void mongoSubCacheRefresh(void);
 #endif

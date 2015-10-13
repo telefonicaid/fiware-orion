@@ -457,9 +457,11 @@ std::string statisticsTreat
     mutexTimeCCGet(ccMutexWaitingTime, sizeof(ccMutexWaitingTime));
     out += TAG_ADD_STRING("curlContextMutexWaitingTime", ccMutexWaitingTime);
 
+#if SUB_CACHE_ON
     char subCacheMutexWaitingTime[64];
     subCacheMutexWaitingTimeGet(subCacheMutexWaitingTime, sizeof(subCacheMutexWaitingTime));
     out += TAG_ADD_STRING("subCacheMutexWaitingTime", subCacheMutexWaitingTime);
+#endif
   }
 
   int now = getCurrentTime();
