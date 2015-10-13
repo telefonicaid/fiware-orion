@@ -478,6 +478,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
+    static int reqNo = 0;
+    LM_M(("Treating request %d: %s %s", reqNo, ciP->method.c_str(), ciP->url.c_str()));
+    ++reqNo;
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
 

@@ -37,9 +37,11 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#if SUB_CACHE_ON
 #include "cache/Subscription.h"
 #include "cache/SubscriptionCache.h"
 #include "cache/subCache.h"
+#endif
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -1212,10 +1214,11 @@ static bool addTriggeredSubscriptions_withCache
   //
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
+#if SUB_CACHE_ON
   std::vector<Subscription*> subVec;
 
   subCache->semTake();
-  //subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
 
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
@@ -1252,6 +1255,7 @@ static bool addTriggeredSubscriptions_withCache
     subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
   }
   subCache->semGive();
+#endif
 
   return true;
 }
@@ -1417,8 +1421,8 @@ static bool addTriggeredSubscriptions_noCache
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          //subToAttributeList(sub)); siganture changed in TriggeredSubscription() constructor in 0.24.0
-          subToAttributeList(sub), NULL);
+          //subToAttributeList(sub)); signature changed in TriggeredSubscription() constructor in 0.24.0
+          subToAttributeList(sub), "");
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
