@@ -66,6 +66,9 @@ typedef struct EntityInfo
 */
 typedef struct CachedSubscription
 {
+  std::vector<EntityInfo*>    entityIdInfos;
+  std::vector<std::string>    attributes;
+  NotifyConditionVector       notifyConditionVector;
   char*                       tenant;
   char*                       servicePath;
   char*                       subscriptionId;
@@ -74,9 +77,6 @@ typedef struct CachedSubscription
   int64_t                     lastNotificationTime;
   Format                      format;
   char*                       reference;
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  NotifyConditionVector       notifyConditionVector;
   struct CachedSubscription*  next;
 } CachedSubscription;
 

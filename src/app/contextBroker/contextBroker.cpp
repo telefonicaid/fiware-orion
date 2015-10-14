@@ -1595,7 +1595,15 @@ int main(int argC, char* argV[])
 
   LM_I(("Startup completed"));
 
+#if 1  // KZ: valgrind-test of STRANGE leaks
+  mongoSubCacheSemTake("main");
+  mongoSubCacheRefresh();
+  mongoSubCacheSemGive("main");
+  exit(0);
+#else
   mongoSubCacheStart(subCacheInterval);
+#endif
+
   while (1)
   {
     sleep(60);

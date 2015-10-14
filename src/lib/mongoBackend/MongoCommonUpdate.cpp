@@ -1219,7 +1219,7 @@ static bool addTriggeredSubscriptions_withCache
   mongoSubCacheSemTake("MongoCommonUpdate");
   LM_M(("Calling mongoSubCacheMatch"));
   fflush(stdout);
-  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
+  // mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
   LM_M(("Back from mongoSubCacheMatch - got %d matches from subVector", subVec.size()));
 
 #if 0

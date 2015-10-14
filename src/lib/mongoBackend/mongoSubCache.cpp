@@ -40,6 +40,10 @@ using namespace mongo;
 using std::auto_ptr;
 
 
+int addedAttributes   = 0;
+int addedEntities     = 0;
+int removedAttributes = 0;
+int removedEntities   = 0;
 
 /* ****************************************************************************
 *
@@ -406,16 +410,23 @@ void cachedSubscriptionDestroy(CachedSubscription* cSubP)
   while (cSubP->entityIdInfos.size() > 0)
   {
     cSubP->entityIdInfos.erase(cSubP->entityIdInfos.begin());
+    ++removedEntities;
   }
 
   cSubP->entityIdInfos.clear();
 
+  while (cSubP->attributes.size() > 0)
+  {
+    cSubP->attributes.erase(cSubP->attributes.begin());
+    ++removedAttributes;
+  }
   cSubP->attributes.clear();
 
   cSubP->notifyConditionVector.release();
   cSubP->notifyConditionVector.vec.clear();
 
   cSubP->next = NULL;
+
 }
 
 
@@ -456,6 +467,9 @@ void mongoSubCacheDestroy(void)
   mongoSubCache.head  = NULL;
   mongoSubCache.tail  = NULL;
   mongoSubCache.items = 0;
+
+  LM_M(("Attributes: %d added, %d destroyed", addedAttributes, removedAttributes));
+  LM_M(("Entities:   %d added, %d destroyed", addedEntities, removedEntities));
 }
 
 
@@ -551,7 +565,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 
     EntityInfo* eiP = new EntityInfo(id, type);
     cSubP->entityIdInfos.push_back(eiP);  // definitely lost ... why?
-
+    ++addedEntities;
     ++entities;
   }
 
@@ -564,6 +578,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
     std::string s = attrVec[ix].String();
     cSubP->attributes.push_back(s);  // definitely lost, same ... why?
     ++attributes;
+    ++addedAttributes;
   }
 
 
@@ -680,6 +695,7 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
     treatFunction(tenant.c_str(), &sub);
 
     ++subNo;
+    break;  // ONE sub per tenant
   }
 
   LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
