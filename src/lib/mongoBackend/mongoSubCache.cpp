@@ -652,10 +652,6 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 */
 static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatFunction)
 {
-  bool reqSemTaken;
-
-  reqSemTake(__FUNCTION__, "subscription cache", SemReadOp, &reqSemTaken);
-
   BSONObj                   query      = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
   DBClientBase*             connection = getMongoConnection();
   auto_ptr<DBClientCursor>  cursor;
@@ -681,14 +677,12 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);
-    reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
     LM_E(("Database Error (DBException: %s)", e.what()));
     return;
   }
   catch (...)
   {
     releaseMongoConnection(connection);
-    reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
     LM_E(("Database Error (generic exception)"));
     return;
   }
@@ -704,7 +698,6 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
     ++subNo;
   }
 
-  reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
   // LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
 }
 
@@ -718,9 +711,12 @@ void mongoSubCacheRefresh(void)
 {
   std::vector<std::string> databases;
   static int               refreshNo = 0;
+  bool                     reqSemTaken;
 
   ++refreshNo;
   LM_M(("Refreshing mongo subscription cache [%d]", refreshNo));
+
+  reqSemTake(__FUNCTION__, "subscription cache", SemReadOp, &reqSemTaken);
 
   // Empty the cache
   mongoSubCacheDestroy();
@@ -737,6 +733,7 @@ void mongoSubCacheRefresh(void)
     mongoSubCacheRefresh(databases[ix], subCacheItemUpdate);
   }
 
+  reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
   LM_M(("Sub Cache refreshed: %d items in Sub Cache", mongoSubCache.items));
 }
 
@@ -746,16 +743,14 @@ void mongoSubCacheRefresh(void)
 *
 * mongoSubCacheRefresherThread - 
 */
-static void* mongoSubCacheRefresherThread(void* ivalP)
+static void* mongoSubCacheRefresherThread(void* vP)
 {
-  int ival = *((int*) ivalP);
+  extern int subCacheInterval;
 
   while (1)
   {
-    // mongoSubCacheSemTake("REFRESH");
     mongoSubCacheRefresh();
-    // mongoSubCacheSemGive("REFRESH");
-    sleep(ival);  
+    sleep(subCacheInterval);
   }
 
   return NULL;
@@ -767,10 +762,10 @@ static void* mongoSubCacheRefresherThread(void* ivalP)
 *
 * mongoSubCacheStart - 
 */
-void mongoSubCacheStart(int subCacheInterval)
+void mongoSubCacheStart(void)
 {
   pthread_t tid;
-  int ret = pthread_create(&tid, NULL, mongoSubCacheRefresherThread, (void*) &subCacheInterval);
+  int ret = pthread_create(&tid, NULL, mongoSubCacheRefresherThread, NULL);
 
   if (ret != 0)
   {

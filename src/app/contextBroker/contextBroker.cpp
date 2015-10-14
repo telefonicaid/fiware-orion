@@ -1186,9 +1186,8 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
-  // mongoSubCacheSemTake("exitFunc");
   // Take mongo req-sem ?
-  mongoSubCacheDestroy();
+  // mongoSubCacheDestroy();
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1597,12 +1596,11 @@ int main(int argC, char* argV[])
   LM_I(("Startup completed"));
 
 #if 0  // KZ: valgrind-test of STRANGE leaks
-  mongoSubCacheSemTake("main");
   mongoSubCacheRefresh();
-  mongoSubCacheSemGive("main");
+  sleep(subCacheInterval);
   exit(0);
 #else
-  mongoSubCacheStart(subCacheInterval);
+  mongoSubCacheStart();
 #endif
 
   while (1)

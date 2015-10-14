@@ -1216,9 +1216,8 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*> subVec;
 
   mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
-  LM_M(("Back from mongoSubCacheMatch - got %d matches from subVector", subVec.size()));
+  LM_M(("Back from mongoSubCacheMatch - got %d matches for tenant '%s'", subVec.size(), tenant.c_str()));
 
-#if 1
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
@@ -1253,7 +1252,6 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId);
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
-#endif
 
   return true;
 }

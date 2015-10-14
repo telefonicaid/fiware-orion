@@ -143,6 +143,6 @@ extern void mongoSubCacheMatch
 *
 * mongoSubCacheStart - 
 */
-extern void mongoSubCacheStart(int subCacheInterval);
+extern void mongoSubCacheStart(void);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_
