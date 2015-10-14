@@ -188,10 +188,6 @@
 #include "contextBroker/version.h"
 #include "common/string.h"
 
-#if SUB_CACHE_ON
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
-#endif
 
 
 /* ****************************************************************************
@@ -1190,16 +1186,7 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
-#if SUB_CACHE_ON
-  if (subCache != NULL)
-  {
-    subCache->semTake();
-    subCache->release();
-    // semaphore not given back as the subCache no longer exists ...
-    delete subCache;
-    subCache = NULL;
-  }
-#endif
+  mongoSubCacheDestroy();
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1236,11 +1223,6 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 {
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
-
-#if SUB_CACHE_ON
-  /* Create the subscription cache object */
-  subscriptionCacheInit(dbName);
-#endif
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
   if (!ngsi9Only)
@@ -1288,6 +1270,8 @@ static void mongoInit
 )
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
+
+  mongoSubCacheInit();
 
   if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
@@ -1614,14 +1598,10 @@ int main(int argC, char* argV[])
   {
     if (subCacheInterval != 0)
     {
+      mongoSubCacheSemTake("REFRESH");
       mongoSubCacheRefresh();
+      mongoSubCacheSemGive("REFRESH");
       sleep(subCacheInterval);
-
-#if SUB_CACHE_ON
-      orion::subCache->semTake();
-      orion::subCache->refresh();
-      orion::subCache->semGive();
-#endif
     }
     else
     {

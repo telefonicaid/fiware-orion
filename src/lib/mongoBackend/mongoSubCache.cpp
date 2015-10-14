@@ -22,8 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include <regex.h>
 #include <string>
+#include <regex.h>
+#include <semaphore.h>
 
 #include "mongo/client/dbclient.h"
 
@@ -33,35 +34,10 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 
+#include "ngsi/NotifyConditionVector.h"
+
 using namespace mongo;
 using std::auto_ptr;
-
-
-
-/* ****************************************************************************
-*
-* EntityInfo - 
-*
-* The struct fields:
-* -------------------------------------------------------------------------------
-* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
-* o entityType           string containing the type of the EntityId
-*
-*/
-typedef struct EntityInfo
-{
-  regex_t       entityIdPattern;
-  std::string   entityType;
-  bool          entityIdPatternToBeFreed;
-
-  EntityInfo() {}
-  EntityInfo(const std::string& idPattern, const std::string& _entityType);
-  ~EntityInfo() { release(); }
-
-  bool          match(const std::string& idPattern, const std::string& type);
-  void          release(void);
-  void          present(const std::string& prefix);
-} EntityInfo;
 
 
 
@@ -133,29 +109,6 @@ void EntityInfo::present(const std::string& prefix)
 
 /* ****************************************************************************
 *
-* CachedSubscription - 
-*/
-typedef struct CachedSubscription
-{
-  char*                       tenant;
-  char*                       servicePath;
-  char*                       subscriptionId;
-  int64_t                     throttling;
-  int64_t                     expirationTime;
-  int64_t                     lastNotificationTime;
-  Format                      format;
-  char*                       reference;
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  Restriction                 restriction;
-  NotifyConditionVector       notifyConditionVector;
-  struct CachedSubscription*  next;
-} CachedSubscription;
-
-
-
-/* ****************************************************************************
-*
 * MongoSubCache - 
 */
 typedef struct MongoSubCache
@@ -163,6 +116,7 @@ typedef struct MongoSubCache
   CachedSubscription* head;
   CachedSubscription* tail;
   int                 items;
+  sem_t               mutex;
 } MongoSubCache;
 
 
@@ -171,7 +125,48 @@ typedef struct MongoSubCache
 *
 * mongoSubCache - 
 */
-MongoSubCache mongoSubCache = { NULL, NULL, 0 };
+MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheInit - 
+*/
+void mongoSubCacheInit(void)
+{
+  mongoSubCache.head     = NULL;
+  mongoSubCache.tail     = NULL;
+  mongoSubCache.items    = 0;
+
+  int r = sem_init(&mongoSubCache.mutex, 0, 1); // Shared between threads, not taken initially
+  LM_M(("Initialized semaphore: %d", r));
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheSemTake - 
+*/
+void mongoSubCacheSemTake(const char* who)
+{
+  LM_M(("%s waiting for mutex (thread %p)", who, pthread_self()));
+  sem_wait(&mongoSubCache.mutex);
+  LM_M(("%s got mutex (thread %p)", who, pthread_self()));
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheSemGive - 
+*/
+void mongoSubCacheSemGive(const char* who)
+{
+  LM_M(("%s giving mutex (thread %p)", who, pthread_self()));
+  sem_post(&mongoSubCache.mutex);
+}
 
 
 
@@ -181,7 +176,7 @@ MongoSubCache mongoSubCache = { NULL, NULL, 0 };
 */
 void mongoSubCacheInsert(CachedSubscription* cSubP)
 {
-  LM_M(("Inserting CachedSubscription at %p", cSubP));
+  // LM_M(("Inserting CachedSubscription at %p", cSubP));
 
   //
   // First of all, insertion is done at the end of the list, so, 
@@ -200,9 +195,189 @@ void mongoSubCacheInsert(CachedSubscription* cSubP)
     return;
   }
 
+  
   mongoSubCache.tail->next  = cSubP;
   mongoSubCache.items      += 1;
+  mongoSubCache.tail        = cSubP;
 }
+
+
+
+/* ****************************************************************************
+*
+* attributeMatch - 
+*/
+static bool attributeMatch(CachedSubscription* cSubP, const char* attr)
+{
+  for (unsigned int ncvIx = 0; ncvIx < cSubP->notifyConditionVector.size(); ++ncvIx)
+  {
+    NotifyCondition* ncP = cSubP->notifyConditionVector[ncvIx];
+
+    for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
+    {
+      if (ncP->condValueList[cvIx] == attr)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePathMatch - 
+*/
+static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
+{
+  const char*  spath;
+
+  // Special case. "/#" matches EVERYTHING
+  if ((strlen(servicePath) == 2) && (servicePath[0] == '/') && (servicePath[1] == '#') && (servicePath[2] == 0))
+  {
+    return true;
+  }
+
+  //
+  // Empty service path?
+  //
+  if ((strlen(servicePath) == 0) && (strlen(cSubP->servicePath) == 0))
+  {
+    return true;
+  }
+
+  //
+  // Default service path for a subscription is "/".
+  // So, if empty, set it to "/"
+  //
+  if (servicePath[0] == 0)
+  {
+    servicePath = (char*) "/";
+  }
+
+  spath = cSubP->servicePath;
+
+  //
+  // No wildcard - exact match
+  //
+  if (spath[strlen(spath) - 1] != '#')
+  {
+    return (strcmp(servicePath, cSubP->servicePath) == 0);
+  }
+
+
+  //
+  // Wildcard - remove '#' and compare to the length of _servicePath.
+  //            If equal upto the length of _servicePath, then it is a match
+  //
+  // Actually, there is more than one way to match here:
+  // If we have a servicePath of the subscription as 
+  // "/a/b/#", then the following service-paths must match:
+  //   1. /a/b
+  //   2. /a/b/ AND /a/b/.+  (any path below /a/b/)
+  //
+  // What should NOT match is "/a/b2".
+  //
+  unsigned int len = strlen(spath) - 2;
+
+  // 1. /a/b - (removing 2 chars from the cache-subscription removes "/#"
+
+  if ((spath[len] == '/') && (strlen(servicePath) == len) && (strncmp(spath, servicePath, len) == 0))
+  {
+    return true;
+  }
+
+  // 2. /a/b/.+
+  len = strlen(spath) - 1;
+  if (strncmp(spath, servicePath, len) == 0)
+  {
+    return true;
+  }
+  
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* subMatch - 
+*/
+static bool subMatch
+(
+  CachedSubscription*  cSubP,
+  const char*          tenant,
+  const char*          servicePath,
+  const char*          entityId,
+  const char*          entityType,
+  const char*          attr
+)
+{
+  if (strcmp(cSubP->tenant, tenant) != 0)
+  {
+    return false;
+  }
+
+  if (servicePathMatch(cSubP, (char*) servicePath) == false)
+  {
+    return false;
+  }
+
+
+  //
+  // If ONCHANGE and one of the attribute names in the scope vector
+  // of the subscription has the same name as the incoming attribute. there is a match.
+  //
+  if (!attributeMatch(cSubP, attr))
+  {
+    return false;
+  }
+
+  for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
+  {
+    EntityInfo* eiP = cSubP->entityIdInfos[ix];
+
+    if (eiP->match(entityId, entityType))
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheMatch - 
+*/
+void mongoSubCacheMatch
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const char*                        entityId,
+  const char*                        entityType,
+  const char*                        attr,
+  std::vector<CachedSubscription*>*  subVecP
+)
+{
+  CachedSubscription* cSubP = mongoSubCache.head;
+
+  while (cSubP != NULL)
+  {
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attr))
+    {
+      subVecP->push_back(cSubP);
+    }
+
+    cSubP = cSubP->next;
+  }
+}
+
 
 
 /* ****************************************************************************
@@ -211,19 +386,30 @@ void mongoSubCacheInsert(CachedSubscription* cSubP)
 */
 void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 {
-  LM_M(("Destoying CachedSubscription at %p", cSubP));
+//  LM_M(("Destroying CachedSubscription at %p", cSubP));
 
   free(cSubP->tenant);
   free(cSubP->servicePath);
   free(cSubP->subscriptionId);
-
   free(cSubP->reference);
 
-//  cSubP->entityIdInfos.release();
+  for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
+  {
+    cSubP->entityIdInfos[ix]->release();
+    delete cSubP->entityIdInfos[ix];
+  }
+
+  while (cSubP->entityIdInfos.size() > 0)
+  {
+    cSubP->entityIdInfos.erase(cSubP->entityIdInfos.begin());
+  }
+
   cSubP->entityIdInfos.clear();
 
   cSubP->attributes.clear();
+
   cSubP->notifyConditionVector.release();
+  cSubP->notifyConditionVector.vec.clear();
 
   cSubP->next = NULL;
 }
@@ -236,10 +422,14 @@ void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 */
 void mongoSubCacheDestroy(void)
 {
-  CachedSubscription* cSubP = mongoSubCache.head;
+  CachedSubscription* cSubP     = mongoSubCache.head;
+  int                 destroys  = 0;
+
+  LM_M(("Destroying %d subs in cache", mongoSubCache.items));
 
   if (mongoSubCache.head == NULL)
   {
+    LM_M(("Sub cache was empty"));
     return;
   }
 
@@ -250,10 +440,14 @@ void mongoSubCacheDestroy(void)
     cSubP = cSubP->next;
     cachedSubscriptionDestroy(prev);
     free(prev);
+    ++destroys;
   }
 
   cachedSubscriptionDestroy(cSubP);
   free(cSubP);
+  ++destroys;
+
+  LM_M(("Destroyed %d subs in cache", destroys));
 
   mongoSubCache.head  = NULL;
   mongoSubCache.tail  = NULL;
@@ -287,7 +481,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 
   if (cSubP == NULL)
   {
-    LM_E(("Runtime Error (cannot allocate memory for a cached subscription: %s)", strerror(errno)));
+    LM_X(1, ("Runtime Error (cannot allocate memory for a cached subscription: %s)", strerror(errno)));
     return;
   }
 
@@ -310,6 +504,8 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   cSubP->format                = stringToFormat(formatString);
   cSubP->lastNotificationTime  = subP->hasField(CSUB_LASTNOTIFICATION)? subP->getField(CSUB_LASTNOTIFICATION).Int() : 0;
   cSubP->next                  = NULL;
+
+  LM_M(("Updating cache item '%s' for tenant '%s'", cSubP->subscriptionId, cSubP->tenant));
 
   // Debug counters
   int entities    = 0;
@@ -350,7 +546,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
     }
 
     EntityInfo* eiP = new EntityInfo(id, type);
-    cSubP->entityIdInfos.push_back(eiP);
+    cSubP->entityIdInfos.push_back(eiP);  // definitely lost ... why?
 
     ++entities;
   }
@@ -361,9 +557,8 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   //
   for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
   {
-    std::string attributeName = attrVec[ix].String();
-
-    cSubP->attributes.push_back(attributeName);
+    std::string s = attrVec[ix].String();
+    cSubP->attributes.push_back(s);  // definitely lost, same ... why?
     ++attributes;
   }
 
@@ -396,17 +591,13 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
       ++conditions;
     }
 
-    cSubP->notifyConditionVector.push_back(ncP);
+    cSubP->notifyConditionVector.push_back(ncP);  // definitely lost (inside NotifyConditionVector.cpp:113)
   }
 
   if (cSubP->notifyConditionVector.size() == 0)  // Cleanup
   {
-    for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
-    {
-      delete(cSubP->entityIdInfos[ix]);
-    }
-    cSubP->entityIdInfos.clear();
-
+    LM_E(("ERROR (empty notifyConditionVector) - cleaning up"));
+    cachedSubscriptionDestroy(cSubP);
     return;
   }
 
@@ -476,13 +667,7 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
     return;
   }
 
-  bool        reqSemTaken;
-  reqSemTake(__FUNCTION__, "cache refresh", SemWriteOp, &reqSemTaken);
-
   // Call the treat function for each subscription
-#if SUB_CACHE_ON
-  subCache->semTake();
-#endif
   int subNo = 0;
   while (cursor->more())
   {
@@ -490,19 +675,10 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
 
     treatFunction(tenant.c_str(), &sub);
 
-#if SUB_CACHE_ON
-    treatFunction(tenant, &sub);
-#endif
-
     ++subNo;
   }
-#if SUB_CACHE_ON
-  subCache->semGive();
-#endif
 
   LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
-  
-  reqSemGive(__FUNCTION__, "cache refresh", reqSemTaken);
 }
 
 

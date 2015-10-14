@@ -37,14 +37,12 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
-#if SUB_CACHE_ON
-#include "cache/Subscription.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/subCache.h"
-#endif
+
 #include "orionTypes/OrionValueType.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
+#include "mongoBackend/mongoSubCache.h"
 
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
@@ -1214,12 +1212,17 @@ static bool addTriggeredSubscriptions_withCache
   //
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
-#if SUB_CACHE_ON
-  std::vector<Subscription*> subVec;
 
-  subCache->semTake();
-  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+  std::vector<CachedSubscription*> subVec;
 
+  LM_M(("Wanting to call mongoSubCacheMatch"));
+  mongoSubCacheSemTake("MongoCommonUpdate");
+  LM_M(("Calling mongoSubCacheMatch"));
+  fflush(stdout);
+  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
+  LM_M(("Back from mongoSubCacheMatch - got %d matches from subVector", subVec.size()));
+
+#if 0
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
@@ -1254,8 +1257,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            sP->subscriptionId);
     subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
   }
-  subCache->semGive();
 #endif
+  mongoSubCacheSemGive("MongoCommonUpdate");
 
   return true;
 }
