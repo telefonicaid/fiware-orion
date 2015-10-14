@@ -17,7 +17,7 @@ and run it from the command-line, or directly run the broker with something like
 
     vagrant ssh -c 'contextBroker -multiservice -t 0-255'
 
-Orion Context Broker will be accessible at `127.0.0.1:1026` (`5683` for CoAP).
+Orion Context Broker will be accessible at `127.0.0.1:1026`.
 
 You can also use these commands to automate building and running from your favorite IDE.
 
