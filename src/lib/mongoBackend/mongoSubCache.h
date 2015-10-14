@@ -136,4 +136,12 @@ extern void mongoSubCacheMatch
   std::vector<CachedSubscription*>*  subVecP
 );
 
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheStart - 
+*/
+extern void mongoSubCacheStart(int subCacheInterval);
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

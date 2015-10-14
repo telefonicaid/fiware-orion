@@ -1186,6 +1186,7 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
+  mongoSubCacheSemTake("exitFunc");
   mongoSubCacheDestroy();
 
   curl_context_cleanup();
@@ -1594,18 +1595,9 @@ int main(int argC, char* argV[])
 
   LM_I(("Startup completed"));
 
+  mongoSubCacheStart(subCacheInterval);
   while (1)
   {
-    if (subCacheInterval != 0)
-    {
-      mongoSubCacheSemTake("REFRESH");
-      mongoSubCacheRefresh();
-      mongoSubCacheSemGive("REFRESH");
-      sleep(subCacheInterval);
-    }
-    else
-    {
-      sleep(60);
-    }
+    sleep(60);
   }
 }

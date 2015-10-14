@@ -117,6 +117,7 @@ typedef struct MongoSubCache
   CachedSubscription* tail;
   int                 items;
   sem_t               mutex;
+  pthread_t           mutexOwner;
 } MongoSubCache;
 
 
@@ -135,9 +136,10 @@ MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
 */
 void mongoSubCacheInit(void)
 {
-  mongoSubCache.head     = NULL;
-  mongoSubCache.tail     = NULL;
-  mongoSubCache.items    = 0;
+  mongoSubCache.head       = NULL;
+  mongoSubCache.tail       = NULL;
+  mongoSubCache.items      = 0;
+  mongoSubCache.mutexOwner = 0;
 
   int r = sem_init(&mongoSubCache.mutex, 0, 1); // Shared between threads, not taken initially
   LM_M(("Initialized semaphore: %d", r));
@@ -153,7 +155,8 @@ void mongoSubCacheSemTake(const char* who)
 {
   LM_M(("%s waiting for mutex (thread %p)", who, pthread_self()));
   sem_wait(&mongoSubCache.mutex);
-  LM_M(("%s got mutex (thread %p)", who, pthread_self()));
+  mongoSubCache.mutexOwner = pthread_self();
+  LM_M(("%s got mutex (thread %p)", who, mongoSubCache.mutexOwner));
 }
 
 
@@ -164,8 +167,9 @@ void mongoSubCacheSemTake(const char* who)
 */
 void mongoSubCacheSemGive(const char* who)
 {
-  LM_M(("%s giving mutex (thread %p)", who, pthread_self()));
+  LM_M(("%s giving mutex (thread %p)", who, mongoSubCache.mutexOwner));
   sem_post(&mongoSubCache.mutex);
+  mongoSubCache.mutexOwner = 0;
 }
 
 
@@ -505,7 +509,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   cSubP->lastNotificationTime  = subP->hasField(CSUB_LASTNOTIFICATION)? subP->getField(CSUB_LASTNOTIFICATION).Int() : 0;
   cSubP->next                  = NULL;
 
-  LM_M(("Updating cache item '%s' for tenant '%s'", cSubP->subscriptionId, cSubP->tenant));
+  // LM_M(("Updating cache item '%s' for tenant '%s'", cSubP->subscriptionId, cSubP->tenant));
 
   // Debug counters
   int entities    = 0;
@@ -712,4 +716,44 @@ void mongoSubCacheRefresh(void)
   }
 
   LM_M(("Sub Cache refreshed: %d items in Sub Cache", mongoSubCache.items));
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheRefresherThread - 
+*/
+static void* mongoSubCacheRefresherThread(void* ivalP)
+{
+  int ival = *((int*) ivalP);
+
+  while (1)
+  {
+    mongoSubCacheSemTake("REFRESH");
+    mongoSubCacheRefresh();
+    mongoSubCacheSemGive("REFRESH");
+    sleep(ival);  
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheStart - 
+*/
+void mongoSubCacheStart(int subCacheInterval)
+{
+  pthread_t tid;
+  int ret = pthread_create(&tid, NULL, mongoSubCacheRefresherThread, (void*) &subCacheInterval);
+
+  if (ret != 0)
+  {
+    LM_E(("Runtime Error (error creating thread: %d)", ret));
+    return;
+  }
+  pthread_detach(tid);
 }
