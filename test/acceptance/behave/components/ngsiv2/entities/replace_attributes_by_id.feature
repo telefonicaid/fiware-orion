@@ -317,7 +317,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | Service,sr                      |
       | greater than max length allowed |
 
-# ------------------------ Service path ----------------------------------------------
+  # ------------------------ Service path ----------------------------------------------
 
   @service_path_replace
   Scenario Outline:  replace attributes by entity ID using NGSI v2 with several service header values

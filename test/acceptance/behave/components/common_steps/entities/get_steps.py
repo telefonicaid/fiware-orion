@@ -59,7 +59,7 @@ def get_an_entity_by_id(context, entity_id):
     :param entity_id: entity ID
     """
     __logger__.debug("getting an entity by id...")
-    context.resp = context.cb.list_an_entity_by_ID(context, entity_id)
+    context.resp = context.cb.list_an_entity_by_id(context, entity_id)
     __logger__.info("...returned an entity by id")
 
 
@@ -71,7 +71,7 @@ def get_an_attribute_by_id(context, attribute_name, entity_id):
     :param entity_id:
     """
     __logger__.debug("getting an attribute by id...")
-    context.resp = context.cb.list_an_attribute_by_ID(attribute_name, entity_id)
+    context.resp = context.cb.list_an_attribute_by_id(attribute_name, entity_id)
     __logger__.info("...returned an attribute by id")
 
 # ------------------------------------- validations ----------------------------------------------
