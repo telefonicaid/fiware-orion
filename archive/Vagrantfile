@@ -34,10 +34,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "chef/centos-6.5"
   
   # This script will be run at startup
-  config.vm.provision :shell, path: "scripts/bootstrap/centos65.sh"
+  config.vm.provision :shell, path: "../scripts/bootstrap/centos65.sh"
   
   # Network configuration
   config.vm.network "forwarded_port", host: 1026, guest: 1026 # Orion port
-  config.vm.network "forwarded_port", host: 5683, guest: 5683 # CoAP
 
 end
