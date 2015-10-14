@@ -66,7 +66,6 @@ std::string AttributeList::render(Format format, const std::string& indent, bool
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    //out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, false, true);
     out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, true);
   }
 
