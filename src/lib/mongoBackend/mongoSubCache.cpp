@@ -40,11 +40,6 @@ using namespace mongo;
 using std::auto_ptr;
 
 
-int addedAttributes   = 0;
-int addedEntities     = 0;
-int removedAttributes = 0;
-int removedEntities   = 0;
-
 /* ****************************************************************************
 *
 * EntityInfo::EntityInfo - 
@@ -145,8 +140,8 @@ void mongoSubCacheInit(void)
   mongoSubCache.items      = 0;
   mongoSubCache.mutexOwner = 0;
 
-  int r = sem_init(&mongoSubCache.mutex, 0, 1); // Shared between threads, not taken initially
-  LM_M(("Initialized semaphore: %d", r));
+  sem_init(&mongoSubCache.mutex, 0, 1); // Shared between threads, not taken initially
+  // LM_M(("Initialized semaphore: %d", r));
 }
 
 
@@ -157,10 +152,10 @@ void mongoSubCacheInit(void)
 */
 void mongoSubCacheSemTake(const char* who)
 {
-  LM_M(("%s waiting for mutex (thread %p)", who, pthread_self()));
+  // LM_M(("%s waiting for mutex (thread %p)", who, pthread_self()));
   sem_wait(&mongoSubCache.mutex);
   mongoSubCache.mutexOwner = pthread_self();
-  LM_M(("%s got mutex (thread %p)", who, mongoSubCache.mutexOwner));
+  // LM_M(("%s got mutex (thread %p)", who, mongoSubCache.mutexOwner));
 }
 
 
@@ -171,7 +166,7 @@ void mongoSubCacheSemTake(const char* who)
 */
 void mongoSubCacheSemGive(const char* who)
 {
-  LM_M(("%s giving mutex (thread %p)", who, mongoSubCache.mutexOwner));
+  // LM_M(("%s giving mutex (thread %p)", who, mongoSubCache.mutexOwner));
   sem_post(&mongoSubCache.mutex);
   mongoSubCache.mutexOwner = 0;
 }
@@ -324,7 +319,14 @@ static bool subMatch
   const char*          attr
 )
 {
-  if (strcmp(cSubP->tenant, tenant) != 0)
+  if ((cSubP->tenant == NULL) || (tenant == NULL))
+  {
+    if ((cSubP->tenant != NULL) || (tenant != NULL))
+    {
+      return false;
+    }
+  }
+  else if (strcmp(cSubP->tenant, tenant) != 0)
   {
     return false;
   }
@@ -394,31 +396,42 @@ void mongoSubCacheMatch
 */
 void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 {
-//  LM_M(("Destroying CachedSubscription at %p", cSubP));
+  // LM_M(("Destroying CachedSubscription at %p", cSubP));
 
-  free(cSubP->tenant);
-  free(cSubP->servicePath);
-  free(cSubP->subscriptionId);
-  free(cSubP->reference);
+  if (cSubP->tenant != NULL)
+  {
+    free(cSubP->tenant);
+    cSubP->tenant = NULL;
+  }
+
+  if (cSubP->servicePath != NULL)
+  {
+    free(cSubP->servicePath);
+    cSubP->servicePath = NULL;
+  }
+
+  if (cSubP->subscriptionId != NULL)
+  {
+    free(cSubP->subscriptionId);
+    cSubP->subscriptionId = NULL;
+  }
+
+  if (cSubP->reference != NULL)
+  {
+    free(cSubP->reference);
+    cSubP->reference = NULL;
+  }
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
     cSubP->entityIdInfos[ix]->release();
     delete cSubP->entityIdInfos[ix];
   }
-
-  while (cSubP->entityIdInfos.size() > 0)
-  {
-    cSubP->entityIdInfos.erase(cSubP->entityIdInfos.begin());
-    ++removedEntities;
-  }
-
   cSubP->entityIdInfos.clear();
 
   while (cSubP->attributes.size() > 0)
   {
     cSubP->attributes.erase(cSubP->attributes.begin());
-    ++removedAttributes;
   }
   cSubP->attributes.clear();
 
@@ -426,7 +439,6 @@ void cachedSubscriptionDestroy(CachedSubscription* cSubP)
   cSubP->notifyConditionVector.vec.clear();
 
   cSubP->next = NULL;
-
 }
 
 
@@ -438,13 +450,10 @@ void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 void mongoSubCacheDestroy(void)
 {
   CachedSubscription* cSubP     = mongoSubCache.head;
-  int                 destroys  = 0;
-
-  LM_M(("Destroying %d subs in cache", mongoSubCache.items));
 
   if (mongoSubCache.head == NULL)
   {
-    LM_M(("Sub cache was empty"));
+    // LM_M(("Sub cache was empty"));
     return;
   }
 
@@ -454,22 +463,15 @@ void mongoSubCacheDestroy(void)
 
     cSubP = cSubP->next;
     cachedSubscriptionDestroy(prev);
-    free(prev);
-    ++destroys;
+    delete prev;
   }
 
   cachedSubscriptionDestroy(cSubP);
-  free(cSubP);
-  ++destroys;
-
-  LM_M(("Destroyed %d subs in cache", destroys));
+  delete cSubP;
 
   mongoSubCache.head  = NULL;
   mongoSubCache.tail  = NULL;
   mongoSubCache.items = 0;
-
-  LM_M(("Attributes: %d added, %d destroyed", addedAttributes, removedAttributes));
-  LM_M(("Entities:   %d added, %d destroyed", addedEntities, removedEntities));
 }
 
 
@@ -495,7 +497,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   //
   // 03. Create CachedSubscription
   //
-  CachedSubscription* cSubP = (CachedSubscription*) calloc(1, sizeof(CachedSubscription));
+  CachedSubscription* cSubP = new CachedSubscription();
 
   if (cSubP == NULL)
   {
@@ -503,6 +505,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
     return;
   }
 
+  // LM_M(("Allocated CachedSubscription at %p", cSubP));
 
   //
   // 04. Extract data from subP
@@ -513,23 +516,24 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   std::vector<BSONElement>  condVec           = subP->getField(CSUB_CONDITIONS).Array();
 
 
-  cSubP->tenant                = strdup(tenant);
+  if (tenant[0] == 0)
+    cSubP->tenant = NULL;
+  else
+    cSubP->tenant                = strdup(tenant);
+
+  // FIXME: Check all strings about empty strings
+  //        What happens if you call strdup on an empty string?
+  //
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(subP->hasField(CSUB_SERVICE_PATH)? subP->getField(CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(subP->hasField(CSUB_REFERENCE)?    subP->getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
+  cSubP->format                = stringToFormat(formatString);
   cSubP->throttling            = subP->hasField(CSUB_THROTTLING)? subP->getField(CSUB_THROTTLING).Long() : -1;
   cSubP->expirationTime        = subP->hasField(CSUB_EXPIRATION)? subP->getField(CSUB_EXPIRATION).Long() : 0;
-  cSubP->format                = stringToFormat(formatString);
   cSubP->lastNotificationTime  = subP->hasField(CSUB_LASTNOTIFICATION)? subP->getField(CSUB_LASTNOTIFICATION).Int() : 0;
   cSubP->next                  = NULL;
 
   // LM_M(("Updating cache item '%s' for tenant '%s'", cSubP->subscriptionId, cSubP->tenant));
-
-  // Debug counters
-  int entities    = 0;
-  int attributes  = 0;
-  int conditions  = 0;
-
 
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
@@ -565,8 +569,6 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 
     EntityInfo* eiP = new EntityInfo(id, type);
     cSubP->entityIdInfos.push_back(eiP);  // definitely lost ... why?
-    ++addedEntities;
-    ++entities;
   }
 
 
@@ -577,9 +579,8 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   {
     std::string s = attrVec[ix].String();
     cSubP->attributes.push_back(s);  // definitely lost, same ... why?
-    ++attributes;
-    ++addedAttributes;
   }
+
 
 
   //
@@ -607,7 +608,6 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 
       condValue = valueVec[vIx].String();
       ncP->condValueList.push_back(condValue);
-      ++conditions;
     }
 
     cSubP->notifyConditionVector.push_back(ncP);  // definitely lost (inside NotifyConditionVector.cpp:113)
@@ -625,7 +625,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   //
   // 08. Debug
   //
-  LM_M(("%s: TEN:%s, SPATH:%s, REF:%s, EXP:%lu, THR:%lu, FMT:%d, LNOT:%d, ENTS:%d, ATTR:%d,CONDS:%d",
+  LM_M(("%s: TEN:%s, SPATH:%s, REF:%s, EXP:%lu, THR:%lu, FMT:%d, LNOT:%d",
         cSubP->subscriptionId,
         cSubP->tenant,
         cSubP->servicePath,
@@ -633,10 +633,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
         cSubP->expirationTime,
         cSubP->throttling,
         cSubP->format,
-        cSubP->lastNotificationTime,
-        entities,
-        attributes,
-        conditions));
+        cSubP->lastNotificationTime));
 #endif
   mongoSubCacheInsert(cSubP);
 }
@@ -651,6 +648,10 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 */
 static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatFunction)
 {
+  bool reqSemTaken;
+
+  reqSemTake(__FUNCTION__, "subscription cache", SemReadOp, &reqSemTaken);
+
   BSONObj                   query      = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
   DBClientBase*             connection = getMongoConnection();
   auto_ptr<DBClientCursor>  cursor;
@@ -676,12 +677,14 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);
+    reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
     LM_E(("Database Error (DBException: %s)", e.what()));
     return;
   }
   catch (...)
   {
     releaseMongoConnection(connection);
+    reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
     LM_E(("Database Error (generic exception)"));
     return;
   }
@@ -695,10 +698,10 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
     treatFunction(tenant.c_str(), &sub);
 
     ++subNo;
-    break;  // ONE sub per tenant
   }
 
-  LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
+  reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
+  // LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
 }
 
 
@@ -714,7 +717,6 @@ void mongoSubCacheRefresh(void)
 
   ++refreshNo;
   LM_M(("Refreshing mongo subscription cache [%d]", refreshNo));
-  LM_M(("First cached sub at %p", mongoSubCache.head));
 
   // Empty the cache
   mongoSubCacheDestroy();
