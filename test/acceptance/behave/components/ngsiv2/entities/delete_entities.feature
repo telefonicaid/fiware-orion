@@ -45,7 +45,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
   Setup: stop ContextBroker
 
   @happy_path
-  Scenario:  delete several entities using NGSI v2 API
+  Scenario:  Delete several entities using NGSI v2 API
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_delete_happy_path |
@@ -72,7 +72,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
   # ------------------------ Service ----------------------------------------------
 
   @service_delete
-  Scenario Outline:  delete entities by ID using NGSI v2 with several service header values
+  Scenario Outline:  Delete entities by ID using NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -103,7 +103,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | max length allowed |
 
   @service_delete_without
-  Scenario:  delete entities by ID using NGSI v2 without service header
+  Scenario:  Delete entities by ID using NGSI v2 without service header
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
@@ -125,7 +125,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
     And verify that entities are not stored in mongo
 
   @service_delete_error
-  Scenario Outline:  try to delete entities by ID using NGSI v2 with wrong service header values
+  Scenario Outline:  Try to delete entities by ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -150,7 +150,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
   # ------------------------ Service path ----------------------------------------------
 
   @service_path_delete
-  Scenario Outline:  delete entities by ID using NGSI v2 with several service header values
+  Scenario Outline:  Delete entities by ID using NGSI v2 with several service path header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_delete_service_path |
@@ -184,7 +184,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | max length allowed and ten levels                             |
 
   @service_path_delete_without
-  Scenario:  delete entities by ID using NGSI v2 without service header
+  Scenario:  Delete entities by ID using NGSI v2 without service path header
     Given  a definition of headers
       | parameter      | value                    |
       | Fiware-Service | test_delete_service_path |
@@ -206,7 +206,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
     And verify that entities are not stored in mongo
 
   @service_path_delete_error
-  Scenario Outline:  try to delete entities by ID using NGSI v2 with wrong service header values
+  Scenario Outline:  Try to delete entities by ID using NGSI v2 with wrong service header path values
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_delete_service_path_error |
@@ -228,7 +228,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | /serv(45)    |
 
   @service_path_delete_error
-  Scenario Outline:  try to delete entities by ID using NGSI v2 with wrong service header values
+  Scenario Outline:  Try to delete entities by ID using NGSI v2 with wrong service path header values
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_delete_service_path_error |
@@ -246,7 +246,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | /service,sr  |
 
   @service_path_delete_error
-  Scenario Outline:  try to delete entities by ID using NGSI v2 with wrong service header values
+  Scenario Outline:  Try to delete entities by ID using NGSI v2 with wrong service path header values
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_replace_service_path_error |
@@ -264,7 +264,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | greater than max length allowed and ten levels |
 
   @service_path_delete_error
-  Scenario:  try to delete entities by ID using NGSI v2 with wrong service header values
+  Scenario:  Try to delete entities by ID using NGSI v2 with wrong service path header values
     Given  a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_replace_service_path_error      |
@@ -280,7 +280,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
  #  -------------------------- entity id --------------------------------------------------
 
   @entity_id_delete
-  Scenario Outline:  delete entities by ID using NGSI v2 with several entity id values
+  Scenario Outline:  Delete entities by ID using NGSI v2 with several entity id values
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_delete_entity_id |
@@ -324,7 +324,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | room_19     | random=960 |
 
   @entity_not_exists
-  Scenario:  try to delete an entity by ID but it does not exists using NGSI v2
+  Scenario:  Try to delete an entity by ID but it does not exists using NGSI v2
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_delete_happy_path |
@@ -350,7 +350,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | description | The requested entity has not been found. Check type and id |
 
   @more_entities_delete @BUG_1346 @skip
-  Scenario:  try to delete an entity by ID using NGSI v2 with more than one entity with the same id
+  Scenario:  Try to delete an entity by ID using NGSI v2 with more than one entity with the same id
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_delete_happy_path |
@@ -378,7 +378,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
       | description | There is more than one entity that match the delete. Please refine your query. |
 
   @entity_id_delete_invalid
-  Scenario Outline:  try to delete entity by ID using NGSI v2 with invalid entity id values
+  Scenario Outline:  Try to delete entity by ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_replace_entity_id |
