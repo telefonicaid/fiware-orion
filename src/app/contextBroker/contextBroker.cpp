@@ -1186,7 +1186,8 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
-  mongoSubCacheSemTake("exitFunc");
+  // mongoSubCacheSemTake("exitFunc");
+  // Take mongo req-sem ?
   mongoSubCacheDestroy();
 
   curl_context_cleanup();

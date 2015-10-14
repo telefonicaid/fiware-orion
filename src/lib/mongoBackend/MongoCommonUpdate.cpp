@@ -1215,47 +1215,45 @@ static bool addTriggeredSubscriptions_withCache
 
   std::vector<CachedSubscription*> subVec;
 
-  mongoSubCacheSemTake("MongoCommonUpdate");
   mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
   LM_M(("Back from mongoSubCacheMatch - got %d matches from subVector", subVec.size()));
 
-#if 0
+#if 1
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
-    Subscription* sP = subVec[ix];
+    CachedSubscription* cSubP = subVec[ix];
 
-    sP->pendingNotifications += 1;
+    cSubP->pendingNotifications += 1;
 
     // Outdated subscriptions are skipped
-    if (sP->expirationTime < now)
+    if (cSubP->expirationTime < now)
     {
       continue;
     }
 
     AttributeList aList;
 
-    aList.fill(sP->attributes);
+    aList.fill(cSubP->attributes);
 
     // Throttling
-    if ((sP->throttling != -1) && (sP->lastNotificationTime != -1))
+    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != -1))
     {
-      if ((now - sP->lastNotificationTime) < sP->throttling)
+      if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
         continue;
       }
     }
 
-    TriggeredSubscription* sub = new TriggeredSubscription((long long) sP->throttling,
-                                                           (long long) sP->lastNotificationTime,
-                                                           sP->format,
-                                                           sP->reference.get(),
+    TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
+                                                           (long long) cSubP->lastNotificationTime,
+                                                           cSubP->format,
+                                                           cSubP->reference,
                                                            aList,
-                                                           sP->subscriptionId);
-    subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
+                                                           cSubP->subscriptionId);
+    subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 #endif
-  mongoSubCacheSemGive("MongoCommonUpdate");
 
   return true;
 }

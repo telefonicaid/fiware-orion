@@ -75,6 +75,7 @@ typedef struct CachedSubscription
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
+  int                         pendingNotifications;
   Format                      format;
   char*                       reference;
   struct CachedSubscription*  next;

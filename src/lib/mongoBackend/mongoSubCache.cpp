@@ -152,10 +152,13 @@ void mongoSubCacheInit(void)
 */
 void mongoSubCacheSemTake(const char* who)
 {
-  // LM_M(("%s waiting for mutex (thread %p)", who, pthread_self()));
+  if (mongoSubCache.mutexOwner != 0)
+    LM_M(("%s waiting for mutex %p (thread %p), currently taken by %p", who, &mongoSubCache.mutex, pthread_self(), mongoSubCache.mutexOwner));
+  else
+    LM_M(("%s waiting for mutex %p (thread %p)", who, &mongoSubCache.mutex, pthread_self()));
   sem_wait(&mongoSubCache.mutex);
   mongoSubCache.mutexOwner = pthread_self();
-  // LM_M(("%s got mutex (thread %p)", who, mongoSubCache.mutexOwner));
+  LM_M(("%s got mutex %p (thread %p)", who, &mongoSubCache.mutex, mongoSubCache.mutexOwner));
 }
 
 
@@ -166,8 +169,8 @@ void mongoSubCacheSemTake(const char* who)
 */
 void mongoSubCacheSemGive(const char* who)
 {
-  // LM_M(("%s giving mutex (thread %p)", who, mongoSubCache.mutexOwner));
   sem_post(&mongoSubCache.mutex);
+  LM_M(("%s gave mutex %p (thread %p)", who, &mongoSubCache.mutex, mongoSubCache.mutexOwner));
   mongoSubCache.mutexOwner = 0;
 }
 
@@ -531,6 +534,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   cSubP->throttling            = subP->hasField(CSUB_THROTTLING)? subP->getField(CSUB_THROTTLING).Long() : -1;
   cSubP->expirationTime        = subP->hasField(CSUB_EXPIRATION)? subP->getField(CSUB_EXPIRATION).Long() : 0;
   cSubP->lastNotificationTime  = subP->hasField(CSUB_LASTNOTIFICATION)? subP->getField(CSUB_LASTNOTIFICATION).Int() : 0;
+  cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
 
   // LM_M(("Updating cache item '%s' for tenant '%s'", cSubP->subscriptionId, cSubP->tenant));
@@ -748,9 +752,9 @@ static void* mongoSubCacheRefresherThread(void* ivalP)
 
   while (1)
   {
-    mongoSubCacheSemTake("REFRESH");
+    // mongoSubCacheSemTake("REFRESH");
     mongoSubCacheRefresh();
-    mongoSubCacheSemGive("REFRESH");
+    // mongoSubCacheSemGive("REFRESH");
     sleep(ival);  
   }
 
