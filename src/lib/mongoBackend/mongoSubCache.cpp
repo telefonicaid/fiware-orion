@@ -698,7 +698,7 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
     ++subNo;
   }
 
-  // LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
+  LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
 }
 
 
@@ -726,6 +726,9 @@ void mongoSubCacheRefresh(void)
 
   // Add the 'default tenant'
   databases.push_back(dbPrefixGet());
+
+//  for (unsigned int ix = 0; ix < databases.size(); ++ix)
+//    LM_M(("Tenant %d: '%s'", ix, databases[ix].c_str()));
 
   // Now refresh the subCache for each and every tenant
   for (unsigned int ix = 0; ix < databases.size(); ++ix)

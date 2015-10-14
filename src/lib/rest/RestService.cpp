@@ -479,7 +479,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
     static int reqNo = 0;
-    LM_M(("Treating request %d: %s %s", reqNo, ciP->method.c_str(), ciP->url.c_str()));
+    LM_M(("Treating request %d: %s %s for tenant '%s'", reqNo, ciP->method.c_str(), ciP->url.c_str(), ciP->tenant.c_str()));
     ++reqNo;
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
