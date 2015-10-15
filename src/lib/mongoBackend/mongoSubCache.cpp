@@ -496,6 +496,13 @@ CachedSubscription* mongoSubCacheItemLookup(const char* tenant, const char* subs
 /* ****************************************************************************
 *
 * mongoSubCacheItemInsert - 
+*
+* RETURN VALUES
+*   0:  all OK
+*  -1:  Database Error - id-field not found
+*  -2:  Out of memory (either returns -2 or exit the entire broker)
+*  -3:  The vector of notify-conditions is empty
+*
 */
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
@@ -533,11 +540,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   std::vector<BSONElement>  condVec           = sub.getField(CSUB_CONDITIONS).Array();
 
 
-  if (tenant[0] == 0)
-    cSubP->tenant = NULL;
-  else
-    cSubP->tenant                = strdup(tenant);
+  cSubP->tenant = (tenant[0] == 0)? NULL : strdup(tenant);
 
+  //
   // FIXME: Check all strings about empty strings
   //        What happens if you call strdup on an empty string?
   //
