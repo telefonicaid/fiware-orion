@@ -273,21 +273,21 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   // Modification of the subscription cache
   //
-  // The subscription before this update is looked up in cache and referenced by 'cSubP'.
-  // The updated subscription information is in 'newSub' (mongo BSON object format).
+  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
+  // The "updated subscription information" is in 'newSub' (mongo BSON object format).
   // 
   // All we need to do now for the cache is to:
-  //   1. Remove 'sub' from sub-cache (if present)
+  //   1. Remove 'cSubP' from sub-cache (if present)
   //   2. Create 'newSub' in sub-cache (if applicable)
   //
-  // The subscription is already updated in mongo. 
+  // The subscription is already updated in mongo.
   //
 
   // 0. Lookup matching subscription in subscription-cache
   CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
-  // 1. Remove 'sub' from sub-cache (if present)
-  if (cSubP)
+  // 1. Remove 'cSubP' from sub-cache (if present)
+  if (cSubP != NULL)
   {
     mongoSubCacheItemRemove(cSubP);
   }

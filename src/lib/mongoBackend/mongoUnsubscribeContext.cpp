@@ -180,7 +180,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     }
     else
     {
-      LM_E(("Runtime Error (removed subscription not fopund in mongo subscription cache)"));
+      LM_E(("Runtime Error (removed subscription not found in mongo subscription cache)"));
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
