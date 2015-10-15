@@ -52,6 +52,7 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 #
 # o LISTENER_PORT  - port where listening (test) applications listen for connections
 # o LISTENER2_PORT - port where a second listening (test) application listens for connections
+# o LISTENER3_PORT - port where a third listening (test) application listens for connections
 #
 export CB_PORT=${CB_PORT:-9999}
 export CM_PORT=${CM_PORT:-9998}
@@ -63,6 +64,7 @@ export CP4_PORT=${CP4_PORT:-9804}
 export CP5_PORT=${CP5_PORT:-9805}
 export LISTENER_PORT=${LISTENER_PORT:-9997}
 export LISTENER2_PORT=${LISTENER2_PORT:-9977}
+export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 
 
 

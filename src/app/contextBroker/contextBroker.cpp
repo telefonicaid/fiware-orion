@@ -273,7 +273,7 @@ bool            noCache;
 #define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC "interval in seconds between calls to Subscription Cache refresh"
-#define NO_CACHE             "disable csubs cache in lookups"
+#define NO_CACHE             "disable subscription cache for lookups"
 
 
 

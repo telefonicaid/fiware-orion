@@ -230,7 +230,7 @@ Broker Restarted
 05. Statistics in XML
 =====================
 HTTP/1.1 200 OK
-Content-Length: 269
+Content-Length: 230
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -239,7 +239,6 @@ Date: REGEX(.*)
   <xmlRequests>REGEX((1|2))</xmlRequests>
   <versionRequests>0</versionRequests>
   <statisticsRequests>1</statisticsRequests>
-  <subCacheEntries>3</subCacheEntries>
   <uptime_in_secs>REGEX(\d)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d)</measuring_interval_in_secs>
 </orion>
@@ -248,7 +247,7 @@ Date: REGEX(.*)
 06. Statistics in JSON
 ======================
 HTTP/1.1 200 OK
-Content-Length: 230
+Content-Length: 201
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -257,7 +256,6 @@ Date: REGEX(.*)
         "jsonRequests": "1",
         "measuring_interval_in_secs": "REGEX(\d)",
         "statisticsRequests": "2",
-        "subCacheEntries": "3",
         "uptime_in_secs": "REGEX(\d)",
         "versionRequests": "0",
         "xmlRequests": "REGEX((1|2))"
