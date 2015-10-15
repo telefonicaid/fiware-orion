@@ -212,7 +212,7 @@ SET (SOURCES
     mongoBackend/mongoContextProvidersUpdate_test.cpp
     mongoBackend/mongoQueryTypes_test.cpp
     mongoBackend/mongoQueryContextFilterExistEntity_test.cpp
-    mongoBackend/mongoListSubscriptions_test.cpp
+    mongoBackend/mongoGetSubscriptions_test.cpp
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp

@@ -40,8 +40,7 @@ SET (SOURCES
     mongoQueryTypes.cpp
     TriggeredSubscription.cpp
     mongoConnectionPool.cpp
-    mongoListSubscriptions.cpp
-    mongoGetSubscription.cpp
+    mongoGetSubscriptions.cpp
     connectionOperations.cpp
 )
 
@@ -65,8 +64,7 @@ SET (HEADERS
     mongoQueryTypes.h
     TriggeredSubscription.h
     mongoConnectionPool.h
-    mongoListSubscriptions.h
-    mongoGetSubscription.h
+    mongoGetSubscriptions.h
     connectionOperations.h
 )
 
