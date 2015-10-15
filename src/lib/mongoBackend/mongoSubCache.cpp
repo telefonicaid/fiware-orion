@@ -441,6 +441,32 @@ void mongoSubCacheDestroy(void)
 
 /* ****************************************************************************
 *
+* tenantMatch - 
+*/
+static bool tenantMatch(const char* tenant1, const char* tenant2)
+{
+  if ((tenant1 == NULL) && (tenant2 == NULL))
+  {
+    return true;
+  }
+
+  if ((tenant1 == NULL) || (tenant2 == NULL))
+  {
+    return false;
+  }
+
+  if (strcmp(tenant1, tenant2) == 0)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheItemLookup - 
 *
 * FIXME P7: lookups would be A LOT faster if the subCache used a hash-table instead of
@@ -454,7 +480,7 @@ CachedSubscription* mongoSubCacheItemLookup(const char* tenant, const char* subs
 
   while (cSubP != NULL)
   {
-    if ((strcmp(tenant, cSubP->tenant) == 0) && (strcmp(subscriptionId, cSubP->subscriptionId) == 0))
+    if ((tenantMatch(tenant, cSubP->tenant)) && (strcmp(subscriptionId, cSubP->subscriptionId) == 0))
     {
       return cSubP;
     }
