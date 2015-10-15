@@ -110,6 +110,7 @@ static int contextAttribute(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Creating an attribute"));
   reqData->upcr.attributeP = new ContextAttribute();
+  reqData->upcr.attributeP->valueType = orion::ValueTypeNone;
   reqData->upcr.ceP->contextAttributeVector.push_back(reqData->upcr.attributeP);
   return 0;
 }

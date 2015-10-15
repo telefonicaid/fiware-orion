@@ -1537,6 +1537,8 @@ bool entitiesQuery
     std::string             err  = r.getStringField("$err");
     ContextElementResponse* cer  = new ContextElementResponse();
 
+    LM_T(LmtMongo, ("result: %s", r.toString().c_str()));
+
     if (err != "")
     {
       //
@@ -2236,7 +2238,7 @@ bool processOnChangeCondition
   Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
-  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
+  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -2262,7 +2264,6 @@ bool processOnChangeCondition
       AttributeList                 emptyList;
 
       // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-      // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
       if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();

@@ -106,6 +106,7 @@ static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute"));
   parseDataP->upcrs.attributeP = new ContextAttribute();
+  parseDataP->upcrs.attributeP->valueType = orion::ValueTypeNone;
   parseDataP->upcrs.cerP->contextElement.contextAttributeVector.push_back(parseDataP->upcrs.attributeP);
   return 0;
 }
@@ -148,6 +149,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   parseDataP->lastContextAttribute = parseDataP->upcrs.attributeP;
   parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
   parseDataP->upcrs.attributeP->stringValue = node->value();
+  parseDataP->upcrs.attributeP->valueType = orion::ValueTypeString;
   return 0;
 }
 
