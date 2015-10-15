@@ -1076,7 +1076,7 @@ std::string servicePathSubscriptionRegex(const std::string servicePath, std::vec
 
 /* ****************************************************************************
 *
-* addTriggeredSubscriptions
+* addTriggeredSubscriptions_withCache
 *
 */
 static bool addTriggeredSubscriptions_withCache
@@ -1169,7 +1169,7 @@ static bool addTriggeredSubscriptions_withCache
     return false;
   }
 
-  /* For each one of the subscriptions found, add it to the map (if not already there) */
+  /* For each of the subscriptions found, add it to the map (if not already there) */
   while (cursor->more())
   {
     BSONObj      sub      = cursor->next();
@@ -1202,7 +1202,10 @@ static bool addTriggeredSubscriptions_withCache
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub), "");
+          subToAttributeList(sub),
+          "",  // No subscriptionId as the sub-cache is not used for non-isPattern subscriptions
+          ""   // No tenant as the sub-cache is not used for non-isPattern subscriptions
+        );
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -1246,10 +1249,11 @@ static bool addTriggeredSubscriptions_withCache
 
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
-                                                           cSubP->format,
+                                                           cSubP->notifyFormat,
                                                            cSubP->reference,
                                                            aList,
-                                                           cSubP->subscriptionId);
+                                                           cSubP->subscriptionId,
+                                                           cSubP->tenant);
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
@@ -1260,8 +1264,9 @@ static bool addTriggeredSubscriptions_withCache
 
 /* ****************************************************************************
 *
-* addTriggeredSubscriptions. Recovered almost verbatim from 0.23.0 release
+* addTriggeredSubscriptions_noCache
 *
+* Recovered almost verbatim from release 0.23.0
 */
 static bool addTriggeredSubscriptions_noCache
 (
@@ -1418,7 +1423,7 @@ static bool addTriggeredSubscriptions_noCache
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
           //subToAttributeList(sub)); signature changed in TriggeredSubscription() constructor in 0.24.0
-          subToAttributeList(sub), "");
+          subToAttributeList(sub), "", "");
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -1427,6 +1432,12 @@ static bool addTriggeredSubscriptions_noCache
   return true;
 }
 
+
+
+/* ****************************************************************************
+*
+* addTriggeredSubscriptions - 
+*/
 static bool addTriggeredSubscriptions
 (
   std::string                               entityId,
@@ -1439,6 +1450,7 @@ static bool addTriggeredSubscriptions
 )
 {
   extern bool noCache;
+
   if (noCache)
   {
     return addTriggeredSubscriptions_noCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
@@ -1524,29 +1536,29 @@ static bool processSubscriptions
               update.toString().c_str(),
               query.toString().c_str()));
 
-#if 0
+
         //
         // Saving lastNotificationTime for cached subscription
         //
         if (trigs->cacheSubId != "")
         {
-          Subscription* subP = subCache->lookupById(trigs->tenant, trigs->cacheSubId);
+          CachedSubscription* cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
 
-          if (subP != NULL)
+          if (cSubP != NULL)
           {
-            subP->pendingNotifications -= 1;
+            cSubP->pendingNotifications -= 1;
 
-            if (subP->pendingNotifications == 0)
+            if (cSubP->pendingNotifications == 0)
             {
-              subP->lastNotificationTime = getCurrentTime();
+              cSubP->lastNotificationTime = getCurrentTime();
             }
           }
           else
           {
-            LM_E(("Runtime Error (cached subscription '%s' not found)", trigs->cacheSubId.c_str()));
+            LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
+                  trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
           }
         }
-#endif
       }
       catch (const DBException &e)
       {

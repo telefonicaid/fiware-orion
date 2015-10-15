@@ -586,21 +586,4 @@ extern std::string dbDotEncode(std::string fromString);
 */
 extern std::string dbDotDecode(std::string fromString);
 
-
-
-/* ****************************************************************************
-*
-* MongoSubCacheTreat - 
-*/
-typedef void (MongoSubCacheTreat)(const char* tenant, BSONObj* subP);
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheRefresh - 
-*
-* Lookup all subscriptions in the database and call a treat function for each
-*/
-extern void mongoSubCacheRefresh(void);
 #endif

@@ -34,7 +34,6 @@
 #include "common/statistics.h"
 #include "common/sem.h"
 
-#include "cache/subCache.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/statisticsTreat.h"
@@ -456,12 +455,6 @@ std::string statisticsTreat
     char ccMutexWaitingTime[64];
     mutexTimeCCGet(ccMutexWaitingTime, sizeof(ccMutexWaitingTime));
     out += TAG_ADD_STRING("curlContextMutexWaitingTime", ccMutexWaitingTime);
-
-#if SUB_CACHE_ON
-    char subCacheMutexWaitingTime[64];
-    subCacheMutexWaitingTimeGet(subCacheMutexWaitingTime, sizeof(subCacheMutexWaitingTime));
-    out += TAG_ADD_STRING("subCacheMutexWaitingTime", subCacheMutexWaitingTime);
-#endif
   }
 
   int now = getCurrentTime();

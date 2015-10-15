@@ -28,13 +28,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#if SUB_CACHE_ON
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/Subscription.h"
-#endif
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
@@ -272,41 +268,35 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
-  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
 
   //
   // Modification of the subscription cache
   //
-  // The subscription before this updatye is stored in 'sub'.
-  // The updated subscription is stored in 'newSub'
+  // The subscription before this update is looked up in cache and referenced by 'cSubP'.
+  // The updated subscription information is in 'newSub' (mongo BSON object format).
   // 
   // All we need to do now for the cache is to:
   //   1. Remove 'sub' from sub-cache (if present)
   //   2. Create 'newSub' in sub-cache (if applicable)
   //
+  // The subscription is already updated in mongo. 
+  //
 
   // 0. Lookup matching subscription in subscription-cache
-  std::string servicePath;
-
-  servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
-
-#if SUB_CACHE_ON
-  subCache->semTake();
-
-  Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
+  CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
   // 1. Remove 'sub' from sub-cache (if present)
-  if (subP)
+  if (cSubP)
   {
-    subCache->remove(subP);
+    mongoSubCacheItemRemove(cSubP);
   }
 
   // 2. Create 'newSub' in sub-cache (if applicable)
-  subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
+  mongoSubCacheItemInsert(tenant.c_str(), newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
 
-  subCache->semGive();
-#endif
+
+  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
   return SccOk;
 }

@@ -56,11 +56,6 @@
 
 #include "common/wsStrip.h"
 
-#if SUB_CACHE_ON
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
-#endif
-
 using namespace mongo;
 using std::auto_ptr;
 

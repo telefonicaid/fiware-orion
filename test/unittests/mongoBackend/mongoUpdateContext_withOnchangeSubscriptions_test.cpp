@@ -22,6 +22,8 @@
 *
 * Author: Fermin Galan
 */
+#include "mongo/client/dbclient.h"
+
 #include "unittest.h"
 
 #include "logMsg/logMsg.h"
@@ -35,10 +37,6 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/subCache.h"
-
-#include "mongo/client/dbclient.h"
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
 

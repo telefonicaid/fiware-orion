@@ -24,7 +24,6 @@
 */
 #include <string>
 #include <regex.h>
-#include <semaphore.h>
 
 #include "mongo/client/dbclient.h"
 
@@ -35,9 +34,11 @@
 #include "mongoBackend/mongoSubCache.h"
 
 #include "ngsi/NotifyConditionVector.h"
+#include "ngsi10/SubscribeContextRequest.h"
 
 using namespace mongo;
 using std::auto_ptr;
+
 
 
 /* ****************************************************************************
@@ -115,8 +116,6 @@ typedef struct MongoSubCache
   CachedSubscription* head;
   CachedSubscription* tail;
   int                 items;
-  sem_t               mutex;
-  pthread_t           mutexOwner;
 } MongoSubCache;
 
 
@@ -135,55 +134,19 @@ MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
 */
 void mongoSubCacheInit(void)
 {
-  mongoSubCache.head       = NULL;
-  mongoSubCache.tail       = NULL;
-  mongoSubCache.items      = 0;
-  mongoSubCache.mutexOwner = 0;
-
-  sem_init(&mongoSubCache.mutex, 0, 1); // Shared between threads, not taken initially
-  // LM_M(("Initialized semaphore: %d", r));
+  mongoSubCache.head   = NULL;
+  mongoSubCache.tail   = NULL;
+  mongoSubCache.items  = 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* mongoSubCacheSemTake - 
+* mongoSubCacheItemInsert - 
 */
-void mongoSubCacheSemTake(const char* who)
+static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
 {
-  if (mongoSubCache.mutexOwner != 0)
-    LM_M(("%s waiting for mutex %p (thread %p), currently taken by %p", who, &mongoSubCache.mutex, pthread_self(), mongoSubCache.mutexOwner));
-  else
-    LM_M(("%s waiting for mutex %p (thread %p)", who, &mongoSubCache.mutex, pthread_self()));
-  sem_wait(&mongoSubCache.mutex);
-  mongoSubCache.mutexOwner = pthread_self();
-  LM_M(("%s got mutex %p (thread %p)", who, &mongoSubCache.mutex, mongoSubCache.mutexOwner));
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheSemGive - 
-*/
-void mongoSubCacheSemGive(const char* who)
-{
-  sem_post(&mongoSubCache.mutex);
-  LM_M(("%s gave mutex %p (thread %p)", who, &mongoSubCache.mutex, mongoSubCache.mutexOwner));
-  mongoSubCache.mutexOwner = 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheInsert - 
-*/
-void mongoSubCacheInsert(CachedSubscription* cSubP)
-{
-  // LM_M(("Inserting CachedSubscription at %p", cSubP));
-
   //
   // First of all, insertion is done at the end of the list, so, 
   // cSubP->next must ALWAYS be zero at insertion time
@@ -397,10 +360,8 @@ void mongoSubCacheMatch
 *
 * cachedSubscriptionDestroy - 
 */
-void cachedSubscriptionDestroy(CachedSubscription* cSubP)
+static void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 {
-  // LM_M(("Destroying CachedSubscription at %p", cSubP));
-
   if (cSubP->tenant != NULL)
   {
     free(cSubP->tenant);
@@ -456,7 +417,6 @@ void mongoSubCacheDestroy(void)
 
   if (mongoSubCache.head == NULL)
   {
-    // LM_M(("Sub cache was empty"));
     return;
   }
 
@@ -481,19 +441,47 @@ void mongoSubCacheDestroy(void)
 
 /* ****************************************************************************
 *
-* subCacheItemUpdate - 
+* mongoSubCacheItemLookup - 
+*
+* FIXME P7: lookups would be A LOT faster if the subCache used a hash-table instead of
+*           just a single linked link for the subscriptions.
+*           The hash could be adding each char in 'tenant' and 'subscriptionId' to a 8-bit
+*           integer and then we'd have a vector of 256 linked lists.
 */
-static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
+CachedSubscription* mongoSubCacheItemLookup(const char* tenant, const char* subscriptionId)
+{
+  CachedSubscription* cSubP = mongoSubCache.head;
+
+  while (cSubP != NULL)
+  {
+    if ((strcmp(tenant, cSubP->tenant) == 0) && (strcmp(subscriptionId, cSubP->subscriptionId) == 0))
+    {
+      return cSubP;
+    }
+
+    cSubP = cSubP->next;
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemInsert - 
+*/
+int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
   //
   // 01. Check validity of subP parameter 
   //
-  BSONElement  idField = subP->getField("_id");
+  BSONElement  idField = sub.getField("_id");
 
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", subP->toString().c_str()));
-    return;
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    return -1;
   }
 
 
@@ -506,18 +494,17 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   {
     // FIXME P7: See github issue #1362
     LM_X(1, ("Runtime Error (cannot allocate memory for a cached subscription: %s)", strerror(errno)));
-    return;
+    return -2;
   }
 
-  // LM_M(("Allocated CachedSubscription at %p", cSubP));
 
   //
   // 04. Extract data from subP
   //
-  std::string               formatString      = subP->hasField(CSUB_FORMAT)? subP->getField(CSUB_FORMAT).String() : "XML";
-  std::vector<BSONElement>  eVec              = subP->getField(CSUB_ENTITIES).Array();
-  std::vector<BSONElement>  attrVec           = subP->getField(CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec           = subP->getField(CSUB_CONDITIONS).Array();
+  std::string               formatString      = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "XML";
+  std::vector<BSONElement>  eVec              = sub.getField(CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  attrVec           = sub.getField(CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condVec           = sub.getField(CSUB_CONDITIONS).Array();
 
 
   if (tenant[0] == 0)
@@ -529,16 +516,15 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   //        What happens if you call strdup on an empty string?
   //
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
-  cSubP->servicePath           = strdup(subP->hasField(CSUB_SERVICE_PATH)? subP->getField(CSUB_SERVICE_PATH).String().c_str() : "/");
-  cSubP->reference             = strdup(subP->hasField(CSUB_REFERENCE)?    subP->getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
-  cSubP->format                = stringToFormat(formatString);
-  cSubP->throttling            = subP->hasField(CSUB_THROTTLING)? subP->getField(CSUB_THROTTLING).Long() : -1;
-  cSubP->expirationTime        = subP->hasField(CSUB_EXPIRATION)? subP->getField(CSUB_EXPIRATION).Long() : 0;
-  cSubP->lastNotificationTime  = subP->hasField(CSUB_LASTNOTIFICATION)? subP->getField(CSUB_LASTNOTIFICATION).Int() : 0;
+  cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? sub.getField(CSUB_SERVICE_PATH).String().c_str() : "/");
+  cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
+  cSubP->notifyFormat          = stringToFormat(formatString);
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? sub.getField(CSUB_THROTTLING).Long() : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)? sub.getField(CSUB_EXPIRATION).Long() : 0;
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? sub.getField(CSUB_LASTNOTIFICATION).Int() : 0;
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
 
-  // LM_M(("Updating cache item '%s' for tenant '%s'", cSubP->subscriptionId, cSubP->tenant));
 
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
@@ -622,7 +608,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
   {
     LM_E(("ERROR (empty notifyConditionVector) - cleaning up"));
     cachedSubscriptionDestroy(cSubP);
-    return;
+    return -3;
   }
 
 
@@ -637,10 +623,120 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
         cSubP->reference,
         cSubP->expirationTime,
         cSubP->throttling,
-        cSubP->format,
+        cSubP->notifyFormat,
         cSubP->lastNotificationTime));
 #endif
-  mongoSubCacheInsert(cSubP);
+
+  mongoSubCacheItemInsert(cSubP);
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemInsert - create a new sub, fill it in, and add it to cache
+*/
+void mongoSubCacheItemInsert
+(
+  const char*               tenant,
+  const char*               servicePath,
+  SubscribeContextRequest*  scrP,
+  const char*               subscriptionId,
+  int64_t                   expirationTime,
+  int64_t                   throttling,
+  Format                    notifyFormat
+)
+{
+  CachedSubscription* cSubP = new CachedSubscription();
+
+  //
+  // 1. First the non-complex values
+  //
+  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->servicePath           = strdup(servicePath);
+  cSubP->subscriptionId        = strdup(subscriptionId);
+  cSubP->reference             = strdup(scrP->reference.get().c_str());
+  cSubP->expirationTime        = expirationTime;
+  cSubP->throttling            = throttling;
+  cSubP->lastNotificationTime  = -1;
+  cSubP->pendingNotifications  = 0;
+  cSubP->notifyFormat          = notifyFormat;
+  cSubP->next                  = NULL;
+
+
+  //
+  // 2. Then the values that have functions/methods for filling/parsing
+  //
+  cSubP->throttling = scrP->throttling.parse();
+  cSubP->notifyConditionVector.fill(scrP->notifyConditionVector);
+
+
+  //
+  // 3. Convert all patterned EntityId to EntityInfo
+  //
+  for (unsigned int ix = 0; ix < scrP->entityIdVector.vec.size(); ++ix)
+  {
+    EntityId* eIdP;
+
+    eIdP = scrP->entityIdVector.vec[ix];
+
+    if (eIdP->isPattern == "false")
+    {
+      continue;
+    }
+
+    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type);
+    
+    cSubP->entityIdInfos.push_back(eP);
+  }
+
+
+  //
+  // 4. Insert all attributes 
+  //
+  for (unsigned int ix = 0; ix < scrP->attributeList.attributeV.size(); ++ix)
+  {
+    cSubP->attributes.push_back(scrP->attributeList.attributeV[ix]);
+  }
+
+
+  //
+  // 5. Now, insert the subscription in the cache
+  //
+  mongoSubCacheItemInsert(cSubP);
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemRemove - 
+*/
+int mongoSubCacheItemRemove(CachedSubscription* cSubP)
+{
+  CachedSubscription* current = mongoSubCache.head;
+  CachedSubscription* prev    = NULL;
+
+  while (current != NULL)
+  {
+    if (current == cSubP)
+    {
+      if (cSubP == mongoSubCache.head)  mongoSubCache.head = cSubP->next;
+      if (cSubP == mongoSubCache.tail)  mongoSubCache.tail = prev;
+      if (prev != NULL)                 prev->next         = cSubP->next;
+
+      cachedSubscriptionDestroy(cSubP);
+      return 0;
+    }
+
+    prev    = current;
+    current = current->next;
+  }
+
+  LM_E(("Runtime Error (item to remove from sub-cache not found)"));
+  return -1;
 }
 
 
@@ -649,9 +745,11 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 *
 * mongoSubCacheRefresh -
 *
-* Lookup all subscriptions in the database and call a treat function for each
+* 1. Empty cache
+* 2. Lookup all subscriptions in the database 
+* 3. Insert them again in the cache (with fresh data from database)
 */
-static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatFunction)
+static void mongoSubCacheRefresh(std::string database)
 {
   BSONObj                   query      = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
   DBClientBase*             connection = getMongoConnection();
@@ -694,7 +792,7 @@ static void mongoSubCacheRefresh(std::string database, MongoSubCacheTreat treatF
   {
     BSONObj sub = cursor->next();
 
-    treatFunction(tenant.c_str(), &sub);
+    mongoSubCacheItemInsert(tenant.c_str(), sub);
 
     ++subNo;
   }
@@ -734,7 +832,7 @@ void mongoSubCacheRefresh(void)
   // Now refresh the subCache for each and every tenant
   for (unsigned int ix = 0; ix < databases.size(); ++ix)
   {
-    mongoSubCacheRefresh(databases[ix], subCacheItemUpdate);
+    mongoSubCacheRefresh(databases[ix]);
   }
 
   reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);

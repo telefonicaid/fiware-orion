@@ -30,6 +30,7 @@
 #include <regex.h>
 
 #include "ngsi/NotifyConditionVector.h"
+#include "ngsi10/SubscribeContextRequest.h"
 
 
 
@@ -76,7 +77,7 @@ typedef struct CachedSubscription
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
   int                         pendingNotifications;
-  Format                      format;
+  Format                      notifyFormat;
   char*                       reference;
   struct CachedSubscription*  next;
 } CachedSubscription;
@@ -93,25 +94,9 @@ extern void mongoSubCacheInit(void);
 
 /* ****************************************************************************
 *
-* mongoSubCacheSemTake - 
+* mongoSubCacheStart - 
 */
-extern void mongoSubCacheSemTake(const char* who);
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheSemGive - 
-*/
-extern void mongoSubCacheSemGive(const char* who);
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheRefresh - 
-*/
-extern void mongoSubCacheRefresh(void);
+extern void mongoSubCacheStart(void);
 
 
 
@@ -120,6 +105,55 @@ extern void mongoSubCacheRefresh(void);
 * mongoSubCacheDestroy - 
 */
 extern void mongoSubCacheDestroy(void);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemInsert - 
+*/
+extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemInsert - 
+*/
+extern void mongoSubCacheItemInsert
+(
+  const char*               tenant,
+  const char*               servicePath,
+  SubscribeContextRequest*  scrP,
+  const char*               subscriptionId,
+  int64_t                   expiration,
+  int64_t                   throttling,
+  Format                    notifyFormat
+);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemLookup - 
+*/
+extern CachedSubscription* mongoSubCacheItemLookup(const char* tenant, const char* subscriptionId);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemRemove - 
+*/
+extern int mongoSubCacheItemRemove(CachedSubscription* cSubP);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheRefresh - 
+*/
+extern void mongoSubCacheRefresh(void);
 
 
 
@@ -136,13 +170,5 @@ extern void mongoSubCacheMatch
   const char*                        attr,
   std::vector<CachedSubscription*>*  subVecP
 );
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheStart - 
-*/
-extern void mongoSubCacheStart(void);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_
