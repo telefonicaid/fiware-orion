@@ -60,11 +60,13 @@ PaArgument paArgs[] =
 *
 * global variables
 */
-bool  harakiri          = true;
-int   logFd             = -1;
-int   fwdPort           = -1;
-char  fwdHost[64];
-unsigned cprForwardLimit = 1000;
+bool      harakiri          = true;
+int       logFd             = -1;
+int       fwdPort           = -1;
+int       subCacheInterval  = 10;
+unsigned  cprForwardLimit   = 1000;
+bool      noCache           = false;
+char      fwdHost[64];
 
 
 

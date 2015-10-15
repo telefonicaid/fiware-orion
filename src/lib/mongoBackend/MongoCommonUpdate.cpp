@@ -1202,7 +1202,7 @@ static bool addTriggeredSubscriptions_withCache
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub), NULL);
+          subToAttributeList(sub), "");
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
