@@ -211,7 +211,8 @@ void mongoGetSubscription
   const std::string&                  idSub,
   std::map<std::string, std::string>& uriParam,
   const std::string&                  tenant
-){
+)
+{
 
   bool           reqSemTaken = false;
 
