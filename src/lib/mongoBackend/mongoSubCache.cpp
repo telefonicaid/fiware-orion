@@ -504,6 +504,7 @@ static void subCacheItemUpdate(const char* tenant, BSONObj* subP)
 
   if (cSubP == NULL)
   {
+    // FIXME P7: See github issue #1362
     LM_X(1, ("Runtime Error (cannot allocate memory for a cached subscription: %s)", strerror(errno)));
     return;
   }
