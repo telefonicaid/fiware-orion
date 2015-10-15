@@ -25,6 +25,7 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 import os
 
 from termcolor import colored
+from behave.model import ScenarioOutline
 
 from components.common_steps.initial_steps import *
 from components.common_steps.general_steps import *
@@ -33,14 +34,27 @@ __logger__ = logging.getLogger("environment")
 
 
 # constants
+# pre-actions in feature files
 ACTIONS_BEFORE_FEATURE = u'actions before the feature'
 ACTIONS_AFTER_FEATURE = u'actions after the feature'
 ACTIONS_BEFORE_SCENARIO = u'actions before each scenario'
 ACTIONS_AFTER_SCENARIO = u'actions after each scenario'
-KEYWORDS = ["Setup", "Check"]
+KEYWORDS = ["Setup", "Check"]  # prefix in steps to pre-actions
 GIVEN_PREFIX = u'Given'
 AND_PREFIX = u'And'
 SEPARATOR = u':'
+SHOW_SUMMARY = True
+scenarios_status = {"untested": 0,  # The scenario was has not been completely tested yet.
+                    "skipped": 0,   # One or more steps of this scenario was passed over during testing.
+                    "passed": 0,    # The scenario was tested successfully.
+                    "failed": 0}    # One or more steps of this scenario failed.
+
+features_data = {"scenario_status": None,  # A summary status of the scenario’s run
+                 "file_name": None,        # The file name where the feature was found
+                 "duration": None,         # The time, in seconds, that it took to test this feature
+                 "total": None}            # total of scenarios into the feature
+features_list = []  # list of features executed with its name and scenarios status
+
 
 def __create_log_folder(name):
     """
@@ -72,7 +86,7 @@ def get_steps_from_feature_description(label, feature):
     for description in feature.description:
         if label_exists:
             if description.split(SEPARATOR)[0] in KEYWORDS:
-                steps_list.append(description.replace(description.split(SEPARATOR)[0]+SEPARATOR, GIVEN_PREFIX))
+                steps_list.append(description.replace(description.split(SEPARATOR)[0] + SEPARATOR, GIVEN_PREFIX))
             else:
                 break
         if description.lower().find(label) >= 0:
@@ -102,6 +116,35 @@ def execute_one_step(context, name, **kwargs):
     context.execute_steps(name)
 
 
+def init_feature():
+    """
+    initialize feature values
+    :return:
+    """
+    global features_data, scenarios_status
+    features_data = {"scenario_status": None, "file_name": ""}
+    scenarios_status = {"untested": 0, "skipped": 0, "passed": 0, "failed": 0}
+
+
+def process_scenario(scenario):
+    """
+    determine the status in each scenario
+    :param scenario:
+    :return:
+    """
+    scenarios_status[scenario.status or 'skipped'] += 1
+
+
+def process_scenario_outline(scenario_outline):
+    """
+    determine the scenario status in each outline example
+    :param scenario_outline: is executed for each row in the Examples section
+    :return:
+    """
+    for scenario in scenario_outline.scenarios:
+        process_scenario(scenario)
+
+
 def before_all(context):
     """
     actions before all
@@ -109,6 +152,23 @@ def before_all(context):
     """
     __create_log_folder("logs")
     context.config.setup_logging(configfile="logging.ini")
+
+
+def after_all(context):
+    """
+    actions after all
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    if SHOW_SUMMARY:
+        summary_color = u'yellow'
+        print colored("                    SUMMARY:", summary_color)
+        print colored("-------------------------------------------------", summary_color)
+        for item in features_list:
+            status = item["scenario_status"]
+            print colored("  - %s >> passed: %s, failed: %s, skipped: %s and total: %s with duration: %.3f seconds."
+                          % (item["file_name"], status["passed"], status["failed"], status["skipped"], str(item["total"]),
+                             item["duration"]), summary_color)
+        print colored("-------------------------------------------------", summary_color)
 
 
 def before_feature(context, feature):
@@ -143,6 +203,19 @@ def after_feature(context, feature):
     # ---- ConditionsAfterFeature ----
     for item in steps_after_feature:
         execute_one_step(context, item, show=True)
+
+    features_data["file_name"] = feature.filename
+    features_data["scenario_status"] = scenarios_status
+    features_data["duration"] = feature.duration
+    for scenario in feature:
+        if isinstance(scenario, ScenarioOutline):
+            process_scenario_outline(scenario)
+        else:
+            process_scenario(scenario)
+    features_data["total"] = scenarios_status["passed"] + scenarios_status["skipped"] + scenarios_status["failed"] + scenarios_status["untested"]
+    features_list.append(features_data)
+    init_feature()
+
     __logger__.info("AFTER FEATURE")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
