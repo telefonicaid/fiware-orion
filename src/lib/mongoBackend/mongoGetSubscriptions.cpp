@@ -206,15 +206,14 @@ void mongoListSubscriptions
 */
 void mongoGetSubscription
 (
-  ngsiv2::Subscription                *sub,
-  OrionError                          *oe,
+  ngsiv2::Subscription*               sub,
+  OrionError*                         oe,
   const std::string&                  idSub,
   std::map<std::string, std::string>& uriParam,
   const std::string&                  tenant
 )
 {
-
-  bool           reqSemTaken = false;
+  bool  reqSemTaken = false;
 
   reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
 
@@ -244,13 +243,12 @@ void mongoGetSubscription
 
     if (cursor->more())
     {
-      // Ooops,  we expect only one
+      // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccConflict);
       return;
     }
-
   }
   else
   {
