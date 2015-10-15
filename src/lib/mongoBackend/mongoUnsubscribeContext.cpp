@@ -31,10 +31,9 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
 
 
 
@@ -169,16 +168,22 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
     responseP->statusCode.fill(SccOk);
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
 
     //
-    // Removing subscription from cache
+    // Removing subscription from mongo subscription cache
     //
-#if SUB_CACHE_ON
-    subCache->semTake();
-    subCache->remove(tenant, "", requestP->subscriptionId.get());
-    subCache->semGive();
-#endif
+    CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
+    if (cSubP != NULL)
+    {
+      mongoSubCacheItemRemove(cSubP);
+    }
+    else
+    {
+      LM_E(("Runtime Error (removed subscription not found in mongo subscription cache)"));
+    }
+
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
 
     return SccOk;
 }

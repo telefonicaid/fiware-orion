@@ -40,7 +40,8 @@ TriggeredSubscription::TriggeredSubscription
   Format             _format,
   const std::string& _reference,
   AttributeList      _attrL,
-  const std::string& _cacheSubId
+  const std::string& _cacheSubId,
+  const std::string& _tenant
 )
 {
   throttling        = _throttling;
@@ -49,6 +50,7 @@ TriggeredSubscription::TriggeredSubscription
   reference         = _reference;
   attrL             = _attrL;
   cacheSubId        = _cacheSubId;
+  tenant            = _tenant;
 }
 
 
@@ -72,6 +74,7 @@ TriggeredSubscription::TriggeredSubscription
   reference         = _reference;
   attrL             = _attrL;
   cacheSubId        = "";
+  tenant            = "";
 }
 
 
