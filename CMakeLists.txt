@@ -50,6 +50,7 @@ execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
 
 add_definitions(-DLM_ON)
 add_definitions(-fPIC)
+# add_definitions(-fstack-check -fstack-protector)
 add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types

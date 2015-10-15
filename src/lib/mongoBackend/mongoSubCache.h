@@ -25,6 +25,85 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+#include <regex.h>
+
+#include "ngsi/NotifyConditionVector.h"
+
+
+
+/* ****************************************************************************
+*
+* EntityInfo - 
+*
+* The struct fields:
+* -------------------------------------------------------------------------------
+* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
+* o entityType           string containing the type of the EntityId
+*
+*/
+typedef struct EntityInfo
+{
+  regex_t       entityIdPattern;
+  std::string   entityType;
+  bool          entityIdPatternToBeFreed;
+
+  EntityInfo() {}
+  EntityInfo(const std::string& idPattern, const std::string& _entityType);
+  ~EntityInfo() { release(); }
+
+  bool          match(const std::string& idPattern, const std::string& type);
+  void          release(void);
+  void          present(const std::string& prefix);
+} EntityInfo;
+
+
+
+/* ****************************************************************************
+*
+* CachedSubscription - 
+*/
+typedef struct CachedSubscription
+{
+  std::vector<EntityInfo*>    entityIdInfos;
+  std::vector<std::string>    attributes;
+  NotifyConditionVector       notifyConditionVector;
+  char*                       tenant;
+  char*                       servicePath;
+  char*                       subscriptionId;
+  int64_t                     throttling;
+  int64_t                     expirationTime;
+  int64_t                     lastNotificationTime;
+  int                         pendingNotifications;
+  Format                      format;
+  char*                       reference;
+  struct CachedSubscription*  next;
+} CachedSubscription;
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheInit - 
+*/
+extern void mongoSubCacheInit(void);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheSemTake - 
+*/
+extern void mongoSubCacheSemTake(const char* who);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheSemGive - 
+*/
+extern void mongoSubCacheSemGive(const char* who);
 
 
 
@@ -33,5 +112,37 @@
 * mongoSubCacheRefresh - 
 */
 extern void mongoSubCacheRefresh(void);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheDestroy - 
+*/
+extern void mongoSubCacheDestroy(void);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheMatch - 
+*/
+extern void mongoSubCacheMatch
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const char*                        entityId,
+  const char*                        entityType,
+  const char*                        attr,
+  std::vector<CachedSubscription*>*  subVecP
+);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheStart - 
+*/
+extern void mongoSubCacheStart(void);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

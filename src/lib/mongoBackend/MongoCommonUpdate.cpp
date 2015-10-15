@@ -37,14 +37,12 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
-#if SUB_CACHE_ON
-#include "cache/Subscription.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/subCache.h"
-#endif
+
 #include "orionTypes/OrionValueType.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
+#include "mongoBackend/mongoSubCache.h"
 
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
@@ -1204,7 +1202,7 @@ static bool addTriggeredSubscriptions_withCache
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub), NULL);
+          subToAttributeList(sub), "");
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -1214,48 +1212,46 @@ static bool addTriggeredSubscriptions_withCache
   //
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
-#if SUB_CACHE_ON
-  std::vector<Subscription*> subVec;
 
-  subCache->semTake();
-  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+  std::vector<CachedSubscription*> subVec;
+
+  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
+  LM_M(("Back from mongoSubCacheMatch - got %d matches for tenant '%s'", subVec.size(), tenant.c_str()));
 
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
-    Subscription* sP = subVec[ix];
+    CachedSubscription* cSubP = subVec[ix];
 
-    sP->pendingNotifications += 1;
+    cSubP->pendingNotifications += 1;
 
     // Outdated subscriptions are skipped
-    if (sP->expirationTime < now)
+    if (cSubP->expirationTime < now)
     {
       continue;
     }
 
     AttributeList aList;
 
-    aList.fill(sP->attributes);
+    aList.fill(cSubP->attributes);
 
     // Throttling
-    if ((sP->throttling != -1) && (sP->lastNotificationTime != -1))
+    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != -1))
     {
-      if ((now - sP->lastNotificationTime) < sP->throttling)
+      if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
         continue;
       }
     }
 
-    TriggeredSubscription* sub = new TriggeredSubscription((long long) sP->throttling,
-                                                           (long long) sP->lastNotificationTime,
-                                                           sP->format,
-                                                           sP->reference.get(),
+    TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
+                                                           (long long) cSubP->lastNotificationTime,
+                                                           cSubP->format,
+                                                           cSubP->reference,
                                                            aList,
-                                                           sP->subscriptionId);
-    subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
+                                                           cSubP->subscriptionId);
+    subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
-  subCache->semGive();
-#endif
 
   return true;
 }

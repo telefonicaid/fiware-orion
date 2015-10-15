@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
@@ -293,7 +294,7 @@ static void prepareDatabase(bool initializeCache = true) {
   /* Given that preparation including csubs, we have to init cache */
   if (initializeCache == true)
   {
-    subscriptionCacheInit("");
+    mongoSubCacheInit();
   }
 }
 
@@ -375,7 +376,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub5);
 
     /* Given that preparation including csubs, we have to init cache */
-    subscriptionCacheInit("");
+    mongoSubCacheInit();
 }
 
 /* ****************************************************************************
