@@ -218,7 +218,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | - general_operations                        |      16      | GET     | /version   /statistics    /v2                       | No             |
 |                                                                                                                                             |
 |**entities folder**                                                                                                                          |
-| - create_entities                           |     559      | POST   | /v2/entities/                                        | Yes            |      
+| - create_entities                           |     578      | POST   | /v2/entities/                                        | Yes            |      
 | - list_all_entities                         |     200      | GET    | /v2/entities/                                        | No             | 
 |                                                                                                                                             |
 | - update_append_attributes_by_id            |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   

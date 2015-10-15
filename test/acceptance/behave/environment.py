@@ -43,7 +43,7 @@ KEYWORDS = ["Setup", "Check"]  # prefix in steps to pre-actions
 GIVEN_PREFIX = u'Given'
 AND_PREFIX = u'And'
 SEPARATOR = u':'
-SHOW_SUMMARY = True
+SHOW_SUMMARY = True  # determine whether the summary is displayed or not (boolean).
 scenarios_status = {"untested": 0,  # The scenario was has not been completely tested yet.
                     "skipped": 0,   # One or more steps of this scenario was passed over during testing.
                     "passed": 0,    # The scenario was tested successfully.
@@ -118,8 +118,7 @@ def execute_one_step(context, name, **kwargs):
 
 def init_feature():
     """
-    initialize feature values
-    :return:
+    features_data, scenarios_status dicts are initialized
     """
     global features_data, scenarios_status
     features_data = {"scenario_status": None, "file_name": ""}
@@ -129,8 +128,7 @@ def init_feature():
 def process_scenario(scenario):
     """
     determine the status in each scenario
-    :param scenario:
-    :return:
+    :param scenario: scenario unique
     """
     scenarios_status[scenario.status or 'skipped'] += 1
 
@@ -139,7 +137,6 @@ def process_scenario_outline(scenario_outline):
     """
     determine the scenario status in each outline example
     :param scenario_outline: is executed for each row in the Examples section
-    :return:
     """
     for scenario in scenario_outline.scenarios:
         process_scenario(scenario)
@@ -203,7 +200,7 @@ def after_feature(context, feature):
     # ---- ConditionsAfterFeature ----
     for item in steps_after_feature:
         execute_one_step(context, item, show=True)
-
+    # ---- Summary ----
     features_data["file_name"] = feature.filename
     features_data["scenario_status"] = scenarios_status
     features_data["duration"] = feature.duration
