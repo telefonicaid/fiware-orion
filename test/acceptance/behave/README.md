@@ -180,6 +180,31 @@ Feature: feature name...
 ```
 
 
+### Summary of Features and Scenarios
+
+Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
+To activate/deactivate this summary, modify `SHOW_SUMMARY` variable (boolean).
+Example:
+```
+                    SUMMARY:
+-------------------------------------------------
+  - components/ngsiv2/entities/create_entities.feature >> passed: 440, failed: 0, skipped: 138 and total: 578 with duration: 62.688 seconds.
+  - components/ngsiv2/entities/delete_entities.feature >> passed: 64, failed: 0, skipped: 1 and total: 65 with duration: 9.605 seconds.
+  - components/ngsiv2/entities/list_all_entities.feature >> passed: 132, failed: 0, skipped: 68 and total: 200 with duration: 44.388 seconds.
+  - components/ngsiv2/entities/list_an_attribute_by_id_and_name.feature >> passed: 130, failed: 0, skipped: 68 and total: 198 with duration: 32.760 seconds.
+  - components/ngsiv2/entities/list_an_entity_by_id.feature >> passed: 141, failed: 0, skipped: 68 and total: 209 with duration: 28.082 seconds.
+  - components/ngsiv2/entities/replace_attributes_by_id.feature >> passed: 253, failed: 0, skipped: 307 and total: 560 with duration: 55.864 seconds.
+  - components/ngsiv2/entities/update_an_attribute_by_id_and_name.feature >> passed: 1, failed: 0, skipped: 0 and total: 1 with duration: 0.237 seconds.
+  - components/ngsiv2/entities/update_append_attributes_by_id.feature >> passed: 402, failed: 0, skipped: 364 and total: 766 with duration: 74.562 seconds.
+  - components/ngsiv2/entities/update_attributes_by_id.feature >> passed: 307, failed: 0, skipped: 347 and total: 654 with duration: 59.563 seconds.
+-------------------------------------------------
+9 features passed, 0 failed, 0 skipped
+1870 scenarios passed, 0 failed, 1361 skipped
+9784 steps passed, 0 failed, 7313 skipped, 0 undefined
+Took 6m7.748s
+```
+
+
 ### Logs
 
 The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
@@ -193,20 +218,20 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | - general_operations                        |      16      | GET     | /version   /statistics    /v2                       | No             |
 |                                                                                                                                             |
 |**entities folder**                                                                                                                          |
-| - create_entities                           |     559      | POST   | /v2/entities/                                        | Yes            |      
+| - create_entities                           |     578      | POST   | /v2/entities/                                        | Yes            |      
 | - list_all_entities                         |     200      | GET    | /v2/entities/                                        | No             | 
 |                                                                                                                                             |
-| - update_append_attribute_by_id             |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   
+| - update_append_attributes_by_id            |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   
 | - list_an_entity_by_id                      |     209      | GET    | /v2/entities/`<entity_id>`                           | No             | 
 | - replace_attributes_by_id                  |     511      | PUT    | /v2/entities/`<entity_id>`                           | Yes            |   
-| - update_attribute_by_id                    |     654      | PATCH  | /v2/entities/`<entity_id>`                           | Yes            | 
+| - update_attributes_by_id                   |     654      | PATCH  | /v2/entities/`<entity_id>`                           | Yes            | 
 | - delete_entity_by_id                       |      65      | DELETE | /v2/entities/`<entity_id>`                           | No             |
 |                                                                                                                                             |
-| - list_an_attribute_by_id                   |     198      | GET    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |   
-| - update_only_one_attribute_by_id           |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes            | 
-| - delete_attribute_by_id                    |  (pending)   | DELETE | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |
+| - list_an_attribute_by_id_and_name          |     198      | GET    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |   
+| - update_an_attribute_by_id_and_name        |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes            | 
+| - delete_an_attribute_by_id_and_name        |  (pending)   | DELETE | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |
 |                                                                                                                                             |
-| - update_only_one_attribute_value_by_id     |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes            |   
+| - update_an_attribute_value_by_id_and_name  |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes            |   
 |                                                                                                                                             |
 |**alarms folder**                            |  (pending)   |                                                                                |
 
