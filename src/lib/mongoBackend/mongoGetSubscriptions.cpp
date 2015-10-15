@@ -28,7 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "mongoBackend/mongoListSubscriptions.h"
+#include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 
@@ -195,6 +195,71 @@ void mongoListSubscriptions
   }
 
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
+  *oe = OrionError(SccOk);
+  return;
+}
+
+
+/* ****************************************************************************
+*
+* mongoGetSubscription -
+*/
+void mongoGetSubscription
+(
+  ngsiv2::Subscription                *sub,
+  OrionError                          *oe,
+  const std::string&                  idSub,
+  std::map<std::string, std::string>& uriParam,
+  const std::string&                  tenant
+){
+
+  bool           reqSemTaken = false;
+
+  reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
+
+  LM_T(LmtMongo, ("Mongo Get Subscription"));
+
+  std::auto_ptr<DBClientCursor>  cursor;
+  std::string                    err;
+  BSONObj                        q     = BSON("_id" << OID(idSub));
+
+  if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  {
+    reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+    *oe = OrionError(SccReceiverInternalError, err);
+    return;
+  }
+
+  /* Process query result */
+  if (cursor->more())
+  {
+    BSONObj r = cursor->next();
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+
+    setSubscriptionId(sub, r);
+    setSubject(sub, r);
+    setNotification(sub, r);
+    setExpires(sub, r);
+
+    if (cursor->more())
+    {
+      // Ooops,  we expect only one
+      LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
+      reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+      *oe = OrionError(SccConflict);
+      return;
+    }
+
+  }
+  else
+  {
+    LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
+    reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+    *oe = OrionError(SccSubscriptionIdNotFound);
+    return;
+  }
+
+  reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
   *oe = OrionError(SccOk);
   return;
 }

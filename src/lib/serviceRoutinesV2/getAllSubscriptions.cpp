@@ -31,7 +31,7 @@
 #include "apiTypesV2/Subscription.h"
 #include "common/JsonHelper.h"
 #include "common/string.h"
-#include "mongoBackend/mongoListSubscriptions.h"
+#include "mongoBackend/mongoGetSubscriptions.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
