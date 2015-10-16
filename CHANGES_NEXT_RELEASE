@@ -23,3 +23,4 @@ Fix:  Fix Conv op to std op mapping wrongly using patterns in some GET operation
 Fix:  Fix escaping dots in attrNames (Issue #1323)
 Fix:  POST /v2/entities returns error if the entity to create already exists (Issue #1158)
 Fix:  Add charset=utf-8 for notifications (Issue #1340)
+Add:  Functional test to PUT/POST/PATCH with 'empty' JSON object as payload (Issue #1305)

@@ -83,6 +83,14 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       return eP->render(ciP, EntitiesRequest);
     }
   }
+  else if (document.Empty()) 
+  {
+    LM_W(("Bad Input (Empty payload)"));
+    eP->errorCode.fill("ParseError", "empty payload");
+    ciP->httpStatusCode = SccBadRequest;;
+    return eP->render(ciP, EntitiesRequest);
+
+  }
 
 
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
