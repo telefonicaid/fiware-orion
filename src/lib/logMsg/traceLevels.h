@@ -119,6 +119,7 @@ typedef enum TraceLevels
   LmtRush,
   LmtSoftError,
   LmtNotImplemented,
+  LmtCurlContext,
 
   LmtBug = 250
 } TraceLevels;

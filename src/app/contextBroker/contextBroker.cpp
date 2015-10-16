@@ -232,6 +232,7 @@ bool            mutexTimeStat;
 int             writeConcern;
 unsigned        cprForwardLimit;
 int             subCacheInterval;
+char            notificationMode[64];
 
 
 
@@ -243,34 +244,34 @@ int             subCacheInterval;
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
 
-#define FG_DESC             "don't start as daemon"
-#define LOCALIP_DESC        "IP to receive new connections"
-#define PORT_DESC           "port to receive new connections"
-#define PIDPATH_DESC        "pid file path"
-#define DBHOST_DESC         "database host"
-#define RPLSET_DESC         "replica set"
-#define DBUSER_DESC         "database user"
-#define DBPASSWORD_DESC     "database password"
-#define DB_DESC             "database name"
-#define DB_TMO_DESC         "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
-#define USEIPV4_DESC        "use ip v4 only"
-#define USEIPV6_DESC        "use ip v6 only"
-#define HARAKIRI_DESC       "commits harakiri on request"
-#define HTTPS_DESC          "use the https 'protocol'"
-#define HTTPSKEYFILE_DESC   "private server key file (for https)"
-#define HTTPSCERTFILE_DESC  "certificate key file (for https)"
-#define RUSH_DESC           "rush host (IP:port)"
-#define MULTISERVICE_DESC   "service multi tenancy mode"
-#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
-#define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
-#define DBPS_DESC           "database connection pool size"
-#define MAX_L               900000
-#define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
-#define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
-#define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
+#define FG_DESC               "don't start as daemon"
+#define LOCALIP_DESC           "IP to receive new connections"
+#define PORT_DESC              "port to receive new connections"
+#define PIDPATH_DESC           "pid file path"
+#define DBHOST_DESC            "database host"
+#define RPLSET_DESC            "replica set"
+#define DBUSER_DESC            "database user"
+#define DBPASSWORD_DESC        "database password"
+#define DB_DESC                "database name"
+#define DB_TMO_DESC            "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
+#define USEIPV4_DESC           "use ip v4 only"
+#define USEIPV6_DESC           "use ip v6 only"
+#define HARAKIRI_DESC          "commits harakiri on request"
+#define HTTPS_DESC             "use the https 'protocol'"
+#define HTTPSKEYFILE_DESC      "private server key file (for https)"
+#define HTTPSCERTFILE_DESC     "certificate key file (for https)"
+#define RUSH_DESC              "rush host (IP:port)"
+#define MULTISERVICE_DESC      "service multi tenancy mode"
+#define ALLOWED_ORIGIN_DESC    "CORS allowed origin. use '__ALL' for any"
+#define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
+#define DBPS_DESC              "database connection pool size"
+#define MAX_L                  900000
+#define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
+#define MUTEX_TIMESTAT_DESC    "measure total semaphore waiting time"
+#define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
-#define SUB_CACHE_IVAL_DESC "interval in seconds between calls to Subscription Cache refresh"
-
+#define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh"
+#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
 
 
 /* ****************************************************************************
@@ -308,9 +309,10 @@ PaArgument paArgs[] =
   { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
-  { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
-  { "-cprForwardLimit", &cprForwardLimit, "CPR_FORWARD_LIMIT", PaUInt, PaOpt, 1000, 0, UINT_MAX, CPR_FORWARD_LIMIT_DESC},
-  { "-subCacheIval",  &subCacheInterval, "SUBCACHE_IVAL", PaInt, PaOpt, 10,         0,     3600,  SUB_CACHE_IVAL_DESC },
+  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "", PaNL, PaNL,     ALLOWED_ORIGIN_DESC},
+  { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,  0,    UINT_MAX, CPR_FORWARD_LIMIT_DESC},
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,    0,    3600,     SUB_CACHE_IVAL_DESC },
+  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "", PaNL, PaNL,     NOTIFICATION_MODE_DESC },
 
 
   PA_END_OF_ARGS
@@ -1572,6 +1574,11 @@ int main(int argC, char* argV[])
   }
 
   LM_I(("Startup completed"));
+
+  if (strcmp(notificationMode, "none") == 0)
+  {
+    LM_W(("notification mode 'none'"));
+  }
 
   while (1)
   {

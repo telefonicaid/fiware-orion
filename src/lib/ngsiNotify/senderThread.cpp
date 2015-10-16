@@ -24,6 +24,7 @@
 #include "senderThread.h"
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+#include "common/statistics.h"
 #include "rest/httpRequestSend.h"
 
 /* ****************************************************************************
@@ -46,18 +47,26 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
-    httpRequestSend(params->ip,
-                    params->port,
-                    params->protocol,                   
-                    params->verb,
-                    params->tenant,
-                    params->servicePath,
-                    params->xauthToken,
-                    params->resource,
-                    params->content_type,
-                    params->content,
-                    true,
-                    NOTIFICATION_WAIT_MODE);
+    if (strcmp(notificationMode,"none") != 0)
+    {
+      httpRequestSend(params->ip,
+                      params->port,
+                      params->protocol,
+                      params->verb,
+                      params->tenant,
+                      params->servicePath,
+                      params->xauthToken,
+                      params->resource,
+                      params->content_type,
+                      params->content,
+                      true,
+                      NOTIFICATION_WAIT_MODE);
+    }
+    else
+    {
+      LM_T(LmtNotifier, ("notificationMode is 'none', skipping outgoing request"));
+      ++noOfDroppedNotifications;
+    }
 
     /* Delete the parameters after using them */
     delete params;

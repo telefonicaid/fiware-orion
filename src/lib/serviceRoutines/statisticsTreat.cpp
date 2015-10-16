@@ -140,11 +140,13 @@ std::string statisticsTreat
     noOfSubCacheLookups                             = -1;
     noOfSubCacheRemovals                            = -1;
     noOfSubCacheRemovalFailures                     = -1;
+    noOfDroppedNotifications                        = -1;
 
     semTimeReqReset();
     semTimeTransReset();
     mongoPoolConnectionSemWaitingTimeReset();
     mutexTimeCCReset();
+
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -437,6 +439,11 @@ std::string statisticsTreat
   if (noOfSubCacheRemovalFailures != -1)
   {
     out += TAG_ADD_COUNTER("subCacheRemovalFailures", noOfSubCacheRemovalFailures);
+  }
+
+  if (noOfDroppedNotifications != -1)
+  {
+    out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications);
   }
 
   if (semTimeStatistics)
