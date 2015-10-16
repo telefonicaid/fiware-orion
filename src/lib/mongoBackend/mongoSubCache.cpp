@@ -285,9 +285,14 @@ static bool subMatch
   const char*          attr
 )
 {
-  if ((cSubP->tenant == NULL) || (tenant == NULL))
+  if ((cSubP->tenant == NULL) || (tenant == NULL) || (cSubP->tenant[0] == 0) || (tenant[0] == 0))
   {
-    if ((cSubP->tenant != NULL) || (tenant != NULL))
+    if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
+    {
+      return false;
+    }
+
+    if ((tenant != NULL) && (tenant[0] != 0))
     {
       return false;
     }
@@ -642,22 +647,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     return -3;
   }
 
-
-#if 0
-  //
-  // 08. Debug
-  //
-  LM_M(("%s: TEN:%s, SPATH:%s, REF:%s, EXP:%lu, THR:%lu, FMT:%d, LNOT:%d",
-        cSubP->subscriptionId,
-        cSubP->tenant,
-        cSubP->servicePath,
-        cSubP->reference,
-        cSubP->expirationTime,
-        cSubP->throttling,
-        cSubP->notifyFormat,
-        cSubP->lastNotificationTime));
-#endif
-
   mongoSubCacheItemInsert(cSubP);
 
   return 0;
@@ -827,8 +816,6 @@ static void mongoSubCacheRefresh(std::string database)
 
     ++subNo;
   }
-
-  LM_M(("Got %d subscriptions for tenant '%s'", subNo, tenant.c_str()));
 }
 
 
@@ -840,11 +827,7 @@ static void mongoSubCacheRefresh(std::string database)
 void mongoSubCacheRefresh(void)
 {
   std::vector<std::string> databases;
-  static int               refreshNo = 0;
   bool                     reqSemTaken;
-
-  ++refreshNo;
-  LM_M(("Refreshing mongo subscription cache [%d]", refreshNo));
 
   reqSemTake(__FUNCTION__, "subscription cache", SemReadOp, &reqSemTaken);
 
@@ -857,8 +840,6 @@ void mongoSubCacheRefresh(void)
   // Add the 'default tenant'
   databases.push_back(dbPrefixGet());
 
-//  for (unsigned int ix = 0; ix < databases.size(); ++ix)
-//    LM_M(("Tenant %d: '%s'", ix, databases[ix].c_str()));
 
   // Now refresh the subCache for each and every tenant
   for (unsigned int ix = 0; ix < databases.size(); ++ix)
@@ -867,7 +848,6 @@ void mongoSubCacheRefresh(void)
   }
 
   reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
-  LM_M(("Sub Cache refreshed: %d items in Sub Cache", mongoSubCache.items));
 }
 
 

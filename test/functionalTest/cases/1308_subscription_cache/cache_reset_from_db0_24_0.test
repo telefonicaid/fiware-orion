@@ -1,0 +1,394 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Possible Bug in Subscription Cache reloading from database for 0.24.0
+
+--SHELL-INIT--
+dbInit CB
+dbInit ftest-t1
+dbInit ftest-t2
+brokerStart CB 0 IPv4 -multiservice -subCacheIval 2
+
+--SHELL--
+
+#
+# 01. Create subscription for s0.* entities, attribute A, w/o tenant
+# 02. Create subscription for s1.* entities, attribute A, for tenant t1
+# 03. Create subscription for s2.* entities, attribute A, for tenant t2
+# 04. See subscriptions w/o tenant 
+# 05. See subscriptions for tenant t1
+# 06. See subscriptions for tenant t2
+# 07. Wait 3 secs so that the subscription cache has been reset from DB
+# 08. See subscriptions w/o tenant 
+# 09. See subscriptions for tenant t1
+# 10. See subscriptions for tenant t2
+#
+
+
+echo "01. Create subscription for s0.* entities, attribute A, w/o tenant"
+echo "=================================================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": "s0.*"
+    }
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create subscription for s1.* entities, attribute A, for tenant t1"
+echo "====================================================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": "s1.*"
+    }
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json --tenant t1
+echo
+echo
+
+
+echo "03. Create subscription for s2.* entities, attribute A, for tenant t2"
+echo "====================================================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": "s2.*"
+    }
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json --tenant t2
+echo
+echo
+
+
+echo "04. See subscriptions w/o tenant"
+echo "================================"
+echo 'db.csubs.findOne()' | mongo ftest
+echo
+echo
+
+
+echo "05. See subscriptions for tenant t1"
+echo "==================================="
+echo 'db.csubs.findOne()' | mongo ftest-t1
+echo
+echo
+
+
+echo "06. See subscriptions for tenant t2"
+echo "==================================="
+echo 'db.csubs.findOne()' | mongo ftest-t2
+echo
+echo
+
+
+echo "07. Wait 3 secs so that the subscription cache has been reset from DB"
+echo "====================================================================="
+sleep 3
+echo
+echo
+
+
+echo "08. See subscriptions w/o tenant"
+echo "================================"
+echo 'db.csubs.findOne()' | mongo ftest
+echo
+echo
+
+
+echo "09. See subscriptions for tenant t1"
+echo "==================================="
+echo 'db.csubs.findOne()' | mongo ftest-t1
+echo
+echo
+
+
+echo "10. See subscriptions for tenant t2"
+echo "==================================="
+echo 'db.csubs.findOne()' | mongo ftest-t2
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for s0.* entities, attribute A, w/o tenant
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create subscription for s1.* entities, attribute A, for tenant t1
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+03. Create subscription for s2.* entities, attribute A, for tenant t2
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+04. See subscriptions w/o tenant
+================================
+MongoDB shell version: REGEX(.*)
+connecting to: ftest
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "127.0.0.1",
+	"servicePath" : "/#",
+	"entities" : [
+		{
+			"id" : "s0.*",
+			"isPattern" : "true"
+		}
+	],
+	"attrs" : [ ],
+	"conditions" : [
+		{
+			"type" : "ONCHANGE",
+			"value" : [
+				"A"
+			]
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+05. See subscriptions for tenant t1
+===================================
+MongoDB shell version: REGEX(.*)
+connecting to: ftest-t1
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "127.0.0.1",
+	"servicePath" : "/#",
+	"entities" : [
+		{
+			"id" : "s1.*",
+			"isPattern" : "true"
+		}
+	],
+	"attrs" : [ ],
+	"conditions" : [
+		{
+			"type" : "ONCHANGE",
+			"value" : [
+				"A"
+			]
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+06. See subscriptions for tenant t2
+===================================
+MongoDB shell version: REGEX(.*)
+connecting to: ftest-t2
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "127.0.0.1",
+	"servicePath" : "/#",
+	"entities" : [
+		{
+			"id" : "s2.*",
+			"isPattern" : "true"
+		}
+	],
+	"attrs" : [ ],
+	"conditions" : [
+		{
+			"type" : "ONCHANGE",
+			"value" : [
+				"A"
+			]
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+07. Wait 3 secs so that the subscription cache has been reset from DB
+=====================================================================
+
+
+08. See subscriptions w/o tenant
+================================
+MongoDB shell version: REGEX(.*)
+connecting to: ftest
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "127.0.0.1",
+	"servicePath" : "/#",
+	"entities" : [
+		{
+			"id" : "s0.*",
+			"isPattern" : "true"
+		}
+	],
+	"attrs" : [ ],
+	"conditions" : [
+		{
+			"type" : "ONCHANGE",
+			"value" : [
+				"A"
+			]
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+09. See subscriptions for tenant t1
+===================================
+MongoDB shell version: REGEX(.*)
+connecting to: ftest-t1
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "127.0.0.1",
+	"servicePath" : "/#",
+	"entities" : [
+		{
+			"id" : "s1.*",
+			"isPattern" : "true"
+		}
+	],
+	"attrs" : [ ],
+	"conditions" : [
+		{
+			"type" : "ONCHANGE",
+			"value" : [
+				"A"
+			]
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+10. See subscriptions for tenant t2
+===================================
+MongoDB shell version: REGEX(.*)
+connecting to: ftest-t2
+{
+	"_id" : ObjectId(REGEX(.*)),
+	"expiration" : NumberLong(REGEX(.*)),
+	"reference" : "127.0.0.1",
+	"servicePath" : "/#",
+	"entities" : [
+		{
+			"id" : "s2.*",
+			"isPattern" : "true"
+		}
+	],
+	"attrs" : [ ],
+	"conditions" : [
+		{
+			"type" : "ONCHANGE",
+			"value" : [
+				"A"
+			]
+		}
+	],
+	"format" : "JSON"
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop ftest-t1
+dbDrop ftest-t2

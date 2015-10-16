@@ -35,13 +35,13 @@
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  long long          _throttling,
-  long long          _lastNotification,
-  Format             _format,
-  const std::string& _reference,
-  AttributeList      _attrL,
-  const std::string& _cacheSubId,
-  const std::string& _tenant
+  long long           _throttling,
+  long long           _lastNotification,
+  Format              _format,
+  const std::string&  _reference,
+  AttributeList       _attrL,
+  const std::string&  _cacheSubId,
+  const char*         _tenant
 )
 {
   throttling        = _throttling;
@@ -50,7 +50,7 @@ TriggeredSubscription::TriggeredSubscription
   reference         = _reference;
   attrL             = _attrL;
   cacheSubId        = _cacheSubId;
-  tenant            = _tenant;
+  tenant            = (_tenant == NULL)? "" : _tenant;
 }
 
 

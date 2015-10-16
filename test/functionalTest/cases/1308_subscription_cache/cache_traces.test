@@ -1,0 +1,153 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Temp
+
+--SHELL-INIT--
+dbInit CB
+dbInit ftest-t1
+brokerStart CB 216 IPv4 -multiservice -subCacheIval 2
+
+--SHELL--
+
+#
+# 01. Create subscription for s0.* entities, attribute A, w/o tenant
+# 02. Create subscription for s1.* entities, attribute A, for tenant t1
+# 03. Wait 3 secs so that the subscription cache has been reset from DB
+# 04. Create entity s01 w/ attr A w/o tenant
+#
+#
+
+
+echo "01. Create subscription for s0.* entities, attribute A, w/o tenant"
+echo "=================================================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": "s0.*"
+    }
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create subscription for s1.* entities, attribute A, for tenant t1"
+echo "====================================================================="
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": "s1.*"
+    }
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json --tenant t1
+echo
+echo
+
+
+echo "03. Wait 3 secs so that the subscription cache has been reset from DB"
+echo "====================================================================="
+sleep 3
+echo
+echo
+
+
+echo "04. Create entity s01 w/ attr A w/o tenant"
+echo "=========================================="
+payload='{
+  "id": "s01",
+  "A": 4
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for s0.* entities, attribute A, w/o tenant
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create subscription for s1.* entities, attribute A, for tenant t1
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+03. Wait 3 secs so that the subscription cache has been reset from DB
+=====================================================================
+
+
+04. Create entity s01 w/ attr A w/o tenant
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/s01
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB
+#dbDrop ftest-t1

@@ -122,8 +122,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * entities and csbus collections.
 */
-static void prepareDatabase(bool initializeCache = true) {
-
+static void prepareDatabase(bool useSubCache = true)
+{
   /* Set database */
   setupDatabase();
 
@@ -280,19 +280,23 @@ static void prepareDatabase(bool initializeCache = true) {
                                                      ))
                       );
 
+  LM_M(("Creating 5 entities"));
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
   connection->insert(ENTITIES_COLL, en3);
   connection->insert(ENTITIES_COLL, en4);
   connection->insert(ENTITIES_COLL, en5);
+
+  LM_M(("Creating 5 subscriptions"));
   connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
   connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
   connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
 
   /* Given that preparation including csubs, we have to init cache */
-  if (initializeCache == true)
+  if (useSubCache == true)
   {
     mongoSubCacheInit();
+    mongoSubCacheRefresh();
   }
 }
 
@@ -306,8 +310,8 @@ static void prepareDatabase(bool initializeCache = true) {
 * no type cases
 *
 */
-static void prepareDatabaseWithNoTypeSubscriptions(void) {
-
+static void prepareDatabaseWithNoTypeSubscriptions(void)
+{
     prepareDatabase(false);
 
     DBClientBase* connection = getMongoConnection();
@@ -375,6 +379,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
 
     /* Given that preparation including csubs, we have to init cache */
     mongoSubCacheInit();
+    mongoSubCacheRefresh();
 }
 
 /* ****************************************************************************

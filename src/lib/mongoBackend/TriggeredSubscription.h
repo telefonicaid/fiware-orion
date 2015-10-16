@@ -57,17 +57,17 @@ class TriggeredSubscription
   std::string   cacheSubId;
   std::string   tenant;
 
-  TriggeredSubscription(long long          _throttling,
-                        long long          _lastNotification,
-                        Format             _format,
-                        const std::string& _reference,
-                        AttributeList      _attrL,
-                        const std::string& _cacheSubId,
-                        const std::string& _tenant);
+  TriggeredSubscription(long long           _throttling,
+                        long long           _lastNotification,
+                        Format              _format,
+                        const std::string&  _reference,
+                        AttributeList       _attrL,
+                        const std::string&  _cacheSubId,
+                        const char*         _tenant);
 
-  TriggeredSubscription(Format             _format,
-                        const std::string& _reference,
-                        AttributeList      _attrL);
+  TriggeredSubscription(Format              _format,
+                        const std::string&  _reference,
+                        AttributeList       _attrL);
 
   std::string toString(const std::string& delimiter);
 };
