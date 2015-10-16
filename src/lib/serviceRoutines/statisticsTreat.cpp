@@ -203,6 +203,11 @@ std::string statisticsTreat
     out += TAG_ADD_COUNTER("availabilityNotificationsReceived", noOfAvailabilityNotificationsReceived);
   }
 
+  if (noOfAvailabilityNotificationsSent != -1)
+  {
+    out += TAG_ADD_COUNTER("availabilityNotificationsSent", noOfAvailabilityNotificationsSent);
+  }
+
   if (noOfQueries != -1)
   {
     out += TAG_ADD_COUNTER("queries", noOfQueries);
@@ -231,6 +236,11 @@ std::string statisticsTreat
   if (noOfNotificationsReceived != -1)
   {
     out += TAG_ADD_COUNTER("notificationsReceived", noOfNotificationsReceived);
+  }
+
+  if (noOfNotificationsSent != -1)
+  {
+    out += TAG_ADD_COUNTER("notificationsSent", noOfNotificationsSent);
   }
 
   if (noOfQueryContextResponses != -1)
