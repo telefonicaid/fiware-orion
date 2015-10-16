@@ -1,8 +1,6 @@
 #ifndef SRC_LIB_LOGMSG_LOGMSG_H_
 #define SRC_LIB_LOGMSG_LOGMSG_H_
 
-#define LM_NO_I 1
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
