@@ -79,7 +79,6 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   case EntityAttributeRequest:
     releaseP->attribute = &parseDataP->attr.attribute;
     answer = parseContextAttribute(ciP, &parseDataP->attr.attribute);
-    parseDataP->attr.attribute.present("Parsed Attribute: ", 0);
     if (answer != "OK")
     {
       return answer;

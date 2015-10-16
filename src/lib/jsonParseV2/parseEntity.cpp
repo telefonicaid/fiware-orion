@@ -159,6 +159,5 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     }
   }
 
-  eP->present("");
   return "OK";
 }
