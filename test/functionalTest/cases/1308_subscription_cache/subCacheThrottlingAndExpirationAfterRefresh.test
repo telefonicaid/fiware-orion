@@ -316,5 +316,5 @@ Content-Type: application/json; charset=utf-8
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
-#dbDrop ftest-t1
+dbDrop CB
+dbDrop ftest-t1
