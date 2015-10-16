@@ -1,6 +1,4 @@
-#!/bin/bash
-# -*- coding: latin-1 -*-
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -19,14 +17,24 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
-#
 
-# This small script is useful for Qt Creator users, in order to regenerate the files directory
-# The argument is the file in which your Orion Context Broker repository is, e.g:
-#
-# ./qt_regenerate_files.sh ~/src/fiware-orion
-
-CURRENT=$(pwd)
-cd $1
-find | egrep '(\.cpp|\.h|\.test|\.txt|\.sh|\.py|\.jmx|\.vtest|\.md|\.apib)$' | grep -v BUILD | grep -v '.git' | grep -v 'archive/' | cut -c 3-
-cd $CURRENT
+outFiles=$(find . -name '*.out' | grep -v valgrind | sort)
+for outFile in $outFiles
+do
+  # Search for the corresponging .regexpect file
+  base=$(basename $outFile)
+  dir=$(dirname $outFile)
+  baseWithoutExtension="${base%.*}"
+  regexpectFile=$dir/$baseWithoutExtension.regexpect
+  testFile=$dir/$baseWithoutExtension.test
+  if [ -f "$regexpectFile" ]
+  then
+    echo
+    if [ ! -f "$testFile" ]
+    then
+      echo "WARNING: '$testFile' doesn't exist, this is a false positive"
+      exit 1
+    fi
+    ./testHarness.sh $testFile
+  fi
+done

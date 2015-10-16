@@ -851,7 +851,7 @@ Date: REGEX(.*)
 08. Update/APPEND OfficeRoom/Room/pressure=
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 814
+Content-Length: 636
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -872,9 +872,8 @@ Date: REGEX(.*)
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>422</code>
-        <reasonPhrase>Invalid Modification</reasonPhrase>
-        <details>action: APPEND - entity: [OfficeRoom, Room, false] - offending attribute: pressure - empty attribute not allowed in APPEND or UPDATE</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -884,7 +883,7 @@ Date: REGEX(.*)
 09. Update/UPDATE OfficeRoom/Room/pressure=
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 814
+Content-Length: 636
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -905,9 +904,8 @@ Date: REGEX(.*)
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>422</code>
-        <reasonPhrase>Invalid Modification</reasonPhrase>
-        <details>action: UPDATE - entity: [OfficeRoom, Room, false] - offending attribute: pressure - empty attribute not allowed in APPEND or UPDATE</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

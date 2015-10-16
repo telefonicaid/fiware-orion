@@ -385,23 +385,26 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 *
 * attributeValueAbsent -
 *
-* Check that the attribute doesn't have any value, taking into account its multi-valuated nature.
-*
-* NOTE
-*   1. ValueTypeNumber and ValueTypeBoolean are always non-empty.
-*   2. In API version 2, the value of a ContextAttribute CANNOT be left out
+* Check that the attribute doesn't have any value
 *
 */
-bool attributeValueAbsent(ContextAttribute* caP, const std::string& apiVersion)
+bool attributeValueAbsent(ContextAttribute* caP)
 {
-  if (apiVersion == "v1")
-  {
-    return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
-  }
-  else // NGSIv2
-  {
-    return caP->valueType == ValueTypeNone;
-  }
+  return caP->valueType == ValueTypeNone;
+}
+
+/* ****************************************************************************
+*
+* attributeTypeAbsent -
+*
+* Check that the attribute doesn't have any type
+*
+*/
+bool attributeTypeAbsent(ContextAttribute* caP)
+{
+  // FIXME P10: this is a temporal solution while the ContextAttribute class gets
+  // modified to inlcude a "NoneType" or similar. Type "" should be allowed in NGSIv2
+  return caP->type == "";
 }
 
 
@@ -411,6 +414,19 @@ bool attributeValueAbsent(ContextAttribute* caP, const std::string& apiVersion)
 */
 bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 {
+  /* Not finding the attribute field at MongoDB is consideres as an implicit "" */
+  if (!attr.hasField(ENT_ATTRS_VALUE))
+  {
+    return (caP->valueType != ValueTypeString || caP->stringValue != "");
+  }
+
+  /* No value in the request means that the value stays as it was before, so it is not
+   * a change */
+  if (caP->valueType == ValueTypeNone)
+  {
+    return false;
+  }
+
   switch (attr.getField(ENT_ATTRS_VALUE).type())
   {
     case Object:
@@ -490,14 +506,14 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
 * request (caP), and merged them producing the mergedAttr output. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, const std::string& apiVersion)
+static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr)
 {
   BSONObjBuilder ab;
 
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!attributeValueAbsent(caP, apiVersion))
+  if (!attributeValueAbsent(caP))
   {
     valueBson(caP, ab);
   }
@@ -603,16 +619,13 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   {
     /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
      *
-     * 1) the value of the attribute changed (probably the !attr.hasField(ENT_ATTRS_VALUE) is not needed, as any
-     *    attribute is supposed to have a value (according to NGSI spec), but it doesn't hurt anyway and makes CB
-     *    stronger)
+     * 1) the value of the attribute changed (see attrValueChanges for details)
      * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
      *    type is optional according to NGSI and the attribute may not have that field in the BSON)
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-      actualUpdate = (!attr.hasField(ENT_ATTRS_VALUE) ||
-                      attrValueChanges(attr, caP) ||
+      actualUpdate = (attrValueChanges(attr, caP) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
                                              STR_FIELD(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
@@ -710,8 +723,7 @@ static bool updateAttribute
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
   bool&               actualUpdate,
-  bool                isReplace,
-  const std::string&  apiVersion
+  bool                isReplace
 )
 {
   actualUpdate = false;
@@ -753,7 +765,7 @@ static bool updateAttribute
 
     BSONObj newAttr;
     BSONObj attr = attrs.getField(effectiveName).embeddedObject();
-    actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
+    actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
 
     if (actualUpdate)
     {
@@ -787,8 +799,7 @@ static void appendAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate,
-  const std::string&  apiVersion
+  bool&               actualUpdate
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
@@ -801,7 +812,7 @@ static void appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion);
+    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false);
     return;
   }
 
@@ -1456,12 +1467,11 @@ static bool updateContextAttributeItem
   std::string&              locAttr,
   double&                   coordLat,
   double&                   coordLong,
-  bool                      isReplace,
-  const std::string&        apiVersion
+  bool                      isReplace
 )
 {
 
-  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
+  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace))
   {
     entityModified = actualUpdate || entityModified;
   }
@@ -1540,13 +1550,12 @@ static bool appendContextAttributeItem
   bool&                     entityModified,
   std::string&              locAttr,
   double&                   coordLat,
-  double&                   coordLong,
-  const std::string&        apiVersion
+  double&                   coordLong
 )
 {
   if (legalIdUsage(attrs, targetAttr))
   {
-    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
+    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
     entityModified = actualUpdate || entityModified;
 
     /* Check aspects related with location */
@@ -1738,15 +1747,14 @@ static bool processContextAttributeVector
                                       locAttr,
                                       coordLat,
                                       coordLong,
-                                      strcasecmp(action.c_str(), "replace") == 0,
-                                      apiVersion))
+                                      strcasecmp(action.c_str(), "replace") == 0))
       {
         return false;
       }
     }
     else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
     {
-      if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong, apiVersion))
+      if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
       {
         return false;
       }
@@ -2131,7 +2139,7 @@ void processContextElement
     return;  // Error already in responseP
   }
 
-  /* Check that UPDATE or APPEND is not used with attributes with empty value */
+  /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
   if ((strcasecmp(action.c_str(), "update") == 0) ||
       (strcasecmp(action.c_str(), "append") == 0) ||
       (strcasecmp(action.c_str(), "append_strict") == 0) ||
@@ -2140,21 +2148,21 @@ void processContextElement
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
-
-      if (attributeValueAbsent(aP, apiVersion) && (aP->metadataVector.size() == 0))
+      if (attributeValueAbsent(aP) && attributeTypeAbsent(aP) && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
                                   std::string("action: ") + action +
                                   " - entity: [" + enP->toString(true) + "]" +
-                                  " - offending attribute: " + aP->toString() +
+                                  " - offending attribute: " + aP->name +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return;   // Error already in responseP
+        return; // Error already in responseP
       }
     }
   }
+
 
   /* Find entities (could be several, in the case of no type or isPattern=true) */
   const std::string  idString          = "_id." ENT_ENTITY_ID;

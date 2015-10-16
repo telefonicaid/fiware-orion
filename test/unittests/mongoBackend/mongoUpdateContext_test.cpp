@@ -80,8 +80,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - createEntityWithId          - a non-existing entity is created (with metadata ID in attributes)
 * - createEntityMixIdNoIdFails  - attempt to create entity with same attribute with ID and not ID fails
 * - createEntityMd              - createEntity + custom metadata
-* - updateEmptyValueFail        - fail due to UPDATE with empty attribute value
-* - appendEmptyValueFail        - fail due to APPEND with empty attribute value
+* - updateEmptyValueOK          - UPDATE with empty attribute value
+* - appendEmptyValueOk          - APPEND with empty attribute value
 * - updateAttrNotFoundFail      - fail due to UPDATE in not existing attribute
 * - deleteAttrNotFoundFail      - fail due to DELETE on not existing attribute
 * - mixUpdateAndCreate          - mixing a regular update (on an existing entity) and entity creation in same request
@@ -5178,9 +5178,9 @@ TEST(mongoUpdateContextRequest, createEntityMd)
 
 /* ****************************************************************************
 *
-* updateEmptyValueFail -
+* updateEmptyValueOk -
 */
-TEST(mongoUpdateContextRequest, updateEmptyValueFail)
+TEST(mongoUpdateContextRequest, updateEmptyValueOk)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -5220,9 +5220,9 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ(SccInvalidModification, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Invalid Modification", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: [E1, T1, false] - offending attribute: A1 - empty attribute not allowed in APPEND or UPDATE", RES_CER_STATUS(0).details);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5238,7 +5238,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
@@ -5248,8 +5248,8 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("", C_STR_FIELD(a1, "value"));
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
@@ -5335,9 +5335,9 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
 
 /* ****************************************************************************
 *
-* appendEmptyValueFail -
+* appendEmptyValueOk -
 */
-TEST(mongoUpdateContextRequest, appendEmptyValueFail)
+TEST(mongoUpdateContextRequest, appendEmptyValueOk)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -5377,9 +5377,9 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ(SccInvalidModification, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Invalid Modification", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E1, T1, false] - offending attribute: A8 - empty attribute not allowed in APPEND or UPDATE", RES_CER_STATUS(0).details);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5395,21 +5395,27 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     attrNames = ent.getField("attrNames").Array();
-    ASSERT_EQ(2, attrs.nFields());
-    ASSERT_EQ(2, attrNames.size());
+    ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    BSONObj a8 = attrs.getField("A8").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));   
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
+    EXPECT_STREQ("", C_STR_FIELD(a8, "value"));
+    EXPECT_EQ(1360232700, a8.getIntField("creDate"));
+    EXPECT_EQ(1360232700, a8.getIntField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
