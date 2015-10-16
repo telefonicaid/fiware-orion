@@ -376,7 +376,7 @@ Content-Type: application/json; charset=utf-8
             "isDomain" : "false"
           }
         ],
-        "providingApplication" : "http://localhost:9997/notify"
+        "providingApplication" : "http://localhost:'${LISTENER_PORT}'/notify"
       }
     }
   ]
@@ -406,7 +406,7 @@ Content-Type: application/xml
             <isDomain>false</isDomain>
           </contextRegistrationAttribute>
         </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:9997/notify</providingApplication>
+        <providingApplication>http://localhost:'${LISTENER_PORT}'/notify</providingApplication>
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
@@ -436,7 +436,7 @@ Content-Type: application/xml
             <isDomain>false</isDomain>
           </contextRegistrationAttribute>
         </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:9997/notify</providingApplication>
+        <providingApplication>http://localhost:'${LISTENER_PORT}'/notify</providingApplication>
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
@@ -468,7 +468,7 @@ Content-Type: application/json; charset=utf-8
             "isDomain" : "false"
           }
         ],
-        "providingApplication" : "http://localhost:9997/notify"
+        "providingApplication" : "http://localhost:'${LISTENER_PORT}'/notify"
       }
     }
   ]
