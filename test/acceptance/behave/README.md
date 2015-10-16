@@ -122,7 +122,7 @@ This libraries will be install into `requirements.txt`
 - context_broker_env
     * CB_PROTOCOL: web protocol used (http by default)
     * CB_HOST: context broker host (localhost by default)
-    * CB_PORT: sth port (8666 by default)
+    * CB_PORT: sth port (1026 by default)
     * CB_VERSION: context broker version (x.y.z by default)
     * CB_VERIFY_VERSION: determine whether the version is verified or not (True or False).
     * CB_FABRIC_USER: user used to connect by Fabric
@@ -151,10 +151,12 @@ This libraries will be install into `requirements.txt`
     * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
 
-### BackgroundFeature
+### Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
 
-In certain cases, could be useful define a background by feature instead of `Background` that is by scenario.
-Recommend append `BackgroundFeature` in Feature description and define the steps with `Setup:` or `Check:` prefix.
+In certain cases, could be useful to define actions before or/and after of the feature or/and each scenario. This help to read all pre or post actions into the feature. 
+
+Recommend append labels defined (`Actions Before the Feature`, `Actions Before each Scenario`, `Actions After each Scenario`,`Actions After the Feature`)
+into de feature description, these labels are Optional. And define steps with `Setup:` or `Check:` prefix (must be `:` in the step prefix). See `environment.py` in root path.
 Example:
 ```
 Feature: feature name...
@@ -162,45 +164,89 @@ Feature: feature name...
   I would like to execute once several steps in the feature
   So ....
 
-  BackgroundFeature:
-    Setup: update config file
-    Setup: restart service
-    Check: verify if the service is installed successfully
+   Actions Before the Feature:
+      Setup: update config file
+      Setup: start service
+      Check: verify if the service is installed successfully
+  
+   Actions Before each Scenario:
+      Setup: reinit the configuration
+  
+   Actions After each Scenario:
+      Setup: delete database
+
+   Actions After the Feature:
+       Setup: stop service
+```
+
+
+### Summary of Features and Scenarios
+
+Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
+To activate/deactivate this summary, modify `SHOW_SUMMARY` variable (boolean).
+Example:
+```
+                    SUMMARY:
+-------------------------------------------------
+  - components/ngsiv2/entities/create_entities.feature >> passed: 440, failed: 0, skipped: 138 and total: 578 with duration: 62.688 seconds.
+  - components/ngsiv2/entities/delete_entities.feature >> passed: 64, failed: 0, skipped: 1 and total: 65 with duration: 9.605 seconds.
+  - components/ngsiv2/entities/list_all_entities.feature >> passed: 132, failed: 0, skipped: 68 and total: 200 with duration: 44.388 seconds.
+  - components/ngsiv2/entities/list_an_attribute_by_id_and_name.feature >> passed: 130, failed: 0, skipped: 68 and total: 198 with duration: 32.760 seconds.
+  - components/ngsiv2/entities/list_an_entity_by_id.feature >> passed: 141, failed: 0, skipped: 68 and total: 209 with duration: 28.082 seconds.
+  - components/ngsiv2/entities/replace_attributes_by_id.feature >> passed: 253, failed: 0, skipped: 307 and total: 560 with duration: 55.864 seconds.
+  - components/ngsiv2/entities/update_an_attribute_by_id_and_name.feature >> passed: 1, failed: 0, skipped: 0 and total: 1 with duration: 0.237 seconds.
+  - components/ngsiv2/entities/update_append_attributes_by_id.feature >> passed: 402, failed: 0, skipped: 364 and total: 766 with duration: 74.562 seconds.
+  - components/ngsiv2/entities/update_attributes_by_id.feature >> passed: 307, failed: 0, skipped: 347 and total: 654 with duration: 59.563 seconds.
+-------------------------------------------------
+9 features passed, 0 failed, 0 skipped
+1870 scenarios passed, 0 failed, 1361 skipped
+9784 steps passed, 0 failed, 7313 skipped, 0 undefined
+Took 6m7.748s
 ```
 
 
 ### Logs
 
-The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
+The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
 
 ### Tests Suites Coverage (features):
 
-  - entities
-    * general_operations - 16 testcases
-    * create_entities - 559 testcases                   POST - /v2/entities/ plus payload
-    * list_all_entities - 200 testcases                 GET - /v2/entities/
-    * list_an_entity_by_id - 209 testcases              GET - /v2/entities/<entity_id>
-    * list_an_attribute_by_id - 198 testcases           GET - /v2/entities/<entity_id>/attrs/<attr_name>
-    * update_append_attribute_by_id - 766 testcases     POST - /v2/entities/<entity_id> plus payload
-    * update_attribute_by_id - 654 testcases            PATCH - /v2/entities/<entity_id> plus payload  
-    * replace_attributes_by_id (pending)
-    * remove_entity (pending)
+|           FEATURE                           |  TEST CASES  | METHOD  |            URL                                      |  PAYLOAD       |  
+|:--------------------------------------------|:------------:|--------:|:----------------------------------------------------|:--------------:|      
+|**general folder**                                                                                                                           |
+| - general_operations                        |      16      | GET     | /version   /statistics    /v2                       | No             |
+|                                                                                                                                             |
+|**entities folder**                                                                                                                          |
+| - create_entities                           |     578      | POST   | /v2/entities/                                        | Yes            |      
+| - list_all_entities                         |     200      | GET    | /v2/entities/                                        | No             | 
+|                                                                                                                                             |
+| - update_append_attributes_by_id            |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   
+| - list_an_entity_by_id                      |     209      | GET    | /v2/entities/`<entity_id>`                           | No             | 
+| - replace_attributes_by_id                  |     511      | PUT    | /v2/entities/`<entity_id>`                           | Yes            |   
+| - update_attributes_by_id                   |     654      | PATCH  | /v2/entities/`<entity_id>`                           | Yes            | 
+| - delete_entity_by_id                       |      65      | DELETE | /v2/entities/`<entity_id>`                           | No             |
+|                                                                                                                                             |
+| - list_an_attribute_by_id_and_name          |     198      | GET    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |   
+| - update_an_attribute_by_id_and_name        |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes            | 
+| - delete_an_attribute_by_id_and_name        |  (pending)   | DELETE | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |
+|                                                                                                                                             |
+| - update_an_attribute_value_by_id_and_name  |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes            |   
+|                                                                                                                                             |
+|**alarms folder**                            |  (pending)   |                                                                                |
 
-  -  alarms (pending)
-
-
+  
 ### Hints:
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
   - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
       The number after "=" is the number of chars
         ex: | attr_name | random=10 |
-  - If entities number is "1", the entity id is without consecutive, ex: `entity_id=room`
-    Else entities number is major than "1" the entities number are prefix plus consecutive, ex:
+  - If entities number is "1", the entity id has not suffix, ex: `entity_id=room`
+    Else entities number is major than "1" the entities id are value plus a suffix (consecutive), ex:
         `entity_id=room_0, entity_id=room_1, ..., entity_id=room_N`
-  - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
-    Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
+  - If attribute number is "1", the attribute name has not suffix, ex: `attributes_name=temperature`
+    Else attributes number is major than "1" the attributes name are value plus a suffix (consecutive), ex:
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
   - If would like a wrong query parameter name, use `qp_` prefix   
   - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)

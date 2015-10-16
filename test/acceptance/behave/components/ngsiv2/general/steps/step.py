@@ -25,9 +25,6 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 from components.common_steps.initial_steps import *
 from components.common_steps.general_steps import *
-from components.common_steps.entities.create_update_replace_steps import *
-from components.common_steps.entities.get_steps import *
-from components.common_steps.entities.delete_steps import *
 
 #  common steps
 # ---- initial_steps.py --------------------------------------------------------------
@@ -54,38 +51,4 @@ from components.common_steps.entities.delete_steps import *
 @step(u'verify that receive several "([^"]*)" http code')
 @step(u'verify an error response')
 @step(u'verify several error responses')
-"""
-
-# ---- entities.create_update_replace_steps.py -----------------------------------------
-"""
-@step(u'a definition of headers')
-@step(u'create "([^"]*)" entities with "([^"]*)" attributes')
-@step(u'create an entity and attribute with special values in raw')
-@step(u'update or append attributes by ID "([^"]*)"')
-@step(u'update or append attributes by ID "([^"]*)" in raw mode')
-@step(u'update an attribute by ID "([^"]*)" if it exists')
-@step(u'update an attribute by ID "([^"]*)" if it exists in raw mode')
-@step(u'replace attributes by ID "([^"]*)"')
-@step(u'replace attributes by ID "([^"]*)" in raw mode')
-@step(u'verify that entities are stored in default tenant at mongo')
-@step(u'verify that entities are stored in mongo')
-@step(u'verify that entities are not stored in mongo')
-@step(u'verify that an entity is updated in mongo')
-"""
-
-# ---- entities.get_steps.py -------------------------------------------------------------
-"""
-@step(u'get all entities')
-@step(u'get an entity by ID "([^"]*)"')
-@step(u'get an attribute "([^"]*)" by ID "([^"]*)"')
-@step(u'verify that all entities are returned')
-@step(u'verify an entity in raw mode with type "([^"]*)" in attribute value from http response')
-@step(u'verify that the entity by ID is returned')
-@step(u'verify that the attribute by ID is returned')
-@step(u'verify an attribute by ID in raw mode with type "([^"]*)" in attribute value from http response')
-"""
-
-# ---- entities.delete_steps.py -------------------------------------------------------------
-"""
-@step(u'delete entity with id "([^"]*)"')
 """

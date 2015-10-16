@@ -137,7 +137,6 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * [Advanced Programming](doc/manuals/user/README.md)
 * [Installation and administration](doc/manuals/admin/README.md)
 * Container-based deployment
-  * [Vagrant](doc/manuals/vagrant.md)
   * [Docker](docker/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
 * [Deprecated features](doc/manuals/deprecated.md)

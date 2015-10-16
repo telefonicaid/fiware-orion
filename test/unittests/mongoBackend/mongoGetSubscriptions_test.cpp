@@ -30,7 +30,7 @@
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/mongoListSubscriptions.h"
+#include "mongoBackend/mongoGetSubscriptions.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -51,6 +51,15 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 */
 
+
+/* ****************************************************************************
+ *  Subscrptions IDs
+*/
+static const std::string SUB_OID1 = "51307b66f481db11bf860001";
+static const std::string SUB_OID2 = "51307b66f481db11bf860002";
+static const std::string SUB_OID3 = "51307b66f481db11bf860003";
+
+
 /* ****************************************************************************
 *
 * prepareDatabaseV1Subs -
@@ -65,7 +74,7 @@ static void prepareDatabaseV1Subs(void) {
     // 25000000 -> Sat, 17 Oct 1970 08:26:40 GMT -> "1970-19-17T08:26:40.00Z"
     DBClientBase* connection = getMongoConnection();
 
-    BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
+    BSONObj sub1 = BSON("_id" << OID(SUB_OID1) <<
                         "expiration" << 10000000 <<                        
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
@@ -76,7 +85,7 @@ static void prepareDatabaseV1Subs(void) {
                                                        ))
                         );
 
-    BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
+    BSONObj sub2 = BSON("_id" << OID(SUB_OID2) <<
                         "expiration" << 25000000 <<
                         "lastNotification" << 20000000 <<
                         "count" << 24 <<
@@ -90,7 +99,7 @@ static void prepareDatabaseV1Subs(void) {
                         "throttling" << 5.0
                         );
 
-    BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
+    BSONObj sub3 = BSON("_id" << OID(SUB_OID3) <<
                         "expiration" << 20000000 <<
                         "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
@@ -135,7 +144,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Subscription #1 */
   s = subs[0];
-  EXPECT_EQ("51307b66f481db11bf860001", s.id);
+  EXPECT_EQ(SUB_OID1, s.id);
   ents = s.subject.entities;
   ASSERT_EQ(1, ents.size());
   EXPECT_EQ("E1", ents[0].id);
@@ -158,7 +167,86 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Subscription #2 */
   s = subs[1];
-  EXPECT_EQ("51307b66f481db11bf860002", s.id);
+  EXPECT_EQ(SUB_OID2, s.id);
+  ents = s.subject.entities;
+  ASSERT_EQ(1, ents.size());
+  EXPECT_EQ("", ents[0].id);
+  EXPECT_EQ("T2", ents[0].type);
+  EXPECT_EQ("E.*", ents[0].idPattern);
+  attrs = s.subject.condition.attributes;
+  ASSERT_EQ(2, attrs.size());
+  EXPECT_EQ("AX2", attrs[0]);
+  EXPECT_EQ("AY2", attrs[1]);
+  EXPECT_EQ("", s.subject.condition.expression.q);
+  EXPECT_EQ("", s.subject.condition.expression.geometry);
+  EXPECT_EQ("", s.subject.condition.expression.coords);
+  attrs = s.notification.attributes;
+  ASSERT_EQ(2, attrs.size());
+  EXPECT_EQ("A1", attrs[0]);
+  EXPECT_EQ("A2", attrs[1]);
+  EXPECT_EQ("http://notify2.me", s.notification.callback);
+  EXPECT_EQ(24, s.notification.timesSent);;
+  EXPECT_EQ(20000000, s.notification.lastNotification);
+  EXPECT_EQ(5, s.notification.throttling);
+  EXPECT_EQ(25000000, s.expires);
+
+}
+
+/* ****************************************************************************
+*
+* getSubscriptionsV1Info -
+*/
+TEST(mongoGetSubscription, getSubscription)
+{
+  OrionError oe;
+
+  /* Prepare database */
+  prepareDatabaseV1Subs();
+
+  /* Invoke the function in mongoBackend library */
+  Subscription empty, s;
+
+  mongoGetSubscription(&s, &oe, SUB_OID1, uriParams, "");
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, oe.code);
+  EXPECT_EQ("OK", oe.reasonPhrase);
+  EXPECT_EQ("", oe.details);
+
+  std::vector<EntID>       ents;
+  std::vector<std::string> attrs;
+
+  /* Subscription #1 */
+
+  EXPECT_EQ(SUB_OID1, s.id);
+  ents = s.subject.entities;
+  ASSERT_EQ(1, ents.size());
+  EXPECT_EQ("E1", ents[0].id);
+  EXPECT_EQ("T1", ents[0].type);
+  EXPECT_EQ("", ents[0].idPattern);
+  attrs = s.subject.condition.attributes;
+  ASSERT_EQ(2, attrs.size());
+  EXPECT_EQ("AX1", attrs[0]);
+  EXPECT_EQ("AY1", attrs[1]);
+  EXPECT_EQ("", s.subject.condition.expression.q);
+  EXPECT_EQ("", s.subject.condition.expression.geometry);
+  EXPECT_EQ("", s.subject.condition.expression.coords);
+  attrs = s.notification.attributes;
+  ASSERT_EQ(0, attrs.size());
+  EXPECT_EQ("http://notify1.me", s.notification.callback);
+  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ(-1, s.notification.lastNotification);
+  EXPECT_EQ(-1, s.notification.throttling);
+  EXPECT_EQ(10000000, s.expires);
+
+  /* Subscription #2 */
+
+  // clear subscription
+  s = empty;
+
+  mongoGetSubscription(&s, &oe, SUB_OID2, uriParams, "");
+
+  EXPECT_EQ(SUB_OID2, s.id);
   ents = s.subject.entities;
   ASSERT_EQ(1, ents.size());
   EXPECT_EQ("", ents[0].id);
