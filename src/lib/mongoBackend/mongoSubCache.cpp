@@ -116,6 +116,11 @@ typedef struct MongoSubCache
   CachedSubscription* head;
   CachedSubscription* tail;
   int                 items;
+
+  // Statistics counters
+  int                 noOfRefreshes;
+  int                 noOfInserts;
+  int                 noOfRemoves;
 } MongoSubCache;
 
 
@@ -134,9 +139,11 @@ MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
 */
 void mongoSubCacheInit(void)
 {
-  mongoSubCache.head   = NULL;
-  mongoSubCache.tail   = NULL;
-  mongoSubCache.items  = 0;
+  mongoSubCache.head          = NULL;
+  mongoSubCache.tail          = NULL;
+  mongoSubCache.items         = 0;
+
+  mongoSubCacheStatisticsReset();
 }
 
 
@@ -157,17 +164,16 @@ static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
   // First insertion?
   if ((mongoSubCache.head == NULL) && (mongoSubCache.tail == NULL))
   {
-    mongoSubCache.head  = cSubP;
-    mongoSubCache.tail  = cSubP;
-    mongoSubCache.items = 1;
-
+    mongoSubCache.head          = cSubP;
+    mongoSubCache.tail          = cSubP;
+    mongoSubCache.items         = 1;
     return;
   }
 
   
-  mongoSubCache.tail->next  = cSubP;
-  mongoSubCache.items      += 1;
-  mongoSubCache.tail        = cSubP;
+  mongoSubCache.tail->next    = cSubP;
+  mongoSubCache.items        += 1;
+  mongoSubCache.tail          = cSubP;
 }
 
 
@@ -726,6 +732,34 @@ void mongoSubCacheItemInsert
   // 5. Now, insert the subscription in the cache
   //
   mongoSubCacheItemInsert(cSubP);
+
+  mongoSubCache.noOfInserts  += 1;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheStatisticsGet - 
+*/
+void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes)
+{
+  *refreshes = mongoSubCache.noOfRefreshes;
+  *inserts   = mongoSubCache.noOfInserts;
+  *removes   = mongoSubCache.noOfRemoves;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheStatisticsReset - 
+*/
+void mongoSubCacheStatisticsReset(void)
+{
+  mongoSubCache.noOfRefreshes  = 0;
+  mongoSubCache.noOfInserts    = 0;
+  mongoSubCache.noOfRemoves    = 0;
 }
 
 
@@ -746,6 +780,8 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
       if (cSubP == mongoSubCache.head)  mongoSubCache.head = cSubP->next;
       if (cSubP == mongoSubCache.tail)  mongoSubCache.tail = prev;
       if (prev != NULL)                 prev->next         = cSubP->next;
+
+      mongoSubCache.noOfRemoves += 1;
 
       cachedSubscriptionDestroy(cSubP);
       return 0;
@@ -847,6 +883,7 @@ void mongoSubCacheRefresh(void)
     mongoSubCacheRefresh(databases[ix]);
   }
 
+  ++mongoSubCache.noOfRefreshes;
   reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
 }
 

@@ -38,6 +38,7 @@
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "mongoBackend/mongoConnectionPool.h"
+#include "mongoBackend/mongoSubCache.h"
 
 
 
@@ -46,7 +47,9 @@
 * TAG_ADD - 
 */
 #define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, true)
+#define TAG_ADD_COUNTER_LAST(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, false)
 #define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outFormat, true)
+#define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outFormat, comma)
 
 
 
@@ -144,6 +147,8 @@ std::string statisticsTreat
     semTimeTransReset();
     mongoPoolConnectionSemWaitingTimeReset();
     mutexTimeCCReset();
+
+    mongoSubCacheStatisticsReset();
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -459,7 +464,22 @@ std::string statisticsTreat
 
   int now = getCurrentTime();
   out += valueTag(indent2, "uptime_in_secs",             now - startTime,      ciP->outFormat, true);
-  out += valueTag(indent2, "measuring_interval_in_secs", now - statisticsTime, ciP->outFormat, false);
+  out += valueTag(indent2, "measuring_interval_in_secs", now - statisticsTime, ciP->outFormat, true);
+
+
+  //
+  // mongo sub cache counters
+  //
+  int mscRefreshs = 0;
+  int mscInserts  = 0;
+  int mscRemoves  = 0;
+
+  mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves);
+
+
+  out += TAG_ADD_INTEGER("subCacheRefreshs", mscRefreshs, true);
+  out += TAG_ADD_INTEGER("subCacheInserts",  mscInserts,  true);
+  out += TAG_ADD_INTEGER("subCacheRemoves",  mscRemoves,  false);
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
   out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);
