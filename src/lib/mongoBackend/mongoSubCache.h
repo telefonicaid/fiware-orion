@@ -177,7 +177,7 @@ extern void mongoSubCacheMatch
 *
 * mongoSubCacheStatisticsGet - 
 */
-extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes);
+extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* items);
 
 
 

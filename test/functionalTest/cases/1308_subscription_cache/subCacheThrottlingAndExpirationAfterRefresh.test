@@ -170,7 +170,7 @@ Date: REGEX(.*)
 02. Sleep 6 secs to let the cache refresh from DB
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 291
+Content-Length: 318
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -180,6 +180,7 @@ Date: REGEX(.*)
         "measuring_interval_in_secs": "REGEX((8|9))",
         "statisticsRequests": "1",
         "subCacheInserts": "1",
+        "subCacheItems": "1",
         "subCacheRefreshs": "2",
         "subCacheRemoves": "0",
         "subscriptions": "1",

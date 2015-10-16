@@ -139,9 +139,9 @@ MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
 */
 void mongoSubCacheInit(void)
 {
-  mongoSubCache.head          = NULL;
-  mongoSubCache.tail          = NULL;
-  mongoSubCache.items         = 0;
+  mongoSubCache.head   = NULL;
+  mongoSubCache.tail   = NULL;
+  mongoSubCache.items  = 0;
 
   mongoSubCacheStatisticsReset();
 }
@@ -164,16 +164,16 @@ static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
   // First insertion?
   if ((mongoSubCache.head == NULL) && (mongoSubCache.tail == NULL))
   {
-    mongoSubCache.head          = cSubP;
-    mongoSubCache.tail          = cSubP;
-    mongoSubCache.items         = 1;
+    mongoSubCache.head   = cSubP;
+    mongoSubCache.tail   = cSubP;
+    mongoSubCache.items  = 1;
     return;
   }
 
   
-  mongoSubCache.tail->next    = cSubP;
-  mongoSubCache.items        += 1;
-  mongoSubCache.tail          = cSubP;
+  mongoSubCache.tail->next  = cSubP;
+  mongoSubCache.items      += 1;
+  mongoSubCache.tail        = cSubP;
 }
 
 
@@ -424,7 +424,7 @@ static void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 */
 void mongoSubCacheDestroy(void)
 {
-  CachedSubscription* cSubP     = mongoSubCache.head;
+  CachedSubscription* cSubP  = mongoSubCache.head;
 
   if (mongoSubCache.head == NULL)
   {
@@ -545,10 +545,10 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               formatString      = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "XML";
-  std::vector<BSONElement>  eVec              = sub.getField(CSUB_ENTITIES).Array();
-  std::vector<BSONElement>  attrVec           = sub.getField(CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec           = sub.getField(CSUB_CONDITIONS).Array();
+  std::string               formatString  = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "XML";
+  std::vector<BSONElement>  eVec          = sub.getField(CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  attrVec       = sub.getField(CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
 
 
   cSubP->tenant = (tenant[0] == 0)? NULL : strdup(tenant);
@@ -742,11 +742,12 @@ void mongoSubCacheItemInsert
 *
 * mongoSubCacheStatisticsGet - 
 */
-void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes)
+void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* items)
 {
   *refreshes = mongoSubCache.noOfRefreshes;
   *inserts   = mongoSubCache.noOfInserts;
   *removes   = mongoSubCache.noOfRemoves;
+  *items     = mongoSubCache.items;
 }
 
 

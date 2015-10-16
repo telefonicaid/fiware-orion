@@ -309,7 +309,7 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: REGEX((314|316))
+Content-Length: REGEX((468|470))
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -322,6 +322,10 @@ Date: REGEX(.*)
   <statisticsRequests>1</statisticsRequests>
   <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
+  <subCacheRefreshs>1</subCacheRefreshs>
+  <subCacheInserts>0</subCacheInserts>
+  <subCacheRemoves>0</subCacheRemoves>
+  <subCacheItems>0</subCacheItems>
 </orion>
 
 

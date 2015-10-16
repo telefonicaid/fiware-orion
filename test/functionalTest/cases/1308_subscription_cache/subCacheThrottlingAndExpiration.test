@@ -26,7 +26,7 @@ Subscription Cache Throttling and expiration
 --SHELL-INIT--
 dbInit CB
 dbInit ftest-t1
-brokerStart CB 216 IPv4 -multiservice -subCacheIval 5
+brokerStart CB 0 IPv4 -multiservice -subCacheIval 5
 accumulatorStart
 
 --SHELL--
