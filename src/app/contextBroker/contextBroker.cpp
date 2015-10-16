@@ -1493,7 +1493,7 @@ int main(int argC, char* argV[])
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
-  // FIXME P8: for release 0.24, -reqMutexPolicy != "all" (which is default) cannot
+  // FIXME P8: for release 0.24, -reqMutexPolicy != "all" ("all" is default) cannot
   //           be used together with mongo subscription cache.
   //           This limitation will be fixed in the next release (0.25.0)
   //
