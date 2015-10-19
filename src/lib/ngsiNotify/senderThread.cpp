@@ -47,7 +47,7 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
-    if (strcmp(notificationMode,"none") != 0)
+    if (strcmp(notificationMode, "none") != 0)
     {
       httpRequestSend(params->ip,
                       params->port,

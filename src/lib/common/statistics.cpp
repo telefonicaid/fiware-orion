@@ -239,7 +239,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntityAttributeValueRequest:                      ++noOfEntityAttributeValueRequests; break;
   case EntityAttributeValueResponse:                     ++noOfEntityAttributeValueResponses; break;
 
-
   case PostEntity:                                       ++noOfPostEntity; break;
   case PostAttributes:                                   ++noOfPostAttributes; break;
   case DeleteEntity:                                     ++noOfDeleteEntity; break;
