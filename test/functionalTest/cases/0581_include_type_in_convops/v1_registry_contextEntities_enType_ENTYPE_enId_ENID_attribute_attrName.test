@@ -237,7 +237,7 @@ Date: REGEX(.*)
         "subCacheRefreshs": "1",
         "subCacheRemoves": "0",
         "uptime_in_secs": "REGEX(\d+)", 
-        "versionRequests": "0",
+        "versionRequests": "REGEX((0|1))",
         "xmlRequests": "REGEX((2|3))"
     }
 }
