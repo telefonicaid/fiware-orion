@@ -13,11 +13,11 @@ These tests are used to verify the cache refresh in a balanced system.
 
 #### Architecture for testing
 
-- 1 node to balancer (nginx)
-- 2 nodes to context broker installed
-- 1 node to mongo db (associated to CBs)
-- 1 node to launch listener and viewer
-- 1 node to launch jmeter
+- 1 node for balancer (nginx)
+- 2 nodes for context broker installed
+- 1 node for mongo db (associated to CBs)
+- 1 node for launch listener and viewer
+- 1 node for launch jmeter
 
 
 #### Scripts used:
@@ -33,8 +33,8 @@ These tests are used to verify the cache refresh in a balanced system.
      SERVICE: service header used in requests (by default, entities_append_long_time)
      SERVICE_PATH: service path header used in requests (by default, /test)
      ENTITIES: number of consecutive entities in each thread (by default, 10)
-     SUBSCRIPTION: optionally is possible to create a subs before all appends requests, in case of would like to create use CREATE as value (by default, nothing)
-     SUBS_DURATION: duration time of the subscription, used if the subscription is create previously  (by default, 60)
+     SUBSCRIPTION: optionally is possible to create a subscription before all appends requests, in case of you would like to create use CREATE as value (by default, nothing)
+     SUBS_DURATION: duration time of the subscription, used if the subscription is create previously (by default, 60)
      LISTEN_HOST: listen host used per receive notifications, used if the subscription is create previously (by default, localhost)
      LISTEN_PORT: listen por used per receive notifications, used if the subscription is create previously  (by default, 8090)
   ```
@@ -116,7 +116,7 @@ These tests are used to verify the cache refresh in a balanced system.
  
  5- delete all dbs with orion prefix in Mongo, with `drop_database_mongo.sh` script.
   
- 6- launch jmeter script `append_entities_long_time_v1.0.jmx` per long time
+ 6- launch jmeter script `append_entities_long_time_v1.0.jmx` for a long time
  
  7- create a subscription with `subs_create_delete.sh` script.
  
@@ -128,4 +128,4 @@ These tests are used to verify the cache refresh in a balanced system.
 
 
 #### Summary:
-These tests are very complicated to automate, because the system should be balanced and the responses (total requests each seconds) are not the same in each execution. So that, these tests will be executed manually.
+These tests are very complicated to automate, because the system should be balanced and the responses (total requests each seconds) are not the same in each execution. So that, these tests should be executed manually.
