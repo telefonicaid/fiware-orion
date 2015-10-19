@@ -308,6 +308,10 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS")
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS")
+  # FIXME P4: Issue #476: remove or keep?
+  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")
   # ADDED FOR UBUNTU 14.10
   MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
