@@ -171,4 +171,20 @@ extern void mongoSubCacheMatch
   std::vector<CachedSubscription*>*  subVecP
 );
 
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheStatisticsGet - 
+*/
+extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* items);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheStatisticsReset - 
+*/
+extern void mongoSubCacheStatisticsReset(void);
+
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

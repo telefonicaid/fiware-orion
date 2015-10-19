@@ -43,7 +43,7 @@ echo
 --REGEXPECT--
 +++++ 1. statistics in XML
 HTTP/1.1 200 OK
-Content-Length: 530
+Content-Length: 684
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -58,12 +58,16 @@ Date: REGEX(.*)
   <curlContextMutexWaitingTime>REGEX(\d+.\d+)</curlContextMutexWaitingTime>
   <uptime_in_secs>REGEX(1?\d)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(1?\d)</measuring_interval_in_secs>
+  <subCacheRefreshs>1</subCacheRefreshs>
+  <subCacheInserts>0</subCacheInserts>
+  <subCacheRemoves>0</subCacheRemoves>
+  <subCacheItems>0</subCacheItems>
 </orion>
 
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: 409
+Content-Length: 524
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -75,6 +79,10 @@ Date: REGEX(.*)
         "measuring_interval_in_secs": "REGEX(1?\d)", 
         "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "2", 
+        "subCacheInserts": "0",
+        "subCacheItems": "0",
+        "subCacheRefreshs": "1",
+        "subCacheRemoves": "0",
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "uptime_in_secs": "REGEX(1?\d)", 
         "versionRequests": "0", 

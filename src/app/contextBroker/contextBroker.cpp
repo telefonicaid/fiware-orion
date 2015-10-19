@@ -315,12 +315,10 @@ PaArgument paArgs[] =
   { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
-  { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
-  { "-cprForwardLimit", &cprForwardLimit, "CPR_FORWARD_LIMIT", PaUInt, PaOpt, 1000, 0, UINT_MAX, CPR_FORWARD_LIMIT_DESC},
-  { "-subCacheIval",  &subCacheInterval, "SUBCACHE_IVAL", PaInt, PaOpt, 10,         0,     3600,  SUB_CACHE_IVAL_DESC },
-
-  // ADDED FOR THE HOTFIX
-  { "-noCache",       &noCache,           "NOCACHE",     PaBool,   PaOpt, false,      false,  true,  NO_CACHE            },
+  { "-corsOrigin",      allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",      PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
+  { "-cprForwardLimit", &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,       0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
+  { "-subCacheIval",    &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,         1,     3600,     SUB_CACHE_IVAL_DESC    },
+  { "-noCache",         &noCache,          "NOCACHE",           PaBool,   PaOpt, false,      false, true,     NO_CACHE               },
 
 
   PA_END_OF_ARGS
@@ -1272,8 +1270,6 @@ static void mongoInit
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  mongoSubCacheInit();
-
   if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
@@ -1492,6 +1488,17 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+  //
+  // FIXME P8: for release 0.24, -reqMutexPolicy != "all" ("all" is default) cannot
+  //           be used together with mongo subscription cache.
+  //           This limitation will be fixed in the next release (0.25.0)
+  //
+  if ((strcmp(reqMutexPolicy, "all") != 0) && (noCache == false))
+  {
+    LM_E(("Bad Input (reqMutexPolicy != 'all'  AND  subscription-cache CANNOT be used together in 0.24.0 (cache can be disabled using -noCache))"));
+    exit(1);
+  }
+
 #ifdef DEBUG_develenv
   //
   // FIXME P9: Temporary setting trace level 250 in jenkins only, until the ftest-ftest-ftest bug is solved
@@ -1566,6 +1573,12 @@ int main(int argC, char* argV[])
     LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
   }
 
+  if (noCache == false)
+  {
+    mongoSubCacheInit();
+    mongoSubCacheStart();
+  }
+
   if (https)
   {
     char* httpsPrivateServerKey = (char*) malloc(2048);
@@ -1594,14 +1607,6 @@ int main(int argC, char* argV[])
   }
 
   LM_I(("Startup completed"));
-
-#if 0  // KZ: valgrind-test of STRANGE leaks
-  mongoSubCacheRefresh();
-  sleep(subCacheInterval);
-  exit(0);
-#else
-  mongoSubCacheStart();
-#endif
 
   while (1)
   {
