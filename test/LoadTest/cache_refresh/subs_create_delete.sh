@@ -23,9 +23,8 @@
 
 service=entities_append_long_time
 service_path=/test
-listen_host=qa-orion-fe-03
+listen_host=localhost
 listen_port=8090
-subs_duration=10000
 
 
 if [  "$1" == ""  ]

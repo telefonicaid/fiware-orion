@@ -26,7 +26,7 @@ if [  "$1" == ""  ]
     echo "ERROR - No url defined (Mandatory)"
     echo "usage:"
     echo "    ./reqs_x_secs.sh <url> "
-    echo "    example: ./reqs_x_secs..sh localhost:4567 "
+    echo "    example: ./reqs_x_secs.sh localhost:4567 "
     exit
 fi
 
@@ -39,7 +39,7 @@ sec=0
 req=0
 while true
 do
-	sleep 1s
+  sleep 1s
   sec=$(($sec+1))
   resp=`curl -s $1/receive 2>&1`
   total=`echo $resp | sed 's/^{"requests": "\(.*\)","tps":\(.*\)"}/\1/'`

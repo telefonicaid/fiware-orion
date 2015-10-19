@@ -19,8 +19,8 @@
 
  For those usages not covered by this license please contact with
  iot_support at tid dot es
- 
- Author: Ivan Arias 
+
+ Author: Ivan Arias
  -->
 <jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
   <hashTree>
@@ -367,7 +367,7 @@
             <threadCounts>true</threadCounts>
           </value>
         </objProp>
-        <stringProp name="filename">/tmp/jmeter_result/__${prefix}/errors__${prefix}</stringProp>
+        <stringProp name="filename">/tmp/jmeter_result/__${prefix}/errors__${prefix}.csv</stringProp>
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
@@ -425,7 +425,7 @@
             <threadCounts>true</threadCounts>
           </value>
         </objProp>
-        <stringProp name="filename">/tmp/jmeter_result/_${prefix}/report__${prefix}</stringProp>
+        <stringProp name="filename">/tmp/jmeter_result/__${prefix}/reports__${prefix}.csv</stringProp>
       </ResultCollector>
       <hashTree/>
       <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second" enabled="true">
@@ -482,7 +482,7 @@
             <bytes>true</bytes>
           </value>
         </objProp>
-        <stringProp name="filename">/tmp/jmeter_result/_${prefix}tps__${prefix}</stringProp>
+        <stringProp name="filename">/tmp/jmeter_result/__${prefix}/tps__${prefix}.csv</stringProp>
         <longProp name="interval_grouping">1000</longProp>
         <boolProp name="graph_aggregated">false</boolProp>
         <stringProp name="include_sample_labels"></stringProp>
