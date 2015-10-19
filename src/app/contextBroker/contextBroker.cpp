@@ -309,10 +309,10 @@ PaArgument paArgs[] =
   { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
-  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "", PaNL, PaNL,     ALLOWED_ORIGIN_DESC},
-  { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,  0,    UINT_MAX, CPR_FORWARD_LIMIT_DESC},
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,    0,    3600,     SUB_CACHE_IVAL_DESC },
-  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "", PaNL, PaNL,     NOTIFICATION_MODE_DESC },
+  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL, PaNL,     ALLOWED_ORIGIN_DESC   },
+  { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,    UINT_MAX, CPR_FORWARD_LIMIT_DESC},
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             0,    3600,     SUB_CACHE_IVAL_DESC   },
+  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL, PaNL,     NOTIFICATION_MODE_DESC},
 
 
   PA_END_OF_ARGS
