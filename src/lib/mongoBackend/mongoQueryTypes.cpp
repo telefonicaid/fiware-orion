@@ -72,7 +72,7 @@ static std::string attributeType
     /* It could happen that different entities within the same entity type may have attributes with the same name
      * but different types. In that case, one type (at random) is returned. A list could be returned but the
      * NGSIv2 operations only allow to set one type */
-    return r.getField(ENT_ATTRS).embeddedObject().getField(attrName).embeddedObject().getStringField(ENT_ATTRS_TYPE);
+    return getStringField(getField(getField(r, ENT_ATTRS).embeddedObject(), attrName).embeddedObject(), ENT_ATTRS_TYPE);
   }
 
   return "";
@@ -199,7 +199,7 @@ HttpStatusCode mongoEntityTypes
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = result.getField("result").Array();
+  std::vector<BSONElement> resultsArray = getField(result, "result").Array();
 
   if (resultsArray.size() == 0)
   {
@@ -221,8 +221,8 @@ HttpStatusCode mongoEntityTypes
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    EntityType*               entityType  = new EntityType(resultItem.getStringField("_id"));
-    std::vector<BSONElement>  attrsArray  = resultItem.getField("attrs").Array();
+    EntityType*               entityType  = new EntityType(getStringField(resultItem, "_id"));
+    std::vector<BSONElement>  attrsArray  = getField(resultItem, "attrs").Array();
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
@@ -348,7 +348,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = result.getField("result").Array();
+  std::vector<BSONElement> resultsArray = getField(result, "result").Array();
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
 

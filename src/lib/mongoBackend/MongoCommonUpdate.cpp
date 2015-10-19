@@ -31,6 +31,7 @@
 
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeBsonGet.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -300,12 +301,12 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
 static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
 {
 
-  if (md1.getField(ENT_ATTRS_MD_VALUE).type() != md2.getField(ENT_ATTRS_MD_VALUE).type())
+  if (getField(md1, ENT_ATTRS_MD_VALUE).type() != getField(md2, ENT_ATTRS_MD_VALUE).type())
   {
     return false;
   }
 
-  switch (md1.getField(ENT_ATTRS_MD_VALUE).type())
+  switch (getField(md1, ENT_ATTRS_MD_VALUE).type())
   {
     /* FIXME not yet
     case Object:
@@ -318,16 +319,16 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     */
 
     case NumberDouble:
-      return md1.getField(ENT_ATTRS_MD_VALUE).Number() == md2.getField(ENT_ATTRS_MD_VALUE).Number();
+      return getField(md1, ENT_ATTRS_MD_VALUE).Number() == getField(md2, ENT_ATTRS_MD_VALUE).Number();
 
     case Bool:
-      return md1.getBoolField(ENT_ATTRS_MD_VALUE) == md2.getBoolField(ENT_ATTRS_MD_VALUE);
+      return getBoolField(md1, ENT_ATTRS_MD_VALUE) == getBoolField(md2, ENT_ATTRS_MD_VALUE);
 
     case String:
       return STR_FIELD(md1, ENT_ATTRS_MD_VALUE) == STR_FIELD(md2, ENT_ATTRS_MD_VALUE);
 
     default:
-      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", md1.getField(ENT_ATTRS_MD_VALUE).type()));
+      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getField(md1, ENT_ATTRS_MD_VALUE).type()));
       return false;
   }
 
@@ -427,7 +428,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
     return false;
   }
 
-  switch (attr.getField(ENT_ATTRS_VALUE).type())
+  switch (getField(attr, ENT_ATTRS_VALUE).type())
   {
     case Object:
     case Array:
@@ -436,16 +437,16 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       return true;
 
     case NumberDouble:
-      return caP->valueType != ValueTypeNumber || caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
+      return caP->valueType != ValueTypeNumber || caP->numberValue != getField(attr, ENT_ATTRS_VALUE).Number();
 
     case Bool:
-      return caP->valueType != ValueTypeBoolean || caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolField(attr, ENT_ATTRS_VALUE);
 
     case String:
       return caP->valueType != ValueTypeString || caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
 
     default:
-      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
       return false;
   }
 }
@@ -520,22 +521,22 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   else
   {
     /* Slightly different treatment, depending on attribute value type in DB (string, number, boolean, vector or object) */
-    switch (attr.getField(ENT_ATTRS_VALUE).type())
+    switch (getField(attr, ENT_ATTRS_VALUE).type())
     {
       case Object:
-        ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
+        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).embeddedObject());
         break;
 
       case Array:
-        ab.appendArray(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
+        ab.appendArray(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).embeddedObject());
         break;
 
       case NumberDouble:
-        ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).Number());
+        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).Number());
         break;
 
       case Bool:
-        ab.append(ENT_ATTRS_VALUE, attr.getBoolField(ENT_ATTRS_VALUE));
+        ab.append(ENT_ATTRS_VALUE, getBoolField(attr, ENT_ATTRS_VALUE));
         break;
 
       case String:
@@ -543,7 +544,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
     }
   }
 
@@ -582,7 +583,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
   if (attr.hasField(ENT_ATTRS_MD))
   {
-    mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+    mdV = getField(attr, ENT_ATTRS_MD).embeddedObject();
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
@@ -609,7 +610,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getIntField(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* It was an actual update? */
@@ -649,7 +650,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntField(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -764,7 +765,7 @@ static bool updateAttribute
     }
 
     BSONObj newAttr;
-    BSONObj attr = attrs.getField(effectiveName).embeddedObject();
+    BSONObj attr = getField(attrs, effectiveName).embeddedObject();
     actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
 
     if (actualUpdate)
@@ -1181,7 +1182,7 @@ static bool addTriggeredSubscriptions
   while (cursor->more())
   {
     BSONObj      sub      = cursor->next();
-    BSONElement  idField  = sub.getField("_id");
+    BSONElement  idField  = getField(sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -1201,8 +1202,8 @@ static bool addTriggeredSubscriptions
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
+      long long throttling       = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
+      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? getIntField(sub, CSUB_LASTNOTIFICATION) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
@@ -2266,7 +2267,7 @@ void processContextElement
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
     ++docs;
 
-    BSONElement idField = r.getField("_id");
+    BSONElement idField = getField(r, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -2302,7 +2303,7 @@ void processContextElement
      * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
      * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
      * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-    BSONObj           attrs     = r.getField(ENT_ATTRS).embeddedObject();
+    BSONObj           attrs     = getField(r, ENT_ATTRS).embeddedObject();
     BSONObjBuilder    toSet;
     BSONObjBuilder    toUnset;
     BSONArrayBuilder  toPush;
@@ -2327,11 +2328,11 @@ void processContextElement
       //           DB out-of-band of the context broker), a safer way of parsing BSON object
       //           will be needed. This is a general comment, applicable to many places in the mongoBackend code
       //
-      BSONObj loc = r.getObjectField(ENT_LOCATION);
+      BSONObj loc = getObjectField(r, ENT_LOCATION);
 
-      locAttr     = loc.getStringField(ENT_LOCATION_ATTRNAME);
-      coordLong   = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[0].Double();
-      coordLat    = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
+      locAttr     = getStringField(loc, ENT_LOCATION_ATTRNAME);
+      coordLong   = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[0].Double();
+      coordLat    = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[1].Double();
     }
 
     //
