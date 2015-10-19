@@ -340,7 +340,7 @@ Content-Type: application/json; charset=utf-8
             "isDomain" : "false"
           }
         ],
-        "providingApplication" : "http://localhost:9997/notify"
+        "providingApplication" : "http://localhost:'${LISTENER_PORT}'/notify"
       }
     }
   ]
@@ -389,7 +389,7 @@ Content-Type: application/json; charset=utf-8
             "isDomain" : "false"
           }
         ],
-        "providingApplication" : "http://localhost:9997/notify"
+        "providingApplication" : "http://localhost:'${LISTENER_PORT}'/notify"
       }
     }
   ]
