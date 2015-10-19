@@ -1,23 +1,25 @@
-#!/usr/bin/
-# Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
+#!/bin/bash
+
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
-# This file is part of Short Term Historic (FI-WARE project).
+# This file is part of Orion Context Broker.
 #
-# iot-sth is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
-# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-# iot-sth is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
 #
-# You should have received a copy of the GNU Affero General Public License along with iot-sth. If not, see
-#    http://www.gnu.org/licenses/.
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
 #
-# For those usages not covered by the GNU Affero General Public License please contact:
-#    iot_support at tid.es
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
-# author: 'Iván Arias León (ivan.ariasleon at telefonica dot com)'
-#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+# author: 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 if [  "$1" == ""  ]
   then
