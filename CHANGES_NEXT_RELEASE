@@ -26,3 +26,4 @@ Fix:  Add charset=utf-8 for notifications (Issue #1340)
 Add:  Functional test to PUT/POST/PATCH with 'empty' JSON object as payload (Issue #1305)
 Fix:  performance problem in NGSIv2 API due to uncontrolled log trace printing
 Add:  empty attribute values supported in NGSIv1 API operations (Issue #1358)
+Add:  Add CLI argument for notification mode (Issue #1370)
