@@ -153,13 +153,16 @@ void mongoListSubscriptions
   std::vector<Subscription>            *subs,
   OrionError                           *oe,
   std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant
+  const std::string&                   tenant,
+  int                                  limit,
+  int                                  offset
 )
 {
 
   // FIXME P10: Pagination not yet implemented
 
   bool           reqSemTaken = false;
+  long long      count       = 0LL;
 
   reqSemTake(__FUNCTION__, "Mongo List Subscriptions", SemReadOp, &reqSemTaken);
 
@@ -173,7 +176,7 @@ void mongoListSubscriptions
   std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
   BSONObj                        q     = BSON(conds << "ONCHANGE");
 
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  if (!collectionRangedQuery(getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, &count, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
