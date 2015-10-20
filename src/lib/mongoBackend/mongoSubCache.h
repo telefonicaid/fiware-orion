@@ -151,6 +151,14 @@ extern void mongoSubCacheItemInsert
 
 /* ****************************************************************************
 *
+* mongoSubCacheItemInsert - 
+*/
+extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* subscriptionId, const char* servicePath);
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheItemLookup - 
 */
 extern CachedSubscription* mongoSubCacheItemLookup(const char* tenant, const char* subscriptionId);

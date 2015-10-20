@@ -8,6 +8,7 @@
     "subCacheRefreshs" : "0",
     "subCacheInserts" : "0",
     "subCacheRemoves" : "0",
+    "subCacheUpdates" : "0",
     "subCacheItems" : "0"
   }
 }

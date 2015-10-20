@@ -213,11 +213,9 @@ HttpStatusCode mongoUpdateContextSubscription
   /* Adding format to use in notifications */
   newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
 
-  /* Update document in MongoDB */
+  // Update document in MongoDB
+  // This BSONObj (named update), is used later for the subscription cache
   BSONObj update       = newSub.obj();
-  BSONObj newSubObject = newSub.obj();
-
-  LM_M(("newSubObject: %s", newSubObject.toString().c_str()));
 
   try
   {
@@ -278,11 +276,11 @@ HttpStatusCode mongoUpdateContextSubscription
   // Modification of the subscription cache
   //
   // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
-  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
+  // The "updated subscription information" is in 'update' (mongo BSON object format).
   // 
   // All we need to do now for the cache is to:
   //   1. Remove 'cSubP' from sub-cache (if present)
-  //   2. Create 'newSubObject' in sub-cache (if applicable)
+  //   2. Create 'update' in sub-cache (if applicable)
   //
   // The subscription is already updated in mongo.
   //
@@ -292,19 +290,21 @@ HttpStatusCode mongoUpdateContextSubscription
   // 0. Lookup matching subscription in subscription-cache
   CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
-  // 1. Remove 'cSubP' from sub-cache (if present)
-  if (cSubP != NULL)
+  if (cSubP == NULL)
   {
-    mongoSubCacheItemRemove(cSubP);
-
-    // If bote remove and insert, then it is an update
-    mongoSubCacheUpdateStatisticsIncrement(); 
+    // Not a cached subscription - no problem
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
+    return SccOk;
   }
 
-  // 2. Create 'newSubObject' in sub-cache (if applicable)
-  LM_M(("newSubObject: %s", newSubObject.toString().c_str()));
-  mongoSubCacheItemInsert(tenant.c_str(), newSubObject);  // The insert method takes care of making sure isPattern and ONCHANGE is there
+  char* subscriptionId = (char*) requestP->subscriptionId.get().c_str();
+  char* servicePath    = cSubP->servicePath;
 
+  LM_T(LmtMongoSubCache, ("update: %s", update.toString().c_str()));
+
+  mongoSubCacheItemInsert(tenant.c_str(), update, subscriptionId, servicePath);
+  mongoSubCacheItemRemove(cSubP);
+  mongoSubCacheUpdateStatisticsIncrement(); 
 
   reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 

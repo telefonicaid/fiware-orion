@@ -33,7 +33,7 @@ accumulatorStart
 
 #
 # 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 11 secs
-# 02. Sleep 6 secs to let the cache refresh from DB
+# 02. Sleep 6 secs to let the cache refresh from DB - one cache insert comes from the refresh
 # 03. Create entity s01 w/ attr A w/o tenant
 # 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 # 05. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
@@ -70,8 +70,8 @@ echo
 echo
 
 
-echo "02. Sleep 6 secs to let the cache refresh from DB"
-echo "================================================="
+echo "02. Sleep 6 secs to let the cache refresh from DB - one cache insert comes from the refresh"
+echo "==========================================================================================="
 sleep 6
 orionCurl --url /statistics --json
 echo
@@ -167,10 +167,10 @@ Date: REGEX(.*)
 }
 
 
-02. Sleep 6 secs to let the cache refresh from DB
-=================================================
+02. Sleep 6 secs to let the cache refresh from DB - one cache insert comes from the refresh
+===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 343
+Content-Length: 372
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -179,10 +179,11 @@ Date: REGEX(.*)
         "jsonRequests": "2",
         "measuring_interval_in_secs": "REGEX((8|9))",
         "statisticsRequests": "1",
-        "subCacheInserts": "1",
+        "subCacheInserts": "2",
         "subCacheItems": "1",
         "subCacheRefreshs": "2",
         "subCacheRemoves": "0",
+        "subCacheUpdates": "0",
         "subscriptions": "1",
         "uptime_in_secs": "REGEX((8|9))",
         "versionRequests": "0",

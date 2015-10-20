@@ -712,6 +712,155 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
 /* ****************************************************************************
 *
+* mongoSubCacheItemInsert - 
+*/
+int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* subscriptionId, const char* servicePath)
+{
+  CachedSubscription* cSubP = new CachedSubscription();
+
+  LM_T(LmtMongoSubCache,  ("allocated CachedSubscription at %p", cSubP));
+
+  if (cSubP == NULL)
+  {
+    // FIXME P7: See github issue #1362
+    LM_X(1, ("Runtime Error (cannot allocate memory for a cached subscription: %s)", strerror(errno)));
+    return -2;
+  }
+
+
+  //
+  // 04. Extract data from mongo sub
+  //
+  std::string               formatString  = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "XML";
+  std::vector<BSONElement>  eVec          = sub.getField(CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  attrVec       = sub.getField(CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
+
+
+  cSubP->tenant = (tenant[0] == 0)? NULL : strdup(tenant);
+
+  //
+  // FIXME: Check all strings about empty strings
+  //        What happens if you call strdup on an empty string?
+  //
+  cSubP->subscriptionId        = strdup(subscriptionId);
+  cSubP->servicePath           = strdup(servicePath);
+  cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
+  cSubP->notifyFormat          = stringToFormat(formatString);
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? sub.getField(CSUB_THROTTLING).Long() : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)? sub.getField(CSUB_EXPIRATION).Long() : 0;
+
+  // FIXME P6: Doubt: should lastNotificationTime be reset when a subscription is updated?
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? sub.getField(CSUB_LASTNOTIFICATION).Int() : 0;
+  cSubP->pendingNotifications  = 0;
+  cSubP->next                  = NULL;
+
+  LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
+
+  //
+  // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
+  //
+  for (unsigned int ix = 0; ix < eVec.size(); ++ix)
+  {
+    BSONObj entity = eVec[ix].embeddedObject();
+
+    if (!entity.hasField(CSUB_ENTITY_ID))
+    {
+      LM_W(("Runtime Error (got a subscription without id)"));
+      continue;
+    }
+
+    std::string id = entity.getStringField(ENT_ENTITY_ID);
+    
+    if (!entity.hasField(CSUB_ENTITY_ISPATTERN))
+    {
+      continue;
+    }
+
+    std::string isPattern = entity.getStringField(CSUB_ENTITY_ISPATTERN);
+    if (isPattern != "true")
+    {
+      continue;
+    }
+
+    std::string type;
+    if (entity.hasField(CSUB_ENTITY_TYPE))
+    {
+      type = entity.getStringField(CSUB_ENTITY_TYPE);
+    }
+
+    EntityInfo* eiP = new EntityInfo(id, type);
+    cSubP->entityIdInfos.push_back(eiP);
+  }
+
+  if (cSubP->entityIdInfos.size() == 0)
+  {
+    LM_E(("ERROR (no patterned entityId) - cleaning up"));
+    cachedSubscriptionDestroy(cSubP);
+    delete cSubP;
+    return -3;
+  }
+
+
+  //
+  // 06. Push attribute names to Attribute Vector (cSubP->attributes)
+  //
+  for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
+  {
+    std::string s = attrVec[ix].String();
+    cSubP->attributes.push_back(s);
+  }
+
+
+
+  //
+  // 07. Fill in cSubP->notifyConditionVector from condVec
+  //
+  for (unsigned int ix = 0; ix < condVec.size(); ++ix)
+  {
+    BSONObj                   condition = condVec[ix].embeddedObject();
+    std::string               condType;
+    std::vector<BSONElement>  valueVec;
+
+    condType = condition.getStringField(CSUB_CONDITIONS_TYPE);
+    if (condType != "ONCHANGE")
+    {
+      continue;
+    }
+
+    NotifyCondition* ncP = new NotifyCondition();
+    ncP->type = condType;
+
+    valueVec = condition.getField(CSUB_CONDITIONS_VALUE).Array();
+    for (unsigned int vIx = 0; vIx < valueVec.size(); ++vIx)
+    {
+      std::string condValue;
+
+      condValue = valueVec[vIx].String();
+      ncP->condValueList.push_back(condValue);
+    }
+
+    cSubP->notifyConditionVector.push_back(ncP);
+  }
+
+  if (cSubP->notifyConditionVector.size() == 0)  // Cleanup
+  {
+    LM_E(("ERROR (empty notifyConditionVector) - cleaning up"));
+    cachedSubscriptionDestroy(cSubP);
+    delete cSubP;
+    return -4;
+  }
+
+  mongoSubCacheItemInsert(cSubP);
+
+  return 0;
+}
+
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheItemInsert - create a new sub, fill it in, and add it to cache
 */
 void mongoSubCacheItemInsert

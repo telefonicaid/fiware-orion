@@ -309,7 +309,7 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: REGEX((468|470))
+Content-Length: REGEX((507|509))
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -325,6 +325,7 @@ Date: REGEX(.*)
   <subCacheRefreshs>1</subCacheRefreshs>
   <subCacheInserts>0</subCacheInserts>
   <subCacheRemoves>0</subCacheRemoves>
+  <subCacheUpdates>0</subCacheUpdates>
   <subCacheItems>0</subCacheItems>
 </orion>
 

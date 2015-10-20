@@ -200,8 +200,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -216,8 +216,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -232,8 +232,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 04. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((551|553))
+Content-Length: REGEX((580|582))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -258,6 +258,7 @@ Date: REGEX(.*)
         "subCacheItems": "2",
         "subCacheRefreshs": "1",
         "subCacheRemoves": "0",
+        "subCacheUpdates": "0",
         "subscriptions": "3",
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
         "uptime_in_secs": "REGEX(\d+)",
@@ -276,9 +277,9 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
-    }, 
+    },
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 
@@ -286,25 +287,26 @@ Date: REGEX(.*)
 06. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((580|582))
+Content-Length: REGEX((609|611))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
-        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
-        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
-        "jsonRequests": "REGEX((6|7))", 
-        "measuring_interval_in_secs": "REGEX(\d+)", 
-        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
-        "statisticsRequests": "2", 
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
+        "jsonRequests": "REGEX((6|7))",
+        "measuring_interval_in_secs": "REGEX(\d+)",
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+        "statisticsRequests": "2",
         "subCacheInserts": "2",
         "subCacheItems": "2",
         "subCacheRefreshs": "1",
         "subCacheRemoves": "0",
-        "subscriptions": "3", 
-        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
-        "unsubscriptions": "1", 
+        "subCacheUpdates": "0",
+        "subscriptions": "3",
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+        "unsubscriptions": "1",
         "uptime_in_secs": "REGEX(\d+)",
         "versionRequests": "REGEX((0|1))",
         "xmlRequests": "REGEX((0|1))"
@@ -321,9 +323,9 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
-    }, 
+    },
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 
@@ -331,25 +333,26 @@ Date: REGEX(.*)
 08. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((580|582))
+Content-Length: REGEX((609|611))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
-        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
-        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
-        "jsonRequests": "REGEX((8|9))", 
-        "measuring_interval_in_secs": "REGEX(\d+)", 
-        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
-        "statisticsRequests": "3", 
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
+        "jsonRequests": "REGEX((8|9))",
+        "measuring_interval_in_secs": "REGEX(\d+)",
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+        "statisticsRequests": "3",
         "subCacheInserts": "2",
         "subCacheItems": "1",
         "subCacheRefreshs": "REGEX((1|2))",
         "subCacheRemoves": "1",
-        "subscriptions": "3", 
-        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
-        "unsubscriptions": "2", 
+        "subCacheUpdates": "0",
+        "subscriptions": "3",
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+        "unsubscriptions": "2",
         "uptime_in_secs": "REGEX(\d+)",
         "versionRequests": "REGEX((0|1))",
         "xmlRequests": "REGEX((0||1))"

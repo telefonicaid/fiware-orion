@@ -552,7 +552,7 @@ Date: REGEX(.*)
 16. Check statistics, see NO entries in subCache
 ================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((406||408))
+Content-Length: REGEX((435||437))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -565,6 +565,7 @@ Date: REGEX(.*)
         "subCacheItems": "0",
         "subCacheRefreshs": "1",
         "subCacheRemoves": "2",
+        "subCacheUpdates": "1",
         "subscriptionUpdates": "3",
         "subscriptions": "3",
         "unsubscriptions": "2",
