@@ -319,9 +319,9 @@ void curl_context_cleanup(void)
 
 /* ****************************************************************************
 *
-* get_curl_context - 
+* get_curl_context_reuse -
 */
-int get_curl_context(const std::string& key, struct curl_context* pcc)
+static int get_curl_context_reuse(const std::string& key, struct curl_context* pcc)
 {
   pcc->curl   = NULL;
   pcc->pmutex = NULL;
@@ -424,13 +424,50 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
   return 0;
 }
 
+/* ****************************************************************************
+*
+* get_curl_context_new -
+*/
+static int get_curl_context_new(const std::string& key, struct curl_context* pcc)
+{
+  pcc->curl   = NULL;
+  pcc->pmutex = NULL;
+
+  pcc->curl = curl_easy_init();
+
+  if (pcc->curl == NULL)
+  {
+    LM_E(("Runtime Error (curl_easy_init)"));
+    return -1;
+  }
+
+  return 0;
+}
+
+/* ****************************************************************************
+*
+* get_curl_context -
+*/
+int get_curl_context(const std::string& key, struct curl_context* pcc)
+{
+
+  if (strcmp(notificationMode, "persistent") == 0)
+  {
+    LM_T(LmtCurlContext, ("using persistent curl_contexts"));
+    return get_curl_context_reuse(key, pcc);
+  }
+
+  return get_curl_context_new(key, pcc);
+}
+
+
 
 
 /* ****************************************************************************
 *
-* release_curl_context - 
+* release_curl_context_reuse -
 */
-int release_curl_context(struct curl_context *pcc, bool final)
+static int release_curl_context_reuse(struct curl_context *pcc, bool final)
 {
   // Reset context if not an empty context
   if (pcc->curl != NULL)
@@ -457,11 +494,38 @@ int release_curl_context(struct curl_context *pcc, bool final)
     pcc->pmutex = NULL; // It will remain in global map
   }
 
+  return 0;
+}
+
+/* ****************************************************************************
+*
+* release_curl_context_new -
+*/
+static int release_curl_context_new(struct curl_context *pcc, bool final)
+{
+  // Clean-up context if not an empty context
+  if (pcc->curl != NULL)
+  {
+    curl_easy_cleanup(pcc->curl);
+    pcc->curl = NULL;
+  }
 
   return 0;
 }
 
+/* ****************************************************************************
+*
+* release_curl_context -
+*/
+int release_curl_context(struct curl_context *pcc, bool final)
+{
+  if (strcmp(notificationMode, "persistent") == 0)
+  {
+    return release_curl_context_reuse(pcc, final);
+  }
 
+  return release_curl_context_new(pcc, final);
+}
 
 /* ****************************************************************************
 *
@@ -472,8 +536,6 @@ void mutexTimeCCReset(void)
   accCCMutexTime.tv_sec  = 0;
   accCCMutexTime.tv_nsec = 0;
 }
-
-
 
 /* ****************************************************************************
 *

@@ -60,5 +60,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-corsOrigin' <CORS allowed origin. use '__ALL' for any>]
                       [option '-cprForwardLimit' <maximum number of forwarded requests to Context Providers for a single client request>]
                       [option '-subCacheIval' <interval in seconds between calls to Subscription Cache refresh>]
+                      [option '-notificationMode' <notification mode (persistent|transient|none)>]
 
 --TEARDOWN--
