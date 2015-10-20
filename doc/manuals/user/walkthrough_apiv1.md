@@ -184,7 +184,7 @@ EOF
 -   For PUT:
 
 ```
-(curl localhost:1026/<operation_url> -s -S [headers] -X PUT -d @- <<EOF
+curl localhost:1026/<operation_url> -s -S [headers] -X PUT -d @- <<EOF
 [payload]
 EOF
 ```
@@ -241,7 +241,7 @@ EOF
 -   Check that curl is installed in your system using:
 
 ```
-# which curl
+which curl
 ```
 
 [Top](#top)
@@ -708,7 +708,8 @@ Additional comments:
             "id": "Room1"
         }
     ]
-} EOF
+}
+EOF
 ```
 
 [Top](#top)
