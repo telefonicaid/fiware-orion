@@ -167,7 +167,7 @@ Date: REGEX(.*)
             "occupancy",
             "lightstatus"
         ],
-        "callback": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+        "callback": "http://127.0.0.1:REGEX(\d+)/notify",
         "throttling": 5
     },
     "status": "active",
@@ -214,7 +214,7 @@ Date: REGEX(.*)
             "speed",
             "location"
         ],
-        "callback": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+        "callback": "http://127.0.0.1:REGEX(\d+)/notify"
     },
     "status": "active",
     "subject": {
