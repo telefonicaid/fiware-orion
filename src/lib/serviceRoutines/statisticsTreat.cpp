@@ -482,14 +482,16 @@ std::string statisticsTreat
   int mscRefreshs = 0;
   int mscInserts  = 0;
   int mscRemoves  = 0;
-  int cacheItems = 0;
+  int mscUpdates  = 0;
+  int cacheItems  = 0;
 
-  mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &cacheItems);
+  mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems);
 
 
   out += TAG_ADD_INTEGER("subCacheRefreshs", mscRefreshs, true);
   out += TAG_ADD_INTEGER("subCacheInserts",  mscInserts,  true);
   out += TAG_ADD_INTEGER("subCacheRemoves",  mscRemoves,  true);
+  out += TAG_ADD_INTEGER("subCacheUpdates",  mscUpdates,  true);
   out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  false);
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;

@@ -1184,8 +1184,11 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
-  // Take mongo req-sem ?
-  // mongoSubCacheDestroy();
+  // Take mongo req-sem ?  
+  LM_T(LmtMongoSubCache, ("try-taking req semaphore"));
+  reqSemTryToTake();
+  LM_T(LmtMongoSubCache, ("calling mongoSubCacheDestroy"));
+  mongoSubCacheDestroy();
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1577,6 +1580,7 @@ int main(int argC, char* argV[])
   {
     mongoSubCacheInit();
     mongoSubCacheStart();
+    mongoSubCachePresent("STARTED");
   }
   else
   {

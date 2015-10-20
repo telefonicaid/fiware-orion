@@ -91,6 +91,19 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
 
 /* ****************************************************************************
 *
+* reqSemTryToTake - try to take take semaphore
+*/
+int reqSemTryToTake(void)
+{
+  int r = sem_trywait(&reqSem);
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
 * reqSemTake -
 */
 int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken)

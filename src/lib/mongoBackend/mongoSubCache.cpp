@@ -115,12 +115,12 @@ typedef struct MongoSubCache
 {
   CachedSubscription* head;
   CachedSubscription* tail;
-  int                 items;
 
   // Statistics counters
   int                 noOfRefreshes;
   int                 noOfInserts;
   int                 noOfRemoves;
+  int                 noOfUpdates;
 } MongoSubCache;
 
 
@@ -143,9 +143,28 @@ void mongoSubCacheInit(void)
 
   mongoSubCache.head   = NULL;
   mongoSubCache.tail   = NULL;
-  mongoSubCache.items  = 0;
 
   mongoSubCacheStatisticsReset();
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItems - 
+*/
+int mongoSubCacheItems(void)
+{
+  CachedSubscription* cSubP = mongoSubCache.head;
+  int                 items = 0;
+
+  while (cSubP != NULL)
+  {
+    ++items;
+    cSubP = cSubP->next;
+  }
+
+  return items;
 }
 
 
@@ -164,18 +183,18 @@ static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
 
   LM_T(LmtMongoSubCache, ("inserting sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
+  ++mongoSubCache.noOfInserts;
+
   // First insertion?
   if ((mongoSubCache.head == NULL) && (mongoSubCache.tail == NULL))
   {
     mongoSubCache.head   = cSubP;
     mongoSubCache.tail   = cSubP;
-    mongoSubCache.items  = 1;
     return;
   }
 
   
   mongoSubCache.tail->next  = cSubP;
-  mongoSubCache.items      += 1;
   mongoSubCache.tail        = cSubP;
 }
 
@@ -443,15 +462,16 @@ void mongoSubCacheDestroy(void)
 
     cSubP = cSubP->next;
     cachedSubscriptionDestroy(prev);
+    LM_T(LmtMongoSubCache,  ("removing CachedSubscription at %p", prev));
     delete prev;
   }
 
   cachedSubscriptionDestroy(cSubP);
+  LM_T(LmtMongoSubCache,  ("removing CachedSubscription at %p", cSubP));
   delete cSubP;
 
   mongoSubCache.head  = NULL;
   mongoSubCache.tail  = NULL;
-  mongoSubCache.items = 0;
 }
 
 
@@ -462,12 +482,13 @@ void mongoSubCacheDestroy(void)
 */
 static bool tenantMatch(const char* tenant1, const char* tenant2)
 {
-  if ((tenant1 == NULL) && (tenant2 == NULL))
-  {
-    return true;
-  }
+  //
+  // Removing complications with NULL, giving NULL tenants the value of an empty string;
+  //
+  tenant1 = (tenant1 == NULL)? "" : tenant1;
+  tenant2 = (tenant2 == NULL)? "" : tenant2;
 
-  if ((tenant1 == NULL) || (tenant2 == NULL))
+  if (strlen(tenant1) != strlen(tenant2))
   {
     return false;
   }
@@ -512,13 +533,25 @@ CachedSubscription* mongoSubCacheItemLookup(const char* tenant, const char* subs
 
 /* ****************************************************************************
 *
+* mongoSubCacheUpdateStatisticsIncrement - 
+*/
+void mongoSubCacheUpdateStatisticsIncrement(void)
+{
+  ++mongoSubCache.noOfUpdates;
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheItemInsert - 
 *
 * RETURN VALUES
 *   0:  all OK
 *  -1:  Database Error - id-field not found
 *  -2:  Out of memory (either returns -2 or exit the entire broker)
-*  -3:  The vector of notify-conditions is empty
+*  -3:  No patterned entity found
+*  -4:  The vector of notify-conditions is empty
 *
 */
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
@@ -539,6 +572,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   // 03. Create CachedSubscription
   //
   CachedSubscription* cSubP = new CachedSubscription();
+  LM_T(LmtMongoSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
   if (cSubP == NULL)
   {
@@ -608,7 +642,15 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     }
 
     EntityInfo* eiP = new EntityInfo(id, type);
-    cSubP->entityIdInfos.push_back(eiP);  // definitely lost ... why?
+    cSubP->entityIdInfos.push_back(eiP);
+  }
+
+  if (cSubP->entityIdInfos.size() == 0)
+  {
+    LM_E(("ERROR (no patterned entityId) - cleaning up"));
+    cachedSubscriptionDestroy(cSubP);
+    delete cSubP;
+    return -3;
   }
 
 
@@ -618,7 +660,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
   {
     std::string s = attrVec[ix].String();
-    cSubP->attributes.push_back(s);  // definitely lost, same ... why?
+    cSubP->attributes.push_back(s);
   }
 
 
@@ -650,14 +692,15 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       ncP->condValueList.push_back(condValue);
     }
 
-    cSubP->notifyConditionVector.push_back(ncP);  // definitely lost (inside NotifyConditionVector.cpp:113)
+    cSubP->notifyConditionVector.push_back(ncP);
   }
 
   if (cSubP->notifyConditionVector.size() == 0)  // Cleanup
   {
     LM_E(("ERROR (empty notifyConditionVector) - cleaning up"));
     cachedSubscriptionDestroy(cSubP);
-    return -3;
+    delete cSubP;
+    return -4;
   }
 
   mongoSubCacheItemInsert(cSubP);
@@ -683,6 +726,7 @@ void mongoSubCacheItemInsert
 )
 {
   CachedSubscription* cSubP = new CachedSubscription();
+  LM_T(LmtMongoSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
   //
   // 1. First the non-complex values
@@ -740,10 +784,8 @@ void mongoSubCacheItemInsert
   //
   // 5. Now, insert the subscription in the cache
   //
-  LM_M(("Inserting NEW sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
+  LM_T(LmtMongoSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
   mongoSubCacheItemInsert(cSubP);
-
-  mongoSubCache.noOfInserts  += 1;
 }
 
 
@@ -752,12 +794,13 @@ void mongoSubCacheItemInsert
 *
 * mongoSubCacheStatisticsGet - 
 */
-void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* items)
+void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items)
 {
   *refreshes = mongoSubCache.noOfRefreshes;
   *inserts   = mongoSubCache.noOfInserts;
   *removes   = mongoSubCache.noOfRemoves;
-  *items     = mongoSubCache.items;
+  *updates   = mongoSubCache.noOfUpdates;
+  *items     = mongoSubCacheItems();
 }
 
 
@@ -771,6 +814,7 @@ void mongoSubCacheStatisticsReset(void)
   mongoSubCache.noOfRefreshes  = 0;
   mongoSubCache.noOfInserts    = 0;
   mongoSubCache.noOfRemoves    = 0;
+  mongoSubCache.noOfUpdates    = 0;
 }
 
 
@@ -794,6 +838,8 @@ void mongoSubCachePresent(const char* title)
   LM_T(LmtMongoSubCache, ("--------------------------------"));
 }
 
+
+
 /* ****************************************************************************
 *
 * mongoSubCacheItemRemove - 
@@ -813,9 +859,10 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
       if (prev != NULL)                 prev->next         = cSubP->next;
 
       LM_T(LmtMongoSubCache, ("in mongoSubCacheItemRemove, REMOVING '%s'", cSubP->subscriptionId));
-      mongoSubCache.noOfRemoves += 1;
+      ++mongoSubCache.noOfRemoves;
 
       cachedSubscriptionDestroy(cSubP);
+      delete cSubP;
       return 0;
     }
 

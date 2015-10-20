@@ -110,6 +110,14 @@ extern void mongoSubCacheDestroy(void);
 
 /* ****************************************************************************
 *
+* mongoSubCacheItems - 
+*/
+extern int mongoSubCacheItems(void);
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCachePresent - 
 */
 extern void mongoSubCachePresent(const char* title);
@@ -185,7 +193,15 @@ extern void mongoSubCacheMatch
 *
 * mongoSubCacheStatisticsGet - 
 */
-extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* items);
+extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheUpdateStatisticsIncrement - 
+*/
+extern void mongoSubCacheUpdateStatisticsIncrement(void);
 
 
 

@@ -168,22 +168,19 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
 
+    // FIXME P7: mongoSubCache stuff should be avoided if subscription is not patterned
+
     //
     // Removing subscription from mongo subscription cache
     //
+    LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
     mongoSubCachePresent("REMOVE");
-    LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", tenant.c_str(), requestP->subscriptionId.get().c_str()));
     CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
 
-    if (cSubP != NULL)
+    if (cSubP != NULL)  // Will only enter here if wildcard subscription
     {
       mongoSubCacheItemRemove(cSubP);
-    }
-    else
-    {
-      LM_T(LmtMongoSubCache, ("cannot find subscription '%s' in mongo subscription cache", requestP->subscriptionId.get().c_str()));
-      LM_E(("Runtime Error (removed subscription not found in mongo subscription cache)"));
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);

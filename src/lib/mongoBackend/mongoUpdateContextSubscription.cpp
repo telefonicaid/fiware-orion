@@ -214,7 +214,11 @@ HttpStatusCode mongoUpdateContextSubscription
   newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
 
   /* Update document in MongoDB */
-  BSONObj update = newSub.obj();
+  BSONObj update       = newSub.obj();
+  BSONObj newSubObject = newSub.obj();
+
+  LM_M(("newSubObject: %s", newSubObject.toString().c_str()));
+
   try
   {
       LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextCollectionName(tenant).c_str(),
@@ -274,13 +278,15 @@ HttpStatusCode mongoUpdateContextSubscription
   // Modification of the subscription cache
   //
   // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
-  // The "updated subscription information" is in 'newSub' (mongo BSON object format).
+  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
   // 
   // All we need to do now for the cache is to:
   //   1. Remove 'cSubP' from sub-cache (if present)
-  //   2. Create 'newSub' in sub-cache (if applicable)
+  //   2. Create 'newSubObject' in sub-cache (if applicable)
   //
   // The subscription is already updated in mongo.
+  //
+  // FIXME P7: mongoSubCache stuff should be avoided if subscription is not patterned
   //
 
   // 0. Lookup matching subscription in subscription-cache
@@ -290,10 +296,14 @@ HttpStatusCode mongoUpdateContextSubscription
   if (cSubP != NULL)
   {
     mongoSubCacheItemRemove(cSubP);
+
+    // If bote remove and insert, then it is an update
+    mongoSubCacheUpdateStatisticsIncrement(); 
   }
 
-  // 2. Create 'newSub' in sub-cache (if applicable)
-  mongoSubCacheItemInsert(tenant.c_str(), newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
+  // 2. Create 'newSubObject' in sub-cache (if applicable)
+  LM_M(("newSubObject: %s", newSubObject.toString().c_str()));
+  mongoSubCacheItemInsert(tenant.c_str(), newSubObject);  // The insert method takes care of making sure isPattern and ONCHANGE is there
 
 
   reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
