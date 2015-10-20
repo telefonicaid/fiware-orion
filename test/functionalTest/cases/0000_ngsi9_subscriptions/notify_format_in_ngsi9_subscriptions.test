@@ -664,7 +664,7 @@ Content-Length: 505
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -770,7 +770,7 @@ Content-Length: 505
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -901,7 +901,7 @@ Content-Length: 505
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -1032,7 +1032,7 @@ Content-Length: 505
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
