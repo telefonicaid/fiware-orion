@@ -242,7 +242,7 @@ Date: REGEX(.*)
 04. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((526|528))
+Content-Length: REGEX((551|553))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -261,7 +261,8 @@ Date: REGEX(.*)
         "subscriptions": "3",
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
+        "versionRequests": "REGEX((0|1))",
+        "xmlRequests": "REGEX((1|0))"
     }
 }
 
@@ -285,7 +286,7 @@ Date: REGEX(.*)
 06. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((555|557))
+Content-Length: REGEX((580|582))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -305,7 +306,8 @@ Date: REGEX(.*)
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "1", 
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
+        "versionRequests": "REGEX((0|1))",
+        "xmlRequests": "REGEX((0|1))"
     }
 }
 
@@ -329,7 +331,7 @@ Date: REGEX(.*)
 08. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((555|557))
+Content-Length: REGEX((580|582))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -342,14 +344,15 @@ Date: REGEX(.*)
         "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "3", 
         "subCacheInserts": "2",
-        "subCacheItems": "2",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
+        "subCacheItems": "1",
+        "subCacheRefreshs": "REGEX((1|2))",
+        "subCacheRemoves": "1",
         "subscriptions": "3", 
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "2", 
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
+        "versionRequests": "REGEX((0|1))",
+        "xmlRequests": "REGEX((1||2))"
     }
 }
 

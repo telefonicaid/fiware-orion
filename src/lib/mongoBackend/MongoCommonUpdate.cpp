@@ -1238,12 +1238,33 @@ static bool addTriggeredSubscriptions_withCache
     aList.fill(cSubP->attributes);
 
     // Throttling
-    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != -1))
+    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
+        LM_T(LmtMongoSubCache, ("subscription '%s' removed due to throttling", cSubP->subscriptionId));
         continue;
       }
+      else
+      {
+        LM_T(LmtMongoSubCache, ("subscription '%s' NOT removed due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                                cSubP->subscriptionId,
+                                cSubP->throttling,
+                                cSubP->lastNotificationTime,
+                                now,
+                                now - cSubP->lastNotificationTime,
+                                cSubP->throttling));
+      }
+    }
+    else
+    {
+      LM_T(LmtMongoSubCache, ("subscription '%s' NOT removed due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                              cSubP->subscriptionId,
+                              cSubP->throttling,
+                              cSubP->lastNotificationTime,
+                              now,
+                              now - cSubP->lastNotificationTime,
+                              cSubP->throttling));
     }
 
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
@@ -1550,6 +1571,7 @@ static bool processSubscriptions
             if (cSubP->pendingNotifications == 0)
             {
               cSubP->lastNotificationTime = getCurrentTime();
+              LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s'", cSubP->lastNotificationTime, cSubP->subscriptionId));
             }
           }
           else

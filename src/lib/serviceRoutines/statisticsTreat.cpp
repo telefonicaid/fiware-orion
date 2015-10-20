@@ -158,10 +158,10 @@ std::string statisticsTreat
 
   out += startTag(indent, tag, ciP->outFormat, true, true);
 
-  if (noOfXmlRequests != -1)
-  {
-    out += TAG_ADD_COUNTER("xmlRequests", noOfXmlRequests);
-  }
+  // FIXME P1: Always show xmlRequests, just for 0.24, as valgrind tests use XML for its ping
+  //           This is fixed in develop already - valgrind uses JSON
+  out += TAG_ADD_COUNTER("xmlRequests", noOfXmlRequests);
+
 
   if (noOfJsonRequests != -1)
   {

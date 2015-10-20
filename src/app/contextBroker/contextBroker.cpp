@@ -1578,6 +1578,10 @@ int main(int argC, char* argV[])
     mongoSubCacheInit();
     mongoSubCacheStart();
   }
+  else
+  {
+    LM_T(LmtMongoSubCache, ("noCache == false"));
+  }
 
   if (https)
   {

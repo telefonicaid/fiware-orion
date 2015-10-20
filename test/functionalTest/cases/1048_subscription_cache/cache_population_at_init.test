@@ -237,7 +237,7 @@ Date: REGEX(.*)
 <?xml version="1.0"?>
 <orion>
   <xmlRequests>REGEX((1|2))</xmlRequests>
-  <versionRequests>0</versionRequests>
+  <versionRequests>REGEX((0|1))</versionRequests>
   <statisticsRequests>1</statisticsRequests>
   <uptime_in_secs>REGEX(\d)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d)</measuring_interval_in_secs>
@@ -265,7 +265,7 @@ Date: REGEX(.*)
         "subCacheRefreshs": "1",
         "subCacheRemoves": "0",
         "uptime_in_secs": "REGEX(\d)",
-        "versionRequests": "0",
+        "versionRequests": "REGEX((0|1))",
         "xmlRequests": "REGEX((1|2))"
     }
 }

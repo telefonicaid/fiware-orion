@@ -139,6 +139,8 @@ MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
 */
 void mongoSubCacheInit(void)
 {
+  LM_T(LmtMongoSubCache, ("Initializing subscription cache"));
+
   mongoSubCache.head   = NULL;
   mongoSubCache.tail   = NULL;
   mongoSubCache.items  = 0;
@@ -160,6 +162,7 @@ static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
   //
   cSubP->next = NULL;
 
+  LM_T(LmtMongoSubCache, ("inserting sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
   // First insertion?
   if ((mongoSubCache.head == NULL) && (mongoSubCache.tail == NULL))
@@ -359,6 +362,7 @@ void mongoSubCacheMatch
     if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attr))
     {
       subVecP->push_back(cSubP);
+      LM_T(LmtMongoSubCache, ("added subscription '%s': lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
     }
 
     cSubP = cSubP->next;
@@ -424,6 +428,8 @@ static void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 */
 void mongoSubCacheDestroy(void)
 {
+  LM_T(LmtMongoSubCache, ("destroying subscription cache"));
+
   CachedSubscription* cSubP  = mongoSubCache.head;
 
   if (mongoSubCache.head == NULL)
@@ -567,6 +573,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
 
+  LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
@@ -686,10 +693,12 @@ void mongoSubCacheItemInsert
   cSubP->reference             = strdup(scrP->reference.get().c_str());
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
-  cSubP->lastNotificationTime  = -1;
+  cSubP->lastNotificationTime  = 0;
   cSubP->pendingNotifications  = 0;
   cSubP->notifyFormat          = notifyFormat;
   cSubP->next                  = NULL;
+
+  LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
 
   //
@@ -731,6 +740,7 @@ void mongoSubCacheItemInsert
   //
   // 5. Now, insert the subscription in the cache
   //
+  LM_M(("Inserting NEW sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
   mongoSubCacheItemInsert(cSubP);
 
   mongoSubCache.noOfInserts  += 1;
@@ -767,6 +777,25 @@ void mongoSubCacheStatisticsReset(void)
 
 /* ****************************************************************************
 *
+* mongoSubCachePresent - 
+*/
+void mongoSubCachePresent(const char* title)
+{
+  CachedSubscription* cSubP = mongoSubCache.head;
+
+  LM_T(LmtMongoSubCache, ("----------- %s ------------", title));
+
+  while (cSubP != NULL)
+  {
+    LM_T(LmtMongoSubCache, ("o %s (tenant: %s)", cSubP->subscriptionId, cSubP->tenant));
+    cSubP = cSubP->next;
+  }
+
+  LM_T(LmtMongoSubCache, ("--------------------------------"));
+}
+
+/* ****************************************************************************
+*
 * mongoSubCacheItemRemove - 
 */
 int mongoSubCacheItemRemove(CachedSubscription* cSubP)
@@ -774,6 +803,7 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
   CachedSubscription* current = mongoSubCache.head;
   CachedSubscription* prev    = NULL;
 
+  LM_T(LmtMongoSubCache, ("in mongoSubCacheItemRemove, trying to remove '%s'", cSubP->subscriptionId));
   while (current != NULL)
   {
     if (current == cSubP)
@@ -782,6 +812,7 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
       if (cSubP == mongoSubCache.tail)  mongoSubCache.tail = prev;
       if (prev != NULL)                 prev->next         = cSubP->next;
 
+      LM_T(LmtMongoSubCache, ("in mongoSubCacheItemRemove, REMOVING '%s'", cSubP->subscriptionId));
       mongoSubCache.noOfRemoves += 1;
 
       cachedSubscriptionDestroy(cSubP);
@@ -808,6 +839,8 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
 */
 static void mongoSubCacheRefresh(std::string database)
 {
+  LM_T(LmtMongoSubCache, ("in mongoSubCacheRefresh"));
+
   BSONObj                   query      = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
   DBClientBase*             connection = getMongoConnection();
   auto_ptr<DBClientCursor>  cursor;

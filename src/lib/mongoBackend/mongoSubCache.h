@@ -110,6 +110,14 @@ extern void mongoSubCacheDestroy(void);
 
 /* ****************************************************************************
 *
+* mongoSubCachePresent - 
+*/
+extern void mongoSubCachePresent(const char* title);
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheItemInsert - 
 */
 extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub);

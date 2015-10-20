@@ -167,12 +167,14 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     /* Destroy any previous ONTIMEINTERVAL thread */
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
-    responseP->statusCode.fill(SccOk);
 
     //
     // Removing subscription from mongo subscription cache
     //
+    mongoSubCachePresent("REMOVE");
+    LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", tenant.c_str(), requestP->subscriptionId.get().c_str()));
     CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
 
     if (cSubP != NULL)
     {
@@ -180,10 +182,12 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     }
     else
     {
+      LM_T(LmtMongoSubCache, ("cannot find subscription '%s' in mongo subscription cache", requestP->subscriptionId.get().c_str()));
       LM_E(("Runtime Error (removed subscription not found in mongo subscription cache)"));
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
 
+    responseP->statusCode.fill(SccOk);
     return SccOk;
 }
