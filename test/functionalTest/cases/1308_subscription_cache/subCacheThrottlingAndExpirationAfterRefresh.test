@@ -170,7 +170,7 @@ Date: REGEX(.*)
 02. Sleep 6 secs to let the cache refresh from DB - one cache insert comes from the refresh
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 372
+Content-Length: REGEX((372|374))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -186,7 +186,7 @@ Date: REGEX(.*)
         "subCacheUpdates": "0",
         "subscriptions": "1",
         "uptime_in_secs": "REGEX((8|9))",
-        "versionRequests": "0",
+        "versionRequests": "REGEX((0|1))",
         "xmlRequests": "REGEX((0|1))"
     }
 }

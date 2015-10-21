@@ -345,7 +345,7 @@ Date: REGEX(.*)
         "measuring_interval_in_secs": "REGEX(\d+)",
         "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
         "statisticsRequests": "3",
-        "subCacheInserts": "2",
+        "subCacheInserts": "REGEX((2|3))",
         "subCacheItems": "1",
         "subCacheRefreshs": "REGEX((1|2))",
         "subCacheRemoves": "1",
