@@ -1259,16 +1259,6 @@ void restInit
     strncpy(bindIp, _bindAddress, MAX_LEN_IP - 1);
   }
 
-  if ((_ipVersion == IPV4) || (_ipVersion == IPDUAL))
-  {
-     strncpy(bindIp, bindIp, MAX_LEN_IP - 1);
-  }
-
-  if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
-  {
-     strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
-  }
-
   // Starting REST interface
   int r;
   if ((r = restStart(_ipVersion, key, cert)) != 0)

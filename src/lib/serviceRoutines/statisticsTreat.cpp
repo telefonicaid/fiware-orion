@@ -34,11 +34,11 @@
 #include "common/statistics.h"
 #include "common/sem.h"
 
-#include "cache/subCache.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "mongoBackend/mongoConnectionPool.h"
+#include "mongoBackend/mongoSubCache.h"
 
 
 
@@ -48,6 +48,7 @@
 */
 #define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, true)
 #define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outFormat, true)
+#define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outFormat, comma)
 
 
 
@@ -147,6 +148,7 @@ std::string statisticsTreat
     mongoPoolConnectionSemWaitingTimeReset();
     mutexTimeCCReset();
 
+    mongoSubCacheStatisticsReset();
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -157,10 +159,10 @@ std::string statisticsTreat
 
   out += startTag(indent, tag, ciP->outFormat, true, true);
 
-  if (noOfXmlRequests != -1)
-  {
-    out += TAG_ADD_COUNTER("xmlRequests", noOfXmlRequests);
-  }
+  // FIXME P1: Always show xmlRequests, just for 0.24, as valgrind tests use XML for its ping
+  //           This is fixed in develop already - valgrind uses JSON
+  out += TAG_ADD_COUNTER("xmlRequests", noOfXmlRequests);
+
 
   if (noOfJsonRequests != -1)
   {
@@ -202,6 +204,11 @@ std::string statisticsTreat
     out += TAG_ADD_COUNTER("availabilityNotificationsReceived", noOfAvailabilityNotificationsReceived);
   }
 
+  if (noOfAvailabilityNotificationsSent != -1)
+  {
+    out += TAG_ADD_COUNTER("availabilityNotificationsSent", noOfAvailabilityNotificationsSent);
+  }
+
   if (noOfQueries != -1)
   {
     out += TAG_ADD_COUNTER("queries", noOfQueries);
@@ -230,6 +237,11 @@ std::string statisticsTreat
   if (noOfNotificationsReceived != -1)
   {
     out += TAG_ADD_COUNTER("notificationsReceived", noOfNotificationsReceived);
+  }
+
+  if (noOfNotificationsSent != -1)
+  {
+    out += TAG_ADD_COUNTER("notificationsSent", noOfNotificationsSent);
   }
 
   if (noOfQueryContextResponses != -1)
@@ -463,15 +475,30 @@ std::string statisticsTreat
     char ccMutexWaitingTime[64];
     mutexTimeCCGet(ccMutexWaitingTime, sizeof(ccMutexWaitingTime));
     out += TAG_ADD_STRING("curlContextMutexWaitingTime", ccMutexWaitingTime);
-
-    char subCacheMutexWaitingTime[64];
-    orion::subCacheMutexWaitingTimeGet(subCacheMutexWaitingTime, sizeof(subCacheMutexWaitingTime));
-    out += TAG_ADD_STRING("subCacheMutexWaitingTime", subCacheMutexWaitingTime);
   }
 
   int now = getCurrentTime();
   out += valueTag(indent2, "uptime_in_secs",             now - startTime,      ciP->outFormat, true);
-  out += valueTag(indent2, "measuring_interval_in_secs", now - statisticsTime, ciP->outFormat, false);
+  out += valueTag(indent2, "measuring_interval_in_secs", now - statisticsTime, ciP->outFormat, true);
+
+
+  //
+  // mongo sub cache counters
+  //
+  int mscRefreshs = 0;
+  int mscInserts  = 0;
+  int mscRemoves  = 0;
+  int mscUpdates  = 0;
+  int cacheItems  = 0;
+
+  mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems);
+
+
+  out += TAG_ADD_INTEGER("subCacheRefreshs", mscRefreshs, true);
+  out += TAG_ADD_INTEGER("subCacheInserts",  mscInserts,  true);
+  out += TAG_ADD_INTEGER("subCacheRemoves",  mscRemoves,  true);
+  out += TAG_ADD_INTEGER("subCacheUpdates",  mscUpdates,  true);
+  out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  false);
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
   out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);

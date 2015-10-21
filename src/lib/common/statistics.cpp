@@ -175,6 +175,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case UpdateContextSubscription:                        ++noOfSubscriptionUpdates; break;
   case UnsubscribeContext:                               ++noOfUnsubscriptions; break;
   case NotifyContext:                                    ++noOfNotificationsReceived; break;
+  case NotifyContextSent:                                ++noOfNotificationsSent; break;
   case UpdateContext:                                    ++noOfUpdates; break;
   case RtQueryContextResponse:                           ++noOfQueryContextResponses; break;
   case RtUpdateContextResponse:                          ++noOfUpdateContextResponses; break;

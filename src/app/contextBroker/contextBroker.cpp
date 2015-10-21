@@ -65,6 +65,7 @@
 #include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoSubCache.h"
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
@@ -189,8 +190,6 @@
 
 #include "contextBroker/version.h"
 #include "common/string.h"
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
 
 using namespace orion;
 
@@ -233,6 +232,7 @@ int             writeConcern;
 unsigned        cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
+bool            noCache;
 
 
 
@@ -272,6 +272,8 @@ char            notificationMode[64];
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
+#define NO_CACHE               "disable subscription cache for lookups"
+
 
 
 /* ****************************************************************************
@@ -309,11 +311,11 @@ PaArgument paArgs[] =
   { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
-  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL, PaNL,     ALLOWED_ORIGIN_DESC   },
-  { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,    UINT_MAX, CPR_FORWARD_LIMIT_DESC},
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             0,    3600,     SUB_CACHE_IVAL_DESC   },
-  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL, PaNL,     NOTIFICATION_MODE_DESC},
-
+  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
+  { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             1,     3600,     SUB_CACHE_IVAL_DESC    },
+  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
+  { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
 
   PA_END_OF_ARGS
 };
@@ -1162,12 +1164,13 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
-  if (subCache != NULL)
-  {
-    subCache->release();
-    delete subCache;
-    subCache = NULL;
-  }
+#ifdef DEBUG
+  // Take mongo req-sem ?  
+  LM_T(LmtMongoSubCache, ("try-taking req semaphore"));
+  reqSemTryToTake();
+  LM_T(LmtMongoSubCache, ("calling mongoSubCacheDestroy"));
+  mongoSubCacheDestroy();
+#endif
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1204,9 +1207,6 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
-
-  /* Create the subscription cache object */
-  subscriptionCacheInit(dbName);
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
   recoverOntimeIntervalThreads("");
@@ -1472,6 +1472,17 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+  //
+  // FIXME P8: for release 0.24, -reqMutexPolicy != "all" ("all" is default) cannot
+  //           be used together with mongo subscription cache.
+  //           This limitation will be fixed in the next release (0.25.0)
+  //
+  if ((strcmp(reqMutexPolicy, "all") != 0) && (noCache == false))
+  {
+    LM_E(("Bad Input (reqMutexPolicy != 'all'  AND  subscription-cache CANNOT be used together in 0.24.0 (cache can be disabled using -noCache))"));
+    exit(1);
+  }
+
 #ifdef DEBUG_develenv
   //
   // FIXME P9: Temporary setting trace level 250 in jenkins only, until the ftest-ftest-ftest bug is solved
@@ -1546,6 +1557,16 @@ int main(int argC, char* argV[])
     LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
   }
 
+  if (noCache == false)
+  {
+    mongoSubCacheInit();
+    mongoSubCacheStart();
+  }
+  else
+  {
+    LM_T(LmtMongoSubCache, ("noCache == false"));
+  }
+
   if (https)
   {
     char* httpsPrivateServerKey = (char*) malloc(2048);
@@ -1582,14 +1603,6 @@ int main(int argC, char* argV[])
 
   while (1)
   {
-    if (subCacheInterval != 0)
-    {
-      sleep(subCacheInterval);
-      orion::subCache->refresh();
-    }
-    else
-    {
-      sleep(60);
-    }
+    sleep(60);
   }
 }

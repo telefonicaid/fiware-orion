@@ -79,6 +79,7 @@ extern OrionExitFunction  orionExitFunction;
 extern bool               semTimeStatistics;
 extern unsigned           cprForwardLimit;
 extern char               notificationMode[];
+extern bool               noCache;
 
 
 

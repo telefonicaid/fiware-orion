@@ -27,6 +27,8 @@
 #include <sstream>
 #include "mongoBackend/TriggeredSubscription.h"
 
+
+
 /* ****************************************************************************
 *
 * TriggeredSubscription::TriggeredSubscription -
@@ -38,7 +40,8 @@ TriggeredSubscription::TriggeredSubscription
   Format               _format,
   const std::string&   _reference,
   AttributeList        _attrL,
-  orion::Subscription* _cacheSubReference
+  const std::string&   _cacheSubId,
+  const char*          _tenant
 )
 {
   throttling        = _throttling;
@@ -46,8 +49,10 @@ TriggeredSubscription::TriggeredSubscription
   format            = _format;
   reference         = _reference;
   attrL             = _attrL;
-  cacheSubReference = _cacheSubReference;
+  cacheSubId        = _cacheSubId;
+  tenant            = (_tenant == NULL)? "" : _tenant;
 }
+
 
 
 /* ****************************************************************************
@@ -68,8 +73,10 @@ TriggeredSubscription::TriggeredSubscription
   format            = _format;
   reference         = _reference;
   attrL             = _attrL;
-  cacheSubReference = NULL;
+  cacheSubId        = "";
+  tenant            = "";
 }
+
 
 
 /* ****************************************************************************

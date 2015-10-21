@@ -20,9 +20,19 @@
 
 if [ -z "$CB_DIFF_TOOL" ] 
 then
-    echo "Need to set CB_DIFF_TOOL"
+    echo "Need to set env-var CB_DIFF_TOOL"
     exit 1
 fi  
+
+if [ "$#" == 1 ]
+then
+  base=$(basename $1 .test)
+  out=$(find . -name ${base}.out)
+  exp=$(find . -name ${base}.regexpect)
+  $CB_DIFF_TOOL $out $exp
+  exit $?
+fi
+
 
 outFiles=$(find . -name '*.out' | grep -v valgrind | sort)
 for outFile in $outFiles

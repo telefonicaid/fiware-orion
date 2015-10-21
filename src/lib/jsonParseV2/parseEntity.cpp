@@ -112,7 +112,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
         eP->id = iter->value.GetString();
       }
-      else  // "id" present in payload for /v2/entities/<eid> - not a valid payload
+      else  // "id" is present in payload for /v2/entities/<eid> - not a valid payload
       {
         LM_W(("Bad Input ('id' is not a valid attribute"));
         eP->errorCode.fill("ParseError", "invalid input, 'id' as attribute");
