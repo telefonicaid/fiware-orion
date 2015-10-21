@@ -67,7 +67,7 @@ extern int semInit
 *
 * reqSemTryToTake - try to take take semaphore
 *
-* This function is only used by the exit-function (and only for DBUG compilations),
+* This function is only used by the exit-function (AND only for DEBUG compilations),
 * in order to clean the subscription cache.
 * The exit-function runs when the broker is shutting down and instead of just wating for the
 * semaphore, it is taken if it is free, if not, the subscription cache is simply cleaned.
