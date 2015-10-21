@@ -29,8 +29,12 @@
 #include <vector>
 #include <regex.h>
 
+#include "mongo/client/dbclient.h"
+
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/SubscribeContextRequest.h"
+
+using namespace mongo;
 
 
 
@@ -110,6 +114,22 @@ extern void mongoSubCacheDestroy(void);
 
 /* ****************************************************************************
 *
+* mongoSubCacheItems - 
+*/
+extern int mongoSubCacheItems(void);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCachePresent - 
+*/
+extern void mongoSubCachePresent(const char* title);
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheItemInsert - 
 */
 extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub);
@@ -130,6 +150,14 @@ extern void mongoSubCacheItemInsert
   int64_t                   throttling,
   Format                    notifyFormat
 );
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheItemInsert - 
+*/
+extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* subscriptionId, const char* servicePath);
 
 
 
@@ -177,7 +205,15 @@ extern void mongoSubCacheMatch
 *
 * mongoSubCacheStatisticsGet - 
 */
-extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* items);
+extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheUpdateStatisticsIncrement - 
+*/
+extern void mongoSubCacheUpdateStatisticsIncrement(void);
 
 
 

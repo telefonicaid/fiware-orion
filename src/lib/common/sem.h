@@ -65,6 +65,24 @@ extern int semInit
 
 /* ****************************************************************************
 *
+* reqSemTryToTake - try to take take semaphore
+*
+* This function is only used by the exit-function (AND only for DEBUG compilations),
+* in order to clean the subscription cache.
+* The exit-function runs when the broker is shutting down and instead of just wating for the
+* semaphore, it is taken if it is free, if not, the subscription cache is simply cleaned.
+* A little dangerous, no doubt, but, the broke is shutting down anyway, if it dies because
+* of a SIGSEGV in the subscription cache code, it is not such a big deal ... perhaps ...
+* This implementation will stay like this until we find a better way attack the problem.
+*
+* The cleanup is necessary for our memory-leak detection, to avoid finding false leaks.
+*/
+extern int reqSemTryToTake(void);
+
+
+
+/* ****************************************************************************
+*
 * xxxSemTake -
 */
 extern int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken);

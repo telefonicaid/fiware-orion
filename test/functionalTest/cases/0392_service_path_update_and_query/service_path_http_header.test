@@ -67,8 +67,11 @@ echo
 echo "+++++ 5: four service paths"
 orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
 echo
+
+
+# The grep -v '/#' is to remove the "GET /version" that is used by the valgrind test suite
 echo "+++++ 6: service paths from log file"
-grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }' | grep -v '/#'
 echo
 
 

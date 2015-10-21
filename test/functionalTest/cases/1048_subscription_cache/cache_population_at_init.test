@@ -182,8 +182,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -198,8 +198,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -214,8 +214,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -230,20 +230,21 @@ Broker Restarted
 05. Statistics in XML
 =====================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 423
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
   <xmlRequests>REGEX((1|2))</xmlRequests>
-  <versionRequests>0</versionRequests>
+  <versionRequests>REGEX((0|1))</versionRequests>
   <statisticsRequests>1</statisticsRequests>
   <uptime_in_secs>REGEX(\d)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d)</measuring_interval_in_secs>
   <subCacheRefreshs>1</subCacheRefreshs>
-  <subCacheInserts>0</subCacheInserts>
+  <subCacheInserts>3</subCacheInserts>
   <subCacheRemoves>0</subCacheRemoves>
+  <subCacheUpdates>0</subCacheUpdates>
   <subCacheItems>3</subCacheItems>
 </orion>
 
@@ -251,7 +252,7 @@ Date: REGEX(.*)
 06. Statistics in JSON
 ======================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 345
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -260,12 +261,13 @@ Date: REGEX(.*)
         "jsonRequests": "1",
         "measuring_interval_in_secs": "REGEX(\d)",
         "statisticsRequests": "2",
-        "subCacheInserts": "0",
+        "subCacheInserts": "3",
         "subCacheItems": "3",
         "subCacheRefreshs": "1",
         "subCacheRemoves": "0",
+        "subCacheUpdates": "0",
         "uptime_in_secs": "REGEX(\d)",
-        "versionRequests": "0",
+        "versionRequests": "REGEX((0|1))",
         "xmlRequests": "REGEX((1|2))"
     }
 }

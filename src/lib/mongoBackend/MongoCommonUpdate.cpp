@@ -1225,8 +1225,6 @@ static bool addTriggeredSubscriptions_withCache
   {
     CachedSubscription* cSubP = subVec[ix];
 
-    cSubP->pendingNotifications += 1;
-
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
@@ -1238,12 +1236,37 @@ static bool addTriggeredSubscriptions_withCache
     aList.fill(cSubP->attributes);
 
     // Throttling
-    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != -1))
+    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
+        LM_T(LmtMongoSubCache, ("subscription '%s' ignored due to throttling", cSubP->subscriptionId));
         continue;
       }
+      else
+      {
+        cSubP->pendingNotifications += 1;
+
+        LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                                cSubP->subscriptionId,
+                                cSubP->throttling,
+                                cSubP->lastNotificationTime,
+                                now,
+                                now - cSubP->lastNotificationTime,
+                                cSubP->throttling));
+      }
+    }
+    else
+    {
+      cSubP->pendingNotifications += 1;
+
+      LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                              cSubP->subscriptionId,
+                              cSubP->throttling,
+                              cSubP->lastNotificationTime,
+                              now,
+                              now - cSubP->lastNotificationTime,
+                              cSubP->throttling));
     }
 
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
@@ -1550,6 +1573,7 @@ static bool processSubscriptions
             if (cSubP->pendingNotifications == 0)
             {
               cSubP->lastNotificationTime = getCurrentTime();
+              LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s'", cSubP->lastNotificationTime, cSubP->subscriptionId));
             }
           }
           else

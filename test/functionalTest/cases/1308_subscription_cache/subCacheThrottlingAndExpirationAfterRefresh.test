@@ -26,27 +26,27 @@ Subscription Cache Throttling and expiration after Refresh
 --SHELL-INIT--
 dbInit CB
 dbInit ftest-t1
-brokerStart CB 216 IPv4 -multiservice -subCacheIval 5
+brokerStart CB 37,101 IPv4 -multiservice -subCacheIval 10
 accumulatorStart
 
 --SHELL--
 
 #
-# 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 11 secs
-# 02. Sleep 6 secs to let the cache refresh from DB
+# 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs
+# 02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
 # 03. Create entity s01 w/ attr A w/o tenant
 # 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 # 05. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
-# 06. Wait 3 secs so that the throttling of 2 secs is OK
+# 06. Wait 5 secs so that the throttling of 4 secs is OK
 # 07. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
 # 08. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
-# 09. Wait 3 secs more, to make subscription expire
+# 09. Wait 6 secs more, to make subscription expire
 # 10. Modify entity s01 w/ attr A w/o tenant - no notification as expired
 # 11. Dump accumulator - see two notifications
 #
 
 
-echo "01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 11 secs"
+echo "01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs"
 echo "==========================================================================================="
 payload='{
   "entities": [
@@ -56,8 +56,8 @@ payload='{
     }
   ],
   "reference": "http://localhost:'${LISTENER_PORT}'/notify",
-  "duration": "PT11S",
-  "throttling": "PT2S",
+  "duration": "PT21S",
+  "throttling": "PT4S",
   "notifyConditions": [
     {
       "type": "ONCHANGE",
@@ -70,9 +70,9 @@ echo
 echo
 
 
-echo "02. Sleep 6 secs to let the cache refresh from DB"
-echo "================================================="
-sleep 6
+echo "02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh"
+echo "============================================================================================"
+sleep 11
 orionCurl --url /statistics --json
 echo
 echo
@@ -105,9 +105,14 @@ echo
 echo
 
 
-echo "06. Wait 3 secs so that the throttling of 2 secs is OK"
+echo "06. Wait 5 secs so that the throttling of 4 secs is OK"
 echo "======================================================"
-sleep 3
+if [ "$VALGRIND" == "" ]
+then
+  sleep 5
+else
+  sleep 2
+fi
 echo
 echo
 
@@ -128,9 +133,9 @@ echo
 echo
 
 
-echo "09. Wait 3 secs more, to make subscription expire"
+echo "09. Wait 6 secs more, to make subscription expire"
 echo "================================================="
-sleep 3
+sleep 6
 echo
 echo
 
@@ -151,7 +156,7 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 11 secs
+01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs
 ===========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 137
@@ -160,32 +165,34 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "PT11S",
+        "duration": "PT21S",
         "subscriptionId": "REGEX([0-9a-f]{24})",
-        "throttling": "PT2S"
+        "throttling": "PT4S"
     }
 }
 
 
-02. Sleep 6 secs to let the cache refresh from DB
-=================================================
+02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
+============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 318
+Content-Length: REGEX((372|374))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
         "jsonRequests": "2",
-        "measuring_interval_in_secs": "REGEX((8|9))",
+        "measuring_interval_in_secs": "REGEX(\d+)",
         "statisticsRequests": "1",
-        "subCacheInserts": "1",
+        "subCacheInserts": "2",
         "subCacheItems": "1",
         "subCacheRefreshs": "2",
         "subCacheRemoves": "0",
+        "subCacheUpdates": "0",
         "subscriptions": "1",
-        "uptime_in_secs": "REGEX((8|9))",
-        "versionRequests": "0"
+        "uptime_in_secs": "REGEX(\d+)",
+        "versionRequests": "REGEX((0|1))",
+        "xmlRequests": "REGEX((0|1))"
     }
 }
 
@@ -215,7 +222,7 @@ Date: REGEX(.*)
 
 
 
-06. Wait 3 secs so that the throttling of 2 secs is OK
+06. Wait 5 secs so that the throttling of 4 secs is OK
 ======================================================
 
 
@@ -235,7 +242,7 @@ Date: REGEX(.*)
 
 
 
-09. Wait 3 secs more, to make subscription expire
+09. Wait 6 secs more, to make subscription expire
 =================================================
 
 
