@@ -159,8 +159,6 @@ void mongoListSubscriptions
 )
 {
 
-  // FIXME P10: Pagination not yet implemented
-
   bool           reqSemTaken = false;
   long long      count       = 0LL;
 
@@ -174,7 +172,9 @@ void mongoListSubscriptions
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    err;
   std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
-  BSONObj                        q     = BSON(conds << "ONCHANGE");
+  Query                          q     = Query(BSON(conds << "ONCHANGE"));
+
+  q.sort(BSON("_id" << 1));
 
   if (!collectionRangedQuery(getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, &count, &err))
   {
