@@ -35,6 +35,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
 
 /* ****************************************************************************
 *
@@ -54,8 +55,10 @@ std::string getAllSubscriptions
 
   std::vector<ngsiv2::Subscription> subs;
   OrionError                        oe;
+  int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
-  mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant);
+  mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, limit, offset);
 
   if (oe.code != SccOk)
   {
