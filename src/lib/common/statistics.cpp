@@ -140,6 +140,7 @@ int noOfEntityTypeRequest                                = -1;
 int noOfEntityAllTypesRequest                            = -1;
 int noOfSubscriptionsRequest                             = -1;
 int noOfIndividualSubscriptionRequest                    = -1;
+int noOfDroppedNotifications                             = -1;
 
 /* ****************************************************************************
 *
@@ -238,7 +239,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntityAttributeValueRequest:                      ++noOfEntityAttributeValueRequests; break;
   case EntityAttributeValueResponse:                     ++noOfEntityAttributeValueResponses; break;
 
-
   case PostEntity:                                       ++noOfPostEntity; break;
   case PostAttributes:                                   ++noOfPostAttributes; break;
   case DeleteEntity:                                     ++noOfDeleteEntity; break;
@@ -247,5 +247,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntityAllTypesRequest:                            ++noOfEntityAllTypesRequest; break;
   case SubscriptionsRequest:                             ++noOfSubscriptionsRequest; break;
   case IndividualSubscriptionRequest:                    ++noOfIndividualSubscriptionRequest; break;
+
   }
 }

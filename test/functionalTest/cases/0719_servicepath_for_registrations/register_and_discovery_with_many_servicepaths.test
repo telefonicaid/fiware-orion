@@ -351,7 +351,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }, 
         {
@@ -370,7 +370,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }, 
         {
@@ -389,7 +389,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }, 
         {
@@ -408,7 +408,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }
     ]
@@ -440,7 +440,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }, 
         {
@@ -459,7 +459,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }, 
         {
@@ -478,7 +478,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }
     ]
@@ -510,7 +510,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }, 
         {
@@ -529,7 +529,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }
     ]
@@ -561,7 +561,7 @@ Date: REGEX(.*)
                         "type": "T"
                     }
                 ], 
-                "providingApplication": "http://localhost:9801/v1"
+                "providingApplication": "http://localhost:REGEX(\d+)/v1"
             }
         }
     ]

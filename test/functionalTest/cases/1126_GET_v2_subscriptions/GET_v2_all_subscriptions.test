@@ -178,7 +178,7 @@ Date: REGEX(.*)
                 "occupancy",
                 "lightstatus"
             ],
-            "callback": "http://127.0.0.1:9997/notify",
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify",
             "throttling": 5
         },
         "status": "active",
@@ -216,7 +216,7 @@ Date: REGEX(.*)
                 "speed",
                 "location"
             ],
-            "callback": "http://127.0.0.1:9997/notify"
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify"
         },
         "status": "active",
         "subject": {
@@ -273,7 +273,7 @@ Date: REGEX(.*)
                 "occupancy",
                 "lightstatus"
             ],
-            "callback": "http://127.0.0.1:9997/notify",
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify",
             "throttling": 5
         },
         "status": "active",
@@ -311,7 +311,7 @@ Date: REGEX(.*)
                 "speed",
                 "location"
             ],
-            "callback": "http://127.0.0.1:9997/notify",            
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify",            
             "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
             "timesSent": 1
         },
