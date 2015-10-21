@@ -1225,8 +1225,6 @@ static bool addTriggeredSubscriptions_withCache
   {
     CachedSubscription* cSubP = subVec[ix];
 
-    cSubP->pendingNotifications += 1;
-
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
@@ -1242,12 +1240,14 @@ static bool addTriggeredSubscriptions_withCache
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
-        LM_T(LmtMongoSubCache, ("subscription '%s' removed due to throttling", cSubP->subscriptionId));
+        LM_T(LmtMongoSubCache, ("subscription '%s' ignored due to throttling", cSubP->subscriptionId));
         continue;
       }
       else
       {
-        LM_T(LmtMongoSubCache, ("subscription '%s' NOT removed due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+        cSubP->pendingNotifications += 1;
+
+        LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                                 cSubP->subscriptionId,
                                 cSubP->throttling,
                                 cSubP->lastNotificationTime,
@@ -1258,7 +1258,9 @@ static bool addTriggeredSubscriptions_withCache
     }
     else
     {
-      LM_T(LmtMongoSubCache, ("subscription '%s' NOT removed due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+      cSubP->pendingNotifications += 1;
+
+      LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                               cSubP->subscriptionId,
                               cSubP->throttling,
                               cSubP->lastNotificationTime,

@@ -1580,7 +1580,6 @@ int main(int argC, char* argV[])
   {
     mongoSubCacheInit();
     mongoSubCacheStart();
-    mongoSubCachePresent("STARTED");
   }
   else
   {

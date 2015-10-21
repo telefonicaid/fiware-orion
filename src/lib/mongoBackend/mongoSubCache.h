@@ -29,8 +29,12 @@
 #include <vector>
 #include <regex.h>
 
+#include "mongo/client/dbclient.h"
+
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/SubscribeContextRequest.h"
+
+using namespace mongo;
 
 
 

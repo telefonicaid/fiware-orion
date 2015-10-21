@@ -174,7 +174,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     // Removing subscription from mongo subscription cache
     //
     LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
-    mongoSubCachePresent("REMOVE");
     CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
 

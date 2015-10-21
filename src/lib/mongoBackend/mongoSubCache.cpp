@@ -190,6 +190,7 @@ static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
   {
     mongoSubCache.head   = cSubP;
     mongoSubCache.tail   = cSubP;
+
     return;
   }
 
@@ -980,7 +981,7 @@ void mongoSubCachePresent(const char* title)
 
   while (cSubP != NULL)
   {
-    LM_T(LmtMongoSubCache, ("o %s (tenant: %s)", cSubP->subscriptionId, cSubP->tenant));
+    LM_T(LmtMongoSubCache, ("o %s (tenant: %s, LNT: %lu, THR: %d)", cSubP->subscriptionId, cSubP->tenant, cSubP->lastNotificationTime, cSubP->throttling));
     cSubP = cSubP->next;
   }
 
