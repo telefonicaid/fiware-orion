@@ -22,20 +22,21 @@ Follow these steps:
 
 1. Create a directory on your system on which to work (for example, `~/fiware`).
 2. Create a new file called `docker-compose.yml` inside your directory with the following contents:
-```
-	mongo:
-	  image: mongo:2.6
-      #command: --smallfiles
-	orion:
-	  image: fiware/orion
-	  links:
-	    - mongo
-	  ports:
-	    - "1026:1026"
-	  command: -dbhost mongo
-```
-> Uncomment the `--smallfiles` line if you host doesn't have too much free space.
+	
+		mongo:
+		  image: mongo:2.6
+		  command: --smallfiles --nojournal
+		orion:
+		  image: fiware/orion
+		  links:
+		    - mongo
+		  ports:
+		    - "1026:1026"
+		  command: -dbhost mongo
+
 3. Using the command-line and within the directory you created type: `sudo docker-compose up`.
+
+> Regarding --smallfiles, you can ommit it if your hosting machine have enough disk space. Regarding --nojournal it is not recommened for production, but it speeds up mongo container start up and avoids some race conditions problems if Orion container is faster and doesn't find the DB up and ready.
 
 After a few seconds you should have your Context Broker running and listening on port `1026`.
 
