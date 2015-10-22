@@ -87,6 +87,49 @@ function dMsg()
 }
 
 
+# ------------------------------------------------------------------------------
+#
+# dbInitTenant - 
+#
+function dbInitTenant()
+{
+  role=$1
+  
+  host="${CB_DATABASE_HOST}"
+  if [ "$host" == "" ]
+  then
+    host="localhost"
+  fi
+  
+  port="${CB_DATABASE_PORT}"
+  if [ "$port" == "" ]
+  then
+    port="27017"
+  fi
+  
+  db=$host:$port/$1
+
+  dMsg initializing database;
+
+  if [ "$role" == "CB  t1" ]
+  then
+    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DATABASE_NAME} --quiet
+  elif [ "$role" == "CB  t2" ]
+  then
+    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP1  t1" ]
+  then
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP1  t2" ]
+  then
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP2_DATABASE_NAME} --quiet
+  else
+    echo 'db.dropDatabase()' | mongo $db --quiet
+  fi
+}
+
+
+
 
 # ------------------------------------------------------------------------------
 #
@@ -153,7 +196,22 @@ function dbDrop()
   fi
 }
 
+# ------------------------------------------------------------------------------
+#
+# dbDropTenant - 
+#
+function dbDropTenant()
+{
+  db=$1
 
+  if [ "$CB_DB_DROP" != "No" ]
+  then
+    if [ "$db" != "" ]
+    then
+      dbInitTenant $db
+    fi
+  fi
+}
 
 # -----------------------------------------------------------------------------
 #
@@ -191,7 +249,7 @@ function dbResetAll()
     port="27017"
   fi
   
-  all=$(echo show dbs | mongo $host:$port --quiet | grep ftest | awk '{ print $1 }')
+  all=$(echo show dbs | mongo $host:$port --quiet | grep CB | awk '{ print $1 }')
   for db in $all
   do
     dbDrop $db
@@ -1196,8 +1254,10 @@ function coapCurl()
 
 
 export -f dbInit
+export -f dbInitTenant
 export -f dbList
 export -f dbDrop
+export -f dbDropTenant
 export -f dbResetAll
 export -f brokerStart
 export -f localBrokerStop

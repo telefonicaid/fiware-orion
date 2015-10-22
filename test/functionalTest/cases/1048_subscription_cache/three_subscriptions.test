@@ -31,7 +31,7 @@ accumulatorStart
 --SHELL--
 
 #
-# 00. Making sure only ONE ftest database exists
+# 00. Making sure only ONE CB database exists
 # 00. Making sure counters are RESET
 # 01. Subscribe to E1/A1 (no pattern)
 # 02. Subscribe to E2.*/A1
@@ -44,9 +44,9 @@ accumulatorStart
 #
 
 
-echo "00. Making sure only ONE ftest database exists"
+echo "00. Making sure only ONE CB database exists"
 echo "=============================================="
-dbList ftest*
+dbList CB*
 echo
 echo
 
@@ -194,9 +194,9 @@ echo
 
 
 --REGEXPECT--
-00. Making sure only ONE ftest database exists
+00. Making sure only ONE CB database exists
 ==============================================
-ftest
+CB
 
 
 00. Making sure counters are RESET
