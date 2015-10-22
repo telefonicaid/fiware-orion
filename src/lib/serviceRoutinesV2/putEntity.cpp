@@ -93,8 +93,7 @@ std::string putEntity
   {
     OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
     answer = orionError.render(ciP, "");
-   }
-
+  }
 
 
   // 05. Cleanup and return result

@@ -144,7 +144,7 @@ void mongoSubCacheInit(void)
   mongoSubCache.head   = NULL;
   mongoSubCache.tail   = NULL;
 
-  mongoSubCacheStatisticsReset();
+  mongoSubCacheStatisticsReset("mongoSubCacheInit");
 }
 
 
@@ -944,13 +944,47 @@ void mongoSubCacheItemInsert
 *
 * mongoSubCacheStatisticsGet - 
 */
-void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items)
+void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize)
 {
   *refreshes = mongoSubCache.noOfRefreshes;
   *inserts   = mongoSubCache.noOfInserts;
   *removes   = mongoSubCache.noOfRemoves;
   *updates   = mongoSubCache.noOfUpdates;
   *items     = mongoSubCacheItems();
+
+  CachedSubscription* cSubP = mongoSubCache.head;
+
+  //
+  // FIXME?
+  // If the listBuffer is not big enough to hold the entire list of cached subscriptions,
+  // mongoSubCacheStatisticsGet returns the empty string and the list is excluded from
+  // the response of "GET /statistics".
+  // Minimum size of the list is set to 128 bytes and the needed size is detected later.
+  // Again, if the list-buffer is not big enough to hold the request, no list is shown.
+  //
+  *list = 0;
+  if (listSize > 128)
+  {
+    while (cSubP != NULL)
+    {
+      unsigned int bytesLeft = listSize - strlen(list);
+
+      if (strlen(cSubP->subscriptionId) + 2 > bytesLeft)
+      {
+        *list = 0;
+        break;
+      }
+      
+      if (list[0] != 0)
+        strcat(list, ", ");
+
+      strcat(list, cSubP->subscriptionId);
+
+      cSubP = cSubP->next;
+    }
+  }
+
+  LM_T(LmtMongoSubCache, ("Statistics: refreshes: %d (%d)", *refreshes, mongoSubCache.noOfRefreshes));
 }
 
 
@@ -959,12 +993,14 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
 *
 * mongoSubCacheStatisticsReset - 
 */
-void mongoSubCacheStatisticsReset(void)
+void mongoSubCacheStatisticsReset(const char* by)
 {
   mongoSubCache.noOfRefreshes  = 0;
   mongoSubCache.noOfInserts    = 0;
   mongoSubCache.noOfRemoves    = 0;
   mongoSubCache.noOfUpdates    = 0;
+
+  LM_T(LmtMongoSubCache, ("Statistics reset by %s: refreshes is now %d", by, mongoSubCache.noOfRefreshes));
 }
 
 
@@ -1036,7 +1072,7 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
 */
 static void mongoSubCacheRefresh(std::string database)
 {
-  LM_T(LmtMongoSubCache, ("in mongoSubCacheRefresh"));
+  LM_T(LmtMongoSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                   query      = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
   DBClientBase*             connection = getMongoConnection();
@@ -1096,7 +1132,10 @@ void mongoSubCacheRefresh(void)
   std::vector<std::string> databases;
   bool                     reqSemTaken;
 
+  LM_T(LmtMongoSubCache, ("Refreshing subscription cache"));
   reqSemTake(__FUNCTION__, "subscription cache", SemReadOp, &reqSemTaken);
+  LM_T(LmtMongoSubCache, ("Refreshing subscription cache"));
+
 
   // Empty the cache
   mongoSubCacheDestroy();
@@ -1111,10 +1150,13 @@ void mongoSubCacheRefresh(void)
   // Now refresh the subCache for each and every tenant
   for (unsigned int ix = 0; ix < databases.size(); ++ix)
   {
+    LM_T(LmtMongoSubCache, ("DB %d: %s", ix, databases[ix].c_str()));
     mongoSubCacheRefresh(databases[ix]);
   }
 
   ++mongoSubCache.noOfRefreshes;
+  LM_T(LmtMongoSubCache, ("Refreshed subscription cache [%d]", mongoSubCache.noOfRefreshes));
+
   reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
 }
 
@@ -1130,8 +1172,8 @@ static void* mongoSubCacheRefresherThread(void* vP)
 
   while (1)
   {
-    mongoSubCacheRefresh();
     sleep(subCacheInterval);
+    mongoSubCacheRefresh();
   }
 
   return NULL;
@@ -1145,8 +1187,13 @@ static void* mongoSubCacheRefresherThread(void* vP)
 */
 void mongoSubCacheStart(void)
 {
-  pthread_t tid;
-  int ret = pthread_create(&tid, NULL, mongoSubCacheRefresherThread, NULL);
+  pthread_t  tid;
+  int        ret;
+
+  // Populate subscription cache from database
+  mongoSubCacheRefresh();
+
+  ret = pthread_create(&tid, NULL, mongoSubCacheRefresherThread, NULL);
 
   if (ret != 0)
   {

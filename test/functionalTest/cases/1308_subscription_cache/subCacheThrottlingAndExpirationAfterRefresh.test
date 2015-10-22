@@ -26,7 +26,7 @@ Subscription Cache Throttling and expiration after Refresh
 --SHELL-INIT--
 dbInit CB
 dbInit ftest-t1
-brokerStart CB 37,101 IPv4 -multiservice -subCacheIval 10
+brokerStart CB 38,101 IPv4 -multiservice -subCacheIval 10
 accumulatorStart
 
 --SHELL--
@@ -175,15 +175,16 @@ Date: REGEX(.*)
 02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((372|374))
+Content-Length: 394
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
-        "jsonRequests": "2",
+        "jsonRequests": "1",
         "measuring_interval_in_secs": "REGEX(\d+)",
         "statisticsRequests": "1",
+        "subCache": "REGEX([0-9a-f]{24})",
         "subCacheInserts": "2",
         "subCacheItems": "1",
         "subCacheRefreshs": "2",
@@ -191,8 +192,7 @@ Date: REGEX(.*)
         "subCacheUpdates": "0",
         "subscriptions": "1",
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))",
-        "xmlRequests": "REGEX((0|1))"
+        "versionRequests": "REGEX((0|1))"
     }
 }
 

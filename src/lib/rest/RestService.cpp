@@ -428,6 +428,10 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+    if (ciP->payloadSize == 0)
+    {
+      ciP->inFormat = NOFORMAT;
+    }
     statisticsUpdate(serviceV[ix].request, ciP->inFormat);
 
     // Tenant to connectionInfo

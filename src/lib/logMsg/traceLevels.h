@@ -56,7 +56,7 @@ typedef enum TraceLevels
   LmtHttps = 35,
   LmtIpVersion,
   LmtCtxProviders,
-  LmtRequest = 37,          // ONLY to be used in ONE place - incoming requests
+  LmtRequest = 38,          // ONLY to be used in ONE place - incoming requests
 
   /* Parser (40-59) */
   LmtParse    = 40,

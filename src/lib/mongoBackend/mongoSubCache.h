@@ -205,7 +205,7 @@ extern void mongoSubCacheMatch
 *
 * mongoSubCacheStatisticsGet - 
 */
-extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items);
+extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize);
 
 
 
@@ -221,6 +221,6 @@ extern void mongoSubCacheUpdateStatisticsIncrement(void);
 *
 * mongoSubCacheStatisticsReset - 
 */
-extern void mongoSubCacheStatisticsReset(void);
+extern void mongoSubCacheStatisticsReset(const char* by);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOSUBCACHE_H_

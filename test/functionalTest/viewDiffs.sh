@@ -29,6 +29,19 @@ then
   base=$(basename $1 .test)
   out=$(find . -name ${base}.out)
   exp=$(find . -name ${base}.regexpect)
+
+  if [ "$out" == "" ]
+  then
+    echo "Sorry, ${base}.out NOT FOUND - using ${base}.shell.stdout instead"
+    out=$(find . -name ${base}.shell.stdout)
+    if [ "$out" == "" ]
+    then
+      echo "Sorry, ${base}.shell.stdout ALSO NOT FOUND - no diff is possible"
+      exit 1
+    fi
+  fi
+
+  echo $CB_DIFF_TOOL $out $exp
   $CB_DIFF_TOOL $out $exp
   exit $?
 fi

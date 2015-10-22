@@ -193,11 +193,21 @@
 
 using namespace orion;
 
+
+
 /* ****************************************************************************
 *
 * DB_NAME_MAX_LEN - max length of database name
 */
 #define DB_NAME_MAX_LEN  10
+
+
+
+/* ****************************************************************************
+*
+* Global vars
+*/
+static bool isFather = false;
 
 
 
@@ -1084,6 +1094,7 @@ void daemonize(void)
   // Exiting father process
   if (pid > 0)
   {
+    isFather = true;
     exit(0);
   }
 
@@ -1164,6 +1175,12 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
+  if (isFather)
+  {
+    isFather = false;
+    return;
+  }
+
 #ifdef DEBUG
   // Take mongo req-sem ?  
   LM_T(LmtMongoSubCache, ("try-taking req semaphore"));
@@ -1495,8 +1512,6 @@ int main(int argC, char* argV[])
   {
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
-
-  LM_I(("Orion Context Broker is running"));
 
   if (useOnlyIPv6 && useOnlyIPv4)
   {

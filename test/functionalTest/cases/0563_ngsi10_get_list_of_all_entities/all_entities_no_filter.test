@@ -315,7 +315,7 @@ Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
-  <xmlRequests>REGEX((6|7))</xmlRequests>
+  <xmlRequests>3</xmlRequests>
   <updates>3</updates>
   <allContextEntitiesRequests>2</allContextEntitiesRequests>
   <versionRequests>REGEX((0|1))</versionRequests>

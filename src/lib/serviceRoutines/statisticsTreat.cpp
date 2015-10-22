@@ -148,7 +148,7 @@ std::string statisticsTreat
     mongoPoolConnectionSemWaitingTimeReset();
     mutexTimeCCReset();
 
-    mongoSubCacheStatisticsReset();
+    mongoSubCacheStatisticsReset("statisticsTreat::DELETE");
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -168,6 +168,7 @@ std::string statisticsTreat
   {
     out += TAG_ADD_COUNTER("jsonRequests", noOfJsonRequests);
   }
+
 
   if (noOfRegistrations != -1)
   {
@@ -485,14 +486,22 @@ std::string statisticsTreat
   //
   // mongo sub cache counters
   //
-  int mscRefreshs = 0;
-  int mscInserts  = 0;
-  int mscRemoves  = 0;
-  int mscUpdates  = 0;
-  int cacheItems  = 0;
+  int   mscRefreshs = 0;
+  int   mscInserts  = 0;
+  int   mscRemoves  = 0;
+  int   mscUpdates  = 0;
+  int   cacheItems  = 0;
+  char  listBuffer[1024];
+  bool  reqSemTaken;
 
-  mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems);
+  reqSemTake(__FUNCTION__, "mongoSubCacheStatisticsGet", SemReadOp, &reqSemTaken);
+  mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems, listBuffer, sizeof(listBuffer));
+  reqSemGive(__FUNCTION__, "mongoSubCacheStatisticsGet", reqSemTaken);
 
+  if (listBuffer[0] != 0)
+  {
+    out += TAG_ADD_STRING("subCache",          listBuffer);
+  }
 
   out += TAG_ADD_INTEGER("subCacheRefreshs", mscRefreshs, true);
   out += TAG_ADD_INTEGER("subCacheInserts",  mscInserts,  true);

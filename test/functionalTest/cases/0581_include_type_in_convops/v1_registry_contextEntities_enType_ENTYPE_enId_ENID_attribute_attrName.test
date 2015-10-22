@@ -229,7 +229,7 @@ Date: REGEX(.*)
 {
     "orion": {
         "entityByIdAttributeByNameIdAndType": "5",
-        "jsonRequests": "4",
+        "jsonRequests": "1",
         "measuring_interval_in_secs": "REGEX(\d+)",
         "statisticsRequests": "1",
         "subCacheInserts": "0",
@@ -239,7 +239,7 @@ Date: REGEX(.*)
         "subCacheUpdates": "0",
         "uptime_in_secs": "REGEX(\d+)",
         "versionRequests": "REGEX((0|1))",
-        "xmlRequests": "REGEX((2|3))"
+        "xmlRequests": "1"
     }
 }
 

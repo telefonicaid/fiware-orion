@@ -935,7 +935,6 @@ static int connectionTreat
     LM_TRANSACTION_START("from", ip, port, url);  // Incoming REST request starts
 
 
-
     //
     // URI parameters
     // 
