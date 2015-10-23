@@ -72,7 +72,9 @@ static std::string attributeType
     /* It could happen that different entities within the same entity type may have attributes with the same name
      * but different types. In that case, one type (at random) is returned. A list could be returned but the
      * NGSIv2 operations only allow to set one type */
-    return getStringField(getField(getField(r, ENT_ATTRS).embeddedObject(), attrName).embeddedObject(), ENT_ATTRS_TYPE);
+    BSONObj attrs = getField(r, ENT_ATTRS).embeddedObject();
+    BSONObj attr = getField(attrs, attrName).embeddedObject();
+    return getStringField(attr, ENT_ATTRS_TYPE);
   }
 
   return "";

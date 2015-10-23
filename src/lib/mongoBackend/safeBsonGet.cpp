@@ -35,19 +35,22 @@ using namespace mongo;
 */
 BSONObj getObjectField(const BSONObj& b, const std::string& field)
 {
+  if (b.hasField(field) && b.getField(field).type() == Object)
+  {
+    return b.getObjectField(field);
+  }
+
+  // Detect error
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
-    return BSONObj();
   }
-  if (b.getField(field).type() != Object)
+  else
   {
-
     LM_E(("Runtime Error (field '%s' was supposed to be an object but type=%d in BSONObj <%s>)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
-    return BSONObj();
   }
-  return b.getObjectField(field);
+  return BSONObj();
 }
 
 /* ****************************************************************************
@@ -57,18 +60,22 @@ BSONObj getObjectField(const BSONObj& b, const std::string& field)
 */
 std::string getStringField(const BSONObj& b, const std::string& field)
 {
+  if (b.hasField(field) && b.getField(field).type() == String)
+  {
+    return b.getStringField(field);
+  }
+
+  // Detect error
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
-    return "";
   }
-  if (b.getField(field).type() != String)
+  else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d in BSONObj <%s>)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
-    return "";
   }
-  return b.getStringField(field);
+  return "";
 }
 
 /* ****************************************************************************
@@ -78,18 +85,22 @@ std::string getStringField(const BSONObj& b, const std::string& field)
 */
 int getIntField(const BSONObj& b, const std::string& field)
 {
+  if (b.hasField(field) && b.getField(field).type() == NumberInt)
+  {
+    return b.getIntField(field);
+  }
+
+  // Detect error
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (int field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
-    return -1;
   }
-  if (b.getField(field).type() != NumberInt)
+  else
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a int but type=%d in BSONObj <%s>)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
-    return -1;
-  }
-  return b.getIntField(field);
+  }  
+  return -1;
 }
 
 /* ****************************************************************************
@@ -99,18 +110,22 @@ int getIntField(const BSONObj& b, const std::string& field)
 */
 bool getBoolField(const BSONObj& b, const std::string& field)
 {
+  if (b.hasField(field) && b.getField(field).type() == Bool)
+  {
+    return b.getBoolField(field);
+  }
+
+  // Detect error
   if (!b.hasField(field))
   {
     LM_E(("Runtime Error (bool field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
-    return -1;
   }
-  if (b.getField(field).type() != Bool)
+  else 
   {
     LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s>)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
-    return -1;
   }
-  return b.getBoolField(field);
+  return false;
 }
 
 /* ****************************************************************************
@@ -120,11 +135,12 @@ bool getBoolField(const BSONObj& b, const std::string& field)
 */
 BSONElement getField(const BSONObj& b, const std::string& field)
 {
-  if (!b.hasField(field))
+  if (b.hasField(field))
   {
-    LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
-    return BSONElement();
+    return b.getField(field);
   }
-  return b.getField(field);
+
+  LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+  return BSONElement();
 }
 
