@@ -233,6 +233,7 @@ int             writeConcern;
 unsigned        cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
+unsigned        connectionMemory;
 
 
 
@@ -272,7 +273,7 @@ char            notificationMode[64];
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
-
+#define CONN_MEMORY_DESC       "maximum memory size per connection in kilobytes"
 
 /* ****************************************************************************
 *
@@ -313,7 +314,7 @@ PaArgument paArgs[] =
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,    UINT_MAX, CPR_FORWARD_LIMIT_DESC},
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             0,    3600,     SUB_CACHE_IVAL_DESC   },
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL, PaNL,     NOTIFICATION_MODE_DESC},
-
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,    UINT_MAX, CONN_MEMORY_DESC},
 
   PA_END_OF_ARGS
 };
