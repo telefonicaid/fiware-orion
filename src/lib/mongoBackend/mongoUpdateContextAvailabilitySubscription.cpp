@@ -127,7 +127,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
 
   /* Duration (optional) */
   if (requestP->duration.isEmpty()) {
-      newSub.append(CASUB_EXPIRATION, sub.getField(CASUB_EXPIRATION).numberLong());
+      newSub.append(CASUB_EXPIRATION, getField(sub, CASUB_EXPIRATION).numberLong());
   }
   else {
       long long expiration = getCurrentTime() + requestP->duration.parse();
@@ -138,11 +138,11 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Reference is not updatable, so it is appended directly */
   newSub.append(CASUB_REFERENCE, STR_FIELD(sub, CASUB_REFERENCE));
 
-  int count = sub.hasField(CASUB_COUNT) ? sub.getIntField(CASUB_COUNT) : 0;
+  int count = sub.hasField(CASUB_COUNT) ? getIntField(sub, CASUB_COUNT) : 0;
 
   /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
   if (sub.hasField(CASUB_LASTNOTIFICATION)) {
-      newSub.append(CASUB_LASTNOTIFICATION, sub.getIntField(CASUB_LASTNOTIFICATION));
+      newSub.append(CASUB_LASTNOTIFICATION, getIntField(sub, CASUB_LASTNOTIFICATION));
   }
   if (sub.hasField(CASUB_COUNT)) {
       newSub.append(CASUB_COUNT, count);

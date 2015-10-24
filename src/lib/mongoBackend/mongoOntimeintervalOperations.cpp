@@ -69,7 +69,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo
     }
 
     /* Build the ContextSubcriptionInfo object */
-    std::vector<BSONElement> entities = sub.getField(CSUB_ENTITIES).Array();
+    std::vector<BSONElement> entities = getField(sub, CSUB_ENTITIES).Array();
     for (unsigned int ix = 0; ix < entities.size(); ++ix) {
         BSONObj entity = entities[ix].embeddedObject();
         EntityId* enP = new EntityId;
@@ -79,23 +79,23 @@ HttpStatusCode mongoGetContextSubscriptionInfo
         csiP->entityIdVector.push_back(enP);
 
     }
-    std::vector<BSONElement> attrs = sub.getField(CSUB_ATTRS).Array();
+    std::vector<BSONElement> attrs = getField(sub, CSUB_ATTRS).Array();
     for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
         csiP->attributeList.push_back(attrs[ix].String());
     }
 
-    BSONElement be = sub.getField(CSUB_EXPIRATION);
+    BSONElement be = getField(sub, CSUB_EXPIRATION);
     csiP->expiration = be.numberLong();
 
     csiP->url = STR_FIELD(sub, CSUB_REFERENCE);
     if (sub.hasElement(CSUB_LASTNOTIFICATION)) {
-        csiP->lastNotification = sub.getIntField(CSUB_LASTNOTIFICATION);
+        csiP->lastNotification = getIntField(sub, CSUB_LASTNOTIFICATION);
     }
     else {
         csiP->lastNotification = -1;
     }
 
-    csiP->throttling = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
+    csiP->throttling = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
     std::string fmt = STR_FIELD(sub, CSUB_FORMAT);

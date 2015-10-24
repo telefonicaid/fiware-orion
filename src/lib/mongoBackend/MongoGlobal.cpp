@@ -46,6 +46,7 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeBsonGet.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
@@ -279,7 +280,7 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs)
     return false;
   }
 
-  std::vector<BSONElement> databases = result.getField("databases").Array();
+  std::vector<BSONElement> databases = getField(result, "databases").Array();
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
@@ -512,7 +513,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
 */
 static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
-  BSONElement  idField = sub.getField("_id");
+  BSONElement  idField = getField(sub, "_id");
 
   // Paranoia check:  _id exists?
   if (idField.eoo() == true)
@@ -524,21 +525,21 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   std::string  subId   = idField.OID().toString();
 
   // Paranoia check II:  'conditions' exists?
-  BSONElement conditionsField = sub.getField(CSUB_CONDITIONS);
+  BSONElement conditionsField = getField(sub, CSUB_CONDITIONS);
   if (conditionsField.eoo() == true)
   {
     LM_E(("Database Error (error retrieving 'conditions' field) for subscription '%s'", subId.c_str()));
     return;
   }
 
-  std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
+  std::vector<BSONElement> condV = getField(sub, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < condV.size(); ++ix)
   {
     BSONObj condition = condV[ix].embeddedObject();
 
     if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
-      int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+      int interval = getIntField(condition, CSUB_CONDITIONS_VALUE);
 
       LM_T(LmtNotifier, ("creating ONTIMEINTERVAL thread for subscription '%s' with interval %d (tenant '%s')",
                          subId.c_str(),
@@ -566,7 +567,7 @@ void recoverOntimeIntervalThreads(std::string tenant)
 */
 static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
-  BSONElement  idField = sub.getField("_id");
+  BSONElement  idField = getField(sub, "_id");
 
   if (idField.eoo() == true)
   {
@@ -1370,27 +1371,27 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
 */
 Metadata* bsonToMetadata(BSONObj& mdB)
 {
-  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
+  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE) : "";
 
-  switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
+  switch (getField(mdB, ENT_ATTRS_MD_VALUE).type())
   {
   case String:
-    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
+    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getStringField(mdB, ENT_ATTRS_MD_VALUE));
     break;
 
   case NumberDouble:
-    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
+    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getField(mdB, ENT_ATTRS_MD_VALUE).Number());
     break;
 
   case Bool:
-    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
+    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getBoolField(mdB, ENT_ATTRS_MD_VALUE));
     break;
 
   default:  // Just to avoid compilation error about missing constants ...
     break;
   }
 
-  LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
+  LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
   return NULL;  
 }
 
@@ -1534,7 +1535,7 @@ bool entitiesQuery
   while (cursor->more())
   {
     BSONObj                 r    = cursor->next();
-    std::string             err  = r.getStringField("$err");
+    std::string             err  = getStringField(r, "$err");
     ContextElementResponse* cer  = new ContextElementResponse();
 
     LM_T(LmtMongo, ("result: %s", r.toString().c_str()));
@@ -1586,7 +1587,7 @@ bool entitiesQuery
 
     /* Entity part */
 
-    BSONObj queryEntity = r.getObjectField("_id");
+    BSONObj queryEntity = getObjectField(r, "_id");
 
     cer->contextElement.entityId.id          = STR_FIELD(queryEntity, ENT_ENTITY_ID);
     cer->contextElement.entityId.type        = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
@@ -1597,7 +1598,7 @@ bool entitiesQuery
     std::string locAttr;
     if (r.hasElement(ENT_LOCATION))
     {
-      locAttr = r.getObjectField(ENT_LOCATION).getStringField(ENT_LOCATION_ATTRNAME);
+      locAttr = getStringField(getObjectField(r, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
     }
 
     /* Attributes part */
@@ -1611,7 +1612,7 @@ bool entitiesQuery
     //
     try
     {
-      queryAttrs = r.getField(ENT_ATTRS).embeddedObject();
+      queryAttrs = getField(r, ENT_ATTRS).embeddedObject();
     }
     catch (...)
     {
@@ -1628,7 +1629,7 @@ bool entitiesQuery
     for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
     {
       std::string       attrName   = *i;
-      BSONObj           queryAttr  = queryAttrs.getField(attrName).embeddedObject();
+      BSONObj           queryAttr  = getField(queryAttrs, attrName).embeddedObject();
       ContextAttribute  ca;
 
       ca.name          = dbDotDecode(basePart(attrName));
@@ -1642,7 +1643,7 @@ bool entitiesQuery
       {
         ContextAttribute* caP;
 
-        switch(queryAttr.getField(ENT_ATTRS_VALUE).type())
+        switch(getField(queryAttr, ENT_ATTRS_VALUE).type())
         {
         case String:
           ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
@@ -1654,29 +1655,29 @@ bool entitiesQuery
           break;
 
         case NumberDouble:
-          ca.numberValue = queryAttr.getField(ENT_ATTRS_VALUE).Number();
+          ca.numberValue = getField(queryAttr, ENT_ATTRS_VALUE).Number();
           caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
           break;
 
         case Bool:
-          ca.boolValue = queryAttr.getBoolField(ENT_ATTRS_VALUE);
+          ca.boolValue = getBoolField(queryAttr, ENT_ATTRS_VALUE);
           caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
           break;
 
         case Object:
           caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
-          compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+          compoundObjectResponse(caP->compoundValueP, getField(queryAttr, ENT_ATTRS_VALUE));
           break;
 
         case Array:
           caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
-          compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+          compoundVectorResponse(caP->compoundValueP, getField(queryAttr, ENT_ATTRS_VALUE));
           break;
 
         default:
-          LM_E(("Runtime Error (unknown attribute value type in DB: %d)", queryAttr.getField(ENT_ATTRS_VALUE).type()));
+          LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(queryAttr, ENT_ATTRS_VALUE).type()));
           continue;
         }
 
@@ -1698,7 +1699,7 @@ bool entitiesQuery
         /* Setting custom metadata (if any) */
         if (queryAttr.hasField(ENT_ATTRS_MD))
         {
-          std::vector<BSONElement> metadataV = queryAttr.getField(ENT_ATTRS_MD).Array();
+          std::vector<BSONElement> metadataV = getField(queryAttr, ENT_ATTRS_MD).Array();
 
           for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
           {
@@ -1921,7 +1922,7 @@ static void processContextRegistrationElement
   crr.contextRegistration.providingApplication.set(STR_FIELD(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setFormat(format);
 
-  std::vector<BSONElement> queryEntityV = cr.getField(REG_ENTITIES).Array();
+  std::vector<BSONElement> queryEntityV = getField(cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
   {
@@ -1933,7 +1934,7 @@ static void processContextRegistrationElement
   {
     if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
     {
-      std::vector<BSONElement> queryAttrV = cr.getField(REG_ATTRS).Array();
+      std::vector<BSONElement> queryAttrV = getField(cr, REG_ATTRS).Array();
 
       for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
       {
@@ -2101,7 +2102,7 @@ bool registrationsQuery
     // registrations document (for pre-0.21.0 versions)
     //
     Format                    format = r.hasField(REG_FORMAT)? stringToFormat(STR_FIELD(r, REG_FORMAT)) : XML;
-    std::vector<BSONElement>  queryContextRegistrationV = r.getField(REG_CONTEXT_REGISTRATION).Array();
+    std::vector<BSONElement>  queryContextRegistrationV = getField(r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
@@ -2157,7 +2158,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 EntityIdVector subToEntityIdVector(BSONObj sub)
 {
   EntityIdVector            enV;
-  std::vector<BSONElement>  subEnts = sub.getField(CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  subEnts = getField(sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
@@ -2183,7 +2184,7 @@ EntityIdVector subToEntityIdVector(BSONObj sub)
 AttributeList subToAttributeList(BSONObj sub)
 {
   AttributeList             attrL;
-  std::vector<BSONElement>  subAttrs = sub.getField(CSUB_ATTRS).Array();
+  std::vector<BSONElement>  subAttrs = getField(sub, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
