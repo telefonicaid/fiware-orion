@@ -29,6 +29,7 @@
 #include "mongo/client/dbclient.h"
 
 using namespace mongo;
+using std::auto_ptr;
 
 /* ****************************************************************************
 *

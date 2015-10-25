@@ -207,7 +207,7 @@ using namespace orion;
 *
 * Global vars
 */
-static bool isFather = false;
+static bool isFatherProcess = false;
 
 
 
@@ -1094,7 +1094,7 @@ void daemonize(void)
   // Exiting father process
   if (pid > 0)
   {
-    isFather = true;
+    isFatherProcess = true;
     exit(0);
   }
 
@@ -1175,9 +1175,9 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
-  if (isFather)
+  if (isFatherProcess)
   {
-    isFather = false;
+    isFatherProcess = false;
     return;
   }
 
@@ -1490,13 +1490,14 @@ int main(int argC, char* argV[])
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   //
-  // FIXME P8: for release 0.24, -reqMutexPolicy != "all" ("all" is default) cannot
-  //           be used together with mongo subscription cache.
-  //           This limitation will be fixed in the next release (0.25.0)
+  // FIXME P8: for release 0.25, -reqMutexPolicy != "all" ("all" is default) must
+  //           be able to be used together with mongo subscription cache.
+  //           The current limitation will be fixed for next release (0.25.0)
+  //           See issue #1401
   //
   if ((strcmp(reqMutexPolicy, "all") != 0) && (noCache == false))
   {
-    LM_E(("Bad Input (reqMutexPolicy != 'all'  AND  subscription-cache CANNOT be used together in 0.24.0 (cache can be disabled using -noCache))"));
+    LM_E(("This must be fixed for the 0.25.0 release!!!"));
     exit(1);
   }
 
@@ -1529,6 +1530,8 @@ int main(int argC, char* argV[])
       LM_X(1, ("Fatal Error (when option '-https' is used, option '-cert' is mandatory)"));
     }
   }
+
+  LM_I(("Orion Context Broker is running"));
 
   if (fg == false)
   {

@@ -268,11 +268,11 @@ void setDbPrefix(std::string _dbPrefix)
 
 /*****************************************************************************
 *
-* dbPrefixGet -
+* getDbPrefix -
 */
-const char* dbPrefixGet(void)
+const std::string& getDbPrefix(void)
 {
-  return dbPrefix.c_str();
+  return dbPrefix;
 }
 
 

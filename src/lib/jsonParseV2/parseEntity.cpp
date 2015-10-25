@@ -86,6 +86,11 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   }
   else if (document.ObjectEmpty()) 
   {
+    //
+    // Initially we used the method "Empty". As the broker crashed inside that method, some
+    // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
+    // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
+    //
     LM_W(("Bad Input (Empty payload)"));
     eP->errorCode.fill("ParseError", "empty payload");
     ciP->httpStatusCode = SccBadRequest;

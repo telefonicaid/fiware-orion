@@ -128,7 +128,7 @@ using namespace mongo;
 *
 * MAX_SERVICE_NAME_LEN
 */
-#define MAX_SERVICE_NAME_LEN 1024
+#define MAX_SERVICE_NAME_LEN 50
 
 /*****************************************************************************
 *
@@ -208,9 +208,9 @@ extern void setDbPrefix(std::string dbPrefix);
 
 /*****************************************************************************
 *
-* dbPrefixGet -
+* getDbPrefix -
 */
-extern const char* dbPrefixGet(void);
+extern const std::string& getDbPrefix(void);
 
 /*****************************************************************************
 *

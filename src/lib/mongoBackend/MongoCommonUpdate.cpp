@@ -1467,6 +1467,11 @@ static bool addTriggeredSubscriptions_noCache
 /* ****************************************************************************
 *
 * addTriggeredSubscriptions - 
+*
+* FIXME P3: The functions addTriggeredSubscriptions_noCache and
+*           addTriggeredSubscriptions_withCache share a lot of code and a few
+*           helper functions should be extracted to avoid the copies of source code.
+*           
 */
 static bool addTriggeredSubscriptions
 (
@@ -1562,11 +1567,16 @@ static bool processSubscriptions
           if (cSubP != NULL)
           {
             cSubP->pendingNotifications -= 1;
+            LM_T(LmtMongoSubCache, ("Found sub '%s', set its pendingNotifications to %d", trigs->cacheSubId.c_str(), cSubP->pendingNotifications));
 
             if (cSubP->pendingNotifications == 0)
             {
               cSubP->lastNotificationTime = getCurrentTime();
               LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s'", cSubP->lastNotificationTime, cSubP->subscriptionId));
+            }
+            else
+            {
+              LM_T(LmtMongoSubCache, ("Not touching lastNotificationTime for sub '%s' - its pendingNotifications == %d", cSubP->subscriptionId, cSubP->pendingNotifications));
             }
           }
           else

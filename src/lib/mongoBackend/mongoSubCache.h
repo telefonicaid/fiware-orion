@@ -157,7 +157,7 @@ extern void mongoSubCacheItemInsert
 *
 * mongoSubCacheItemInsert - 
 */
-extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* subscriptionId, const char* servicePath);
+extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* subscriptionId, const char* servicePath, int lastNotificationTime, long long expirationTime);
 
 
 
