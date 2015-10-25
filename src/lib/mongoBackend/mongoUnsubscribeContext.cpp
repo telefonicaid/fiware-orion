@@ -75,7 +75,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
       //
       // This happens when OID format is wrong
       // FIXME: this checking should be done at parsing stage, without progressing to
-      // mongoBackend. By the moment we can live this here, but we should remove in the future
+      // mongoBackend. For the moment we can live this here, but we should remove in the future
       // (old issue #95)
       //
       responseP->statusCode.fill(SccContextElementNotFound);
@@ -99,7 +99,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     }
 
     /* Remove document in MongoDB */
-    // FIXME: I will prefer to do the find and remove in a single operation. Is the some similar
+    // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
     // to findAndModify for this?    
     if (!collectionRemove(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), &err))
     {
@@ -112,7 +112,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
 
-    // FIXME P7: mongoSubCache stuff should be avoided if subscription is not patterned
+    // FIXME P7: mongoSubCache stuff could be avoided if subscription is not patterned
 
     //
     // Removing subscription from mongo subscription cache
