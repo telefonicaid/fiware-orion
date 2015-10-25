@@ -280,7 +280,7 @@ bool            noCache;
 #define MUTEX_TIMESTAT_DESC    "measure total semaphore waiting time"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
-#define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh"
+#define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
 #define NO_CACHE               "disable subscription cache for lookups"
 
@@ -323,7 +323,7 @@ PaArgument paArgs[] =
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             1,     3600,     SUB_CACHE_IVAL_DESC    },
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
 
@@ -1578,7 +1578,17 @@ int main(int argC, char* argV[])
   if (noCache == false)
   {
     mongoSubCacheInit();
-    mongoSubCacheStart();
+
+    if (subCacheInterval == 0)
+    {
+      // Populate subscription cache from database
+      mongoSubCacheRefresh();
+    }
+    else
+    {
+      // Populate subscription cache AND start sub-cache-refresh-thread
+      mongoSubCacheStart();
+    }
   }
   else
   {

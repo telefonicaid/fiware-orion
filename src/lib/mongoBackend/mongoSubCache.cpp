@@ -593,12 +593,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
 
 
-  cSubP->tenant = (tenant[0] == 0)? NULL : strdup(tenant);
-
-  //
-  // FIXME: Check all strings about empty strings
-  //        What happens if you call strdup on an empty string?
-  //
+  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? sub.getField(CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
@@ -986,12 +981,12 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
   CachedSubscription* cSubP = mongoSubCache.head;
 
   //
-  // FIXME?
-  // If the listBuffer is not big enough to hold the entire list of cached subscriptions,
-  // mongoSubCacheStatisticsGet returns the empty string and the list is excluded from
-  // the response of "GET /statistics".
-  // Minimum size of the list is set to 128 bytes and the needed size is detected later.
-  // Again, if the list-buffer is not big enough to hold the request, no list is shown.
+  // NOTE
+  //   If the listBuffer is not big enough to hold the entire list of cached subscriptions,
+  //   mongoSubCacheStatisticsGet returns the empty string and the list is excluded from
+  //   the response of "GET /statistics".
+  //   Minimum size of the list is set to 128 bytes and the needed size is detected later.
+  //   Again, if the list-buffer is not big enough to hold the entire text, no list is shown.
   //
   *list = 0;
   if (listSize > 128)
