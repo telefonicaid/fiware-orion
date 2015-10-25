@@ -901,8 +901,50 @@ void mongoSubCacheItemInsert
   Format                    notifyFormat
 )
 {
+  //
+  // Add the subscription to the subscription cache.
+  // But only if any of the entities in entityIdVector is pattern based -
+  // AND it is a subscription of type ONCHANGE
+  //
+
+  //
+  // 00. Check that the subscription is pattern based an ONCHANGE
+  //
+  bool patternBased = false;
+  bool onchange     = false;
+
+  // 00.1. Any entity pattern-based?
+  for (unsigned int ix = 0; ix < scrP->entityIdVector.size(); ++ix)
+  {
+    if (scrP->entityIdVector[ix]->isPattern == "true")
+    {
+      patternBased = true;
+      break;
+    }
+  }
+
+  // 00.2. ONCHANGE?
+  for (unsigned int ix = 0; ix < scrP->notifyConditionVector.size(); ++ix)
+  {
+    if (strcasecmp(scrP->notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
+    {
+      onchange = true;
+      break;
+    }
+  }
+
+  if (!patternBased || !onchange)
+  {
+    return;
+  }
+
+    
+  //
+  // Now allocate the subscription
+  //
   CachedSubscription* cSubP = new CachedSubscription();
   LM_T(LmtMongoSubCache,  ("allocated CachedSubscription at %p", cSubP));
+
 
   //
   // 1. First the non-complex values

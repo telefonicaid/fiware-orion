@@ -151,46 +151,17 @@ HttpStatusCode mongoSubscribeContext
     }
 
     //
-    // Add the subscription to the subscription cache.
-    // But only if any of the entities in entityIdVector is pattern based -
-    // AND it is a subscription of type ONCHANGE
-    //
-    bool patternBased = false;
-    bool onchange     = false;
-
-    // 1. Pattern-based?
-    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
-    {
-      if (requestP->entityIdVector[ix]->isPattern == "true")
-      {
-        patternBased = true;
-        break;
-      }
-    }
-
-    // 2. ONCHANGE?
-    for (unsigned int ix = 0; ix < requestP->notifyConditionVector.size(); ++ix)
-    {
-      if (strcasecmp(requestP->notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
-      {
-        onchange = true;
-        break;
-      }
-    }
-
     // 3. Create Subscription for the cache
-    if (patternBased && onchange)
-    {
-      std::string oidString = oid.toString();
+    //
+    std::string oidString = oid.toString();
 
-      LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
-      mongoSubCacheItemInsert(tenant.c_str(), servicePath.c_str(), requestP, oidString.c_str(), expiration, throttling, notifyFormat);
-    }
+    LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
+    mongoSubCacheItemInsert(tenant.c_str(), servicePath.c_str(), requestP, oidString.c_str(), expiration, throttling, notifyFormat);
 
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
 
-    /* Fill the response element */
+    /* Fill int the response element */
     responseP->subscribeResponse.duration = requestP->duration;
     responseP->subscribeResponse.subscriptionId.set(oid.toString());
     responseP->subscribeResponse.throttling = requestP->throttling;
