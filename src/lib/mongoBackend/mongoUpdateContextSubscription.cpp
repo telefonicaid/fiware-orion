@@ -103,15 +103,15 @@ HttpStatusCode mongoUpdateContextSubscription
   BSONObjBuilder newSub;
 
   /* Entities, attribute list and reference are not updatable, so they are appended directly */
-  newSub.appendArray(CSUB_ENTITIES, sub.getField(CSUB_ENTITIES).Obj());
-  newSub.appendArray(CSUB_ATTRS, sub.getField(CSUB_ATTRS).Obj());
+  newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
+  newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
   newSub.append(CSUB_REFERENCE, STR_FIELD(sub, CSUB_REFERENCE));
 
   /* Duration update */
   long long expiration = getCurrentTime() + requestP->duration.parse();
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CSUB_EXPIRATION, sub.getField(CSUB_EXPIRATION).numberLong());
+    newSub.append(CSUB_EXPIRATION, getField(sub, CSUB_EXPIRATION).numberLong());
   }
   else
   {
@@ -133,14 +133,14 @@ HttpStatusCode mongoUpdateContextSubscription
   else {
       /* The hasField check is needed due to Throttling could not be present in the original doc */
       if (sub.hasField(CSUB_THROTTLING)) {
-          newSub.append(CSUB_THROTTLING, sub.getField(CSUB_THROTTLING).numberLong());
+          newSub.append(CSUB_THROTTLING, getField(sub, CSUB_THROTTLING).numberLong());
       }
   }
 
   /* Notify conditions */
   bool notificationDone = false;
   if (requestP->notifyConditionVector.size() == 0) {
-    newSub.appendArray(CSUB_CONDITIONS, sub.getField(CSUB_CONDITIONS).embeddedObject());
+    newSub.appendArray(CSUB_CONDITIONS, getField(sub, CSUB_CONDITIONS).embeddedObject());
   }
   else {
       /* Destroy any previous ONTIMEINTERVAL thread */
@@ -170,7 +170,7 @@ HttpStatusCode mongoUpdateContextSubscription
        attrL.release();
   }
 
-  int count = sub.hasField(CSUB_COUNT) ? sub.getIntField(CSUB_COUNT) : 0;
+  int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
 
   /* Last notification */
   long long lastNotification = -1;
@@ -186,7 +186,7 @@ HttpStatusCode mongoUpdateContextSubscription
     /* The hasField checks are needed as lastNotification/count might not be present in the original doc */
     if (sub.hasField(CSUB_LASTNOTIFICATION))
     {
-      newSub.append(CSUB_LASTNOTIFICATION, sub.getIntField(CSUB_LASTNOTIFICATION));
+      newSub.append(CSUB_LASTNOTIFICATION, getIntField(sub, CSUB_LASTNOTIFICATION));
     }
 
     if (sub.hasField(CSUB_COUNT))
