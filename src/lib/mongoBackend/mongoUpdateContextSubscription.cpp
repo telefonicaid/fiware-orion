@@ -28,12 +28,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
@@ -61,6 +59,7 @@ HttpStatusCode mongoUpdateContextSubscription
   BSONObj     sub;
   std::string err;
   OID         id;
+
   try
   {
     id = OID(requestP->subscriptionId.get());
@@ -85,10 +84,11 @@ HttpStatusCode mongoUpdateContextSubscription
     return SccOk;
   }
 
-  if (sub.isEmpty()) {
-      responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)", reqSemTaken);
-      return SccOk;
+  if (sub.isEmpty())
+  {
+    responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)", reqSemTaken);
+    return SccOk;
   }
 
   /* We start with an empty BSONObjBuilder and process requestP for all the fields that can
@@ -108,13 +108,15 @@ HttpStatusCode mongoUpdateContextSubscription
   newSub.append(CSUB_REFERENCE, STR_FIELD(sub, CSUB_REFERENCE));
 
   /* Duration update */
-  if (requestP->duration.isEmpty()) {      
-      newSub.append(CSUB_EXPIRATION, getField(sub, CSUB_EXPIRATION).numberLong());
+  long long expiration = getCurrentTime() + requestP->duration.parse();
+  if (requestP->duration.isEmpty())
+  {
+    newSub.append(CSUB_EXPIRATION, getField(sub, CSUB_EXPIRATION).numberLong());
   }
-  else {
-      long long expiration = getCurrentTime() + requestP->duration.parse();
-      newSub.append(CSUB_EXPIRATION, expiration);
-      LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
+  else
+  {
+    newSub.append(CSUB_EXPIRATION, expiration);
+    LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
   /* Restriction update */
@@ -171,25 +173,34 @@ HttpStatusCode mongoUpdateContextSubscription
   int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
 
   /* Last notification */
-  if (notificationDone) {
-      newSub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
-      newSub.append(CSUB_COUNT, count + 1);
+  long long lastNotification = -1;
+  if (notificationDone)
+  {
+    lastNotification = getCurrentTime();
+    LM_T(LmtMongoSubCache, ("notificationDone => lastNotification set to %lu", lastNotification));
+    newSub.append(CSUB_LASTNOTIFICATION, lastNotification);
+    newSub.append(CSUB_COUNT, count + 1);
   }
-  else {
-      /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
-      if (sub.hasField(CSUB_LASTNOTIFICATION)) {
-          newSub.append(CSUB_LASTNOTIFICATION, getIntField(sub, CSUB_LASTNOTIFICATION));
-      }
-      if (sub.hasField(CSUB_COUNT)) {
-          newSub.append(CSUB_COUNT, count);
-      }
+  else
+  {
+    /* The hasField checks are needed as lastNotification/count might not be present in the original doc */
+    if (sub.hasField(CSUB_LASTNOTIFICATION))
+    {
+      newSub.append(CSUB_LASTNOTIFICATION, getIntField(sub, CSUB_LASTNOTIFICATION));
+    }
+
+    if (sub.hasField(CSUB_COUNT))
+    {
+      newSub.append(CSUB_COUNT, count);
+    }
   }
 
   /* Adding format to use in notifications */
   newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
 
   /* Update document in MongoDB */
-  if (!collectionUpdate(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), newSub.obj(), false, &err))
+  BSONObj  newSubObject = newSub.obj();
+  if (!collectionUpdate(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), newSubObject, false, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)", reqSemTaken);
     responseP->subscribeError.errorCode.fill(SccReceiverInternalError, err);
@@ -208,34 +219,54 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
-  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
 
   //
   // Modification of the subscription cache
   //
-  // The subscription before this updatye is stored in 'sub'.
-  // The updated subscription is stored in 'newSub'
+  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
+  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
   // 
   // All we need to do now for the cache is to:
-  //   1. Remove 'sub' from sub-cache (if present)
-  //   2. Create 'newSub' in sub-cache (if applicable)
+  //   1. Remove 'cSubP' from sub-cache (if present)
+  //   2. Create 'newSubObject' in sub-cache (if applicable)
+  //
+  // The subscription is already updated in mongo.
+  //
+  //
+  // There are four different scenarios here:
+  //   1. Old sub was in cache, new sub enters cache
+  //   2. Old sub was NOT in cache, new sub enters cache
+  //   3. Old subwas in cache, new sub DOES NOT enter cache
+  //   4. Old sub was NOT in cache, new sub DOES NOT enter cache
+  //
+  // This is resolved by two separate functions, one that removes the old one, if found (mongoSubCacheItemLookup+mongoSubCacheItemRemove), 
+  // and the other one that inserts the sub, IF it should be inserted (mongoSubCacheItemInsert).
+  // If inserted, mongoSubCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
   //
 
+
   // 0. Lookup matching subscription in subscription-cache
-  std::string servicePath;
+  CachedSubscription*  cSubP           = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  char*                subscriptionId  = (char*) requestP->subscriptionId.get().c_str();
+  char*                servicePath     = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
-  servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
-  orion::Subscription* subP = orion::subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
+  LM_T(LmtMongoSubCache, ("update: %s", newSubObject.toString().c_str()));
 
-  // 1. Remove 'sub' from sub-cache (if present)
-  if (subP)
+  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(), newSubObject, subscriptionId, servicePath, lastNotification, expiration);
+
+  if (cSubP != NULL)
   {
-    orion::subCache->remove(subP);
+    LM_T(LmtMongoSubCache, ("Calling mongoSubCacheItemRemove"));
+    mongoSubCacheItemRemove(cSubP);
   }
 
-  // 2. Create 'newSub' in sub-cache (if applicable)
-  orion::subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
+  if (mscInsert == 0)  // OInsertion was really made
+  {
+    mongoSubCacheUpdateStatisticsIncrement();
+  }
+
+  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
   return SccOk;
 }

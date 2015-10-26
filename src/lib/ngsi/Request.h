@@ -56,6 +56,7 @@ typedef enum RequestType
   NotifyContext,
   UpdateContext,
   RtUpdateContextResponse,
+  NotifyContextSent,
 
   ContextEntitiesByEntityId = 21,
   ContextEntityAttributes,

@@ -612,8 +612,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     setNotifier(notifierMock);
 
     TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
+    ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
     setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -627,7 +626,6 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     std::string tenant      = "";
     std::string servicePath = "";
     ms = mongoUpdateContextSubscription(&req, &res, XML, tenant, servicePath, emptyServicePathV);
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
@@ -668,6 +666,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     BSONObj cond0 = conds[0].embeddedObject();
     BSONObj cond1 = conds[1].embeddedObject();
     EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
+
     std::vector<BSONElement> condValues = cond0.getField("value").Array();
     ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("AX1", condValues[0].String());
@@ -704,6 +703,8 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
+
+    utInit();
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
@@ -777,6 +778,8 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
 
     /* Release mock */
     delete notifierMock;
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -1305,7 +1308,6 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
 */
 TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -1319,6 +1321,10 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -1380,9 +1386,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
     setMongoConnectionForUnitTest(NULL);
 
 
-    /* Release mock */
+    /* Release mocks */
     delete notifierMock;
-
+    delete timerMock;
 }
 
 /* ****************************************************************************
@@ -1405,6 +1411,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -1470,15 +1481,15 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * Ent1_Attr0_T0_CN -
 */
 TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -1492,6 +1503,11 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -1529,7 +1545,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));  // No notification attempt should have been made
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1563,8 +1579,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * Ent1_Attr0_T0_CNbis -
@@ -1585,6 +1602,11 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -1650,8 +1672,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 *  Ent1_AttrN_T0_CN -
@@ -1672,6 +1695,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -1746,8 +1774,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * Ent1_AttrN_T0_CNbis -
@@ -1768,6 +1797,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -1835,8 +1869,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 *  Ent1_Attr0_TN_CN -
@@ -1859,6 +1894,11 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -1942,8 +1982,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * Ent1_Attr0_TN_CNbis -
@@ -1966,6 +2007,11 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -2042,8 +2088,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * Ent1_AttrN_TN_CN -
@@ -2066,6 +2113,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -2151,8 +2203,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * Ent1_AttrN_TN_CNbis -
@@ -2175,6 +2228,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -2254,7 +2312,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
 
 /* ****************************************************************************
@@ -2277,6 +2335,11 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
@@ -2341,7 +2404,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
 
 /* ****************************************************************************
@@ -2364,6 +2427,11 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
@@ -2431,7 +2499,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
 
 /* ****************************************************************************
@@ -2457,6 +2525,11 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
             .Times(1);
     setNotifier(notifierMock);
 
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
     NotifyCondition nc1, nc2;
@@ -2527,7 +2600,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
 
 /* ****************************************************************************
@@ -2553,6 +2626,11 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
             .Times(1);
     setNotifier(notifierMock);
 
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
     NotifyCondition nc1, nc2;
@@ -2624,7 +2702,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
 
 /* ****************************************************************************
@@ -2648,6 +2726,11 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
             .Times(0);
     setNotifier(notifierMock);
 
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
     NotifyCondition nc;
@@ -2714,7 +2797,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
 
 /* ****************************************************************************
@@ -2738,6 +2821,11 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
             .Times(0);
     setNotifier(notifierMock);
 
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
     NotifyCondition nc;
@@ -2806,8 +2894,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * EntN_Attr0_T0_CN -
@@ -2829,6 +2918,11 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
             .Times(0);
     setNotifier(notifierMock);
 
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
     NotifyCondition nc1, nc2;
@@ -2904,18 +2998,20 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
 
     /* Release mock */
     delete notifierMock;
-
+    delete timerMock;
 }
+
 /* ****************************************************************************
 *
 * EntN_Attr0_T0_CNbis -
 */
 TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
+
+    utInit();
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
@@ -2995,7 +3091,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     /* Release mock */
     delete notifierMock;
 
+    utExit();
 }
+
 /* ****************************************************************************
 *
 * EntN_AttrN_T0_CN -
@@ -3007,6 +3105,8 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
@@ -3095,17 +3195,20 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     /* Release mock */
     delete notifierMock;
 
+    utExit();
 }
+
 /* ****************************************************************************
 *
 * EntN_AttrN_T0_CNbis -
 */
 TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
+
+    utInit();
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
@@ -3187,7 +3290,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     /* Release mock */
     delete notifierMock;
 
+    utExit();
 }
+
 /* ****************************************************************************
 *
 *  EntN_Attr0_TN_CN -
@@ -3199,6 +3304,8 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
@@ -3299,7 +3406,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
     /* Release mock */
     delete notifierMock;
 
+    utExit();
 }
+
 /* ****************************************************************************
 *
 * EntN_Attr0_TN_CNbis -
@@ -3311,6 +3420,8 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
@@ -3403,7 +3514,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
     /* Release mock */
     delete notifierMock;
 
+    utExit();    
 }
+
 /* ****************************************************************************
 *
 * EntN_AttrN_TN_CN -
@@ -3414,6 +3527,8 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
+
+    utInit();
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
@@ -3517,7 +3632,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
     /* Release mock */
     delete notifierMock;
 
+    utExit();
 }
+
 /* ****************************************************************************
 *
 * EntN_AttrN_TN_CNbis -
@@ -3528,6 +3645,8 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
+
+    utInit();
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
@@ -3623,6 +3742,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
     /* Release mock */
     delete notifierMock;
 
+    utExit();
 }
 
 
@@ -3826,7 +3946,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     delete notifierMock;
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3928,7 +4047,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     delete notifierMock;
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3937,7 +4055,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -4029,7 +4146,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     delete notifierMock;
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -4144,7 +4260,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     delete notifierMock;
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -4153,7 +4268,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
 */
 TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
@@ -4259,7 +4373,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     delete notifierMock;
 
     utExit();
-
 }
 
 /* ****************************************************************************

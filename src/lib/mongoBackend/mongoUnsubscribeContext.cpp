@@ -32,9 +32,9 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
-#include "cache/subCache.h"
 
 
 
@@ -75,7 +75,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
       //
       // This happens when OID format is wrong
       // FIXME: this checking should be done at parsing stage, without progressing to
-      // mongoBackend. By the moment we can live this here, but we should remove in the future
+      // mongoBackend. For the moment we can live this here, but we should remove in the future
       // (old issue #95)
       //
       responseP->statusCode.fill(SccContextElementNotFound);
@@ -99,7 +99,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     }
 
     /* Remove document in MongoDB */
-    // FIXME: I will prefer to do the find and remove in a single operation. Is the some similar
+    // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
     // to findAndModify for this?    
     if (!collectionRemove(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), &err))
     {
@@ -111,13 +111,23 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     /* Destroy any previous ONTIMEINTERVAL thread */
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
-    responseP->statusCode.fill(SccOk);
+
+    // FIXME P7: mongoSubCache stuff could be avoided if subscription is not patterned
+
+    //
+    // Removing subscription from mongo subscription cache
+    //
+    LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
+    CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
+
+    if (cSubP != NULL)  // Will only enter here if wildcard subscription
+    {
+      mongoSubCacheItemRemove(cSubP);
+    }
+
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
 
-    //
-    // Removing subscription from cache
-    //
-    orion::subCache->remove(tenant, "", requestP->subscriptionId.get());
-
+    responseP->statusCode.fill(SccOk);
     return SccOk;
 }

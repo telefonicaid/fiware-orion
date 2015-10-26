@@ -128,7 +128,7 @@ using namespace mongo;
 *
 * MAX_SERVICE_NAME_LEN
 */
-#define MAX_SERVICE_NAME_LEN 1024
+#define MAX_SERVICE_NAME_LEN 50
 
 /*****************************************************************************
 *
@@ -211,6 +211,12 @@ extern void releaseMongoConnection(DBClientBase* connection);
 * setDbPrefix -
 */
 extern void setDbPrefix(std::string dbPrefix);
+
+/*****************************************************************************
+*
+* getDbPrefix -
+*/
+extern const std::string& getDbPrefix(void);
 
 /*****************************************************************************
 *
@@ -564,15 +570,5 @@ extern std::string dbDotEncode(std::string fromString);
 *
 */
 extern std::string dbDotDecode(std::string fromString);
-
-
-
-/* ****************************************************************************
-*
-* subscriptionsTreat -
-*
-* Lookup all subscriptions in the database and call a treat function for each
-*/
-extern void subscriptionsTreat(std::string tenant, MongoTreatFunction treatFunction);
 
 #endif

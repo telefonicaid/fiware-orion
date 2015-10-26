@@ -33,7 +33,6 @@ SET (STATIC_LIBS
     serviceRoutines
     serviceRoutinesV2
     mongoBackend
-    cache
     rest
     jsonParse
     jsonParseV2

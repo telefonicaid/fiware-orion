@@ -219,6 +219,30 @@ Subscription* SubscriptionCache::lookupById
 
 /* ****************************************************************************
 *
+* SubscriptionCache::lookupById - 
+*/
+Subscription* SubscriptionCache::lookupById(const std::string&  subId)
+{
+  unsigned int  ix;
+  const char*   id = subId.c_str();
+
+  for (ix = 0; ix < subs.size(); ++ix)
+  {
+    if (subs[ix]->subscriptionId != id)
+    {
+      continue;
+    }
+
+    return subs[ix];
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
 * subToCache - 
 */
 static void subToCache(std::string tenant, BSONObj& bobj)
@@ -235,7 +259,10 @@ static void subToCache(std::string tenant, BSONObj& bobj)
 void SubscriptionCache::init(void)
 {
   semInit();
+
+  semTake();
   fillFromDb();
+  semGive();
 }
 
 
@@ -275,9 +302,7 @@ void SubscriptionCache::insert(Subscription* subP)
     return;
   }
 
-  semTake();
   subs.push_back(subP);
-  semGive();
 
   ++noOfSubCacheEntries;
 }
@@ -457,15 +482,11 @@ int SubscriptionCache::remove(Subscription* subP)
   {
     if (subs[ix] == subP)
     {
-      semTake();
-
       subP->release();
       delete(subP);
 
       subs.erase(subs.begin() + ix);
       
-      semGive();
-
       ++noOfSubCacheRemovals;
       --noOfSubCacheEntries;
       return 0;
@@ -524,10 +545,8 @@ void SubscriptionCache::release(void)
 */
 int SubscriptionCache::refresh(void)
 {
-  semTake();
   release();
   fillFromDb();
-  semGive();
 
   return 0;
 }

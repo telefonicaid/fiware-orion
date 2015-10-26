@@ -260,11 +260,22 @@ void setNotifier(Notifier* n)
 *
 * setDbPrefix -
 */
-extern void setDbPrefix(std::string _dbPrefix)
+void setDbPrefix(std::string _dbPrefix)
 {
   dbPrefix = _dbPrefix;
   LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
 }
+
+
+/*****************************************************************************
+*
+* getDbPrefix -
+*/
+const std::string& getDbPrefix(void)
+{
+  return dbPrefix;
+}
+
 
 
 /*****************************************************************************
@@ -311,10 +322,12 @@ std::string tenantFromDb(std::string& database)
 {
   std::string r;
   std::string prefix  = dbPrefix + "-";
+
   if (strncmp(prefix.c_str(), database.c_str(), strlen(prefix.c_str())) == 0)
   {
     char tenant[MAX_SERVICE_NAME_LEN];
-    strcpy(tenant, prefix.c_str() + strlen(prefix.c_str()));
+
+    strncpy(tenant, database.c_str() + strlen(prefix.c_str()), sizeof(tenant));
     r = std::string(tenant);
   }
   else
@@ -998,9 +1011,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
 {
   char* str         = strdup(in.c_str());
   char* toFree      = str;
-#if 0
-  int   statementNo = 0;
-#endif
   char* s;
 
   while ((s = strtok(str, ";")) != NULL)
@@ -1013,10 +1023,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
     std::vector<char*>  valVector;
 
     s = wsStrip(s);
-
-#if 0
-    printf("statement %d: %s\n", statementNo, s);
-#endif
 
     left = s;
     if ((op = (char*) strstr(s, "==")) != NULL)
@@ -1164,25 +1170,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
       }
     }
 
-#if 0
-    // FIXME P10: I leave this block just in case you need if you continue working on this. It should
-    // be removed at the end
-    if (std::string(left)      != "") printf("  left:        %s\n", left);
-    if (std::string(op)        != "") printf("  OP:          %s\n", op);
-    if (std::string(right)     != "") printf("  right:       %s\n", right);
-    if (std::string(rangeFrom) != "") printf("  rangeFrom:   %s\n", rangeFrom);
-    if (std::string(rangeTo)   != "") printf("  rangeTo:     %s\n", rangeTo);
-    if (valVector.size() != 0)
-    {
-      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-      {
-        printf("  value %02d: \"%s\"\n", ix, valVector[ix]);
-      }
-    }
-    printf("\n");
-
-    ++statementNo;
-#endif
     str = NULL;  // So that strtok continues eating the initial string
 
     /* Build the BSON filter */
@@ -2699,33 +2686,4 @@ std::string dbDotDecode(std::string s)
 {
   std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
   return s;
-}
-
-
-
-/* ****************************************************************************
-*
-* subscriptionsTreat -
-*
-* Lookup all subscriptions in the database and call a treat function for each
-*/
-void subscriptionsTreat(std::string database, MongoTreatFunction treatFunction)
-{
-  BSONObj                   query;
-  std::string               err;
-  auto_ptr<DBClientCursor>  cursor;
-  std::string               tenant = tenantFromDb(database);
-
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), query, &cursor, &err))
-  {
-    return;
-  }
-
-  // Call the treat function for each subscription
-  while (cursor->more())
-  {
-    BSONObj sub = cursor->next();
-
-    treatFunction(tenant, sub);
-  }
 }
