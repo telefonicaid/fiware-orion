@@ -45,7 +45,7 @@
 #define RES_CER_STATUS(i)       res.contextElementResponseVector.get(i)->statusCode
 #define RES_CER_ATTR(i, j)      res.contextElementResponseVector.get(i)->contextElement.contextAttributeVector.get(j)
 
-#define C_STR_FIELD(b, f)       getStringField(b, f).c_str();
+#define C_STR_FIELD(b, f)       getStringField(b, f).c_str()
 
 /* ****************************************************************************
 *
