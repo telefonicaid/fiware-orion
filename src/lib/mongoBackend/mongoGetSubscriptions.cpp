@@ -42,7 +42,7 @@ using namespace ngsiv2;
 */
 static void setSubscriptionId(Subscription* s, const BSONObj& r)
 {
-  s->id = r.getField("_id").OID().toString();
+  s->id = getField(r, "_id").OID().toString();
 }
 
 
@@ -53,13 +53,13 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 static void setSubject(Subscription* s, const BSONObj& r)
 {
   // Entities
-  std::vector<BSONElement> ents = r.getField(CSUB_ENTITIES).Array();
+  std::vector<BSONElement> ents = getField(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj ent           = ents[ix].embeddedObject();
-    std::string id        = ent.getStringField(CSUB_ENTITY_ID);
-    std::string type      = ent.getStringField(CSUB_ENTITY_TYPE);
-    std::string isPattern = ent.getStringField(CSUB_ENTITY_ISPATTERN);
+    std::string id        = getStringField(ent, CSUB_ENTITY_ID);
+    std::string type      = getStringField(ent, CSUB_ENTITY_TYPE);
+    std::string isPattern = getStringField(ent, CSUB_ENTITY_ISPATTERN);
 
     EntID en;
     if (isFalse(isPattern))
@@ -76,14 +76,14 @@ static void setSubject(Subscription* s, const BSONObj& r)
   }
 
   // Condition
-  std::vector<BSONElement> conds = r.getField(CSUB_CONDITIONS).Array();
+  std::vector<BSONElement> conds = getField(r, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < conds.size(); ++ix)
   {
     BSONObj cond = conds[ix].embeddedObject();
     // The ONCHANGE check is needed, as a subscription could mix different conditions types in DB
-    if (std::string(cond.getStringField(CSUB_CONDITIONS_TYPE)) == "ONCHANGE")
+    if (std::string(getStringField(cond, CSUB_CONDITIONS_TYPE)) == "ONCHANGE")
     {
-      std::vector<BSONElement> condValues = cond.getField(CSUB_CONDITIONS_VALUE).Array();
+      std::vector<BSONElement> condValues = getField(cond, CSUB_CONDITIONS_VALUE).Array();
       for (unsigned int jx = 0; jx < condValues.size(); ++jx)
       {
         std::string attr = condValues[jx].String();
@@ -107,7 +107,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 static void setNotification(Subscription* s, const BSONObj& r)
 {
   // Attributes
-  std::vector<BSONElement> attrs = r.getField(CSUB_ATTRS).Array();
+  std::vector<BSONElement> attrs = getField(r, CSUB_ATTRS).Array();
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     std::string attr = attrs[ix].String();
@@ -115,16 +115,16 @@ static void setNotification(Subscription* s, const BSONObj& r)
   }
 
   // Callback
-  s->notification.callback = r.getStringField(CSUB_REFERENCE);
+  s->notification.callback = getStringField(r, CSUB_REFERENCE);
 
   // Throttling
-  s->notification.throttling = r.hasField(CSUB_THROTTLING)? r.getField(CSUB_THROTTLING).numberLong() : -1;
+  s->notification.throttling = r.hasField(CSUB_THROTTLING)? getField(r, CSUB_THROTTLING).numberLong() : -1;
 
   // Last Notification
-  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION) ? r.getField(CSUB_LASTNOTIFICATION).numberLong() : -1;
+  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION) ? getField(r, CSUB_LASTNOTIFICATION).numberLong() : -1;
 
   // Count
-  s->notification.timesSent = r.hasField(CSUB_COUNT) ? r.getField(CSUB_COUNT).numberLong() : -1;
+  s->notification.timesSent = r.hasField(CSUB_COUNT) ? getField(r, CSUB_COUNT).numberLong() : -1;
 
 }
 
@@ -136,7 +136,7 @@ static void setNotification(Subscription* s, const BSONObj& r)
 static void setExpires(Subscription* s, const BSONObj& r)
 {
   // Last Notification
-  s->expires = r.hasField(CSUB_EXPIRATION) ? r.getField(CSUB_EXPIRATION).numberLong() : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION) ? getField(r, CSUB_EXPIRATION).numberLong() : -1;
 
   // Status
   // FIXME P10: use a enum for this
