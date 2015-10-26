@@ -93,9 +93,12 @@ std::string putEntity
   {
     OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
     answer = orionError.render(ciP, "");
-   }
-
-
+  }
+  else if (ciP->httpStatusCode == SccContextElementNotFound)
+  {
+    OrionError orionError(SccContextElementNotFound, "No context element found");
+    answer = orionError.render(ciP, "");
+  }
 
   // 05. Cleanup and return result
   eP->release();
