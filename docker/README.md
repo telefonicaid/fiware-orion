@@ -124,7 +124,7 @@ If you want to know more about images and the building process you can find it i
 Things to keep in mind while working with docker containers and Orion Context Broker.
 
 ### 4.1 Data persistence
-Everything you do with Orion Context Broker when dockerized is non-persistent. *You will lose all your data* if you turn off the MongoDB container. This happens with either this method or the manual one.
+Everything you do with Orion Context Broker when dockerized is non-persistent. *You will lose all your data* if you turn off the MongoDB container. This will happen with either method presented in this README.
 
 If you want to prevent this from happening take a look at [this link](https://registry.hub.docker.com/_/mongo/) in section *Where to Store Data* of the MongoDB docker documentation. In it you will find instructions and ideas on how to make your MongoDB data persistent.
 
