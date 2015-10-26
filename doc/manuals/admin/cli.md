@@ -121,16 +121,16 @@ The list of available options is the following:
     Active-Active Orion configuration "none" is recommended.
 -   **-mutexTimeStat**. Include semaphore waiting time in the
     "/statistics" information. It may have performance impact.
--   **-subCacheIval**. Interval in seconds between calls to subscription cache refresh. Zero
-    value means "no refresh" (default value and the recomnended one for mono-CB
+-   **-subCacheIval**. Interval in seconds between calls to subscription cache refresh. A zero
+    value means "no refresh" (default value and the recommended one for mono-CB
     deployments).
--   **-noCache**. Disables context subscription cache, so subscriptions searchs are
-    always done at DB (not recommneded but useful for debugging).
+-   **-noCache**. Disables context subscription cache, so subscriptions searches are
+    always done at DB (not recommended but useful for debugging).
 -   **-notificationMode** *(Experimental option)*. Allows to select notification mode, either:
     `transient`, `permanent` or `none`. Default mode is `transient`.
     * In transient mode, connections are closed by CB just after sending the notification.
     * In permanent connection mode, a permanent connection is created the first time a notification
-      is sent to a given URL path (if the receiver support permanent connections). Next notifications to the same
+      is sent to a given URL path (if the receiver support permanent connections). Following notifications to the same
       URL path will reuse the connection, saving HTTP connection time.
     * The `none` mode is not aimed at production usage, but it is useful for debugging. In this case
       notifications are not sent, but recorded internally and shown in the [statistics](management_api.md#statistics)
