@@ -152,7 +152,14 @@ def record():
         #times.append(t)
 
     # Store verb and URL
-    s += request.method + ' ' + request.url + '\n'
+    #
+    # We have found that request.url can be problematic in some distributions (e.g. Debian 8.2)
+    # when used with IPv6, so we use request.scheme, request.host and request.path to compose
+    # the URL "manually"
+    #
+    #  request.url = request.scheme + '://' + request.host + request.path
+    #
+    s += request.method + ' ' + request.scheme + '://' + request.host + request.path + '\n'
 
     # Store headers
     for h in request.headers.keys():
