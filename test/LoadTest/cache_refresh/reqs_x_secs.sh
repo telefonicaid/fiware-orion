@@ -38,7 +38,7 @@ if [  "$2" == "-reset"  ]
   then
      curl -s $1/reset > /dev/null
      echo ""
-     echo " WARN - The listener has been reseted... "
+     echo " WARN - The listener has been reset... "
      echo ""
 fi
 

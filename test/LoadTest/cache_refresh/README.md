@@ -15,7 +15,7 @@ These tests are used to verify the cache refresh in a balanced system.
 
 - 1 node for balancer (nginx)
 - 2 nodes for context broker installed
-- 1 node for mongo db (associated to CBs)
+- 1 node for mongoDB (associated to CBs)
 - 1 node for launch listener and viewer
 - 1 node for launch jmeter
 
@@ -26,17 +26,17 @@ These tests are used to verify the cache refresh in a balanced system.
      
   Parameters:
   ```
-     HOST: CB or balancer host (by default, localhost)
-     PORT: CB or balancer port (by default, 1026)
-     THREADS: number of threads used in the test (by default, 1)
-     TESTTIME: duration time of the test (by default, 60)
-     SERVICE: service header used in requests (by default, entities_append_long_time)
-     SERVICE_PATH: service path header used in requests (by default, /test)
-     ENTITIES: number of consecutive entities in each thread (by default, 10)
-     SUBSCRIPTION: optionally is possible to create a subscription before all appends requests, in case of you would like to create use CREATE as value (by default, nothing)
-     SUBS_DURATION: duration time of the subscription, used if the subscription is create previously (by default, 60)
-     LISTEN_HOST: listen host used per receive notifications, used if the subscription is create previously (by default, localhost)
-     LISTEN_PORT: listen por used per receive notifications, used if the subscription is create previously  (by default, 8090)
+     HOST: CB or balancer host (default: localhost)
+     PORT: CB or balancer port (default: 1026)
+     THREADS: number of threads used in the test (default: 1)
+     TESTTIME: duration time of the test (default: 60)
+     SERVICE: service header used in requests (default: entities_append_long_time)
+     SERVICE_PATH: service path header used in requests (default: /test)
+     ENTITIES: number of consecutive entities in each thread (default: 10)
+     SUBSCRIPTION: optionally is possible to create a subscription before all appends requests, in case of you would like to create use CREATE as value (default: nothing)
+     SUBS_DURATION: duration time of the subscription, used if the subscription is create previously (default: 60)
+     LISTEN_HOST: listen host used per receive notifications, used if the subscription is create previously (default: localhost)
+     LISTEN_PORT: listen por used per receive notifications, used if the subscription is create previously  (default: 8090)
   ```
   
   Example:
@@ -69,7 +69,7 @@ These tests are used to verify the cache refresh in a balanced system.
   Parameters:
   ```
      <url>: host and port used by requests_listener.py script (MANDATORY)
-     -reset: is used to reset the listener previously (Optional)
+     -reset: it is used to reset the listener before starting the test (total requests and TPS)  (Optional)
   ```
   
   Example:
@@ -78,18 +78,18 @@ These tests are used to verify the cache refresh in a balanced system.
   ```
   
 - **subscription_manager.py**: create, update or delete a subscription associated to appends generated with Jmeter script `append_entities_long_time_v1.0.jmx`.
-                               It is neccesary to import `requests` library. `pip install requests`. 
+                               It is necessary to import `requests` library. `pip install requests`. 
   Parameters:
   ```                                                                       
-       <host>               : CB o balancer host (MANDATORY).
+       <host>               : CB or balancer host (MANDATORY).
        -u                   : show this usage (Optional).  
-       -operation=<value>   : operation allowed: create | update | delete (by default, create) (Optional).       
-       -duration=<value>    : used only in create and update operations (by default, 1000S) (Optional)           
-       -throttling=<value>  : used only in create and update operations (by default, it is not used) (Optional)  
-       -subs_id=<value>     : used only in delete and update operation (by default, NotDefined) (Optional)                                
-       -service=<value>     : service header (by default, entities_append_long_time) (Optional)                                                          
-       -service_path=<value>: service path header (by default, /test)(Optional)                                                     
-       -refer_url=<value>   : reference url used to notifications in create operation (by default, http://localhost:9999/notify (Optional)                                                                  
+       -operation=<value>   : operations allowed: create | update | delete (default: create) (Optional).       
+       -duration=<value>    : used only in create and update operations (default: 1000S) (Optional)           
+       -throttling=<value>  : used only in create and update operations (default: it is not used) (Optional)  
+       -subs_id=<value>     : used only in delete and update operation (default: NotDefined) (Optional)                                
+       -service=<value>     : service header (default: entities_append_long_time) (Optional)                                                          
+       -service_path=<value>: service path header (default: /test)(Optional)                                                     
+       -refer_url=<value>   : reference url used to notifications in create operation (default: http://localhost:9999/notify (Optional)                                                                  
   ```
   
   Examples:
@@ -104,7 +104,7 @@ These tests are used to verify the cache refresh in a balanced system.
   Parameters:
   ```
     <host>: mongo host (MANDATORY)
-    <prefix>: databases prefix (by default, orion) (Optional)
+    <prefix>: databases prefix (default: orion) (Optional)
   ```
   
   Example:
