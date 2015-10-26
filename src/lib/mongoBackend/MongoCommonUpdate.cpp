@@ -1310,7 +1310,6 @@ static bool addTriggeredSubscriptions_noCache
   const std::vector<std::string>&           servicePathV
 )
 {
-  DBClientBase*             connection      = NULL;
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::string               spathRegex      = "";
   std::vector<std::string>  spathV;
@@ -1375,50 +1374,21 @@ static bool addTriggeredSubscriptions_noCache
   queryPattern.appendCode("$where", function);
 
   // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
-  BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
+  BSONObj                   query       = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
+  std::string               collection  = getSubscribeContextCollectionName(tenant);
+  auto_ptr<DBClientCursor>  cursor;
+  std::string               errorString;
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
                   getSubscribeContextCollectionName(tenant).c_str(),
                   query.toString().c_str()));
 
-  /* Do the query */
-  auto_ptr<DBClientCursor> cursor;
-  try
+  if (collectionQuery(collection, query, &cursor, &errorString) != true)
   {
-    connection      = getMongoConnection();
-    cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
-
-    /*
-     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-     * exception ourselves
-     */
-    if (cursor.get() == NULL)
-    {
-      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-    }
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-    err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-               " - query(): " + query.toString() +
-               " - exception: " + e.what();
-    LM_E(("Database Error (%s)", err.c_str()));
+    LM_E(("Database Error (%s)", errorString.c_str()));
     return false;
   }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-    err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-               " - query(): " + query.toString() +
-               " - exception: " + "generic";
-    LM_E(("Database Error (%s)", err.c_str()));
-    return false;
-  }
+
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
   while (cursor->more())
