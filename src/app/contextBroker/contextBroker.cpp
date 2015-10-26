@@ -1464,11 +1464,13 @@ int main(int argC, char* argV[])
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
 
+  std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
+
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
-  paConfig("man version",                   (void*) ORION_VERSION);
+  paConfig("man version",                   (void*) versionString.c_str());
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
