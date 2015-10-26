@@ -44,6 +44,7 @@ typedef struct UpdateContextAttributeRequest
 {
   std::string                type;                // Optional
   std::string                contextValue;        // Mandatory
+  orion::ValueType           valueType;           // Type of value: either string or none
   MetadataVector             metadataVector;      // Optional
 
   std::string                typeFromXmlAttribute;
