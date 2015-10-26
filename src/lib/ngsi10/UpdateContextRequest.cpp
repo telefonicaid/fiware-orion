@@ -288,10 +288,7 @@ void UpdateContextRequest::fill
   else
   {
     caP = new ContextAttribute(attributeName, ucarP->type, ucarP->contextValue);
-    if (ucarP->valueType == orion::ValueTypeNone)
-    {
-      caP->valueType = orion::ValueTypeNone;
-    }
+    caP->valueType = ucarP->valueType;
   }
 
   caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
