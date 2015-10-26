@@ -295,7 +295,7 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs)
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
-    std::string  dbName  = STR_FIELD(db, "name");
+    std::string  dbName  = getStringField(db, "name");
     std::string  prefix  = dbPrefix + "-";
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
@@ -550,7 +550,7 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   {
     BSONObj condition = condV[ix].embeddedObject();
 
-    if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
+    if (strcmp(getStringField(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
       int interval = getIntField(condition, CSUB_CONDITIONS_VALUE);
 
@@ -1576,9 +1576,9 @@ bool entitiesQuery
 
     BSONObj queryEntity = getObjectField(r, "_id");
 
-    cer->contextElement.entityId.id          = STR_FIELD(queryEntity, ENT_ENTITY_ID);
-    cer->contextElement.entityId.type        = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
-    cer->contextElement.entityId.servicePath = STR_FIELD(queryEntity, ENT_SERVICE_PATH);
+    cer->contextElement.entityId.id          = getStringField(queryEntity, ENT_ENTITY_ID);
+    cer->contextElement.entityId.type        = getStringField(queryEntity, ENT_ENTITY_TYPE);
+    cer->contextElement.entityId.servicePath = getStringField(queryEntity, ENT_SERVICE_PATH);
     cer->contextElement.entityId.isPattern   = "false";
 
     /* Get the location attribute (if it exists) */
@@ -1621,7 +1621,7 @@ bool entitiesQuery
 
       ca.name          = dbDotDecode(basePart(attrName));
       std::string mdId = idPart(attrName);
-      ca.type          = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
+      ca.type          = getStringField(queryAttr, ENT_ATTRS_TYPE);
 
       /* Note that includedAttribute decision is based on name and type. Value is set only if
        * decision is positive
@@ -1633,7 +1633,7 @@ bool entitiesQuery
         switch(getField(queryAttr, ENT_ATTRS_VALUE).type())
         {
         case String:
-          ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+          ca.stringValue = getStringField(queryAttr, ENT_ATTRS_VALUE);
           if (!includeEmpty && ca.stringValue.length() == 0)
           {
             continue;
@@ -1851,8 +1851,8 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
 {
   EntityId en;
 
-  en.id = STR_FIELD(entity, REG_ENTITY_ID);
-  en.type = STR_FIELD(entity, REG_ENTITY_TYPE);
+  en.id = getStringField(entity, REG_ENTITY_ID);
+  en.type = getStringField(entity, REG_ENTITY_TYPE);
 
   /* isPattern = true is not allowed in registrations so it is not in the
    * document retrieved with the query; however we will set it to be formally correct
@@ -1876,9 +1876,9 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
 static void processAttribute(ContextRegistrationResponse* crr, AttributeList attrL, BSONObj attribute)
 {
   ContextRegistrationAttribute attr(
-    STR_FIELD(attribute, REG_ATTRS_NAME),
-    STR_FIELD(attribute, REG_ATTRS_TYPE),
-    STR_FIELD(attribute, REG_ATTRS_ISDOMAIN));
+    getStringField(attribute, REG_ATTRS_NAME),
+    getStringField(attribute, REG_ATTRS_TYPE),
+    getStringField(attribute, REG_ATTRS_ISDOMAIN));
 
   // FIXME: we don't take metadata into account at the moment
   // attr.metadataV = ..
@@ -1906,7 +1906,7 @@ static void processContextRegistrationElement
 {
   ContextRegistrationResponse crr;
 
-  crr.contextRegistration.providingApplication.set(STR_FIELD(cr, REG_PROVIDING_APPLICATION));
+  crr.contextRegistration.providingApplication.set(getStringField(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setFormat(format);
 
   std::vector<BSONElement> queryEntityV = getField(cr, REG_ENTITIES).Array();
@@ -2088,7 +2088,7 @@ bool registrationsQuery
     // Default format is XML, in the case the field is not found in the
     // registrations document (for pre-0.21.0 versions)
     //
-    Format                    format = r.hasField(REG_FORMAT)? stringToFormat(STR_FIELD(r, REG_FORMAT)) : XML;
+    Format                    format = r.hasField(REG_FORMAT)? stringToFormat(getStringField(r, REG_FORMAT)) : XML;
     std::vector<BSONElement>  queryContextRegistrationV = getField(r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
@@ -2150,9 +2150,9 @@ EntityIdVector subToEntityIdVector(BSONObj sub)
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
     BSONObj    subEnt = subEnts[ix].embeddedObject();
-    EntityId*  en     = new EntityId(STR_FIELD(subEnt, CSUB_ENTITY_ID),
-                                     STR_FIELD(subEnt, CSUB_ENTITY_TYPE),
-                                     STR_FIELD(subEnt, CSUB_ENTITY_ISPATTERN));
+    EntityId*  en     = new EntityId(getStringField(subEnt, CSUB_ENTITY_ID),
+                                     getStringField(subEnt, CSUB_ENTITY_TYPE),
+                                     getStringField(subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
 

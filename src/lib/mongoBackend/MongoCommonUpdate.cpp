@@ -285,12 +285,12 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
   if (md1.hasField(ENT_ATTRS_MD_TYPE))
   {
     return md2.hasField(ENT_ATTRS_MD_TYPE) &&
-      STR_FIELD(md1, ENT_ATTRS_MD_TYPE) == STR_FIELD(md2, ENT_ATTRS_MD_TYPE) &&
-      STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
+      getStringField(md1, ENT_ATTRS_MD_TYPE) == getStringField(md2, ENT_ATTRS_MD_TYPE) &&
+      getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
   }
 
   return !md2.hasField(ENT_ATTRS_MD_TYPE) &&
-    STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
+    getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
 }
 
 /* ****************************************************************************
@@ -325,7 +325,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       return getBoolField(md1, ENT_ATTRS_MD_VALUE) == getBoolField(md2, ENT_ATTRS_MD_VALUE);
 
     case String:
-      return STR_FIELD(md1, ENT_ATTRS_MD_VALUE) == STR_FIELD(md2, ENT_ATTRS_MD_VALUE);
+      return getStringField(md1, ENT_ATTRS_MD_VALUE) == getStringField(md2, ENT_ATTRS_MD_VALUE);
 
     default:
       LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getField(md1, ENT_ATTRS_MD_VALUE).type()));
@@ -443,7 +443,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolField(attr, ENT_ATTRS_VALUE);
 
     case String:
-      return caP->valueType != ValueTypeString || caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeString || caP->stringValue != getStringField(attr, ENT_ATTRS_VALUE);
 
     default:
       LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
@@ -540,7 +540,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
         break;
 
       case String:
-        ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+        ab.append(ENT_ATTRS_VALUE, getStringField(attr, ENT_ATTRS_VALUE));
         break;
 
       default:
@@ -557,7 +557,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   {
     if (attr.hasField(ENT_ATTRS_TYPE))
     {
-      ab.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+      ab.append(ENT_ATTRS_TYPE, getStringField(attr, ENT_ATTRS_TYPE));
     }
   }
 
@@ -628,7 +628,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      */
       actualUpdate = (attrValueChanges(attr, caP) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
-                                             STR_FIELD(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
+                                             getStringField(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
   }
   else
@@ -1209,8 +1209,8 @@ static bool addTriggeredSubscriptions_withCache
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
-          STR_FIELD(sub, CSUB_REFERENCE),
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
+          getStringField(sub, CSUB_REFERENCE),
           subToAttributeList(sub),
           "",  // No subscriptionId as the sub-cache is not used for non-isPattern subscriptions
           ""   // No tenant as the sub-cache is not used for non-isPattern subscriptions
@@ -1421,8 +1421,8 @@ static bool addTriggeredSubscriptions_noCache
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
-          STR_FIELD(sub, CSUB_REFERENCE),
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
+          getStringField(sub, CSUB_REFERENCE),
           //subToAttributeList(sub)); signature changed in TriggeredSubscription() constructor in 0.24.0
           subToAttributeList(sub), "", "");
 
@@ -2501,9 +2501,9 @@ void processContextElement
       continue;
     }
 
-    std::string entityId    = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_ID);
-    std::string entityType  = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_TYPE);
-    std::string entitySPath = STR_FIELD(idField.embeddedObject(), ENT_SERVICE_PATH);
+    std::string entityId    = getStringField(idField.embeddedObject(), ENT_ENTITY_ID);
+    std::string entityType  = getStringField(idField.embeddedObject(), ENT_ENTITY_TYPE);
+    std::string entitySPath = getStringField(idField.embeddedObject(), ENT_SERVICE_PATH);
 
     LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 

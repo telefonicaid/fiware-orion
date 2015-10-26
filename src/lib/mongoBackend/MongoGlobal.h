@@ -130,19 +130,6 @@ using namespace mongo;
 */
 #define MAX_SERVICE_NAME_LEN 50
 
-/*****************************************************************************
-*
-* Macros to ease extracting fields from BSON objects
-*
-* FIXME P10: probably the STR_FIELD macro (and maybe C_STR_FIELD) are not needed at
-* the end
-*/
-//#define STR_FIELD(i, sf) std::string(i.getStringField(sf))
-//#define C_STR_FIELD(i, sf) i.getStringField(sf)
-#include "mongoBackend/safeBsonGet.h"
-#define STR_FIELD(i, sf) getStringField(i, sf)
-#define C_STR_FIELD(i, sf) getStringField(i, sf).c_str()
-
 
 
 /* ****************************************************************************

@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeBsonGet.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
@@ -105,7 +106,7 @@ HttpStatusCode mongoUpdateContextSubscription
   /* Entities, attribute list and reference are not updatable, so they are appended directly */
   newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
   newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
-  newSub.append(CSUB_REFERENCE, STR_FIELD(sub, CSUB_REFERENCE));
+  newSub.append(CSUB_REFERENCE, getStringField(sub, CSUB_REFERENCE));
 
   /* Duration update */
   long long expiration = getCurrentTime() + requestP->duration.parse();
@@ -156,7 +157,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 enV,
                                                 attrL,
                                                 requestP->subscriptionId.get(),
-                                                C_STR_FIELD(sub, CSUB_REFERENCE),
+                                                getStringField(sub, CSUB_REFERENCE).c_str(),
                                                 &notificationDone,
                                                 notifyFormat,
                                                 tenant,

@@ -33,6 +33,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeBsonGet.h"
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
@@ -136,7 +137,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Reference is not updatable, so it is appended directly */
-  newSub.append(CASUB_REFERENCE, STR_FIELD(sub, CASUB_REFERENCE));
+  newSub.append(CASUB_REFERENCE, getStringField(sub, CASUB_REFERENCE));
 
   int count = sub.hasField(CASUB_COUNT) ? getIntField(sub, CASUB_COUNT) : 0;
 
@@ -160,7 +161,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), STR_FIELD(sub, CASUB_REFERENCE), notifyFormat, tenant);
+  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringField(sub, CASUB_REFERENCE), notifyFormat, tenant);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */

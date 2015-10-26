@@ -32,6 +32,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeBsonGet.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
 
 using namespace mongo;
@@ -73,9 +74,9 @@ HttpStatusCode mongoGetContextSubscriptionInfo
     for (unsigned int ix = 0; ix < entities.size(); ++ix) {
         BSONObj entity = entities[ix].embeddedObject();
         EntityId* enP = new EntityId;
-        enP->id = STR_FIELD(entity, CSUB_ENTITY_ID);
-        enP->type = STR_FIELD(entity, CSUB_ENTITY_TYPE);
-        enP->isPattern = STR_FIELD(entity, CSUB_ENTITY_ISPATTERN);
+        enP->id = getStringField(entity, CSUB_ENTITY_ID);
+        enP->type = getStringField(entity, CSUB_ENTITY_TYPE);
+        enP->isPattern = getStringField(entity, CSUB_ENTITY_ISPATTERN);
         csiP->entityIdVector.push_back(enP);
 
     }
@@ -87,7 +88,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo
     BSONElement be = getField(sub, CSUB_EXPIRATION);
     csiP->expiration = be.numberLong();
 
-    csiP->url = STR_FIELD(sub, CSUB_REFERENCE);
+    csiP->url = getStringField(sub, CSUB_REFERENCE);
     if (sub.hasElement(CSUB_LASTNOTIFICATION)) {
         csiP->lastNotification = getIntField(sub, CSUB_LASTNOTIFICATION);
     }
@@ -98,7 +99,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo
     csiP->throttling = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-    std::string fmt = STR_FIELD(sub, CSUB_FORMAT);
+    std::string fmt = getStringField(sub, CSUB_FORMAT);
     csiP->format = sub.hasField(CSUB_FORMAT)? stringToFormat(fmt) : XML;
 
     reqSemGive(__FUNCTION__, "get info on subscriptions", reqSemTaken);
