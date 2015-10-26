@@ -1,5 +1,5 @@
-#ifndef MONGOLISTSUBSCRIPTIONS_H
-#define MONGOLISTSUBSCRIPTIONS_H
+#ifndef SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
+#define SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
 
 /*
 *
@@ -23,42 +23,44 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Fermin Galan Marquez
 */
 
-#include <map>
-#include <string>
-#include <vector>
-
-#include "rest/OrionError.h"
-#include "apiTypesV2/Subscription.h"
+#include "mongo/client/dbclient.h"
 
 /* ****************************************************************************
 *
-* mongoListSubscriptions -
+* getObjectField -
+*
 */
-extern void mongoListSubscriptions
-(
-  std::vector<ngsiv2::Subscription>   *vec,
-  OrionError                          *oe,
-  std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant,
-  int                                 limit,
-  int                                 offset
-);
+extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *
-* mongoGetSubscription -
+* getStringField -
+*
 */
-extern void mongoGetSubscription
-(
-  ngsiv2::Subscription                *sub,
-  OrionError                          *oe,
-  const std::string&                  idSub,
-  std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant
-);
+extern std::string getStringField(const mongo::BSONObj& b, const std::string& field);
 
+/* ****************************************************************************
+*
+* getIntField -
+*
+*/
+extern int getIntField(const mongo::BSONObj& b, const std::string& field);
 
-#endif // MONGOLISTSUBSCRIPTIONS_H
+/* ****************************************************************************
+*
+* getBoolField -
+*
+*/
+extern bool getBoolField(const mongo::BSONObj& b, const std::string& field);
+
+/* ****************************************************************************
+*
+* getField -
+*
+*/
+extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field);
+
+#endif // SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_

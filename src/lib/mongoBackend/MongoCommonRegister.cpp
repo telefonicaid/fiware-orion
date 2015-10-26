@@ -233,7 +233,7 @@ static bool addTriggeredSubscriptions
   while (cursor->more())
   {
     BSONObj     sub     = cursor->next();
-    BSONElement idField = sub.getField("_id");
+    BSONElement idField = getField(sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'

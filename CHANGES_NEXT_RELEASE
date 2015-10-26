@@ -28,3 +28,4 @@ Fix:  performance problem in NGSIv2 API due to uncontrolled log trace printing
 Add:  empty attribute values supported in NGSIv1 API operations (Issue #1358)
 Add:  Add CLI argument for notification mode (Issue #1370)
 Fix:  Improve error description in NGSIv2 PUT entity, when entity is not found  (Issue #1320)
+Add:  Hardening: mongoBackend checking for field existence and proper type to avoid broker crashes due to DB corruption (Issue #136)

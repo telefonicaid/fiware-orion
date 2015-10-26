@@ -42,6 +42,7 @@ SET (SOURCES
     mongoConnectionPool.cpp
     mongoGetSubscriptions.cpp
     connectionOperations.cpp
+    safeBsonGet.cpp
 )
 
 SET (HEADERS
@@ -66,6 +67,7 @@ SET (HEADERS
     mongoConnectionPool.h
     mongoGetSubscriptions.h
     connectionOperations.h
+    safeBsonGet.h
 )
 
 
