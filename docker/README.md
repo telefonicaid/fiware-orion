@@ -1,91 +1,145 @@
 
-# How to use this Dockerfile
+# How to use Orion Context Broker with Docker
 
-You can build a docker image based on this Dockerfile. This image will contain only an Orion Context Broker instance, exposing port `1026`. This requires that you have [docker](https://docs.docker.com/installation/) installed on your machine.
+You can run Orion Context Broker very easily using docker. There are several ways to accomplish this. These are (in order of complexity):
 
-If you just want to have an Orion Context Broker running as quickly as possible jump to section *The Fastest Way*.
+- _"Have everything automatically done for me"_. See Section **1. The Fastest Way** (recommended).
+- _"Only run a Context Broker, I'll take care of where I put my database"_. See Section **2. Run one container**.
+- _"Let me see how this docker thing works from the inside"_ or _"I want to customize my Orion Docker file"_ : See Section **3. Build a docker image**.
 
-If you want to know what is behind the scenes of our container you can go ahead and read the build and run sections.
+These are alternative ways to do the same thing, you do not need to do all three of them.
 
-## The Fastest Way
+You do need to have docker in your machine. See the [documentation](https://docs.docker.com/installation/) on how to do this.
 
-Docker Compose allows you to link an Orion Context Broker container to a MongoDB container in a few minutes. You must install [Docker Compose](https://docs.docker.com/compose/install/) for this method to work.
+----
+## 1. The Fastest Way
 
-### Run a container from an image you just built
+Docker Compose allows you to link an Orion Context Broker container to a MongoDB container in a few minutes. This method requires that you install [Docker Compose](https://docs.docker.com/compose/install/).
 
-If you have downloaded the [Orion's code](https://github.com/telefonicaid/fiware-orion/) simply navigate to the docker directory and run
+Consider this method if you want to try Orion Context Broker and do not want to bother about databases or you don't care about losing data.
 
-	sudo docker-compose up
+Follow these steps:
 
-You are using this [docker-compose.yml](docker-compose.yml) file. This will instruct to build a new image for Orion and run it linking it to a MongoDB container.
+1. Create a directory on your system on which to work (for example, `~/fiware`).
+2. Create a new file called `docker-compose.yml` inside your directory with the following contents:
+	
+		mongo:
+		  image: mongo:2.6
+		  command: --smallfiles --nojournal
+		orion:
+		  image: fiware/orion
+		  links:
+		    - mongo
+		  ports:
+		    - "1026:1026"
+		  command: -dbhost mongo
 
-### Run a container pulling an image from the cloud (recommended)
+3. Using the command-line and within the directory you created type: `sudo docker-compose up`.
 
-If you do not have or want to download the Orion repository, you can create a file called `docker-compose.yml` in a directory of your choice and fill it with the following content (uncomment the `--smallfiles` line if you host doesn't have too much free space)
+> Regarding --smallfiles, you can ommit it if your hosting machine have enough disk space. Regarding --nojournal it is not recommened for production, but it speeds up mongo container start up and avoids some race conditions problems if Orion container is faster and doesn't find the DB up and ready.
 
-	mongo:
-	  image: mongo:2.6
-      #command: --smallfiles
+After a few seconds you should have your Context Broker running and listening on port `1026`.
 
-	orion:
-	  image: fiware/orion
-	  links:
-	    - mongo
-	  ports:
-	    - "1026:1026"
-	  command: -dbhost mongo
-
-Then run
-
-	sudo docker-compose up
-
-This way is equivalent to the previous one, except that it pulls the image from the Docker Registry instead of building your own. Keep in mind though that everything is run locally. 
-
-> **Warning**
-> Everything you do with Orion Context Broker when dockerized is non-persistent. *You will lose all your data* if you turn off the MongoDB container. This happens with either this method or the manual one.
-> If you want to prevent this from happening take a look at [this link](https://registry.hub.docker.com/_/mongo/) in section *Where to Store Data* of the MongoDB docker documentation. In it you will find instructions and ideas on how to make your MongoDB data persistent.
-
-## Build the image
-
-This is an alternative approach to the one presented in the previous section. You do not need to go through these steps if you have used docker-compose. The end result will be the same, but this way you have a bit more of control of what's happening.
-
-You only need to do this once in your system:
-
-	sudo docker build -t orion .
-
-> **Note**
-> If you do not want to have to use `sudo` in this or in the next section follow [these instructions](http://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo).
-
-
-The parameter `-t orion` gives the image a name. This name could be anything, or even include an organization like `-t org/fiware-orion`. This name is later used to run the container based on the image.
-
-If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
-    
-### Run the container
-
-The following line will run the container exposing port `1026`, give it a name -in this case `orion1`, link it to a MongoDB docker, and present a bash prompt. This uses the image built in the previous section.
-
-	  sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb
-
-If you did not build the image yourself and want to use the one on Docker Hub use the following command:
-
-	  sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbhost mongodb
-
-> **Note**
-> Keep in mind that if you use this last command you get access to the tags and specific versions of Orion. For example, you may use `fiware/orion:0.22` instead of `fiware/orion` in the above command if you need that particular version. If you do not specify a version you are pulling from `latest` by default.
-
-As a result of this command, there is a context broker listening on port 1026 on localhost. Try to see if it works now with
+Check that everything works with
 
 	curl localhost:1026/version
 
+What you have done with this method is download images for [Orion Context Broker](https://hub.docker.com/r/fiware/orion/) and [MongoDB](https://hub.docker.com/_/mongo/) from the public repository of images called [Docker Hub](https://hub.docker.com/). Then you have created two containers based on both images.
 
+If you want to stop the scenario you have to press Control+C on the terminal where docker-compose is running. Note that you will lose any data that was being used in Orion using this method.
 
-A few points to consider:
+----
+## 2. Run one container
 
-* The name `orion1` can be anything and doesn't have to be related to the name given to the docker image in the previous section.
-* `--link mongodb:mongodb` assumes there is a docker container running a MongoDB image in your system,
-whose name is `mongodb`. In case you need one type `sudo docker run --name mongodb -d mongo:2.6`.
-* In `-p 1026:1026` the first value represents the port to listen on localhost. If you want to run a second context broker
+This method will launch a container running Orion Context Broker, but it is up to you to provide a MongoDB instance. This MongoDB instance may be running on localhost, other host on your network, another container, or anywhere you have network access to.
+
+> TIP: If you are trying these methods or run them more than once and come across an error saying that the container already exists you can delete it with `docker rm orion1`. If you have to stop it first do `docker stop orion1`.
+
+Keep in mind that if you use these commands you get access to the tags and specific versions of Orion. For example, you may use `fiware/orion:0.22` instead of `fiware/orion` in the following commands if you need that particular version. If you do not specify a version you are pulling from `latest` by default.
+
+### 2A. MongoDB is on localhost
+
+To do this run this command
+
+	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion
+
+Check that everything works with
+
+	curl localhost:1026/version
+
+### 2B. MongoDB runs on another docker container
+In case you want to run MongoDB on another container you can launch it like this
+
+	sudo docker run --name mongodb -d mongo:2.6
+
+And then run Orion with this command
+
+	sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbhost mongodb
+
+Check that everything works with
+
+	curl localhost:1026/version
+
+This method is functionally equivalent as the one described in section 1, but doing the steps manually instead of with a docker-compose file. You equally lose your data as soon as you turn off your MongoDB container.
+
+### 2C. MongoDB runs on a different host
+
+If you want to connect to a different MongoDB instance do the following command **instead of** the previous one
+
+	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbhost <MongoDB Host>
+
+Check that everything works with
+
+	curl localhost:1026/version
+----
+## 3. Build a docker image
+
+Building an image gives more control on what is happening within the Orion Context Broker container. Only use this method if you are familiar with building docker images or really need to change how this image is built. For most purposes you probably don't need to build an image, only deploy a container based on one already built for you (which is covered in sections 1 and 2).
+
+Steps:
+
+1. Download [Orion's source code](https://github.com/telefonicaid/fiware-orion/) from Github (`git clone https://github.com/telefonicaid/fiware-orion/`)
+2. `cd fiware-orion/docker`
+3. Modify the Dockerfile to your liking
+4. Run Orion...
+	* Using an automated scenario with docker-compose and building your new image: `sudo docker-compose up`. You may also modify the provided `docker-compose.yml` file if you need so.
+	* Manually, running MongoDB on another container: 
+		1. `sudo docker run --name mongodb -d mongo:2.6`
+		2. `sudo docker build -t orion .`
+		3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
+	* Manually, specifying where to find your MongoDB host:
+		1. `sudo docker build -t orion .`
+		2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbhost <MongoDB Host>`.
+
+Check that everything works with
+
+	curl localhost:1026/version
+
+The parameter `-t orion` in the `docker build` command gives the image a name. This name could be anything, or even include an organization like `-t org/fiware-orion`. This name is later used to run the container based on the image.
+
+If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
+
+## 4. Other info
+
+Things to keep in mind while working with docker containers and Orion Context Broker.
+
+### 4.1 Data persistence
+Everything you do with Orion Context Broker when dockerized is non-persistent. *You will lose all your data* if you turn off the MongoDB container. This will happen with either method presented in this README.
+
+If you want to prevent this from happening take a look at [this link](https://registry.hub.docker.com/_/mongo/) in section *Where to Store Data* of the MongoDB docker documentation. In it you will find instructions and ideas on how to make your MongoDB data persistent.
+
+### 4.2 Using `sudo`
+
+If you do not want to have to use `sudo` follow [these instructions](http://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo).
+
+### 4.3 Listen on different ports
+
+In `-p 1026:1026` the first value represents the port to listen on localhost. If you want to run a second context broker
 on your machine you should change this value to something else, for example `-p 1027:1026`.
-* Anything after the name of the container image (in this case `orion`) is interpreted as a parameter for the Orion Context Broker. In this case we are telling the broker where the MongoDB host is, represented by the name of our other MongoDB container. Take a look at the [documentation](https://github.com/telefonicaid/fiware-orion) for other command-line options.
-* Orion will be running on [multi-tenant](https://fiware-orion.readthedocs.org/en/develop/user/multitenancy/index.html) mode.
+
+### 4.4 Extra parameters for Orion
+
+Anything after the name of the container image (`orion` if you are building, or `fiware/orion` if you are pulling from the repository) is interpreted as a parameter for the Orion Context Broker. In this case we are telling the broker where the MongoDB host is, represented by the name of our other MongoDB container. Take a look at the [documentation](https://github.com/telefonicaid/fiware-orion) for other command-line options.
+
+Orion will be running on [multi-tenant](https://fiware-orion.readthedocs.org/en/develop/user/multitenancy/index.html) mode.
+   

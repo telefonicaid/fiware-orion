@@ -61,7 +61,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     }
     break;
 
-  case EntityRequest:  // POST /v2/entities/<eid>
+  case EntityRequest:  // POST|PUT /v2/entities/<eid>
     releaseP->entity = &parseDataP->ent.res;
     answer = parseEntity(ciP, &parseDataP->ent.res, true);
     if (answer != "OK")

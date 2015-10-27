@@ -27,6 +27,7 @@ Ignoring service header when not running in multiservice mode
 dbInit CB
 dbInit ${CB_DATABASE_NAME}-foo
 dbResetAll
+echo "show dbs" | mongo | grep ${CB_DATABASE_NAME} | awk '{ print $1 }'
 
 brokerStart CB 0-255 IPV4
 
@@ -66,7 +67,7 @@ echo "show dbs" | mongo | grep ${CB_DATABASE_NAME}-foo | wc -l
 # Next line was added in PR https://github.com/telefonicaid/fiware-orion/pull/1184/files#r37738638
 # in order to help us to detect where the CB-CB-CB-... problem is. It could happen that
 # after fixing #1186 this is no longer needed, but let's keep it for a while as a "quarentine" measure...
-echo "show dbs" | mongo | grep CB | awk '{ print $1 }'
+echo "show dbs" | mongo | grep ${CB_DATABASE_NAME} | awk '{ print $1 }'
 
 --REGEXPECT--
 1. Create an entity using foo as tenant

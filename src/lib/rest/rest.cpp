@@ -22,6 +22,12 @@
 *
 * Author: Ken Zangelin
 */
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 #include <string>
 #include <map>
 
@@ -38,13 +44,8 @@
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
+#include "mongoBackend/MongoGlobal.h"  // MAX_SERVICE_NAME_LEN
 
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/select.h>
-#include <sys/socket.h>
-
-#include <netdb.h>
 
 
 /* ****************************************************************************
@@ -935,7 +936,6 @@ static int connectionTreat
     LM_TRANSACTION_START("from", ip, port, url);  // Incoming REST request starts
 
 
-
     //
     // URI parameters
     // 
@@ -952,7 +952,7 @@ static int connectionTreat
 
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
-    char tenant[128];
+    char tenant[MAX_SERVICE_NAME_LEN + 1];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
@@ -1257,16 +1257,6 @@ void restInit
   else
   {
     strncpy(bindIp, _bindAddress, MAX_LEN_IP - 1);
-  }
-
-  if ((_ipVersion == IPV4) || (_ipVersion == IPDUAL))
-  {
-     strncpy(bindIp, bindIp, MAX_LEN_IP - 1);
-  }
-
-  if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
-  {
-     strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
   }
 
   // Starting REST interface

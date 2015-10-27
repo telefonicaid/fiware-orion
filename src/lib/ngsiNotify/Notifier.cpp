@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
+#include "common/statistics.h"
 #include "ngsi10/NotifyContextRequest.h"
 
 #include "onTimeIntervalThread.h"
@@ -112,18 +113,26 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    httpRequestSend(host,
-                    port,
-                    protocol,
-                    "POST",
-                    tenant,
-                    spathList,
-                    xauthToken,
-                    uriPath,
-                    content_type,
-                    payload,
-                    true,
-                    NOTIFICATION_WAIT_MODE);
+    std::string r;
+
+    r = httpRequestSend(host,
+                        port,
+                        protocol,
+                        "POST",
+                        tenant,
+                        spathList,
+                        xauthToken,
+                        uriPath,
+                        content_type,
+                        payload,
+                        true,
+                        NOTIFICATION_WAIT_MODE);
+
+    if ((r != "") && (r != "error"))
+    {
+      statisticsUpdate(NotifyContextSent, format);
+    }
+
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -140,6 +149,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->resource      = uriPath;
     params->content_type  = content_type;
     params->content       = payload;
+    params->format        = format;
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);

@@ -111,6 +111,7 @@ static int attributeValue(xml_node<>* node, ParseData* reqData)
   //       directly to ParseData::UpdateContextAttributeData::res, finding compoundValueP
   //
   reqData->upcar.res.typeFromXmlAttribute = xmlTypeAttributeGet(node);
+  reqData->upcar.res.valueType            = orion::ValueTypeString;
   reqData->upcar.res.contextValue         = node->value();
 
   return 0;

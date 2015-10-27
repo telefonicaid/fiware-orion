@@ -24,6 +24,7 @@
 */
 #include "common/statistics.h"
 #include "ngsi/Request.h"
+#include "logMsg/logMsg.h"
 
 
 
@@ -33,6 +34,7 @@
 */
 int noOfJsonRequests                                     = -1;
 int noOfXmlRequests                                      = -1;
+int noOfRequestsWithoutPayload                           = -1;
 int noOfRegistrations                                    = -1;
 int noOfRegistrationErrors                               = -1;
 int noOfRegistrationUpdates                              = -1;
@@ -155,10 +157,14 @@ void statisticsUpdate(RequestType request, Format inFormat)
   {
      ++noOfXmlRequests;
   }
-
-  if (inFormat == JSON)
+  else if (inFormat == JSON)
   {
     ++noOfJsonRequests;
+  }
+  else if (inFormat == NOFORMAT)
+  {
+    // FIXME P4: Include this counter in the statistics (Issue #1400)
+    ++noOfRequestsWithoutPayload;
   }
 
   switch (request)
@@ -175,6 +181,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case UpdateContextSubscription:                        ++noOfSubscriptionUpdates; break;
   case UnsubscribeContext:                               ++noOfUnsubscriptions; break;
   case NotifyContext:                                    ++noOfNotificationsReceived; break;
+  case NotifyContextSent:                                ++noOfNotificationsSent; break;
   case UpdateContext:                                    ++noOfUpdates; break;
   case RtQueryContextResponse:                           ++noOfQueryContextResponses; break;
   case RtUpdateContextResponse:                          ++noOfUpdateContextResponses; break;
@@ -247,6 +254,5 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntityAllTypesRequest:                            ++noOfEntityAllTypesRequest; break;
   case SubscriptionsRequest:                             ++noOfSubscriptionsRequest; break;
   case IndividualSubscriptionRequest:                    ++noOfIndividualSubscriptionRequest; break;
-
   }
 }

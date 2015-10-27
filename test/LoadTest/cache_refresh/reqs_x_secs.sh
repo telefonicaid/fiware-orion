@@ -25,10 +25,23 @@ if [  "$1" == ""  ]
   then
     echo "ERROR - No url defined (Mandatory)"
     echo "usage:"
-    echo "    ./reqs_x_secs.sh <url> "
+    echo "    ./reqs_x_secs.sh <url> [-reset]"
     echo "    example: ./reqs_x_secs.sh localhost:4567 "
+    echo ""
+    echo " the -reset parameter is used to reset the listener previously."
+    echo ""
+    echo "           ( use [ Ctrl+C ] to stop )"
     exit
 fi
+
+if [  "$2" == "-reset"  ]
+  then
+     curl -s $1/reset > /dev/null
+     echo ""
+     echo " WARN - The listener has been reset... "
+     echo ""
+fi
+
 
 echo "Show requests x seconds (TPS)... [CTRL+C] to stop!"
 echo "--------------------------------------------------------------"
@@ -37,6 +50,8 @@ echo "     seconds    each sec      total        to last request"
 echo "---------------------------------------------------------------"
 sec=0
 req=0
+
+
 while true
 do
   sleep 1s

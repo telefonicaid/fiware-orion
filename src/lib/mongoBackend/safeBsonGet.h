@@ -1,7 +1,9 @@
-#ifndef SENDERTHREAD_H
-#define SENDERTHREAD_H
+#ifndef SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
+#define SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
 
-/* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+/*
+*
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -21,48 +23,44 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermín Galán Márquez
+* Author: Fermin Galan Marquez
 */
-#include <string>
 
-#include "common/Format.h"
-
-
+#include "mongo/client/dbclient.h"
 
 /* ****************************************************************************
 *
-* NOTIFICATION_WAIT_MODE - 
+* getObjectField -
+*
 */
-#define NOTIFICATION_WAIT_MODE false
-
-
+extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *
-* SenderThreadParams - 
+* getStringField -
+*
 */
-typedef struct SenderThreadParams
-{
-  std::string    ip;
-  unsigned short port;
-  std::string    protocol;
-  std::string    verb;
-  std::string    tenant;
-  std::string    servicePath;
-  std::string    xauthToken;
-  std::string    resource;
-  std::string    content_type;
-  std::string    content;
-  char           transactionId[64];
-  Format         format;
-} SenderThreadParams;
-
-
+extern std::string getStringField(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *
-* startSenderThread -
+* getIntField -
+*
 */
-extern void* startSenderThread(void* params);
+extern int getIntField(const mongo::BSONObj& b, const std::string& field);
 
-#endif
+/* ****************************************************************************
+*
+* getBoolField -
+*
+*/
+extern bool getBoolField(const mongo::BSONObj& b, const std::string& field);
+
+/* ****************************************************************************
+*
+* getField -
+*
+*/
+extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field);
+
+#endif // SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
