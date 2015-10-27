@@ -33,3 +33,4 @@ Add:  Hardening: mongoBackend checking for field existence and proper type to av
 Add:  githash in --version (Issue #1363)
 Add:  Added CLI argument for notification mode. Default mode is 'transient' (previous version used 'permanent' implicitly) (Issue #1370)
 Add:  Added CLI argument for connection memory limit.  Default value is 64Kb (Issue #1384)
+Add:  Hardening: safer way of processing query results at mongoBackend (Issue #704)
