@@ -61,5 +61,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-cprForwardLimit' <maximum number of forwarded requests to Context Providers for a single client request>]
                       [option '-subCacheIval' <interval in seconds between calls to Subscription Cache refresh>]
                       [option '-notificationMode' <notification mode (persistent|transient|none)>]
+                      [option '-connectionMemory' <maximum memory size per connection in kilobytes>]
 
 --TEARDOWN--
