@@ -1082,7 +1082,7 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
     }
     else
     {
-      printf("\nNo OP found\n");
+      //printf("\nNo OP found\n");
       op    = (char*) "";
       right = (char*) "";
     }
@@ -1263,7 +1263,7 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
     }
     else if (std::string(op) == ">")
     {
-     f = BSON(k << BSON("$gt" << atof(right)));
+      f = BSON(k << BSON("$gt" << atof(right)));
     }
     else if (std::string(op) == "<")
     {
