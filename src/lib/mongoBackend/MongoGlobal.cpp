@@ -513,7 +513,17 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   // Call the treat function for each subscription
   while (cursor->more())
   {
-    BSONObj sub = cursor->next();
+    BSONObj sub;
+    try
+    {
+      sub = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
 
     treatFunction(tenant, sub);
   }
@@ -1521,14 +1531,16 @@ bool entitiesQuery
   /* Process query result */
   while (cursor->more())
   {
-    BSONObj                 r    = cursor->next();
-    std::string             err  = getStringField(r, "$err");
-    ContextElementResponse* cer  = new ContextElementResponse();
-
-    LM_T(LmtMongo, ("result: %s", r.toString().c_str()));
-
-    if (err != "")
+    BSONObj                  r;
+    ContextElementResponse*  cer  = new ContextElementResponse();
+    try
     {
+      r = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      std::string err = e.what();
+
       //
       // We can't return the error 'as is', as it may contain forbidden characters.
       // So, we can just match the error and send a less descriptive text.
@@ -1546,7 +1558,6 @@ bool entitiesQuery
       {
         err = defaultErrorString;
       }
-
 
       //
       // It would be nice to fill in the entity but it is difficult to do this.
@@ -2080,8 +2091,17 @@ bool registrationsQuery
   /* Process query result */
   while (cursor->more())
   {
-    BSONObj r = cursor->next();
-
+    BSONObj r;
+    try
+    {
+      r = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     //

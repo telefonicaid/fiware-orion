@@ -1181,7 +1181,17 @@ static bool addTriggeredSubscriptions_withCache
   /* For each of the subscriptions found, add it to the map (if not already there) */
   while (cursor->more())
   {
-    BSONObj      sub      = cursor->next();
+    BSONObj sub;
+    try
+    {
+      sub = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
     BSONElement  idField  = getField(sub, "_id");
 
     //
@@ -1393,8 +1403,18 @@ static bool addTriggeredSubscriptions_noCache
   /* For each one of the subscriptions found, add it to the map (if not already there) */
   while (cursor->more())
   {
-    BSONObj      sub      = cursor->next();
-    BSONElement  idField  = getField(sub, "_id");
+    BSONObj sub;
+    try
+    {
+      sub = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    BSONElement  idField  = sub.getField("_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -2482,8 +2502,17 @@ void processContextElement
 
   while (cursor->more())
   {
-    BSONObj r = cursor->next();
-
+    BSONObj r;
+    try
+    {
+      r = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
     ++docs;
 

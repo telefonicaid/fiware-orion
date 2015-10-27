@@ -66,7 +66,17 @@ static std::string attributeType
 
   while (cursor->more())
   {
-    BSONObj r = cursor->next();
+    BSONObj r;
+    try
+    {
+      r = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
