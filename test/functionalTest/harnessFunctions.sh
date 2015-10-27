@@ -94,6 +94,7 @@ function dMsg()
 function dbInitTenant()
 {
   role=$1
+
   
   host="${CB_DATABASE_HOST}"
   if [ "$host" == "" ]
@@ -107,22 +108,22 @@ function dbInitTenant()
     port="27017"
   fi
   
-  db=$host:$port/$1
+  db=$host:$port/$1 
 
   dMsg initializing database;
 
-  if [ "$role" == "CB  t1" ]
+  if [ "$role" == "CB t1" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DATABASE_NAME} --quiet
-  elif [ "$role" == "CB  t2" ]
+    echo 'db.dropDatabase()' | mongo $host:$port/${CBT1_DATABASE_NAME} --quiet
+  elif [ "$role" == "CB t2" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DATABASE_NAME} --quiet
-  elif [ "$role" == "CP1  t1" ]
+    echo 'db.dropDatabase()' | mongo $host:$port/${CBT2_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP1 t1" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DATABASE_NAME} --quiet
-  elif [ "$role" == "CP1  t2" ]
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP1T1_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP1 t2" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP2_DATABASE_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP1T2_DATABASE_NAME} --quiet
   else
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi
@@ -177,6 +178,7 @@ function dbInit()
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi
 }
+
 
 
 # ------------------------------------------------------------------------------
@@ -1299,7 +1301,6 @@ export -f brokerStart
 export -f localBrokerStop
 export -f localBrokerStart
 export -f brokerStop
-export -f localBrokerStop
 export -f proxyCoapStart
 export -f proxyCoapStop
 export -f accumulatorStart
