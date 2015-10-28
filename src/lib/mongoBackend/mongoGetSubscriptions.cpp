@@ -37,6 +37,8 @@
 
 using namespace ngsiv2;
 
+
+
 /* ****************************************************************************
 *
 * setSubscriptionId -
@@ -97,7 +99,6 @@ static void setSubject(Subscription* s, const BSONObj& r)
   // subject.condition.expression cannot be filled. The implemetion will be enhanced once
   // the DB model gets defined
   // TBD
-
 }
 
 
@@ -126,8 +127,8 @@ static void setNotification(Subscription* s, const BSONObj& r)
 
   // Count
   s->notification.timesSent = r.hasField(CSUB_COUNT) ? getField(r, CSUB_COUNT).numberLong() : -1;
-
 }
+
 
 
 /* ****************************************************************************
@@ -142,8 +143,9 @@ static void setExpires(Subscription* s, const BSONObj& r)
   // Status
   // FIXME P10: use a enum for this
   s->status = s->expires > getCurrentTime() ? "active" : "expired";
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -151,17 +153,16 @@ static void setExpires(Subscription* s, const BSONObj& r)
 */
 void mongoListSubscriptions
 (
-  std::vector<Subscription>            *subs,
-  OrionError                           *oe,
+  std::vector<Subscription>*           subs,
+  OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
   int                                  limit,
   int                                  offset,
-  long long                            *count
+  long long*                           count
 )
 {
-
-  bool           reqSemTaken = false;
+  bool  reqSemTaken = false;
 
   reqSemTake(__FUNCTION__, "Mongo List Subscriptions", SemReadOp, &reqSemTaken);
 

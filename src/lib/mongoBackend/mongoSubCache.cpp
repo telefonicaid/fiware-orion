@@ -22,6 +22,25 @@
 *
 * Author: Ken Zangelin
 */
+
+/*
+*
+* The mongo subscription cache maintains in memory all subscriptions of type ONCHANGE that has
+* a patterned Entity::id. The reason for this cache is to avoid a very slow mongo operation ... (Fermin)
+*
+* The cache is implementged in mongoBackend/mongoSubCache.cpp/h and used in:
+*   - MongoCommonUpdate.cpp               (function addTriggeredSubscriptions_withCache)
+*   - mongoSubscribeContext.cpp           (function mongoSubscribeContext)
+*   - mongoUnsubscribeContext.cpp         (function mongoUnsubscribeContext)
+*   - mongoUpdateContextSubscription.cpp  (function mongoUpdateContextSubscription)
+*   - mongoSubCache.cpp                   (function mongoSubCacheRefresh)
+*
+* To manipulate the subscription cache, a semaphore is necessary, as various threads can be
+* reading/inserting/removing subs at the same time.
+* This semaphore is NOT optional, like the mongo request semaphore.
+*
+* Two functions have been added to common/sem.cpp|h for this: cacheSemTake/Give.
+*/
 #include <string>
 #include <regex.h>
 
@@ -29,6 +48,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/sem.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -1182,11 +1203,9 @@ static void mongoSubCacheRefresh(std::string database)
 void mongoSubCacheRefresh(void)
 {
   std::vector<std::string> databases;
-  bool                     reqSemTaken;
 
   LM_T(LmtMongoSubCache, ("Refreshing subscription cache"));
-  reqSemTake(__FUNCTION__, "subscription cache", SemReadOp, &reqSemTaken);
-  LM_T(LmtMongoSubCache, ("Refreshing subscription cache"));
+  cacheSemTake(__FUNCTION__, "subscription cache for refresh");
 
 
   // Empty the cache
@@ -1209,7 +1228,7 @@ void mongoSubCacheRefresh(void)
   ++mongoSubCache.noOfRefreshes;
   LM_T(LmtMongoSubCache, ("Refreshed subscription cache [%d]", mongoSubCache.noOfRefreshes));
 
-  reqSemGive(__FUNCTION__, "subscription cache", reqSemTaken);
+  cacheSemGive(__FUNCTION__, "subscription cache for refresh");
 }
 
 

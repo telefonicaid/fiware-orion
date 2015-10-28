@@ -113,6 +113,7 @@ typedef enum TraceLevels
   LmtReqSem = 200,
   LmtMongoSem,
   LmtTransSem,
+  LmtCacheSem,
 
   /* Others (>=210) */
   LmtCm = 210,

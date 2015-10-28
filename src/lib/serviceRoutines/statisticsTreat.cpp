@@ -145,6 +145,7 @@ std::string statisticsTreat
 
     semTimeReqReset();
     semTimeTransReset();
+    semTimeCacheReset();
     mongoPoolConnectionSemWaitingTimeReset();
     mutexTimeCCReset();
 
@@ -472,6 +473,10 @@ std::string statisticsTreat
     char transSemaphoreWaitingTime[64];
     semTimeTransGet(transSemaphoreWaitingTime, sizeof(transSemaphoreWaitingTime));
     out += TAG_ADD_STRING("transactionSemaphoreWaitingTime", transSemaphoreWaitingTime);
+
+    char cacheSemaphoreWaitingTime[64];
+    semTimeCacheGet(cacheSemaphoreWaitingTime, sizeof(cacheSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("subCacheSemaphoreWaitingTime", cacheSemaphoreWaitingTime);
 
     char ccMutexWaitingTime[64];
     mutexTimeCCGet(ccMutexWaitingTime, sizeof(ccMutexWaitingTime));

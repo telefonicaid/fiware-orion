@@ -248,9 +248,12 @@ HttpStatusCode mongoUpdateContextSubscription
 
 
   // 0. Lookup matching subscription in subscription-cache
-  CachedSubscription*  cSubP           = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
-  char*                subscriptionId  = (char*) requestP->subscriptionId.get().c_str();
-  char*                servicePath     = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
+
+  cacheSemTake(__FUNCTION__, "Updating cached subscription");
+
+  CachedSubscription*  cSubP            = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  char*                subscriptionId   = (char*) requestP->subscriptionId.get().c_str();
+  char*                servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
   LM_T(LmtMongoSubCache, ("update: %s", newSubObject.toString().c_str()));
 
@@ -262,11 +265,12 @@ HttpStatusCode mongoUpdateContextSubscription
     mongoSubCacheItemRemove(cSubP);
   }
 
-  if (mscInsert == 0)  // OInsertion was really made
+  if (mscInsert == 0)  // 0: Insertion was really made
   {
     mongoSubCacheUpdateStatisticsIncrement();
   }
 
+  cacheSemGive(__FUNCTION__, "Updating cached subscription");
   reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
   return SccOk;

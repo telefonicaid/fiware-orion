@@ -239,11 +239,11 @@ int             dbPoolSize;
 char            reqMutexPolicy[16];
 bool            mutexTimeStat;
 int             writeConcern;
-unsigned        cprForwardLimit;
+unsigned int    cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
 bool            noCache;
-unsigned        connectionMemory;
+unsigned int    connectionMemory;
 
 
 
@@ -1491,18 +1491,6 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
-
-  //
-  // FIXME P8: for release 0.25, -reqMutexPolicy != "all" ("all" is default) must
-  //           be able to be used together with mongo subscription cache.
-  //           The current limitation will be fixed for next release (0.25.0)
-  //           See issue #1401
-  //
-  if ((strcmp(reqMutexPolicy, "all") != 0) && (noCache == false))
-  {
-    LM_E(("This must be fixed for the 0.25.0 release!!!"));
-    exit(1);
-  }
 
 #ifdef DEBUG_develenv
   //
