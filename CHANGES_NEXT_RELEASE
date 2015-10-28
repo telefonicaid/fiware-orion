@@ -27,11 +27,10 @@ Add:  Functional test to PUT/POST/PATCH with 'empty' JSON object as payload (Iss
 Fix:  performance problem in NGSIv2 API due to uncontrolled log trace printing
 Add:  empty attribute values supported in NGSIv1 API operations (Issue #1358)
 Fix:  Recovering $where from 0.23.0 code bases to search for subscriptions (-noCache flag)
-Fix:  Fixed broken subscription cache (Issue #1308)
 Fix:  Improve error description in NGSIv2 PUT entity, when entity is not found  (Issue #1320)
 Add:  Hardening: mongoBackend checking for field existence and proper type to avoid broker crashes due to DB corruption (Issue #136)
 Add:  githash in --version (Issue #1363)
 Add:  Added CLI argument for notification mode. Default mode is 'transient' (previous version used 'permanent' implicitly) (Issue #1370)
 Add:  Added CLI argument for connection memory limit.  Default value is 64Kb (Issue #1384)
 Fix:  Separate semahpore for subscription cache, so that sub cache is independent of mutex policy (Issue #1401)
-Add:  Hardening: safer way of processing query results at mongoBackend (Issue #704)
+Fix:  Fixed broken subscription cache (Issue #1308), including the semaphore for subscription cache (#1401)
