@@ -155,12 +155,12 @@ void mongoListSubscriptions
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
   int                                  limit,
-  int                                  offset
+  int                                  offset,
+  long long                            *count
 )
 {
 
   bool           reqSemTaken = false;
-  long long      count       = 0LL;
 
   reqSemTake(__FUNCTION__, "Mongo List Subscriptions", SemReadOp, &reqSemTaken);
 
@@ -176,7 +176,7 @@ void mongoListSubscriptions
 
   q.sort(BSON("_id" << 1));
 
-  if (!collectionRangedQuery(getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, &count, &err))
+  if (!collectionRangedQuery(getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, count, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);

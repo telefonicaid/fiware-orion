@@ -44,7 +44,8 @@ extern void mongoListSubscriptions
   std::map<std::string, std::string>& uriParam,
   const std::string&                  tenant,
   int                                 limit,
-  int                                 offset
+  int                                 offset,
+  long long                           *count
 );
 
 /* ****************************************************************************
