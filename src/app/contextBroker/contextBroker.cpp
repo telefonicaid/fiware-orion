@@ -243,6 +243,7 @@ unsigned        cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
 bool            noCache;
+unsigned        connectionMemory;
 
 
 
@@ -283,8 +284,7 @@ bool            noCache;
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
 #define NO_CACHE               "disable subscription cache for lookups"
-
-
+#define CONN_MEMORY_DESC       "maximum memory size per connection in kilobytes"
 
 /* ****************************************************************************
 *
@@ -326,6 +326,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     UINT_MAX, CONN_MEMORY_DESC       },
 
   PA_END_OF_ARGS
 };
