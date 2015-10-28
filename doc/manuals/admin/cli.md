@@ -136,6 +136,6 @@ The list of available options is the following:
       notifications are not sent, but recorded internally and shown in the [statistics](management_api.md#statistics)
       operation (`droppedNotifications` counter). This can be useful to calculate a maximum upper limit
       in notification rate from a CB internal logic point of view.
--   **-connectionMemory. sets the size of the connection memory buffer (in Kb) per connection used internally
+-   **-connectionMemory**. sets the size of the connection memory buffer (in Kb) per connection used internally
        by the HTTP server library. Default value is 64 Kb.
 
