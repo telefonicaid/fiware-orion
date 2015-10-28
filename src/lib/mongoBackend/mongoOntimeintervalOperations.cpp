@@ -75,7 +75,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo
         BSONObj entity = entities[ix].embeddedObject();
         EntityId* enP = new EntityId;
         enP->id = getStringField(entity, CSUB_ENTITY_ID);
-        enP->type = getStringField(entity, CSUB_ENTITY_TYPE);
+        enP->type = entity.hasField(CSUB_ENTITY_TYPE) ? getStringField(entity, CSUB_ENTITY_TYPE) : "";
         enP->isPattern = getStringField(entity, CSUB_ENTITY_ISPATTERN);
         csiP->entityIdVector.push_back(enP);
 
@@ -85,8 +85,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo
         csiP->attributeList.push_back(attrs[ix].String());
     }
 
-    BSONElement be = getField(sub, CSUB_EXPIRATION);
-    csiP->expiration = be.numberLong();
+    csiP->expiration = getField(sub, CSUB_EXPIRATION).numberLong();
 
     csiP->url = getStringField(sub, CSUB_REFERENCE);
     if (sub.hasElement(CSUB_LASTNOTIFICATION)) {

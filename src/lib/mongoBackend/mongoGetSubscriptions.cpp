@@ -59,7 +59,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     BSONObj ent           = ents[ix].embeddedObject();
     std::string id        = getStringField(ent, CSUB_ENTITY_ID);
-    std::string type      = getStringField(ent, CSUB_ENTITY_TYPE);
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE) ? getStringField(ent, CSUB_ENTITY_TYPE) : "";
     std::string isPattern = getStringField(ent, CSUB_ENTITY_ISPATTERN);
 
     EntID en;

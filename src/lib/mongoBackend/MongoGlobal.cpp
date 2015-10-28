@@ -552,7 +552,7 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 
     if (strcmp(getStringField(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
-      int interval = getIntField(condition, CSUB_CONDITIONS_VALUE);
+      int interval = getField(condition, CSUB_CONDITIONS_VALUE).numberLong();
 
       LM_T(LmtNotifier, ("creating ONTIMEINTERVAL thread for subscription '%s' with interval %d (tenant '%s')",
                          subId.c_str(),
@@ -2151,7 +2151,7 @@ EntityIdVector subToEntityIdVector(BSONObj sub)
   {
     BSONObj    subEnt = subEnts[ix].embeddedObject();
     EntityId*  en     = new EntityId(getStringField(subEnt, CSUB_ENTITY_ID),
-                                     getStringField(subEnt, CSUB_ENTITY_TYPE),
+                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringField(subEnt, CSUB_ENTITY_TYPE) : "",
                                      getStringField(subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
