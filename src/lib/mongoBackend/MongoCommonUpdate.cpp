@@ -1225,8 +1225,9 @@ static bool addTriggeredSubscriptions_withCache
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
 
-  std::vector<CachedSubscription*> subVec;
+  std::vector<CachedSubscription*>  subVec;
 
+  cacheSemTake(__FUNCTION__, "match subs for notifications");
   mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
 
   int now = getCurrentTime();
@@ -1287,6 +1288,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->tenant);
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
+
+  cacheSemGive(__FUNCTION__, "match subs for notifications");
 
   return true;
 }
@@ -1533,7 +1536,9 @@ static bool processSubscriptions
         //
         if (trigs->cacheSubId != "")
         {
-          CachedSubscription* cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
+          cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
+
+          CachedSubscription*  cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
 
           if (cSubP != NULL)
           {
@@ -1555,6 +1560,8 @@ static bool processSubscriptions
             LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
                   trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
           }
+
+          cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
         }
       }
       else

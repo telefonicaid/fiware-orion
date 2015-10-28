@@ -44,8 +44,8 @@
 */
 HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, const std::string& tenant)
 {
-    bool        reqSemTaken;
-    std::string err;
+    bool         reqSemTaken;
+    std::string  err;
 
     reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
 
@@ -118,13 +118,17 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     // Removing subscription from mongo subscription cache
     //
     LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
-    CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
+    cacheSemTake(__FUNCTION__, "Removing subscription from cache");
+
+    CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
     if (cSubP != NULL)  // Will only enter here if wildcard subscription
     {
       mongoSubCacheItemRemove(cSubP);
     }
+
+    cacheSemGive(__FUNCTION__, "Removing subscription from cache");
 
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
 

@@ -41,6 +41,7 @@
 */
 static sem_t           reqSem;
 static sem_t           transSem;
+static sem_t           cacheSem;
 static SemRequestType  reqPolicy;
 
 
@@ -51,6 +52,7 @@ static SemRequestType  reqPolicy;
 */
 static struct timespec accReqSemTime   = { 0, 0 };
 static struct timespec accTransSemTime = { 0, 0 };
+static struct timespec accCacheSemTime = { 0, 0 };
 
 
 
@@ -77,6 +79,12 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
   if (sem_init(&transSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'transactionId' semaphore: %s)", strerror(errno)));
+    return -1;
+  }
+
+  if (sem_init(&cacheSem, shared, takenInitially) == -1)
+  {
+    LM_E(("Runtime Error (error initializing 'cache' semaphore: %s)", strerror(errno)));
     return -1;
   }
 
@@ -195,6 +203,24 @@ void semTimeTransGet(char* buf, int bufLen)
 
 /* ****************************************************************************
 *
+* semTimeCacheGet - get accumulated cache semaphore waiting time
+*/
+void semTimeCacheGet(char* buf, int bufLen)
+{
+  if (semTimeStatistics)
+  {
+    snprintf(buf, bufLen, "%lu.%09d", accCacheSemTime.tv_sec, (int) accCacheSemTime.tv_nsec);
+  }
+  else
+  {
+    snprintf(buf, bufLen, "Disabled");
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * semTimeReqReset - 
 */
 void semTimeReqReset(void)
@@ -213,6 +239,18 @@ void semTimeTransReset(void)
 {
   accTransSemTime.tv_sec  = 0;
   accTransSemTime.tv_nsec = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* semTimeCacheReset - 
+*/
+void semTimeCacheReset(void)
+{
+  accCacheSemTime.tv_sec  = 0;
+  accCacheSemTime.tv_nsec = 0;
 }
 
 
@@ -247,6 +285,42 @@ int transSemTake(const char* who, const char* what)
   }
 
   LM_T(LmtTransSem, ("%s has the 'trans' semaphore", who));
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
+* cacheSemTake -
+*/
+int cacheSemTake(const char* who, const char* what)
+{
+  int r;
+
+  LM_T(LmtCacheSem, ("%s taking the 'cache' semaphore for '%s'", who, what));
+
+  struct timespec startTime;
+  struct timespec endTime;
+  struct timespec diffTime;
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &startTime);
+  }
+
+  r = sem_wait(&cacheSem);
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &endTime);
+
+    clock_difftime(&endTime, &startTime, &diffTime);
+    clock_addtime(&accCacheSemTime, &diffTime);
+  }
+
+  LM_T(LmtCacheSem, ("%s has the 'cache' semaphore", who));
 
   return r;
 }
@@ -297,9 +371,29 @@ int transSemGive(const char* who, const char* what)
 }
 
 
+
 /* ****************************************************************************
- *  curl context
- */
+*
+* cacheSemGive -
+*/
+int cacheSemGive(const char* who, const char* what)
+{
+  if (what != NULL)
+  {
+    LM_T(LmtCacheSem, ("%s gives the 'cache' semaphore for '%s'", who, what));
+  }
+  else
+  {
+    LM_T(LmtCacheSem, ("%s gives the 'cache' semaphore", who));
+  }
+
+  return sem_post(&cacheSem);
+}
+
+
+/* ****************************************************************************
+*  curl context
+*/
 
 
 static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
