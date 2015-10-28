@@ -187,7 +187,17 @@ void mongoListSubscriptions
   /* Process query result */
   while (cursor->more())
   {
-    BSONObj r = cursor->next();
+    BSONObj r;
+    try
+    {
+      r = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     Subscription s;
@@ -237,7 +247,19 @@ void mongoGetSubscription
   /* Process query result */
   if (cursor->more())
   {
-    BSONObj r = cursor->next();
+    BSONObj r;
+    try
+    {
+      r = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      // $err raised
+      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+      *oe = OrionError(SccReceiverInternalError, std::string("Assertion exception in nextSafe(): ") + e.what());
+      return;
+    }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     setSubscriptionId(sub, r);
