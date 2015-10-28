@@ -34,3 +34,4 @@ Add:  Added CLI argument for notification mode. Default mode is 'transient' (pre
 Add:  Added CLI argument for connection memory limit.  Default value is 64Kb (Issue #1384)
 Fix:  Fixed broken subscription cache (Issue #1308), including the semaphore for subscription cache (#1401)
 Fix:  compound attribute values support in CPr update forwardking (Issue #1440)
+Fix:  [BUG] when is exceeded the index key limit in mongo (Issue #1289)
