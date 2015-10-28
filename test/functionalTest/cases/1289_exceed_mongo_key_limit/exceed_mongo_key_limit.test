@@ -30,8 +30,8 @@ brokerStart CB 0
 --SHELL--
 
 #
-# 01. POST /v2/entities (Room1-Room)
-# 02. POST /v2/entities (Room1-Room)
+# 01. POST /v2/entities (Room1)
+# 02. POST /v2/entities (Room1)
 #
 
 echo "01. POST /v2/entities (Room1)"
