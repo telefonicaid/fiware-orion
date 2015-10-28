@@ -34,6 +34,12 @@
 #include "serviceRoutines/postUpdateContext.h"
 
 
+static bool legalEntityLength(Entity* eP, const std::string &servicePath)
+{
+  const int constant = 10;
+  return (servicePath.size() + eP->id.size() + eP->type.size() + constant) < 1024;
+}
+
 
 /* ****************************************************************************
 *
@@ -61,6 +67,14 @@ std::string postEntities
 )
 {
   Entity*  eP = &parseDataP->ent.res;
+
+  if (!legalEntityLength(eP, ciP->servicePath))
+  {
+    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination");
+    ciP->httpStatusCode = SccBadRequest;
+    eP->release();
+    return oe.render(ciP, "");
+  }
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "APPEND_STRICT");
