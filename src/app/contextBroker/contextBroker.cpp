@@ -239,11 +239,11 @@ int             dbPoolSize;
 char            reqMutexPolicy[16];
 bool            mutexTimeStat;
 int             writeConcern;
-unsigned        cprForwardLimit;
+unsigned int    cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
 bool            noCache;
-unsigned        connectionMemory;
+unsigned int    connectionMemory;
 
 
 
