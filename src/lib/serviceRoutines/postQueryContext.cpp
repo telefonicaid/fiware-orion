@@ -155,7 +155,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   if ((out == "error") || (out == ""))
   {
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
-    LM_E(("Runtime Error (error forwarding 'Query' to providing application)"));
+    LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }
 
