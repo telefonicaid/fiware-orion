@@ -47,6 +47,7 @@
 #include "mongoBackend/MongoGlobal.h"  // MAX_SERVICE_NAME_LEN
 
 
+extern unsigned connectionMemory;
 
 /* ****************************************************************************
 *
@@ -1097,7 +1098,7 @@ static int connectionTreat
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   bool   mhdStartError = true;
-  size_t memoryLimit   = 2 * PAYLOAD_SIZE;
+  size_t memoryLimit   = connectionMemory * 1024; // connectionMemory are kilobytes
 
   if (port == 0)
   {

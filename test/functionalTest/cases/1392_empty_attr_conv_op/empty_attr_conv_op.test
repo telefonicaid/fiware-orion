@@ -1,0 +1,338 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSIv1: Empty attribute values with convops
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with empty value
+# 02. GET E1 and see empty value
+# 03. Update E1 with non-empty value (foo)
+# 04. GET E1 and see non-empty value (foo)
+# 05. Update E1 with empty value
+# 06. GET E1 and see empty value
+# 07. Update E1 with non-empty value (bar)
+# 08. GET E1 and see non-empty value (bar)
+# 09. Update E1 with absent value
+# 10. GET E1 and see attribute hasn't changed (bar)
+#
+
+
+echo "01. Create E1 with empty value"
+echo "=============================="
+payload='{
+   "type": "T",
+   "value": ""
+}'
+orionCurl --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+echo
+echo
+
+
+echo "02. GET E1 and see empty value"
+echo "=============================="
+orionCurl --url /v1/contextEntities/E1 --json
+echo
+echo
+
+
+echo "03. Update E1 with non-empty value (foo)"
+echo "========================================"
+payload='{
+   "type": "T",
+   "value": "foo"
+}'
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+echo
+echo
+
+
+echo "04. GET E1 and see non-empty value (foo)"
+echo "========================================"
+orionCurl --url /v1/contextEntities/E1 --json
+echo
+echo
+
+
+echo "05. Update E1 with empty value"
+echo "=============================="
+payload='{
+   "type": "T",
+   "value": ""
+}'
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+echo
+echo
+
+
+echo "06. GET E1 and see empty value"
+echo "=============================="
+orionCurl --url /v1/contextEntities/E1 --json
+echo
+echo
+
+
+echo "07. Update E1 with non-empty value (bar)"
+echo "========================================"
+payload='{
+   "type": "T",
+   "value": "bar"
+}'
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+echo
+echo
+
+
+echo "08. GET E1 and see non-empty value (bar)"
+echo "========================================"
+orionCurl --url /v1/contextEntities/E1 --json
+echo
+echo
+
+
+echo "09. Update E1 with absent value"
+echo "=============================="
+payload='{
+   "type": "T"
+}'
+orionCurl -X PUT --url /v1/contextEntities/E1/attributes/attr --payload "$payload" --json
+echo
+echo
+
+
+echo "10. GET E1 and see attribute hasn't changed (bar)"
+echo "================================================="
+orionCurl --url /v1/contextEntities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with empty value
+==============================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+02. GET E1 and see empty value
+==============================
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "attr",
+                "type": "T",
+                "value": ""
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+03. Update E1 with non-empty value (foo)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+04. GET E1 and see non-empty value (foo)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 276
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "attr",
+                "type": "T",
+                "value": "foo"
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+05. Update E1 with empty value
+==============================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+06. GET E1 and see empty value
+==============================
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "attr",
+                "type": "T",
+                "value": ""
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+07. Update E1 with non-empty value (bar)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+08. GET E1 and see non-empty value (bar)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 276
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "attr",
+                "type": "T",
+                "value": "bar"
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+09. Update E1 with absent value
+==============================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+10. GET E1 and see attribute hasn't changed (bar)
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 276
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "attr",
+                "type": "T",
+                "value": "bar"
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

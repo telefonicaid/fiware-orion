@@ -55,10 +55,11 @@ std::string getAllSubscriptions
 
   std::vector<ngsiv2::Subscription> subs;
   OrionError                        oe;
+  long long                         count = 0LL;
   int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
   int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
-  mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, limit, offset);
+  mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, limit, offset, &count);
 
   if (oe.code != SccOk)
   {
@@ -68,7 +69,7 @@ std::string getAllSubscriptions
   if ((ciP->uriParamOptions["count"]))
   {
     ciP->httpHeader.push_back("X-Total-Count");
-    ciP->httpHeaderValue.push_back(toString(subs.size()));
+    ciP->httpHeaderValue.push_back(toString(count));
   }
   return  vectorToJson(subs);
 }

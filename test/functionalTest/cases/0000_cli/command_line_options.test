@@ -62,5 +62,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-subCacheIval' <interval in seconds between calls to Subscription Cache refresh (0: no refresh)>]
                       [option '-notificationMode' <notification mode (persistent|transient|none)>]
                       [option '-noCache' (disable subscription cache for lookups)]
+                      [option '-connectionMemory' <maximum memory size per connection in kilobytes>]
 
 --TEARDOWN--

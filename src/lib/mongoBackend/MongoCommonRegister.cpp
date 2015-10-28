@@ -41,6 +41,7 @@
 #include "mongoBackend/TriggeredSubscription.h"
 
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeBsonGet.h"
 
 using std::string;
 using std::map;
@@ -254,8 +255,8 @@ static bool addTriggeredSubscriptions
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML,
-        STR_FIELD(sub, CASUB_REFERENCE),
+        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringField(sub, CASUB_FORMAT)) : XML,
+        getStringField(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));

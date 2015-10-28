@@ -45,6 +45,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
   metadataVector.tagSet("metadata");
   compoundValueP = NULL;
+  valueType = orion::ValueTypeNone;
 }
 
 
@@ -118,10 +119,6 @@ std::string UpdateContextAttributeRequest::check
   if (predetectedError != "")
   {
     response.fill(SccBadRequest, predetectedError);
-  }
-  else if ((contextValue == "") && (compoundValueP == NULL))
-  {
-    response.fill(SccBadRequest, "empty context value");
   }
   else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
   {

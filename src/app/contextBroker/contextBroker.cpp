@@ -243,6 +243,7 @@ unsigned        cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
 bool            noCache;
+unsigned        connectionMemory;
 
 
 
@@ -283,8 +284,7 @@ bool            noCache;
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
 #define NO_CACHE               "disable subscription cache for lookups"
-
-
+#define CONN_MEMORY_DESC       "maximum memory size per connection in kilobytes"
 
 /* ****************************************************************************
 *
@@ -326,6 +326,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     UINT_MAX, CONN_MEMORY_DESC       },
 
   PA_END_OF_ARGS
 };
@@ -1464,11 +1465,13 @@ int main(int argC, char* argV[])
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
 
+  std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
+
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
-  paConfig("man version",                   (void*) ORION_VERSION);
+  paConfig("man version",                   (void*) versionString.c_str());
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
   paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");

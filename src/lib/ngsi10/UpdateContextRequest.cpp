@@ -288,6 +288,7 @@ void UpdateContextRequest::fill
   else
   {
     caP = new ContextAttribute(attributeName, ucarP->type, ucarP->contextValue);
+    caP->valueType = ucarP->valueType;
   }
 
   caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);

@@ -63,8 +63,8 @@ static std::string attributeValue(const std::string& path, const std::string& va
   //       save the 'typeFromXmlAttribute', a ContextAttribute has been added to 
   //       UpdateContextAttributeData.
   //
-  reqData->lastContextAttribute = &reqData->upcar.attribute;
-
+  reqData->lastContextAttribute   = &reqData->upcar.attribute;
+  reqData->upcar.res.valueType    = orion::ValueTypeString;
   reqData->upcar.res.contextValue = value;
 
   return "OK";
