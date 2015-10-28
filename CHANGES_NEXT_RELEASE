@@ -31,3 +31,4 @@ Fix:  Recovering $where from 0.23.0 code bases to search for subscriptions (-noC
 Fix:  Fixed broken subscription cache (Issue #1308)
 Fix:  Improve error description in NGSIv2 PUT entity, when entity is not found  (Issue #1320)
 Add:  Hardening: mongoBackend checking for field existence and proper type to avoid broker crashes due to DB corruption (Issue #136)
+Fix:  Separate semahpore for subscription cache, so that sub cache is independent of mutex policy (Issue #1401)
