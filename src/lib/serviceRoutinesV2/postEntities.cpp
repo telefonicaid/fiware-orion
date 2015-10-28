@@ -33,11 +33,11 @@
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
 
+static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
 
 static bool legalEntityLength(Entity* eP, const std::string &servicePath)
 {
-  const int constant = 10;
-  return (servicePath.size() + eP->id.size() + eP->type.size() + constant) < 1024;
+  return (servicePath.size() + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
 }
 
 
