@@ -104,16 +104,16 @@ orionCurl --url /v1/subscribeContext --payload "${payload}" --json
 echo
 echo
 
-echo "02. GET /v2/subscriptions?limit=1"
-echo "================================="
-orionCurl --url "/v2/subscriptions?limit=1" --json
+echo "02. GET /v2/subscriptions?limit=1&options=count"
+echo "==============================================="
+orionCurl --url "/v2/subscriptions?limit=1&options=count" --json
 echo
 echo
 
 
-echo "03. GET /v2/subscriptions?limit=1&offset=1"
-echo "=========================================="
-orionCurl --url "/v2/subscriptions?limit=1&offset=1" --json
+echo "03. GET /v2/subscriptions?limit=1&offset=1&options=count"
+echo "========================================================"
+orionCurl --url "/v2/subscriptions?limit=1&offset=1&options=count" --json
 echo
 echo
 
@@ -148,11 +148,12 @@ Date: REGEX(.*)
 }
 
 
-02. GET /v2/subscriptions?limit=1
-=================================
+02. GET /v2/subscriptions?limit=1&options=count
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 451
 Content-Type: application/json
+X-Total-Count: 2
 Date: REGEX(.*)
 
 [
@@ -198,11 +199,12 @@ Date: REGEX(.*)
 ]
 
 
-03. GET /v2/subscriptions?limit=1&offset=1
-==========================================
+03. GET /v2/subscriptions?limit=1&offset=1&options=count
+========================================================
 HTTP/1.1 200 OK
 Content-Length: 387
 Content-Type: application/json
+X-Total-Count: 2
 Date: REGEX(.*)
 
 [
