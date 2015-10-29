@@ -30,8 +30,8 @@ brokerStart CB 0
 --SHELL--
 
 #
-# 01. POST /v2/entities (Room1)
-# 02. POST /v2/entities (Room1)
+# 01. Trying to create a entity with a type > 1024
+# 02. Making sure no entity was created in part 01
 #
 
 echo "01. POST /v2/entities (Room1)"
