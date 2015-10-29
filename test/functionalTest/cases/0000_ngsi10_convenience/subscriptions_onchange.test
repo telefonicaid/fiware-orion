@@ -87,7 +87,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "2: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -117,7 +117,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "3: ++++++++++++++++++++"
 url="/v1/contextSubscriptions/${SUB_ID}"
@@ -130,7 +130,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 # Get notifications count
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "4: ++++++++++++++++++++"
 
@@ -164,7 +164,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "5: ++++++++++++++++++++"
 url="/v1/updateContext"
@@ -219,7 +219,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 # Get notifications count
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "7: ++++++++++++++++++++"
 url="/v1/updateContext"
