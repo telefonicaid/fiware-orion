@@ -1056,9 +1056,13 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
   {
     while (cSubP != NULL)
     {
+      char msg[256];
+
       unsigned int bytesLeft = listSize - strlen(list);
 
-      if (strlen(cSubP->subscriptionId) + 2 > bytesLeft)
+      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d", cSubP->subscriptionId, cSubP->lastNotificationTime, cSubP->expirationTime, cSubP->throttling, cSubP->pendingNotifications);
+
+      if (strlen(msg) + 2 > bytesLeft)
       {
         *list = 0;
         break;
@@ -1067,7 +1071,7 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
       if (list[0] != 0)
         strcat(list, ", ");
 
-      strcat(list, cSubP->subscriptionId);
+      strcat(list, msg);
 
       cSubP = cSubP->next;
     }
