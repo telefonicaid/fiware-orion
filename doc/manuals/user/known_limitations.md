@@ -52,8 +52,8 @@ list](http://lists.gnu.org/archive/html/libmicrohttpd/2014-01/msg00063.html).
 
 ## Entity fields length limitation
 
-Due to limitations at MongoDB layer, the lenght of entity ID, type and servicePath has to follow the following rule.
+Due to limitations at MongoDB layer, the length of entity ID, type and servicePath has to follow the following rule.
 
     length(id) + length(type) + length(servicePath) + 10 < 1024
 
-Otherwise, we will get and error at entity creation time.
+Otherwise, we will get an error at entity creation time.
