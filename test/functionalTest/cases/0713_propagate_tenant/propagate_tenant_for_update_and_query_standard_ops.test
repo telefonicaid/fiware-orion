@@ -26,11 +26,10 @@ Propagate Tenant for Update and Query Requests
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
-
-dbInitTenant CB t1
-dbInitTenant CB t2
-dbInitTenant CP1 t1
-dbInitTenant CP1 t2
+dbInit CB t1
+dbInit CB t2
+dbInit CP1 t1
+dbInit CP1 t2
 
 brokerStart CB  0 IPV4 -multiservice
 brokerStart CP1 0 IPV4 -multiservice
@@ -490,8 +489,8 @@ brokerStop CB
 brokerStop CP1
 dbDrop CB
 dbDrop CP1
-dbDropTenant CB t1
-dbDropTenant CB t2
-dbDropTenant CP1 t1
-dbDropTenant CP1 t2
+dbDrop CB t1
+dbDrop CB t2
+dbDrop CP1 t1
+dbDrop CP1 t2
 

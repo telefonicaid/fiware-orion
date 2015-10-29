@@ -25,7 +25,7 @@ Subscription Cache Throttling and expiration after Refresh
 
 --SHELL-INIT--
 dbInit CB
-dbInitTenant CB t1
+dbInit CB t1
 brokerStart CB 38,101 IPv4 -multiservice -subCacheIval 10
 accumulatorStart
 
@@ -325,4 +325,4 @@ Content-Type: application/json; charset=utf-8
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-dbDropTenant CB t1
+dbDrop CB t1
