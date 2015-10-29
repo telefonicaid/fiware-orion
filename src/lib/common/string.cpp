@@ -662,7 +662,7 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
   {
     if (strncmp(&from[fromIx], oldString, oldLen) == 0)
     {
-      snprintf(to, toLen, "%s", newString);
+      strncat(to, newString, toLen - strlen(to));
       toIx   += newLen;
       fromIx += oldLen;
     }
