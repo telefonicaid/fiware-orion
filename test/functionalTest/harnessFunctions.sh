@@ -152,7 +152,7 @@ function dbInit()
 #
 function dbDrop()
 {
-  db=$1
+  db=$1-$2
 
   if [ "$CB_DB_DROP" != "No" ]
   then
