@@ -1,4 +1,4 @@
-# # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -114,6 +114,7 @@ function dbInit()
   
   db=$host:$port/$1
   
+  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
   if [ $# == 2 ]
   then 
     db=$db-$tenant
@@ -155,6 +156,7 @@ function dbDrop()
   db=$1
   tenant=$2
   
+  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
   if [ $# == 2 ]
   then 
     db=$db-$tenant
