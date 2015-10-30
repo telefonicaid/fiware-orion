@@ -1,4 +1,4 @@
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -91,10 +91,14 @@ function dMsg()
 #
 # dbInit - 
 #
+# ------------------------------------------------------------------------------
+#
+# dbInit - 
+#
 function dbInit()
 {
   role=$1  
-
+  tenant=$2
   
   host="${CB_DATABASE_HOST}"
   if [ "$host" == "" ]
@@ -112,29 +116,29 @@ function dbInit()
   
   if [ $# == 2 ]
   then 
-    db=$db$2
+    db=$db-$tenant
   fi
 
   dMsg initializing database;
 
   if [ "$role" == "CB" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DB_NAME}  --quiet
+    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DB_NAME}-$tenant  --quiet
   elif [ "$role" == "CP1" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DB_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DB_NAME}-$tenant --quiet
   elif [ "$role" == "CP2" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP2_DB_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP2_DB_NAME}-$tenant --quiet
   elif [ "$role" == "CP3" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP3_DB_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP3_DB_NAME}-$tenant --quiet
   elif [ "$role" == "CP4" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP4_DB_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP4_DB_NAME}-$tenant --quiet
   elif [ "$role" == "CP5" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP5_DB_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo $host:$port/${CP5_DB_NAME}-$2 --quiet
   else
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi
