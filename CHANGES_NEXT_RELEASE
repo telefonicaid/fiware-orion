@@ -36,4 +36,3 @@ Fix:  Fixed broken subscription cache (Issue #1308), including the semaphore for
 Fix:  compound attribute values support in CPr update forwarding (Issue #1440)
 Fix:  Return error response when the (mongo) index key limit is exceeded (Issue #1289)
 Fix:  Incorrect 'details' field rendering (leading to illegal JSON) for error responses in some cases (Issue #843) 
-Fix:  
