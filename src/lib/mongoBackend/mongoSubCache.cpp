@@ -1079,6 +1079,10 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
       snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
 #endif
 
+      //
+      // If "msg" and ", " has no room in the "list", then no list is shown.
+      // (the '+ 2' if for the string ", ")
+      //
       if (strlen(msg) + 2 > bytesLeft)
       {
         *list = 0;
