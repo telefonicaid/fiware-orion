@@ -148,7 +148,11 @@ is typically done in the REST interface)
 
 ### Exchanging Context Availability Information
 
-(placeholder on some introduction of what context availability information is)
+FIWARE NGSI distinguishes between **context information** and **context availability information**. The former kind of information is the actual data, and it is exchanged by means of context queries, context subscriptions, and context updates as described above.
+
+**Context availability information**, in contrast, is information about data providers. FIWARE NGSI defines a representation of such information and a set of operations for exchanging it.
+
+The separation of availability information from the actual data enables FIWARE NGSI to be used across federated systems with multiple data providers, consumers, and brokers. Information on which component can deliver which context information enables ...
 
 #### Context Registrations
 
