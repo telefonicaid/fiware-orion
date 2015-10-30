@@ -31,35 +31,36 @@
 /* ****************************************************************************
 *
 * getObjectField -
-*
 */
 extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *
 * getStringField -
-*
 */
 extern std::string getStringField(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *
 * getIntField -
-*
 */
 extern int getIntField(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *
-* getBoolField -
+* getLongField -
+*/
+extern long getLongField(const mongo::BSONObj& b, const std::string& field);
+
+/* ****************************************************************************
 *
+* getBoolField -
 */
 extern bool getBoolField(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *
 * getField -
-*
 */
 extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field);
 
