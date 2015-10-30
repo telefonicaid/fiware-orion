@@ -1069,15 +1069,10 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
   {
     while (cSubP != NULL)
     {
-      char msg[256];
+      char          msg[256];
+      unsigned int  bytesLeft = listSize - strlen(list);
 
-      unsigned int bytesLeft = listSize - strlen(list);
-
-#if UpdateBugTests
-      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d", cSubP->subscriptionId, cSubP->lastNotificationTime, cSubP->expirationTime, cSubP->throttling, cSubP->pendingNotifications);
-#else
       snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
-#endif
 
       //
       // If "msg" and ", " has no room in the "list", then no list is shown.
