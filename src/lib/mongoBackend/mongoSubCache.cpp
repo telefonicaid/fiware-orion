@@ -54,6 +54,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoSubCache.h"
+#include "mongoBackend/safeBsonGet.h"
 
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -621,9 +622,21 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->notifyFormat          = stringToFormat(formatString);
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? sub.getField(CSUB_THROTTLING).Long() : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)? sub.getField(CSUB_EXPIRATION).Long() : 0;
-  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? sub.getField(CSUB_LASTNOTIFICATION).Int() : 0;
+  cSubP->lastNotificationTime  = 0;
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
+
+  if (sub.hasField(CSUB_LASTNOTIFICATION))
+  {
+    if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberLong)
+    {
+      cSubP->lastNotificationTime = getLongField(sub, CSUB_LASTNOTIFICATION);
+    }
+    else if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberInt)
+    {
+      cSubP->lastNotificationTime = (long long) getIntField(sub, CSUB_LASTNOTIFICATION);
+    }
+  }
 
   LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
@@ -1060,7 +1073,11 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
 
       unsigned int bytesLeft = listSize - strlen(list);
 
+#if UpdateBugTests
       snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d", cSubP->subscriptionId, cSubP->lastNotificationTime, cSubP->expirationTime, cSubP->throttling, cSubP->pendingNotifications);
+#else
+      snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
+#endif
 
       if (strlen(msg) + 2 > bytesLeft)
       {

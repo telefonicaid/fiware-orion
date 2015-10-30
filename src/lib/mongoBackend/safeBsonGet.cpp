@@ -31,7 +31,6 @@ using namespace mongo;
 /* ****************************************************************************
 *
 * getObjectField -
-*
 */
 BSONObj getObjectField(const BSONObj& b, const std::string& field)
 {
@@ -56,7 +55,6 @@ BSONObj getObjectField(const BSONObj& b, const std::string& field)
 /* ****************************************************************************
 *
 * getStringField -
-*
 */
 std::string getStringField(const BSONObj& b, const std::string& field)
 {
@@ -81,7 +79,6 @@ std::string getStringField(const BSONObj& b, const std::string& field)
 /* ****************************************************************************
 *
 * getIntField -
-*
 */
 int getIntField(const BSONObj& b, const std::string& field)
 {
@@ -97,7 +94,31 @@ int getIntField(const BSONObj& b, const std::string& field)
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a int but type=%d in BSONObj <%s>)",
+    LM_E(("Runtime Error (field '%s' was supposed to be an int but type=%d in BSONObj <%s>)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+  }  
+  return -1;
+}
+
+/* ****************************************************************************
+*
+* getLongField -
+*/
+long getLongField(const BSONObj& b, const std::string& field)
+{
+  if (b.hasField(field) && b.getField(field).type() == NumberLong)
+  {
+    return b.getField(field).Long();
+  }
+
+  // Detect error
+  if (!b.hasField(field))
+  {
+    LM_E(("Runtime Error (long field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s>)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
   }  
   return -1;
@@ -106,7 +127,6 @@ int getIntField(const BSONObj& b, const std::string& field)
 /* ****************************************************************************
 *
 * getBoolField -
-*
 */
 bool getBoolField(const BSONObj& b, const std::string& field)
 {
@@ -131,7 +151,6 @@ bool getBoolField(const BSONObj& b, const std::string& field)
 /* ****************************************************************************
 *
 * getField -
-*
 */
 BSONElement getField(const BSONObj& b, const std::string& field)
 {
@@ -143,4 +162,3 @@ BSONElement getField(const BSONObj& b, const std::string& field)
   LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
   return BSONElement();
 }
-

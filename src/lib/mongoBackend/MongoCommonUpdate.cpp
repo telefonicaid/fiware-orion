@@ -55,6 +55,7 @@ using std::string;
 using std::map;
 using std::auto_ptr;
 using namespace orion;
+using namespace mongo;
 
 
 /* ****************************************************************************
@@ -1213,7 +1214,19 @@ static bool addTriggeredSubscriptions_withCache
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       long long throttling       = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? getIntField(sub, CSUB_LASTNOTIFICATION) : -1;
+      long long lastNotification = -1;
+
+      if (sub.hasField(CSUB_LASTNOTIFICATION))
+      {
+        if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberLong)
+        {
+          lastNotification = getLongField(sub, CSUB_LASTNOTIFICATION);
+        }
+        else if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberInt)
+        {
+          lastNotification = (long long) getIntField(sub, CSUB_LASTNOTIFICATION);
+        }
+      }
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
