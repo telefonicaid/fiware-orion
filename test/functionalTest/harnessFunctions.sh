@@ -152,8 +152,14 @@ function dbInit()
 #
 function dbDrop()
 {
-  db=$1-$2
-
+  db=$1
+  tenant=$2
+  
+  if [ $# == 2 ]
+  then 
+    db=$db-$tenant
+  fi
+  
   if [ "$CB_DB_DROP" != "No" ]
   then
     if [ "$db" != "" ]
