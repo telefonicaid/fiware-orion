@@ -33,6 +33,22 @@
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
 
+static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
+
+
+
+/* ****************************************************************************
+*
+* legalEntityLength -
+*
+* Check if the entity length is supported by Mongo
+*/
+
+static bool legalEntityLength(Entity* eP, const std::string& servicePath)
+{
+  return (servicePath.size() + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
+}
+
 
 
 /* ****************************************************************************
@@ -61,6 +77,14 @@ std::string postEntities
 )
 {
   Entity*  eP = &parseDataP->ent.res;
+
+  if (!legalEntityLength(eP, ciP->servicePath))
+  {
+    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination");
+    ciP->httpStatusCode = SccBadRequest;
+    eP->release();
+    return oe.render(ciP, "");
+  }
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "APPEND_STRICT");
