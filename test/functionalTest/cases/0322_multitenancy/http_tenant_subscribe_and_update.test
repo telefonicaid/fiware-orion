@@ -25,8 +25,8 @@ HTTP-Tenant subscribe and update
 
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DATABASE_NAME}-t_01
-dbInit ${CB_DATABASE_NAME}-t_02
+dbInit ${CB_DB_NAME} t_01
+dbInit ${CB_DB_NAME} t_02
 brokerStart CB 0-255 IPV4 -multiservice
 accumulatorStart 
 accumulatorStart 127.0.0.1 $LISTENER2_PORT
@@ -318,5 +318,5 @@ brokerStop CB
 accumulatorStop $LISTENER_PORT
 accumulatorStop $LISTENER2_PORT
 dbDrop CB
-dbDrop ${CB_DATABASE_NAME}-t_01
-dbDrop ${CB_DATABASE_NAME}-t_02
+dbDrop ${CB_DB_NAME} t_01
+dbDrop ${CB_DB_NAME} t_02
