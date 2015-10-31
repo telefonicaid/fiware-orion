@@ -156,21 +156,10 @@ function dbInit()
 #
 function dbDrop()
 {
-  db=$1
-  tenant=$2
-  
-  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
-  if [ $# == 2 ]
-  then 
-    db=$db-$tenant
-  fi
-  
   if [ "$CB_DB_DROP" != "No" ]
   then
-    if [ "$db" != "" ]
-    then
-      dbInit $db
-    fi
+    # FIXME: Not sure if $@ should be better...
+    dbInit $*
   fi
 }
 
