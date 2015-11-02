@@ -85,7 +85,7 @@ echo
 
 echo "07. Check attributes in DB"
 echo "=========================="
-echo 'db.entities.find({ "_id" : { "id" : "E1",  "servicePath" : "/" } }, {_id:0, attrNames: 1})'  | mongo $CB_DATABASE_NAME --quiet
+echo 'db.entities.find({ "_id" : { "id" : "E1",  "servicePath" : "/" } }, {_id:0, attrNames: 1})'  | mongo $CB_DB_NAME --quiet
 echo
 echo
 
