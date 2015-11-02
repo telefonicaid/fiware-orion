@@ -844,7 +844,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
 
   if (lastNotificationTime == -1)
   {
-    lastNotificationTime = (sub.hasField(CSUB_THROTTLING))? sub.getField(CSUB_THROTTLING).Long() : -1;
+    lastNotificationTime = getLongField(sub, CSUB_LASTNOTIFICATION);
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
