@@ -579,10 +579,6 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
 }
 
@@ -737,12 +733,7 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -922,11 +913,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1106,13 +1093,9 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
 
-   }
+}
 
 /* ****************************************************************************
 *
@@ -1281,11 +1264,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1445,11 +1424,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1631,12 +1606,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1794,12 +1764,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1956,12 +1921,8 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2154,12 +2115,8 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
     EXPECT_EQ(1360232700, a8.getIntField("modDate"));
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2352,12 +2309,8 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
     EXPECT_EQ(1360232700, a8.getIntField("modDate"));
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2537,11 +2490,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2710,11 +2659,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2916,12 +2861,8 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3048,11 +2989,7 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3199,11 +3136,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3351,11 +3284,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3467,11 +3396,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3640,11 +3565,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3813,11 +3734,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -3976,12 +3893,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
-
 }
 
 /* ****************************************************************************
@@ -4130,11 +4042,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -4297,11 +4205,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -4460,11 +4364,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -4633,11 +4533,7 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -4811,11 +4707,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -4978,9 +4870,6 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -5169,11 +5058,7 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -5326,11 +5211,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueOk)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -5489,11 +5370,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueOk)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -5651,11 +5528,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -5808,11 +5681,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -5998,11 +5867,7 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -6155,11 +6020,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -6340,11 +6201,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -6531,11 +6388,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("new_val2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -6720,11 +6573,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -6920,11 +6769,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("new_val3", C_STR_FIELD(a3, "value"));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -7105,11 +6950,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -7285,11 +7126,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -7465,11 +7302,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -7647,11 +7480,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -7747,9 +7576,6 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -7841,9 +7667,6 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -7934,9 +7757,6 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
     EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -8032,10 +7852,6 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     EXPECT_EQ("TMD2", getStringField(mdV[2].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[2].embeddedObject(), "value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
 }
 
@@ -8129,9 +7945,6 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     EXPECT_EQ("MD2", getStringField(mdV[2].embeddedObject(), "name"));
     EXPECT_EQ("TMD2", getStringField(mdV[2].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[2].embeddedObject(), "value"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -8232,9 +8045,6 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     EXPECT_EQ("TMD1", getStringField(mdV[2].embeddedObject(), "type"));
     EXPECT_EQ("MD1val", getStringField(mdV[2].embeddedObject(), "value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -8334,9 +8144,6 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     EXPECT_EQ("TMD1", getStringField(mdV[2].embeddedObject(), "type"));
     EXPECT_EQ("MD1val", getStringField(mdV[2].embeddedObject(), "value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -8428,9 +8235,6 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -8521,9 +8325,6 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
     EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -8617,9 +8418,6 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -8710,9 +8508,6 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     EXPECT_EQ("MD2", getStringField(mdV[1].embeddedObject(), "name"));
     EXPECT_EQ("TMD2", getStringField(mdV[1].embeddedObject(), "type"));
     EXPECT_EQ("MD2val", getStringField(mdV[1].embeddedObject(), "value"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -8881,11 +8676,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -9041,9 +8832,6 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -9239,9 +9027,6 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -9401,10 +9186,6 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
 }
 
@@ -9504,9 +9285,6 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
     EXPECT_EQ("x1", a5.getField("value").Array()[0].str());
     EXPECT_EQ("x2", a5.getField("value").Array()[1].str());
     EXPECT_FALSE(a5.hasField("modDate"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -9706,9 +9484,6 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -9814,10 +9589,6 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     EXPECT_EQ("T", getStringField(mdV[2].embeddedObject(), "type"));
     EXPECT_TRUE(mdV[2].embeddedObject().getBoolField("value"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
 }
 
@@ -9906,9 +9677,6 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     EXPECT_EQ("MD3", getStringField(mdV[2].embeddedObject(), "name"));
     EXPECT_EQ("T", getStringField(mdV[2].embeddedObject(), "type"));
     EXPECT_FALSE(mdV[2].embeddedObject().getBoolField("value"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -10080,9 +9848,6 @@ TEST(mongoUpdateContextRequest, replace)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -10231,9 +9996,6 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
   EXPECT_FALSE(a2.hasField("value"));
   EXPECT_FALSE(a2.hasField("modDate"));
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -10390,9 +10152,6 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   EXPECT_FALSE(a2.hasField("value"));
   EXPECT_FALSE(a2.hasField("modDate"));
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
   utExit();
 }
 
@@ -10458,6 +10217,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -10496,9 +10256,11 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
               "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } },{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, modDate: 1360232700 }, $unset: { location: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
     /* Release mocks */
-    delete connectionMock;
-    setMongoConnectionForUnitTest(NULL);
+    delete connectionMock;    
 
     utExit();
 
@@ -10523,6 +10285,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -10556,9 +10319,11 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
               "- query(): { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
     /* Release mock */
-    delete connectionMock;
-    setMongoConnectionForUnitTest(NULL);
+    delete connectionMock;   
 
     utExit();
 }
@@ -10650,10 +10415,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
-  EXPECT_FALSE(a1.hasField("modDate"));
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
+  EXPECT_FALSE(a1.hasField("modDate"));  
 
   utExit();
 }
@@ -10751,10 +10513,6 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
 
   utExit();
 }
@@ -10863,11 +10621,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -10974,11 +10728,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -11048,9 +10798,6 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -11194,9 +10941,6 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
   EXPECT_FALSE(a2.hasField("value"));
   EXPECT_FALSE(a2.hasField("modDate"));
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }

@@ -283,6 +283,12 @@ int mongoConnectionPoolInit
   bool         semTimeStat
 )
 {
+#ifdef UNIT_TEST
+  /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
+   * are mocked in similar way to ensure a coherent behaviour */
+  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout));
+  return 0;
+#else
   //
   // Create the pool
   //
@@ -330,6 +336,7 @@ int mongoConnectionPoolInit
   semStatistics = semTimeStat;
 
   return 0;
+#endif
 }
 
 

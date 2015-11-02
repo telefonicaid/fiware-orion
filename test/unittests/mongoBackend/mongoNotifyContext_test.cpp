@@ -312,11 +312,8 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -462,11 +459,8 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -615,11 +609,8 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -772,11 +763,8 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -936,10 +924,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete timerMock;
-
 }
 
