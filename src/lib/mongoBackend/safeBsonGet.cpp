@@ -106,9 +106,16 @@ int getIntField(const BSONObj& b, const std::string& field)
 */
 long long getLongField(const BSONObj& b, const std::string& field)
 {
-  if (b.hasField(field) && b.getField(field).type() == NumberLong)
+  if (b.hasField(field))
   {
-    return b.getField(field).Long();
+    if (b.getField(field).type() == NumberLong)
+    {
+      return b.getField(field).Long();
+    }
+    else if (b.getField(field).type() == NumberInt)
+    {
+      return b.getField(field).Int();
+    }
   }
 
   // Detect error

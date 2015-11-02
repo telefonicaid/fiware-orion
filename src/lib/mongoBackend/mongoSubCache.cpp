@@ -620,8 +620,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? sub.getField(CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->notifyFormat          = stringToFormat(formatString);
-  cSubP->throttling            = getLongField(sub, CSUB_THROTTLING);
-  cSubP->expirationTime        = getLongField(sub, CSUB_EXPIRATION);
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? sub.getField(CSUB_THROTTLING).Long() : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)? sub.getField(CSUB_EXPIRATION).Long() : 0;
   cSubP->lastNotificationTime  = 0;
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
@@ -844,7 +844,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
 
   if (lastNotificationTime == -1)
   {
-    lastNotificationTime = getLongField(sub, CSUB_THROTTLING);
+    lastNotificationTime = (sub.hasField(CSUB_THROTTLING))? sub.getField(CSUB_THROTTLING).Long() : -1;
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
@@ -852,7 +852,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
   cSubP->servicePath           = strdup(servicePath);
   cSubP->notifyFormat          = stringToFormat(formatString);
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)? sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
-  cSubP->throttling            = getLongField(sub, CSUB_THROTTLING);
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       sub.getField(CSUB_THROTTLING).Long()          : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->pendingNotifications  = 0;
@@ -1075,12 +1075,16 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
       char          msg[256];
       unsigned int  bytesLeft = listSize - strlen(list);
 
-#if 1
-      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d", cSubP->subscriptionId, cSubP->lastNotificationTime, cSubP->expirationTime, cSubP->throttling, cSubP->pendingNotifications);
+#if 0
+      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d",
+               cSubP->subscriptionId,
+               cSubP->lastNotificationTime,
+               cSubP->expirationTime,
+               cSubP->throttling,
+               cSubP->pendingNotifications);
 #else
-      snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
+        snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
 #endif
-
       //
       // If "msg" and ", " has no room in the "list", then no list is shown.
       // (the '+ 2' if for the string ", ")

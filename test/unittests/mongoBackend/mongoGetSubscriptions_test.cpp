@@ -75,7 +75,7 @@ static void prepareDatabaseV1Subs(void) {
     DBClientBase* connection = getMongoConnection();
 
     BSONObj sub1 = BSON("_id" << OID(SUB_OID1) <<
-                        "expiration" << 10000000 <<                        
+                        "expiration" << (long long) 10000000 <<                        
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
@@ -86,9 +86,9 @@ static void prepareDatabaseV1Subs(void) {
                         );
 
     BSONObj sub2 = BSON("_id" << OID(SUB_OID2) <<
-                        "expiration" << 25000000 <<
-                        "lastNotification" << 20000000 <<
-                        "count" << 24 <<
+                        "expiration" << (long long) 25000000 <<
+                        "lastNotification" << (long long) 20000000 <<
+                        "count" << (long long) 24 <<
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
@@ -96,12 +96,12 @@ static void prepareDatabaseV1Subs(void) {
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
                                                        )) <<
-                        "throttling" << 5.0
+                        "throttling" << (long long) 5
                         );
 
     BSONObj sub3 = BSON("_id" << OID(SUB_OID3) <<
-                        "expiration" << 20000000 <<
-                        "lastNotification" << 25000000 <<
+                        "expiration" << (long long) 20000000 <<
+                        "lastNotification" << (long long) 25000000 <<
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
@@ -114,7 +114,6 @@ static void prepareDatabaseV1Subs(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
-
 }
 
 /* ****************************************************************************
@@ -161,7 +160,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   attrs = s.notification.attributes;
   ASSERT_EQ(0, attrs.size());
   EXPECT_EQ("http://notify1.me", s.notification.callback);
-  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ(-1, s.notification.timesSent);
   EXPECT_EQ(-1, s.notification.lastNotification);
   EXPECT_EQ(-1, s.notification.throttling);
   EXPECT_EQ(10000000, s.expires);

@@ -562,7 +562,7 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 
     if (strcmp(getStringField(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
-      long interval = getLongField(condition, CSUB_CONDITIONS_VALUE);
+      int interval = getField(condition, CSUB_CONDITIONS_VALUE).numberLong();
 
       LM_T(LmtNotifier, ("creating ONTIMEINTERVAL thread for subscription '%s' with interval %d (tenant '%s')",
                          subId.c_str(),

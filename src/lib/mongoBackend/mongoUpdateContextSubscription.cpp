@@ -112,7 +112,7 @@ HttpStatusCode mongoUpdateContextSubscription
   long long expiration = getCurrentTime() + requestP->duration.parse();
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CSUB_EXPIRATION, getLongField(sub, CSUB_EXPIRATION));
+    newSub.append(CSUB_EXPIRATION, getField(sub, CSUB_EXPIRATION).numberLong());
   }
   else
   {
@@ -135,7 +135,7 @@ HttpStatusCode mongoUpdateContextSubscription
       /* The hasField check is needed due to Throttling could not be present in the original doc */
       if (sub.hasField(CSUB_THROTTLING))
       {
-        newSub.append(CSUB_THROTTLING, getLongField(sub, CSUB_THROTTLING));
+        newSub.append(CSUB_THROTTLING, getField(sub, CSUB_THROTTLING).numberLong());
       }
   }
 
@@ -180,7 +180,7 @@ HttpStatusCode mongoUpdateContextSubscription
   {
     lastNotification = getCurrentTime();
     LM_T(LmtMongoSubCache, ("notificationDone => lastNotification set to %lu", lastNotification));
-    newSub.append(CSUB_LASTNOTIFICATION, lastNotification);
+    newSub.append(CSUB_LASTNOTIFICATION, (long long) lastNotification);
     newSub.append(CSUB_COUNT, count + 1);
   }
   else
@@ -188,7 +188,7 @@ HttpStatusCode mongoUpdateContextSubscription
     /* The hasField checks are needed as lastNotification/count might not be present in the original doc */
     if (sub.hasField(CSUB_LASTNOTIFICATION))
     {
-      newSub.append(CSUB_LASTNOTIFICATION, getIntField(sub, CSUB_LASTNOTIFICATION));
+      newSub.append(CSUB_LASTNOTIFICATION, getLongField(sub, CSUB_LASTNOTIFICATION));
     }
 
     if (sub.hasField(CSUB_COUNT))

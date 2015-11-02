@@ -133,9 +133,10 @@ HttpStatusCode mongoSubscribeContext
                                              xauthToken,
                                              servicePathV);
     sub.append(CSUB_CONDITIONS, conds);
-    if (notificationDone) {
-        sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
-        sub.append(CSUB_COUNT, 1);
+    if (notificationDone)
+    {
+      sub.append(CSUB_LASTNOTIFICATION, (long long) getCurrentTime());
+      sub.append(CSUB_COUNT, 1);
     }
 
     /* Adding format to use in notifications */
