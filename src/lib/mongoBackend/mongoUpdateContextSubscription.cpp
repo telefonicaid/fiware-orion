@@ -28,11 +28,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
@@ -215,8 +213,10 @@ HttpStatusCode mongoUpdateContextSubscription
   /* Adding format to use in notifications */
   newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
 
-  /* Update document in MongoDB */
-  BSONObj update = newSub.obj();
+  // Update document in MongoDB
+  // This BSONObj (named update), is used later for the subscription cache
+  BSONObj update       = newSub.obj();
+
   try
   {
       LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextCollectionName(tenant).c_str(),
@@ -270,39 +270,43 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
-  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
 
   //
   // Modification of the subscription cache
   //
-  // The subscription before this updatye is stored in 'sub'.
-  // The updated subscription is stored in 'newSub'
+  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
+  // The "updated subscription information" is in 'update' (mongo BSON object format).
   // 
   // All we need to do now for the cache is to:
-  //   1. Remove 'sub' from sub-cache (if present)
-  //   2. Create 'newSub' in sub-cache (if applicable)
+  //   1. Remove 'cSubP' from sub-cache (if present)
+  //   2. Create 'update' in sub-cache (if applicable)
+  //
+  // The subscription is already updated in mongo.
+  //
+  // FIXME P7: mongoSubCache stuff should be avoided if subscription is not patterned
   //
 
   // 0. Lookup matching subscription in subscription-cache
-  std::string servicePath;
+  CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
-  servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
-
-  subCache->semTake();
-
-  Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
-
-  // 1. Remove 'sub' from sub-cache (if present)
-  if (subP)
+  if (cSubP == NULL)
   {
-    subCache->remove(subP);
+    // Not a cached subscription - no problem
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
+    return SccOk;
   }
 
-  // 2. Create 'newSub' in sub-cache (if applicable)
-  subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
+  char* subscriptionId = (char*) requestP->subscriptionId.get().c_str();
+  char* servicePath    = cSubP->servicePath;
 
-  subCache->semGive();
+  LM_T(LmtMongoSubCache, ("update: %s", update.toString().c_str()));
+
+  mongoSubCacheItemInsert(tenant.c_str(), update, subscriptionId, servicePath);
+  mongoSubCacheItemRemove(cSubP);
+  mongoSubCacheUpdateStatisticsIncrement(); 
+
+  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
   return SccOk;
 }

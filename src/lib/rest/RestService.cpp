@@ -41,6 +41,7 @@
 #include "rest/restReply.h"
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
+#include "mongoBackend/mongoSubCache.h"
 
 
 
@@ -478,6 +479,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
+    LM_T(LmtRequest, (""));
+    LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", ciP->method.c_str(), ciP->url.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
 

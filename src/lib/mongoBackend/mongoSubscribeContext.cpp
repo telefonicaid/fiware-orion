@@ -31,12 +31,11 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContext.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
 #include "rest/uriParamNames.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/subCache.h"
 
 
 
@@ -82,8 +81,11 @@ HttpStatusCode mongoSubscribeContext
     sub.append(CSUB_REFERENCE, requestP->reference.get());
 
     /* Throttling */
-    if (!requestP->throttling.isEmpty()) {
-      sub.append(CSUB_THROTTLING, (long long) requestP->throttling.parse());
+    long long throttling = 0;
+    if (!requestP->throttling.isEmpty())
+    {
+      throttling = (long long) requestP->throttling.parse();
+      sub.append(CSUB_THROTTLING, throttling);
     }
 
     if (servicePath != "")
@@ -177,8 +179,6 @@ HttpStatusCode mongoSubscribeContext
         return SccOk;
     }    
 
-    reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
-
     
     //
     // Add the subscription to the subscription cache.
@@ -213,12 +213,12 @@ HttpStatusCode mongoSubscribeContext
     {
       std::string oidString = oid.toString();
 
-      subCache->semTake();
-      subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oidString, expiration, notifyFormat));
-      subCache->semGive();
+      LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
+      mongoSubCacheItemInsert(tenant.c_str(), servicePath.c_str(), requestP, oidString.c_str(), expiration, throttling, notifyFormat);
     }
 
 
+    reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
 
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;

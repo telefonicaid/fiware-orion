@@ -31,10 +31,9 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
+#include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
 
 
 
@@ -168,15 +167,23 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     /* Destroy any previous ONTIMEINTERVAL thread */
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
-    responseP->statusCode.fill(SccOk);
+
+    // FIXME P7: mongoSubCache stuff should be avoided if subscription is not patterned
+
+    //
+    // Removing subscription from mongo subscription cache
+    //
+    LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
+    CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
+
+    if (cSubP != NULL)  // Will only enter here if wildcard subscription
+    {
+      mongoSubCacheItemRemove(cSubP);
+    }
+
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
 
-    //
-    // Removing subscription from cache
-    //
-    subCache->semTake();
-    subCache->remove(tenant, "", requestP->subscriptionId.get());
-    subCache->semGive();
-
+    responseP->statusCode.fill(SccOk);
     return SccOk;
 }

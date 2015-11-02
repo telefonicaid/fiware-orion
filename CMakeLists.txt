@@ -50,6 +50,7 @@ execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
 
 add_definitions(-DLM_ON)
 add_definitions(-fPIC)
+# add_definitions(-fstack-check -fstack-protector)
 add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types
@@ -170,7 +171,6 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/xmlParse)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
-  ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/app/contextBroker)
   ADD_SUBDIRECTORY(src/app/proxyCoap)
 else ()
