@@ -3,3 +3,7 @@ Fix:    Add charset=utf-8 for notifications (Issue #1340)
 Hotfix: Recovering $where from 0.23.0 code bases to search for subscriptions (-noCache flag)
 Hotfix: Fixed broken subscription cache (Issue #1308)
 Fix:    Enhanced performance for NGSIv2 API removing unnecessary traces
+
+NOTE: release/0.24.0 branch may lack of some late fixes (done in the develop code base, after
+porting the fix to that branch). Please have a look to https://github.com/telefonicaid/fiware-orion/issues/1432
+if you are going to use release/0.24.0 HEAD in production
