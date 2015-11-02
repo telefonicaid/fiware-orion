@@ -120,13 +120,13 @@ static void setNotification(Subscription* s, const BSONObj& r)
   s->notification.callback = getStringField(r, CSUB_REFERENCE);
 
   // Throttling
-  s->notification.throttling = r.hasField(CSUB_THROTTLING)? getField(r, CSUB_THROTTLING).numberLong() : -1;
+  s->notification.throttling = getLongField(r, CSUB_THROTTLING);
 
   // Last Notification
-  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION) ? getField(r, CSUB_LASTNOTIFICATION).numberLong() : -1;
+  s->notification.lastNotification = getLongField(r, CSUB_LASTNOTIFICATION);
 
   // Count
-  s->notification.timesSent = r.hasField(CSUB_COUNT) ? getField(r, CSUB_COUNT).numberLong() : -1;
+  s->notification.timesSent = getLongField(r, CSUB_COUNT);
 }
 
 
@@ -138,7 +138,7 @@ static void setNotification(Subscription* s, const BSONObj& r)
 static void setExpires(Subscription* s, const BSONObj& r)
 {
   // Last Notification
-  s->expires = r.hasField(CSUB_EXPIRATION) ? getField(r, CSUB_EXPIRATION).numberLong() : -1;
+  s->expires = getLongField(r, CSUB_EXPIRATION);
 
   // Status
   // FIXME P10: use a enum for this

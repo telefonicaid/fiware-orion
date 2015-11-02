@@ -104,7 +104,7 @@ int getIntField(const BSONObj& b, const std::string& field)
 *
 * getLongField -
 */
-long getLongField(const BSONObj& b, const std::string& field)
+long long getLongField(const BSONObj& b, const std::string& field)
 {
   if (b.hasField(field) && b.getField(field).type() == NumberLong)
   {
@@ -121,6 +121,7 @@ long getLongField(const BSONObj& b, const std::string& field)
     LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s>)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
   }  
+
   return -1;
 }
 

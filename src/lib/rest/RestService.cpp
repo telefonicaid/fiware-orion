@@ -485,6 +485,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     LM_T(LmtRequest, (""));
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", ciP->method.c_str(), ciP->url.c_str()));
+    LM_M((""));
+    LM_M(("--------------------- Serving request %s %s -----------------", ciP->method.c_str(), ciP->url.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
 

@@ -1213,9 +1213,12 @@ static bool addTriggeredSubscriptions_withCache
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
+      long long throttling       = getLongField(sub, CSUB_THROTTLING);
       long long lastNotification = -1;
 
+      //
+      // CSUB_LASTNOTIFICATION might be either Int or Long ...
+      //
       if (sub.hasField(CSUB_LASTNOTIFICATION))
       {
         if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberLong)
@@ -1253,6 +1256,8 @@ static bool addTriggeredSubscriptions_withCache
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
 
+  LM_M(("%d subscriptions in cache match the update", subVec.size()));
+
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
@@ -1261,6 +1266,7 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
+      LM_M(("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
 
@@ -1273,7 +1279,7 @@ static bool addTriggeredSubscriptions_withCache
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
-        LM_T(LmtMongoSubCache, ("subscription '%s' ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+        LM_M(("subscription '%s' ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                                 cSubP->subscriptionId,
                                 cSubP->throttling,
                                 cSubP->lastNotificationTime,
@@ -1286,7 +1292,7 @@ static bool addTriggeredSubscriptions_withCache
       {
         cSubP->pendingNotifications += 1;
 
-        LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+        LM_M(("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                                 cSubP->subscriptionId,
                                 cSubP->throttling,
                                 cSubP->lastNotificationTime,
@@ -1299,7 +1305,7 @@ static bool addTriggeredSubscriptions_withCache
     {
       cSubP->pendingNotifications += 1;
 
-      LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+      LM_M(("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                               cSubP->subscriptionId,
                               cSubP->throttling,
                               cSubP->lastNotificationTime,
@@ -1456,8 +1462,8 @@ static bool addTriggeredSubscriptions_noCache
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? getIntField(sub, CSUB_LASTNOTIFICATION) : -1;
+      long long throttling       = getLongField(sub, CSUB_THROTTLING);
+      long long lastNotification = getLongField(sub, CSUB_LASTNOTIFICATION);
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (

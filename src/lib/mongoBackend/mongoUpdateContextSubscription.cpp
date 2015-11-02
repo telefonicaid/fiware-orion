@@ -112,7 +112,7 @@ HttpStatusCode mongoUpdateContextSubscription
   long long expiration = getCurrentTime() + requestP->duration.parse();
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CSUB_EXPIRATION, getField(sub, CSUB_EXPIRATION).numberLong());
+    newSub.append(CSUB_EXPIRATION, getLongField(sub, CSUB_EXPIRATION));
   }
   else
   {
@@ -133,8 +133,9 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   else {
       /* The hasField check is needed due to Throttling could not be present in the original doc */
-      if (sub.hasField(CSUB_THROTTLING)) {
-          newSub.append(CSUB_THROTTLING, getField(sub, CSUB_THROTTLING).numberLong());
+      if (sub.hasField(CSUB_THROTTLING))
+      {
+        newSub.append(CSUB_THROTTLING, getLongField(sub, CSUB_THROTTLING));
       }
   }
 
