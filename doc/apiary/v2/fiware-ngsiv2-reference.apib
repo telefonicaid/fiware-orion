@@ -152,7 +152,7 @@ FIWARE NGSI distinguishes between **context information** and **context availabi
 
 **Context availability information**, in contrast, is information about where and how context data can be obtained. FIWARE NGSI defines a model for representing context availability information and a set of operations for exchanging it.
 
-The separation of availability information from the actual data enables FIWARE NGSI to be flexibly used across federated systems. In such scenarios each NGSI subsystem can publish information about the data it can provide, while preserving control over who has access to which data.
+The separation of availability information from the actual data enables FIWARE NGSI to be flexibly used across federated systems. In such scenarios each NGSI subsystem can publish information about the data it can provide, while preserving control over where the actual data is sent to.
 
 #### Context Registrations
 
@@ -164,15 +164,20 @@ A context registration is a unit of context availability information. Context Re
  
 #### Context Discovery
 
-(placehoder for describing what discovery does)
+A **context discovery** is an operation to instantly retrieve context availability information. In the request message, the user specifies a set of entity identifiers, entity types, attributes, and restrictions or scopes. The response message from the FIWARE NGSI system consists of a number of context registrations that match the criteria specified in the request.
 
 #### Context Availability Subscription
 
-(placeholder for describing context availability subscriptions)
+FIWARE NGSI defines a subscription mechanism for context availability information, analogously to the subscription mechanism for context data. Users can
+ * subscribe for context availability information
+ * update existing subscriptions for context availability information
+ * cancel existing context availability subscriptions
+ 
+Users subscribing for context availability information need to provide a callback URL where **context availability notifications** can be sent to by the FIWARE NGSI system.
 
 #### Registering Context Availability Information
 
-(placeholder for describing the operation of registering context)
+FIWARE NGSI components can be informed about the availability of context information via the registration operation defined by FIWARE NGSI. The registration message typically contains one or more context registration items.
 
 ### Roles of FIWARE NGSI components
 
