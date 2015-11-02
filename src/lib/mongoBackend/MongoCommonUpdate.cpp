@@ -37,12 +37,12 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
-#include "cache/Subscription.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/subCache.h"
+
 #include "orionTypes/OrionValueType.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
+#include "mongoBackend/mongoSubCache.h"
 
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
@@ -1076,7 +1076,7 @@ std::string servicePathSubscriptionRegex(const std::string servicePath, std::vec
 
 /* ****************************************************************************
 *
-* addTriggeredSubscriptions
+* addTriggeredSubscriptions_withCache
 *
 */
 static bool addTriggeredSubscriptions_withCache
@@ -1169,7 +1169,7 @@ static bool addTriggeredSubscriptions_withCache
     return false;
   }
 
-  /* For each one of the subscriptions found, add it to the map (if not already there) */
+  /* For each of the subscriptions found, add it to the map (if not already there) */
   while (cursor->more())
   {
     BSONObj      sub      = cursor->next();
@@ -1202,7 +1202,10 @@ static bool addTriggeredSubscriptions_withCache
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub), NULL);
+          subToAttributeList(sub),
+          "",  // No subscriptionId as the sub-cache is not used for non-isPattern subscriptions
+          ""   // No tenant as the sub-cache is not used for non-isPattern subscriptions
+        );
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -1212,53 +1215,80 @@ static bool addTriggeredSubscriptions_withCache
   //
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
-  std::vector<Subscription*> subVec;
 
-  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+  std::vector<CachedSubscription*> subVec;
+
+  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
 
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
-    Subscription* sP = subVec[ix];
-
-    sP->pendingNotifications += 1;
+    CachedSubscription* cSubP = subVec[ix];
 
     // Outdated subscriptions are skipped
-    if (sP->expirationTime < now)
+    if (cSubP->expirationTime < now)
     {
       continue;
     }
 
     AttributeList aList;
 
-    aList.fill(sP->attributes);
+    aList.fill(cSubP->attributes);
 
     // Throttling
-    if ((sP->throttling != -1) && (sP->lastNotificationTime != -1))
+    if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
-      if ((now - sP->lastNotificationTime) < sP->throttling)
+      if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
+        LM_T(LmtMongoSubCache, ("subscription '%s' ignored due to throttling", cSubP->subscriptionId));
         continue;
       }
+      else
+      {
+        cSubP->pendingNotifications += 1;
+
+        LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                                cSubP->subscriptionId,
+                                cSubP->throttling,
+                                cSubP->lastNotificationTime,
+                                now,
+                                now - cSubP->lastNotificationTime,
+                                cSubP->throttling));
+      }
+    }
+    else
+    {
+      cSubP->pendingNotifications += 1;
+
+      LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                              cSubP->subscriptionId,
+                              cSubP->throttling,
+                              cSubP->lastNotificationTime,
+                              now,
+                              now - cSubP->lastNotificationTime,
+                              cSubP->throttling));
     }
 
-    TriggeredSubscription* sub = new TriggeredSubscription((long long) sP->throttling,
-                                                           (long long) sP->lastNotificationTime,
-                                                           sP->format,
-                                                           sP->reference.get(),
+    TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
+                                                           (long long) cSubP->lastNotificationTime,
+                                                           cSubP->notifyFormat,
+                                                           cSubP->reference,
                                                            aList,
-                                                           sP);
-    subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
+                                                           cSubP->subscriptionId,
+                                                           cSubP->tenant);
+    subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
   return true;
 }
 
 
+
 /* ****************************************************************************
 *
-* addTriggeredSubscriptions. Recovered almost verbatim from 0.23.0 release
+* addTriggeredSubscriptions_noCache
 *
+* Recovered almost verbatim from release 0.23.0
 */
 static bool addTriggeredSubscriptions_noCache
 (
@@ -1414,8 +1444,8 @@ static bool addTriggeredSubscriptions_noCache
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          //subToAttributeList(sub)); siganture changed in TriggeredSubscription() constructor in 0.24.0
-          subToAttributeList(sub), NULL);
+          //subToAttributeList(sub)); signature changed in TriggeredSubscription() constructor in 0.24.0
+          subToAttributeList(sub), "", "");
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -1424,6 +1454,12 @@ static bool addTriggeredSubscriptions_noCache
   return true;
 }
 
+
+
+/* ****************************************************************************
+*
+* addTriggeredSubscriptions - 
+*/
 static bool addTriggeredSubscriptions
 (
   std::string                               entityId,
@@ -1436,6 +1472,7 @@ static bool addTriggeredSubscriptions
 )
 {
   extern bool noCache;
+
   if (noCache)
   {
     return addTriggeredSubscriptions_noCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
@@ -1521,16 +1558,28 @@ static bool processSubscriptions
               update.toString().c_str(),
               query.toString().c_str()));
 
+
         //
         // Saving lastNotificationTime for cached subscription
         //
-        if (trigs->cacheSubReference != NULL)
+        if (trigs->cacheSubId != "")
         {
-          trigs->cacheSubReference->pendingNotifications -= 1;
+          CachedSubscription* cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
 
-          if (trigs->cacheSubReference->pendingNotifications == 0)
+          if (cSubP != NULL)
           {
-            trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+            cSubP->pendingNotifications -= 1;
+
+            if (cSubP->pendingNotifications == 0)
+            {
+              cSubP->lastNotificationTime = getCurrentTime();
+              LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s'", cSubP->lastNotificationTime, cSubP->subscriptionId));
+            }
+          }
+          else
+          {
+            LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
+                  trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
           }
         }
       }
