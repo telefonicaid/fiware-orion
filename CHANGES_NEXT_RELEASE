@@ -1,0 +1,2 @@
+Hardening: safer treatment of database fields lastNotification, expiration and throttling in 
+           the 'csub' collection, assuming that the field can be either int or long (it is always written as long)
