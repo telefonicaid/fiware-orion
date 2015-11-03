@@ -20,7 +20,7 @@
  For those usages not covered by this license please contact with
  iot_support at tid dot es
 
- Author: Ivan Arias - ivan dot ariasleon at telefonica dot com
+ Author: Ivan Arias
  -->
 <jmeterTestPlan version="1.2" properties="2.8" jmeter="2.13 r1665067">
   <hashTree>
@@ -53,6 +53,11 @@
             <stringProp name="Argument.value">${__P(THREADS,1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Threads</stringProp>
+          </elementProp>
+          <elementProp name="RAMP_UP" elementType="Argument">
+            <stringProp name="Argument.name">RAMP_UP</stringProp>
+            <stringProp name="Argument.value">${__P(RAMP_UP, 5)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="TEST_TIME" elementType="Argument">
             <stringProp name="Argument.name">TEST_TIME</stringProp>
@@ -154,11 +159,6 @@
             <stringProp name="Argument.name">ATTRIBUTE_PREFIX</stringProp>
             <stringProp name="Argument.value">A</stringProp>
             <stringProp name="Argument.desc">prefix used in attributes</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="RAMP_UP" elementType="Argument">
-            <stringProp name="Argument.name">RAMP_UP</stringProp>
-            <stringProp name="Argument.value">${__P(RAMP_UP, 5)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -289,7 +289,7 @@
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${THREADS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP_UP}</stringProp>
         <longProp name="ThreadGroup.start_time">1446476792000</longProp>
         <longProp name="ThreadGroup.end_time">1446562411000</longProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
@@ -328,7 +328,7 @@
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/v2/entities/${ENTITY_PREFIX}${entity}</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -422,9 +422,9 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 </stringProp>
             </BeanShellPreProcessor>
             <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="ASSERTION - 201 Created" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="ASSERTION - 204 No Content" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="49587">201</stringProp>
+                <stringProp name="49590">204</stringProp>
               </collectionProp>
               <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
               <boolProp name="Assertion.assume_success">false</boolProp>

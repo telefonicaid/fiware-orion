@@ -29,19 +29,21 @@ is made to not constantly access and penalizes the test times. We only store dat
 #### Scripts:
 
 **orion_updates_ngsiv2.jmx**: script used to send update requests using ngsi V2 API and subscriptions. This script only use one host.
-
-- If the ATTRIBUTES property is major than 20, the ATTRIBUTES property is replaced by 20.
+ 
+ - If the ATTRIBUTES property is major than 20, the ATTRIBUTES property is replaced by 20.
  - The entity id is random (between 1 until 50000), with this format ex: E00001 or E50000.
  - Sufix of attributes are random (between 1 until 20), with this format ex: A01, A07, A20.
  - Attribute values are random values (12 characters).
  - It is possible to include metadata or not in each attribute.
  - It is possible to include TimeInstant (in zulu mode) or not in each entity.
-
+ - **WARN: It is a requisite very important that all entities (50000) with the format A00000 exist in db, because the PATCH request is used.**
+ 
 Properties:
 ```
 		* HOST           - CB host or balancer (default: localhost)
 		* PORT           - CB port (default: 1026)
 		* THREADS        - number of concurrent threads (default: 1)
+		* RAMP_UP        - the amount of time for creating the total number of threads (default: 1)
 	    * TEST_TIME      - test duration time in seconds (default:30)
 		* SERVICE        - service header (default: update_ngsiv2))
 		* SERVICE_PATH   - service path header (default: /test))	    
