@@ -61,7 +61,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     BSONObj ent           = ents[ix].embeddedObject();
     std::string id        = getStringField(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE) ? getStringField(ent, CSUB_ENTITY_TYPE) : "";
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringField(ent, CSUB_ENTITY_TYPE) : "";
     std::string isPattern = getStringField(ent, CSUB_ENTITY_ISPATTERN);
 
     EntID en;
@@ -113,20 +113,14 @@ static void setNotification(Subscription* s, const BSONObj& r)
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     std::string attr = attrs[ix].String();
+
     s->notification.attributes.push_back(attr);
   }
 
-  // Callback
-  s->notification.callback = getStringField(r, CSUB_REFERENCE);
-
-  // Throttling
-  s->notification.throttling = r.hasField(CSUB_THROTTLING)? getField(r, CSUB_THROTTLING).numberLong() : -1;
-
-  // Last Notification
-  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION) ? getField(r, CSUB_LASTNOTIFICATION).numberLong() : -1;
-
-  // Count
-  s->notification.timesSent = r.hasField(CSUB_COUNT) ? getField(r, CSUB_COUNT).numberLong() : -1;
+  s->notification.callback         = getStringField(r, CSUB_REFERENCE);
+  s->notification.throttling       = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(r, CSUB_THROTTLING)       : -1;
+  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(r, CSUB_LASTNOTIFICATION) : -1;
+  s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getField(r, CSUB_COUNT).numberLong()              : -1;
 }
 
 
@@ -137,12 +131,24 @@ static void setNotification(Subscription* s, const BSONObj& r)
 */
 static void setExpires(Subscription* s, const BSONObj& r)
 {
-  // Last Notification
-  s->expires = r.hasField(CSUB_EXPIRATION) ? getField(r, CSUB_EXPIRATION).numberLong() : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLong(r, CSUB_EXPIRATION) : -1;
 
+  //
   // Status
-  // FIXME P10: use a enum for this
-  s->status = s->expires > getCurrentTime() ? "active" : "expired";
+  // FIXME P10: use an enum for active/expired
+  //
+  // NOTE:
+  //   if the field CSUB_EXPIRATION is not present in the subscription, then the default
+  //   value of "-1 == never expires" is used.
+  //
+  if ((s->expires > getCurrentTime()) || (s->expires == -1))
+  {
+    s->status = "active";
+  }
+  else
+  {
+    s->status = "expired";
+  }
 }
 
 

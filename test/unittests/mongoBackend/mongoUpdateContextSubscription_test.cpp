@@ -643,7 +643,9 @@ TEST(mongoUpdateContextSubscription, updateDuration)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(1360250700, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
+
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -740,7 +742,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
 
     EXPECT_EQ("51307b66f481db11bf860005", sub.getField("_id").OID().toString());
     EXPECT_EQ(50000000, sub.getIntField("expiration"));
-    EXPECT_EQ(55000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(55000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(4, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -823,7 +825,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
 
     EXPECT_EQ("51307b66f481db11bf860005", sub.getField("_id").OID().toString());
     EXPECT_EQ(50000000, sub.getIntField("expiration"));
-    EXPECT_EQ(55000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(55000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -908,7 +910,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -987,7 +989,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
@@ -1066,7 +1068,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T1_C0)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1152,7 +1154,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_C0)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1239,7 +1241,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1326,7 +1328,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1413,7 +1415,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1504,7 +1506,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));  // No notification attempt should have been made
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());  // No notification attempt should have been made
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1598,7 +1600,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1690,7 +1692,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1786,7 +1788,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1887,7 +1889,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1995,7 +1997,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2100,7 +2102,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2210,7 +2212,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2306,7 +2308,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2395,7 +2397,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2491,7 +2493,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2588,7 +2590,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2682,7 +2684,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2773,7 +2775,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2869,7 +2871,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2963,7 +2965,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3056,7 +3058,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3153,7 +3155,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3256,7 +3258,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3366,7 +3368,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3473,7 +3475,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3585,7 +3587,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3696,7 +3698,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3794,7 +3796,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
@@ -3889,7 +3891,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -3985,7 +3987,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4096,7 +4098,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860022", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4206,7 +4208,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
 
     EXPECT_EQ("51307b66f481db11bf860022", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4310,7 +4312,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4414,7 +4416,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4530,7 +4532,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860022", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4646,7 +4648,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
 
     EXPECT_EQ("51307b66f481db11bf860022", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4748,7 +4750,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4854,7 +4856,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -4959,7 +4961,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5058,7 +5060,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5164,7 +5166,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5270,7 +5272,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5374,7 +5376,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5485,7 +5487,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5603,7 +5605,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5716,7 +5718,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5834,7 +5836,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
     EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -5948,7 +5950,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6053,7 +6055,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6167,7 +6169,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6283,7 +6285,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6392,7 +6394,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6504,7 +6506,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6625,7 +6627,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6753,7 +6755,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
     EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -6874,7 +6876,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -7000,7 +7002,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
 
     EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
     EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
+    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -7098,7 +7100,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
     EXPECT_EQ(1360250700, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getIntField("lastNotification"));
+    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
