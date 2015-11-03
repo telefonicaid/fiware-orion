@@ -153,8 +153,10 @@ static char* curlVersionGet(char* buf, int bufLen)
 *
 * httpRequestSend -
 */
-std::string httpRequestSend
+
+std::string httpRequestSendWithCurl
 (
+   CURL                   *curl,
    const std::string&     _ip,
    unsigned short         port,
    const std::string&     protocol,
@@ -179,8 +181,6 @@ std::string httpRequestSend
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
   int                        outgoingMsgSize       = 0;
-  CURL*                      curl;
-  struct curl_context        cc;
   std::string                content_type(orig_content_type);
 
   ++callNo;
@@ -241,14 +241,7 @@ std::string httpRequestSend
     return "error";
   }
 
-  get_curl_context(ip, &cc);
-  if ((curl = cc.curl) == NULL)
-  {
-    release_curl_context(&cc);
-    LM_E(("Runtime Error (could not init libcurl)"));
-    LM_TRANSACTION_END();
-    return "error";
-  }
+
 
   // Allocate to hold HTTP response
   httpResponse = new MemoryStruct;
@@ -370,8 +363,6 @@ std::string httpRequestSend
   {
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
 
-    // Cleanup curl environment
-    release_curl_context(&cc);
     curl_slist_free_all(headers);
 
     free(httpResponse->memory);
@@ -443,7 +434,7 @@ std::string httpRequestSend
   }
 
   // Cleanup curl environment
-  release_curl_context(&cc);
+
   curl_slist_free_all(headers);
 
   free(httpResponse->memory);
@@ -454,6 +445,42 @@ std::string httpRequestSend
   return result;
 }
 
+std::string httpRequestSend
+(
+   const std::string&     _ip,
+   unsigned short         port,
+   const std::string&     protocol,
+   const std::string&     verb,
+   const std::string&     tenant,
+   const std::string&     servicePath,
+   const std::string&     xauthToken,
+   const std::string&     resource,
+   const std::string&     orig_content_type,
+   const std::string&     content,
+   bool                   useRush,
+   bool                   waitForResponse,
+   const std::string&     acceptFormat,
+   long                   timeoutInMilliseconds
+)
+{
+  struct curl_context cc;
+  std::string         resp;
+
+  get_curl_context(_ip, &cc);
+  if (cc.curl == NULL)
+  {
+    release_curl_context(&cc);
+    LM_E(("Runtime Error (could not init libcurl)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+  resp = httpRequestSendWithCurl(cc.curl, _ip, port, protocol, verb, tenant, servicePath, xauthToken,
+                                             resource, orig_content_type, content, useRush, waitForResponse,
+                                             acceptFormat, timeoutInMilliseconds
+        );
+  release_curl_context(&cc);
+  return resp;
+}
 
 #else // Old functionality()
 

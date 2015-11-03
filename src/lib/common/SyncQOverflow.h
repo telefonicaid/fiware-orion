@@ -1,0 +1,78 @@
+#ifndef SYNCQOVERFLOW_H
+#define SYNCQOVERFLOW_H
+
+/*
+*
+* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+*
+* This file is part of Orion Context Broker.
+*
+* Orion Context Broker is free software: you can redistribute it and/or
+* modify it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Orion Context Broker is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+* General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+*
+* For those usages not covered by this license please contact with
+* iot_support at tid dot es
+*
+* Author: Orion dev team
+*/
+
+#include <queue>
+
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
+
+template <typename Data>
+class SyncQOverflow {
+private:
+    std::queue<Data> queue;
+    mutable boost::mutex mtx;
+    boost::condition_variable addedElement;
+    size_t max_size;
+
+public:
+    SyncQOverflow(size_t sz): max_size(sz) {}
+    bool try_push(Data element);
+    Data pop();
+};
+
+template <typename Data>
+bool SyncQOverflow<Data>::try_push(Data element)
+{
+  boost::mutex::scoped_lock lock(mtx);
+
+  if (queue.size() < max_size)
+    {
+      queue.push(element);
+      lock.unlock();
+      addedElement.notify_one();
+      return true;
+    }
+  return false;
+}
+
+template <typename Data>
+Data SyncQOverflow<Data>::pop()
+{
+  boost::mutex::scoped_lock lock(mtx);
+  while(queue.empty())
+    {
+      addedElement.wait(lock);
+    }
+
+  Data element=queue.front();
+  queue.pop();
+  return element;
+}
+
+
+#endif // SYNQOVERFLOW_H
