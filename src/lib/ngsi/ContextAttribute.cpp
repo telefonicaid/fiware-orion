@@ -469,7 +469,7 @@ std::string ContextAttribute::render
       case ValueTypeNumber:
         char num[32];
         snprintf(num, sizeof(num), "%f", numberValue);
-        effectiveValue      = std::string(num);
+        effectiveValue      = num;
         valueIsNumberOrBool = true;
         break;
 

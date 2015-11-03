@@ -287,7 +287,8 @@ std::string valueTag
   const std::string&  unescapedValue,
   Format              format,
   bool                showComma,
-  bool                isVectorElement
+  bool                isVectorElement,
+  bool                valueIsNumberOrBool
 )
 {
 
@@ -317,20 +318,19 @@ std::string valueTag
     return out;
   }
 
+  std::string effectiveValue = valueIsNumberOrBool ? value : std::string("\"") + value + "\"";
+  free(value);
+
   if (showComma == true)
   {
     if (isVectorElement == true)
     {
-      std::string out = indent + "\"" + value + "\",\n";
-
-      free(value);
+      std::string out = indent + effectiveValue + ",\n";
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\",\n";
-
-      free(value);
+      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + ",\n";
       return out;
     }
   }
@@ -338,16 +338,12 @@ std::string valueTag
   {
     if (isVectorElement == true)
     {
-      std::string out = indent + "\"" + value + "\"\n";
-
-      free(value);
+      std::string out = indent + effectiveValue + "\n";
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\"\n";
-
-      free(value);
+      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + "\n";
       return out;
     }
   }
