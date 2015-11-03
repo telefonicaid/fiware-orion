@@ -4,32 +4,70 @@ This is the Jmeter scripts repository for the Orion Context Broker, used for Per
 
 #### Pre-conditions:
 
-* "Jmeter" app exists in Launcher VM 
-* "ServerAgent" app exist in Launcher VM, in ContextBroker VM and Nginx VM (only in cluster case) 
-* have a account in Loadosophia - (http://loadosophia.org)
+* "Jmeter" app (2.11 or higher) is required in Launcher VM (http://jmeter.apache.org)
+* "jmeter-plugin" is required (http://jmeter-plugins.org)
+* "ServerAgent" is required in ContextBroker and/or balancer hosts (http://jmeter-plugins.org/wiki/PerfMonAgent) (Java is required)
+* have a account in Loadosophia (optional) - (http://loadosophia.org)
 * "nginx" app exists in Balancer VM (only in cluster case)
 * Verify nginx configuration for each scenario (only in cluster case)
-* Verify contextBroker MD5 in each Node
-* Verify mongoDB version in each Node	
+* Verify mongoDB version (2.6.x)	
 	
 #### Steps:
 
-* Launch "ServerAgent" in ContextBroker VM in Balancer and each Node VM 
+* Launch "ServerAgent" in ContextBroker VM or/and in Balancer. 
 ```
-nohup sh startAgent.sh --udp-port 0 --tcp-port 3450 > monitor.log &
+nohup sh startAgent.sh --udp-port 0 --tcp-port 4444 > monitor.log &
 ```
-* Launch jmeter script "orionPerfTest_cluster_v1.2.jmx" in Launcher VM
-```
-./jmeter.sh -n -t <script>.jmx -J<property>=value > /<path>/jmeter_report__`date +%Y%m%d%H`.log
-```
-* Upload in Loadosophia Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz and perfmon_xxxxxxxxxxxxxxxxxxxx.jtl.gz (where "xxxxxxxxxxxxxxxxxxx" is a hash value).
+* Launch jmeter script 
+* get reports in `/tmp/jmeter_result/<date>__<proyect_name>/` folder
+* (Optional) Upload in Loadosophia Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz and perfmon_xxxxxxxxxxxxxxxxxxxx.jtl.gz (where "xxxxxxxxxxxxxxxxxxx" is a hash value).
 
 Comments:
     /tmp/error_xxxxxxxxxxxxxxxxxxx.html is created, because does not have access at loadosophia, the token is wrong intentionally 
 is made to not constantly access and penalizes the test times. We only store datas manually when finished test. So "xxxxxxxxxxxxxxxxxxx" is a hash value.
 
 #### Scripts:
-1. **orionPerformanceTest_v1.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
+
+**orion_updates_ngsiv2.jmx**: script used to send update requests using ngsi V2 API and subscriptions. This script only use one host.
+
+- If the ATTRIBUTES property is major than 20, the ATTRIBUTES property is replaced by 20.
+ - The entity id is random (between 1 until 50000), with this format ex: E00001 or E50000.
+ - Sufix of attributes are random (between 1 until 20), with this format ex: A01, A07, A20.
+ - Attribute values are random values (12 characters).
+ - It is possible to include metadata or not in each attribute.
+ - It is possible to include TimeInstant (in zulu mode) or not in each entity.
+
+Properties:
+```
+		* HOST           - CB host or balancer (default: localhost)
+		* PORT           - CB port (default: 1026)
+		* THREADS        - number of concurrent threads (default: 1)
+	    * TEST_TIME      - test duration time in seconds (default:30)
+		* SERVICE        - service header (default: update_ngsiv2))
+		* SERVICE_PATH   - service path header (default: /test))	    
+	    * ATTRIBUTES     - number of attributes per entity (default:1)
+	    * METADATA       - if true is appended a metadata in each attribute (default: false)
+	    * TIME_INSTANT   - if true is appended a "timeInstant" attribute in each entity (default: false)
+	    * SUBSC          - number of subscriptions (default: 0)
+	    * SUBSC_DURATION - Duration of the subscriptions in seconds (default: 60)
+		* LISTEN_HOST    - host to receive notifications (mock) (default:localhost)
+		* LISTEN_PORT    - port to receive notifications (mock) (default:8090)				
+```
+
+Report files (listeners):
+```
+  * tps_<date>.csv: this graph shows the number of transactions per second for each sampler (jp@gc - Transactions per Second).
+  * reports_<date>.csv: which displays values for all request made during the test and an individual row for each named request in your test(Aggregate Report).
+  * perfmon_<date>.csv: Some metric types (CPU, Memory, TCP) are show in graphic (jp@gc - Perfom Metrics Collector)
+  * errors__<date>.csv:  shows a tree of all sample responses, allowing you to view the response for any sample (only errors are stored) (View Results Tree).
+```
+
+Example:
+```
+./jmeter.sh -n -t orion_updates_ngsiv2.jmx -JHOST=10.10.10.1 -JTHREADS=100 -JTEST_TIME=60 -JATTRIBUTES=3
+```
+
+**orionPerformanceTest_v1.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
 	 
         Properties:
 
