@@ -123,6 +123,5 @@ TEST(cache, SubscriptionCache)
   EXPECT_EQ("012345678901234567890124", subV[1]->subscriptionId);
   subV.clear();
 
-  utExit();
-  setMongoConnectionForUnitTest(NULL);
+  utExit();  
 }

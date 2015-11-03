@@ -627,7 +627,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);  	
   utExit();
 }
 
@@ -687,9 +686,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -754,9 +751,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -822,9 +817,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -903,9 +896,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -978,9 +969,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1016,9 +1005,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -1061,9 +1048,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1176,9 +1161,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1245,9 +1228,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1337,9 +1318,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1440,9 +1419,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1543,9 +1520,7 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1603,9 +1578,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1684,9 +1657,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1778,9 +1749,7 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1820,9 +1789,7 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1937,9 +1904,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2080,9 +2045,7 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -2180,9 +2143,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2273,9 +2234,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2349,9 +2308,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2424,9 +2381,6 @@ TEST(mongoContextProvidersQueryRequest, severalCprsFormat)
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-  setMongoConnectionForUnitTest(NULL);  
   
   utExit();
-
 }
