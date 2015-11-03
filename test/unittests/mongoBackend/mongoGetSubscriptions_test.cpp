@@ -87,7 +87,7 @@ static void prepareDatabaseV1Subs(void) {
 
     BSONObj sub2 = BSON("_id" << OID(SUB_OID2) <<
                         "expiration" << (long long) 25000000 <<
-                        "lastNotification" << (long long) 20000000 <<
+                        "lastNotification" << 20000000 <<
                         "count" << (long long) 24 <<
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
@@ -101,7 +101,7 @@ static void prepareDatabaseV1Subs(void) {
 
     BSONObj sub3 = BSON("_id" << OID(SUB_OID3) <<
                         "expiration" << (long long) 20000000 <<
-                        "lastNotification" << (long long) 25000000 <<
+                        "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
