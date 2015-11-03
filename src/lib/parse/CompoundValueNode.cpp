@@ -588,7 +588,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
     LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
     char num[32];
     snprintf(num, sizeof(num), "%f", numberValue);
-    std::string effectiveValue = std::string(num);
+    std::string effectiveValue = num;
     out = valueTag(indent, tagName, effectiveValue, format, jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeBoolean)
