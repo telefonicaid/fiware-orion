@@ -620,8 +620,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? sub.getField(CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->notifyFormat          = stringToFormat(formatString);
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getLongField(sub, CSUB_THROTTLING) : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION) : 0;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
@@ -827,8 +827,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
   std::vector<BSONElement>  attrVec       = sub.getField(CSUB_ATTRS).Array();
   std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
 
-  if (lastNotificationTime == -1)
+  if ((lastNotificationTime == -1) && (sub.hasField(CSUB_LASTNOTIFICATION)))
   {
+    //
+    // If no lastNotificationTime is given to this function AND
+    // if the database objuect contains lastNotificationTime,
+    // then use the value from the database
+    //
     lastNotificationTime = getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION);
   }
 
@@ -837,7 +842,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
   cSubP->servicePath           = strdup(servicePath);
   cSubP->notifyFormat          = stringToFormat(formatString);
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)? sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getLongField(sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->pendingNotifications  = 0;

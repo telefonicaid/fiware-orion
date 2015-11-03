@@ -96,7 +96,7 @@ static void prepareDatabaseV1Subs(void) {
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
                                                        )) <<
-                        "throttling" << 5.0
+                        "throttling" << 5
                         );
 
     BSONObj sub3 = BSON("_id" << OID(SUB_OID3) <<

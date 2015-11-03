@@ -129,19 +129,26 @@ HttpStatusCode mongoUpdateContextSubscription
   // FIXME: Restrictions not implemented yet
 
   /* Throttling update */
-  if (!requestP->throttling.isEmpty()) {
-      /* Throttling equal to 0 removes throttling */
-      long long throttling = requestP->throttling.parse();
-      if (throttling != 0) {
-          newSub.append(CSUB_THROTTLING, throttling);
-      }
+  if (!requestP->throttling.isEmpty())
+  {
+    /* Throttling equal to 0 removes throttling */
+    long long throttling = requestP->throttling.parse();
+
+    if (throttling != 0)
+    {
+      newSub.append(CSUB_THROTTLING, throttling);
+    }
   }
-  else {
-      /* The hasField check is needed due to Throttling could not be present in the original doc */
-      if (sub.hasField(CSUB_THROTTLING))
-      {
-        newSub.append(CSUB_THROTTLING, getField(sub, CSUB_THROTTLING).numberLong());
-      }
+  else
+  {
+    //
+    // The hasField check is needed as Throttling might not be present in the original doc
+    // FIXME P1: However, we could include Throttling in the new doc anyway ...
+    //
+    if (sub.hasField(CSUB_THROTTLING))
+    {
+      newSub.append(CSUB_THROTTLING, getIntOrLongFieldAsLong(sub, CSUB_THROTTLING));
+    }
   }
 
   /* Notify conditions */

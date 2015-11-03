@@ -90,7 +90,8 @@ HttpStatusCode mongoGetContextSubscriptionInfo
     csiP->url              = getStringField(sub, CSUB_REFERENCE);
     csiP->expiration       = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : -1;
     csiP->lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
-    csiP->throttling       = sub.hasField(CSUB_THROTTLING)?       getField(sub, CSUB_THROTTLING).numberLong()         : -1;
+    csiP->throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
+
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
     std::string fmt = getStringField(sub, CSUB_FORMAT);

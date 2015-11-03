@@ -1213,7 +1213,7 @@ static bool addTriggeredSubscriptions_withCache
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING)? getField(sub, CSUB_THROTTLING).numberLong() : -1;
+      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
       long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription
@@ -1447,7 +1447,7 @@ static bool addTriggeredSubscriptions_noCache
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING)? getField(sub, CSUB_THROTTLING).numberLong() : -1;
+      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
       long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription

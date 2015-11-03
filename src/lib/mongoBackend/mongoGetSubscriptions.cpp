@@ -113,20 +113,14 @@ static void setNotification(Subscription* s, const BSONObj& r)
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     std::string attr = attrs[ix].String();
+
     s->notification.attributes.push_back(attr);
   }
 
-  // Callback
-  s->notification.callback = getStringField(r, CSUB_REFERENCE);
-
-  // Throttling
-  s->notification.throttling = r.hasField(CSUB_THROTTLING)? getField(r, CSUB_THROTTLING).numberLong() : -1;
-
-  // Last Notification Time
+  s->notification.callback         = getStringField(r, CSUB_REFERENCE);
+  s->notification.throttling       = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(r, CSUB_THROTTLING)       : -1;
   s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(r, CSUB_LASTNOTIFICATION) : -1;
-
-  // Count
-  s->notification.timesSent = r.hasField(CSUB_COUNT)? getField(r, CSUB_COUNT).numberLong() : -1;
+  s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getField(r, CSUB_COUNT).numberLong()              : -1;
 }
 
 
