@@ -46,7 +46,7 @@ Properties:
 		* RAMP_UP        - the amount of time for creating the total number of threads (default: 1)
 	    * TEST_TIME      - test duration time in seconds (default:30)
 		* SERVICE        - service header (default: update_ngsiv2))
-		* SERVICE_PATH   - service path header (default: /test))	    
+		* SERVICE_PATH   - service path header (default: /))	    
 	    * ATTRIBUTES     - number of attributes per entity (default:1)
 	    * METADATA       - if true is appended a metadata in each attribute (default: false)
 	    * TIME_INSTANT   - if true is appended a "timeInstant" attribute in each entity (default: false)
