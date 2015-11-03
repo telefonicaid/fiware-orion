@@ -23,8 +23,16 @@ nohup sh startAgent.sh --udp-port 0 --tcp-port 4444 > monitor.log &
 * (Optional) Upload in Loadosophia Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz and perfmon_xxxxxxxxxxxxxxxxxxxx.jtl.gz (where "xxxxxxxxxxxxxxxxxxx" is a hash value).
 
 Comments:
-    /tmp/error_xxxxxxxxxxxxxxxxxxx.html is created, because does not have access at loadosophia, the token is wrong intentionally 
-is made to not constantly access and penalizes the test times. We only store datas manually when finished test. So "xxxxxxxxxxxxxxxxxxx" is a hash value.
+
+  - if someone would like to disable the listener to get metrics from host (jp@gc - Perfom Metrics Collector), it is very easy, in GUI or in file directly (change enabled="false"). Avoiding scripts duplicate.
+   Review if the testname is correct.
+   ```
+   <kg.apc.jmeter.perfmon.PerfMonCollector guiclass="kg.apc.jmeter.vizualizers.PerfMonGui" testclass="kg.apc.jmeter.perfmon.PerfMonCollector" testname="PerfMon Metrics Collector" enabled="true">
+   ``` 
+
+  -  /tmp/error_xxxxxxxxxxxxxxxxxxx.html is created, because does not have access at loadosophia, the token is wrong intentionally, because the jmeter do not constantly access and penalizes the test times. We only store datas manually when finished test. So "xxxxxxxxxxxxxxxxxxx" is a hash value.
+
+  
 
 #### Scripts:
 
