@@ -621,7 +621,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->notifyFormat          = stringToFormat(formatString);
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getLongField(sub, CSUB_THROTTLING) : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getLongField(sub, CSUB_EXPIRATION) : 0;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION) : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;

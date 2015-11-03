@@ -63,22 +63,29 @@ HttpStatusCode mongoSubscribeContext
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
-    /* If expiration is not present, then use a default one */
-    if (requestP->duration.isEmpty()) {
-        requestP->duration.set(DEFAULT_DURATION);
+    //
+    // Calculate expiration (using the current time and the duration field in the request).
+    // If expiration is not present, use a default value
+    //
+    if (requestP->duration.isEmpty())
+    {
+      requestP->duration.set(DEFAULT_DURATION);
     }
 
-    /* Calculate expiration (using the current time and the duration field in the request) */
     long long expiration = getCurrentTime() + requestP->duration.parse();
+
     LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
 
     /* Create the mongoDB subscription document */
-    BSONObjBuilder sub;
-    OID oid;
+    BSONObjBuilder  sub;
+    OID             oid;
+
     oid.init();
+
     sub.append("_id", oid);
     sub.append(CSUB_EXPIRATION, expiration);
-    sub.append(CSUB_REFERENCE, requestP->reference.get());
+    sub.append(CSUB_REFERENCE,  requestP->reference.get());
+
 
     /* Throttling */
     long long throttling = 0;

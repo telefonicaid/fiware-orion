@@ -112,7 +112,12 @@ HttpStatusCode mongoUpdateContextSubscription
   long long expiration = getCurrentTime() + requestP->duration.parse();
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CSUB_EXPIRATION, getField(sub, CSUB_EXPIRATION).numberLong());
+    //
+    // No duration in incoming request => "inherit" expirationDate from 'old' subscription
+    //
+    long long expirationTime = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION) : -1;
+
+    newSub.append(CSUB_EXPIRATION, expirationTime);
   }
   else
   {

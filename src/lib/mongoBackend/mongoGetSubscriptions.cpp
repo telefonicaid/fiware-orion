@@ -137,12 +137,24 @@ static void setNotification(Subscription* s, const BSONObj& r)
 */
 static void setExpires(Subscription* s, const BSONObj& r)
 {
-  // Last Notification
-  s->expires = r.hasField(CSUB_EXPIRATION)? getField(r, CSUB_EXPIRATION).numberLong() : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLong(r, CSUB_EXPIRATION) : -1;
 
+  //
   // Status
-  // FIXME P10: use an enum for this
-  s->status = (s->expires > getCurrentTime())? "active" : "expired";
+  // FIXME P10: use an enum for active/expired
+  //
+  // NOTE:
+  //   if the field CSUB_EXPIRATION is not present in the subscription, then the default
+  //   value of "-1 == never expires" is used.
+  //
+  if ((s->expires > getCurrentTime()) || (s->expires == -1))
+  {
+    s->status = "active";
+  }
+  else
+  {
+    s->status = "expired";
+  }
 }
 
 
