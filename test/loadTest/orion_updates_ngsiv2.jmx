@@ -56,7 +56,7 @@
           </elementProp>
           <elementProp name="RAMP_UP" elementType="Argument">
             <stringProp name="Argument.name">RAMP_UP</stringProp>
-            <stringProp name="Argument.value">${__P(RAMP_UP, 5)}</stringProp>
+            <stringProp name="Argument.value">${__P(RAMP_UP, 1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="TEST_TIME" elementType="Argument">
@@ -73,7 +73,7 @@
           </elementProp>
           <elementProp name="SERVICE_PATH" elementType="Argument">
             <stringProp name="Argument.name">SERVICE_PATH</stringProp>
-            <stringProp name="Argument.value">${__P(SERVICE_PATH, /test)}</stringProp>
+            <stringProp name="Argument.value">${__P(SERVICE_PATH, /)}</stringProp>
             <stringProp name="Argument.desc">service path header</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
