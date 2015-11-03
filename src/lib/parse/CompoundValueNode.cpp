@@ -583,6 +583,19 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
     out = valueTag(indent, tagName, stringValue, format, jsonComma, container->valueType == orion::ValueTypeVector);
   }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
+    char num[32];
+    snprintf(num, sizeof(num), "%f", numberValue);
+    std::string effectiveValue = std::string(num);
+    out = valueTag(indent, tagName, effectiveValue, format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
+    out = valueTag(indent, tagName, boolValue? "true" : "false", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+  }
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
