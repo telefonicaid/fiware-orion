@@ -38,12 +38,12 @@ Comments:
 
 **orion_updates_ngsiv2.jmx**: script used to send update requests using ngsi V2 API and subscriptions. This script only use one host.
  
- - If the ATTRIBUTES property is major than 20, the ATTRIBUTES property is replaced by 20.
- - The entity id is random (between 1 until 50000), with this format ex: E00001 or E50000.
- - Sufix of attributes are random (between 1 until 20), with this format ex: A01, A07, A20.
+ - If the ATTRIBUTES property is bigger than 20, the ATTRIBUTES property is replaced by 20.
+ - The entity id is random (between 1 and 50000), with this format ex: E00001 or E50000.
+ - Suffix of attributes are random (between 1 and 20), with this format ex: A01, A07, A20.
  - Attribute values are random values (12 characters).
  - It is possible to include metadata or not in each attribute.
- - It is possible to include TimeInstant (in zulu mode) or not in each entity.
+ - It is possible to include TimeInstant attribute (in zulu mode) or not in each entity.
  - **WARN: It is a requisite very important that all entities (50000) with the format A00000 exist in db, because the PATCH request is used.**
  
 Properties:
