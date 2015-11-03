@@ -172,6 +172,8 @@ HttpStatusCode mongoUpdateContextSubscription
        attrL.release();
   }
 
+
+  
   int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
 
   /* Last notification */
@@ -180,15 +182,22 @@ HttpStatusCode mongoUpdateContextSubscription
   {
     lastNotification = getCurrentTime();
     LM_T(LmtMongoSubCache, ("notificationDone => lastNotification set to %lu", lastNotification));
-    newSub.append(CSUB_LASTNOTIFICATION, (long long) lastNotification);
+    newSub.append(CSUB_LASTNOTIFICATION, lastNotification);
     newSub.append(CSUB_COUNT, count + 1);
   }
   else
   {
+    //
+    // FIXME P1: if CSUB_LASTNOTIFICATION is not in the original doc, it will also not be in the new doc.
+    //           Is this necessary?
+    //           The implementation would get a lot simpler if we ALWAYS add CSUB_LASTNOTIFICATION and CSUB_COUNT
+    //           to 'newSub'
+    //
+
     /* The hasField checks are needed as lastNotification/count might not be present in the original doc */
     if (sub.hasField(CSUB_LASTNOTIFICATION))
     {
-      newSub.append(CSUB_LASTNOTIFICATION, getLongField(sub, CSUB_LASTNOTIFICATION));
+      newSub.append(CSUB_LASTNOTIFICATION, getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION));
     }
 
     if (sub.hasField(CSUB_COUNT))

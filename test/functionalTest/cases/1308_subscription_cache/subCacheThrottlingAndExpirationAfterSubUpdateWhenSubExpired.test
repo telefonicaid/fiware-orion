@@ -31,8 +31,8 @@ accumulatorStart
 --SHELL--
 
 #
-# 00. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 1 sec
-# 01. Update the subscription, after it has expired, now setting duration to 10 secs
+# 00. Create subscription for s0.* entities, attribute A, w/o tenant, with 'bad' duration and throttling
+# 01. Update the subscription, after it has expired, now setting duration to 10 secs and throttling 4 secs
 # 02. Create entity s01 w/ attr A w/o tenant
 # 03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 # 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
@@ -45,8 +45,8 @@ accumulatorStart
 #
 
 
-echo "00. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 1 sec"
-echo "========================================================================================="
+echo "00. Create subscription for s0.* entities, attribute A, w/o tenant, with 'bad' duration and throttling"
+echo "======================================================================================================"
 payload='{
   "entities": [
     {
@@ -70,8 +70,8 @@ echo
 echo
 
 
-echo "01. Update the subscription, after it has expired, now setting duration to 10 secs"
-echo "=================================================================================="
+echo "01. Update the subscription, after it has expired, now setting duration to 10 secs and throttling 4 secs"
+echo "========================================================================================================"
 sleep 2
 payload='{
   "subscriptionId": "'$SUB_ID'",
@@ -168,8 +168,8 @@ echo
 
 
 --REGEXPECT--
-00. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 1 sec
-=========================================================================================
+00. Create subscription for s0.* entities, attribute A, w/o tenant, with 'bad' duration and throttling
+======================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
@@ -184,8 +184,8 @@ Date: REGEX(.*)
 }
 
 
-01. Update the subscription, after it has expired, now setting duration to 10 secs
-==================================================================================
+01. Update the subscription, after it has expired, now setting duration to 10 secs and throttling 4 secs
+========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 137
 Content-Type: application/json

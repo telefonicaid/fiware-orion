@@ -1214,26 +1214,7 @@ static bool addTriggeredSubscriptions_withCache
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       long long throttling       = sub.hasField(CSUB_THROTTLING)? getField(sub, CSUB_THROTTLING).numberLong() : -1;
-      long long lastNotification = -1;
-
-      //
-      // CSUB_LASTNOTIFICATION might be either Int or Long ...
-      //
-      if (sub.hasField(CSUB_LASTNOTIFICATION))
-      {
-        if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberLong)
-        {
-          lastNotification = getLongField(sub, CSUB_LASTNOTIFICATION);
-        }
-        else if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberInt)
-        {
-          lastNotification = (long long) getIntField(sub, CSUB_LASTNOTIFICATION);
-        }
-      }
-      else
-      {
-        lastNotification = -1;
-      }
+      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
@@ -1466,8 +1447,8 @@ static bool addTriggeredSubscriptions_noCache
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
-      long long lastNotification = getLongField(sub, CSUB_LASTNOTIFICATION);
+      long long throttling       = sub.hasField(CSUB_THROTTLING)? getField(sub, CSUB_THROTTLING).numberLong() : -1;
+      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (

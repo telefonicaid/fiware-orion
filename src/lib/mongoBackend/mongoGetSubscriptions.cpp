@@ -61,7 +61,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     BSONObj ent           = ents[ix].embeddedObject();
     std::string id        = getStringField(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE) ? getStringField(ent, CSUB_ENTITY_TYPE) : "";
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringField(ent, CSUB_ENTITY_TYPE) : "";
     std::string isPattern = getStringField(ent, CSUB_ENTITY_ISPATTERN);
 
     EntID en;
@@ -122,11 +122,11 @@ static void setNotification(Subscription* s, const BSONObj& r)
   // Throttling
   s->notification.throttling = r.hasField(CSUB_THROTTLING)? getField(r, CSUB_THROTTLING).numberLong() : -1;
 
-  // Last Notification
-  s->notification.lastNotification = getLongField(r, CSUB_LASTNOTIFICATION);
+  // Last Notification Time
+  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(r, CSUB_LASTNOTIFICATION) : -1;
 
   // Count
-  s->notification.timesSent = r.hasField(CSUB_COUNT) ? getField(r, CSUB_COUNT).numberLong() : -1;;
+  s->notification.timesSent = r.hasField(CSUB_COUNT)? getField(r, CSUB_COUNT).numberLong() : -1;
 }
 
 

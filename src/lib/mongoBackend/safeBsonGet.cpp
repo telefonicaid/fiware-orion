@@ -106,6 +106,31 @@ int getIntField(const BSONObj& b, const std::string& field)
 */
 long long getLongField(const BSONObj& b, const std::string& field)
 {
+  if (b.hasField(field) && (b.getField(field).type() == NumberLong))
+  {
+    return b.getField(field).Long();
+  }
+
+  // Detect error
+  if (!b.hasField(field))
+  {
+    LM_E(("Runtime Error (long field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s>)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+  }  
+
+  return -1;
+}
+
+/* ****************************************************************************
+*
+* getIntOrLongFieldAsLong -
+*/
+long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field)
+{
   if (b.hasField(field))
   {
     if (b.getField(field).type() == NumberLong)
@@ -121,11 +146,11 @@ long long getLongField(const BSONObj& b, const std::string& field)
   // Detect error
   if (!b.hasField(field))
   {
-    LM_E(("Runtime Error (long field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+    LM_E(("Runtime Error (int/long field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s>)",
+    LM_E(("Runtime Error (field '%s' was supposed to be int or long but type=%d in BSONObj <%s>)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
   }  
 

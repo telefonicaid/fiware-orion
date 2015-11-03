@@ -80,24 +80,17 @@ HttpStatusCode mongoGetContextSubscriptionInfo
         csiP->entityIdVector.push_back(enP);
 
     }
+
     std::vector<BSONElement> attrs = getField(sub, CSUB_ATTRS).Array();
-    for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
-        csiP->attributeList.push_back(attrs[ix].String());
-    }
-
-    csiP->expiration = sub.hasField(CSUB_EXPIRATION)? getField(sub, CSUB_EXPIRATION).numberLong() : -1;
-
-    csiP->url = getStringField(sub, CSUB_REFERENCE);
-    if (sub.hasElement(CSUB_LASTNOTIFICATION))
+    for (unsigned int ix = 0; ix < attrs.size(); ++ix)
     {
-      csiP->lastNotification = getLongField(sub, CSUB_LASTNOTIFICATION);
-    }
-    else
-    {
-      csiP->lastNotification = -1;
+      csiP->attributeList.push_back(attrs[ix].String());
     }
 
-    csiP->throttling = sub.hasField(CSUB_THROTTLING)? getField(sub, CSUB_THROTTLING).numberLong() : -1;
+    csiP->expiration       = sub.hasField(CSUB_EXPIRATION)? getField(sub, CSUB_EXPIRATION).numberLong() : -1;
+    csiP->url              = getStringField(sub, CSUB_REFERENCE);
+    csiP->lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
+    csiP->throttling       = sub.hasField(CSUB_THROTTLING)? getField(sub, CSUB_THROTTLING).numberLong() : -1;
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
     std::string fmt = getStringField(sub, CSUB_FORMAT);
