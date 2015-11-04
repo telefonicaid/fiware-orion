@@ -25,7 +25,7 @@ notifyFormat_ngsi10
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 38,101,102 IPv4 -subCacheIval 6
+brokerStart CB 38,101,102 IPv4 -subCacheIval 8
 accumulatorStart
 
 --SHELL--
@@ -37,11 +37,13 @@ accumulatorStart
 # 04. Sleep 3 secs to let the subscription expire
 # 05. Update subscription, duration 30 secs
 # 06. Statistics - to see the sub-update
-# 07. Sleep 4 secs to let the cache be refreshed
+# 07. Sleep 6 secs to let the cache be refreshed
 # 08. Statistics - see 2 refresh, one notification
 # 09. Update E10/A1
-# 10. Statistics - see 2 refresh, two notifications
-# 11. Dump accumulator - see two notifications
+# 10. Update E10/A1
+# 11. Update E10/A1
+# 12. Statistics - see 2 refresh, four notifications
+# 13. Dump accumulator - see four notifications
 #
 
 echo "01. Create entity E10, attribute A1"
@@ -67,6 +69,7 @@ payload='{
   "attributes": [
     "A1"
   ],
+  "throttling": "PT1S",
   "reference": "http://localhost:'${LISTENER_PORT}'/notify",
   "duration": "PT2S",
   "notifyConditions": [
@@ -117,9 +120,9 @@ echo
 echo
 
 
-echo "07. Sleep 4 secs to let the cache be refreshed"
+echo "07. Sleep 6 secs to let the cache be refreshed"
 echo "=============================================="
-sleep 4
+sleep 6
 echo
 echo
 
@@ -134,22 +137,44 @@ echo
 echo "09. Update E10/A1"
 echo "================="
 payload='{
-  "A1": "07. Updated"
+  "A1": "09. Updated"
 }'
 orionCurl --url /v2/entities/E10 --payload "$payload" --json
 echo
 echo
 
 
-echo "10. Statistics - see 2 refresh, two notifications"
-echo "================================================="
+echo "10. Update E10/A1"
+echo "================="
+sleep 2
+payload='{
+  "A1": "10. Updated"
+}'
+orionCurl --url /v2/entities/E10 --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Update E10/A1"
+echo "================="
+sleep 2
+payload='{
+  "A1": "11. Updated"
+}'
+orionCurl --url /v2/entities/E10 --payload "$payload" --json
+echo
+echo
+
+
+echo "12. Statistics - see 2 refresh, four notifications"
+echo "=================================================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
-echo "11. Dump accumulator - see two notifications"
-echo "============================================"
+echo "13. Dump accumulator - see four notifications"
+echo "============================================="
 accumulatorDump
 echo
 echo
@@ -168,14 +193,15 @@ Date: REGEX(.*)
 02. Subscribe to E1.*/A1, duration 2 secs
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 109
+Content-Length: 136
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "subscribeResponse": {
         "duration": "PT2S",
-        "subscriptionId": "REGEX([0-9a-f]{24})"
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT1S"
     }
 }
 
@@ -252,7 +278,7 @@ Date: REGEX(.*)
 }
 
 
-07. Sleep 4 secs to let the cache be refreshed
+07. Sleep 6 secs to let the cache be refreshed
 ==============================================
 
 
@@ -292,8 +318,26 @@ Date: REGEX(.*)
 
 
 
-10. Statistics - see 2 refresh, two notifications
-=================================================
+10. Update E10/A1
+=================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E10
+Date: REGEX(.*)
+
+
+
+11. Update E10/A1
+=================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E10
+Date: REGEX(.*)
+
+
+
+12. Statistics - see 2 refresh, four notifications
+==================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
@@ -301,9 +345,9 @@ Date: REGEX(.*)
 
 {
     "orion": {
-        "jsonRequests": "6",
+        "jsonRequests": "10",
         "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "2",
+        "notificationsSent": "4",
         "statisticsRequests": "4",
         "subCache": "REGEX(.*)",
         "subCacheInserts": "3",
@@ -319,8 +363,8 @@ Date: REGEX(.*)
 }
 
 
-11. Dump accumulator - see two notifications
-============================================
+13. Dump accumulator - see four notifications
+=============================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 467
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -373,7 +417,71 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A1",
             "type" : "",
-            "value" : "07. Updated"
+            "value" : "09. Updated"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 466
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "",
+        "isPattern" : "false",
+        "id" : "E10",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "",
+            "value" : "10. Updated"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 466
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "",
+        "isPattern" : "false",
+        "id" : "E10",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "",
+            "value" : "11. Updated"
           }
         ]
       },

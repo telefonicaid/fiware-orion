@@ -1071,9 +1071,9 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
       char          msg[256];
       unsigned int  bytesLeft = listSize - strlen(list);
 
-#if 1
+#if 0
       //
-      // To be removed once sub-update is OK in QA
+      // FIXME P5: To be removed once sub-update is OK in QA
       //
       int now = getCurrentTime();
       snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d|DUR:%lu",
