@@ -1267,7 +1267,10 @@ void mongoSubCacheRefresh(void)
   LM_T(LmtMongoSubCache, ("Refreshed subscription cache [%d]", mongoSubCache.noOfRefreshes));
 
   //
-  // FIXME P8: Remove this debugging code once the refresh works again
+  // FIXME P5: Remove this debugging code once the refresh works again
+  //
+#if 0
+
   //
   // DEBUG STARTS HERE
   //
@@ -1298,7 +1301,7 @@ void mongoSubCacheRefresh(void)
   //
   // DEBUG ENDS HERE
   //
-
+#endif
 
   cacheSemGive(__FUNCTION__, "subscription cache for refresh");
 }
