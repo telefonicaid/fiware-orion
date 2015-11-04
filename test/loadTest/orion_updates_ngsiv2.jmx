@@ -21,7 +21,7 @@
  iot_support at tid dot es
 
  Author: Ivan Arias
- -->
+-->
 <jmeterTestPlan version="1.2" properties="2.8" jmeter="2.13 r1665067">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Entities Update/Append  in NGSI v2" enabled="true">
@@ -38,7 +38,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="HOST" elementType="Argument">
             <stringProp name="Argument.name">HOST</stringProp>
-            <stringProp name="Argument.value">${__P(HOST,qa-orion-fe-02)}</stringProp>
+            <stringProp name="Argument.value">${__P(HOST,localhost)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">CB host or balancer</stringProp>
           </elementProp>
@@ -347,6 +347,7 @@ import java.util.Random;
 import java.util.*;
 import java.text.DecimalFormat;
 import java.text.*;
+import java.util.Stack;
 
 // constants
 rnd = new Random();
@@ -385,23 +386,17 @@ if (attributesNumber &lt;= 0){
 		attributesNumber = 1;
 	}
 }
-// generate sufix randomly for each attribute. This sufixes are uniques.
-sufixes = new String[attributesNumber];
-while ((i&lt;attributesNumber)) {
-	value = df.format(rnd.nextInt(maxAttributes)).toString();	
-	for (int a=0; a&lt;i; a++) {
-		if (sufixes[a].equals(value)) {
-			exists = &quot;true&quot;;
-			break;
-		} else {
-			exists = &quot;false&quot;;	
-		}	
-	}	
-	if (exists.equals(&quot;false&quot;)) {
-		sufixes[i]=value; 
-		i++;		
-	}			
+// generate suffix randomly for each attribute. These suffixes are uniques.
+suffixes = new Stack();
+//pos = &quot;&quot;;
+for (int i = 0; i &lt; attributesNumber ; i++) {
+      pos =  df.format(rnd.nextInt(maxAttributes));
+      while (suffixes.contains(pos)) {
+          pos =  df.format(rnd.nextInt(maxAttributes));
+      }
+      suffixes.push(pos);
 }
+
 // if METADATA property is true, the metadata is appended in each attribute
 if (metadata.toLowerCase().equals(&quot;true&quot;)) {
 	meta = &quot;, \&quot;metadata\&quot;: {\&quot;value\&quot;: \&quot;true\&quot;, \&quot;type\&quot;: \&quot;MT\&quot;}&quot;;	
@@ -412,7 +407,7 @@ for (int i=0; i&lt;attributesNumber; i++) {
 	for( int i = 0; i &lt; randomStringLen; i++ ) {
 		v = v + chars.charAt(rnd.nextInt(chars.length()));
 	}
-	tempRequest = tempRequest + &quot;\&quot;&quot;+ attributePrefix + sufixes[i] + &quot;\&quot;: { \&quot;value\&quot;: \&quot;&quot; + v + &quot;\&quot;, \&quot;type\&quot;: \&quot;T\&quot;&quot; + meta + &quot;},&quot;;	
+	tempRequest = tempRequest + &quot;\&quot;&quot;+ attributePrefix + suffixes.elementAt(i) + &quot;\&quot;: { \&quot;value\&quot;: \&quot;&quot; + v + &quot;\&quot;, \&quot;type\&quot;: \&quot;T\&quot;&quot; + meta + &quot;},&quot;;	
 }
 tempRequest = tempRequest.substring(0, tempRequest.length()-1) + &quot;}&quot;;
 request = request + tempRequest;
