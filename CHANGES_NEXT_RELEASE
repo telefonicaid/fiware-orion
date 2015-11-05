@@ -1,3 +1,5 @@
 - Fix: safer treatment of database fields lastNotification, expiration and throttling in 
        the 'csub' collection, assuming that the field can be either int or long (it is always written as long)
 - Fix: number/bool correct rendering in NGSIv1 compound values
+- Add: possibility to limit the maximum number of simultaneous connections, using the CLI option -maxConnections (Issue #1384)
+- Add: possibility to use thread pool for incoming connections, using CLI option -threadPoolSize (Issue #1384)
