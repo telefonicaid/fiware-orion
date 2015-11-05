@@ -64,6 +64,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-noCache' (disable subscription cache for lookups)]
                       [option '-connectionMemory' <maximum memory size per connection (in kilobytes)>]
                       [option '-maxConnections' <maximum number of simultaneous connections>]
-                      [option '-threadPoolSize' <size of thread pool for incoming connections>]
+                      [option '-reqPoolSize' <size of thread pool for incoming connections>]
 
 --TEARDOWN--

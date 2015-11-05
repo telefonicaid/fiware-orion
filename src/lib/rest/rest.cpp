@@ -1146,7 +1146,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 {
   bool      mhdStartError  = true;
   size_t    memoryLimit    = connMemory * 1024; // connMemory is expressed in kilobytes
-  MHD_FLAG  flag           = MHD_USE_THREAD_PER_CONNECTION;
+  MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)
   {
@@ -1155,7 +1155,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
   if (threadPoolSize != 0)
   {
-    flag = MHD_USE_SELECT_INTERNALLY;
+    serverMode = MHD_USE_SELECT_INTERNALLY;
     LM_M(("threadPoolSize: %d", threadPoolSize));
   }
 
@@ -1174,7 +1174,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(flag | MHD_USE_SSL,
+      mhdDaemon = MHD_start_daemon(serverMode | MHD_USE_SSL,
                                    htons(port),
                                    NULL,
                                    NULL,
@@ -1192,7 +1192,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(flag,
+      mhdDaemon = MHD_start_daemon(serverMode,
                                    htons(port),
                                    NULL,
                                    NULL,
@@ -1226,7 +1226,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(flag | MHD_USE_IPv6 | MHD_USE_SSL,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
                                       NULL,
@@ -1243,7 +1243,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(flag | MHD_USE_IPv6,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
                                       NULL,

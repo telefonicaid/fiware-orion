@@ -3,3 +3,4 @@
 - Fix: number/bool correct rendering in NGSIv1 compound values
 - Add: possibility to limit the maximum number of simultaneous connections, using the CLI option -maxConnections (Issue #1384)
 - Add: possibility to use thread pool for incoming connections, using CLI option -threadPoolSize (Issue #1384)
+- Fix: A bug in the request reading logic that may cause unexpected Parse Errors or even SIGSEGVs

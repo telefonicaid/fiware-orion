@@ -245,7 +245,7 @@ char            notificationMode[64];
 bool            noCache;
 unsigned int    connectionMemory;
 unsigned int    maxConnections;
-unsigned int    mhdThreadPoolSize;
+unsigned int    reqPoolSize;
 
 
 
@@ -288,13 +288,24 @@ unsigned int    mhdThreadPoolSize;
 #define NO_CACHE               "disable subscription cache for lookups"
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
-#define THREAD_POOL_SIZE       "size of thread pool for incoming connections"
+#define REQ_POOL_SIZE          "size of thread pool for incoming connections"
 
 
 
 /* ****************************************************************************
 *
-* Parse arguments
+* paArgs - option vector for the Parse CLI arguments library
+*
+* NOTE
+*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
+*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
+*
+*   MHD_OPTION_CONNECTION_LIMIT
+*     Maximum number of concurrent connections to accept.
+*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
+*     select minus four for stdin, stdout, stderr and the server socket). In other words,
+*    the default is as large as possible.
+*
 */
 PaArgument paArgs[] =
 {
@@ -333,8 +344,8 @@ PaArgument paArgs[] =
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
-  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, 128,            0,     1024,     MAX_CONN_DESC          },
-  { "-threadPoolSize",   &mhdThreadPoolSize,"THREAD_POOL_SIZE",  PaUInt,   PaOpt, 0,              0,     1024,     THREAD_POOL_SIZE       },
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   PA_END_OF_ARGS
 };
@@ -1611,14 +1622,14 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, mhdThreadPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, mhdThreadPoolSize, rushHost, rushPort, allowedOrigin);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));
