@@ -50,7 +50,13 @@ extern int getIntField(const mongo::BSONObj& b, const std::string& field);
 *
 * getLongField -
 */
-extern long getLongField(const mongo::BSONObj& b, const std::string& field);
+extern long long getLongField(const mongo::BSONObj& b, const std::string& field);
+
+/* ****************************************************************************
+*
+* getIntOrLongFieldAsLong -
+*/
+extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field);
 
 /* ****************************************************************************
 *

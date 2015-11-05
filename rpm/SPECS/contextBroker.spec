@@ -164,6 +164,46 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Nov 02 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.25.0-1
+- Add: NGSIv2 operation GET /v2/subscriptions (#1126)
+- Add: NGSIv2 operation GET /v2/subscription/<id> (#1317)
+- Add: URI params 'geometry' and 'coords' for GET /v2/entities (#1177)
+- Add: CLI argument -notificationMode. Default mode is 'transient' (previous version used 'permanent' implicitly) (#1370)
+- Add: CLI argument -connectionMemory for connection memory limit. Default value is 64Kb (#1384)
+- Add: CLI argument -noCache to disable cache (recovering $where from 0.23.0 code base to search for subscriptions always in DB)
+- Add: githash in --version (#1363)
+- Add: contextBroker standard error log in RPM init script (#1175)
+- Fix: broken subscription cache (#1308), including the semaphore for subscription cache (#1401)
+- Fix: conv op to std op mapping wrongly using patterns in some GET operations (#1322)
+- Fix: using 'count' in all paginated queries in NGSIv2 (get entities list was missing) (#1041)
+- Fix: add charset=utf-8 for notifications (#1340)
+- Fix: incorrect 'details' field rendering (leading to illegal JSON) for error responses in some cases (#843)
+- Fix: escaping dot (.) in attrNames field in entities collection in DB (#1323)
+- Fix: compound attribute values support in CPr update forwarding (#1440)
+- Fix: traces to stdout only if CLI '-fg' is set (#1272)
+- Fix: avoid noisy error output in RPM init script (#309)
+- Fix: performance problem in NGSIv2 API due to uncontrolled log trace printing
+- Fix: trying to update several matching entities associated to the same ID in NGSIv2 API now returns in TooManyResults error (#1198)
+- Fix: more accurate text for details field in zero content-length error responses (#1203)
+- Fix: description text for parse errors in NGSIv2 JSON requests (#1200)
+- Fix: leftover whitespaces in NGSIv2 error names (#1199) 
+- Fix: clearer error on NGSIv2 entity attribute update, without value in payload (#1164)
+- Fix: changed  error code from 472 (Invalid Parameter) to 422 (Invalid Modification) in NGSIv1 in the case of missing attribute value (#1164)
+- Fix: return error response in NGSIv2 API when the combined length of id/type/servicePath exceeds (mongo) index key length limit (#1289)
+- Fix: error responses for NGSIv2 PATCH request on entity without payload (#1257)
+- Fix: clearer errors for 'entity not found' and 'conflict too many results' on NGSIv2 update PATCH (#1260)
+- Fix: update PATCH request with invalid service-path never returned a response (#1280)
+- Fix: error must be Not Found, when updating an unknown attribute of an existing entity on NGSIv2 update PATCH (#1278)
+- Fix: POST /v2/entities returns error if the entity to create already exists (#1158)
+- Fix: error description for PUT/POST/PATCH request with empty JSON object as payload in NGSIv2 (#1305)
+- Fix: improve error description in NGSIv2 PUT on entity, when entity is not found or there is a conflict due to many results (#1320)
+- Fix: empty/absent attribute value support, both in NGSIv1 and NGSIv2 (#1187, #1188 and #1358)
+- Hardening: mongoBackend checking for field existence and proper type to avoid broker crashes due to DB corruption (#136)
+- Hardening: safer input/ouput logic for csub documents in MongoDB and cache
+- Remove: proxyCoap binary from RPM (#1202)
+- Remove: deprecated command line arguments -ngsi9, -fwdHost and -fwdPort
+- Remove: deprecated functionality related with associations
+
 * Mon Sep 14 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.24.0-1
 - Add:  FIWARE::StringQuery scope, implementing filtering capabilities (equal, unqual, greater/less than, ranges, existence) (Issue #864)
 - Add:  APPEND_STRICT action type for POST /v1/updateContext operation

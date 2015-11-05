@@ -308,21 +308,25 @@ static bool subMatch
   {
     if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
     {
+      LM_T(LmtMongoSubCacheMatch, ("No match due to tenant I"));
       return false;
     }
 
     if ((tenant != NULL) && (tenant[0] != 0))
     {
+      LM_T(LmtMongoSubCacheMatch, ("No match due to tenant II"));
       return false;
     }
   }
   else if (strcmp(cSubP->tenant, tenant) != 0)
   {
+    LM_T(LmtMongoSubCacheMatch, ("No match due to tenant III"));
     return false;
   }
 
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
+    LM_T(LmtMongoSubCacheMatch, ("No match due to servicePath"));
     return false;
   }
 
@@ -333,6 +337,7 @@ static bool subMatch
   //
   if (!attributeMatch(cSubP, attr))
   {
+    LM_T(LmtMongoSubCacheMatch, ("No match due to attributes"));
     return false;
   }
 
@@ -346,6 +351,7 @@ static bool subMatch
     }
   }
 
+  LM_T(LmtMongoSubCacheMatch, ("No match due to EntityInfo"));
   return false;
 }
 
@@ -620,23 +626,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? sub.getField(CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->notifyFormat          = stringToFormat(formatString);
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? sub.getField(CSUB_THROTTLING).Long() : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)? sub.getField(CSUB_EXPIRATION).Long() : 0;
-  cSubP->lastNotificationTime  = 0;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : 0;
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
-
-  if (sub.hasField(CSUB_LASTNOTIFICATION))
-  {
-    if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberLong)
-    {
-      cSubP->lastNotificationTime = getLongField(sub, CSUB_LASTNOTIFICATION);
-    }
-    else if (sub.getField(CSUB_LASTNOTIFICATION).type() == NumberInt)
-    {
-      cSubP->lastNotificationTime = (long long) getIntField(sub, CSUB_LASTNOTIFICATION);
-    }
-  }
 
   LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
@@ -841,7 +835,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
 
   if ((lastNotificationTime == -1) && (sub.hasField(CSUB_LASTNOTIFICATION)))
   {
-    lastNotificationTime = sub.getField(CSUB_THROTTLING).Long();
+    //
+    // If no lastNotificationTime is given to this function AND
+    // if the database objuect contains lastNotificationTime,
+    // then use the value from the database
+    //
+    lastNotificationTime = getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION);
   }
 
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
@@ -849,7 +848,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
   cSubP->servicePath           = strdup(servicePath);
   cSubP->notifyFormat          = stringToFormat(formatString);
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)? sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       sub.getField(CSUB_THROTTLING).Long() : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->pendingNotifications  = 0;
@@ -1072,8 +1071,21 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
       char          msg[256];
       unsigned int  bytesLeft = listSize - strlen(list);
 
-      snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
-
+#if 0
+      //
+      // FIXME P5: To be removed once sub-update is OK in QA
+      //
+      int now = getCurrentTime();
+      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d|DUR:%lu",
+               cSubP->subscriptionId,
+               cSubP->lastNotificationTime,
+               cSubP->expirationTime,
+               cSubP->throttling,
+               cSubP->pendingNotifications,
+               cSubP->expirationTime - now);
+#else
+        snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
+#endif
       //
       // If "msg" and ", " has no room in the "list", then no list is shown.
       // (the '+ 2' if for the string ", ")
@@ -1207,11 +1219,17 @@ static void mongoSubCacheRefresh(std::string database)
   while (cursor->more())
   {
     BSONObj sub = cursor->next();
+    int     r;
 
-    mongoSubCacheItemInsert(tenant.c_str(), sub);
+    r = mongoSubCacheItemInsert(tenant.c_str(), sub);
 
-    ++subNo;
+    if (r == 0)
+    {
+      ++subNo;
+    }
   }
+
+  LM_T(LmtMongoSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
 }
 
 
@@ -1247,6 +1265,43 @@ void mongoSubCacheRefresh(void)
 
   ++mongoSubCache.noOfRefreshes;
   LM_T(LmtMongoSubCache, ("Refreshed subscription cache [%d]", mongoSubCache.noOfRefreshes));
+
+  //
+  // FIXME P5: Remove this debugging code once the refresh works again
+  //
+#if 0
+
+  //
+  // DEBUG STARTS HERE
+  //
+  CachedSubscription* cSubP = mongoSubCache.head;
+  int                 items = 0;
+
+  while (cSubP != NULL)
+  {
+    LM_T(LmtMongoSubCache, ("%s: TEN:%s, SPath:%s, THR:%lu, EXP:%lu, LNT:%lu PN:%d, REF:%s, Es:%d, As:%d, NCs:%d",
+                            cSubP->subscriptionId,
+                            cSubP->tenant,
+                            cSubP->servicePath,
+                            cSubP->throttling,
+                            cSubP->expirationTime,
+                            cSubP->lastNotificationTime,
+                            cSubP->pendingNotifications,
+                            cSubP->reference,
+                            cSubP->entityIdInfos.size(),
+                            cSubP->attributes.size(),
+                            cSubP->notifyConditionVector.size()));
+
+    cSubP = cSubP->next;
+    ++items;
+  }
+
+  LM_T(LmtMongoSubCache, ("%d subs in sub.cache", items));
+
+  //
+  // DEBUG ENDS HERE
+  //
+#endif
 
   cacheSemGive(__FUNCTION__, "subscription cache for refresh");
 }

@@ -22,9 +22,9 @@
 
  Author: Ivan Arias
 -->
-<jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
+<jmeterTestPlan version="1.2" properties="2.8" jmeter="2.13 r1665067">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Entities Appends Long Time Test Plan " enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Entities Update/Append  in NGSI v2" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
@@ -54,41 +54,58 @@
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Threads</stringProp>
           </elementProp>
-          <elementProp name="TESTTIME" elementType="Argument">
-            <stringProp name="Argument.name">TESTTIME</stringProp>
-            <stringProp name="Argument.value">${__P(TESTTIME, 60)}</stringProp>
+          <elementProp name="RAMP_UP" elementType="Argument">
+            <stringProp name="Argument.name">RAMP_UP</stringProp>
+            <stringProp name="Argument.value">${__P(RAMP_UP, 1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="TEST_TIME" elementType="Argument">
+            <stringProp name="Argument.name">TEST_TIME</stringProp>
+            <stringProp name="Argument.value">${__P(TEST_TIME, 30)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">duration time of the test</stringProp>
           </elementProp>
           <elementProp name="SERVICE" elementType="Argument">
             <stringProp name="Argument.name">SERVICE</stringProp>
-            <stringProp name="Argument.value">${__P(SERVICE, entities_append_long_time)}</stringProp>
+            <stringProp name="Argument.value">${__P(SERVICE,update_ngsiv2)}</stringProp>
             <stringProp name="Argument.desc">service header</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="SERVICE_PATH" elementType="Argument">
             <stringProp name="Argument.name">SERVICE_PATH</stringProp>
-            <stringProp name="Argument.value">${__P(SERVICE_PATH, /test)}</stringProp>
+            <stringProp name="Argument.value">${__P(SERVICE_PATH, /)}</stringProp>
             <stringProp name="Argument.desc">service path header</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="ENTITIES" elementType="Argument">
-            <stringProp name="Argument.name">ENTITIES</stringProp>
-            <stringProp name="Argument.value">${__P(ENTITIES,1)}</stringProp>
-            <stringProp name="Argument.desc">entities appends</stringProp>
+          <elementProp name="ATTRIBUTES" elementType="Argument">
+            <stringProp name="Argument.name">ATTRIBUTES</stringProp>
+            <stringProp name="Argument.value">${__P(ATTRIBUTES, 1)}</stringProp>
+            <stringProp name="Argument.desc">number of attributes per entity</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="SUBSCRIPTION" elementType="Argument">
-            <stringProp name="Argument.name">SUBSCRIPTION</stringProp>
-            <stringProp name="Argument.value">${__P(SUBS,nothing)}</stringProp>
-            <stringProp name="Argument.desc">allowed values ( CREATE )</stringProp>
+          <elementProp name="METADATA" elementType="Argument">
+            <stringProp name="Argument.name">METADATA</stringProp>
+            <stringProp name="Argument.value">${__P(METADATA,false)}</stringProp>
+            <stringProp name="Argument.desc">if true is appended a metadata in each attribute</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="SUBS_DURATION" elementType="Argument">
-            <stringProp name="Argument.name">SUBS_DURATION</stringProp>
+          <elementProp name="TIME_INSTANT" elementType="Argument">
+            <stringProp name="Argument.name">TIME_INSTANT</stringProp>
+            <stringProp name="Argument.value">${__P(TIME_INSTANT,true)}</stringProp>
+            <stringProp name="Argument.desc">if true is appended a timeInstant attribute  in each entity</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="SUBSC" elementType="Argument">
+            <stringProp name="Argument.name">SUBSC</stringProp>
+            <stringProp name="Argument.value">${__P(SUBSC,0)}</stringProp>
+            <stringProp name="Argument.desc">number of subcriptions </stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="SUBSC_DURATION" elementType="Argument">
+            <stringProp name="Argument.name">SUBSC_DURATION</stringProp>
             <stringProp name="Argument.value">${__P(SUBS_DURATION,60)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
-            <stringProp name="Argument.desc">Duration of the subscription</stringProp>
+            <stringProp name="Argument.desc">Duration of the subscriptions</stringProp>
           </elementProp>
           <elementProp name="LISTEN_HOST" elementType="Argument">
             <stringProp name="Argument.name">LISTEN_HOST</stringProp>
@@ -102,14 +119,65 @@
             <stringProp name="Argument.desc">port to receive notifications (mock)</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="prefix" elementType="Argument">
-            <stringProp name="Argument.name">prefix</stringProp>
-            <stringProp name="Argument.value">__${__time(YMDHMS,)}</stringProp>
+          <elementProp name="PROJECT" elementType="Argument">
+            <stringProp name="Argument.name">PROJECT</stringProp>
+            <stringProp name="Argument.value">orion_updates_ngsiv2</stringProp>
+            <stringProp name="Argument.desc">project name</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="MAX_ENTITIES" elementType="Argument">
+            <stringProp name="Argument.name">MAX_ENTITIES</stringProp>
+            <stringProp name="Argument.value">50000</stringProp>
+            <stringProp name="Argument.desc">maximum entities </stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="MAX_ATTRIBUTES" elementType="Argument">
+            <stringProp name="Argument.name">MAX_ATTRIBUTES</stringProp>
+            <stringProp name="Argument.value">20</stringProp>
+            <stringProp name="Argument.desc">maximum attributes</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PERFORM_PORT" elementType="Argument">
+            <stringProp name="Argument.name">PERFORM_PORT</stringProp>
+            <stringProp name="Argument.value">4444</stringProp>
+            <stringProp name="Argument.desc">performance monitor port</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PREFIX_REPORT" elementType="Argument">
+            <stringProp name="Argument.name">PREFIX_REPORT</stringProp>
+            <stringProp name="Argument.value">${__time(YMDHMS,)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">prefix used in reports</stringProp>
           </elementProp>
+          <elementProp name="ENTITY_PREFIX" elementType="Argument">
+            <stringProp name="Argument.name">ENTITY_PREFIX</stringProp>
+            <stringProp name="Argument.value">E</stringProp>
+            <stringProp name="Argument.desc">prefix used in the entity</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="ATTRIBUTE_PREFIX" elementType="Argument">
+            <stringProp name="Argument.name">ATTRIBUTE_PREFIX</stringProp>
+            <stringProp name="Argument.value">A</stringProp>
+            <stringProp name="Argument.desc">prefix used in attributes</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </Arguments>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+        <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        <stringProp name="HTTPSampler.protocol">http</stringProp>
+        <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
+        <stringProp name="HTTPSampler.path"></stringProp>
+        <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+        <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
+      </ConfigTestElement>
       <hashTree/>
       <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
         <collectionProp name="HeaderManager.headers">
@@ -132,17 +200,7 @@
         </collectionProp>
       </HeaderManager>
       <hashTree/>
-      <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="jp@gc - Throughput Shaping Timer" enabled="true">
-        <collectionProp name="load_profile">
-          <collectionProp name="-1370517191">
-            <stringProp name="663137417">${__P(TPS, 1)}</stringProp>
-            <stringProp name="663137417">${__P(TPS, 1)}</stringProp>
-            <stringProp name="-910543600">${__P(TESTTIME, 60)}</stringProp>
-          </collectionProp>
-        </collectionProp>
-      </kg.apc.jmeter.timers.VariableThroughputTimer>
-      <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="subcription" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="SUBCRIPTIONS" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -155,15 +213,15 @@
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
-        <stringProp name="TestPlan.comments">create / delete a subcription</stringProp>
+        <stringProp name="TestPlan.comments">create a subcription</stringProp>
       </ThreadGroup>
       <hashTree>
-        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Controlador If" enabled="true">
-          <stringProp name="IfController.condition">&quot;${SUBSCRIPTION}&quot; == &quot;CREATE&quot;</stringProp>
-          <boolProp name="IfController.evaluateAll">false</boolProp>
-        </IfController>
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="subscriptions loop" enabled="true">
+          <boolProp name="LoopController.continue_forever">true</boolProp>
+          <stringProp name="LoopController.loops">${SUBSC}</stringProp>
+        </LoopController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Subscripcion" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Subscription" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
               <collectionProp name="Arguments.arguments">
@@ -171,14 +229,13 @@
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&#xd;
     &quot;entities&quot;: [&#xd;
-        {&#xd;
-            &quot;type&quot;: &quot;house&quot;,&#xd;
+        {            &#xd;
             &quot;isPattern&quot;: &quot;true&quot;,&#xd;
-            &quot;id&quot;: &quot;room_*&quot;&#xd;
+            &quot;id&quot;: &quot;${ENTITY_PREFIX}*&quot;&#xd;
         }&#xd;
     ],&#xd;
     &quot;attributes&quot;: [&#xd;
-        &quot;temperature&quot;&#xd;
+        &quot;${ATTRIBUTE_PREFIX}*&quot;&#xd;
     ],&#xd;
   &quot;reference&quot;: &quot;http://${LISTEN_HOST}:${LISTEN_PORT}/notify&quot;,&#xd;
     &quot;duration&quot;: &quot;PT${SUBS_DURATION}S&quot;,&#xd;
@@ -186,7 +243,7 @@
         {&#xd;
             &quot;type&quot;: &quot;ONCHANGE&quot;,&#xd;
             &quot;condValues&quot;: [&#xd;
-                &quot;temperature&quot;&#xd;
+                &quot;${ATTRIBUTE_PREFIX}*&quot;&#xd;
             ]&#xd;
         }&#xd;
     ]&#xd;
@@ -195,11 +252,11 @@
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
-            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.connect_timeout"></stringProp>
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/NGSI10/subscribeContext</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -225,81 +282,53 @@
           </hashTree>
         </hashTree>
       </hashTree>
-      <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate Thread Group" enabled="true">
-        <collectionProp name="ultimatethreadgroupdata">
-          <collectionProp name="2135619125">
-            <stringProp name="-1814363565">${__P(THREADS,1)}</stringProp>
-            <stringProp name="0">0</stringProp>
-            <stringProp name="53">5</stringProp>
-            <stringProp name="-910543600">${__P(TESTTIME, 60)}</stringProp>
-            <stringProp name="1629">30</stringProp>
-          </collectionProp>
-        </collectionProp>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="UPDATES" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <intProp name="LoopController.loops">-1</intProp>
+          <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-      </kg.apc.jmeter.threads.UltimateThreadGroup>
+        <stringProp name="ThreadGroup.num_threads">${THREADS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP_UP}</stringProp>
+        <longProp name="ThreadGroup.start_time">1446476792000</longProp>
+        <longProp name="ThreadGroup.end_time">1446562411000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${TEST_TIME}</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
       <hashTree>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="entities loop" enabled="true">
-          <boolProp name="LoopController.continue_forever">true</boolProp>
-          <stringProp name="LoopController.loops">${ENTITIES}</stringProp>
-        </LoopController>
+        <RunTime guiclass="RunTimeGui" testclass="RunTime" testname="Runtime controller" enabled="true">
+          <stringProp name="RunTime.seconds">${TEST_TIME}</stringProp>
+        </RunTime>
         <hashTree>
-          <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter entities" enabled="true">
-            <stringProp name="CounterConfig.start">1</stringProp>
-            <stringProp name="CounterConfig.end">${ENTITIES}</stringProp>
-            <stringProp name="CounterConfig.incr">1</stringProp>
-            <stringProp name="CounterConfig.name">COUNTER_ENTITIES</stringProp>
-            <stringProp name="CounterConfig.format"></stringProp>
-            <boolProp name="CounterConfig.per_user">false</boolProp>
-          </CounterConfig>
-          <hashTree/>
-          <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="attribute value random" enabled="true">
-            <stringProp name="maximumValue">10000000000</stringProp>
+          <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="entity sufix  - randomly" enabled="true">
+            <stringProp name="maximumValue">${MAX_ENTITIES}</stringProp>
             <stringProp name="minimumValue">1</stringProp>
-            <stringProp name="outputFormat">00000000000</stringProp>
+            <stringProp name="outputFormat">00000</stringProp>
             <boolProp name="perThread">false</boolProp>
             <stringProp name="randomSeed"></stringProp>
-            <stringProp name="variableName">VALUE_RND</stringProp>
+            <stringProp name="variableName">entity</stringProp>
           </RandomVariableConfig>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append context" enabled="true">
-            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="update request" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">{&#xd;
-    &quot;contextElements&quot;: [&#xd;
-        {&#xd;
-            &quot;type&quot;: &quot;house&quot;,&#xd;
-            &quot;isPattern&quot;: &quot;false&quot;,&#xd;
-            &quot;id&quot;: &quot;room_${COUNTER_ENTITIES}&quot;,&#xd;
-            &quot;attributes&quot;: [&#xd;
-              {&#xd;
-                &quot;name&quot;: &quot;temperature&quot;,&#xd;
-                &quot;type&quot;: &quot;celcius&quot;,&#xd;
-                &quot;value&quot;: &quot;${VALUE_RND}&quot;&#xd;
-              }           &#xd;
-            ]&#xd;
-        }&#xd;
-    ],&#xd;
-    &quot;updateAction&quot;: &quot;APPEND&quot;&#xd;
-}</stringProp>
+                  <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
-            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.connect_timeout"></stringProp>
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/v1/updateContext</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <stringProp name="HTTPSampler.path">/v2/entities/${ENTITY_PREFIX}${entity}</stringProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -308,12 +337,91 @@
             <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="ASSERTION - 200 OK" enabled="true">
+            <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="BeanShell PreProcessor" enabled="true">
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <boolProp name="resetInterpreter">false</boolProp>
+              <stringProp name="script">// libraries
+
+import java.util.Random;
+import java.util.*;
+import java.text.DecimalFormat;
+import java.text.*;
+import java.util.Stack;
+
+// constants
+rnd = new Random();
+df = new DecimalFormat(&quot;00&quot;); 
+tempRequest = &quot; &quot;;
+maxAttributes = Integer.parseInt(vars.get(&quot;MAX_ATTRIBUTES&quot;));
+attributesNumber = Integer.parseInt(vars.get(&quot;ATTRIBUTES&quot;));
+attributePrefix = vars.get(&quot;ATTRIBUTE_PREFIX&quot;);
+metadata = vars.get(&quot;METADATA&quot;);
+timeInstant = vars.get(&quot;TIME_INSTANT&quot;);
+request = &quot;{&quot;;
+i = 0;
+exists = &quot;false&quot;;
+chars = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&quot;;
+randomStringLen = 12;
+v = &quot;&quot;;
+meta = &quot;&quot;;
+
+//begin
+// if TIME_INSTANT property is true, the TimeInstant attribute is appended in each entity
+if (timeInstant.toLowerCase().equals(&quot;true&quot;)) {
+	timeInstant = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.SSS&apos;Z&apos;&quot;).format(new Date());
+	request = request + &quot;\&quot;TimeInstant\&quot;: { \&quot;value\&quot;: \&quot;&quot;+timeInstant.toString()+&quot;\&quot;, \&quot;type\&quot;: \&quot;T\&quot;},&quot;;	
+}
+// determine number of attributes.
+// attribute max is 20.
+// if ATTRIBUTES property is zero or negative value, the attribute number will be a random value.
+if (attributesNumber &gt; maxAttributes){
+	attributesNumber = maxAttributes;
+	vars.put(&quot;ATTRIBUTES&quot;,attributesNumber.toString());
+	System.out.println (&quot;WARN - ATTRIBUTES maximum value is 20, now ATTRIBUTES is 20...&quot;);
+}
+if (attributesNumber &lt;= 0){
+	attributesNumber=rnd.nextInt(maxAttributes+1);	
+	if (attributesNumber == 0){
+		attributesNumber = 1;
+	}
+}
+// generate suffix randomly for each attribute. These suffixes are uniques.
+suffixes = new Stack();
+//pos = &quot;&quot;;
+for (int i = 0; i &lt; attributesNumber ; i++) {
+      pos =  df.format(rnd.nextInt(maxAttributes));
+      while (suffixes.contains(pos)) {
+          pos =  df.format(rnd.nextInt(maxAttributes));
+      }
+      suffixes.push(pos);
+}
+
+// if METADATA property is true, the metadata is appended in each attribute
+if (metadata.toLowerCase().equals(&quot;true&quot;)) {
+	meta = &quot;, \&quot;metadata\&quot;: {\&quot;value\&quot;: \&quot;true\&quot;, \&quot;type\&quot;: \&quot;MT\&quot;}&quot;;	
+}
+// generate a payload with N attributes.
+for (int i=0; i&lt;attributesNumber; i++) {		
+	v = &quot;&quot;;
+	for( int i = 0; i &lt; randomStringLen; i++ ) {
+		v = v + chars.charAt(rnd.nextInt(chars.length()));
+	}
+	tempRequest = tempRequest + &quot;\&quot;&quot;+ attributePrefix + suffixes.elementAt(i) + &quot;\&quot;: { \&quot;value\&quot;: \&quot;&quot; + v + &quot;\&quot;, \&quot;type\&quot;: \&quot;T\&quot;&quot; + meta + &quot;},&quot;;	
+}
+tempRequest = tempRequest.substring(0, tempRequest.length()-1) + &quot;}&quot;;
+request = request + tempRequest;
+// create a variable to use in HTTP request
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+</stringProp>
+            </BeanShellPreProcessor>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="ASSERTION - 204 No Content" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">200</stringProp>
-                <stringProp name="2524">OK</stringProp>
+                <stringProp name="49590">204</stringProp>
               </collectionProp>
-              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
               <boolProp name="Assertion.assume_success">false</boolProp>
               <intProp name="Assertion.test_type">2</intProp>
             </ResponseAssertion>
@@ -324,32 +432,7 @@
       <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Errors report" enabled="true">
         <boolProp name="ResultCollector.error_logging">true</boolProp>
         <objProp>
-          <value class="SampleSaveConfiguration">
-            <time>true</time>
-            <latency>true</latency>
-            <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
-            <message>true</message>
-            <threadName>true</threadName>
-            <dataType>true</dataType>
-            <encoding>false</encoding>
-            <assertions>true</assertions>
-            <subresults>true</subresults>
-            <responseData>false</responseData>
-            <samplerData>false</samplerData>
-            <xml>false</xml>
-            <fieldNames>false</fieldNames>
-            <responseHeaders>false</responseHeaders>
-            <requestHeaders>false</requestHeaders>
-            <responseDataOnError>false</responseDataOnError>
-            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-            <assertionsResultsToSave>0</assertionsResultsToSave>
-            <bytes>true</bytes>
-          </value>
-        </objProp>
-        <objProp>
+          <name>saveConfig</name>
           <value class="SampleSaveConfiguration">
             <time>true</time>
             <latency>true</latency>
@@ -376,38 +459,41 @@
             <threadCounts>true</threadCounts>
           </value>
         </objProp>
-        <stringProp name="filename">/tmp/jmeter_result/__${prefix}/errors__${prefix}.csv</stringProp>
+        <objProp>
+          <name></name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <stringProp name="filename">/tmp/jmeter_result/${PREFIX_REPORT}_${PROJECT}/errors__${PREFIX_REPORT}.csv</stringProp>
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
-          <value class="SampleSaveConfiguration">
-            <time>true</time>
-            <latency>true</latency>
-            <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
-            <message>true</message>
-            <threadName>true</threadName>
-            <dataType>true</dataType>
-            <encoding>false</encoding>
-            <assertions>true</assertions>
-            <subresults>true</subresults>
-            <responseData>false</responseData>
-            <samplerData>false</samplerData>
-            <xml>false</xml>
-            <fieldNames>false</fieldNames>
-            <responseHeaders>false</responseHeaders>
-            <requestHeaders>false</requestHeaders>
-            <responseDataOnError>false</responseDataOnError>
-            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-            <assertionsResultsToSave>0</assertionsResultsToSave>
-            <bytes>true</bytes>
-          </value>
-        </objProp>
-        <objProp>
+          <name>saveConfig</name>
           <value class="SampleSaveConfiguration">
             <time>true</time>
             <latency>true</latency>
@@ -434,12 +520,41 @@
             <threadCounts>true</threadCounts>
           </value>
         </objProp>
-        <stringProp name="filename">/tmp/jmeter_result/__${prefix}/reports__${prefix}.csv</stringProp>
+        <objProp>
+          <name></name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <stringProp name="filename">/tmp/jmeter_result/${PREFIX_REPORT}_${PROJECT}/reports__${PREFIX_REPORT}.csv</stringProp>
       </ResultCollector>
       <hashTree/>
-      <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second" enabled="true">
+      <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="Transactions per Second monitor" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
+          <name>saveConfig</name>
           <value class="SampleSaveConfiguration">
             <time>true</time>
             <latency>true</latency>
@@ -463,9 +578,11 @@
             <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
             <assertionsResultsToSave>0</assertionsResultsToSave>
             <bytes>true</bytes>
+            <threadCounts>true</threadCounts>
           </value>
         </objProp>
         <objProp>
+          <name></name>
           <value class="SampleSaveConfiguration">
             <time>true</time>
             <latency>true</latency>
@@ -489,14 +606,108 @@
             <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
             <assertionsResultsToSave>0</assertionsResultsToSave>
             <bytes>true</bytes>
+            <threadCounts>true</threadCounts>
           </value>
         </objProp>
-        <stringProp name="filename">/tmp/jmeter_result/__${prefix}/tps__${prefix}.csv</stringProp>
+        <stringProp name="filename">/tmp/jmeter_result/${PREFIX_REPORT}_${PROJECT}/tps__${PREFIX_REPORT}.csv</stringProp>
         <longProp name="interval_grouping">1000</longProp>
         <boolProp name="graph_aggregated">false</boolProp>
         <stringProp name="include_sample_labels"></stringProp>
         <stringProp name="exclude_sample_labels"></stringProp>
+        <stringProp name="start_offset"></stringProp>
+        <stringProp name="end_offset"></stringProp>
+        <boolProp name="include_checkbox_state">false</boolProp>
+        <boolProp name="exclude_checkbox_state">false</boolProp>
       </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
+      <hashTree/>
+      <kg.apc.jmeter.perfmon.PerfMonCollector guiclass="kg.apc.jmeter.vizualizers.PerfMonGui" testclass="kg.apc.jmeter.perfmon.PerfMonCollector" testname="PerfMon Metrics Collector" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <objProp>
+          <name></name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <stringProp name="filename">/tmp/jmeter_result/${PREFIX_REPORT}_${PROJECT}/perfmon__${PREFIX_REPORT}.csv</stringProp>
+        <longProp name="interval_grouping">1000</longProp>
+        <boolProp name="graph_aggregated">false</boolProp>
+        <stringProp name="include_sample_labels"></stringProp>
+        <stringProp name="exclude_sample_labels"></stringProp>
+        <collectionProp name="metricConnections">
+          <collectionProp name="-1171173748">
+            <stringProp name="1180709214">${HOST}</stringProp>
+            <stringProp name="-658771417">${PERFORM_PORT}</stringProp>
+            <stringProp name="66952">CPU</stringProp>
+            <stringProp name="0"></stringProp>
+          </collectionProp>
+          <collectionProp name="823079227">
+            <stringProp reference="../../collectionProp/stringProp"/>
+            <stringProp name="-658771417">${PERFORM_PORT}</stringProp>
+            <stringProp name="-1993889503">Memory</stringProp>
+            <stringProp reference="../../collectionProp/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="810199374">
+            <stringProp reference="../../collectionProp/stringProp"/>
+            <stringProp name="-658771417">${PERFORM_PORT}</stringProp>
+            <stringProp name="82881">TCP</stringProp>
+            <stringProp reference="../../collectionProp/stringProp[4]"/>
+          </collectionProp>
+        </collectionProp>
+        <stringProp name="start_offset"></stringProp>
+        <stringProp name="end_offset"></stringProp>
+        <boolProp name="include_checkbox_state">false</boolProp>
+        <boolProp name="exclude_checkbox_state">false</boolProp>
+      </kg.apc.jmeter.perfmon.PerfMonCollector>
       <hashTree/>
     </hashTree>
   </hashTree>

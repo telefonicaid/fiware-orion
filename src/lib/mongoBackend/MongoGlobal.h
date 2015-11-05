@@ -161,8 +161,7 @@ extern bool mongoStart
 
 
 #ifdef UNIT_TEST
-extern bool mongoConnect(const char* host);
-extern bool mongoConnect(DBClientConnection* c);
+extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 #endif
 
 /*****************************************************************************

@@ -112,37 +112,40 @@ function dbInit()
     port="27017"
   fi
   
-  db=$host:$port/$1
-  
-  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
-  if [ $# == 2 ]
-  then 
-    db=$db-$tenant
-  fi
-
   dMsg initializing database;
 
   if [ "$role" == "CB" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DB_NAME}-$tenant  --quiet
+    baseDbName=${CB_DB_NAME}
   elif [ "$role" == "CP1" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DB_NAME}-$tenant --quiet
+    baseDbName=${CP1_DB_NAME}
   elif [ "$role" == "CP2" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP2_DB_NAME}-$tenant --quiet
+    baseDbName=${CP2_DB_NAME}
   elif [ "$role" == "CP3" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP3_DB_NAME}-$tenant --quiet
+    baseDbName=${CP3_DB_NAME}
   elif [ "$role" == "CP4" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP4_DB_NAME}-$tenant --quiet
+    baseDbName=${CP4_DB_NAME}
   elif [ "$role" == "CP5" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP5_DB_NAME}-$2 --quiet
+    baseDbName=${CP5_DB_NAME}
   else
-    echo 'db.dropDatabase()' | mongo $db --quiet
+    baseDbName=$1
   fi
+
+  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
+  if [ $# == 2 ]
+  then 
+    db=$baseDbName-$tenant
+  else
+    db=$baseDbName
+  fi
+
+  dMsg "database to drop: <$db>" 
+  echo 'db.dropDatabase()' | mongo $host:$port/$db --quiet
 }
 
 
@@ -153,21 +156,10 @@ function dbInit()
 #
 function dbDrop()
 {
-  db=$1
-  tenant=$2
-  
-  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
-  if [ $# == 2 ]
-  then 
-    db=$db-$tenant
-  fi
-  
   if [ "$CB_DB_DROP" != "No" ]
   then
-    if [ "$db" != "" ]
-    then
-      dbInit $db
-    fi
+    # FIXME: Not sure if $@ should be better...
+    dbInit $*
   fi
 }
 

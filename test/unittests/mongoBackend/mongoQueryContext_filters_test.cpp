@@ -294,9 +294,6 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -336,9 +333,6 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -391,9 +385,6 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -434,9 +425,6 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -489,9 +477,6 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -534,9 +519,6 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -588,9 +570,6 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -632,9 +611,6 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -687,9 +663,6 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -741,9 +714,6 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -796,9 +766,6 @@ TEST(mongoQueryContextRequest_filters, lesserThan_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -850,9 +817,6 @@ TEST(mongoQueryContextRequest_filters, lesserThanOrEqual_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -904,9 +868,6 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -959,9 +920,6 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1016,9 +974,6 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1063,9 +1018,6 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1113,9 +1065,6 @@ TEST(mongoQueryContextRequest_filters, withEntityType)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1156,9 +1105,6 @@ TEST(mongoQueryContextRequest_filters, withoutEntityType)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1199,9 +1145,6 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1241,9 +1184,6 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1284,9 +1224,6 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1327,8 +1264,5 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
