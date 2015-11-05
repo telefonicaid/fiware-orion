@@ -38,6 +38,7 @@
 #include "common/wsStrip.h"
 #include "common/globals.h"
 #include "common/defaultValues.h"
+#include "common/clockFunctions.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -89,11 +90,26 @@ bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
 char                             restAllowedOrigin[64];
+bool                             timeStatistics        = false;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
+
+
+
+/* ****************************************************************************
+*
+* TimeStat - 
+*/
+typedef struct TimeStat
+{
+  struct timespec  lastReqTime;
+  struct timespec  accReqTime;
+} TimeStat;
+
+TimeStat timeStat;
 
 
 
@@ -449,7 +465,6 @@ static void serve(ConnectionInfo* ciP)
 }
 
 
-
 /* ****************************************************************************
 *
 * requestCompleted -
@@ -462,7 +477,8 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+  ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+  struct timespec  reqEndTime;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
@@ -473,6 +489,16 @@ static void requestCompleted
   *con_cls = NULL;
 
   LM_TRANSACTION_END();  // Incoming REST request ends
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &reqEndTime);
+
+    // FIXME P5: sem-protect timeStat? 
+    clock_difftime(&reqEndTime, &ciP->reqStartTime, &timeStat.lastReqTime);
+    clock_addtime(&timeStat.accReqTime, &timeStat.lastReqTime);
+    // FIXME P5: End of sem-protect timeStat?
+  }  
 }
 
 
@@ -937,6 +963,11 @@ static int connectionTreat
     {
       LM_E(("Runtime Error (error allocating ConnectionInfo)"));
       return MHD_NO;
+    }
+
+    if (timeStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
 
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
