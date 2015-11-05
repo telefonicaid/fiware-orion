@@ -949,7 +949,7 @@ static int connectionTreat
     ciP->port    = port;
     ciP->ip      = ip;
     ciP->callNo  = reqNo;
-    
+
     ++reqNo;
 
     //
