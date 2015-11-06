@@ -25,7 +25,7 @@
 
 #include "common/string.h"
 
-#include "QueueNotifier.h"
+#include "ngsiNotify/QueueNotifier.h"
 
 /* ****************************************************************************
 *
