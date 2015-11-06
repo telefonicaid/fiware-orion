@@ -10,6 +10,13 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
 {
   ConnectionInfo ci;
 
+
+  if (pQueue == NULL)
+  {
+   LM_E(("Runtime Error (notification queue is NULL)"));
+   return;
+  }
+
   //
   // Creating the value of the Fiware-ServicePath HTTP header.
   // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
@@ -71,15 +78,11 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   params->format        = format;
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
-  if (pQueue == NULL)
-  {
-   LM_E(("Runtime Error (notification queue is NULL)"));
-   return;
-  }
   bool enqueued = pQueue->try_push(params);
   if (!enqueued)
   {
    LM_E(("Runtime Error (notification queue is full)"));
+   delete params;
    return;
   }
 }
