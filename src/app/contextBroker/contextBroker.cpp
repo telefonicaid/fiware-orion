@@ -1457,8 +1457,9 @@ static SemRequestType policyGet(std::string mutexPolicy)
 */
 static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
 {
-  char *mode, *first_colon;
-  int  flds_num;
+  char* mode;
+  char* first_colon;
+  int   flds_num;
 
   mode = (char *) malloc(strlen(notifModeArg) + 1);
   if (mode == NULL)
