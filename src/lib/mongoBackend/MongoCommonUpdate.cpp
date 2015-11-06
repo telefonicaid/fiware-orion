@@ -32,6 +32,8 @@
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -588,8 +590,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
-      BSONObj    mdB = i.next().embeddedObject();
-      Metadata*  md  = bsonToMetadata(mdB);
+      Metadata*  md = new Metadata(i.next().embeddedObject());
 
       mdVSize++;
 
@@ -1500,6 +1501,83 @@ static bool addTriggeredSubscriptions
   }
 }
 
+/* ****************************************************************************
+*
+* processOnChangeConditionForUpdateContext -
+*
+* This method returns true if the notification was actually send. Otherwise, false
+* is returned. This is used in the caller to know if lastNotification field in the
+* subscription document in csubs collection has to be modified or not.
+*/
+static bool processOnChangeConditionForUpdateContext
+(
+  ContextElementResponse*          notifyCerP,
+  AttributeList                    attrL,
+  std::string                      subId,
+  std::string                      notifyUrl,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken
+)
+{
+  NotifyContextRequest   ncr;
+  ContextElementResponse cer;
+  cer.contextElement.entityId.fill(&notifyCerP->contextElement.entityId);
+
+  /* Fill NotifyContextRequest with cerP, filtering by attrL */
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+    if (attrL.size() == 0)
+    {
+      /* Empty attribute list in the subscription mean that all attributes are added */
+      cer.contextElement.contextAttributeVector.push_back(caP);
+    }
+    else
+    {
+      for (unsigned int jx = 0; jx < attrL.size(); jx++)
+      {
+        /* 'skip' field is used to mark deleted attributes that must not be included in the
+         * notification (see deleteAttrInNotifyCer function for details) */
+        if (caP->name == attrL.get(jx) && !caP->skip)
+        {
+          cer.contextElement.contextAttributeVector.push_back(caP);
+        }
+      }
+    }
+  }
+
+  /* Early exit without sending notification if attribute list is empty */
+  if (cer.contextElement.contextAttributeVector.size() == 0)
+  {
+    ncr.contextElementResponseVector.release();
+    return false;
+  }
+
+  /* Setting status code in CER */
+  cer.statusCode.fill(SccOk);
+
+  ncr.contextElementResponseVector.push_back(&cer);
+
+  /* Complete the fields in NotifyContextRequest */
+  ncr.subscriptionId.set(subId);
+  // FIXME: we use a proper origin name
+  ncr.originator.set("localhost");
+
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+  //ncr.contextElementResponseVector.release();  safe??
+  return true;
+}
+
+/* ****************************************************************************
+*
+* processOntimeIntervalCondition -
+*/
+void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant)
+{
+  getNotifier()->createIntervalThread(subId, interval, tenant);
+}
+
 
 /* ****************************************************************************
 *
@@ -1507,12 +1585,11 @@ static bool addTriggeredSubscriptions
 */
 static bool processSubscriptions
 (
-  const EntityId*                           enP,
   std::map<string, TriggeredSubscription*>& subs,
+  ContextElementResponse*                   notifyCerP,
   std::string*                              err,
   const std::string&                        tenant,
-  const std::string&                        xauthToken,
-  std::vector<std::string>                  servicePathV
+  const std::string&                        xauthToken
 )
 {
   bool ret = true;
@@ -1540,21 +1617,15 @@ static bool processSubscriptions
       }
     }
 
-    /* Build entities vector */
-    EntityIdVector enV;
-    enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
-
     /* Send notification */
     LM_T(LmtMongoSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
-    if (processOnChangeCondition(enV,
-                                 trigs->attrL,
-                                 NULL,
-                                 mapSubId,
-                                 trigs->reference,
-                                 trigs->format,
-                                 tenant,
-                                 xauthToken,
-                                 servicePathV))
+    if (processOnChangeConditionForUpdateContext(notifyCerP,
+                                                 trigs->attrL,
+                                                 mapSubId,
+                                                 trigs->reference,
+                                                 trigs->format,
+                                                 tenant,
+                                                 xauthToken))
     {
       BSONObj query = BSON("_id" << OID(mapSubId));
       BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << (long long) getCurrentTime()) <<
@@ -1603,7 +1674,6 @@ static bool processSubscriptions
 
     /* Release object created dynamically (including the value in the map created by addTriggeredSubscriptions */
     trigs->attrL.release();
-    enV.release();
     delete trigs;
   }
 
@@ -1709,6 +1779,103 @@ static unsigned int howManyAttrs(BSONObj& attrs, std::string& attrName)
 
 /* ****************************************************************************
 *
+* updateAttrInNotifyCer -
+*
+*/
+static void updateAttrInNotifyCer
+(
+  ContextElementResponse* notifyCerP,
+  ContextAttribute*       targetAttr
+)
+{
+  /* Try to find the attribute in the notification CER */
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+    if (caP->name == targetAttr->name)
+    {
+      if (targetAttr->valueType != ValueTypeNone)
+      {
+        caP->valueType      = targetAttr->valueType;
+        caP->stringValue    = targetAttr->stringValue;
+        caP->boolValue      = targetAttr->boolValue;
+        caP->numberValue    = targetAttr->numberValue;
+        caP->compoundValueP = targetAttr->compoundValueP == NULL ? NULL : targetAttr->compoundValueP->clone();
+      }
+      if (targetAttr->type != "")
+      {
+        caP->type = targetAttr->type;
+      }
+
+      /* Metadata */
+      for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
+      {
+        Metadata* targetMdP = targetAttr->metadataVector.get(jx);
+        /* Search for matching medatat in the CER attribute */
+        bool matchMd = false;
+        for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
+        {
+          Metadata* mdP = caP->metadataVector.get(kx);
+          if (mdP->name == targetMdP->name)
+          {
+            mdP->valueType   = targetMdP->valueType;
+            mdP->stringValue = targetMdP->stringValue;
+            mdP->boolValue   = targetMdP->boolValue;
+            mdP->numberValue = targetMdP->numberValue;
+            if (targetMdP->type != "")
+            {
+              mdP->type = targetMdP->type;
+            }
+            matchMd = true;
+            break;   /* kx  loop */
+          }
+        }
+        /* If the attribute in target attr was not found, then it has to be added*/
+        if(!matchMd)
+        {
+          Metadata* newMdP = new Metadata(targetMdP);
+          caP->metadataVector.push_back(newMdP);
+        }
+      }
+      return;
+    }
+  }
+
+  /* Reached this point, it means that it is a new attribute (APPEND case) */
+  ContextAttribute* caP = new ContextAttribute(targetAttr);
+  notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+}
+
+/* ****************************************************************************
+*
+* deleteAttrInNotifyCer -
+*
+*/
+static void deleteAttrInNotifyCer
+(
+  ContextElementResponse* notifyCerP,
+  ContextAttribute*       targetAttr
+)
+{
+  /* The algorithm is based in copying the old notify CER object excluding the delted attribute */
+  //ContextElementResponse* newNotifyCerP = new ContextElementResponse();
+  //newNotifyCerP->contextElement.entityId.fill(notifyCerP->contextElement.entityId.id,
+  //                                            notifyCerP->contextElement.entityId.type, "false");
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+    if (caP->name == targetAttr->name)
+    {
+      //newNotifyCerP->contextElement.contextAttributeVector.push_back(caP);
+      caP->skip = true;
+    }
+  }
+  //delete notifyCerP;  unexplicable crash...
+  //return newNotifyCerP;
+}
+
+/* ****************************************************************************
+*
 * updateContextAttributeItem -
 *
 */
@@ -1718,6 +1885,7 @@ static bool updateContextAttributeItem
   ContextAttribute*         ca,
   BSONObj&                  attrs,
   ContextAttribute*         targetAttr,
+  ContextElementResponse*   notifyCerP,
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
@@ -1733,6 +1901,7 @@ static bool updateContextAttributeItem
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace))
   {
     entityModified = actualUpdate || entityModified;
+    updateAttrInNotifyCer(notifyCerP, targetAttr);
   }
   else
   {
@@ -1799,9 +1968,9 @@ static bool updateContextAttributeItem
 static bool appendContextAttributeItem
 (
   ContextElementResponse*   cerP,
-  ContextAttribute*         ca,
   BSONObj&                  attrs,
   ContextAttribute*         targetAttr,
+  ContextElementResponse*   notifyCerP,
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
@@ -1816,6 +1985,7 @@ static bool appendContextAttributeItem
   {
     appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
     entityModified = actualUpdate || entityModified;
+    updateAttrInNotifyCer(notifyCerP, targetAttr);
 
     /* Check aspects related with location */
     if (targetAttr->getLocation().length() > 0)
@@ -1889,6 +2059,7 @@ static bool deleteContextAttributeItem
   ContextAttribute*                     ca,
   BSONObj&                              attrs,
   ContextAttribute*                     targetAttr,
+  ContextElementResponse*               notifyCerP,
   EntityId*                             eP,
   BSONObjBuilder*                       toUnset,
   bool&                                 entityModified,
@@ -1898,6 +2069,7 @@ static bool deleteContextAttributeItem
 {
   if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
   {
+    deleteAttrInNotifyCer(notifyCerP, targetAttr);
     entityModified = true;
 
     /* Check aspects related with location */
@@ -1954,6 +2126,7 @@ static bool processContextAttributeVector
   ContextElement*                            ceP,
   std::string                                action,
   std::map<string, TriggeredSubscription*>&  subsToNotify,
+  ContextElementResponse*                    notifyCerP,
   BSONObj&                                   attrs,
   BSONObjBuilder*                            toSet,
   BSONObjBuilder*                            toUnset,
@@ -1964,8 +2137,7 @@ static bool processContextAttributeVector
   double&                                    coordLat,
   double&                                    coordLong,
   std::string                                tenant,
-  const std::vector<std::string>&            servicePathV,
-  const std::string&                         apiVersion
+  const std::vector<std::string>&            servicePathV
 )
 {
   EntityId*                            eP              = &cerP->contextElement.entityId;
@@ -1998,6 +2170,7 @@ static bool processContextAttributeVector
                                       ca,
                                       attrs,
                                       targetAttr,
+                                      notifyCerP,
                                       eP,
                                       toSet,
                                       toPush,
@@ -2013,14 +2186,34 @@ static bool processContextAttributeVector
     }
     else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
     {
-      if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
+      if (!appendContextAttributeItem(cerP,
+                                      attrs,
+                                      targetAttr,
+                                      notifyCerP,
+                                      eP,
+                                      toSet,
+                                      toPush,
+                                      actualUpdate,
+                                      entityModified,
+                                      locAttr,
+                                      coordLat,
+                                      coordLong))
       {
         return false;
       }
     }
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
-      if (!deleteContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toUnset, entityModified, locAttr, &deletedAttributesCounter))
+      if (!deleteContextAttributeItem(cerP,
+                                      ca,
+                                      attrs,
+                                      targetAttr,
+                                      notifyCerP,
+                                      eP,
+                                      toUnset,
+                                      entityModified,
+                                      locAttr,
+                                      &deletedAttributesCounter))
       {
         return false;
       }
@@ -2362,31 +2555,17 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 }
 
 
-
 /* ****************************************************************************
 *
-* processContextElement -
-*
-* 0. Preparations
-* 1. Preconditions
-* 2. Get the complete list of entities from mongo
-*
+* contextElementPreconditionsCheck -
 */
-void processContextElement
+static bool contextElementPreconditionsCheck
 (
-  ContextElement*                      ceP,
-  UpdateContextResponse*               responseP,
-  const std::string&                   action,
-  const std::string&                   tenant,
-  const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
-  const std::string&                   xauthToken,
-  const std::string&                   apiVersion,
-  bool                                 checkEntityExistance
+  ContextElement*         ceP,
+  UpdateContextResponse*  responseP,
+  const std::string&      action
 )
 {
-  bool          attributeAlreadyExistsError = false;
-  std::string   attributeAlreadyExistsList  = "[ ";
 
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
@@ -2395,7 +2574,7 @@ void processContextElement
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    return;  // Error already in responseP
+    return false;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
@@ -2417,17 +2596,50 @@ void processContextElement
                                   " - offending attribute: " + aP->name +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return; // Error already in responseP
+        return false; // Error already in responseP
       }
     }
   }
 
+  return true;
+
+}
+
+/* ****************************************************************************
+*
+* processContextElement -
+*
+* 1. Preconditions
+* 2. Get the complete list of entities from mongo
+*
+*/
+void processContextElement
+(
+  ContextElement*                      ceP,
+  UpdateContextResponse*               responseP,
+  const std::string&                   action,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
+  const std::string&                   xauthToken,
+  const std::string&                   apiVersion,
+  bool                                 checkEntityExistance
+)
+{
+
+  /* Check preconditions */
+  if (!contextElementPreconditionsCheck(ceP, responseP, action))
+  {
+    return; // Error already in responseP
+  }
 
   /* Find entities (could be several, in the case of no type or isPattern=true) */
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
   BSONObjBuilder     bob;
+
+  EntityId* enP = &ceP->entityId;
 
   bob.append(idString, enP->id);
 
@@ -2517,6 +2729,10 @@ void processContextElement
   // FIXME P6: Once we allow for ServicePath to be modified, this loop must be looked at.
   //
   int docs = 0;
+
+  // Used to accumulate error response information, checked at the end
+  bool         attributeAlreadyExistsError = false;
+  std::string  attributeAlreadyExistsList  = "[ ";
 
   while (cursor->more())
   {
@@ -2632,9 +2848,14 @@ void processContextElement
       attributeAlreadyExistsList += " ]";
     }
 
+    /* Build CER used for notifying (if needed) */
+    AttributeList emptyAttrL;
+    ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
+
     if (!processContextAttributeVector(ceP,
                                        action,
                                        subsToNotify,
+                                       notifyCerP,
                                        attrs,
                                        &toSet,
                                        &toUnset,
@@ -2645,8 +2866,7 @@ void processContextElement
                                        coordLat,
                                        coordLong,
                                        tenant,
-                                       servicePathV,
-                                       apiVersion))
+                                       servicePathV))
     {
       /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
       // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
@@ -2760,7 +2980,7 @@ void processContextElement
     /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
      * previous addTriggeredSubscriptions() invocations */
     std::string err;
-    processSubscriptions(enP, subsToNotify, &err, tenant, xauthToken, servicePathV);
+    processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken);
 
     //
     // processSubscriptions cleans up the triggered subscriptions; this call here to
@@ -2770,6 +2990,12 @@ void processContextElement
     // The memory to free is allocated in the function addTriggeredSubscriptions.
     //
     releaseTriggeredSubscriptions(subsToNotify);
+
+    // FIXME P10: I would say that the memory allocated previously for notifyCerP should
+    // be released, but uncomentaing this line produces a double-free crash. Mabye somebody
+    // has already released before?
+    //notifyCerP->release();
+    //delete notifyCerP;
 
     /* To finish with this entity processing, search for CPrs in not found attributes and
      * add the corresponding ContextElementResponse to the global response */
@@ -2866,7 +3092,18 @@ void processContextElement
           }
         }
 
-        processSubscriptions(enP, subsToNotify, &errReason, tenant, xauthToken, servicePathV);
+        /* Build CER used for notifying (if needed). Service Path vector shouldn't have more than
+         * one item, thus it should be safer to get item 0 */
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP);
+        notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
+
+        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
+
+        // FIXME P10: I would say that the memory allocated previously for notifyCerP should
+        // be released, but uncomentaing this line produces a double-free crash. Mabye somebody
+        // has already released before?
+        //notifyCerP->release();
+        //delete notifyCerP;
       }
 
       responseP->contextElementResponseVector.push_back(cerP);

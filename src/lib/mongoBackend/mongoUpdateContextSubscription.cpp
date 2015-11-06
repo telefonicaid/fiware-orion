@@ -31,6 +31,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"

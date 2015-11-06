@@ -85,7 +85,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   numberValue           = caP->numberValue;
   boolValue             = caP->boolValue;
   compoundValueP        = caP->compoundValueP;
-  caP->compoundValueP   = NULL;
+  caP->compoundValueP   = NULL;   // FIXME P10: really?? shouldn't it be a clone?
   found                 = caP->found;
   typeFromXmlAttribute  = "";
   skip                  = false;
@@ -696,6 +696,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
 
   LM_F(("%s  PA:       %s (%s)", indent.c_str(), providingApplication.get().c_str(), formatToString(providingApplication.getFormat())));
   LM_F(("%s  found:    %s", indent.c_str(), FT(found)));
+  LM_F(("%s  skip:     %s", indent.c_str(), FT(skip)));
 
   metadataVector.present("Attribute", indent + "  ");
 }

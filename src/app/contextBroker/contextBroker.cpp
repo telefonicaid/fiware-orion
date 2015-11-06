@@ -65,6 +65,7 @@
 #include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoSubCache.h"
 
 #include "parseArgs/parseArgs.h"

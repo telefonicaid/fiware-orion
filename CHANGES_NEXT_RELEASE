@@ -1,3 +1,5 @@
 - Fix: safer treatment of database fields lastNotification, expiration and throttling in 
        the 'csub' collection, assuming that the field can be either int or long (it is always written as long)
 - Fix: number/bool correct rendering in NGSIv1 compound values
+- Fix: ONCHANGE notifications triggered by update context operation are filled avoiding querying entities collection (#881)
+- Fix: wrong notification values (duplicated) when triggering update context operations are too close (race condition)

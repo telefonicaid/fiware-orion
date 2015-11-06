@@ -33,6 +33,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/dbConstants.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "rest/uriParamNames.h"
