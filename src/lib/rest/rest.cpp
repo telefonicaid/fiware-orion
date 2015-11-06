@@ -39,6 +39,7 @@
 #include "common/globals.h"
 #include "common/defaultValues.h"
 #include "common/clockFunctions.h"
+#include "common/tag.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -109,7 +110,80 @@ typedef struct TimeStat
   struct timespec  accReqTime;
 } TimeStat;
 
-TimeStat timeStat;
+static TimeStat timeStat;
+
+
+
+/* ****************************************************************************
+*
+* timingStatistics - 
+*/
+std::string timingStatistics(std::string indent, Format format, std::string apiVersion)
+{
+  if (timeStatistics == false)
+  {
+    return "";
+  }
+
+  std::string  out;
+  char         lastReqBuf[64];
+  char         accReqBuf[64];
+
+  snprintf(lastReqBuf, sizeof(lastReqBuf), "%lu.%09d", timeStat.lastReqTime.tv_sec, (int) timeStat.lastReqTime.tv_nsec);
+  snprintf(accReqBuf,  sizeof(accReqBuf),  "%lu.%09d", timeStat.accReqTime.tv_sec,  (int) timeStat.accReqTime.tv_nsec);
+
+  if (format == JSON)
+  {
+    if ((timeStat.lastReqTime.tv_sec != 0) || (timeStat.lastReqTime.tv_nsec != 0))
+    {
+      if (apiVersion == "v2")
+      {
+        out  = JSON_STR("lastRequest")  + ":" + JSON_STR(lastReqBuf) + ",";
+      }
+      else
+      {
+        out = indent + JSON_STR("lastRequest") + ": " + JSON_STR(lastReqBuf) + ",\n";
+      }
+    }
+
+    if ((timeStat.accReqTime.tv_sec != 0) || (timeStat.accReqTime.tv_nsec != 0))
+    {
+      if (apiVersion == "v2")
+      {
+        out  += JSON_STR("accRequest")  + ":" + JSON_STR(accReqBuf);
+      }
+      else
+      {
+        out += indent + JSON_STR("accRequest") + ": " + JSON_STR(accReqBuf) + "\n";
+      }
+    }
+  }
+  else
+  {
+    if ((timeStat.lastReqTime.tv_sec != 0) || (timeStat.lastReqTime.tv_nsec != 0))
+    {
+      out = indent + "<lastRequest>" + lastReqBuf + "</lastRequest>\n";
+    }
+
+    if ((timeStat.accReqTime.tv_sec != 0) || (timeStat.accReqTime.tv_nsec != 0))
+    {
+      out += indent + "<accRequest>" + accReqBuf + "</accRequest>\n";
+    }
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* timingStatisticsReset - 
+*/
+void timingStatisticsReset(void)
+{
+  memset(&timeStat, 0, sizeof(timeStat));
+}
 
 
 
@@ -485,7 +559,6 @@ static void requestCompleted
     free(ciP->payload);
   }
 
-  delete(ciP);
   *con_cls = NULL;
 
   LM_TRANSACTION_END();  // Incoming REST request ends
@@ -493,12 +566,18 @@ static void requestCompleted
   if (timeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
+    LM_M(("End-time: %lu.%09d", reqEndTime.tv_sec, reqEndTime.tv_nsec));
 
     // FIXME P5: sem-protect timeStat? 
+    LM_M(("Start-time: %lu.%09d", ciP->reqStartTime.tv_sec, ciP->reqStartTime.tv_nsec));
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &timeStat.lastReqTime);
     clock_addtime(&timeStat.accReqTime, &timeStat.lastReqTime);
+    LM_M(("Req-time: %lu.%09d", timeStat.lastReqTime.tv_sec, timeStat.lastReqTime.tv_nsec));
+    LM_M(("Acc-Req-time: %lu.%09d", timeStat.accReqTime.tv_sec, timeStat.accReqTime.tv_nsec));
     // FIXME P5: End of sem-protect timeStat?
   }  
+
+  delete(ciP);
 }
 
 
@@ -968,6 +1047,7 @@ static int connectionTreat
     if (timeStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
+      LM_M(("Start-time: %lu.%09d", ciP->reqStartTime.tv_sec, ciP->reqStartTime.tv_nsec));
     }
 
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls

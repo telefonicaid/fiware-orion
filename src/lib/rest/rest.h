@@ -30,7 +30,15 @@
 
 #include "rest/RestService.h"
 
-#define  MAX_LEN_IP                      64
+
+
+/* ****************************************************************************
+*
+* MAX_LEN_IP - 
+*/
+#define MAX_LEN_IP  64
+
+
 
 /* ****************************************************************************
 *
@@ -84,5 +92,14 @@ extern void restInit
    RestServeFunction   _serveFunction = NULL,
    bool                _acceptTextXml = false
 );
+
+
+
+/* ****************************************************************************
+*
+* timingStatistics - to be moved to common lib?
+*/
+extern std::string timingStatistics(std::string indent, Format format, std::string apiVersion);
+extern void        timingStatisticsReset(void);
 
 #endif

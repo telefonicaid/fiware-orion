@@ -36,6 +36,7 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/rest.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoSubCache.h"
@@ -150,6 +151,7 @@ std::string statisticsTreat
     mutexTimeCCReset();
 
     mongoSubCacheStatisticsReset("statisticsTreat::DELETE");
+    timingStatisticsReset();
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -169,7 +171,6 @@ std::string statisticsTreat
   {
     out += TAG_ADD_COUNTER("jsonRequests", noOfJsonRequests);
   }
-
 
   if (noOfRegistrations != -1)
   {
@@ -513,6 +514,8 @@ std::string statisticsTreat
   out += TAG_ADD_INTEGER("subCacheRemoves",  mscRemoves,  true);
   out += TAG_ADD_INTEGER("subCacheUpdates",  mscUpdates,  true);
   out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  false);
+
+  out += timingStatistics(indent, ciP->outFormat, ciP->apiVersion);
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
   out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);
