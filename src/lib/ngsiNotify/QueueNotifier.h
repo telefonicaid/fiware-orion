@@ -1,5 +1,5 @@
-#ifndef QUEUENOTIFIER_H
-#define QUEUENOTIFIER_H
+#ifndef SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H
+#define SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H
 
 #include "common/SyncQOverflow.h"
 #include "ngsiNotify/Notifier.h"
@@ -10,6 +10,10 @@
 // default number of threads
 #define DEFAULT_NOTIF_TN 10
 
+/* ****************************************************************************
+*
+* class QueueNotifier-
+*/
 class QueueNotifier : public Notifier
 {
 public:
@@ -17,7 +21,7 @@ public:
   void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format);
 
 private:
- SyncQOverflow<SenderThreadParams*> *pQueue;
+ SyncQOverflow<SenderThreadParams*>* pQueue;
 };
 
-#endif // QUEUENOTIFIER_H
+#endif // SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H

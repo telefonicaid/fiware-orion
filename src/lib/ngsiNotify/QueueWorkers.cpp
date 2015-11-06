@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -33,8 +33,12 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
 
-static void *workerFunc(void *pSyncQ); /* prototype */
+static void *workerFunc(void* pSyncQ); /* prototype */
 
+/* ****************************************************************************
+*
+* QueueWorkers::start() -
+*/
 int QueueWorkers::start()
 {
   for (int i = 0; i < numberOfThreads; ++i)
@@ -49,7 +53,11 @@ int QueueWorkers::start()
   return 0;
 }
 
-static void *workerFunc(void *pSyncQ)
+/* ****************************************************************************
+*
+* QueueWorkers::start() -
+*/
+static void *workerFunc(void* pSyncQ)
 {
   SyncQOverflow<SenderThreadParams*> *queue = (SyncQOverflow<SenderThreadParams*> *) pSyncQ;
   CURL *curl;

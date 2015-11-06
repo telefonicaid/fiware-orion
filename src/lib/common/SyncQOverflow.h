@@ -1,5 +1,5 @@
-#ifndef SYNCQOVERFLOW_H
-#define SYNCQOVERFLOW_H
+#ifndef SRC_LIB_COMMON_SYNCQOVERFLOW_H
+#define SRC_LIB_COMMON_SYNCQOVERFLOW_H
 
 /*
 *
@@ -31,8 +31,13 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
+/* ****************************************************************************
+*
+* template class SyncQOverflow<>-
+*/
 template <typename Data>
-class SyncQOverflow {
+class SyncQOverflow
+{
 private:
     std::queue<Data> queue;
     mutable boost::mutex mtx;
@@ -45,6 +50,10 @@ public:
     Data pop();
 };
 
+/* ****************************************************************************
+*
+* SyncQOverflow<Data>::try_push -
+*/
 template <typename Data>
 bool SyncQOverflow<Data>::try_push(Data element)
 {
@@ -60,6 +69,10 @@ bool SyncQOverflow<Data>::try_push(Data element)
   return false;
 }
 
+/* ****************************************************************************
+*
+* SyncQOverflow<Data>::pop -
+*/
 template <typename Data>
 Data SyncQOverflow<Data>::pop()
 {
@@ -74,5 +87,4 @@ Data SyncQOverflow<Data>::pop()
   return element;
 }
 
-
-#endif // SYNQOVERFLOW_H
+#endif // SRC_LIB_COMMON_SYNCQOVERFLOW_H

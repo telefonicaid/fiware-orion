@@ -1,8 +1,8 @@
-#ifndef QUEUEWORKERS_H
-#define QUEUEWORKERS_H
+#ifndef SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H
+#define SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -38,4 +38,4 @@ private:
     int numberOfThreads;
 };
 
-#endif // QUEUEWORKERS_H
+#endif // SRC_LIB_NGSINOTIFY_QUEUEWORKERS_H
