@@ -151,9 +151,21 @@ static char* curlVersionGet(char* buf, int bufLen)
 
 /* ****************************************************************************
 *
-* httpRequestSend -
+* httpRequestSendWithCurl -
+*
+* The waitForResponse arguments specifies if the method has to wait for response
+* before return. If this argument is false, the return string is ""
+*
+* FIXME: I don't like too much "reusing" natural output to return "error" in the
+* case of error. I think it would be smarter to use "std::string* error" in the
+* arguments or (even better) an exception. To be solved in the future in a hardening
+* period.
+*
+* Note, we are using a hybrid approach, consisting in an static thread-local buffer of
+* small size that copes with most notifications to avoid expensive
+* calloc/free syscalls if the notification payload is not very large.
+*
 */
-
 std::string httpRequestSendWithCurl
 (
    CURL                   *curl,
