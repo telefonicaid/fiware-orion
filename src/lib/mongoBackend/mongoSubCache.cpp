@@ -308,21 +308,25 @@ static bool subMatch
   {
     if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
     {
+      LM_T(LmtMongoSubCacheMatch, ("No match due to tenant I"));
       return false;
     }
 
     if ((tenant != NULL) && (tenant[0] != 0))
     {
+      LM_T(LmtMongoSubCacheMatch, ("No match due to tenant II"));
       return false;
     }
   }
   else if (strcmp(cSubP->tenant, tenant) != 0)
   {
+    LM_T(LmtMongoSubCacheMatch, ("No match due to tenant III"));
     return false;
   }
 
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
+    LM_T(LmtMongoSubCacheMatch, ("No match due to servicePath"));
     return false;
   }
 
@@ -333,6 +337,7 @@ static bool subMatch
   //
   if (!attributeMatch(cSubP, attr))
   {
+    LM_T(LmtMongoSubCacheMatch, ("No match due to attributes"));
     return false;
   }
 
@@ -346,6 +351,7 @@ static bool subMatch
     }
   }
 
+  LM_T(LmtMongoSubCacheMatch, ("No match due to EntityInfo"));
   return false;
 }
 
@@ -1067,14 +1073,16 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
 
 #if 0
       //
-      // To be removed once sub-update is OK in QA
+      // FIXME P5: To be removed once sub-update is OK in QA
       //
-      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d",
+      int now = getCurrentTime();
+      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d|DUR:%lu",
                cSubP->subscriptionId,
                cSubP->lastNotificationTime,
                cSubP->expirationTime,
                cSubP->throttling,
-               cSubP->pendingNotifications);
+               cSubP->pendingNotifications,
+               cSubP->expirationTime - now);
 #else
         snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
 #endif
@@ -1211,11 +1219,17 @@ static void mongoSubCacheRefresh(std::string database)
   while (cursor->more())
   {
     BSONObj sub = cursor->next();
+    int     r;
 
-    mongoSubCacheItemInsert(tenant.c_str(), sub);
+    r = mongoSubCacheItemInsert(tenant.c_str(), sub);
 
-    ++subNo;
+    if (r == 0)
+    {
+      ++subNo;
+    }
   }
+
+  LM_T(LmtMongoSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
 }
 
 
@@ -1251,6 +1265,43 @@ void mongoSubCacheRefresh(void)
 
   ++mongoSubCache.noOfRefreshes;
   LM_T(LmtMongoSubCache, ("Refreshed subscription cache [%d]", mongoSubCache.noOfRefreshes));
+
+  //
+  // FIXME P5: Remove this debugging code once the refresh works again
+  //
+#if 0
+
+  //
+  // DEBUG STARTS HERE
+  //
+  CachedSubscription* cSubP = mongoSubCache.head;
+  int                 items = 0;
+
+  while (cSubP != NULL)
+  {
+    LM_T(LmtMongoSubCache, ("%s: TEN:%s, SPath:%s, THR:%lu, EXP:%lu, LNT:%lu PN:%d, REF:%s, Es:%d, As:%d, NCs:%d",
+                            cSubP->subscriptionId,
+                            cSubP->tenant,
+                            cSubP->servicePath,
+                            cSubP->throttling,
+                            cSubP->expirationTime,
+                            cSubP->lastNotificationTime,
+                            cSubP->pendingNotifications,
+                            cSubP->reference,
+                            cSubP->entityIdInfos.size(),
+                            cSubP->attributes.size(),
+                            cSubP->notifyConditionVector.size()));
+
+    cSubP = cSubP->next;
+    ++items;
+  }
+
+  LM_T(LmtMongoSubCache, ("%d subs in sub.cache", items));
+
+  //
+  // DEBUG ENDS HERE
+  //
+#endif
 
   cacheSemGive(__FUNCTION__, "subscription cache for refresh");
 }

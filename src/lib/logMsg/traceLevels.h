@@ -88,6 +88,7 @@ typedef enum TraceLevels
   /* MongoBackend (100-119) */
   LmtMongo = 100,
   LmtMongoSubCache,
+  LmtMongoSubCacheMatch,
 
   /* Cleanup (120-139) */
   LmtDestructor = 120,
