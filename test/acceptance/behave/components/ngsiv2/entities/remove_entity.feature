@@ -149,7 +149,7 @@ Feature: delete entities requests (POST) using NGSI v2 API. "DELETE" - /v2/entit
 
   # ------------------------ Service path ----------------------------------------------
 
-  @service_path_delete
+  @service_path_delete @BUG_1423 @skip
   Scenario Outline: Delete entities by ID using NGSI v2 with several service path header values
     Given a definition of headers
       | parameter          | value                    |
