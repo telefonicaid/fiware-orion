@@ -42,6 +42,12 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
    return;
   }
 
+
+  //
+  // FIXME P5: analyze how much of the code of this function is the same than in Notifier::sendNotifyContextRequest
+  // and could be refactored to common functions
+  //
+
   //
   // Creating the value of the Fiware-ServicePath HTTP header.
   // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
