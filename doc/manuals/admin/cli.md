@@ -141,3 +141,5 @@ The list of available options is the following:
 -   **-connectionMemory**. sets the size of the connection memory buffer (in Kb) per connection used internally
        by the HTTP server library. Default value is 64 Kb.
 
+-   **-maxConnections**. maximum number of simultaneous connections. Default value is "unlimited" (limited by max file descriptors of operating system).
+-   **-reqPoolSize**. size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.

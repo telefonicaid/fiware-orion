@@ -400,6 +400,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
+      LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
@@ -482,9 +483,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
-
-    LM_T(LmtRequest, (""));
-    LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", ciP->method.c_str(), ciP->url.c_str()));
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
