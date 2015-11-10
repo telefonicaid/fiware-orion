@@ -1141,6 +1141,17 @@ static int connectionTreat
 /* ****************************************************************************
 *
 * restStart - 
+*
+* NOTE, according to MHD documentation, thread pool (MHD_OPTION_THREAD_POOL_SIZE) cannot be used
+* is conjunction with MHD_USE_THREAD_PER_CONNECTION.
+* However, we have seen that if the thread pool size is 0 (the case of NOT using thread pool), then
+* MHD_start_daemon is OK with it.
+*
+* From MHD documentation:
+* MHD_OPTION_THREAD_POOL_SIZE
+*   Number (unsigned int) of threads in thread pool. Enable thread pooling by setting this value to to something greater than 1.
+*   Currently, thread model must be MHD_USE_SELECT_INTERNALLY if thread pooling is enabled (MHD_start_daemon returns NULL for
+*   an unsupported thread model).
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
