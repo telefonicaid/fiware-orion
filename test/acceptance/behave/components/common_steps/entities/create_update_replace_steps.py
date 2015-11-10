@@ -67,9 +67,9 @@ def create_entities_with_properties(context, entities_number, attributes_number)
     :param entities_number: number of entities
     :param attributes_number: number of attributes
     """
-    __logger__.debug("Creating %s with %s attributes..." % (entities_number, attributes_number))
+    __logger__.debug("Creating %s entities with %s attributes..." % (entities_number, attributes_number))
     context.resp_list = context.cb.create_entities(context, entities_number, attributes_number)
-    __logger__.info("...Created %s with %s attributes" % (entities_number, attributes_number))
+    __logger__.info("...Created %s entities with %s attributes" % (entities_number, attributes_number))
 
 
 @step(u'create an entity and attribute with special values in raw')
@@ -167,7 +167,35 @@ def replace_attributes_by_idin_raw_mode(context, entity_id):
     context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("PUT", context, entity_id)
     __logger__.info("...replaced attributes by id in raw mode")
 
+
+@step(u'update an attribute by ID "([^"]*)" and attribute name "([^"]*)" if it exists')
+def update_an_attribute_by_id_and_attribute_name_if_it_exists(context, entity_id, attribute_name):
+    """
+    update an attribute by ID and attribute name if it exists
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param entity_id: entity ID
+    :param attribute_name:  attribute name to update
+    """
+    __logger__.debug("updating an attribute by id and by attribute name...")
+    context.resp = context.cb.update_an_attribute_by_id_and_by_name(context, entity_id, attribute_name)
+    __logger__.info("...updated an attribute by id and by attribute name")
+
+
+@step(u'update an attribute by ID "([^"]*)" and attribute name "([^"]*)" if it exists in raw mode')
+def update_an_attribute_by_id_and_attribute_name_if_it_exists_in_raw_mode(context, entity_id, attribute_name):
+    """
+    update an attribute by ID and attribute name if it exists in raw mode
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param entity_id: entity ID
+    :param attribute_name:  attribute name to update
+    """
+    __logger__.debug("updating an attribute by id and by attribute name in raw mode...")
+    context.resp = context.cb.update_an_attribute_by_id_and_by_name_in_raw_mode(context, entity_id, attribute_name)
+    __logger__.info("...updated an attribute by id and by attribute name in raw mode")
+
+
 # ------------------------------------- validations ----------------------------------------------
+
 
 @step(u'verify that entities are stored in default tenant at mongo')
 @step(u'verify that entities are stored in mongo')
