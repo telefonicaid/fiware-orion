@@ -75,6 +75,16 @@ ContextAttribute::ContextAttribute()
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute - 
+*
+* Note that this constructor moves the compoundValue of the source CA to the
+* CA being constructed (the compoundValueP attribute in the source CA is set to NULL).
+* Another option (closer to copy semantics) would be cloning (using the clone() method in
+* CompoundValueNode class) but by the moment this is not needed by this constructor as
+* all their usage cases suffice with this "move compoundValue instead of cloning" approach.
+*
+* Note however that the treatement of metadata is different: in that case, the metadata
+* in "cloned" from source CA to the CA being constructed.
+*
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
@@ -85,7 +95,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   numberValue           = caP->numberValue;
   boolValue             = caP->boolValue;
   compoundValueP        = caP->compoundValueP;
-  caP->compoundValueP   = NULL;   // FIXME P10: really?? shouldn't it be a clone?
+  caP->compoundValueP   = NULL;
   found                 = caP->found;
   typeFromXmlAttribute  = "";
   skip                  = false;

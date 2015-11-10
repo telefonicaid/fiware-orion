@@ -120,12 +120,12 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 * ContextElementResponse::ContextElementResponse -
 *
 * This constructor builds the CER object based in a BSON object taken from the
-* entities collection at DB
+* entities collection at DB.
+*
+* Note that statusCode is not touched by this constructor.
 */
 ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, const AttributeList& attrL, bool includeEmpty)
 {
-  /* Note that statusCode is not touched by this constructor */
-
   prune = false;
 
   // Entity
@@ -247,11 +247,10 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
 *
 * ContextElementResponse::ContextElementResponse -
 *
-* This constructor builds the CER from a CEP
+* This constructor builds the CER from a CEP. Note that statusCode is not touched.
 */
 ContextElementResponse::ContextElementResponse(ContextElement* ceP)
 {
-  /* Note that statusCode is not touched by this constructor */
   contextElement.fill(ceP);
 }
 

@@ -1850,28 +1850,23 @@ static void updateAttrInNotifyCer
 *
 * deleteAttrInNotifyCer -
 *
+* The deletion algorithm is based on using the 'skip' flag in CA in order to
+* mark attributes that must not be render in the notificationMode
 */
 static void deleteAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr
 )
-{
-  /* The algorithm is based in copying the old notify CER object excluding the delted attribute */
-  //ContextElementResponse* newNotifyCerP = new ContextElementResponse();
-  //newNotifyCerP->contextElement.entityId.fill(notifyCerP->contextElement.entityId.id,
-  //                                            notifyCerP->contextElement.entityId.type, "false");
+{  
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
     if (caP->name == targetAttr->name)
     {
-      //newNotifyCerP->contextElement.contextAttributeVector.push_back(caP);
       caP->skip = true;
     }
   }
-  //delete notifyCerP;  unexplicable crash...
-  //return newNotifyCerP;
 }
 
 /* ****************************************************************************
@@ -2981,6 +2976,7 @@ void processContextElement
      * previous addTriggeredSubscriptions() invocations */
     std::string err;
     processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken);
+    delete notifyCerP;
 
     //
     // processSubscriptions cleans up the triggered subscriptions; this call here to
@@ -2989,13 +2985,7 @@ void processContextElement
     // ONE function.
     // The memory to free is allocated in the function addTriggeredSubscriptions.
     //
-    releaseTriggeredSubscriptions(subsToNotify);
-
-    // FIXME P10: I would say that the memory allocated previously for notifyCerP should
-    // be released, but uncomentaing this line produces a double-free crash. Mabye somebody
-    // has already released before?
-    //notifyCerP->release();
-    //delete notifyCerP;
+    releaseTriggeredSubscriptions(subsToNotify);    
 
     /* To finish with this entity processing, search for CPrs in not found attributes and
      * add the corresponding ContextElementResponse to the global response */
@@ -3098,12 +3088,7 @@ void processContextElement
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
 
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
-
-        // FIXME P10: I would say that the memory allocated previously for notifyCerP should
-        // be released, but uncomentaing this line produces a double-free crash. Mabye somebody
-        // has already released before?
-        //notifyCerP->release();
-        //delete notifyCerP;
+        delete notifyCerP;
       }
 
       responseP->contextElementResponseVector.push_back(cerP);

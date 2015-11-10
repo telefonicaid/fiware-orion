@@ -1591,7 +1591,7 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, const AttributeList& attrL, BSONObj attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const AttributeList& attrL, const BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
     getStringField(attribute, REG_ATTRS_NAME),
