@@ -166,22 +166,6 @@ static DBClientBase* connection = NULL;
 
 /* ****************************************************************************
 *
-* mongoConnect -
-*
-* This method is intended for unit testing, that needs the DBClientConnection
-* object to be mocked.
-*
-*/
-bool mongoConnect(DBClientConnection* c)
-{
-  connection = c;
-
-  return true;
-}
-
-
-/* ****************************************************************************
-*
 * For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
 * given out using the function getMongoConnection().
 */
@@ -232,7 +216,11 @@ DBClientBase* getMongoConnection(void)
 */
 void releaseMongoConnection(DBClientBase* connection)
 {
-  mongoPoolConnectionRelease(connection);
+#ifdef UNIT_TEST
+  return;
+#else
+  return mongoPoolConnectionRelease(connection);
+#endif
 }
 
 

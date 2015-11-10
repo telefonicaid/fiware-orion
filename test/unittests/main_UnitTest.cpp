@@ -67,7 +67,6 @@ unsigned int  cprForwardLimit       = 1000;
 bool          noCache               = false;
 char          fwdHost[64];
 char          notificationMode[64];
-unsigned int  connectionMemory      = 64;
 
 
 

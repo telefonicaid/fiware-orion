@@ -179,10 +179,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -247,10 +244,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_XML)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -315,10 +309,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_JSON)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -381,10 +372,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -459,10 +447,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -537,8 +522,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -606,10 +589,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -684,10 +664,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -755,10 +732,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -826,10 +800,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -910,10 +881,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -994,10 +962,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1078,10 +1043,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1162,10 +1124,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1242,10 +1201,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1322,10 +1278,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1427,10 +1380,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1532,10 +1482,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1637,10 +1584,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1742,10 +1686,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1833,10 +1774,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1924,10 +1862,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2039,10 +1974,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2154,10 +2086,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2269,10 +2198,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -2384,10 +2310,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 
@@ -2447,13 +2370,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
   /* The only collection affected by this operation is registrations, which has been extensively
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
-
 }
 
 /* ****************************************************************************
@@ -2519,12 +2438,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
   /* The only collection affected by this operation is registrations, which has been extensively
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
-
 }
 
 /* ****************************************************************************
@@ -2587,8 +2503,6 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
   /* The only collection affected by this operation is registrations, which has been extensively
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
@@ -2654,10 +2568,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2698,7 +2609,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     req.duration.set("PT1M");
 
     /* Set MongoDB connection mock (preserving the "actual" connection for later use) */
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -2724,16 +2635,16 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] }> "
               "- exception: boom!!)", s3);
 
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
     /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 
     /* check collection has not been touched */    
-    EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
-    EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
+    EXPECT_EQ(0, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
+    EXPECT_EQ(0, connectionDb->count(ENTITIES_COLL, BSONObj()));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }

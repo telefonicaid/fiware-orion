@@ -499,8 +499,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
   EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -559,10 +557,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);  
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -625,10 +620,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -697,10 +689,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -759,10 +748,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -826,10 +812,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   EXPECT_EQ("", RES_CER_STATUS(1).details);
   EXPECT_EQ(0, RES_CER(1).contextAttributeVector.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -909,10 +892,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1042,10 +1022,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(1).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1117,10 +1094,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1162,10 +1136,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1203,10 +1174,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1246,10 +1214,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1291,10 +1256,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1332,10 +1294,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   EXPECT_EQ(SccOk, ms);
   //TBD
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1379,10 +1338,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   EXPECT_EQ(SccOk, ms);
   // TBD
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1425,10 +1381,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   EXPECT_EQ(SccOk, ms);
   //TBD
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1634,10 +1587,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_STREQ("30", C_STR_FIELD(a3, "value"));
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1843,10 +1793,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
   EXPECT_STREQ("30", C_STR_FIELD(a3, "value"));
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -1902,8 +1849,6 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -1959,7 +1904,5 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }

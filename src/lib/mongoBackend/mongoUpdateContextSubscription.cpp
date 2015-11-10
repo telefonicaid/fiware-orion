@@ -112,7 +112,12 @@ HttpStatusCode mongoUpdateContextSubscription
   long long expiration = getCurrentTime() + requestP->duration.parse();
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CSUB_EXPIRATION, getField(sub, CSUB_EXPIRATION).numberLong());
+    //
+    // No duration in incoming request => "inherit" expirationDate from 'old' subscription
+    //
+    long long expirationTime = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION) : -1;
+
+    newSub.append(CSUB_EXPIRATION, expirationTime);
   }
   else
   {
@@ -124,18 +129,26 @@ HttpStatusCode mongoUpdateContextSubscription
   // FIXME: Restrictions not implemented yet
 
   /* Throttling update */
-  if (!requestP->throttling.isEmpty()) {
-      /* Throttling equal to 0 removes throttling */
-      long long throttling = requestP->throttling.parse();
-      if (throttling != 0) {
-          newSub.append(CSUB_THROTTLING, throttling);
-      }
+  if (!requestP->throttling.isEmpty())
+  {
+    /* Throttling equal to 0 removes throttling */
+    long long throttling = requestP->throttling.parse();
+
+    if (throttling != 0)
+    {
+      newSub.append(CSUB_THROTTLING, throttling);
+    }
   }
-  else {
-      /* The hasField check is needed due to Throttling could not be present in the original doc */
-      if (sub.hasField(CSUB_THROTTLING)) {
-          newSub.append(CSUB_THROTTLING, getField(sub, CSUB_THROTTLING).numberLong());
-      }
+  else
+  {
+    //
+    // The hasField check is needed as Throttling might not be present in the original doc
+    // FIXME P1: However, we could include Throttling in the new doc anyway ...
+    //
+    if (sub.hasField(CSUB_THROTTLING))
+    {
+      newSub.append(CSUB_THROTTLING, getIntOrLongFieldAsLong(sub, CSUB_THROTTLING));
+    }
   }
 
   /* Notify conditions */
@@ -171,6 +184,8 @@ HttpStatusCode mongoUpdateContextSubscription
        attrL.release();
   }
 
+
+  
   int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
 
   /* Last notification */
@@ -184,10 +199,17 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   else
   {
+    //
+    // FIXME P1: if CSUB_LASTNOTIFICATION is not in the original doc, it will also not be in the new doc.
+    //           Is this necessary?
+    //           The implementation would get a lot simpler if we ALWAYS add CSUB_LASTNOTIFICATION and CSUB_COUNT
+    //           to 'newSub'
+    //
+
     /* The hasField checks are needed as lastNotification/count might not be present in the original doc */
     if (sub.hasField(CSUB_LASTNOTIFICATION))
     {
-      newSub.append(CSUB_LASTNOTIFICATION, getIntField(sub, CSUB_LASTNOTIFICATION));
+      newSub.append(CSUB_LASTNOTIFICATION, getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION));
     }
 
     if (sub.hasField(CSUB_COUNT))
