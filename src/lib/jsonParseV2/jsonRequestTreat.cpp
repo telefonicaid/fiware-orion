@@ -37,7 +37,7 @@
 #include "jsonParseV2/jsonRequestTreat.h"
 
 
-extern bool timeStatistics;
+
 /* ****************************************************************************
 *
 * jsonRequestTreat - 
@@ -48,7 +48,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   struct timespec  start;
   struct timespec  end;
 
-  if (timeStatistics)
+  if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &start);
   }
@@ -109,7 +109,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   }
   
 
-  if (timeStatistics)
+  if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
     clock_difftime(&end, &start, &timeStat.lastJsonV2ParseTime);

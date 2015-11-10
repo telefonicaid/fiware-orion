@@ -37,7 +37,6 @@
 
 
 
-extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postSubscribeContext - 
@@ -78,28 +77,21 @@ std::string postSubscribeContext
   {
     LM_W(("Bad Input (max *one* service-path allowed for subscriptions (%d given))", ciP->servicePathV.size()));
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
+
+    TIME_STAT_RENDER_START();
     answer = scr.render(SubscribeContext, ciP->outFormat, "");
+    TIME_STAT_RENDER_STOP();
+
     return answer;
   }
 
-  struct timespec  start;
-  struct timespec  end;
-
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &start);
-  }
-
+  TIME_STAT_MONGO_START();
   ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV);
+  TIME_STAT_MONGO_STOP();
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
-  }
-
+  TIME_STAT_RENDER_START();
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
+  TIME_STAT_RENDER_STOP();
 
   parseDataP->scr.res.release();
 

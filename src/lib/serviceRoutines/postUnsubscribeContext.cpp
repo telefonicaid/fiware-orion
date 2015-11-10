@@ -36,7 +36,6 @@
 
 
 
-extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postUnsubscribeContext - 
@@ -52,24 +51,13 @@ std::string postUnsubscribeContext
   UnsubscribeContextResponse  uncr;
   std::string                 answer;
 
-  struct timespec  start;
-  struct timespec  end;
-
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &start);
-  }
-
+  TIME_STAT_MONGO_START();
   ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant);
+  TIME_STAT_MONGO_STOP();
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
-  }
-
+  TIME_STAT_RENDER_START();
   answer = uncr.render(UnsubscribeContext, ciP->outFormat, "");
+  TIME_STAT_RENDER_STOP();
 
   return answer;
 }

@@ -46,7 +46,6 @@
 
 
 
-extern bool timeStatistics;
 /* ****************************************************************************
 *
 * xmlPayloadClean -
@@ -121,11 +120,11 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 */
 static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP, Format format)
 {
-  std::string     ip;
-  std::string     protocol;
-  int             port;
-  std::string     prefix;
-  std::string     answer;
+  std::string      ip;
+  std::string      protocol;
+  int              port;
+  std::string      prefix;
+  std::string      answer;
 
 
   //
@@ -150,7 +149,11 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   char*        cleanPayload;
 
   ciP->outFormat  = format;
-  payload         = upcrP->render(ciP, UpdateContext, "");
+
+  TIME_STAT_RENDER_START();
+  payload = upcrP->render(ciP, UpdateContext, "");
+  TIME_STAT_RENDER_STOP();
+
   ciP->outFormat  = outFormat;
   cleanPayload    = (char*) payload.c_str();
 
@@ -470,6 +473,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
+
   //
   // 01. Check service-path consistency
   //
@@ -481,7 +485,11 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     LM_W(("Bad Input (more than one service path for an update request)"));
+
+    TIME_STAT_RENDER_START();
     answer = upcrsP->render(ciP, UpdateContext, "");
+    TIME_STAT_RENDER_STOP();
+
     return answer;
   }
   else if (ciP->servicePathV.size() == 0)
@@ -493,7 +501,11 @@ std::string postUpdateContext
   if (res != "OK")
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
+
+    TIME_STAT_RENDER_START();
     answer = upcrsP->render(ciP, UpdateContext, "");
+    TIME_STAT_RENDER_STOP();
+
     return answer;
   }
 
@@ -504,22 +516,9 @@ std::string postUpdateContext
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
   
-  struct timespec  start;
-  struct timespec  end;
-
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &start);
-  }
-
+  TIME_STAT_MONGO_START();
   HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance);
-
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
-  }
+  TIME_STAT_MONGO_STOP();
 
   if (ciP->httpStatusCode != SccCreated)
   {
@@ -538,7 +537,10 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
+    TIME_STAT_RENDER_START();
     answer = upcrsP->render(ciP, UpdateContext, "");
+    TIME_STAT_RENDER_STOP();
+
     upcrP->release();
     return answer;
   }
@@ -699,7 +701,9 @@ std::string postUpdateContext
     response.merge(&upcrs);
   }
 
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP, UpdateContext, "");
+  TIME_STAT_RENDER_STOP();
 
   //
   // Cleanup

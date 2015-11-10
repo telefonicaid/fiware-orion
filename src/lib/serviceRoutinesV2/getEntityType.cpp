@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntityType.h"
@@ -53,7 +56,9 @@ std::string getEntityType
   std::string         entityTypeName = compV[2];
   std::string         answer;
 
+  TIME_STAT_MONGO_START();
   mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  TIME_STAT_MONGO_STOP();
 
   answer = response.toJson(ciP);
   response.release();

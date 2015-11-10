@@ -92,7 +92,6 @@ bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
 char                             restAllowedOrigin[64];
-bool                             timeStatistics        = false;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -133,24 +132,28 @@ do                                                                            \
 */
 std::string timingStatistics(std::string indent, Format format, std::string apiVersion)
 {
-  if (timeStatistics == false)
+  if (reqTimeStatistics == false)
   {
     return "";
   }
 
   char  buf[64];
-  bool  lastReqTime           = (timeStat.lastReqTime.tv_sec != 0) || (timeStat.lastReqTime.tv_nsec != 0);
-  bool  accReqTime            = (timeStat.accReqTime.tv_sec != 0) || (timeStat.accReqTime.tv_nsec != 0);
-  bool  lastXmlParseTime      = (timeStat.lastXmlParseTime.tv_sec != 0) || (timeStat.lastXmlParseTime.tv_nsec != 0);
-  bool  accXmlParseTime       = (timeStat.accXmlParseTime.tv_sec != 0) || (timeStat.accXmlParseTime.tv_nsec != 0);
-  bool  lastJsonV1ParseTime   = (timeStat.lastJsonV1ParseTime.tv_sec != 0) || (timeStat.lastJsonV1ParseTime.tv_nsec != 0);
-  bool  accJsonV1ParseTime    = (timeStat.accJsonV1ParseTime.tv_sec != 0) || (timeStat.accJsonV1ParseTime.tv_nsec != 0);
-  bool  lastJsonV2ParseTime   = (timeStat.lastJsonV2ParseTime.tv_sec != 0) || (timeStat.lastJsonV2ParseTime.tv_nsec != 0);
-  bool  accJsonV2ParseTime    = (timeStat.accJsonV2ParseTime.tv_sec != 0) || (timeStat.accJsonV2ParseTime.tv_nsec != 0);
+  bool  lastReqTime           = (timeStat.lastReqTime.tv_sec != 0)          || (timeStat.lastReqTime.tv_nsec != 0);
+  bool  accReqTime            = (timeStat.accReqTime.tv_sec != 0)           || (timeStat.accReqTime.tv_nsec != 0);
+  bool  lastXmlParseTime      = (timeStat.lastXmlParseTime.tv_sec != 0)     || (timeStat.lastXmlParseTime.tv_nsec != 0);
+  bool  accXmlParseTime       = (timeStat.accXmlParseTime.tv_sec != 0)      || (timeStat.accXmlParseTime.tv_nsec != 0);
+  bool  lastJsonV1ParseTime   = (timeStat.lastJsonV1ParseTime.tv_sec != 0)  || (timeStat.lastJsonV1ParseTime.tv_nsec != 0);
+  bool  accJsonV1ParseTime    = (timeStat.accJsonV1ParseTime.tv_sec != 0)   || (timeStat.accJsonV1ParseTime.tv_nsec != 0);
+  bool  lastJsonV2ParseTime   = (timeStat.lastJsonV2ParseTime.tv_sec != 0)  || (timeStat.lastJsonV2ParseTime.tv_nsec != 0);
+  bool  accJsonV2ParseTime    = (timeStat.accJsonV2ParseTime.tv_sec != 0)   || (timeStat.accJsonV2ParseTime.tv_nsec != 0);
   bool  lastMongoBackendTime  = (timeStat.lastMongoBackendTime.tv_sec != 0) || (timeStat.lastMongoBackendTime.tv_nsec != 0);
-  bool  accMongoBackendTime   = (timeStat.accMongoBackendTime.tv_sec != 0) || (timeStat.accMongoBackendTime.tv_nsec != 0);
+  bool  accMongoBackendTime   = (timeStat.accMongoBackendTime.tv_sec != 0)  || (timeStat.accMongoBackendTime.tv_nsec != 0);
+  bool  lastRenderTime        = (timeStat.lastRenderTime.tv_sec != 0)       || (timeStat.lastRenderTime.tv_nsec != 0);
+  bool  accRenderTime         = (timeStat.accRenderTime.tv_sec != 0)        || (timeStat.accRenderTime.tv_nsec != 0);
 
-  bool  accMongoBackendTimeComma  = false;
+  bool  accRenderTimeComma        = false;
+  bool  lastRenderTimeComma       = accRenderTime            || accRenderTimeComma;
+  bool  accMongoBackendTimeComma  = lastRenderTime           || lastRenderTimeComma;
   bool  lastMongoBackendTimeComma = accMongoBackendTime      || accMongoBackendTimeComma;
   bool  accJsonV2ParseTimeComma   = lastMongoBackendTime     || lastMongoBackendTimeComma;
   bool  lastJsonV2ParseTimeComma  = accJsonV2ParseTime       || accJsonV2ParseTimeComma;
@@ -269,6 +272,26 @@ std::string timingStatistics(std::string indent, Format format, std::string apiV
   {
     snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accMongoBackendTime.tv_sec, (int) timeStat.accMongoBackendTime.tv_nsec);
     STAT_ADD(out, format, indent2, buf, "accMongoBackend", accMongoBackendTimeComma);
+  }
+
+
+  //
+  // lastRenderTime - the time that the mongoBackend took to treat the last request
+  //
+  if (lastRenderTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastRenderTime.tv_sec, (int) timeStat.lastRenderTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "lastRender", lastRenderTimeComma);
+  }
+
+
+  //
+  // accRenderTime - accumulation of lastRenderTime
+  //
+  if (accRenderTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accRenderTime.tv_sec, (int) timeStat.accRenderTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "accRender", accRenderTimeComma);
   }
 
 
@@ -669,17 +692,13 @@ static void requestCompleted
 
   LM_TRANSACTION_END();  // Incoming REST request ends
 
-  if (timeStatistics)
+  if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
-    LM_M(("End-time: %lu.%09d", reqEndTime.tv_sec, reqEndTime.tv_nsec));
 
     // FIXME P5: sem-protect timeStat? 
-    LM_M(("Start-time: %lu.%09d", ciP->reqStartTime.tv_sec, ciP->reqStartTime.tv_nsec));
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &timeStat.lastReqTime);
     clock_addtime(&timeStat.accReqTime, &timeStat.lastReqTime);
-    LM_M(("Req-time: %lu.%09d", timeStat.lastReqTime.tv_sec, timeStat.lastReqTime.tv_nsec));
-    LM_M(("Acc-Req-time: %lu.%09d", timeStat.accReqTime.tv_sec, timeStat.accReqTime.tv_nsec));
     // FIXME P5: End of sem-protect timeStat?
   }  
 
@@ -1150,10 +1169,9 @@ static int connectionTreat
       return MHD_NO;
     }
 
-    if (timeStatistics)
+    if (reqTimeStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
-      LM_M(("Start-time: %lu.%09d", ciP->reqStartTime.tv_sec, ciP->reqStartTime.tv_nsec));
     }
 
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls

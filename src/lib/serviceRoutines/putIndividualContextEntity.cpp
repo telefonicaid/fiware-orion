@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -86,7 +89,7 @@ std::string putIndividualContextEntity
   
 
   // 03. Call postUpdateContext standard service routine
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 04. Translate UpdateContextResponse to UpdateContextElementResponse
@@ -94,7 +97,10 @@ std::string putIndividualContextEntity
 
 
   // 05. Cleanup and return result
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP, IndividualContextEntity, "");
+  TIME_STAT_RENDER_STOP();
+
   response.release();
   parseDataP->upcr.res.release();
 

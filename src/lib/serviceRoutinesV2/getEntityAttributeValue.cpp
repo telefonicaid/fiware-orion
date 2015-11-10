@@ -25,14 +25,16 @@
 #include <string>
 #include <vector>
 
-#include "serviceRoutinesV2/getEntityAttribute.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 
+#include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/getEntityAttribute.h"
 
-#include "apiTypesV2/Attribute.h"
 
 
 /* ****************************************************************************
@@ -69,12 +71,18 @@ std::string getEntityAttributeValue
   if (attribute.errorCode.error == "TooManyResults")
   {
     ciP->httpStatusCode = SccConflict;
+
+    TIME_STAT_RENDER_START();
     answer = attribute.render(ciP, EntityAttributeResponse);
+    TIME_STAT_RENDER_STOP();
   }
   else if (attribute.errorCode.error == "NotFound")
   {
     ciP->httpStatusCode = SccContextElementNotFound;
+
+    TIME_STAT_RENDER_START();
     answer = attribute.render(ciP, EntityAttributeResponse);
+    TIME_STAT_RENDER_STOP();
   }
   else
   {
@@ -89,7 +97,10 @@ std::string getEntityAttributeValue
     {
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
+
+      TIME_STAT_RENDER_START();
       answer = attribute.render(ciP, EntityAttributeResponse);
+      TIME_STAT_RENDER_STOP();
     }
     else
     {
@@ -98,17 +109,24 @@ std::string getEntityAttributeValue
         answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, "");
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {
-            answer = "{" + answer + "}";
+          TIME_STAT_RENDER_START();
+          answer = "{" + answer + "}";
+          TIME_STAT_RENDER_STOP();
         }
         else if (attribute.pcontextAttribute->compoundValueP->isVector())
         {
-           answer = "[" + answer + "]";
+          TIME_STAT_RENDER_START();
+          answer = "[" + answer + "]";
+          TIME_STAT_RENDER_STOP();
         }
       }
       else
       {
+        TIME_STAT_RENDER_START();
         answer = attribute.pcontextAttribute->toStringValue();
+        TIME_STAT_RENDER_STOP();
       }
+
       ciP->outFormat = TEXT;
     }
  }

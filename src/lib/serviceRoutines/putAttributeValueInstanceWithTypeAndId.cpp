@@ -27,6 +27,9 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -79,7 +82,10 @@ std::string putAttributeValueInstanceWithTypeAndId
   {
     LM_W(("Bad Input non-matching entity::types in URL"));
     response.fill(SccBadRequest, "non-matching entity::types in URL");
+
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP->outFormat, "", false, false);
+    TIME_STAT_RENDER_STOP();
 
     parseDataP->upcar.res.release();
     return answer;
@@ -94,7 +100,11 @@ std::string putAttributeValueInstanceWithTypeAndId
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
     
     response.fill(SccBadRequest, details);
+
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP->outFormat, "", false, false);
+    TIME_STAT_RENDER_STOP();
+
     parseDataP->upcar.res.release();
 
     return answer;
@@ -114,7 +124,9 @@ std::string putAttributeValueInstanceWithTypeAndId
 
 
   // 07. Render result
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP->outFormat, "", false, false);
+  TIME_STAT_RENDER_STOP();
 
 
   // 08. Cleanup and return result

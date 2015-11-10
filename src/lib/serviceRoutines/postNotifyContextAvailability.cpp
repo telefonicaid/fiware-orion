@@ -28,8 +28,11 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 #include "common/string.h"
 #include "common/defaultValues.h"
+
 #include "mongoBackend/mongoNotifyContextAvailability.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
@@ -63,7 +66,11 @@ std::string postNotifyContextAvailability
   {
     ncar.responseCode.fill(SccBadRequest, "more than one service path for notification");
     LM_W(("Bad Input (more than one service path for a notification)"));
+
+    TIME_STAT_RENDER_START();
     answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
+    TIME_STAT_RENDER_STOP();
+
     return answer;
   }
   else if (ciP->servicePathV.size() == 0)
@@ -75,12 +82,21 @@ std::string postNotifyContextAvailability
   if (res != "OK")
   {
     ncar.responseCode.fill(SccBadRequest, res);
+
+    TIME_STAT_RENDER_START();
     answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
+    TIME_STAT_RENDER_STOP();
+
     return answer;
   }
 
+  TIME_STAT_MONGO_START();
   ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
+  TIME_STAT_MONGO_STOP();
 
+  TIME_STAT_RENDER_START();
   answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
+  TIME_STAT_RENDER_STOP();
+
   return answer;
 }

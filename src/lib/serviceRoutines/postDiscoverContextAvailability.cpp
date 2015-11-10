@@ -28,14 +28,18 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postDiscoverContextAvailability.h"
-
-
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
+
+
+
 /* ****************************************************************************
 *
 * postDiscoverContextAvailability - 
@@ -51,8 +55,13 @@ std::string postDiscoverContextAvailability
   DiscoverContextAvailabilityResponse*  dcarP = &parseDataP->dcars.res;
   std::string                           answer;
 
+  TIME_STAT_MONGO_START();
   ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, dcarP, ciP->tenant, ciP->uriParam, ciP->servicePathV);
+  TIME_STAT_MONGO_STOP();
+
+  TIME_STAT_RENDER_START();
   answer = dcarP->render(DiscoverContextAvailability, ciP->outFormat, "");
+  TIME_STAT_RENDER_STOP();
 
   return answer;
 }

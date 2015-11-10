@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsi/ParseData.h"
@@ -58,7 +61,10 @@ std::string leakTreat
     OrionError orionError(SccBadRequest, "no such service");
 
     ciP->httpStatusCode = SccOk;
+
+    TIME_STAT_RENDER_START();
     out = orionError.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
     return out;
   }
 
@@ -71,20 +77,29 @@ std::string leakTreat
   {
     OrionError orionError(SccBadRequest, "Password requested");
     ciP->httpStatusCode = SccOk;
+
+    TIME_STAT_RENDER_START();
     out = orionError.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
   }
   else if (password != "harakiri")
   {
     OrionError orionError(SccBadRequest, "Request denied - password erroneous");
     ciP->httpStatusCode = SccOk;
+
+    TIME_STAT_RENDER_START();
     out = orionError.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
   }
   else
   {
     // No Cleanup for valgrind, and just in case another malloc
     std::string pwd = strdup("Leak test done");
     OrionError orionError(SccOk, "Leak test: " + pwd);
-    return orionError.render(ciP, "");
+
+    TIME_STAT_RENDER_START();
+    out = orionError.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
   }
 
   return out;

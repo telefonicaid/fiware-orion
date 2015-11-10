@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -93,7 +96,9 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP->outFormat, "", false, false);
+    TIME_STAT_RENDER_STOP();
 
     return answer;
   }
@@ -103,7 +108,9 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP->outFormat, "", false, false);
+    TIME_STAT_RENDER_STOP();
 
     return answer;
   }
@@ -122,7 +129,10 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP->outFormat, "", false, false);
+  TIME_STAT_RENDER_STOP();
+
   parseDataP->upcr.res.release();
 
   return answer;

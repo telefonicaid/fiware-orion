@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -83,7 +86,12 @@ std::string postEntities
     OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination");
     ciP->httpStatusCode = SccBadRequest;
     eP->release();
-    return oe.render(ciP, "");
+
+    TIME_STAT_RENDER_START();
+    std::string out = oe.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
+
+    return out;
   }
 
   // 01. Fill in UpdateContextRequest
@@ -110,7 +118,10 @@ std::string postEntities
   {
     OrionError oe(SccInvalidModification, "Entity already exists");
     ciP->httpStatusCode = SccInvalidModification;
+
+    TIME_STAT_RENDER_START();
     answer = oe.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
   }
 
 

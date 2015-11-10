@@ -25,7 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 #include "common/string.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -86,7 +89,9 @@ std::string getEntity
 
   entity.fill(&parseDataP->qcrs.res);
 
+  TIME_STAT_RENDER_START();
   string answer = entity.render(ciP, EntityResponse);
+  TIME_STAT_RENDER_STOP();
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

@@ -36,7 +36,6 @@
 
 
 
-extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postUpdateContextAvailabilitySubscription - 
@@ -51,16 +50,9 @@ std::string postUpdateContextAvailabilitySubscription
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   std::string                                    answer;
-  struct timespec                                start;
-  struct timespec                                end;
 
   ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
   Format notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
-
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &start);
-  }
 
   //
   // FIXME P6: for the moment, we are assuming that notification will be sent in the same format than the one
@@ -68,19 +60,16 @@ std::string postUpdateContextAvailabilitySubscription
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
   //
+  TIME_STAT_MONGO_START();
   ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
                                                                    &ucas,
                                                                    notifyFormat,
                                                                    ciP->tenant);
+  TIME_STAT_MONGO_STOP();
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
-  }
-
+  TIME_STAT_RENDER_START();
   answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);
+  TIME_STAT_RENDER_STOP();
 
   return answer;
 }

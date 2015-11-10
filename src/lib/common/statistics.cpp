@@ -33,6 +33,7 @@
 * Statistic time counters -
 */
 TimeStat timeStat;
+bool     reqTimeStatistics = false;
 
 
 

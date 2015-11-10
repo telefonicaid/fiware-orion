@@ -38,7 +38,6 @@
 
 
 
-extern bool timeStatistics;
 /* ****************************************************************************
 *
 * getAttributesForEntityType -
@@ -62,26 +61,16 @@ std::string getAttributesForEntityType
 {
   EntityTypeResponse  response;
   std::string         entityTypeName = compV[2];
-  struct timespec  start;
-  struct timespec  end;
 
   response.statusCode.fill(SccOk);
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &start);
-  }
-
+  TIME_STAT_MONGO_START();
   mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  TIME_STAT_MONGO_STOP();
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
-  }
-
+  TIME_STAT_RENDER_START();
   std::string rendered = response.render(ciP, "");
+  TIME_STAT_RENDER_STOP();
   response.release();
 
   return rendered;

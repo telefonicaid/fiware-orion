@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "apiTypesV2/Subscription.h"
 #include "common/JsonHelper.h"
 #include "common/string.h"
@@ -35,6 +38,8 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+
+
 
 /* ****************************************************************************
 *
@@ -45,24 +50,32 @@
 */
 std::string getSubscription
 (
-    ConnectionInfo*            ciP,
-    int                        components,
-    std::vector<std::string>&  compV,
-    ParseData*                 parseDataP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 )
 {
-
   ngsiv2::Subscription sub;
   std::string          idSub = compV[2];
   OrionError           oe;
 
+  TIME_STAT_MONGO_START();
   mongoGetSubscription(&sub, &oe,  idSub , ciP->uriParam, ciP->tenant);
+  TIME_STAT_MONGO_STOP();
 
   if (oe.code != SccOk)
   {
-    return oe.render(ciP,"");
+    TIME_STAT_RENDER_START();
+    std::string out = oe.render(ciP,"");
+    TIME_STAT_RENDER_STOP();
+
+    return out;
   }
 
-  return  sub.toJson();
-}
+  TIME_STAT_RENDER_START();
+  std::string out = sub.toJson();
+  TIME_STAT_RENDER_STOP();
 
+  return out;
+}

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -92,12 +95,18 @@ std::string putEntity
   else if (ciP->httpStatusCode == SccConflict)
   {
     OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
+
+    TIME_STAT_RENDER_START();
     answer = orionError.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
   }
   else if (ciP->httpStatusCode == SccContextElementNotFound)
   {
     OrionError orionError(SccContextElementNotFound, "No context element found");
+
+    TIME_STAT_RENDER_START();
     answer = orionError.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
   }
 
   // 05. Cleanup and return result

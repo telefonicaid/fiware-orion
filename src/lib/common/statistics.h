@@ -32,6 +32,88 @@
 
 /* ****************************************************************************
 *
+* TIME_STAT_RENDER_START - 
+*/
+#define TIME_STAT_RENDER_START()                                       \
+  struct timespec renderStart;                                         \
+  struct timespec renderEnd;                                           \
+                                                                       \
+  if (reqTimeStatistics)                                               \
+  {                                                                    \
+    clock_gettime(CLOCK_REALTIME, &renderStart);                       \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_RENDER_RESTART - 
+*/
+#define TIME_STAT_RENDER_RESTART()                                     \
+  if (reqTimeStatistics)                                               \
+  {                                                                    \
+    clock_gettime(CLOCK_REALTIME, &renderStart);                       \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_RENDER_STOP - 
+*/
+#define TIME_STAT_RENDER_STOP()                                         \
+  if (reqTimeStatistics)                                                \
+  {                                                                     \
+    clock_gettime(CLOCK_REALTIME, &renderEnd);                          \
+    clock_difftime(&renderEnd, &renderStart, &timeStat.lastRenderTime); \
+    clock_addtime(&timeStat.accRenderTime, &timeStat.lastRenderTime);   \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_START - 
+*/
+#define TIME_STAT_MONGO_START()                                        \
+  struct timespec mongoStart;                                          \
+  struct timespec mongoEnd;                                            \
+                                                                       \
+  if (reqTimeStatistics)                                               \
+  {                                                                    \
+    clock_gettime(CLOCK_REALTIME, &mongoStart);                        \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_RESTART - 
+*/
+#define TIME_STAT_MONGO_RESTART()                                      \
+  if (reqTimeStatistics)                                               \
+  {                                                                    \
+    clock_gettime(CLOCK_REALTIME, &mongoStart);                        \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_STOP - 
+*/
+#define TIME_STAT_MONGO_STOP()                                                    \
+  if (reqTimeStatistics)                                                          \
+  {                                                                               \
+    clock_gettime(CLOCK_REALTIME, &mongoEnd);                                     \
+    clock_difftime(&mongoEnd, &mongoStart, &timeStat.lastMongoBackendTime);       \
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime); \
+  }
+
+
+
+/* ****************************************************************************
+*
 * TimeStat - 
 */
 typedef struct TimeStat
@@ -46,9 +128,12 @@ typedef struct TimeStat
   struct timespec  accJsonV2ParseTime;
   struct timespec  lastMongoBackendTime;
   struct timespec  accMongoBackendTime;
+  struct timespec  lastRenderTime;
+  struct timespec  accRenderTime;
 } TimeStat;
 
 extern TimeStat timeStat;
+extern bool     reqTimeStatistics;
 
 
 

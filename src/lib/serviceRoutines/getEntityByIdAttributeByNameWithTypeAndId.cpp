@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
@@ -96,13 +99,19 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
   {
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+
+    TIME_STAT_RENDER_START();
     answer = parseDataP->dcars.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, "");
+    TIME_STAT_RENDER_STOP();
   }
   else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
   {
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     LM_W(("Bad Input non-matching entity::types in URL"));
+
+    TIME_STAT_RENDER_START();
     answer = parseDataP->dcars.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, "");
+    TIME_STAT_RENDER_STOP();
   }
   else
   {

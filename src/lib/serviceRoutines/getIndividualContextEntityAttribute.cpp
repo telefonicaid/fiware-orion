@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -117,7 +120,9 @@ std::string getIndividualContextEntityAttribute
 
 
   // 5. Render the ContextAttributeResponse
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP, IndividualContextEntityAttribute, "");
+  TIME_STAT_RENDER_STOP();
 
 
   // 6. Cleanup and return result

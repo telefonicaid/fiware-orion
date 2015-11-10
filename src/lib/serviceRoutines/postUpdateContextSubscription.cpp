@@ -37,7 +37,6 @@
 
 
 
-extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postUpdateContextSubscription - 
@@ -52,33 +51,23 @@ std::string postUpdateContextSubscription
 {
   UpdateContextSubscriptionResponse  ucsr;
   std::string                        answer;
-  struct timespec                    start;
-  struct timespec                    end;
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
   Format  notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &start);
-  }
+  TIME_STAT_MONGO_START();
+  ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
+                                                       &ucsr,
+                                                       notifyFormat,
+                                                       ciP->tenant,
+                                                       ciP->httpHeaders.xauthToken,
+                                                       ciP->servicePathV);
+  TIME_STAT_MONGO_STOP();
 
-  ciP->httpStatusCode  = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
-                                                        &ucsr,
-                                                        notifyFormat,
-                                                        ciP->tenant,
-                                                        ciP->httpHeaders.xauthToken,
-                                                        ciP->servicePathV);
-
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
-  }
-
+  TIME_STAT_RENDER_START();
   answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, "");
+  TIME_STAT_RENDER_STOP();
 
   return answer;
 }

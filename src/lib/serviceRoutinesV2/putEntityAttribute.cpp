@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
@@ -94,9 +97,12 @@ std::string putEntityAttribute
 
   if (ciP->httpStatusCode == SccInvalidModification)
   {
-      std::string details = "Request payload is missing some piece of information. Please, check Orion documentation."; 
-      OrionError orionError(SccInvalidModification, details);     
-      answer = orionError.render(ciP, "");
+    std::string  details = "Request payload is missing some piece of information. Please, check Orion documentation."; 
+    OrionError   orionError(SccInvalidModification, details);     
+
+    TIME_STAT_RENDER_START();
+    answer = orionError.render(ciP, "");
+    TIME_STAT_RENDER_STOP();
   }
 
   return answer;

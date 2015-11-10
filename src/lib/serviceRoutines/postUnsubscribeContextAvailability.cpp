@@ -36,7 +36,6 @@
 
 
 
-extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postUnsubscribeContextAvailability - 
@@ -51,24 +50,14 @@ std::string postUnsubscribeContextAvailability
 {
   UnsubscribeContextAvailabilityResponse  ucar;
   std::string                             answer;
-  struct timespec                         start;
-  struct timespec                         end;
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &start);
-  }
-
+  TIME_STAT_MONGO_START();
   ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, ciP->tenant);
+  TIME_STAT_MONGO_STOP();
 
-  if (timeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
-  }
-
+  TIME_STAT_RENDER_START();
   answer = ucar.render(UnsubscribeContextAvailability, ciP->outFormat, "");
+  TIME_STAT_RENDER_STOP();
 
   return answer;
 }

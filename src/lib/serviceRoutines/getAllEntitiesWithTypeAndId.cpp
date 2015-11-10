@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -130,8 +133,9 @@ std::string getAllEntitiesWithTypeAndId
 
   // 06. Translate QueryContextResponse to ContextElementResponse
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP, RtContextElementResponse, "");
-
+  TIME_STAT_RENDER_STOP();
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

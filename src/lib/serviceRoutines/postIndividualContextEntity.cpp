@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "ngsi/ParseData.h"
@@ -105,7 +108,12 @@ std::string postIndividualContextEntity
 
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIME_STAT_RENDER_START();
+    std::string out = response.render(ciP, IndividualContextEntity, "");
+    TIME_STAT_RENDER_STOP();
+
+    return out;
   }  
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
 
@@ -116,7 +124,12 @@ std::string postIndividualContextEntity
 
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIME_STAT_RENDER_START();
+    std::string out = response.render(ciP, IndividualContextEntity, "");
+    TIME_STAT_RENDER_STOP();
+
+    return out;
   }
   entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
 
@@ -128,7 +141,12 @@ std::string postIndividualContextEntity
 
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIME_STAT_RENDER_START();
+    std::string out = response.render(ciP, IndividualContextEntity, "");
+    TIME_STAT_RENDER_STOP();
+
+    return out;
   }
 
   // 01.04. Entity::id must be present, somewhere ...
@@ -138,7 +156,12 @@ std::string postIndividualContextEntity
 
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIME_STAT_RENDER_START();
+    std::string out = response.render(ciP, IndividualContextEntity, "");
+    TIME_STAT_RENDER_STOP();
+
+    return out;
   }
 
   // Now, forward Entity to response
@@ -159,7 +182,10 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP, IndividualContextEntity, "");
+  TIME_STAT_RENDER_STOP();
+
   response.release();
   parseDataP->upcr.res.release();
 

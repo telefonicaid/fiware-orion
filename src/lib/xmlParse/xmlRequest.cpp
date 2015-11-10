@@ -165,8 +165,6 @@ static XmlRequest xmlRequest[] =
   { InvalidRequest,                        "*", "", NULL, NULL, NULL, NULL, NULL }
 };
 
-extern bool timeStatistics;
-
 
 
 /* ****************************************************************************
@@ -230,7 +228,7 @@ std::string xmlTreat
 
   try
   {
-    if (timeStatistics)
+    if (reqTimeStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &start);
     }
@@ -366,7 +364,7 @@ std::string xmlTreat
 
   xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP, errorMsgP);
 
-  if (timeStatistics)
+  if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
     clock_difftime(&end, &start, &timeStat.lastXmlParseTime);

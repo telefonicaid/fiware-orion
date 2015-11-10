@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "rest/ConnectionInfo.h"
@@ -97,7 +100,10 @@ extern std::string putAllEntitiesWithTypeAndId
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIME_STAT_RENDER_STOP();
+
     return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
@@ -106,7 +112,10 @@ extern std::string putAllEntitiesWithTypeAndId
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
 
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIME_STAT_RENDER_STOP();
+
     return answer;
   }
 
@@ -124,7 +133,10 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP, IndividualContextEntity, "");
+  TIME_STAT_RENDER_STOP();
+
   parseDataP->upcr.res.release();
   response.release();
 

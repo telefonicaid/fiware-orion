@@ -61,7 +61,7 @@ using boost::property_tree::ptree;
 using namespace orion;
 
 
-extern bool timeStatistics;
+
 /* ****************************************************************************
 *
 * compoundRootV -
@@ -435,7 +435,7 @@ std::string jsonParse
   struct timespec    start;
   struct timespec    end;
 
-  if (timeStatistics)
+  if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &start);
   }
@@ -456,7 +456,7 @@ std::string jsonParse
     }
   }
 
-  if (timeStatistics)
+  if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
     clock_difftime(&end, &start, &timeStat.lastJsonV1ParseTime);

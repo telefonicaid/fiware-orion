@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -102,7 +105,12 @@ std::string postAllEntitiesWithTypeAndId
   {
     LM_W(("Bad Input (unknown field)"));
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIME_STAT_RENDER_START();
+    std::string  out = response.render(ciP, IndividualContextEntity, "");
+    TIME_STAT_RENDER_STOP();
+
+    return out;
   }
 
 
@@ -114,7 +122,9 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
 
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIME_STAT_RENDER_STOP();
 
     parseDataP->acer.res.release();
     return answer;
@@ -126,7 +136,9 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");
 
+    TIME_STAT_RENDER_START();
     answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIME_STAT_RENDER_STOP();
 
     parseDataP->acer.res.release();
     return answer;
@@ -149,7 +161,10 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 07. Cleanup and return result
+  TIME_STAT_RENDER_START();
   answer = response.render(ciP, IndividualContextEntity, "");
+  TIME_STAT_RENDER_STOP();
+
   parseDataP->upcr.res.release();
   response.release();
 

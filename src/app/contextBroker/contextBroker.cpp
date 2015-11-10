@@ -1618,9 +1618,9 @@ int main(int argC, char* argV[])
     restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
   }
 
-  // FIXME P10: Before PR (after merging with develop), send the value of 'reqTimeStat' via restInit
-  extern bool timeStatistics;
-  timeStatistics = reqTimeStat;
+  // FIXME P5: Ugly way of setting reqTimeStatistics (from common lib) - commonInit()?
+  extern bool reqTimeStatistics;
+  reqTimeStatistics = reqTimeStat;
 
 
   LM_I(("Startup completed"));
