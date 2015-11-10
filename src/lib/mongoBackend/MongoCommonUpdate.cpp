@@ -1565,7 +1565,6 @@ static bool processOnChangeConditionForUpdateContext
   ncr.originator.set("localhost");
 
   getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
-  //ncr.contextElementResponseVector.release();  safe??
   return true;
 }
 
