@@ -27,6 +27,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
@@ -163,6 +165,8 @@ static XmlRequest xmlRequest[] =
   { InvalidRequest,                        "*", "", NULL, NULL, NULL, NULL, NULL }
 };
 
+extern bool timeStatistics;
+
 
 
 /* ****************************************************************************
@@ -206,8 +210,11 @@ std::string xmlTreat
   std::string*     errorMsgP
 )
 {
-  xml_document<>  doc;
-  char*           xmlPayload = (char*) content;
+  xml_document<>   doc;
+  char*            xmlPayload = (char*) content;
+  struct timespec  start;
+  struct timespec  end;
+
 
   //
   // If the payload is empty, the XML parsing library does an assert
@@ -223,6 +230,11 @@ std::string xmlTreat
 
   try
   {
+    if (timeStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &start);
+    }
+
     doc.parse<0>(xmlPayload);
   }
   catch (parse_error& e)
@@ -351,7 +363,16 @@ std::string xmlTreat
 
   reqP->init(parseDataP);
   ciP->httpStatusCode = SccOk;
+
   xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP, errorMsgP);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastXmlParseTime);
+    clock_addtime(&timeStat.accXmlParseTime, &timeStat.lastXmlParseTime);
+  }
+
   if (ciP->httpStatusCode != SccOk)
   {
     LM_W(("Bad Input (XML parse error)"));

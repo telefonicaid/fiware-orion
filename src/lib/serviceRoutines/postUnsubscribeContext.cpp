@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -33,6 +36,7 @@
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postUnsubscribeContext - 
@@ -48,7 +52,23 @@ std::string postUnsubscribeContext
   UnsubscribeContextResponse  uncr;
   std::string                 answer;
 
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
   ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
+
   answer = uncr.render(UnsubscribeContext, ciP->outFormat, "");
 
   return answer;

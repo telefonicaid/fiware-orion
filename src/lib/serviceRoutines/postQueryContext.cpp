@@ -27,6 +27,9 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -42,6 +45,7 @@
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * xmlPayloadClean -
@@ -326,8 +330,24 @@ std::string postQueryContext
   // 01. Call mongoBackend/mongoQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
+
+
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
   ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP);
 
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
 
   //
   // If API version 2, add count, if asked for, in HTTP header X-Total-Count

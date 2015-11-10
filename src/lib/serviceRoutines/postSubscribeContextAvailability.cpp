@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
@@ -34,6 +37,7 @@
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postSubscribeContextAvailability - 
@@ -51,7 +55,23 @@ std::string postSubscribeContextAvailability
 
   Format notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
 
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
   ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->uriParam, notifyFormat, ciP->tenant);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
+
   answer = scar.render(SubscribeContextAvailability, ciP->outFormat, "");
 
   return answer;

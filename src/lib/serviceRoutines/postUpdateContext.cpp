@@ -27,9 +27,14 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
+#include "jsonParse/jsonRequest.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -38,10 +43,10 @@
 #include "rest/httpRequestSend.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "xmlParse/xmlRequest.h"
-#include "jsonParse/jsonRequest.h"
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * xmlPayloadClean -
@@ -498,7 +503,24 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
+  
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
   HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
+
   if (ciP->httpStatusCode != SccCreated)
   {
     ciP->httpStatusCode = httpStatusCode;

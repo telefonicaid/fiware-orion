@@ -44,6 +44,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 
@@ -58,6 +61,7 @@ using boost::property_tree::ptree;
 using namespace orion;
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * compoundRootV -
@@ -428,6 +432,13 @@ std::string jsonParse
   ptree              tree;
   ptree              subtree;
   std::string        path;
+  struct timespec    start;
+  struct timespec    end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
 
   ss << content;
   read_json(ss, subtree);
@@ -443,6 +454,13 @@ std::string jsonParse
       LM_W(("Bad Input (JSON Parse error: '%s')", res.c_str()));
       return res;
     }
+  }
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastJsonV1ParseTime);
+    clock_addtime(&timeStat.accJsonV1ParseTime, &timeStat.lastJsonV1ParseTime);
   }
 
   return "OK";

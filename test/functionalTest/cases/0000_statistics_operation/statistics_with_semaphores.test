@@ -68,27 +68,25 @@ Date: REGEX(.*)
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: REGEX((554|556))
+Content-Length: REGEX((508|510))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
-        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
-        "measuring_interval_in_secs": "REGEX(1?\d)",
-        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-        "statisticsRequests": "2",
-        "subCacheInserts": "0",
-        "subCacheItems": "0",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-        "subCacheUpdates": "0",
-        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-        "uptime_in_secs": "REGEX(1?\d)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
+    "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
+    "measuring_interval_in_secs": "REGEX(1?\d)",
+    "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "statisticsRequests": "2",
+    "subCacheInserts": "0",
+    "subCacheItems": "0",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "subCacheUpdates": "0",
+    "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "uptime_in_secs": "REGEX(1?\d)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 --TEARDOWN--

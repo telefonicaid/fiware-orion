@@ -32,6 +32,9 @@
 #include "common/Format.h"
 #include "common/string.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "serviceRoutines/postRegisterContext.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi/ParseData.h"
@@ -42,8 +45,7 @@
 
 
 
-
-
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postRegisterContext -
@@ -84,7 +86,23 @@ std::string postRegisterContext
     return answer;
   }
 
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
   ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
+
   answer = rcr.render(RegisterContext, ciP->outFormat, "");
 
   return answer;

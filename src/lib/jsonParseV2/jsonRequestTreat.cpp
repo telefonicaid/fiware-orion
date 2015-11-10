@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "common/clockFunctions.h"
+#include "common/statistics.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -35,14 +37,21 @@
 #include "jsonParseV2/jsonRequestTreat.h"
 
 
-
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * jsonRequestTreat - 
 */
 std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP)
 {
-  std::string answer;
+  std::string      answer;
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
 
   switch (requestType)
   {
@@ -99,5 +108,13 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
   }
   
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastJsonV2ParseTime);
+    clock_addtime(&timeStat.accJsonV2ParseTime, &timeStat.lastJsonV2ParseTime);
+  }
+
   return answer;
 }

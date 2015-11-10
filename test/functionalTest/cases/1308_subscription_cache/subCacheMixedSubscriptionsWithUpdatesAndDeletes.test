@@ -257,24 +257,22 @@ Date: REGEX(.*)
 02. Check statistics, see NO entries in subCache
 ================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((347||349))
+Content-Length: REGEX((307||309))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "1",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "1",
-        "subCacheInserts": "0",
-        "subCacheItems": "0",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "1",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "1",
+    "subCacheInserts": "0",
+    "subCacheItems": "0",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -297,25 +295,23 @@ Date: REGEX(.*)
 04. Check statistics, see no entries in subCache
 ================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((380|382))
+Content-Length: REGEX((338|340))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "2",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "2",
-        "subCacheInserts": "0",
-        "subCacheItems": "0",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptionUpdates": "1",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "2",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "2",
+    "subCacheInserts": "0",
+    "subCacheItems": "0",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptionUpdates": "1",
+    "subscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -338,26 +334,24 @@ Date: REGEX(.*)
 06. Check statistics, see ONE subCacheItem in subCache
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((425|427))
+Content-Length: REGEX((381|383))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "3",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "3",
-        "subCache": "REGEX([0-9a-f]{24})",
-        "subCacheInserts": "1",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptionUpdates": "1",
-        "subscriptions": "2",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "3",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "3",
+    "subCache": "REGEX([0-9a-f]{24})",
+    "subCacheInserts": "1",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptionUpdates": "1",
+    "subscriptions": "2",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -380,26 +374,24 @@ Date: REGEX(.*)
 08. Check statistics, see ONE subCacheItem in subCache
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((425|427))
+Content-Length: REGEX((381|383))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "4",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "4",
-        "subCache": "REGEX([0-9a-f]{24})",
-        "subCacheInserts": "REGEX((1|2))",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "REGEX((1|2))",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptionUpdates": "1",
-        "subscriptions": "3",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "4",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "4",
+    "subCache": "REGEX([0-9a-f]{24})",
+    "subCacheInserts": "REGEX((1|2))",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptionUpdates": "1",
+    "subscriptions": "3",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -422,26 +414,24 @@ Date: REGEX(.*)
 10. Check statistics, see ONE subCacheItem in subCache
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((425|427))
+Content-Length: REGEX((381|383))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "5",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "5",
-        "subCache": "REGEX([0-9a-f]{24})",
-        "subCacheInserts": "REGEX((1|2))",
-        "subCacheItems": "REGEX((1|2))",
-        "subCacheRefreshs": "REGEX((1|2))",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptionUpdates": "2",
-        "subscriptions": "3",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "5",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "5",
+    "subCache": "REGEX([0-9a-f]{24})",
+    "subCacheInserts": "REGEX((1|2))",
+    "subCacheItems": "REGEX((1|2))",
+    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptionUpdates": "2",
+    "subscriptions": "3",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -464,27 +454,25 @@ Date: REGEX(.*)
 12. Check statistics, see ONE subCacheItem in subCache
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((454|456))
+Content-Length: REGEX((408|410))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "6",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "6",
-        "subCache": "REGEX([0-9a-f]{24})",
-        "subCacheInserts": "REGEX((1|2))",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "REGEX((1|2))",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptionUpdates": "2",
-        "subscriptions": "3",
-        "unsubscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "6",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "6",
+    "subCache": "REGEX([0-9a-f]{24})",
+    "subCacheInserts": "REGEX((1|2))",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptionUpdates": "2",
+    "subscriptions": "3",
+    "unsubscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -507,27 +495,25 @@ Date: REGEX(.*)
 14. Check statistics, see ONE subCacheItem in subCache
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((454|456))
+Content-Length: REGEX((408|410))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "7",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "7",
-        "subCache": "REGEX([0-9a-f]{24})",
-        "subCacheInserts": "REGEX((2|3))",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "REGEX((1|2))",
-        "subCacheRemoves": "1",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "3",
-        "subscriptions": "3",
-        "unsubscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "7",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "7",
+    "subCache": "REGEX([0-9a-f]{24})",
+    "subCacheInserts": "REGEX((2|3))",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRemoves": "1",
+    "subCacheUpdates": "1",
+    "subscriptionUpdates": "3",
+    "subscriptions": "3",
+    "unsubscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -550,26 +536,24 @@ Date: REGEX(.*)
 16. Check statistics, see NO entries in subCache
 ================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((409||411))
+Content-Length: REGEX((365||367))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "8",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "8",
-        "subCacheInserts": "REGEX((2|3))",
-        "subCacheItems": "0",
-        "subCacheRefreshs": "REGEX((1|2))",
-        "subCacheRemoves": "2",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "3",
-        "subscriptions": "3",
-        "unsubscriptions": "2",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "8",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "8",
+    "subCacheInserts": "REGEX((2|3))",
+    "subCacheItems": "0",
+    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRemoves": "2",
+    "subCacheUpdates": "1",
+    "subscriptionUpdates": "3",
+    "subscriptions": "3",
+    "unsubscriptions": "2",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 

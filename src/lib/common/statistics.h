@@ -32,6 +32,28 @@
 
 /* ****************************************************************************
 *
+* TimeStat - 
+*/
+typedef struct TimeStat
+{
+  struct timespec  lastReqTime;
+  struct timespec  accReqTime;
+  struct timespec  lastXmlParseTime;
+  struct timespec  accXmlParseTime;
+  struct timespec  lastJsonV1ParseTime;
+  struct timespec  accJsonV1ParseTime;
+  struct timespec  lastJsonV2ParseTime;
+  struct timespec  accJsonV2ParseTime;
+  struct timespec  lastMongoBackendTime;
+  struct timespec  accMongoBackendTime;
+} TimeStat;
+
+extern TimeStat timeStat;
+
+
+
+/* ****************************************************************************
+*
 * Statistic counters for NGSI REST requests
 */
 extern int noOfJsonRequests;

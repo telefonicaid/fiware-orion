@@ -244,7 +244,7 @@ int             subCacheInterval;
 char            notificationMode[64];
 bool            noCache;
 unsigned int    connectionMemory;
-bool            timing;
+bool            reqTimeStat;
 
 
 
@@ -286,7 +286,7 @@ bool            timing;
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
 #define NO_CACHE               "disable subscription cache for lookups"
 #define CONN_MEMORY_DESC       "maximum memory size per connection in kilobytes"
-#define TIMING_DESC            "turn on time measuring in run-time"
+#define REQ_TIME_STAT_DESC     "turn on request-time-measuring in run-time"
 
 
 
@@ -331,7 +331,7 @@ PaArgument paArgs[] =
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     UINT_MAX, CONN_MEMORY_DESC       },
-  { "-timing",           &timing,           "TIMING",            PaBool,   PaHid, false,          false, true,     TIMING_DESC            },
+  { "-reqTimeStat",      &reqTimeStat,      "REQ_TIME_STAT",     PaBool,   PaHid, false,          false, true,     REQ_TIME_STAT_DESC     },
 
   PA_END_OF_ARGS
 };
@@ -1618,9 +1618,9 @@ int main(int argC, char* argV[])
     restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
   }
 
-  // FIXME P10: Before PR (after merging with develop), send the value of 'timing' via restInit
+  // FIXME P10: Before PR (after merging with develop), send the value of 'reqTimeStat' via restInit
   extern bool timeStatistics;
-  timeStatistics = timing;
+  timeStatistics = reqTimeStat;
 
 
   LM_I(("Startup completed"));

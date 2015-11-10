@@ -30,6 +30,14 @@
 
 /* ****************************************************************************
 *
+* Statistic time counters -
+*/
+TimeStat timeStat;
+
+
+
+/* ****************************************************************************
+*
 * Statistic counters for NGSI REST requests
 */
 int noOfJsonRequests                                     = -1;

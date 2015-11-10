@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
@@ -33,6 +36,7 @@
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postUpdateContextAvailabilitySubscription - 
@@ -47,18 +51,34 @@ std::string postUpdateContextAvailabilitySubscription
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   std::string                                    answer;
+  struct timespec                                start;
+  struct timespec                                end;
 
   ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
   Format notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
 
-  // FIXME P6: by the moment, we are assuming that notification will be sent in the same format than the one
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
+  //
+  // FIXME P6: for the moment, we are assuming that notification will be sent in the same format than the one
   // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
+  //
   ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
                                                                    &ucas,
                                                                    notifyFormat,
                                                                    ciP->tenant);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
 
   answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);
 

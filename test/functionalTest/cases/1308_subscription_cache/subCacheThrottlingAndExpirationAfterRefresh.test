@@ -175,25 +175,23 @@ Date: REGEX(.*)
 02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 394
+Content-Length: REGEX((352|354))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "1",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "statisticsRequests": "1",
-        "subCache": "REGEX([0-9a-f]{24})",
-        "subCacheInserts": "2",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "2",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "jsonRequests": "1",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "statisticsRequests": "1",
+    "subCache": "REGEX([0-9a-f]{24})",
+    "subCacheInserts": "2",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "2",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 

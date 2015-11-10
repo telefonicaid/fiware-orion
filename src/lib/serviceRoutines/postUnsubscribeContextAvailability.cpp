@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postUnsubscribeContextAvailability.h"
@@ -33,6 +36,7 @@
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postUnsubscribeContextAvailability - 
@@ -47,8 +51,23 @@ std::string postUnsubscribeContextAvailability
 {
   UnsubscribeContextAvailabilityResponse  ucar;
   std::string                             answer;
+  struct timespec                         start;
+  struct timespec                         end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
 
   ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, ciP->tenant);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
+
   answer = ucar.render(UnsubscribeContextAvailability, ciP->outFormat, "");
 
   return answer;

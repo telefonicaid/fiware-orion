@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
@@ -33,6 +36,7 @@
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * getEntityTypes - 
@@ -54,10 +58,25 @@ std::string getEntityTypes
   ParseData*                 parseDataP
 )
 {
-  EntityTypeVectorResponse response;
+  EntityTypeVectorResponse  response;
+  struct timespec           start;
+  struct timespec           end;
 
   response.statusCode.fill(SccOk);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
   mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
 
   std::string rendered = response.render(ciP, "");
   response.release();

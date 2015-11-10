@@ -68,7 +68,7 @@ std::string statisticsTreat
   std::string out     = "";
   std::string tag     = "orion";
   std::string indent  = "";
-  std::string indent2 = (ciP->outFormat == JSON)? indent + "    " : indent + "  ";
+  std::string indent2 = "  ";
 
   if (ciP->method == "DELETE")
   {
@@ -153,14 +153,14 @@ std::string statisticsTreat
     mongoSubCacheStatisticsReset("statisticsTreat::DELETE");
     timingStatisticsReset();
 
-    out += startTag(indent, tag, ciP->outFormat, true, true);
+    out += startTag(indent, tag, "", ciP->outFormat, false, false, false);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
-    indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
-    out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);
+    out += endTag(indent, tag, ciP->outFormat, false, false, true, false);
+
     return out;
   }
 
-  out += startTag(indent, tag, ciP->outFormat, true, true);
+  out += startTag(indent, tag, "", ciP->outFormat, false, false, false);
 
   if (noOfXmlRequests != -1)
   {
@@ -515,10 +515,14 @@ std::string statisticsTreat
   out += TAG_ADD_INTEGER("subCacheUpdates",  mscUpdates,  true);
   out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  false);
 
-  out += timingStatistics(indent, ciP->outFormat, ciP->apiVersion);
+  std::string timingStats = timingStatistics(indent2, ciP->outFormat, ciP->apiVersion);
 
-  indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
-  out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);
+  if (ciP->outFormat == JSON)
+  {
+    out += (timingStats == "")? "" : std::string(",") + timingStats;
+  }
+
+  out += endTag(indent, tag, ciP->outFormat, false, false, true, false);
 
   ciP->httpStatusCode = SccOk;
   return out;

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
@@ -34,6 +37,7 @@
 
 
 
+extern bool timeStatistics;
 /* ****************************************************************************
 *
 * postSubscribeContext - 
@@ -78,7 +82,23 @@ std::string postSubscribeContext
     return answer;
   }
 
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
+
   ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV);
+
+  if (timeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &timeStat.lastMongoBackendTime);
+    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime);
+  }
+
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
 
   parseDataP->scr.res.release();

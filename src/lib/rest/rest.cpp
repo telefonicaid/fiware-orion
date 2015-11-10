@@ -39,6 +39,7 @@
 #include "common/globals.h"
 #include "common/defaultValues.h"
 #include "common/clockFunctions.h"
+#include "common/statistics.h"
 #include "common/tag.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
@@ -102,15 +103,27 @@ __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
 
 /* ****************************************************************************
 *
-* TimeStat - 
+* STAT_ADD - 
 */
-typedef struct TimeStat
-{
-  struct timespec  lastReqTime;
-  struct timespec  accReqTime;
-} TimeStat;
-
-static TimeStat timeStat;
+#define STAT_ADD(out, format, indent, buf, tag, comma)                        \
+do                                                                            \
+{                                                                             \
+  if (format == JSON)                                                         \
+  {                                                                           \
+    if (comma)                                                                \
+    {                                                                         \
+      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + ",\n";           \
+    }                                                                         \
+    else                                                                      \
+    {                                                                         \
+      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + "\n";            \
+    }                                                                         \
+  }                                                                           \
+  else                                                                        \
+  {                                                                           \
+    out += indent + "<" + tag + ">" + buf + "</" + tag + ">\n";               \
+  }                                                                           \
+} while (0)
 
 
 
@@ -125,52 +138,145 @@ std::string timingStatistics(std::string indent, Format format, std::string apiV
     return "";
   }
 
-  std::string  out;
-  char         lastReqBuf[64];
-  char         accReqBuf[64];
+  char  buf[64];
+  bool  lastReqTime           = (timeStat.lastReqTime.tv_sec != 0) || (timeStat.lastReqTime.tv_nsec != 0);
+  bool  accReqTime            = (timeStat.accReqTime.tv_sec != 0) || (timeStat.accReqTime.tv_nsec != 0);
+  bool  lastXmlParseTime      = (timeStat.lastXmlParseTime.tv_sec != 0) || (timeStat.lastXmlParseTime.tv_nsec != 0);
+  bool  accXmlParseTime       = (timeStat.accXmlParseTime.tv_sec != 0) || (timeStat.accXmlParseTime.tv_nsec != 0);
+  bool  lastJsonV1ParseTime   = (timeStat.lastJsonV1ParseTime.tv_sec != 0) || (timeStat.lastJsonV1ParseTime.tv_nsec != 0);
+  bool  accJsonV1ParseTime    = (timeStat.accJsonV1ParseTime.tv_sec != 0) || (timeStat.accJsonV1ParseTime.tv_nsec != 0);
+  bool  lastJsonV2ParseTime   = (timeStat.lastJsonV2ParseTime.tv_sec != 0) || (timeStat.lastJsonV2ParseTime.tv_nsec != 0);
+  bool  accJsonV2ParseTime    = (timeStat.accJsonV2ParseTime.tv_sec != 0) || (timeStat.accJsonV2ParseTime.tv_nsec != 0);
+  bool  lastMongoBackendTime  = (timeStat.lastMongoBackendTime.tv_sec != 0) || (timeStat.lastMongoBackendTime.tv_nsec != 0);
+  bool  accMongoBackendTime   = (timeStat.accMongoBackendTime.tv_sec != 0) || (timeStat.accMongoBackendTime.tv_nsec != 0);
 
-  snprintf(lastReqBuf, sizeof(lastReqBuf), "%lu.%09d", timeStat.lastReqTime.tv_sec, (int) timeStat.lastReqTime.tv_nsec);
-  snprintf(accReqBuf,  sizeof(accReqBuf),  "%lu.%09d", timeStat.accReqTime.tv_sec,  (int) timeStat.accReqTime.tv_nsec);
+  bool  accMongoBackendTimeComma  = false;
+  bool  lastMongoBackendTimeComma = accMongoBackendTime      || accMongoBackendTimeComma;
+  bool  accJsonV2ParseTimeComma   = lastMongoBackendTime     || lastMongoBackendTimeComma;
+  bool  lastJsonV2ParseTimeComma  = accJsonV2ParseTime       || accJsonV2ParseTimeComma;
+  bool  accJsonV1ParseTimeComma   = lastJsonV2ParseTimeComma || lastJsonV2ParseTime;
+  bool  lastJsonV1ParseTimeComma  = accJsonV1ParseTimeComma  || accJsonV1ParseTime;
+  bool  accXmlParseTimeComma      = lastJsonV1ParseTimeComma || lastJsonV1ParseTime;
+  bool  lastXmlParseTimeComma     = accXmlParseTimeComma     || accXmlParseTime;
+  bool  accReqTimeComma           = lastXmlParseTimeComma    || lastXmlParseTime;
+  bool  lastReqTimeComma          = accReqTimeComma          || accReqTime;
+
+  std::string  out     = "";
+  std::string  indent2 = indent;
+
 
   if (format == JSON)
   {
-    if ((timeStat.lastReqTime.tv_sec != 0) || (timeStat.lastReqTime.tv_nsec != 0))
-    {
-      if (apiVersion == "v2")
-      {
-        out  = JSON_STR("lastRequest")  + ":" + JSON_STR(lastReqBuf) + ",";
-      }
-      else
-      {
-        out = indent + JSON_STR("lastRequest") + ": " + JSON_STR(lastReqBuf) + ",\n";
-      }
-    }
-
-    if ((timeStat.accReqTime.tv_sec != 0) || (timeStat.accReqTime.tv_nsec != 0))
-    {
-      if (apiVersion == "v2")
-      {
-        out  += JSON_STR("accRequest")  + ":" + JSON_STR(accReqBuf);
-      }
-      else
-      {
-        out += indent + JSON_STR("accRequest") + ": " + JSON_STR(accReqBuf) + "\n";
-      }
-    }
+    indent2 = indent + "  ";
+    out     = indent + JSON_STR("timing") + ": {\n";
   }
-  else
+
+  //
+  // lastReqTime - the total time that the LAST request took.
+  // Measuring from the first MHD callback to 'connectionTreat', until the MHD callback to 'requestCompleted'.
+  //
+  if (lastReqTime)
   {
-    if ((timeStat.lastReqTime.tv_sec != 0) || (timeStat.lastReqTime.tv_nsec != 0))
-    {
-      out = indent + "<lastRequest>" + lastReqBuf + "</lastRequest>\n";
-    }
-
-    if ((timeStat.accReqTime.tv_sec != 0) || (timeStat.accReqTime.tv_nsec != 0))
-    {
-      out += indent + "<accRequest>" + accReqBuf + "</accRequest>\n";
-    }
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastReqTime.tv_sec, (int) timeStat.lastReqTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "lastRequest", lastReqTimeComma);
   }
 
+
+  //
+  // accReqTime - accumulation of lastReqTime
+  //
+  if (accReqTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accReqTime.tv_sec, (int) timeStat.accReqTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "accRequest", accReqTimeComma);
+  }
+
+
+  //
+  // lastXmlParseTime - the time that the XML Parse of the LAST request took.
+  //
+  if (lastXmlParseTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastXmlParseTime.tv_sec, (int) timeStat.lastXmlParseTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "lastXmlParse", lastXmlParseTimeComma);
+  }
+
+
+  //
+  // accXmlParseTime - accumulation of lastXmlParseTime
+  //
+  if (accXmlParseTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accXmlParseTime.tv_sec, (int) timeStat.accXmlParseTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "accXmlParse", accXmlParseTimeComma);
+  }
+
+
+  //
+  // lastJsonV1ParseTime - the time that the JSON parse+treat of the LAST request took.
+  //
+  if (lastJsonV1ParseTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastJsonV1ParseTime.tv_sec, (int) timeStat.lastJsonV1ParseTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "lastJsonV1Parse", lastJsonV1ParseTimeComma);
+  }
+
+
+  //
+  // accJsonV1ParseTime - accumulation of lastJsonV1ParseTime
+  //
+  if (accJsonV1ParseTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accJsonV1ParseTime.tv_sec, (int) timeStat.accJsonV1ParseTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "accJsonV1Parse", accJsonV1ParseTimeComma);
+  }
+
+
+  //
+  // lastJsonV2ParseTime - the time that the JSON parse+treat of the LAST request took.
+  //
+  if (lastJsonV2ParseTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastJsonV2ParseTime.tv_sec, (int) timeStat.lastJsonV2ParseTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "lastJsonV2Parse", lastJsonV2ParseTimeComma);
+  }
+
+
+  //
+  // accJsonV2ParseTime - accumulation of lastJsonV2ParseTime
+  //
+  if (accJsonV2ParseTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accJsonV2ParseTime.tv_sec, (int) timeStat.accJsonV2ParseTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "accJsonV2Parse", accJsonV2ParseTimeComma);
+  }
+
+
+  //
+  // lastMongoBackendTime - the time that the mongoBackend took to treat the last request
+  //
+  if (lastMongoBackendTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastMongoBackendTime.tv_sec, (int) timeStat.lastMongoBackendTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "lastMongoBackend", lastMongoBackendTimeComma);
+  }
+
+
+  //
+  // accMongoBackendTime - accumulation of lastMongoBackendTime
+  //
+  if (accMongoBackendTime)
+  {
+    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accMongoBackendTime.tv_sec, (int) timeStat.accMongoBackendTime.tv_nsec);
+    STAT_ADD(out, format, indent2, buf, "accMongoBackend", accMongoBackendTimeComma);
+  }
+
+
+  if (format == JSON)
+  {
+    out += indent + "}\n";
+  }
+  
   return out;
 }
 
