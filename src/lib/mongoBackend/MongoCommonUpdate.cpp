@@ -1528,6 +1528,7 @@ static bool processOnChangeConditionForUpdateContext
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+
     if (attrL.size() == 0)
     {
       /* Empty attribute list in the subscription mean that all attributes are added */
@@ -1567,6 +1568,8 @@ static bool processOnChangeConditionForUpdateContext
   getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
   return true;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -1681,6 +1684,7 @@ static bool processSubscriptions
 }
 
 
+
 /* ****************************************************************************
 *
 * buildGeneralErrorResponse -
@@ -1791,6 +1795,7 @@ static void updateAttrInNotifyCer
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
     ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+
     if (caP->name == targetAttr->name)
     {
       if (targetAttr->valueType != ValueTypeNone)
@@ -1799,6 +1804,14 @@ static void updateAttrInNotifyCer
         caP->stringValue    = targetAttr->stringValue;
         caP->boolValue      = targetAttr->boolValue;
         caP->numberValue    = targetAttr->numberValue;
+
+        if (caP->compoundValueP != NULL)
+        {
+          // FIXME P10: Is this really what we want?
+          //            "Destroy" caP, changing its compoundValueP for targetAttr:s compoundValueP ...
+          delete caP->compoundValueP;
+        }
+
         caP->compoundValueP = targetAttr->compoundValueP == NULL ? NULL : targetAttr->compoundValueP->clone();
       }
       if (targetAttr->type != "")
@@ -1829,13 +1842,15 @@ static void updateAttrInNotifyCer
             break;   /* kx  loop */
           }
         }
+
         /* If the attribute in target attr was not found, then it has to be added*/
-        if(!matchMd)
+        if (!matchMd)
         {
           Metadata* newMdP = new Metadata(targetMdP);
           caP->metadataVector.push_back(newMdP);
         }
       }
+
       return;
     }
   }
@@ -2862,12 +2877,19 @@ void processContextElement
                                        tenant,
                                        servicePathV))
     {
-      /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
+      // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
+
+      //
       // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
       // in only one place
+      //
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
       responseP->contextElementResponseVector.push_back(cerP);
       releaseTriggeredSubscriptions(subsToNotify);
+
+      notifyCerP->release();
+      delete notifyCerP;
+      
       continue;
     }
 
@@ -2968,13 +2990,19 @@ void processContextElement
       cerP->statusCode.fill(SccReceiverInternalError, err);
       responseP->contextElementResponseVector.push_back(cerP);
       releaseTriggeredSubscriptions(subsToNotify);
+
+      notifyCerP->release();
+      delete notifyCerP;
+
       continue;
     }
 
     /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
      * previous addTriggeredSubscriptions() invocations */
     std::string err;
+
     processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken);
+    notifyCerP->release();
     delete notifyCerP;
 
     //
@@ -3081,12 +3109,16 @@ void processContextElement
           }
         }
 
-        /* Build CER used for notifying (if needed). Service Path vector shouldn't have more than
-         * one item, thus it should be safer to get item 0 */
+        //
+        // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
+        // one item, so it should be safe to get item 0
+        //
         ContextElementResponse* notifyCerP = new ContextElementResponse(ceP);
-        notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
 
+        notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
+
+        notifyCerP->release();
         delete notifyCerP;
       }
 

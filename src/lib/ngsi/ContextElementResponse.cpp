@@ -82,6 +82,8 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
   statusCode.fill(cerP->statusCode);
 }
 
+
+
 /* ****************************************************************************
 *
 * includedAttribute -
@@ -115,6 +117,8 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
   return false;
 }
 
+
+
 /* ****************************************************************************
 *
 * ContextElementResponse::ContextElementResponse -
@@ -140,22 +144,26 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
     locAttr = getStringField(getObjectField(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
   }
 
-  // Attributes vector
+
+  //
+  // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
-  BSONObj attrs = getField(entityDoc, ENT_ATTRS).embeddedObject();
-  std::set<std::string> attrNames;
+  //
+  BSONObj                attrs = getField(entityDoc, ENT_ATTRS).embeddedObject();
+  std::set<std::string>  attrNames;
+
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName = *i;
     BSONObj            attr     = getField(attrs, attrName).embeddedObject();
-    ContextAttribute*  caP = NULL;
+    ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
 
     // Name and type
-    ca.name = dbDotDecode(basePart(attrName));
-    std::string mdId = idPart(attrName);
-    ca.type = getStringField(attr, ENT_ATTRS_TYPE);
+    ca.name           = dbDotDecode(basePart(attrName));
+    std::string mdId  = idPart(attrName);
+    ca.type           = getStringField(attr, ENT_ATTRS_TYPE);
 
     // Skip attribute if the attribute is in the list (or attrL is empty)
     if (!includedAttribute(ca, attrL))
@@ -163,7 +171,7 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
       continue;
     }
 
-    /* It could happen (althoug it is very weird) that value field is missing in the
+    /* It could happen (although very rarely) that the value field is missing in the
      * DB for the attribute. The following is a safety check measure to protect against that */
     if (!attr.hasField(ENT_ATTRS_VALUE))
     {
@@ -205,7 +213,7 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);  // LEAK
         compoundVectorResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
         break;
 
@@ -239,9 +247,12 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
         caP->metadataVector.push_back(md);
       }
     }
+
     contextElement.contextAttributeVector.push_back(caP);
   }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -253,6 +264,7 @@ ContextElementResponse::ContextElementResponse(ContextElement* ceP)
 {
   contextElement.fill(ceP);
 }
+
 
 
 /* ****************************************************************************
