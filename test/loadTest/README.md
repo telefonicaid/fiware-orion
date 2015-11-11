@@ -53,7 +53,7 @@ Properties:
 		* THREADS        - number of concurrent threads (default: 1)
 		* RAMP_UP        - the amount of time for creating the total number of threads (default: 1)
 	    * TEST_TIME      - test duration time in seconds (default:30)
-		* SERVICE        - service header (default: no service is used, i.e. Fiware-Service header is omitted)
+		* SERVICE        - service header (default: no service is used, i.e. Fiware-Service header is omitted) 
 		* SERVICE_PATH   - service path header (default: /)	    
 	    * ATTRIBUTES     - number of attributes per entity (default:1)
 	    * METADATA       - if true is appended a metadata in each attribute (default: false)
