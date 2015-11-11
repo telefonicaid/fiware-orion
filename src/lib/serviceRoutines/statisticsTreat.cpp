@@ -40,6 +40,7 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoSubCache.h"
 
+#include "ngsiNotify/QueueStatistics.h"
 
 
 /* ****************************************************************************
@@ -49,7 +50,6 @@
 #define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, true)
 #define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outFormat, true)
 #define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outFormat, comma)
-
 
 
 /* ****************************************************************************
@@ -457,7 +457,7 @@ std::string statisticsTreat
 
   if (noOfDroppedNotifications != -1)
   {
-    out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications);
+    out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications + 1);
   }
 
   if (semTimeStatistics)
@@ -513,6 +513,15 @@ std::string statisticsTreat
   out += TAG_ADD_INTEGER("subCacheRemoves",  mscRemoves,  true);
   out += TAG_ADD_INTEGER("subCacheUpdates",  mscUpdates,  true);
   out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  false);
+
+  if (strcmp(notificationMode, "threadpool") == 0)
+  {
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueIn", QueueStatistics::noOfNotificationsQueueIn, true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueOut", QueueStatistics::noOfNotificationsQueueOut, true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueReject", QueueStatistics::noOfNotificationsQueueReject, true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueOK", QueueStatistics::noOfNotificationsQueueOK, true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueError", QueueStatistics::noOfNotificationsQueueError, false);
+  }
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
   out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);
