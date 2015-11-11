@@ -457,6 +457,7 @@ std::string statisticsTreat
 
   if (noOfDroppedNotifications != -1)
   {
+    // Given that the noOfDroppedNotifications starts at -1, a +1 adjustement is needed
     out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications + 1);
   }
 
@@ -519,8 +520,8 @@ std::string statisticsTreat
     out += TAG_ADD_INTEGER("noOfNotificationsQueueIn", QueueStatistics::noOfNotificationsQueueIn, true);
     out += TAG_ADD_INTEGER("noOfNotificationsQueueOut", QueueStatistics::noOfNotificationsQueueOut, true);
     out += TAG_ADD_INTEGER("noOfNotificationsQueueReject", QueueStatistics::noOfNotificationsQueueReject, true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueOK", QueueStatistics::noOfNotificationsQueueOK, true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueError", QueueStatistics::noOfNotificationsQueueError, false);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentOK", QueueStatistics::noOfNotificationsQueueSentOK, true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentError", QueueStatistics::noOfNotificationsQueueSentError, false);
   }
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;

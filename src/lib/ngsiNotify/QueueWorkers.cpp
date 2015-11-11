@@ -106,13 +106,15 @@ static void *workerFunc(void* pSyncQ)
     {
       statisticsUpdate(NotifyContextSent, params->format);
     }
+
+    // FIXME: These counters should be incremented in the other notification modes
     if (r != "error" && r != "")
     {
-      ++QueueStatistics::noOfNotificationsQueueOK;
+      ++QueueStatistics::noOfNotificationsQueueSentOK;
     }
     else
     {
-      ++QueueStatistics::noOfNotificationsQueueError;
+      ++QueueStatistics::noOfNotificationsQueueSentError;
     }
 
     // Free params memory

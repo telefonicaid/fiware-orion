@@ -34,8 +34,8 @@ public:
   static boost::atomic<int> noOfNotificationsQueueIn;
   static boost::atomic<int> noOfNotificationsQueueOut;
   static boost::atomic<int> noOfNotificationsQueueReject;
-  static boost::atomic<int> noOfNotificationsQueueOK;
-  static boost::atomic<int> noOfNotificationsQueueError;
+  static boost::atomic<int> noOfNotificationsQueueSentOK;
+  static boost::atomic<int> noOfNotificationsQueueSentError;
 private:
    QueueStatistics();
 };

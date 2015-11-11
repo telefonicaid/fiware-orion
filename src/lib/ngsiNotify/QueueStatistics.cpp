@@ -27,5 +27,5 @@
 boost::atomic<int> QueueStatistics::noOfNotificationsQueueIn;
 boost::atomic<int> QueueStatistics::noOfNotificationsQueueOut;
 boost::atomic<int> QueueStatistics::noOfNotificationsQueueReject;
-boost::atomic<int> QueueStatistics::noOfNotificationsQueueOK;
-boost::atomic<int> QueueStatistics::noOfNotificationsQueueError;
+boost::atomic<int> QueueStatistics::noOfNotificationsQueueSentOK;
+boost::atomic<int> QueueStatistics::noOfNotificationsQueueSentError;
