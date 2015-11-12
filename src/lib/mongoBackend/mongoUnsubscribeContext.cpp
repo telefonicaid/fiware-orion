@@ -57,6 +57,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
 
     if (responseP->subscriptionId.get() == "")
     {
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
         responseP->statusCode.fill(SccContextElementNotFound);
         LM_W(("Bad Input (no subscriptionId)"));
         return SccOk;
@@ -93,7 +94,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     if (sub.isEmpty())
     {
        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
-
        responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
        return SccOk;
     }
