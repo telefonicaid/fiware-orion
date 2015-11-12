@@ -244,13 +244,13 @@ SET (STATIC_LIBS
     ${GMOCKMAIN_LIBRARY}
     mongoBackend
     rest
-    ngsiNotify
     jsonParse
     jsonParseV2
     xmlParse
     apiTypesV2
     convenience
     serviceRoutines
+    ngsiNotify
     rest
     parse
     ngsi9
