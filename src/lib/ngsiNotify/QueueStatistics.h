@@ -25,19 +25,85 @@
 * Author: Orion dev team
 */
 
-#include "boost/atomic.hpp"
-#include "boost/date_time/posix_time/posix_time_types.hpp"
+
+// FIXME: To be refactored to be algned with common statistics approach
+// when implemented
+
+// A newer version of boost (>=1.53.0) or c++11 could provide better
+// alternatives to this implementation
+
 
 class QueueStatistics
 {
 public:
-  static boost::atomic<int> noOfNotificationsQueueIn;
-  static boost::atomic<int> noOfNotificationsQueueOut;
-  static boost::atomic<int> noOfNotificationsQueueReject;
-  static boost::atomic<int> noOfNotificationsQueueSentOK;
-  static boost::atomic<int> noOfNotificationsQueueSentError;
+
+  /* ****************************************************************************
+  *
+  * getIn -
+  */
+  static int  getIn();
+
+  /* ****************************************************************************
+  *
+  * incIn -
+  */
+  static void incIn();
+
+  /* ****************************************************************************
+  *
+  * getOut -
+  */
+  static int  getOut();
+
+  /* ****************************************************************************
+  *
+  * incOut -
+  */
+  static void incOut();
+
+  /* ****************************************************************************
+  *
+  * getReject -
+  */
+  static int  getReject();
+
+  /* ****************************************************************************
+  *
+  * incReject -
+  */
+  static void incReject();
+
+  /* ****************************************************************************
+  *
+  * getSentOK -
+  */
+  static int  getSentOK();
+
+  /* ****************************************************************************
+  *
+  * incSentOK -
+  */
+  static void incSentOK();
+
+  /* ****************************************************************************
+  *
+  * getSentError -
+  */
+  static int  getSentError();
+
+  /* ****************************************************************************
+  *
+  * incSentError -
+  */
+  static void incSentError();
+
 private:
    QueueStatistics();
+   static volatile int noOfNotificationsQueueIn;
+   static volatile int noOfNotificationsQueueOut;
+   static volatile int noOfNotificationsQueueReject;
+   static volatile int noOfNotificationsQueueSentOK;
+   static volatile int noOfNotificationsQueueSentError;
 };
 
 #endif // SRC_LIB_NGSINOTIFY_QUEUESTATISTICS_H
