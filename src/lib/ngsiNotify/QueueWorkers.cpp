@@ -76,7 +76,7 @@ static void *workerFunc(void* pSyncQ)
   {
     SenderThreadParams *params =  queue->pop();
 
-    ++QueueStatistics::noOfNotificationsQueueOut;
+    QueueStatistics::incOut();
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
     LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
@@ -110,11 +110,11 @@ static void *workerFunc(void* pSyncQ)
     // FIXME: These counters should be incremented in the other notification modes
     if (r != "error" && r != "")
     {
-      ++QueueStatistics::noOfNotificationsQueueSentOK;
+      QueueStatistics::incSentOK();
     }
     else
     {
-      ++QueueStatistics::noOfNotificationsQueueSentError;
+      QueueStatistics::incSentError();
     }
 
     // Free params memory

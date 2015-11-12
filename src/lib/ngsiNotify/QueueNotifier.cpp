@@ -40,7 +40,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
 
   if (pQueue == NULL)
   {
-   ++QueueStatistics::noOfNotificationsQueueReject;
+   QueueStatistics::incReject();
    LM_E(("Runtime Error (notification queue is NULL)"));
    return;
   }
@@ -115,10 +115,10 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   bool enqueued = pQueue->try_push(params);
   if (!enqueued)
   {
-   ++QueueStatistics::noOfNotificationsQueueReject;
+   QueueStatistics::incReject();
    LM_E(("Runtime Error (notification queue is full)"));
    delete params;
    return;
   }
-  ++QueueStatistics::noOfNotificationsQueueIn;
+  QueueStatistics::incIn();
 }

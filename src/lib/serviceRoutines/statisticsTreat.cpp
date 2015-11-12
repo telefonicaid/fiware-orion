@@ -517,11 +517,11 @@ std::string statisticsTreat
 
   if (strcmp(notificationMode, "threadpool") == 0)
   {
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueIn", QueueStatistics::noOfNotificationsQueueIn, true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueOut", QueueStatistics::noOfNotificationsQueueOut, true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueReject", QueueStatistics::noOfNotificationsQueueReject, true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentOK", QueueStatistics::noOfNotificationsQueueSentOK, true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentError", QueueStatistics::noOfNotificationsQueueSentError, false);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueIn", QueueStatistics::getIn(), true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueOut", QueueStatistics::getOut(), true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueReject", QueueStatistics::getReject(), true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentOK", QueueStatistics::getSentOK(), true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentError", QueueStatistics::getSentError(), false);
   }
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;

@@ -24,8 +24,101 @@
 
 #include "ngsiNotify/QueueStatistics.h"
 
-boost::atomic<int> QueueStatistics::noOfNotificationsQueueIn;
-boost::atomic<int> QueueStatistics::noOfNotificationsQueueOut;
-boost::atomic<int> QueueStatistics::noOfNotificationsQueueReject;
-boost::atomic<int> QueueStatistics::noOfNotificationsQueueSentOK;
-boost::atomic<int> QueueStatistics::noOfNotificationsQueueSentError;
+// This implementation could be 'improved' when boost >=1.53.0 || C++ 11
+// both give atomic types
+
+volatile int QueueStatistics::noOfNotificationsQueueIn;
+volatile int QueueStatistics::noOfNotificationsQueueOut;
+volatile int QueueStatistics::noOfNotificationsQueueReject;
+volatile int QueueStatistics::noOfNotificationsQueueSentOK;
+volatile int QueueStatistics::noOfNotificationsQueueSentError;
+
+/* ****************************************************************************
+*
+* getIn -
+*/
+int  QueueStatistics::getIn()
+{
+  return __sync_fetch_and_add(&noOfNotificationsQueueIn, 0);
+}
+
+/* ****************************************************************************
+*
+* incIn -
+*/
+void QueueStatistics::incIn()
+{
+  __sync_fetch_and_add(&noOfNotificationsQueueIn, 1);
+}
+
+/* ****************************************************************************
+*
+* getOut -
+*/
+int  QueueStatistics::getOut()
+{
+  return __sync_fetch_and_add(&noOfNotificationsQueueOut, 0);
+}
+
+/* ****************************************************************************
+*
+* incOut -
+*/
+void QueueStatistics::incOut()
+{
+  __sync_fetch_and_add(&noOfNotificationsQueueOut, 1);
+}
+
+/* ****************************************************************************
+*
+* getReject -
+*/
+int  QueueStatistics::getReject()
+{
+  return __sync_fetch_and_add(&noOfNotificationsQueueReject, 0);
+}
+
+/* ****************************************************************************
+*
+* incReject -
+*/
+void QueueStatistics::incReject()
+{
+  __sync_fetch_and_add(&noOfNotificationsQueueReject ,1);
+}
+
+/* ****************************************************************************
+*
+* getSentOK -
+*/
+int  QueueStatistics::getSentOK()
+{
+  return __sync_fetch_and_add(&noOfNotificationsQueueSentOK, 0);
+}
+
+/* ****************************************************************************
+*
+* incSentOK -
+*/
+void QueueStatistics::incSentOK()
+{
+  __sync_fetch_and_add(&noOfNotificationsQueueSentOK, 1);
+}
+
+/* ****************************************************************************
+*
+* getSentError -
+*/
+int  QueueStatistics::getSentError()
+{
+  return __sync_fetch_and_add(&noOfNotificationsQueueSentError, 0);
+}
+
+/* ****************************************************************************
+*
+* incSentError -
+*/
+void QueueStatistics::incSentError()
+{
+  __sync_fetch_and_add(&noOfNotificationsQueueSentError, 1);
+}
