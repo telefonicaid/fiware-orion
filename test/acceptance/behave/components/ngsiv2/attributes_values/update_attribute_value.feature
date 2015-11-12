@@ -72,7 +72,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
     And verify that an entity is updated in mongo
 
   @without_payload
-  Scenario:  try to update an attribute value by entity ID and attribute name if it exists using NGSI v2 but without_payload
+  Scenario:  try to update an attribute value by entity ID and attribute name if it exists using NGSI v2 but without payload
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_update_happy_path |
