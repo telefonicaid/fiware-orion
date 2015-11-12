@@ -49,8 +49,8 @@ typedef struct AttributeList
   bool         lookup(const std::string& attributeName);
   void         push_back(const std::string& attributeName);
   void         push_back_if_absent(const std::string& attributeName);
-  unsigned int size(void);
-  std::string  get(int ix);
+  unsigned int size(void) const;
+  std::string  get(int ix) const;
   void         clone(AttributeList& aList);
 
   std::string  check(RequestType         requestType,

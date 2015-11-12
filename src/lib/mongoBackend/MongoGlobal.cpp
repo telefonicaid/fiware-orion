@@ -29,7 +29,6 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <algorithm>  // std::replace
 
 #include "mongo/client/dbclient.h"
 
@@ -47,6 +46,9 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/compoundResponses.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
@@ -54,7 +56,6 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
-#include "parse/CompoundValueNode.h"
 
 #include "common/wsStrip.h"
 
@@ -73,14 +74,6 @@ static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
-
-
-/* ****************************************************************************
-*
-* Forward declarations
-*/
-static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
-static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 
 
 /* ****************************************************************************
@@ -658,58 +651,23 @@ bool includedEntity(EntityId en, EntityIdVector& entityIdV)
   return false;
 }
 
-
 /* ****************************************************************************
 *
 * includedAttribute -
 */
-bool includedAttribute(ContextRegistrationAttribute attr, AttributeList* attrsV)
+bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV)
 {
   // This i's the case in which the discoverAvailabilityRequest doesn't include attributes,
   // so all the attributes are included in the response
   //
-  if (attrsV->size() == 0)
+  if (attrsV.size() == 0)
   {
     return true;
   }
 
-  for (unsigned int ix = 0; ix < attrsV->size(); ++ix)
+  for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV->get(ix) == attr.name)
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-/* ****************************************************************************
-*
-* includedAttribute -
-*
-* FIXME: note that in the current implementation, in which we only use 'name' to
-* compare, this function is equal to the one for ContextRegistrationAttrribute.
-* However, we keep them separated, as isDomain (present in ContextRegistrationAttribute
-* but not in ContextRegistration could mean a difference). To review once domain attributes
-* get implemented.
-*
-*/
-bool includedAttribute(ContextAttribute attr, AttributeList* attrsV)
-{
-  //
-  // This is the case in which the queryContextRequest doesn't include attributes,
-  // so all the attributes are included in the response
-  //
-  if (attrsV->size() == 0)
-  {
-    return true;
-  }
-
-  for (unsigned int ix = 0; ix < attrsV->size(); ++ix)
-  {
-    if (attrsV->get(ix) == attr.name)
+    if (attrsV.get(ix) == attr.name)
     {
       return true;
     }
@@ -832,91 +790,6 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 }
 
 
-/* ****************************************************************************
-*
-* addCompoundNode -
-*
-*/
-static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
-{
-  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != Object) && (e.type() != Array))
-  {
-    LM_T(LmtSoftError, ("unknown BSON type"));
-    return;
-  }
-
-  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
-  child->name = e.fieldName();
-
-  switch (e.type())
-  {
-  case String:
-    child->valueType  = orion::ValueTypeString;
-    child->stringValue = e.String();
-    break;
-
-  case Bool:
-    child->valueType  = orion::ValueTypeBoolean;
-    child->boolValue = e.Bool();
-    break;
-
-  case NumberDouble:
-    child->valueType  = orion::ValueTypeNumber;
-    child->numberValue = e.Number();
-    break;
-
-  case Object:
-    compoundObjectResponse(child, e);
-    break;
-
-  case Array:
-    compoundVectorResponse(child, e);
-    break;
-
-  default:
-    //
-    // We need the default clause to avoid 'enumeration value X not handled in switch' errors
-    // due to -Werror=switch at compilation time
-    //
-    break;
-  }
-
-  cvP->add(child);
-}
-
-
-/* ****************************************************************************
-*
-* compoundObjectResponse -
-*/
-static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be)
-{
-  BSONObj obj = be.embeddedObject();
-
-  cvP->valueType = orion::ValueTypeObject;
-  for (BSONObj::iterator i = obj.begin(); i.more();)
-  {
-    BSONElement e = i.next();
-    addCompoundNode(cvP, e);
-  }
-}
-
-
-/* ****************************************************************************
-*
-* compoundVectorResponse -
-*/
-static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be)
-{
-  std::vector<BSONElement> vec = be.Array();
-
-  cvP->valueType = orion::ValueTypeVector;
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    BSONElement e = vec[ix];
-    addCompoundNode(cvP, e);
-  }
-}
 
 
 /* *****************************************************************************
@@ -996,6 +869,7 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
 
   return true;
 }
+
 
 /* ****************************************************************************
 *
@@ -1350,35 +1224,6 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
   }
 }
 
-/* ****************************************************************************
-*
-* bsonToMetadata -
-*/
-Metadata* bsonToMetadata(BSONObj& mdB)
-{
-  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE) : "";
-
-  switch (getField(mdB, ENT_ATTRS_MD_VALUE).type())
-  {
-  case String:
-    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getStringField(mdB, ENT_ATTRS_MD_VALUE));
-    break;
-
-  case NumberDouble:
-    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getField(mdB, ENT_ATTRS_MD_VALUE).Number());
-    break;
-
-  case Bool:
-    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getBoolField(mdB, ENT_ATTRS_MD_VALUE));
-    break;
-
-  default:  // Just to avoid compilation error about missing constants ...
-    break;
-  }
-
-  LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
-  return NULL;  
-}
 
 /* ****************************************************************************
 *
@@ -1519,15 +1364,15 @@ bool entitiesQuery
   /* Process query result */
   while (cursor->more())
   {
-    BSONObj                  r;
-    ContextElementResponse*  cer  = new ContextElementResponse();
+    BSONObj  r;
     try
     {
       r = cursor->nextSafe();
     }
     catch (const AssertionException &e)
     {
-      std::string err = e.what();
+      std::string err              = e.what();
+      ContextElementResponse*  cer = new ContextElementResponse();
 
       //
       // We can't return the error 'as is', as it may contain forbidden characters.
@@ -1568,136 +1413,10 @@ bool entitiesQuery
       return true;
     }
 
+    // Build CER from BSON retrieved from DB
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty);
     cer->statusCode.fill(SccOk);
-
-    /* Entity part */
-
-    BSONObj queryEntity = getObjectField(r, "_id");
-
-    cer->contextElement.entityId.id          = getStringField(queryEntity, ENT_ENTITY_ID);
-    cer->contextElement.entityId.type        = getStringField(queryEntity, ENT_ENTITY_TYPE);
-    cer->contextElement.entityId.servicePath = getStringField(queryEntity, ENT_SERVICE_PATH);
-    cer->contextElement.entityId.isPattern   = "false";
-
-    /* Get the location attribute (if it exists) */
-    std::string locAttr;
-    if (r.hasElement(ENT_LOCATION))
-    {
-      locAttr = getStringField(getObjectField(r, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
-    }
-
-    /* Attributes part */
-    BSONObj queryAttrs;
-
-    //
-    // This try/catch should not be necessary as all document in the entities collection have an attrs embedded document
-    // from creation time. However, it adds an extra protection, just in case.
-    // Somebody *could* manipulate the mongo database and if so, the broker would crash here.
-    // Better to be on the safe side ...
-    //
-    try
-    {
-      queryAttrs = getField(r, ENT_ATTRS).embeddedObject();
-    }
-    catch (...)
-    {
-      LM_E(("Database Error (no attrs array in document of entities collection)"));
-      cer->statusCode.fill(SccReceiverInternalError, "attrs field missing in entity document");
-      cerV->push_back(cer);
-
-      return true;
-    }
-
-    std::set<std::string> attrNames;
-
-    queryAttrs.getFieldNames(attrNames);
-    for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-    {
-      std::string       attrName   = *i;
-      BSONObj           queryAttr  = getField(queryAttrs, attrName).embeddedObject();
-      ContextAttribute  ca;
-
-      ca.name          = dbDotDecode(basePart(attrName));
-      std::string mdId = idPart(attrName);
-      ca.type          = getStringField(queryAttr, ENT_ATTRS_TYPE);
-
-      /* Note that includedAttribute decision is based on name and type. Value is set only if
-       * decision is positive
-       */
-      if (includedAttribute(ca, &attrL))
-      {
-        ContextAttribute* caP;
-
-        switch(getField(queryAttr, ENT_ATTRS_VALUE).type())
-        {
-        case String:
-          ca.stringValue = getStringField(queryAttr, ENT_ATTRS_VALUE);
-          if (!includeEmpty && ca.stringValue.length() == 0)
-          {
-            continue;
-          }
-          caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
-          break;
-
-        case NumberDouble:
-          ca.numberValue = getField(queryAttr, ENT_ATTRS_VALUE).Number();
-          caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
-          break;
-
-        case Bool:
-          ca.boolValue = getBoolField(queryAttr, ENT_ATTRS_VALUE);
-          caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
-          break;
-
-        case Object:
-          caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
-          compoundObjectResponse(caP->compoundValueP, getField(queryAttr, ENT_ATTRS_VALUE));
-          break;
-
-        case Array:
-          caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
-          compoundVectorResponse(caP->compoundValueP, getField(queryAttr, ENT_ATTRS_VALUE));
-          break;
-
-        default:
-          LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(queryAttr, ENT_ATTRS_VALUE).type()));
-          continue;
-        }
-
-        /* Setting ID (if found) */
-        if (mdId != "")
-        {
-          Metadata* md = new Metadata(NGSI_MD_ID, "string", mdId);
-
-          caP->metadataVector.push_back(md);
-        }
-
-        if (locAttr == ca.name)
-        {
-          Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
-
-          caP->metadataVector.push_back(md);
-        }
-
-        /* Setting custom metadata (if any) */
-        if (queryAttr.hasField(ENT_ATTRS_MD))
-        {
-          std::vector<BSONElement> metadataV = getField(queryAttr, ENT_ATTRS_MD).Array();
-
-          for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
-          {
-            BSONObj    metadata = metadataV[ix].embeddedObject();
-            Metadata*  md = bsonToMetadata(metadata);
-            caP->metadataVector.push_back(md);
-          }
-        }
-
-        cer->contextElement.contextAttributeVector.push_back(caP);
-      }
-    }
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
@@ -1872,7 +1591,7 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, AttributeList attrL, BSONObj attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const AttributeList& attrL, const BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
     getStringField(attribute, REG_ATTRS_NAME),
@@ -1882,7 +1601,7 @@ static void processAttribute(ContextRegistrationResponse* crr, AttributeList att
   // FIXME: we don't take metadata into account at the moment
   // attr.metadataV = ..
 
-  if (includedAttribute(attr, &attrL))
+  if (includedAttribute(attr, attrL))
   {
     ContextRegistrationAttribute* attrP = new ContextRegistrationAttribute(attr.name, attr.type, attr.isDomain);
     crr->contextRegistration.contextRegistrationAttributeVector.push_back(attrP);
@@ -2194,28 +1913,24 @@ AttributeList subToAttributeList(BSONObj sub)
 
 /* ****************************************************************************
 *
-* processOnChangeCondition -
+* processOnChangeConditionForSubscription -
 *
-* This function is called from two places:
+* This function is called from initial processing of an ONCHANGE condition in
+* processConditionVector (used from subscribeContext and updateContextSubscription),
+* so an "initial" notification for all the entites/attributes included in the entity
+* in the case that some of them are within the ones in the condValues.
 *
-* 1) initial processing of an ONCHANGE condition in processConditionVector (used from
-*   subscribeContext and updateContextSubscription), so an "initial"
-*   notification for all the entites/attributes included in the entity in the case
-*   that some of them are within the ones in the condValues.
-* 2) updateContext processing logic when attributes under an ONCHANGE condition are
-*   updated
+* Note that ONCHANGE notifications sent due to updateContext are processed by a
+* different function (see processOnChangeConditionForUpdateContext)
 *
 * The argument enV is the entities and attributes in the subscribeContext
-* request (case 1) or the "triggering" entity (case 2). The argument attrL is the
-* attributes in the subscribeContext request. Note that is condValues is NULL, the checking
-* on condValues is omitted (this is the case when this function is called from updateContext,
-* where the previous query on csubs ensures that that condition is true)
+* request. The argument attrL is the attributes in the subscribeContext request.
 *
 * This method returns true if the notification was actually send. Otherwise, false
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeCondition
+bool processOnChangeConditionForSubscription
 (
   EntityIdVector                   enV,
   AttributeList                    attrL,
@@ -2299,16 +2014,6 @@ bool processOnChangeCondition
 
 /* ****************************************************************************
 *
-* processOntimeIntervalCondition -
-*/
-void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant)
-{
-  getNotifier()->createIntervalThread(subId, interval, tenant);
-}
-
-
-/* ****************************************************************************
-*
 * processConditionVector -
 *
 */
@@ -2359,15 +2064,15 @@ BSONArray processConditionVector
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
                         CSUB_CONDITIONS_VALUE << condValues.arr()));
 
-      if (processOnChangeCondition(enV,
-                                   attrL,
-                                   &(nc->condValueList),
-                                   subId,
-                                   url,
-                                   format,
-                                   tenant,
-                                   xauthToken,
-                                   servicePathV))
+      if (processOnChangeConditionForSubscription(enV,
+                                                  attrL,
+                                                  &(nc->condValueList),
+                                                  subId,
+                                                  url,
+                                                  format,
+                                                  tenant,
+                                                  xauthToken,
+                                                  servicePathV))
       {
         *notificationDone = true;
       }
@@ -2660,38 +2365,3 @@ void cprLookupByAttribute
   }
 }
 
-
-/* ****************************************************************************
-*
-* Characters for attribute value encoding
-*/
-#define ESCAPE_1_DECODED  '.'
-#define ESCAPE_1_ENCODED  '='
-
-
-/* ****************************************************************************
-*
-* dbDotEncode -
-*
-* Replace:
-*   . => =
-*/
-std::string dbDotEncode(std::string s)
-{
-  replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
-  return s;
-}
-
-
-/* ****************************************************************************
-*
-* dbDotDecode -
-*
-* Replace:
-*   = => .
-*/
-std::string dbDotDecode(std::string s)
-{
-  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
-  return s;
-}
