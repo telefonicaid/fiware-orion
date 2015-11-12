@@ -1190,7 +1190,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | room_13   | {"a" "b"}        |
       | room_14   | "a": "b"}        |
 
-  @attribute_value_error_special_2 @BUG_1217 @skip
+  @attribute_value_error_special_2 @BUG_1490 @skip
   Scenario Outline:  try to update an attribute by entity ID and attribute name using NGSI v2 with a dot in attribute values as dict in update request (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                               |
