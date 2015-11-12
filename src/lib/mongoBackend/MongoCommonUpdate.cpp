@@ -1805,13 +1805,11 @@ static void updateAttrInNotifyCer
         caP->boolValue      = targetAttr->boolValue;
         caP->numberValue    = targetAttr->numberValue;
 
+        // Free memory used by the all compound value (if any)
         if (caP->compoundValueP != NULL)
         {
-          // FIXME P10: Is this really what we want?
-          //            "Destroy" caP, changing its compoundValueP for targetAttr:s compoundValueP ...
           delete caP->compoundValueP;
         }
-
         caP->compoundValueP = targetAttr->compoundValueP == NULL ? NULL : targetAttr->compoundValueP->clone();
       }
       if (targetAttr->type != "")
