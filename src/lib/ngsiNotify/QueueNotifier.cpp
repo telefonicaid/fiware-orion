@@ -24,8 +24,10 @@
 */
 
 #include "common/string.h"
+#include "ngsiNotify/QueueStatistics.h"
 
 #include "ngsiNotify/QueueNotifier.h"
+
 
 /* ****************************************************************************
 *
@@ -38,6 +40,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
 
   if (pQueue == NULL)
   {
+   ++QueueStatistics::noOfNotificationsQueueReject;
    LM_E(("Runtime Error (notification queue is NULL)"));
    return;
   }
@@ -112,8 +115,10 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   bool enqueued = pQueue->try_push(params);
   if (!enqueued)
   {
+   ++QueueStatistics::noOfNotificationsQueueReject;
    LM_E(("Runtime Error (notification queue is full)"));
    delete params;
    return;
   }
+  ++QueueStatistics::noOfNotificationsQueueIn;
 }

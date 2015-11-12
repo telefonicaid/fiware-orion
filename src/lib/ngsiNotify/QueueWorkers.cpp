@@ -32,6 +32,7 @@
 #include "logMsg/traceLevels.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
+#include "ngsiNotify/QueueStatistics.h"
 
 static void *workerFunc(void* pSyncQ); /* prototype */
 
@@ -74,6 +75,8 @@ static void *workerFunc(void* pSyncQ)
   for (;;)
   {
     SenderThreadParams *params =  queue->pop();
+
+    ++QueueStatistics::noOfNotificationsQueueOut;
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
     LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
@@ -102,6 +105,16 @@ static void *workerFunc(void* pSyncQ)
     if ((r != "") && (r != "error"))
     {
       statisticsUpdate(NotifyContextSent, params->format);
+    }
+
+    // FIXME: These counters should be incremented in the other notification modes
+    if (r != "error" && r != "")
+    {
+      ++QueueStatistics::noOfNotificationsQueueSentOK;
+    }
+    else
+    {
+      ++QueueStatistics::noOfNotificationsQueueSentError;
     }
 
     // Free params memory
