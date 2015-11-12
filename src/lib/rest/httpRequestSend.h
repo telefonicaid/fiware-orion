@@ -75,4 +75,29 @@ extern std::string httpRequestSend
   long                   timeoutInMilliseconds = -1
 );
 
+/* ****************************************************************************
+*
+* httpRequestSendWithCurl -
+*/
+extern std::string httpRequestSendWithCurl
+(
+  CURL                   *curl,
+  const std::string&     ip,
+  unsigned short         port,
+  const std::string&     protocol,
+  const std::string&     verb,
+  const std::string&     tenant,
+  const std::string&     servicePath,
+  const std::string&     xauthToken,
+  const std::string&     resource,
+  const std::string&     content_type,
+  const std::string&     content,
+  bool                   useRush,
+  bool                   waitForResponse,
+  const std::string&     acceptFormat          = "",
+  long                   timeoutInMilliseconds = -1
+
+);
+
+
 #endif

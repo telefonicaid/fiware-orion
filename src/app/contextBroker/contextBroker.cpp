@@ -87,10 +87,14 @@
 #include "common/globals.h"
 #include "common/Timer.h"
 #include "common/compileInfo.h"
+#include "common/SyncQOverflow.h"
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
+#include "ngsiNotify/QueueNotifier.h"
+#include "ngsiNotify/QueueWorkers.h"
+#include "ngsiNotify/senderThread.h"
 #include "serviceRoutines/logTraceTreat.h"
 #include "serviceRoutines/getEntityTypes.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
@@ -243,8 +247,12 @@ int             writeConcern;
 unsigned int    cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
+int             notificationQueueSize;
+int             notificationThreadNum;
 bool            noCache;
 unsigned int    connectionMemory;
+unsigned int    maxConnections;
+unsigned int    reqPoolSize;
 
 
 
@@ -285,11 +293,26 @@ unsigned int    connectionMemory;
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
 #define NO_CACHE               "disable subscription cache for lookups"
-#define CONN_MEMORY_DESC       "maximum memory size per connection in kilobytes"
+#define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
+#define MAX_CONN_DESC          "maximum number of simultaneous connections"
+#define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+
+
 
 /* ****************************************************************************
 *
-* Parse arguments
+* paArgs - option vector for the Parse CLI arguments library
+*
+* NOTE
+*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
+*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
+*
+*   MHD_OPTION_CONNECTION_LIMIT
+*     Maximum number of concurrent connections to accept.
+*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
+*     select minus four for stdin, stdout, stderr and the server socket). In other words,
+*    the default is as large as possible.
+*
 */
 PaArgument paArgs[] =
 {
@@ -324,10 +347,12 @@ PaArgument paArgs[] =
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,             0,     3600,     SUB_CACHE_IVAL_DESC    },
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,              0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
-  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     UINT_MAX, CONN_MEMORY_DESC       },
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   PA_END_OF_ARGS
 };
@@ -1224,8 +1249,31 @@ const char* description =
 */
 static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
+
+  Notifier*                           pNotifier = NULL;
+  SyncQOverflow<SenderThreadParams*>* pQueue    = NULL;
+  QueueWorkers*                       qws       = NULL;
+  int                                 rc        = 0;
+
+  /* If we use a queue for notifications, start worker threads */
+  if (strcmp(notificationMode, "threadpool") == 0)
+  {
+    LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
+    pQueue    = new SyncQOverflow<SenderThreadParams*>(notificationQueueSize);
+    pNotifier = new QueueNotifier(pQueue);
+    qws       = new QueueWorkers(pQueue, notificationThreadNum);
+    if ((rc = qws->start()) != 0)
+    {
+      LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
+    }
+  }
+  else
+  {
+    pNotifier = new Notifier();
+  }
+
   /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
+  setNotifier(pNotifier);
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
   recoverOntimeIntervalThreads("");
@@ -1423,7 +1471,56 @@ static SemRequestType policyGet(std::string mutexPolicy)
   return SemReadWriteOp;
 }
 
+/* ****************************************************************************
+*
+* notificationModeParse -
+*/
+static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
+{
+  char* mode;
+  char* first_colon;
+  int   flds_num;
 
+  mode = (char *) malloc(strlen(notifModeArg) + 1);
+  if (mode == NULL)
+  {
+     LM_X(1, ("Fatal Error parsing notification mode: malloc (%s)", strerror(errno)));
+  }
+
+  flds_num = sscanf(notifModeArg, "%[^:]:%d:%d", mode, pQueueSize, pNumThreads);
+  if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
+  {
+    if (*pQueueSize <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid queue size (%d)", *pQueueSize));
+    }
+    if (*pNumThreads <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid number of threads (%d)",*pNumThreads));
+    }
+  }
+  else if (flds_num == 1 && strcmp(mode, "threadpool") == 0)
+  {
+    *pQueueSize = DEFAULT_NOTIF_QS;
+    *pNumThreads = DEFAULT_NOTIF_TN;
+  }
+  else if (!(
+             flds_num == 1 &&
+             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0 || strcmp(mode, "none") == 0)
+             ))
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
+  }
+
+  // get rid of params, if any, in notifModeArg
+  first_colon = strchr(notifModeArg, ':');
+  if (first_colon != NULL)
+  {
+    *first_colon = '\0';
+  }
+
+  free(mode);
+}
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
@@ -1523,6 +1620,9 @@ int main(int argC, char* argV[])
     }
   }
 
+  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+
   LM_I(("Orion Context Broker is running"));
 
   if (fg == false)
@@ -1553,6 +1653,11 @@ int main(int argC, char* argV[])
   {
     ipVersion = IPV6;
   }
+
+
+  //
+  //  Where everything begins
+  //
 
   pidFile();
   SemRequestType policy = policyGet(reqMutexPolicy);
@@ -1604,18 +1709,17 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));
-
   if (strcmp(notificationMode, "none") == 0)
   {
     LM_W(("notification mode 'none'"));
