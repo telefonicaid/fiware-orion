@@ -83,14 +83,17 @@ extern void restInit
    IpVersion           _ipVersion,
    const char*         _bindAddress,
    unsigned short      _port,
-   bool                _multitenant   = false,
-   const std::string&  _rushHost      = "",
-   unsigned short      _rushPort      = 0,
-   const char*         _allowedOrigin = NULL,
-   const char*         _httpsKey      = NULL,
-   const char*         _httpsCert     = NULL,
-   RestServeFunction   _serveFunction = NULL,
-   bool                _acceptTextXml = false
+   bool                _multitenant       = false,
+   unsigned int        _connectionMemory  = 64,
+   unsigned int        _maxConnections    = 128,
+   unsigned int        _mhdThreadPoolSize = 128,
+   const std::string&  _rushHost          = "",
+   unsigned short      _rushPort          = 0,
+   const char*         _allowedOrigin     = NULL,
+   const char*         _httpsKey          = NULL,
+   const char*         _httpsCert         = NULL,
+   RestServeFunction   _serveFunction     = NULL,
+   bool                _acceptTextXml     = false
 );
 
 

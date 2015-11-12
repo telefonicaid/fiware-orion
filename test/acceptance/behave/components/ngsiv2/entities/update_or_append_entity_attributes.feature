@@ -34,17 +34,17 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
-     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-     Setup: update contextBroker config file
-     Setup: start ContextBroker
-     Check: verify contextBroker is installed successfully
-     Check: verify mongo is installed successfully
+  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+  Setup: update contextBroker config file
+  Setup: start ContextBroker
+  Check: verify contextBroker is installed successfully
+  Check: verify mongo is installed successfully
 
   Actions After each Scenario:
-     Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
-     Setup: stop ContextBroker
+  Setup: stop ContextBroker
 
   @happy_path
   Scenario:  update and append attributes by entity ID using NGSI v2
@@ -325,7 +325,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
 
      # ------------------------ Service path ----------------------------------------------
 
-  @service_path_update
+  @service_path_update @BUG_1423 @skip
   Scenario Outline:  update attributes by entity ID using NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value                    |
@@ -362,7 +362,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | max length allowed                                            |
       | max length allowed and ten levels                             |
 
-  @service_path_append
+  @service_path_append @BUG_1423 @skip
   Scenario Outline:  append attributes by entity ID using NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value                    |
@@ -767,7 +767,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | random=10       |
       | random=100      |
       | random=10000    |
-      | random=100000   |
+      | random=50000    |
 
   @attribute_name_append
   Scenario Outline:  append attributes by entity ID using NGSI v2 with several attribute names
@@ -2814,7 +2814,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | random=100      |
       | random=1000     |
       | random=10000    |
-      | random=100000   |
+      | random=50000    |
 
   @op_qp_append_unknown
   Scenario Outline:  append an attribute by entity ID using NGSI v2 with unkwnown query parameter

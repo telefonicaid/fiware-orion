@@ -34,17 +34,17 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
-     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-     Setup: update contextBroker config file
-     Setup: start ContextBroker
-     Check: verify contextBroker is installed successfully
-     Check: verify mongo is installed successfully
+  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+  Setup: update contextBroker config file
+  Setup: start ContextBroker
+  Check: verify contextBroker is installed successfully
+  Check: verify mongo is installed successfully
 
   Actions After each Scenario:
-     Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
-     Setup: stop ContextBroker
+  Setup: stop ContextBroker
 
   @happy_path
   Scenario:  get an attribute by entity ID using NGSI v2
@@ -166,7 +166,7 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
 
     # ------------------------ Service path ----------------------------------------------
 
-  @service_path
+  @service_path @BUG_1423 @skip
   Scenario Outline:  get an attribute by entity ID using NGSI v2 with several service paths
     Given  a definition of headers
       | parameter          | value                  |
@@ -286,7 +286,7 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
 
   #    -------------- entity Id ------------------------------------------
   @entity_id
-  Scenario Outline:  get an attribute by entity ID using NGSI v2 with several entity id values
+  Scenario Outline:  get an attribute by entity ID using NGSI v2 with several entity id values between 5 entities
     Given  a definition of headers
       | parameter          | value               |
       | Fiware-Service     | test_attr_entity_id |
@@ -312,6 +312,52 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | room_0    |
       | room_1    |
       | room_4    |
+      | room_2    |
+
+  @entity_id_one_entity
+  Scenario Outline:  get an attribute by entity ID using NGSI v2 with several entity id values with one entity
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_attr_entity_id |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    When create "1" entities with "3" attributes
+      | parameter        | value         |
+      | entities_type    | <entity_type> |
+      | entities_id      | <entity_id>   |
+      | attributes_name  | temperature   |
+      | attributes_value | 34            |
+      | attributes_type  | celcius       |
+      | metadatas_number | 2             |
+      | metadatas_name   | very_hot      |
+      | metadatas_type   | alarm         |
+      | metadatas_value  | hot           |
+    And verify that receive several "Created" http code
+    When get an attribute "temperature_0" by ID "the same value of the previous request"
+    Then verify that receive an "OK" http code
+    And verify that the attribute by ID is returned
+    Examples:
+      | entity_type | entity_id  |
+      | room_1      | room       |
+      | room_2      | 34         |
+      | room_3      | false      |
+      | room_4      | true       |
+      | room_5      | 34.4E-34   |
+      | room_6      | temp.34    |
+      | room_7      | temp_34    |
+      | room_8      | temp-34    |
+      | room_9      | TEMP34     |
+      | room_10     | house_flat |
+      | room_11     | house.flat |
+      | room_12     | house-flat |
+      | room_13     | house@flat |
+      | room_14     | habitación |
+      | room_15     | españa     |
+      | room_16     | barça      |
+      | room_17     | random=10  |
+      | room_18     | random=100 |
+      | room_19     | random=900 |
+
 
   @entity_id_unknown
   Scenario:  try to get an attribute by entity ID using NGSI v2 with an unknown entity id

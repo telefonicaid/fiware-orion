@@ -58,6 +58,7 @@
             <stringProp name="Argument.name">RAMP_UP</stringProp>
             <stringProp name="Argument.value">${__P(RAMP_UP, 1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">the amount of time for creating the total number of threads</stringProp>
           </elementProp>
           <elementProp name="TEST_TIME" elementType="Argument">
             <stringProp name="Argument.name">TEST_TIME</stringProp>
@@ -67,7 +68,7 @@
           </elementProp>
           <elementProp name="SERVICE" elementType="Argument">
             <stringProp name="Argument.name">SERVICE</stringProp>
-            <stringProp name="Argument.value">${__P(SERVICE,update_ngsiv2)}</stringProp>
+            <stringProp name="Argument.value">${__P(SERVICE,)}</stringProp>
             <stringProp name="Argument.desc">service header</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>

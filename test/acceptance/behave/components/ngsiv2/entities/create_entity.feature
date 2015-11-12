@@ -543,21 +543,24 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_18     | random=100    |
       | room_19     | random=960    |
 
-  @key_Limit @BUG_1289 @skip
+  @key_Limit @BUG_1289
   Scenario:  try to create entities using NGSI v2 with overcome index key limit in mongo
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_entities_type |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                        |
+      | Fiware-Service     | test_entities_type_key_limit |
+      | Fiware-ServicePath | /test                        |
+      | Content-Type       | application/json             |
     When create "1" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | random=1024 |
       | entities_id      | room_1      |
       | attributes_name  | temperature |
       | attributes_value | 34          |
-    Then verify that receive several "Created" http code
-    And verify that entities are stored in mongo
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                           |
+      | error       | BadRequest                                      |
+      | description | Too long entity id/type/servicePath combination |
 
   @entities_type_without
   Scenario:  create entities using NGSI v2 without entities type values
@@ -695,21 +698,24 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_18       | random=100  |
       | room_19       | random=960  |
 
-  @key_Limit @BUG_1289 @skip
+  @key_Limit @BUG_1289
   Scenario:  try to create entities using NGSI v2 with overcome index key limit in mongo
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_entities_type |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                      |
+      | Fiware-Service     | test_entities_id_key_limit |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
     When create "1" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
       | entities_id      | random=1024 |
       | attributes_name  | temperature |
       | attributes_value | 34          |
-    Then verify that receive several "Created" http code
-    And verify that entities are stored in mongo
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                           |
+      | error       | BadRequest                                      |
+      | description | Too long entity id/type/servicePath combination |
 
   @entities_id_without
   Scenario:  try to create entities using NGSI v2 without entities id values
@@ -899,7 +905,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=100      |
       | random=1000     |
       | random=10000    |
-      | random=100000   |
+      | random=50000    |
+      | random=120000   |
 
   @attributes_name_error @BUG1093 @BUG_1200 @BUG_1351 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes names
@@ -1461,7 +1468,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=100      |
       | random=1000     |
       | random=10000    |
-      | random=100000   |
+      | random=50000    |
+      | random=120000   |
 
   @attributes_type_without
   Scenario:  create entities using NGSI v2 without attributes type
@@ -1598,7 +1606,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=100    |
       | random=1000   |
       | random=10000  |
-      | random=100000 |
+      | random=50000  |
 
   @attributes_metadata_name_with_type
   Scenario Outline:  create entities using NGSI v2 with several attributes metadata name with metadata type
@@ -1638,7 +1646,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=100    |
       | random=1000   |
       | random=10000  |
-      | random=100000 |
+      | random=50000  |
 
   @attributes_metadata_name_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata name without metadata type
@@ -1801,7 +1809,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=100     |
       | random=1000    |
       | random=10000   |
-      | random=100000  |
+      | random=50000   |
 
   @attributes_metadata_value_with_type
   Scenario Outline:  create entities using NGSI v2 with several attributes metadata value with metadata type
@@ -1841,7 +1849,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=100     |
       | random=1000    |
       | random=10000   |
-      | random=100000  |
+      | random=50000   |
 
   @attributes_metadata_value_without_and_with_type @BUG_1200
   Scenario:  try to create entities using NGSI v2 without attributes metadata value with metadata type
@@ -2161,7 +2169,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=100    |
       | random=1000   |
       | random=10000  |
-      | random=100000 |
+      | random=50000  |
 
   @attributes_metadata_type_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata type

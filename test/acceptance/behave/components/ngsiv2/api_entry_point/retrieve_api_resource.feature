@@ -33,17 +33,17 @@ Feature: general operations in Context Broker using NGSI API v1 and v2
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
-     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-     Setup: update contextBroker config file
-     Setup: start ContextBroker
-     Check: verify contextBroker is installed successfully
-     Check: verify mongo is installed successfully
+  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+  Setup: update contextBroker config file
+  Setup: start ContextBroker
+  Check: verify contextBroker is installed successfully
+  Check: verify mongo is installed successfully
 
   Actions After each Scenario:
-     Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
-     Setup: stop ContextBroker
+  Setup: stop ContextBroker
 
   @version
   Scenario: launch Context broker version request
@@ -56,39 +56,43 @@ Feature: general operations in Context Broker using NGSI API v1 and v2
     When send a version request
     Then verify that receive an "OK" http code
     And verify version "<field>" field does exists
-  Examples:
-    | field        |
-    | version      |
-    | uptime       |
-    | git_hash     |
-    | compile_time |
-    | compiled_by  |
-    | compiled_in  |
+    Examples:
+      | field        |
+      | version      |
+      | uptime       |
+      | git_hash     |
+      | compile_time |
+      | compiled_by  |
+      | compiled_in  |
 
   @statistics
   Scenario Outline: verifying fields in Context Broker statistics request
     When send a statistics request
     Then verify that receive an "OK" http code
     And verify statistics "<field>" field does exists
-  Examples:
-    | field                      |
-    | xmlRequests                |
-    | versionRequests            |
-    | statisticsRequests         |
-    | uptime_in_secs             |
-    | measuring_interval_in_secs |
+    Examples:
+      | field                      |
+      | versionRequests            |
+      | statisticsRequests         |
+      | uptime_in_secs             |
+      | measuring_interval_in_secs |
+      | subCacheRefreshs           |
+      | subCacheInserts            |
+      | subCacheRemoves            |
+      | subCacheUpdates            |
+      | subCacheItems              |
 
   @api_entry_point
   Scenario Outline: launch API entry point request using NGSI v2
     When send a API entry point request
     Then verify that receive an "OK" http code
     And verify "<url>" url with "<value>" value in response
-  Examples:
-    | url               | value             |
-    | entities_url      | /v2/entities      |
-    | types_url         | /v2/types         |
-    | subscriptions_url | /v2/subscriptions |
-    | registrations_url | /v2/registrations |
+    Examples:
+      | url               | value             |
+      | entities_url      | /v2/entities      |
+      | types_url         | /v2/types         |
+      | subscriptions_url | /v2/subscriptions |
+      | registrations_url | /v2/registrations |
 
 
 

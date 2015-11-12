@@ -28,9 +28,9 @@
 #
 
 
-Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
+Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
   As a context broker user
-  I would like to list all entities with get requests using NGSI v2
+  I would like to get an entity by ID using NGSI v2
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
@@ -47,52 +47,81 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
      Setup: stop ContextBroker
 
   @happy_path
-  Scenario:  list all entities using NGSI v2
+  Scenario:  get an entity by ID using NGSI v2
     Given  a definition of headers
-      | parameter          | value                |
-      | Fiware-Service     | test_list_happy_path |
-      | Fiware-ServicePath | /test                |
-      | Content-Type       | application/json     |
-    And create "5" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter          | value              |
+      | Fiware-Service     | test_id_happy_path |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    When create "1" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celcius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value                       |
+      | attrs     | temperature_0,temperature_1 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
 
-  # ------------------------ Service ----------------------------------------------
+  @more_entities
+  Scenario:  try get an entity by ID using NGSI v2 with more than one entity with the same id
+    Given  a definition of headers
+      | parameter          | value                 |
+      | Fiware-Service     | test_id_more_entities |
+      | Fiware-ServicePath | /test                 |
+      | Content-Type       | application/json      |
+    And create "1" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And verify that receive several "Created" http code
+    And create "1" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room"
+      | parameter | value                       |
+      | attrs     | temperature_0,temperature_1 |
+    Then verify that receive an "Conflict" http code
+    And verify an error response
+      | parameter   | value                                                          |
+      | error       | TooManyResults                                                 |
+      | description | There is more than one entity with that id. Refine your query. |
+
+    # ------------------------ Service ----------------------------------------------
+
   @service
-  Scenario Outline:  list all entities using NGSI v2 with several services headers
+  Scenario Outline:  get an entity by ID using NGSI v2 with several services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And create "5" entities with "1" attributes
+    When create "1" entities with "3" attributes
       | parameter        | value       |
-      | entities_type    | room        |
-      | entities_id      | room2       |
+      | entities_type    | house       |
+      | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
     Examples:
       | service            |
       |                    |
@@ -103,32 +132,33 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | max length allowed |
 
   @service_without
-  Scenario:  list all entities using NGSI v2 without service header
+  Scenario:  get an entity by ID using NGSI v2 without services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And create "5" entities with "1" attributes
+    When create "1" entities with "3" attributes
       | parameter        | value       |
-      | entities_type    | room        |
-      | entities_id      | room2       |
+      | entities_type    | house       |
+      | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
 
   @service_error
-  Scenario Outline:  try to list all entities using NGSI v2 with several wrong services headers
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value     |
       | Fiware-Service     | <service> |
       | Fiware-ServicePath | /test     |
-    When get all entities
+    When get an entity by ID "room_0"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "Bad Request" http code
     And verify an error response
       | parameter   | value                                                                                                                                         |
@@ -144,27 +174,27 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Service,sr                      |
       | greater than max length allowed |
 
- # ------------------------ Service path ----------------------------------------------
-  @service_path
-  Scenario Outline:  list all entities using NGSI v2 with several service paths headers
+   # ------------------------ Service path ----------------------------------------------
+
+  @service_path @BUG_1423 @skip
+  Scenario Outline:  get an entity by ID using NGSI v2 with several service paths headers
     Given  a definition of headers
-      | parameter          | value             |
-      | Fiware-Service     | test_service_path |
-      | Fiware-ServicePath | <service_path>    |
-      | Content-Type       | application/json  |
-    And create "5" entities with "1" attributes
+      | parameter          | value                |
+      | Fiware-Service     | test_id_service_path |
+      | Fiware-ServicePath | <service_path>       |
+      | Content-Type       | application/json     |
+    When create "1" entities with "3" attributes
       | parameter        | value       |
-      | entities_type    | room        |
-      | entities_id      | room2       |
+      | entities_type    | house       |
+      | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
     Examples:
       | service_path                                                  |
       |                                                               |
@@ -178,35 +208,34 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | max length allowed and ten levels                             |
 
   @service_path_without
-  Scenario:  list all entities using NGSI v2 without service path header
+  Scenario:  get an entity by ID using NGSI v2 without service paths headers
     Given  a definition of headers
-      | parameter      | value                     |
-      | Fiware-Service | test_service_path_without |
-      | Content-Type   | application/json          |
-    And create "5" entities with "1" attributes
+      | parameter      | value                        |
+      | Fiware-Service | test_id_service_path_without |
+      | Content-Type   | application/json             |
+    When create "1" entities with "3" attributes
       | parameter        | value       |
-      | entities_type    | room        |
-      | entities_id      | room2       |
+      | entities_type    | house       |
+      | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
 
   @service_path_error
-  Scenario Outline:  try to list all entities using NGSI v2 with wrong service path header
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
-      | parameter          | value                        |
-      | Fiware-Service     | test_list_service_path_error |
-      | Fiware-ServicePath | <service_path>               |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+      | parameter          | value                      |
+      | Fiware-Service     | test_id_service_path_error |
+      | Fiware-ServicePath | <service_path>             |
+      | Content-Type       | application/json           |
+    When get an entity by ID "room_0"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "Bad Request" http code
     And verify an error response
       | parameter   | value                                                    |
@@ -222,15 +251,15 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | /serv(45)    |
 
   @service_path_error
-  Scenario Outline:  try to list all entities using NGSI v2 with wrong service path header
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
-      | parameter          | value                        |
-      | Fiware-Service     | test_list_service_path_error |
-      | Fiware-ServicePath | <service_path>               |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+      | parameter          | value                      |
+      | Fiware-Service     | test_id_service_path_error |
+      | Fiware-ServicePath | <service_path>             |
+      | Content-Type       | application/json           |
+    When get an entity by ID "room_0"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "Bad Request" http code
     And verify an error response
       | parameter   | value                                                                    |
@@ -242,15 +271,15 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | /service,sr  |
 
   @service_path_error
-  Scenario Outline: try to list all entities using NGSI v2 with wrong service path header
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
-      | parameter          | value                        |
-      | Fiware-Service     | test_list_service_path_error |
-      | Fiware-ServicePath | <service_path>               |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+      | parameter          | value                     |
+      | Fiware-Service     | test_id_service_pat:error |
+      | Fiware-ServicePath | <service_path>            |
+      | Content-Type       | application/json          |
+    When get an entity by ID "room_0"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "Bad Request" http code
     And verify an error response
       | parameter   | value                                  |
@@ -262,15 +291,15 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | greater than max length allowed and ten levels |
 
   @service_path_error
-  Scenario: try to list all entities using NGSI v2 with wrong service path header
+  Scenario:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                                |
-      | Fiware-Service     | test_list_service_path_error         |
+      | Fiware-Service     | test_id_service_path_error           |
       | Fiware-ServicePath | max length allowed and eleven levels |
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+      | Content-Type       | application/json                     |
+    When get an entity by ID "room_0"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "Bad Request" http code
     And verify an error response
       | parameter   | value                              |
@@ -280,25 +309,24 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
   # -------------- with/without attribute type or metadatas -----------------------
 
   @without_attribute_type
-  Scenario Outline:  list all entities using NGSI v2 with several attribute values and without attribute type
+  Scenario Outline:  get an entity by ID using NGSI v2 without attribute type
     Given  a definition of headers
-      | parameter          | value                            |
-      | Fiware-Service     | test_list_without_attribute_type |
-      | Fiware-ServicePath | /test                            |
-      | Content-Type       | application/json                 |
-    And create "5" entities with "2" attributes
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_without_attribute_type |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "3" attributes
       | parameter        | value             |
-      | entities_type    | room              |
-      | entities_id      | room2             |
+      | entities_type    | house             |
+      | entities_id      | room              |
       | attributes_name  | temperature       |
       | attributes_value | <attribute_value> |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
     Examples:
       | attribute_value         |
       | 017-06-17T07:21:24.238Z |
@@ -322,12 +350,12 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_without_attribute_type @BUG_1106 @skip
-  Scenario Outline:  list all entities using NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
     Given  a definition of headers
-      | parameter          | value                            |
-      | Fiware-Service     | test_list_without_attribute_type |
-      | Fiware-ServicePath | /test                            |
-      | Content-Type       | application/json                 |
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_without_attribute_type |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -359,28 +387,27 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | "room17"  | null                                                                          | NoneType |
 
   @with_attribute_type
-  Scenario Outline:  list all entities using NGSI v2 with several attribute values and attribute type
+  Scenario Outline:  get an entity by ID using NGSI v2 with attribute type
     Given  a definition of headers
-      | parameter          | value                         |
-      | Fiware-Service     | test_list_with_attribute_type |
-      | Fiware-ServicePath | /test                         |
-      | Content-Type       | application/json              |
-    And create "5" entities with "2" attributes
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_without_attribute_type |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "3" attributes
       | parameter        | value             |
-      | entities_type    | room              |
-      | entities_id      | room2             |
+      | entities_type    | house             |
+      | entities_id      | room              |
       | attributes_name  | temperature       |
-      | attributes_value | <attribute value> |
+      | attributes_value | <attribute_value> |
       | attributes_type  | celcius           |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
     Examples:
-      | attribute value         |
+      | attribute_value         |
       | 017-06-17T07:21:24.238Z |
       | 34                      |
       | 34.4E-34                |
@@ -402,12 +429,12 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_with_attribute_type @BUG_1106 @skip
-  Scenario Outline:  list all entities using NGSI v2 with special attribute values and attribute type (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with attribute type (compound, vector, boolean, etc)
     Given  a definition of headers
-      | parameter          | value                            |
-      | Fiware-Service     | test_list_without_attribute_type |
-      | Fiware-ServicePath | /test                            |
-      | Content-Type       | application/json                 |
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_with_attribute_type |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -439,30 +466,29 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
       | "room17"  | null                                                                          | NoneType |
 
-  @with_metadatas
-  Scenario Outline:  list all entities using NGSI v2 with several attribute values and with metadatas
+  @with_metadata
+  Scenario Outline:  get an entity by ID using NGSI v2 with metadata
     Given  a definition of headers
-      | parameter          | value                |
-      | Fiware-Service     | test_list_happy_path |
-      | Fiware-ServicePath | /test                |
-      | Content-Type       | application/json     |
-    And create "5" entities with "2" attributes
+      | parameter          | value            |
+      | Fiware-Service     | test_id_metadata |
+      | Fiware-ServicePath | /test            |
+      | Content-Type       | application/json |
+    When create "1" entities with "3" attributes
       | parameter        | value             |
-      | entities_type    | room              |
-      | entities_id      | room2             |
+      | entities_type    | house             |
+      | entities_id      | room              |
       | attributes_name  | temperature       |
       | attributes_value | <attribute_value> |
       | metadatas_number | 2                 |
       | metadatas_name   | very_hot          |
       | metadatas_type   | alarm             |
-      | metadatas_value  | random=10         |
+      | metadatas_value  | hot               |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
     Examples:
       | attribute_value         |
       | 017-06-17T07:21:24.238Z |
@@ -486,18 +512,19 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_with_metadata @BUG_1106 @skip
-  Scenario Outline:  list all entities using NGSI v2 with special attribute values and metadatas (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with metadatas (compound, vector, boolean, etc)
     Given  a definition of headers
-      | parameter          | value                            |
-      | Fiware-Service     | test_list_without_attribute_type |
-      | Fiware-ServicePath | /test                            |
-      | Content-Type       | application/json                 |
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_with_attribute_type |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
+      | attributes_type  | "celcius"          |
       | metadatas_number | 2                  |
       | metadatas_name   | "very_hot"         |
       | metadatas_type   | "alarm"            |
@@ -527,28 +554,28 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | "room17"  | null                                                                          | NoneType |
 
   @without_metadata_type
-  Scenario Outline:  list all entities using NGSI v2 without metadata type
+  Scenario Outline:  get an entity by ID using NGSI v2 without metadata type
     Given  a definition of headers
-      | parameter          | value                           |
-      | Fiware-Service     | test_list_without_metadata_type |
-      | Fiware-ServicePath | /test                           |
-      | Content-Type       | application/json                |
-    And create "5" entities with "2" attributes
+      | parameter          | value            |
+      | Fiware-Service     | test_id_metadata |
+      | Fiware-ServicePath | /test            |
+      | Content-Type       | application/json |
+    When create "1" entities with "3" attributes
       | parameter        | value             |
-      | entities_type    | room              |
-      | entities_id      | room2             |
+      | entities_type    | house             |
+      | entities_id      | room              |
       | attributes_name  | temperature       |
       | attributes_value | <attribute_value> |
       | metadatas_number | 2                 |
       | metadatas_name   | very_hot          |
-      | metadatas_value  | random=10         |
+      | metadatas_value  | hot               |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
+    And verify that the entity by ID is returned
     Examples:
       | attribute_value         |
       | 017-06-17T07:21:24.238Z |
@@ -572,18 +599,20 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_with_metadata_without_meta_type @BUG_1106 @skip
-  Scenario Outline:  list all entities using NGSI v2 with special attribute values and metatadas but without metadata type (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with metadatas but without
+                    metadata type (compound, vector, boolean, etc)
     Given  a definition of headers
-      | parameter          | value                            |
-      | Fiware-Service     | test_list_without_attribute_type |
-      | Fiware-ServicePath | /test                            |
-      | Content-Type       | application/json                 |
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_with_attribute_type |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
+      | attributes_type  | "celcius"          |
       | metadatas_number | 2                  |
       | metadatas_name   | "very_hot"         |
       | metadatas_value  | "hot"              |
@@ -610,193 +639,262 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
       | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
       | "room17"  | null                                                                          | NoneType |
-  # ------------------ queries parameters -------------------------------
 
-  @only_limit
-  Scenario Outline:  list all entities using NGSI v2 with only limit query parameter
+ # --------------------- entity ID ----------------------------------------------
+
+  @entity_id
+  Scenario Outline:  get an entity by ID using NGSI v2 with several entity id values
     Given  a definition of headers
-      | parameter          | value                |
-      | Fiware-Service     | test_list_only_limit |
-      | Fiware-ServicePath | /test                |
-      | Content-Type       | application/json     |
-    And create "10" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter          | value             |
+      | Fiware-Service     | test_id_entity_id |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    When create "3" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celcius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value   |
-      | limit     | <limit> |
+    When get an entity by ID "<entity_id>"
+      | parameter | value                       |
+      | attrs     | temperature_0,temperature_1 |
     Then verify that receive an "OK" http code
-    And verify that all entities are returned
+    And verify that the entity by ID is returned
     Examples:
-      | limit |
-      | 1     |
-      | 20    |
+      | entity_id |
+      | room_0    |
+      | room_1    |
+      | room_2    |
 
-  @only_limit_error
-  Scenario Outline:  try to list all entities using NGSI v2 with only wrong limit query parameter
+  @entity_id_unknown
+  Scenario:  try to get an entity by ID using NGSI v2 with unknown entity id
     Given  a definition of headers
-      | parameter          | value                      |
-      | Fiware-Service     | test_list_only_limit_error |
-      | Fiware-ServicePath | /test                      |
-      | Content-Type       | application/json           |
-    And create "10" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter          | value                     |
+      | Fiware-Service     | test_id_entity_id_unknown |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    When create "3" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celcius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value   |
-      | limit     | <limit> |
-    Then verify that receive an "Bad Request" http code
+    When get an entity by ID "room_34"
+      | parameter | value                       |
+      | attrs     | temperature_0,temperature_1 |
+    Then verify that receive an "Not Found" http code
     And verify an error response
       | parameter   | value                                                      |
-      | error       | BadRequest                                                 |
-      | description | Bad pagination limit: /<limit>/ [must be a decimal number] |
-    Examples:
-      | limit |
-      | -3    |
-      | 1.5   |
-      | ewrw  |
-      | <2    |
-      | %@#   |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
-  @only_limit_error
-  Scenario:  try to list all entities using NGSI v2 with only wrong limit query parameter
+  @entity_id_invalid
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with invalid entity id
     Given  a definition of headers
-      | parameter          | value                      |
-      | Fiware-Service     | test_list_only_limit_error |
-      | Fiware-ServicePath | /test                      |
-      | Content-Type       | application/json           |
-    And create "10" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
-    And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value |
-      | limit     | 0     |
+      | parameter          | value                     |
+      | Fiware-Service     | test_id_entity_id_invalid |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    When get an entity by ID "<entity_id>"
+      | parameter | value                       |
+      | attrs     | temperature_0,temperature_1 |
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                       |
-      | error       | BadRequest                                                  |
-      | description | Bad pagination limit: /0/ [a value of ZERO is unacceptable] |
-
-  @only_offset
-  Scenario Outline:  list all entities using NGSI v2 with only offset query parameter
-    Given  a definition of headers
-      | parameter          | value                 |
-      | Fiware-Service     | test_list_only_offset |
-      | Fiware-ServicePath | /test                 |
-      | Content-Type       | application/json      |
-    And create "10" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
-    And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value    |
-      | offset    | <offset> |
-    Then verify that receive an "OK" http code
-    And verify that all entities are returned
+      | parameter   | value                    |
+      | error       | BadRequest               |
+      | description | invalid character in URI |
     Examples:
-      | offset |
-      | 0      |
-      | 1      |
-      | 20     |
+      | entity_id           |
+      | house<flat>         |
+      | house=flat          |
+      | house'flat'         |
+      | house\'flat\'       |
+      | house;flat          |
+      | house(flat)         |
+      | {\'a\':34}          |
+      | [\'34\', \'a\', 45] |
 
-  @only_offset_error
-  Scenario Outline:  try to list all entities using NGSI v2 with only wrong offset query parameter
+  # --------------------- queries parameters -----------------------------
+
+  @query_parameter_without
+  Scenario:  get an entity by ID using NGSI v2 without query parameter
     Given  a definition of headers
-      | parameter          | value                       |
-      | Fiware-Service     | test_list_only_offset_error |
-      | Fiware-ServicePath | /test                       |
-      | Content-Type       | application/json            |
-    And create "10" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter          | value                   |
+      | Fiware-Service     | test_id_q_param_without |
+      | Fiware-ServicePath | /test                   |
+      | Content-Type       | application/json        |
+    When create "1" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celcius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value    |
-      | offset    | <offset> |
+    When get an entity by ID "room"
+    Then verify that receive an "OK" http code
+    And verify that the entity by ID is returned
+
+  @query_parameter_without_attribute_type
+  Scenario:  get an entity by ID using NGSI v2 with query parameter without attribute type
+    Given  a definition of headers
+      | parameter          | value                             |
+      | Fiware-Service     | test_id_q_param_without_attr_type |
+      | Fiware-ServicePath | /test                             |
+      | Content-Type       | application/json                  |
+    When create "1" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
+    Then verify that receive an "OK" http code
+    And verify that the entity by ID is returned
+
+  @query_parameter_with_metadatas
+  Scenario:  get an entity by ID using NGSI v2 with query parameter and metadatas
+    Given  a definition of headers
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_with_metadatas |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
+    Then verify that receive an "OK" http code
+    And verify that the entity by ID is returned
+
+  @query_parameter_without_metadata_type
+  Scenario:  get an entity by ID using NGSI v2 with query parameter and without metadata type
+    Given  a definition of headers
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_with_metadatas |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "3" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_value  | hot         |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
+    Then verify that receive an "OK" http code
+    And verify that the entity by ID is returned
+
+  @query_parameter_multiples_attributes
+  Scenario Outline:  get an entity by ID using NGSI v2 with query parameter and multiples attributes
+    Given  a definition of headers
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_with_metadatas |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "10" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room"
+      | parameter | value            |
+      | attrs     | <attribute_name> |
+    Then verify that receive an "OK" http code
+    And verify that the entity by ID is returned
+    Examples:
+      | attribute_name                            |
+      | temperature_0                             |
+      | temperature_0,temperature_1               |
+      | temperature_0,temperature_5,temperature_8 |
+
+  @query_parameter_error
+  Scenario:  try to get an entity by ID using NGSI v2 with wrong query parameter
+    Given  a definition of headers
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_with_metadatas |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "10" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room_0"
+      | parameter | value       |
+      | attrs     | sadasdasdas |
+    Then verify that receive an "Not Found" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
+
+  @query_parameter_invalid
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with invalid query parameter
+    Given  a definition of headers
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_q_param_with_metadatas |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "10" attributes
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room"
+      | parameter | value            |
+      | attrs     | <attribute_name> |
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                        |
-      | error       | BadRequest                                                   |
-      | description | Bad pagination offset: /<offset>/ [must be a decimal number] |
+      | parameter   | value                              |
+      | error       | BadRequest                         |
+      | description | invalid character in URI parameter |
     Examples:
-      | offset |
-      | -3     |
-      | 1.5    |
-      | ewrw   |
-      | <2     |
-      | %@#    |
-
-  @limit_offset
-  Scenario Outline:  list all entities using NGSI v2 with limit and offset queries parameters
-    Given  a definition of headers
-      | parameter          | value                  |
-      | Fiware-Service     | test_list_limit_offset |
-      | Fiware-ServicePath | /test                  |
-      | Content-Type       | application/json       |
-    And create "10" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
-    And verify that receive several "Created" http code
-    When get all entities
-      | parameter | value    |
-      | limit     | <limit>  |
-      | offset    | <offset> |
-    Then verify that receive an "OK" http code
-    And verify that all entities are returned
-    Examples:
-      | limit | offset |
-      | 1     | 1      |
-      | 20    | 1      |
-      | 1     | 20     |
-      | 5     | 3      |
+      | attribute_name      |
+      | house<flat>         |
+      | house=flat          |
+      | house'flat'         |
+      | house\'flat\'       |
+      | house;flat          |
+      | house(flat)         |
+      | {\'a\':34}          |
+      | [\'34\', \'a\', 45] |
