@@ -112,8 +112,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastJsonV2ParseTime);
-    clock_addtime(&timeStat.accJsonV2ParseTime, &timeStat.lastJsonV2ParseTime);
+    clock_difftime(&end, &start, &threadLastTimeStat.jsonV2ParseTime);
   }
 
   return answer;

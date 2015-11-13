@@ -111,11 +111,12 @@ typedef enum TraceLevels
   LmtPartialPayload,
   LmtClientOutputPayloadDump,
 
-  /* Semaphores (200-202) */
+  /* Semaphores (200-204) */
   LmtReqSem = 200,
   LmtMongoSem,
   LmtTransSem,
   LmtCacheSem,
+  LmtTimeStatSem,
 
   /* Others (>=210) */
   LmtCm = 210,

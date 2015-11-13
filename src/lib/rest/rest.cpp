@@ -104,222 +104,6 @@ static unsigned int              threadPoolSize;
 
 /* ****************************************************************************
 *
-* STAT_ADD - 
-*/
-#define STAT_ADD(out, format, indent, buf, tag, comma)                        \
-do                                                                            \
-{                                                                             \
-  if (format == JSON)                                                         \
-  {                                                                           \
-    if (comma)                                                                \
-    {                                                                         \
-      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + ",\n";           \
-    }                                                                         \
-    else                                                                      \
-    {                                                                         \
-      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + "\n";            \
-    }                                                                         \
-  }                                                                           \
-  else                                                                        \
-  {                                                                           \
-    out += indent + "<" + tag + ">" + buf + "</" + tag + ">\n";               \
-  }                                                                           \
-} while (0)
-
-
-
-/* ****************************************************************************
-*
-* timingStatistics - 
-*/
-std::string timingStatistics(std::string indent, Format format, std::string apiVersion)
-{
-  if (reqTimeStatistics == false)
-  {
-    return "";
-  }
-
-  char  buf[64];
-  bool  lastReqTime           = (timeStat.lastReqTime.tv_sec != 0)          || (timeStat.lastReqTime.tv_nsec != 0);
-  bool  accReqTime            = (timeStat.accReqTime.tv_sec != 0)           || (timeStat.accReqTime.tv_nsec != 0);
-  bool  lastXmlParseTime      = (timeStat.lastXmlParseTime.tv_sec != 0)     || (timeStat.lastXmlParseTime.tv_nsec != 0);
-  bool  accXmlParseTime       = (timeStat.accXmlParseTime.tv_sec != 0)      || (timeStat.accXmlParseTime.tv_nsec != 0);
-  bool  lastJsonV1ParseTime   = (timeStat.lastJsonV1ParseTime.tv_sec != 0)  || (timeStat.lastJsonV1ParseTime.tv_nsec != 0);
-  bool  accJsonV1ParseTime    = (timeStat.accJsonV1ParseTime.tv_sec != 0)   || (timeStat.accJsonV1ParseTime.tv_nsec != 0);
-  bool  lastJsonV2ParseTime   = (timeStat.lastJsonV2ParseTime.tv_sec != 0)  || (timeStat.lastJsonV2ParseTime.tv_nsec != 0);
-  bool  accJsonV2ParseTime    = (timeStat.accJsonV2ParseTime.tv_sec != 0)   || (timeStat.accJsonV2ParseTime.tv_nsec != 0);
-  bool  lastMongoBackendTime  = (timeStat.lastMongoBackendTime.tv_sec != 0) || (timeStat.lastMongoBackendTime.tv_nsec != 0);
-  bool  accMongoBackendTime   = (timeStat.accMongoBackendTime.tv_sec != 0)  || (timeStat.accMongoBackendTime.tv_nsec != 0);
-  bool  lastRenderTime        = (timeStat.lastRenderTime.tv_sec != 0)       || (timeStat.lastRenderTime.tv_nsec != 0);
-  bool  accRenderTime         = (timeStat.accRenderTime.tv_sec != 0)        || (timeStat.accRenderTime.tv_nsec != 0);
-
-  bool  accRenderTimeComma        = false;
-  bool  lastRenderTimeComma       = accRenderTime            || accRenderTimeComma;
-  bool  accMongoBackendTimeComma  = lastRenderTime           || lastRenderTimeComma;
-  bool  lastMongoBackendTimeComma = accMongoBackendTime      || accMongoBackendTimeComma;
-  bool  accJsonV2ParseTimeComma   = lastMongoBackendTime     || lastMongoBackendTimeComma;
-  bool  lastJsonV2ParseTimeComma  = accJsonV2ParseTime       || accJsonV2ParseTimeComma;
-  bool  accJsonV1ParseTimeComma   = lastJsonV2ParseTimeComma || lastJsonV2ParseTime;
-  bool  lastJsonV1ParseTimeComma  = accJsonV1ParseTimeComma  || accJsonV1ParseTime;
-  bool  accXmlParseTimeComma      = lastJsonV1ParseTimeComma || lastJsonV1ParseTime;
-  bool  lastXmlParseTimeComma     = accXmlParseTimeComma     || accXmlParseTime;
-  bool  accReqTimeComma           = lastXmlParseTimeComma    || lastXmlParseTime;
-  bool  lastReqTimeComma          = accReqTimeComma          || accReqTime;
-
-  std::string  out     = "";
-  std::string  indent2 = indent;
-
-
-  if (format == JSON)
-  {
-    indent2 = indent + "  ";
-    out     = indent + JSON_STR("timing") + ": {\n";
-  }
-
-  //
-  // lastReqTime - the total time that the LAST request took.
-  // Measuring from the first MHD callback to 'connectionTreat', until the MHD callback to 'requestCompleted'.
-  //
-  if (lastReqTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastReqTime.tv_sec, (int) timeStat.lastReqTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "lastRequest", lastReqTimeComma);
-  }
-
-
-  //
-  // accReqTime - accumulation of lastReqTime
-  //
-  if (accReqTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accReqTime.tv_sec, (int) timeStat.accReqTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "accRequest", accReqTimeComma);
-  }
-
-
-  //
-  // lastXmlParseTime - the time that the XML Parse of the LAST request took.
-  //
-  if (lastXmlParseTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastXmlParseTime.tv_sec, (int) timeStat.lastXmlParseTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "lastXmlParse", lastXmlParseTimeComma);
-  }
-
-
-  //
-  // accXmlParseTime - accumulation of lastXmlParseTime
-  //
-  if (accXmlParseTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accXmlParseTime.tv_sec, (int) timeStat.accXmlParseTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "accXmlParse", accXmlParseTimeComma);
-  }
-
-
-  //
-  // lastJsonV1ParseTime - the time that the JSON parse+treat of the LAST request took.
-  //
-  if (lastJsonV1ParseTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastJsonV1ParseTime.tv_sec, (int) timeStat.lastJsonV1ParseTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "lastJsonV1Parse", lastJsonV1ParseTimeComma);
-  }
-
-
-  //
-  // accJsonV1ParseTime - accumulation of lastJsonV1ParseTime
-  //
-  if (accJsonV1ParseTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accJsonV1ParseTime.tv_sec, (int) timeStat.accJsonV1ParseTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "accJsonV1Parse", accJsonV1ParseTimeComma);
-  }
-
-
-  //
-  // lastJsonV2ParseTime - the time that the JSON parse+treat of the LAST request took.
-  //
-  if (lastJsonV2ParseTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastJsonV2ParseTime.tv_sec, (int) timeStat.lastJsonV2ParseTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "lastJsonV2Parse", lastJsonV2ParseTimeComma);
-  }
-
-
-  //
-  // accJsonV2ParseTime - accumulation of lastJsonV2ParseTime
-  //
-  if (accJsonV2ParseTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accJsonV2ParseTime.tv_sec, (int) timeStat.accJsonV2ParseTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "accJsonV2Parse", accJsonV2ParseTimeComma);
-  }
-
-
-  //
-  // lastMongoBackendTime - the time that the mongoBackend took to treat the last request
-  //
-  if (lastMongoBackendTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastMongoBackendTime.tv_sec, (int) timeStat.lastMongoBackendTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "lastMongoBackend", lastMongoBackendTimeComma);
-  }
-
-
-  //
-  // accMongoBackendTime - accumulation of lastMongoBackendTime
-  //
-  if (accMongoBackendTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accMongoBackendTime.tv_sec, (int) timeStat.accMongoBackendTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "accMongoBackend", accMongoBackendTimeComma);
-  }
-
-
-  //
-  // lastRenderTime - the time that the mongoBackend took to treat the last request
-  //
-  if (lastRenderTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.lastRenderTime.tv_sec, (int) timeStat.lastRenderTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "lastRender", lastRenderTimeComma);
-  }
-
-
-  //
-  // accRenderTime - accumulation of lastRenderTime
-  //
-  if (accRenderTime)
-  {
-    snprintf(buf, sizeof(buf), "%lu.%09d", timeStat.accRenderTime.tv_sec, (int) timeStat.accRenderTime.tv_nsec);
-    STAT_ADD(out, format, indent2, buf, "accRender", accRenderTimeComma);
-  }
-
-
-  if (format == JSON)
-  {
-    out += indent + "}\n";
-  }
-  
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* timingStatisticsReset - 
-*/
-void timingStatisticsReset(void)
-{
-  memset(&timeStat, 0, sizeof(timeStat));
-}
-
-
-
-/* ****************************************************************************
-*
 * uriArgumentGet - 
 */
 static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
@@ -697,14 +481,39 @@ static void requestCompleted
   if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
-
-    // FIXME P5: sem-protect timeStat? 
-    clock_difftime(&reqEndTime, &ciP->reqStartTime, &timeStat.lastReqTime);
-    clock_addtime(&timeStat.accReqTime, &timeStat.lastReqTime);
-    // FIXME P5: End of sem-protect timeStat?
+    clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
   }  
 
   delete(ciP);
+
+  //
+  // Statistics
+  //
+  // Flush this requests timing measures onto a global var to be read by "GET /statistics".
+  // Also, increment the accumulated measures.
+  if (reqTimeStatistics)
+  {
+    timeStatSemTake(__FUNCTION__, "updating statistics");
+
+    memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
+
+    // "Fix" mongoBackendTime
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);
+
+    clock_addtime(&accTimeStat.jsonV1ParseTime,       &threadLastTimeStat.jsonV1ParseTime);
+    clock_addtime(&accTimeStat.jsonV2ParseTime,       &threadLastTimeStat.jsonV2ParseTime);
+    clock_addtime(&accTimeStat.mongoBackendTime,      &threadLastTimeStat.mongoBackendTime);
+    clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
+    clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
+    clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
+    clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
+    clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
+    clock_addtime(&accTimeStat.xmlParseTime,          &threadLastTimeStat.xmlParseTime);
+
+    timeStatSemGive(__FUNCTION__, "updating statistics");
+  }
 }
 
 
@@ -1157,6 +966,15 @@ static int connectionTreat
 
 
     //
+    // Reset time measuring?
+    //
+    if (reqTimeStatistics)
+    {
+      memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
+    }
+
+
+    //
     // ConnectionInfo
     //
     // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
@@ -1402,7 +1220,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
   if (threadPoolSize != 0)
   {
     serverMode = MHD_USE_SELECT_INTERNALLY;
-    LM_M(("threadPoolSize: %d", threadPoolSize));
   }
 
 

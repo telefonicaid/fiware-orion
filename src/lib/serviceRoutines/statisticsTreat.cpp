@@ -70,6 +70,8 @@ std::string statisticsTreat
   std::string indent  = "";
   std::string indent2 = "  ";
 
+  LM_M(("In statisticsTreat"));
+
   if (ciP->method == "DELETE")
   {
     noOfJsonRequests                                = -1;
@@ -147,6 +149,7 @@ std::string statisticsTreat
     semTimeReqReset();
     semTimeTransReset();
     semTimeCacheReset();
+    semTimeTimeStatReset();
     mongoPoolConnectionSemWaitingTimeReset();
     mutexTimeCCReset();
 
@@ -483,6 +486,10 @@ std::string statisticsTreat
     char ccMutexWaitingTime[64];
     mutexTimeCCGet(ccMutexWaitingTime, sizeof(ccMutexWaitingTime));
     out += TAG_ADD_STRING("curlContextMutexWaitingTime", ccMutexWaitingTime);
+
+    char timeStatSemaphoreWaitingTime[64];
+    semTimeTimeStatGet(timeStatSemaphoreWaitingTime, sizeof(timeStatSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("timeStatSemaphoreWaitingTime", timeStatSemaphoreWaitingTime);
   }
 
   int now = getCurrentTime();
@@ -510,26 +517,34 @@ std::string statisticsTreat
     out += TAG_ADD_STRING("subCache",          listBuffer);
   }
 
+  std::string timingStatString      = timingStatistics(indent2, ciP->outFormat, ciP->apiVersion);
+  bool        timingStat            = (timingStatString != "");
+  bool        threadpool            = strcmp(notificationMode, "threadpool") == 0;
+  bool        commaAfterThreadpool  = timingStat;
+  bool        commaAfterSubCache    = timingStat || threadpool;
+
   out += TAG_ADD_INTEGER("subCacheRefreshs", mscRefreshs, true);
   out += TAG_ADD_INTEGER("subCacheInserts",  mscInserts,  true);
   out += TAG_ADD_INTEGER("subCacheRemoves",  mscRemoves,  true);
   out += TAG_ADD_INTEGER("subCacheUpdates",  mscUpdates,  true);
-  out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  false);
+  out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  commaAfterSubCache);
 
   if (strcmp(notificationMode, "threadpool") == 0)
   {
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueIn", QueueStatistics::getIn(), true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueOut", QueueStatistics::getOut(), true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueReject", QueueStatistics::getReject(), true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentOK", QueueStatistics::getSentOK(), true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentError", QueueStatistics::getSentError(), false);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueIn",        QueueStatistics::getIn(),        true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueOut",       QueueStatistics::getOut(),       true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueReject",    QueueStatistics::getReject(),    true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentOK",    QueueStatistics::getSentOK(),    true);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentError", QueueStatistics::getSentError(), commaAfterThreadpool);
   }
 
-  std::string timingStats = timingStatistics(indent2, ciP->outFormat, ciP->apiVersion);
 
+  //
+  // Timing statistics ONLY if JSON
+  //
   if (ciP->outFormat == JSON)
   {
-    out += (timingStats == "")? "" : std::string(",") + timingStats;
+    out += timingStatString;
   }
 
   out += endTag(indent, tag, ciP->outFormat, false, false, true, false);

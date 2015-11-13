@@ -47,26 +47,13 @@
 
 /* ****************************************************************************
 *
-* TIME_STAT_RENDER_RESTART - 
-*/
-#define TIME_STAT_RENDER_RESTART()                                     \
-  if (reqTimeStatistics)                                               \
-  {                                                                    \
-    clock_gettime(CLOCK_REALTIME, &renderStart);                       \
-  }
-
-
-
-/* ****************************************************************************
-*
 * TIME_STAT_RENDER_STOP - 
 */
-#define TIME_STAT_RENDER_STOP()                                         \
-  if (reqTimeStatistics)                                                \
-  {                                                                     \
-    clock_gettime(CLOCK_REALTIME, &renderEnd);                          \
-    clock_difftime(&renderEnd, &renderStart, &timeStat.lastRenderTime); \
-    clock_addtime(&timeStat.accRenderTime, &timeStat.lastRenderTime);   \
+#define TIME_STAT_RENDER_STOP()                                                   \
+  if (reqTimeStatistics)                                                          \
+  {                                                                               \
+    clock_gettime(CLOCK_REALTIME, &renderEnd);                                    \
+    clock_difftime(&renderEnd, &renderStart, &threadLastTimeStat.renderTime);     \
   }
 
 
@@ -88,26 +75,97 @@
 
 /* ****************************************************************************
 *
-* TIME_STAT_MONGO_RESTART - 
-*/
-#define TIME_STAT_MONGO_RESTART()                                      \
-  if (reqTimeStatistics)                                               \
-  {                                                                    \
-    clock_gettime(CLOCK_REALTIME, &mongoStart);                        \
-  }
-
-
-
-/* ****************************************************************************
-*
 * TIME_STAT_MONGO_STOP - 
 */
 #define TIME_STAT_MONGO_STOP()                                                    \
   if (reqTimeStatistics)                                                          \
   {                                                                               \
     clock_gettime(CLOCK_REALTIME, &mongoEnd);                                     \
-    clock_difftime(&mongoEnd, &mongoStart, &timeStat.lastMongoBackendTime);       \
-    clock_addtime(&timeStat.accMongoBackendTime, &timeStat.lastMongoBackendTime); \
+    clock_difftime(&mongoEnd, &mongoStart, &threadLastTimeStat.mongoBackendTime); \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_READ_WAIT_START - 
+*/
+#define TIME_STAT_MONGO_READ_WAIT_START()                                     \
+  struct timespec mongoReadWaitStart;                                         \
+  struct timespec mongoReadWaitEnd;                                           \
+                                                                              \
+  if (reqTimeStatistics)                                                      \
+  {                                                                           \
+    clock_gettime(CLOCK_REALTIME, &mongoReadWaitStart);                       \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_READ_WAIT_STOP - 
+*/
+#define TIME_STAT_MONGO_READ_WAIT_STOP()                                                           \
+  if (reqTimeStatistics)                                                                           \
+  {                                                                                                \
+    clock_gettime(CLOCK_REALTIME, &mongoReadWaitEnd);                                              \
+    clock_difftime(&mongoReadWaitEnd, &mongoReadWaitStart, &threadLastTimeStat.mongoReadWaitTime); \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_WRITE_WAIT_START - 
+*/
+#define TIME_STAT_MONGO_WRITE_WAIT_START()                                     \
+  struct timespec mongoWriteWaitStart;                                         \
+  struct timespec mongoWriteWaitEnd;                                           \
+                                                                               \
+  if (reqTimeStatistics)                                                       \
+  {                                                                            \
+    clock_gettime(CLOCK_REALTIME, &mongoWriteWaitStart);                       \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_WRITE_WAIT_STOP - 
+*/
+#define TIME_STAT_MONGO_WRITE_WAIT_STOP()                                                             \
+  if (reqTimeStatistics)                                                                              \
+  {                                                                                                   \
+    clock_gettime(CLOCK_REALTIME, &mongoWriteWaitEnd);                                                \
+    clock_difftime(&mongoWriteWaitEnd, &mongoWriteWaitStart, &threadLastTimeStat.mongoWriteWaitTime); \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_COMMAND_WAIT_START - 
+*/
+#define TIME_STAT_MONGO_COMMAND_WAIT_START()                                     \
+  struct timespec mongoCommandWaitStart;                                         \
+  struct timespec mongoCommandWaitEnd;                                           \
+                                                                                 \
+  if (reqTimeStatistics)                                                         \
+  {                                                                              \
+    clock_gettime(CLOCK_REALTIME, &mongoCommandWaitStart);                       \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_STAT_MONGO_COMMAND_WAIT_STOP - 
+*/
+#define TIME_STAT_MONGO_COMMAND_WAIT_STOP()                                                                 \
+  if (reqTimeStatistics)                                                                                    \
+  {                                                                                                         \
+    clock_gettime(CLOCK_REALTIME, &mongoCommandWaitEnd);                                                    \
+    clock_difftime(&mongoCommandWaitEnd, &mongoCommandWaitStart, &threadLastTimeStat.mongoCommandWaitTime); \
   }
 
 
@@ -118,22 +176,21 @@
 */
 typedef struct TimeStat
 {
-  struct timespec  lastReqTime;
-  struct timespec  accReqTime;
-  struct timespec  lastXmlParseTime;
-  struct timespec  accXmlParseTime;
-  struct timespec  lastJsonV1ParseTime;
-  struct timespec  accJsonV1ParseTime;
-  struct timespec  lastJsonV2ParseTime;
-  struct timespec  accJsonV2ParseTime;
-  struct timespec  lastMongoBackendTime;
-  struct timespec  accMongoBackendTime;
-  struct timespec  lastRenderTime;
-  struct timespec  accRenderTime;
+  struct timespec  jsonV1ParseTime;
+  struct timespec  jsonV2ParseTime;
+  struct timespec  mongoBackendTime;
+  struct timespec  mongoReadWaitTime;
+  struct timespec  mongoWriteWaitTime;
+  struct timespec  mongoCommandWaitTime;
+  struct timespec  renderTime;
+  struct timespec  reqTime;
+  struct timespec  xmlParseTime;
 } TimeStat;
 
-extern TimeStat timeStat;
-extern bool     reqTimeStatistics;
+extern TimeStat           accTimeStat;
+extern TimeStat           lastTimeStat;
+extern __thread TimeStat  threadLastTimeStat;
+extern bool               reqTimeStatistics;
 
 
 
@@ -217,6 +274,24 @@ extern int noOfSubCacheRemovals;
 extern int noOfSubCacheRemovalFailures;
 
 extern int noOfDroppedNotifications;
+
+
+
+/* ****************************************************************************
+*
+* timingStatistics - 
+*/
+extern std::string timingStatistics(std::string indent, Format format, std::string apiVersion);
+
+
+
+/* ****************************************************************************
+*
+* timingStatisticsReset - 
+*/
+extern void timingStatisticsReset(void);
+
+
 
 /* ****************************************************************************
 *

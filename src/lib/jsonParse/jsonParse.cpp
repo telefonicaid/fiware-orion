@@ -459,8 +459,7 @@ std::string jsonParse
   if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastJsonV1ParseTime);
-    clock_addtime(&timeStat.accJsonV1ParseTime, &timeStat.lastJsonV1ParseTime);
+    clock_difftime(&end, &start, &threadLastTimeStat.jsonV1ParseTime);
   }
 
   return "OK";

@@ -367,8 +367,7 @@ std::string xmlTreat
   if (reqTimeStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
-    clock_difftime(&end, &start, &timeStat.lastXmlParseTime);
-    clock_addtime(&timeStat.accXmlParseTime, &timeStat.lastXmlParseTime);
+    clock_difftime(&end, &start, &threadLastTimeStat.xmlParseTime);
   }
 
   if (ciP->httpStatusCode != SccOk)
