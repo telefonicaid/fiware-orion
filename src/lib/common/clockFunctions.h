@@ -33,7 +33,7 @@
 *
 * clock_difftime - 
 */
-extern void clock_difftime(struct timespec* endTime, struct timespec* startTime, struct timespec* diffTime);
+extern void clock_difftime(const struct timespec* endTime, const struct timespec* startTime, struct timespec* diffTime);
 
 
 
@@ -41,7 +41,7 @@ extern void clock_difftime(struct timespec* endTime, struct timespec* startTime,
 *
 * clock_addtime - 
 */
-extern void clock_addtime(struct timespec* accTime, struct timespec* diffTime);
+extern void clock_addtime(struct timespec* accTime, const struct timespec* diffTime);
 
 #endif  // SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
 

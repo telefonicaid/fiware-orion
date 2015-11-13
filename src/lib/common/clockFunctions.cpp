@@ -32,7 +32,7 @@
 *
 * clock_difftime - 
 */
-void clock_difftime(struct timespec* endTime, struct timespec* startTime, struct timespec* diffTime)
+void clock_difftime(const struct timespec* endTime, const struct timespec* startTime, struct timespec* diffTime)
 {
   diffTime->tv_nsec = endTime->tv_nsec - startTime->tv_nsec;
   diffTime->tv_sec  = endTime->tv_sec  - startTime->tv_sec;
@@ -50,7 +50,7 @@ void clock_difftime(struct timespec* endTime, struct timespec* startTime, struct
 *
 * clock_addtime - 
 */
-void clock_addtime(struct timespec* accTime, struct timespec* diffTime)
+void clock_addtime(struct timespec* accTime, const struct timespec* diffTime)
 {
   accTime->tv_nsec += diffTime->tv_nsec;
   accTime->tv_sec  += diffTime->tv_sec;

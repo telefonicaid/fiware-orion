@@ -43,18 +43,19 @@
 */
 typedef struct SenderThreadParams
 {
-  std::string    ip;
-  unsigned short port;
-  std::string    protocol;
-  std::string    verb;
-  std::string    tenant;
-  std::string    servicePath;
-  std::string    xauthToken;
-  std::string    resource;
-  std::string    content_type;
-  std::string    content;
-  char           transactionId[64];
-  Format         format;
+  std::string     ip;
+  unsigned short  port;
+  std::string     protocol;
+  std::string     verb;
+  std::string     tenant;
+  std::string     servicePath;
+  std::string     xauthToken;
+  std::string     resource;
+  std::string     content_type;
+  std::string     content;
+  char            transactionId[64];
+  Format          format;
+  struct timespec timeStamp;
 } SenderThreadParams;
 
 
