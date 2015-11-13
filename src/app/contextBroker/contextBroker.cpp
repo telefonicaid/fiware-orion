@@ -352,7 +352,7 @@ PaArgument paArgs[] =
   { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     UINT_MAX, CONN_MEMORY_DESC       },
-  { "-reqTimeStat",      &reqTimeStat,      "REQ_TIME_STAT",     PaBool,   PaHid, false,          false, true,     REQ_TIME_STAT_DESC     },
+  { "-reqTimeStat",      &reqTimeStat,      "REQ_TIME_STAT",     PaBool,   PaOpt, false,          false, true,     REQ_TIME_STAT_DESC     },
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 

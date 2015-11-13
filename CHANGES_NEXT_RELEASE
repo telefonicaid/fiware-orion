@@ -6,3 +6,4 @@
 - Add: possibility to use thread pool for incoming connections, using CLI option -reqPoolSize (Issue #1384)
 - Fix: A bug in the request reading logic that may cause unexpected Parse Errors or even SIGSEGVs
 - Fix: Semaphore releasing bug in unsubscribeContext when subscription ID is the empty string (Issue #1488)
+- Add: Built-in Timing/Profiling when using the -reqTimeStat (#Issue 1367)

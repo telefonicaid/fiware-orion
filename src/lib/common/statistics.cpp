@@ -188,14 +188,17 @@ int noOfDroppedNotifications                             = -1;
 *
 * timingStatistics - 
 *
-* lastReqTime           - the total time that the LAST request took.
-*                         Measuring from the first MHD callback to 'connectionTreat',
-*                         until the MHD callback to 'requestCompleted'.
-* lastXmlParseTime      - the time that the XML Parse of the LAST request took.
-* lastJsonV1ParseTime   - the time that the JSON parse+treat of the LAST request took.
-* lastJsonV2ParseTime   - the time that the JSON parse+treat of the LAST request took.
-* lastMongoBackendTime  - the time that the mongoBackend took to treat the last request
-* lastRenderTime        - the time that the last render took to render the response
+* xxxReqTime           - the total time that the LAST request took.
+*                        Measuring from the first MHD callback to 'connectionTreat',
+*                        until the MHD callback to 'requestCompleted'.
+* xxxXmlParseTime      - the time that the XML Parse of the LAST request took.
+* xxxJsonV1ParseTime   - the time that the JSON parse+treat of the LAST request took.
+* xxxJsonV2ParseTime   - the time that the JSON parse+treat of the LAST request took.
+* xxxMongoBackendTime  - the time that the mongoBackend took to treat the last request
+* xxxReadWaitTime      - 
+* xxxWriteWaitTime     - 
+* xxxCommandWaitTime   - 
+* xxxRenderTime        - the time that the last render took to render the response
 *
 */
 std::string timingStatistics(std::string indent, Format format, std::string apiVersion)
