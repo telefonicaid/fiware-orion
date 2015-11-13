@@ -73,7 +73,6 @@ void clock_subtime(struct timespec* subtrahend, struct timespec* minuend)
   subtrahend->tv_sec  -= minuend->tv_sec;
   subtrahend->tv_nsec -= minuend->tv_nsec;
 
-
   if (subtrahend->tv_nsec < 0)
   {
     subtrahend->tv_sec  -= 1;

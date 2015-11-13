@@ -51,9 +51,9 @@ static SemRequestType  reqPolicy;
 *
 * Time measuring variables - 
 */
-static struct timespec accReqSemTime   = { 0, 0 };
-static struct timespec accTransSemTime = { 0, 0 };
-static struct timespec accCacheSemTime = { 0, 0 };
+static struct timespec accReqSemTime      = { 0, 0 };
+static struct timespec accTransSemTime    = { 0, 0 };
+static struct timespec accCacheSemTime    = { 0, 0 };
 static struct timespec accTimeStatSemTime = { 0, 0 };
 
 
