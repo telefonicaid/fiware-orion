@@ -63,15 +63,13 @@ std::string getAllSubscriptions
   int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
   int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
-  TIME_STAT_MONGO_START();
-  mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, limit, offset, &count);
-  TIME_STAT_MONGO_STOP();
+  TIMED_MONGO(mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, limit, offset, &count));
 
   if (oe.code != SccOk)
   {
-    TIME_STAT_RENDER_START();
-    std::string out = oe.render(ciP,"");
-    TIME_STAT_RENDER_STOP();
+    std::string out;
+
+    TIMED_RENDER(out = oe.render(ciP,""));
 
     return out;
   }
@@ -82,9 +80,8 @@ std::string getAllSubscriptions
     ciP->httpHeaderValue.push_back(toString(count));
   }
 
-  TIME_STAT_RENDER_START();
-  std::string out = vectorToJson(subs);
-  TIME_STAT_RENDER_STOP();
+  std::string out;
+  TIMED_RENDER(out = vectorToJson(subs));
 
   return out;
 }

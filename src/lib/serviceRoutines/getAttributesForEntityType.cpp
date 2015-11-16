@@ -64,13 +64,10 @@ std::string getAttributesForEntityType
 
   response.statusCode.fill(SccOk);
 
-  TIME_STAT_MONGO_START();
-  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-  TIME_STAT_MONGO_STOP();
+  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam));
 
-  TIME_STAT_RENDER_START();
-  std::string rendered = response.render(ciP, "");
-  TIME_STAT_RENDER_STOP();
+  std::string rendered;
+  TIMED_RENDER(rendered = response.render(ciP, ""));
   response.release();
 
   return rendered;

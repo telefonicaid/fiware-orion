@@ -92,9 +92,7 @@ std::string putIndividualContextEntityAttribute
 
 
   // 4. Cleanup and return result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP->outFormat, "", false, false);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
   response.release();
   parseDataP->upcr.res.release();  // This call to release() crashed the functional test

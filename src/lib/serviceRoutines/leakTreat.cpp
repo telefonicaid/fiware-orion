@@ -61,10 +61,7 @@ std::string leakTreat
     OrionError orionError(SccBadRequest, "no such service");
 
     ciP->httpStatusCode = SccOk;
-
-    TIME_STAT_RENDER_START();
-    out = orionError.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(out = orionError.render(ciP, ""));
     return out;
   }
 
@@ -78,18 +75,14 @@ std::string leakTreat
     OrionError orionError(SccBadRequest, "Password requested");
     ciP->httpStatusCode = SccOk;
 
-    TIME_STAT_RENDER_START();
-    out = orionError.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(out = orionError.render(ciP, ""));
   }
   else if (password != "harakiri")
   {
     OrionError orionError(SccBadRequest, "Request denied - password erroneous");
     ciP->httpStatusCode = SccOk;
 
-    TIME_STAT_RENDER_START();
-    out = orionError.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(out = orionError.render(ciP, ""));
   }
   else
   {
@@ -97,9 +90,7 @@ std::string leakTreat
     std::string pwd = strdup("Leak test done");
     OrionError orionError(SccOk, "Leak test: " + pwd);
 
-    TIME_STAT_RENDER_START();
-    out = orionError.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(out = orionError.render(ciP, ""));
   }
 
   return out;

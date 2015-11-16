@@ -60,16 +60,12 @@ std::string postUpdateContextAvailabilitySubscription
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
   //
-  TIME_STAT_MONGO_START();
-  ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
-                                                                   &ucas,
-                                                                   notifyFormat,
-                                                                   ciP->tenant);
-  TIME_STAT_MONGO_STOP();
+  TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
+                                                                               &ucas,
+                                                                               notifyFormat,
+                                                                               ciP->tenant));
 
-  TIME_STAT_RENDER_START();
-  answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0));
 
   return answer;
 }

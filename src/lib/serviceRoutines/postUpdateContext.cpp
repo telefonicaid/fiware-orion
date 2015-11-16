@@ -150,9 +150,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   ciP->outFormat  = format;
 
-  TIME_STAT_RENDER_START();
-  payload = upcrP->render(ciP, UpdateContext, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(payload = upcrP->render(ciP, UpdateContext, ""));
 
   ciP->outFormat  = outFormat;
   cleanPayload    = (char*) payload.c_str();
@@ -486,9 +484,7 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     LM_W(("Bad Input (more than one service path for an update request)"));
 
-    TIME_STAT_RENDER_START();
-    answer = upcrsP->render(ciP, UpdateContext, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
     return answer;
   }
@@ -502,9 +498,7 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
 
-    TIME_STAT_RENDER_START();
-    answer = upcrsP->render(ciP, UpdateContext, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
     return answer;
   }
@@ -516,9 +510,8 @@ std::string postUpdateContext
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
   
-  TIME_STAT_MONGO_START();
-  HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance);
-  TIME_STAT_MONGO_STOP();
+  HttpStatusCode httpStatusCode;
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance));
 
   if (ciP->httpStatusCode != SccCreated)
   {
@@ -537,9 +530,7 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIME_STAT_RENDER_START();
-    answer = upcrsP->render(ciP, UpdateContext, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
     upcrP->release();
     return answer;
@@ -701,9 +692,7 @@ std::string postUpdateContext
     response.merge(&upcrs);
   }
 
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP, UpdateContext, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP, UpdateContext, ""));
 
   //
   // Cleanup

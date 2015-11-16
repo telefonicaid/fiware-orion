@@ -100,9 +100,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
 
     return answer;
   }
@@ -112,9 +110,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
 
     return answer;
   }
@@ -133,9 +129,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP, IndividualContextEntity, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntity, ""));
 
   parseDataP->upcr.res.release();
   response.release();

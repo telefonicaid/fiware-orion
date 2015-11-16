@@ -79,16 +79,13 @@ std::string getEntities
   std::string  q          = ciP->uriParam["q"];
   std::string  geometry   = ciP->uriParam["geometry"];
   std::string  coords     = ciP->uriParam["coords"];
-
+  std::string  out;
 
   if ((idPattern != "") && (id != ""))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern");
 
-    TIME_STAT_RENDER_START();
-    answer = oe.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(answer = oe.render(ciP, ""));
     return answer;
   }
   else if (id != "")
@@ -117,21 +114,16 @@ std::string getEntities
   // Making sure geometry and coords are not used individually
   if ((coords != "") && (geometry == ""))
   {
-    OrionError oe(SccBadRequest, "URI param /coords/ used without /geometry/");
+    OrionError   oe(SccBadRequest, "URI param /coords/ used without /geometry/");
 
-    TIME_STAT_RENDER_START();
-    std::string out = oe.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(out = oe.render(ciP, ""));
     return out;
   }
   else if ((geometry != "") && (coords == ""))
   {
     OrionError oe(SccBadRequest, "URI param /geometry/ used without /coords/");
 
-    TIME_STAT_RENDER_START();
-    std::string out = oe.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(out = oe.render(ciP, ""));
 
     return out;
   }
@@ -148,9 +140,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, std::string("error parsing geometry: ") + errorString);
 
-      TIME_STAT_RENDER_START();
-      std::string out = oe.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(out = oe.render(ciP, ""));
 
       return out;
     }
@@ -159,9 +149,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, "URI param /geometry/ must be either /polygon/ or /circle/");
 
-      TIME_STAT_RENDER_START();
-      std::string out = oe.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(out = oe.render(ciP, ""));
 
       return out;
     }
@@ -175,9 +163,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, "URI param /coords/ has no coordinates");
 
-      TIME_STAT_RENDER_START();
-      std::string out = oe.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(out = oe.render(ciP, ""));
 
       return out;
     }
@@ -186,9 +172,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, "Too many coordinates for circle");
 
-      TIME_STAT_RENDER_START();
-      std::string out = oe.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(out = oe.render(ciP, ""));
 
       return out;
     }
@@ -197,9 +181,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, "Too few coordinates for polygon");
 
-      TIME_STAT_RENDER_START();
-      std::string out = oe.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(out = oe.render(ciP, ""));
 
       return out;
     }
@@ -230,9 +212,7 @@ std::string getEntities
     {
       OrionError oe(SccBadRequest, errorString);
 
-      TIME_STAT_RENDER_START();
-      std::string out = oe.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(out = oe.render(ciP, ""));
 
       return out;
     }
@@ -263,9 +243,7 @@ std::string getEntities
   {
     entities.fill(&parseDataP->qcrs.res);
 
-    TIME_STAT_RENDER_START();
-    answer = entities.render(ciP, EntitiesResponse);
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = entities.render(ciP, EntitiesResponse));
   }
 
   // 04. Cleanup and return result

@@ -100,9 +100,7 @@ std::string putEntityAttribute
     std::string  details = "Request payload is missing some piece of information. Please, check Orion documentation."; 
     OrionError   orionError(SccInvalidModification, details);     
 
-    TIME_STAT_RENDER_START();
-    answer = orionError.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = orionError.render(ciP, ""));
   }
 
   return answer;

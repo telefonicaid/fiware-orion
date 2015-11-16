@@ -67,9 +67,7 @@ std::string postNotifyContextAvailability
     ncar.responseCode.fill(SccBadRequest, "more than one service path for notification");
     LM_W(("Bad Input (more than one service path for a notification)"));
 
-    TIME_STAT_RENDER_START();
-    answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ciP->outFormat, ""));
 
     return answer;
   }
@@ -83,20 +81,13 @@ std::string postNotifyContextAvailability
   {
     ncar.responseCode.fill(SccBadRequest, res);
 
-    TIME_STAT_RENDER_START();
-    answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ciP->outFormat, ""));
 
     return answer;
   }
 
-  TIME_STAT_MONGO_START();
-  ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
-  TIME_STAT_MONGO_STOP();
-
-  TIME_STAT_RENDER_START();
-  answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]));
+  TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ciP->outFormat, ""));
 
   return answer;
 }

@@ -68,7 +68,7 @@ void clock_addtime(struct timespec* accTime, struct timespec* diffTime)
 *
 * clock_subtime - 
 */
-void clock_subtime(struct timespec* subtrahend, struct timespec* minuend)
+void clock_subtime(struct timespec* subtrahend, const struct timespec* minuend)
 {
   subtrahend->tv_sec  -= minuend->tv_sec;
   subtrahend->tv_nsec -= minuend->tv_nsec;

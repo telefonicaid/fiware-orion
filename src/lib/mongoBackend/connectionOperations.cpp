@@ -54,9 +54,10 @@ bool collectionQuery
 
   if (connection == NULL)
   {
-     LM_E(("Fatal Error (null DB connection)"));
-     *err = "null DB connection";
-     return false;
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
+    return false;
   }
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
@@ -80,6 +81,8 @@ bool collectionQuery
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);       
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: " + e.what();
@@ -90,6 +93,8 @@ bool collectionQuery
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: generic";
@@ -123,9 +128,11 @@ extern bool collectionRangedQuery
 
   if (connection == NULL)
   {
-     LM_E(("Fatal Error (null DB connection)"));
-     *err = "null DB connection";
-     return false;
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
+
+    return false;
   }
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
@@ -154,6 +161,8 @@ extern bool collectionRangedQuery
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: " + e.what();
@@ -164,6 +173,8 @@ extern bool collectionRangedQuery
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: generic";
@@ -194,9 +205,10 @@ bool collectionCount
 
   if (connection == NULL)
   {
-     LM_E(("Fatal Error (null DB connection)"));
-     *err = "null DB connection";
-     return false;
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
+    return false;
   }
 
   LM_T(LmtMongo, ("count() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
@@ -213,6 +225,8 @@ bool collectionCount
   catch (const DBException& e)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - count(): " + q.toString() +
       " - exception: " + e.what();
@@ -223,6 +237,8 @@ bool collectionCount
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: generic";
@@ -253,6 +269,8 @@ extern bool collectionFindOne
 
   if (connection == NULL)
   {
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
     return false;
@@ -269,6 +287,8 @@ extern bool collectionFindOne
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
         " - findOne(): " + q.toString() +
         " - exception: " + e.what();
@@ -279,6 +299,8 @@ extern bool collectionFindOne
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
         " - findOne(): " + q.toString() +
         " - exception: generic";
@@ -308,9 +330,11 @@ bool collectionInsert
 
   if (connection == NULL)
   {
-     LM_E(("Fatal Error (null DB connection)"));
-     *err = "null DB connection";
-     return false;
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
+    return false;
   }
 
   LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", col.c_str(), doc.toString().c_str()));
@@ -325,6 +349,8 @@ bool collectionInsert
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - insert(): " + doc.toString() +
       " - exception: " + e.what();
@@ -335,6 +361,8 @@ bool collectionInsert
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - insert(): " + doc.toString() +
       " - exception: generic";
@@ -366,9 +394,11 @@ bool collectionUpdate
 
   if (connection == NULL)
   {
-     LM_E(("Fatal Error (null DB connection)"));
-     *err = "null DB connection";
-     return false;
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
+    return false;
   }
 
   LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s", col.c_str(), q.toString().c_str(), doc.toString().c_str(), FT(upsert)));
@@ -383,6 +413,8 @@ bool collectionUpdate
   catch (const DBException& e)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: " + e.what();
@@ -393,6 +425,8 @@ bool collectionUpdate
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: generic";
@@ -422,9 +456,11 @@ bool collectionRemove
 
   if (connection == NULL)
   {
-     LM_E(("Fatal Error (null DB connection)"));
-     *err = "null DB connection";
-     return false;
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
+    LM_E(("Fatal Error (null DB connection)"));
+    *err = "null DB connection";
+    return false;
   }
 
   LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col.c_str(), q.toString().c_str()));
@@ -439,6 +475,8 @@ bool collectionRemove
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - remove(): " + q.toString() +
       " - exception: " + e.what();
@@ -449,6 +487,8 @@ bool collectionRemove
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - remove(): " + q.toString() +
       " - exception: generic";
@@ -478,6 +518,8 @@ bool collectionCreateIndex
 
   if (connection == NULL)
   {
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
+
     LM_E(("Fatal Error (null DB connection)"));
     return false;
   }
@@ -495,6 +537,8 @@ bool collectionCreateIndex
   catch (const DBException &e)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - createIndex(): " + indexes.toString() +
       " - exception: " + e.what();
@@ -505,6 +549,8 @@ bool collectionCreateIndex
   catch (...)
   {
     releaseMongoConnection(connection);
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - createIndex(): " + indexes.toString() +
       " - exception: generic";
@@ -554,15 +600,22 @@ bool runCollectionCommand
   std::string*        err
 )
 {
-  bool releaseConnection = connection == NULL? true : false;
+  bool releaseConnection = false;
 
+  //
+  // The call to TIME_STAT_MONGO_COMMAND_WAIT_START must be on toplevel so that local variables
+  // are visible for TIME_STAT_MONGO_COMMAND_WAIT_STOP()
+  //
   TIME_STAT_MONGO_COMMAND_WAIT_START();
+
   if (connection == NULL)
   {
-    connection = getMongoConnection();
+    connection        = getMongoConnection();
+    releaseConnection = true;
 
     if (connection == NULL)
     {
+      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
       LM_E(("Fatal Error (null DB connection)"));
       return false;
     }
@@ -585,7 +638,9 @@ bool runCollectionCommand
     if (releaseConnection)
     {
       releaseMongoConnection(connection);
+      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - runCommand(): " + command.toString() +
       " - exception: " + e.what();
@@ -598,7 +653,9 @@ bool runCollectionCommand
     if (releaseConnection)
     {
       releaseMongoConnection(connection);
+      TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     }
+
     std::string msg = std::string("collection: ") + col.c_str() +
       " - runCommand(): " + command.toString() +
       " - exception: generic";

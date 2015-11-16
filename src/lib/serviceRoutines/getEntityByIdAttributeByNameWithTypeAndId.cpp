@@ -100,18 +100,14 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     LM_W(("Bad Input (entity::type cannot be empty for this request)"));
 
-    TIME_STAT_RENDER_START();
-    answer = parseDataP->dcars.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = parseDataP->dcars.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, ""));
   }
   else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
   {
     parseDataP->dcars.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     LM_W(("Bad Input non-matching entity::types in URL"));
 
-    TIME_STAT_RENDER_START();
-    answer = parseDataP->dcars.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = parseDataP->dcars.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, ""));
   }
   else
   {

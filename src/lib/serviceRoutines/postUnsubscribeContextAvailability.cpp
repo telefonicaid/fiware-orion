@@ -51,13 +51,8 @@ std::string postUnsubscribeContextAvailability
   UnsubscribeContextAvailabilityResponse  ucar;
   std::string                             answer;
 
-  TIME_STAT_MONGO_START();
-  ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, ciP->tenant);
-  TIME_STAT_MONGO_STOP();
-
-  TIME_STAT_RENDER_START();
-  answer = ucar.render(UnsubscribeContextAvailability, ciP->outFormat, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, ciP->tenant));
+  TIMED_RENDER(answer = ucar.render(UnsubscribeContextAvailability, ciP->outFormat, ""));
 
   return answer;
 }

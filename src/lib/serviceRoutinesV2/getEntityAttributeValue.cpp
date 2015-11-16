@@ -72,17 +72,13 @@ std::string getEntityAttributeValue
   {
     ciP->httpStatusCode = SccConflict;
 
-    TIME_STAT_RENDER_START();
-    answer = attribute.render(ciP, EntityAttributeResponse);
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
   }
   else if (attribute.errorCode.error == "NotFound")
   {
     ciP->httpStatusCode = SccContextElementNotFound;
 
-    TIME_STAT_RENDER_START();
-    answer = attribute.render(ciP, EntityAttributeResponse);
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
   }
   else
   {
@@ -98,17 +94,13 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIME_STAT_RENDER_START();
-      answer = attribute.render(ciP, EntityAttributeResponse);
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
     }
     else
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIME_STAT_RENDER_START();
-
-        answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, "");
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, ""));
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {
           answer = "{" + answer + "}";
@@ -117,14 +109,10 @@ std::string getEntityAttributeValue
         {
           answer = "[" + answer + "]";
         }
-
-        TIME_STAT_RENDER_STOP();
       }
       else
       {
-        TIME_STAT_RENDER_START();
-        answer = attribute.pcontextAttribute->toStringValue();
-        TIME_STAT_RENDER_STOP();
+        TIMED_RENDER(answer = attribute.pcontextAttribute->toStringValue());
       }
 
       ciP->outFormat = TEXT;

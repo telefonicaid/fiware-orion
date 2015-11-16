@@ -89,9 +89,7 @@ std::string putAttributeValueInstance
     
     response.fill(SccBadRequest, details);
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP->outFormat, "", false, false);
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
     parseDataP->upcar.res.release();
 
@@ -111,9 +109,7 @@ std::string putAttributeValueInstance
 
 
   // 05. Render result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP->outFormat, "", false, false);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
 
   // 06. Cleanup and return result

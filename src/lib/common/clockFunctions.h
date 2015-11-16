@@ -49,7 +49,7 @@ extern void clock_addtime(struct timespec* accTime, struct timespec* diffTime);
 *
 * clock_subtime - 
 */
-extern void clock_subtime(struct timespec* subtrahend, struct timespec* minuend);
+extern void clock_subtime(struct timespec* subtrahend, const struct timespec* minuend);
 
 #endif  // SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
 

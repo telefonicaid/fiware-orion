@@ -56,18 +56,14 @@ std::string postUpdateContextSubscription
 
   Format  notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
 
-  TIME_STAT_MONGO_START();
-  ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
-                                                       &ucsr,
-                                                       notifyFormat,
-                                                       ciP->tenant,
-                                                       ciP->httpHeaders.xauthToken,
-                                                       ciP->servicePathV);
-  TIME_STAT_MONGO_STOP();
+  TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
+                                                                   &ucsr,
+                                                                   notifyFormat,
+                                                                   ciP->tenant,
+                                                                   ciP->httpHeaders.xauthToken,
+                                                                   ciP->servicePathV));
 
-  TIME_STAT_RENDER_START();
-  answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, ""));
 
   return answer;
 }

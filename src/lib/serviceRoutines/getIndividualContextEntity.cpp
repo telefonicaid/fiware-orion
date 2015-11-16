@@ -113,9 +113,7 @@ std::string getIndividualContextEntity
 
 
   // 5. Render the ContextElementResponse
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP, IndividualContextEntity, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntity, ""));
 
 
   // 6. Cleanup and return result

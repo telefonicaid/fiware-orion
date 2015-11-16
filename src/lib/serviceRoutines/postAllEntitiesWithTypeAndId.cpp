@@ -103,12 +103,12 @@ std::string postAllEntitiesWithTypeAndId
   // 02. Check that the entity is NOT filled in in the payload
   if ((reqP->entity.id != "") || (reqP->entity.type != "") || (reqP->entity.isPattern != ""))
   {
+    std::string  out;
+
     LM_W(("Bad Input (unknown field)"));
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
 
-    TIME_STAT_RENDER_START();
-    std::string  out = response.render(ciP, IndividualContextEntity, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
 
     return out;
   }
@@ -122,9 +122,7 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
 
     parseDataP->acer.res.release();
     return answer;
@@ -136,9 +134,7 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
 
     parseDataP->acer.res.release();
     return answer;
@@ -161,9 +157,7 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 07. Cleanup and return result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP, IndividualContextEntity, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntity, ""));
 
   parseDataP->upcr.res.release();
   response.release();

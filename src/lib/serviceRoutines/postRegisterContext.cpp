@@ -70,9 +70,7 @@ std::string postRegisterContext
     LM_W(("Bad Input (more than one service path for a registration)"));
     rcr.errorCode.fill(SccBadRequest, "more than one service path for notification");
 
-    TIME_STAT_RENDER_START();
-    answer = rcr.render(RegisterContext, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = rcr.render(RegisterContext, ciP->outFormat, ""));
 
     return answer;
   }
@@ -86,20 +84,12 @@ std::string postRegisterContext
   {
     rcr.errorCode.fill(SccBadRequest, res);
 
-    TIME_STAT_RENDER_START();
-    answer = rcr.render(RegisterContext, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(answer = rcr.render(RegisterContext, ciP->outFormat, ""));
     return answer;
   }
 
-  TIME_STAT_MONGO_START();
-  ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
-  TIME_STAT_MONGO_STOP();
-
-  TIME_STAT_RENDER_START();
-  answer = rcr.render(RegisterContext, ciP->outFormat, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]));
+  TIMED_RENDER(answer = rcr.render(RegisterContext, ciP->outFormat, ""));
 
   return answer;
 }

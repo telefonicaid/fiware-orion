@@ -59,23 +59,16 @@ std::string getSubscription
   ngsiv2::Subscription sub;
   std::string          idSub = compV[2];
   OrionError           oe;
+  std::string          out;
 
-  TIME_STAT_MONGO_START();
-  mongoGetSubscription(&sub, &oe,  idSub , ciP->uriParam, ciP->tenant);
-  TIME_STAT_MONGO_STOP();
+  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
 
   if (oe.code != SccOk)
   {
-    TIME_STAT_RENDER_START();
-    std::string out = oe.render(ciP,"");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(out = oe.render(ciP,""));
     return out;
   }
 
-  TIME_STAT_RENDER_START();
-  std::string out = sub.toJson();
-  TIME_STAT_RENDER_STOP();
-
+  TIMED_RENDER(out = sub.toJson());
   return out;
 }

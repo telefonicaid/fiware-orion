@@ -96,10 +96,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP->outFormat, "", false, false);
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
     return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
@@ -108,10 +105,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP->outFormat, "", false, false);
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
     return answer;
   }
 
@@ -129,9 +123,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP->outFormat, "", false, false);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
   parseDataP->upcr.res.release();
 

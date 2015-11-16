@@ -87,17 +87,13 @@ std::string patchEntity
       {
         OrionError orionError(SccContextElementNotFound, "No context element found");
 
-        TIME_STAT_RENDER_START();
-        answer = orionError.render(ciP, "");
-        TIME_STAT_RENDER_STOP();
+        TIMED_RENDER(answer = orionError.render(ciP, ""));
       } 
       else if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code == SccConflict)
       {
         OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
 
-        TIME_STAT_RENDER_START();
-        answer = orionError.render(ciP, "");
-        TIME_STAT_RENDER_STOP();
+        TIMED_RENDER(answer = orionError.render(ciP, ""));
       }
     }
   }
@@ -114,9 +110,7 @@ std::string patchEntity
 
     ciP->httpStatusCode = SccContextElementNotFound;
 
-    TIME_STAT_RENDER_START();
-    answer = orionError.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = orionError.render(ciP, ""));
   }
 
 

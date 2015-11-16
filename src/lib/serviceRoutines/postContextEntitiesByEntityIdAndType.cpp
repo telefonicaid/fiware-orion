@@ -95,9 +95,7 @@ std::string postContextEntitiesByEntityIdAndType
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.registrationId.set("000000000000000000000000");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, ""));
 
     parseDataP->rpr.res.release();
 
@@ -110,9 +108,7 @@ std::string postContextEntitiesByEntityIdAndType
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.registrationId.set("000000000000000000000000");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, ""));
 
     parseDataP->rpr.res.release();
 

@@ -60,6 +60,19 @@
 
 /* ****************************************************************************
 *
+* TIMED_RENDER - 
+*/
+#define TIMED_RENDER(call)   \
+{                            \
+  TIME_STAT_RENDER_START();  \
+  call;                      \
+  TIME_STAT_RENDER_STOP();   \
+}
+
+
+
+/* ****************************************************************************
+*
 * TIME_STAT_MONGO_START - 
 */
 #define TIME_STAT_MONGO_START()                                        \
@@ -83,6 +96,19 @@
     clock_gettime(CLOCK_REALTIME, &mongoEnd);                                     \
     clock_difftime(&mongoEnd, &mongoStart, &threadLastTimeStat.mongoBackendTime); \
   }
+
+
+
+/* ****************************************************************************
+*
+* TIMED_MONGO - 
+*/
+#define TIMED_MONGO(call)   \
+{                           \
+  TIME_STAT_MONGO_START();  \
+  call;                     \
+  TIME_STAT_MONGO_STOP();   \
+}
 
 
 

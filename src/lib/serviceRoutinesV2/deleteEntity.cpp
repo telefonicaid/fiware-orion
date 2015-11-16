@@ -115,9 +115,7 @@ std::string deleteEntity
         oe.reasonPhrase  = sc.reasonPhrase;
       }
 
-      TIME_STAT_RENDER_START();
-      answer = oe.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
+      TIMED_RENDER(answer = oe.render(ciP, ""));
 
       eP->release();
       delete eP;

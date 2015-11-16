@@ -155,9 +155,7 @@ std::string getAttributeValueInstance
 
 
   // 5. Render the ContextAttributeResponse
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP, IndividualContextEntityAttribute, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntityAttribute, ""));
 
 
   // 6. Cleanup and return result

@@ -117,9 +117,8 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   //
   // 2. Render the string of the request we want to forward
   //
-  TIME_STAT_RENDER_START();
-  std::string  payload = qcrP->render(QueryContext, format, "");
-  TIME_STAT_RENDER_STOP();
+  std::string  payload;
+  TIMED_RENDER(payload = qcrP->render(QueryContext, format, ""));
 
   char* cleanPayload = (char*) payload.c_str();;
 
@@ -333,9 +332,7 @@ std::string postQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
 
-  TIME_STAT_MONGO_START();
-  ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP);
-  TIME_STAT_MONGO_STOP();
+  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP));
 
 
   //
@@ -364,9 +361,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    TIME_STAT_RENDER_START();
-    answer = qcrsP->render(ciP, QueryContext, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = qcrsP->render(ciP, QueryContext, ""));
 
     qcrP->release();
     return answer;
@@ -538,9 +533,8 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  TIME_STAT_RENDER_START();
-  answer = responseV.render(ciP, "", details, qcrsP->errorCode.details);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = responseV.render(ciP, "", details, qcrsP->errorCode.details));
+
 
   //
   // Time to cleanup.

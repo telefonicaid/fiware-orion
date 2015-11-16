@@ -75,9 +75,7 @@ std::string getEntityAttribute
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
-  TIME_STAT_RENDER_START();
-  answer = attribute.render(ciP, EntityAttributeResponse);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
 
   if (attribute.errorCode.error == "TooManyResults")
   {

@@ -93,9 +93,7 @@ std::string postAttributeValueInstanceWithTypeAndId
     LM_W(("Bad Input non-matching entity::types in URL"));
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP->outFormat, "", false, false);
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
     parseDataP->upcar.res.release();
     return answer;
@@ -111,9 +109,7 @@ std::string postAttributeValueInstanceWithTypeAndId
     
     response.fill(SccBadRequest, details);
 
-    TIME_STAT_RENDER_START();
-    answer = response.render(ciP->outFormat, "", false, false);
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
     parseDataP->upcar.res.release();
 
@@ -134,9 +130,7 @@ std::string postAttributeValueInstanceWithTypeAndId
 
 
   // 07. Render result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP->outFormat, "", false, false);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
 
   // 08. Cleanup and return result

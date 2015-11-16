@@ -132,9 +132,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
 
 
   // 07. Cleanup and return result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP, RtContextAttributeResponse, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP, RtContextAttributeResponse, ""));
 
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();

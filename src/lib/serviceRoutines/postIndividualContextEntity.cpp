@@ -95,6 +95,7 @@ std::string postIndividualContextEntity
   std::string                   entityTypeFromURL     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string                   entityType;
   std::string                   answer;
+  std::string                   out;
 
 
   //
@@ -109,10 +110,7 @@ std::string postIndividualContextEntity
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
 
-    TIME_STAT_RENDER_START();
-    std::string out = response.render(ciP, IndividualContextEntity, "");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
     return out;
   }  
   entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
@@ -125,10 +123,7 @@ std::string postIndividualContextEntity
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
 
-    TIME_STAT_RENDER_START();
-    std::string out = response.render(ciP, IndividualContextEntity, "");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
     return out;
   }
   entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
@@ -142,10 +137,7 @@ std::string postIndividualContextEntity
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
 
-    TIME_STAT_RENDER_START();
-    std::string out = response.render(ciP, IndividualContextEntity, "");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
     return out;
   }
 
@@ -157,10 +149,7 @@ std::string postIndividualContextEntity
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
 
-    TIME_STAT_RENDER_START();
-    std::string out = response.render(ciP, IndividualContextEntity, "");
-    TIME_STAT_RENDER_STOP();
-
+    TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
     return out;
   }
 
@@ -182,9 +171,7 @@ std::string postIndividualContextEntity
   response.fill(&parseDataP->upcrs.res);
 
   // 05. Cleanup and return result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP, IndividualContextEntity, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntity, ""));
 
   response.release();
   parseDataP->upcr.res.release();

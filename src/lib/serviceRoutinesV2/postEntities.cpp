@@ -87,9 +87,8 @@ std::string postEntities
     ciP->httpStatusCode = SccBadRequest;
     eP->release();
 
-    TIME_STAT_RENDER_START();
-    std::string out = oe.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    std::string out;
+    TIMED_RENDER(out = oe.render(ciP, ""));
 
     return out;
   }
@@ -119,9 +118,7 @@ std::string postEntities
     OrionError oe(SccInvalidModification, "Entity already exists");
     ciP->httpStatusCode = SccInvalidModification;
 
-    TIME_STAT_RENDER_START();
-    answer = oe.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(answer = oe.render(ciP, ""));
   }
 
 

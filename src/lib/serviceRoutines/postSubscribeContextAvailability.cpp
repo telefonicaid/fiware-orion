@@ -53,13 +53,8 @@ std::string postSubscribeContextAvailability
   std::string                           answer;
   Format                                notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
 
-  TIME_STAT_MONGO_START();
-  ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->uriParam, notifyFormat, ciP->tenant);
-  TIME_STAT_MONGO_STOP();
-
-  TIME_STAT_RENDER_START();
-  answer = scar.render(SubscribeContextAvailability, ciP->outFormat, "");
-  TIME_STAT_RENDER_STOP();
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->uriParam, notifyFormat, ciP->tenant));
+  TIMED_RENDER(answer = scar.render(SubscribeContextAvailability, ciP->outFormat, ""));
 
   return answer;
 }

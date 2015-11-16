@@ -81,9 +81,7 @@ std::string postEntity
 
     ciP->httpStatusCode = SccBadRequest;
     
-    TIME_STAT_RENDER_START();
-    res = error.render(ciP, "");
-    TIME_STAT_RENDER_STOP();
+    TIMED_RENDER(res = error.render(ciP, ""));
 
     return res;
   }
@@ -105,11 +103,7 @@ std::string postEntity
       std::string  res;
 
       ciP->httpStatusCode = error.code;
-
-      TIME_STAT_RENDER_START();
-      res = error.render(ciP, "");
-      TIME_STAT_RENDER_STOP();
-
+      TIMED_RENDER(res = error.render(ciP, ""));
       eP->release();
 
       return res;      

@@ -121,9 +121,7 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
 
 
   // 06. Cleanup and return result
-  TIME_STAT_RENDER_START();
-  answer = response.render(ciP->outFormat, "", false, false);
-  TIME_STAT_RENDER_STOP();
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();
