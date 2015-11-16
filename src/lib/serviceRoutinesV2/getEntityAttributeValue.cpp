@@ -106,19 +106,19 @@ std::string getEntityAttributeValue
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
+        TIME_STAT_RENDER_START();
+
         answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, "");
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {
-          TIME_STAT_RENDER_START();
           answer = "{" + answer + "}";
-          TIME_STAT_RENDER_STOP();
         }
         else if (attribute.pcontextAttribute->compoundValueP->isVector())
         {
-          TIME_STAT_RENDER_START();
           answer = "[" + answer + "]";
-          TIME_STAT_RENDER_STOP();
         }
+
+        TIME_STAT_RENDER_STOP();
       }
       else
       {

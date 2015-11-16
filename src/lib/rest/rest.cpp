@@ -491,13 +491,18 @@ static void requestCompleted
   //
   // Flush this requests timing measures onto a global var to be read by "GET /statistics".
   // Also, increment the accumulated measures.
+  //
   if (reqTimeStatistics)
   {
     timeStatSemTake(__FUNCTION__, "updating statistics");
 
     memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
 
+    //
     // "Fix" mongoBackendTime
+    //   Substract times waiting at mongo driver operation (in mongo[Read|Write|Command]WaitTime counters) so mongoBackendTime
+    //   contains at the end the time passed in our logic, i.e. a kind of "self-time" for mongoBackend
+    //
     clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
     clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
     clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);

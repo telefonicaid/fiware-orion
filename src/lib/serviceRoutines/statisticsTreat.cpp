@@ -70,8 +70,6 @@ std::string statisticsTreat
   std::string indent  = "";
   std::string indent2 = "  ";
 
-  LM_M(("In statisticsTreat"));
-
   if (ciP->method == "DELETE")
   {
     noOfJsonRequests                                = -1;

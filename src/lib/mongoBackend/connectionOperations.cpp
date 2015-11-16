@@ -473,7 +473,7 @@ bool collectionCreateIndex
   std::string*        err
 )
 {
-  TIME_STAT_MONGO_WRITE_WAIT_START();
+  TIME_STAT_MONGO_COMMAND_WAIT_START();
   DBClientBase* connection = getMongoConnection();
 
   if (connection == NULL)
@@ -488,7 +488,7 @@ bool collectionCreateIndex
   {
     connection->createIndex(col.c_str(), indexes);
     releaseMongoConnection(connection);
-    TIME_STAT_MONGO_WRITE_WAIT_STOP();
+    TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
 
   }

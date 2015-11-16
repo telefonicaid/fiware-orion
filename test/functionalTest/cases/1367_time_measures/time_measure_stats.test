@@ -425,7 +425,7 @@ Date: REGEX(.*)
 04. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((791|793))
+Content-Length: REGEX((873|875))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -440,6 +440,7 @@ Date: REGEX(.*)
     "timing": {
         "accumulated": {
             "mongoBackend": "REGEX(\d+.\d+)",
+            "mongoCommandWait": "REGEX(\d+.\d+)",
             "mongoReadWait": "REGEX(\d+.\d+)",
             "mongoWriteWait": "REGEX(\d+.\d+)",
             "render": "REGEX(\d+.\d+)",
@@ -448,6 +449,7 @@ Date: REGEX(.*)
         },
         "last": {
             "mongoBackend": "REGEX(\d+.\d+)",
+            "mongoCommandWait": "REGEX(\d+.\d+)",
             "mongoReadWait": "REGEX(\d+.\d+)",
             "mongoWriteWait": "REGEX(\d+.\d+)",
             "render": "REGEX(\d+.\d+)",
@@ -551,7 +553,7 @@ Date: REGEX(.*)
 06. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((854|856))
+Content-Length: REGEX((936|938))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -568,6 +570,7 @@ Date: REGEX(.*)
         "accumulated": {
             "jsonV1Parse": "REGEX(\d+.\d+)",
             "mongoBackend": "REGEX(\d+.\d+)",
+            "mongoCommandWait": "REGEX(\d+.\d+)",
             "mongoReadWait": "REGEX(\d+.\d+)",
             "mongoWriteWait": "REGEX(\d+.\d+)",
             "render": "REGEX(\d+.\d+)",
@@ -577,6 +580,7 @@ Date: REGEX(.*)
         "last": {
             "jsonV1Parse": "REGEX(\d+.\d+)",
             "mongoBackend": "REGEX(\d+.\d+)",
+            "mongoCommandWait": "REGEX(\d+.\d+)",
             "mongoReadWait": "REGEX(\d+.\d+)",
             "mongoWriteWait": "REGEX(\d+.\d+)",
             "render": "REGEX(\d+.\d+)",
@@ -602,7 +606,7 @@ Date: REGEX(.*)
 08. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((890|892))
+Content-Length: REGEX((972|974))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -620,6 +624,7 @@ Date: REGEX(.*)
             "jsonV1Parse": "REGEX(\d+.\d+)",
             "jsonV2Parse": "REGEX(\d+.\d+)",
             "mongoBackend": "REGEX(\d+.\d+)",
+            "mongoCommandWait": "REGEX(\d+.\d+)",
             "mongoReadWait": "REGEX(\d+.\d+)",
             "mongoWriteWait": "REGEX(\d+.\d+)",
             "render": "REGEX(\d+.\d+)",
@@ -629,6 +634,7 @@ Date: REGEX(.*)
         "last": {
             "jsonV2Parse": "REGEX(\d+.\d+)",
             "mongoBackend": "REGEX(\d+.\d+)",
+            "mongoCommandWait": "REGEX(\d+.\d+)",
             "mongoReadWait": "REGEX(\d+.\d+)",
             "mongoWriteWait": "REGEX(\d+.\d+)",
             "render": "REGEX(\d+.\d+)",
