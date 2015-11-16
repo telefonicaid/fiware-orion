@@ -456,7 +456,7 @@ std::string statisticsTreat
   }
 
   {
-    int noOfDroppedNotifications = __sync_fetch_and_add(&noOfDroppedNotifications,0);
+    int noOfDroppedNotifications = __sync_fetch_and_add(&noOfDroppedNotifications, 0);
     if (noOfDroppedNotifications != -1)
     {
       // Given that the noOfDroppedNotifications starts at -1, a +1 adjustement is needed
