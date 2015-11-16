@@ -195,7 +195,6 @@ class NGSI:
         for i in range(int(entities_contexts["entities_number"])):
             # verify if the entity is stored in mongo
             if stored:
-                #for entity in curs_list:  # manages N entities
                 __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
                 assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
                 entity = curs_list[i]  # manages N entities
@@ -559,3 +558,24 @@ class NGSI:
                 assert str(type(attribute)) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type and ' \
                     'without metadatas' % (str(attribute), field_type)
+
+    def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers):
+        """
+        verify if the attribute has been deleted
+        :param entity_context:
+        :param headers:
+        """
+        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
+
+        # verify entities
+        __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
+        for i in range(int(entities_contexts["entities_number"])):
+            # verify if the entity is stored in mongo
+            __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
+            __logger__.debug("attribute name to verify: %s" % entities_contexts["attributes_name"])
+            assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
+            entity = curs_list[i]  # manages N entities
+            assert entities_contexts["attributes_name"] not in entity["attrNames"], " ERROR - the attribute: %s exists in the entity No: %s" % \
+                                                                                (entities_contexts["attributes_name"], str(i+1))
+        mongo_driver.disconnect()
+
