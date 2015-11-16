@@ -52,8 +52,10 @@
 #define TIME_STAT_RENDER_STOP()                                                   \
   if (reqTimeStatistics)                                                          \
   {                                                                               \
+    struct timespec diff;                                                         \
     clock_gettime(CLOCK_REALTIME, &renderEnd);                                    \
-    clock_difftime(&renderEnd, &renderStart, &threadLastTimeStat.renderTime);     \
+    clock_difftime(&renderEnd, &renderStart, &diff);                              \
+    clock_addtime(&threadLastTimeStat.renderTime, &diff);                         \
   }
 
 
@@ -93,8 +95,10 @@
 #define TIME_STAT_MONGO_STOP()                                                    \
   if (reqTimeStatistics)                                                          \
   {                                                                               \
+    struct timespec diff;                                                         \
     clock_gettime(CLOCK_REALTIME, &mongoEnd);                                     \
-    clock_difftime(&mongoEnd, &mongoStart, &threadLastTimeStat.mongoBackendTime); \
+    clock_difftime(&mongoEnd, &mongoStart, &diff);                                \
+    clock_addtime(&threadLastTimeStat.mongoBackendTime, &diff);                   \
   }
 
 
@@ -131,11 +135,13 @@
 *
 * TIME_STAT_MONGO_READ_WAIT_STOP - 
 */
-#define TIME_STAT_MONGO_READ_WAIT_STOP()                                                           \
-  if (reqTimeStatistics)                                                                           \
-  {                                                                                                \
-    clock_gettime(CLOCK_REALTIME, &mongoReadWaitEnd);                                              \
-    clock_difftime(&mongoReadWaitEnd, &mongoReadWaitStart, &threadLastTimeStat.mongoReadWaitTime); \
+#define TIME_STAT_MONGO_READ_WAIT_STOP()                                \
+  if (reqTimeStatistics)                                                \
+  {                                                                     \
+    struct timespec diff;                                               \
+    clock_gettime(CLOCK_REALTIME, &mongoReadWaitEnd);                   \
+    clock_difftime(&mongoReadWaitEnd, &mongoReadWaitStart, &diff);      \
+    clock_addtime(&threadLastTimeStat.mongoReadWaitTime, &diff);        \
   }
 
 
@@ -159,11 +165,13 @@
 *
 * TIME_STAT_MONGO_WRITE_WAIT_STOP - 
 */
-#define TIME_STAT_MONGO_WRITE_WAIT_STOP()                                                             \
-  if (reqTimeStatistics)                                                                              \
-  {                                                                                                   \
-    clock_gettime(CLOCK_REALTIME, &mongoWriteWaitEnd);                                                \
-    clock_difftime(&mongoWriteWaitEnd, &mongoWriteWaitStart, &threadLastTimeStat.mongoWriteWaitTime); \
+#define TIME_STAT_MONGO_WRITE_WAIT_STOP()                             \
+  if (reqTimeStatistics)                                              \
+  {                                                                   \
+    struct timespec diff;                                             \
+    clock_gettime(CLOCK_REALTIME, &mongoWriteWaitEnd);                \
+    clock_difftime(&mongoWriteWaitEnd, &mongoWriteWaitStart, &diff);  \
+    clock_addtime(&threadLastTimeStat.mongoWriteWaitTime, &diff);     \
   }
 
 
@@ -187,11 +195,13 @@
 *
 * TIME_STAT_MONGO_COMMAND_WAIT_STOP - 
 */
-#define TIME_STAT_MONGO_COMMAND_WAIT_STOP()                                                                 \
-  if (reqTimeStatistics)                                                                                    \
-  {                                                                                                         \
-    clock_gettime(CLOCK_REALTIME, &mongoCommandWaitEnd);                                                    \
-    clock_difftime(&mongoCommandWaitEnd, &mongoCommandWaitStart, &threadLastTimeStat.mongoCommandWaitTime); \
+#define TIME_STAT_MONGO_COMMAND_WAIT_STOP()                              \
+  if (reqTimeStatistics)                                                 \
+  {                                                                      \
+    struct timespec diff;                                                \
+    clock_gettime(CLOCK_REALTIME, &mongoCommandWaitEnd);                 \
+    clock_difftime(&mongoCommandWaitEnd, &mongoCommandWaitStart, &diff); \
+    clock_addtime(&threadLastTimeStat.mongoCommandWaitTime, &diff);      \
   }
 
 
