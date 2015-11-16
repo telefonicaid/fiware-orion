@@ -112,6 +112,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   params->format        = format;
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
+  clock_gettime(CLOCK_REALTIME, &params->timeStamp);
   bool enqueued = pQueue->try_push(params);
   if (!enqueued)
   {

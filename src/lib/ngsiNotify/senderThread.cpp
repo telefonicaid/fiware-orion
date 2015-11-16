@@ -74,7 +74,7 @@ void* startSenderThread(void* p)
     else
     {
       LM_T(LmtNotifier, ("notificationMode is 'none', skipping outgoing request"));
-      ++noOfDroppedNotifications;
+      __sync_fetch_and_add(&noOfDroppedNotifications, 1);
     }
 
     /* Delete the parameters after using them */

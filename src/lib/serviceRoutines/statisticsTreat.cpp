@@ -455,10 +455,13 @@ std::string statisticsTreat
     out += TAG_ADD_COUNTER("subCacheRemovalFailures", noOfSubCacheRemovalFailures);
   }
 
-  if (noOfDroppedNotifications != -1)
   {
-    // Given that the noOfDroppedNotifications starts at -1, a +1 adjustement is needed
-    out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications + 1);
+    int noOfDroppedNotifications = __sync_fetch_and_add(&noOfDroppedNotifications, 0);
+    if (noOfDroppedNotifications != -1)
+    {
+      // Given that the noOfDroppedNotifications starts at -1, a +1 adjustement is needed
+      out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications + 1);
+    }
   }
 
   if (semTimeStatistics)
@@ -521,7 +524,13 @@ std::string statisticsTreat
     out += TAG_ADD_INTEGER("noOfNotificationsQueueOut", QueueStatistics::getOut(), true);
     out += TAG_ADD_INTEGER("noOfNotificationsQueueReject", QueueStatistics::getReject(), true);
     out += TAG_ADD_INTEGER("noOfNotificationsQueueSentOK", QueueStatistics::getSentOK(), true);
-    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentError", QueueStatistics::getSentError(), false);
+    out += TAG_ADD_INTEGER("noOfNotificationsQueueSentError", QueueStatistics::getSentError(), true);
+
+    char queueTime[64];
+    QueueStatistics::getTimeInQ(queueTime, sizeof(queueTime));
+    out += TAG_ADD_STRING("notificationQueueTimeInQueue", queueTime);
+
+    out += TAG_ADD_INTEGER("notificationQueueSizeSnapshot", QueueStatistics::getQSize(), false);
   }
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;

@@ -27,6 +27,7 @@
 
 #include <pthread.h>
 
+#include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -74,9 +75,18 @@ static void *workerFunc(void* pSyncQ)
 
   for (;;)
   {
-    SenderThreadParams *params =  queue->pop();
+    SenderThreadParams* params = queue->pop();
+    struct timespec     now;
+    struct timespec     howlong;
+    size_t              estimatedQSize;
 
     QueueStatistics::incOut();
+    clock_gettime(CLOCK_REALTIME, &now);
+    clock_difftime(&now, &params->timeStamp, &howlong);
+    estimatedQSize = queue->size();
+    QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
+
+
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
     LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
