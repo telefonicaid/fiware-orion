@@ -129,7 +129,7 @@ def delete_database_in_mongo(context):
 
 # ------------------------------------- validations ----------------------------------------------
 
-@step(u'verify that receive an "([^"]*)" http code')
+@step(u'verify that receive a? "([^"]*)" http code')
 def verify_that_receive_an_http_code(context, http_code):
     """
     verify that receive an http code

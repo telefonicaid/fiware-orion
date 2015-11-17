@@ -68,7 +68,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | parameter       | value                                  |
       | entities_number | the same value of the previous request |
     Then verify that receive several "No Content" http code
-    And verify that the attribute is deleted into mongo
+    And verify that the attribute is deleted into mongo in the several entities
 
   # ------------------------ Service ----------------------------------------------
 
@@ -93,7 +93,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
     And verify that receive several "Created" http code
     And verify that entities are stored in mongo
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "No Content" http code
+    Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
       | service            |
@@ -124,7 +124,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
     And verify that receive several "Created" http code
     And verify that entities are stored in mongo
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "No Content" http code
+    Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
 
   @service_delete_error
@@ -135,8 +135,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                                                                                                                                         |
       | error       | BadRequest                                                                                                                                    |
       | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
@@ -173,7 +173,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
     And verify that receive several "Created" http code
     And verify that entities are stored in mongo
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "No Content" http code
+    Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
       | service_path                                                  |
@@ -207,7 +207,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
     And verify that receive several "Created" http code
     And verify that entities are stored in mongo
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "No Content" http code
+    Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
 
   @service_path_delete_error
@@ -218,8 +218,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | <service_path>                 |
       | Content-Type       | application/json               |
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                                                    |
       | error       | BadRequest                                               |
       | description | a component of ServicePath contains an illegal character |
@@ -240,8 +240,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | <service_path>                 |
       | Content-Type       | application/json               |
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                                                                    |
       | error       | BadRequest                                                               |
       | description | Only /absolute/ Service Paths allowed [a service path must begin with /] |
@@ -258,8 +258,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | <service_path>                  |
       | Content-Type       | application/json                |
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                                  |
       | error       | BadRequest                             |
       | description | component-name too long in ServicePath |
@@ -276,8 +276,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | max length allowed and eleven levels |
       | Content-Type       | application/json                     |
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                              |
       | error       | BadRequest                         |
       | description | too many components in ServicePath |
@@ -305,7 +305,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
     And verify that receive several "Created" http code
     And verify that entities are stored in mongo
     When delete an attribute "temperature_0" in entities with id "the same value of the previous request"
-    Then verify that receive several "No Content" http code
+    Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
       | entity_type | entity_id  |
@@ -337,8 +337,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
     When delete an attribute "temperature_0" in entities with id "dsfsdfds"
-    Then verify that receive several "Not Found" http code
-    And verify several error responses
+    Then verify that receive a "Not Found" http code
+    And verify an error response
       | parameter   | value                                                      |
       | error       | NotFound                                                   |
       | description | The requested entity has not been found. Check type and id |
@@ -365,8 +365,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | attributes_value | 45          |
     And verify that receive several "Created" http code
     When delete an attribute "temperature_0" in entities with id "room"
-    Then verify that receive several "Conflict" http code
-    And verify several error responses
+    Then verify that receive a "Conflict" http code
+    And verify an error response
       | parameter   | value                                                                          |
       | error       | TooManyResults                                                                 |
       | description | There is more than one entity that match the delete. Please refine your query. |
@@ -379,8 +379,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
     When delete an attribute "temperature_0" in entities with id "<entity_id>"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                    |
       | error       | BadRequest               |
       | description | invalid character in URI |
@@ -418,7 +418,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
     And verify that receive several "Created" http code
     And verify that entities are stored in mongo
     When delete an attribute "the same value of the previous request" in entities with id "room"
-    Then verify that receive several "No Content" http code
+    Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
       | attributes_name |
@@ -459,8 +459,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
     When delete an attribute "wrwerwerw" in entities with id "room"
-    Then verify that receive several "Not Found" http code
-    And verify several error responses
+    Then verify that receive a "Not Found" http code
+    And verify an error response
       | parameter   | value               |
       | error       | NotFound            |
       | description | Attribute not found |
@@ -473,8 +473,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
     When delete an attribute "<attributes_name>" in entities with id "<entity_id>"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                    |
       | error       | BadRequest               |
       | description | invalid character in URI |
@@ -498,8 +498,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
     When delete an attribute "<attributes_name>" in entities with id "<entity_id>"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value                    |
       | error       | BadRequest               |
       | description | invalid character in URI |
@@ -530,8 +530,8 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
     When delete an attribute "" in entities with id "room"
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
       | parameter   | value             |
       | error       | BadRequest        |
       | description | service not found |

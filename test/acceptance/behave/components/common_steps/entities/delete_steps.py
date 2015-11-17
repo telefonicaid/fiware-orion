@@ -64,13 +64,18 @@ def delete_an_attribute_in_entities_with_id(context, attribute_name, entity_id):
     :param attribute_name: attribute name to delete
     """
     __logger__.debug("Deleting an attribute in entities...")
-    context.resp_list = context.cb.delete_entities_by_id(context, entity_id, attribute_name)
+     # if delete a single attribute in several entities a response list is returned, else only one response is returned.
+    resp_temp = context.cb.delete_entities_by_id(context, entity_id, attribute_name)
+    if len(resp_temp) > 1:
+        context.resp_list = resp_temp
+    else:
+        context.resp = resp_temp[0]
     __logger__.info("...attribute is deleted")
 
 
 # ------------------------- verification steps ----------------------------
 
-
+@step(u'verify that the attribute is deleted into mongo in the several entities')
 @step(u'verify that the attribute is deleted into mongo')
 def verify_that_the_attribute_is_deleted_into_mongo(context):
     """
