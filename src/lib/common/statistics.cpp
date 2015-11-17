@@ -144,6 +144,8 @@ int noOfSubscriptionsRequest                             = -1;
 int noOfIndividualSubscriptionRequest                    = -1;
 int noOfDroppedNotifications                             = -1;
 
+
+
 /* ****************************************************************************
 *
 * statisticsUpdate - 
