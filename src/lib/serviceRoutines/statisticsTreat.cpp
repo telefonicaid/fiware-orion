@@ -141,7 +141,7 @@ std::string statisticsTreat
     noOfSubCacheLookups                             = -1;
     noOfSubCacheRemovals                            = -1;
     noOfSubCacheRemovalFailures                     = -1;
-    noOfDroppedNotifications                        = -1;
+    noOfSimulatedNotifications                      = -1;
 
     semTimeReqReset();
     semTimeTransReset();
@@ -455,14 +455,6 @@ std::string statisticsTreat
     out += TAG_ADD_COUNTER("subCacheRemovalFailures", noOfSubCacheRemovalFailures);
   }
 
-  {
-    int noOfDroppedNotifications = __sync_fetch_and_add(&noOfDroppedNotifications, 0);
-    if (noOfDroppedNotifications != -1)
-    {
-      // Given that the noOfDroppedNotifications starts at -1, a +1 adjustement is needed
-      out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications + 1);
-    }
-  }
 
   if (semTimeStatistics)
   {
@@ -531,6 +523,13 @@ std::string statisticsTreat
     out += TAG_ADD_STRING("notificationQueueTimeInQueue", queueTime);
 
     out += TAG_ADD_INTEGER("notificationQueueSizeSnapshot", QueueStatistics::getQSize(), false);
+  }
+  {
+    int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
+    if (nSimNotif != -1)
+    {
+      out += TAG_ADD_COUNTER("noOfSimulatedNotifications", nSimNotif);
+    }
   }
 
   indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;

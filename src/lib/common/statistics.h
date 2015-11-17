@@ -109,7 +109,7 @@ extern int noOfSubCacheLookups;
 extern int noOfSubCacheRemovals;
 extern int noOfSubCacheRemovalFailures;
 
-extern int noOfDroppedNotifications;
+extern int noOfSimulatedNotifications;
 
 /* ****************************************************************************
 *

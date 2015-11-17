@@ -60,10 +60,11 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-corsOrigin' <CORS allowed origin. use '__ALL' for any>]
                       [option '-cprForwardLimit' <maximum number of forwarded requests to Context Providers for a single client request>]
                       [option '-subCacheIval' <interval in seconds between calls to Subscription Cache refresh (0: no refresh)>]
-                      [option '-notificationMode' <notification mode (persistent|transient|none)>]
                       [option '-noCache' (disable subscription cache for lookups)]
                       [option '-connectionMemory' <maximum memory size per connection (in kilobytes)>]
                       [option '-maxConnections' <maximum number of simultaneous connections>]
                       [option '-reqPoolSize' <size of thread pool for incoming connections>]
+                      [option '-notificationMode' <notification mode (persistent|transient|threadpool:q:n)>]
+                      [option '-simulatedNotification' (drop outgoing notifications (testing))]
 
 --TEARDOWN--

@@ -253,6 +253,7 @@ bool            noCache;
 unsigned int    connectionMemory;
 unsigned int    maxConnections;
 unsigned int    reqPoolSize;
+bool            simulatedNotification;
 
 
 
@@ -291,12 +292,12 @@ unsigned int    reqPoolSize;
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
-#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
+#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
 #define NO_CACHE               "disable subscription cache for lookups"
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
-
+#define DROP_NOTIF_DESC        "drop outgoing notifications (testing)"
 
 
 /* ****************************************************************************
@@ -348,11 +349,13 @@ PaArgument paArgs[] =
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,              0,     3600,     SUB_CACHE_IVAL_DESC    },
-  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
+
+  { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
+  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, DROP_NOTIF_DESC        },
 
   PA_END_OF_ARGS
 };
@@ -1506,7 +1509,7 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   }
   else if (!(
              flds_num == 1 &&
-             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0 || strcmp(mode, "none") == 0)
+             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0)
              ))
   {
     LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
@@ -1720,9 +1723,9 @@ int main(int argC, char* argV[])
   }
 
   LM_I(("Startup completed"));
-  if (strcmp(notificationMode, "none") == 0)
+  if (simulatedNotification)
   {
-    LM_W(("notification mode 'none'"));
+    LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
   while (1)
