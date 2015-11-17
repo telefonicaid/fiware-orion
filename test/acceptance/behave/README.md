@@ -223,6 +223,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |**entities folder**                                                                                                                                       |
 | create_entity                               |    580       | POST    | /v2/entities/                                        | Yes       | No             |    
 | list_entities                               |    200       | GET     | /v2/entities/                                        | No        | Yes            |
+|                                                                                                                                                          |
 | update_or_append_entity_attributes          |    766       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
 | retrieve_entity                             |    209       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
 | replace_all_entity_attributes               |    560       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | No             |  
@@ -232,7 +233,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |**attributes folder**                                                                                                                                     |
 | get_attribute_data                          |    218       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |   
 | update_attribute_data                       |    607       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | No             |
-| remove_a_single_attribute                   |  (pending)   | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
+| remove_a_single_attribute                   |     95       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
 |                                                                                                                                                          |
 |**attributes_value folder**                                                                                                                               |
 | get_attribute_value                         |  (pending)   | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  

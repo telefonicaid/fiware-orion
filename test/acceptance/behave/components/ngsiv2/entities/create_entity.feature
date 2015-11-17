@@ -72,35 +72,35 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @already_exist @BUG_1158
+  @already_exists_1 @BUG_1158
   Scenario:  try  to create an entity using NGSI v2 but this entity already exists with only entity id
     Given  a definition of headers
-      | parameter      | value              |
-      | Fiware-Service | test_already_exist |
-      | Content-Type   | application/json   |
-    And create "1" entities with "2" attributes
-      | parameter        | value       |
-      | entities_id      | room2       |
-      | attributes_name  | temperature |
-      | attributes_value | 56          |
-    And verify that receive several "Created" http code
+      | parameter      | value               |
+      | Fiware-Service | test_already_exists |
+      | Content-Type   | application/json    |
     When create "1" entities with "2" attributes
       | parameter        | value       |
       | entities_id      | room2       |
       | attributes_name  | temperature |
       | attributes_value | 34          |
+    And verify that receive several "Created" http code
+    And create "1" entities with "2" attributes
+      | parameter        | value       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 56          |
     Then verify that receive several "Unprocessable Entity" http code
     And verify several error responses
       | parameter   | value                 |
       | error       | InvalidModification   |
       | description | Entity already exists |
 
-  @already_exist @BUG_1158
+  @already_exists_2 @BUG_1158
   Scenario:  try  to create an entity using NGSI v2 but this entity already exists with entity id and type
     Given  a definition of headers
-      | parameter      | value              |
-      | Fiware-Service | test_already_exist |
-      | Content-Type   | application/json   |
+      | parameter      | value               |
+      | Fiware-Service | test_already_exists |
+      | Content-Type   | application/json    |
     And create "1" entities with "2" attributes
       | parameter        | value       |
       | entities_id      | room2       |
@@ -120,13 +120,13 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | InvalidModification   |
       | description | Entity already exists |
 
-  @already_exist @BUG_1158
+  @already_exists_3 @BUG_1158
   Scenario:  try  to create an entity using NGSI v2 but this entity already exists with entity id and type and service_path
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_already_exist |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value               |
+      | Fiware-Service     | test_already_exists |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
     And create "1" entities with "2" attributes
       | parameter        | value       |
       | entities_id      | room2       |
