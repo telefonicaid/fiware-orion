@@ -317,10 +317,10 @@ EOF
 
 The updateContext request payload contains a list of contextElement
 elements. Each contextElement is associated to an entity (whose
-identification is provided in the entityId element, in this case we
-provide the identification for Room1) and contains a list of
-attributes elements . Each contextAttribute provides the value 
-for a given attribute (identified by name and type) of the entity. 
+identification is provided by the id, type and isPattern fields, in this case
+we provide the identification for Room1) and contains  an attribute vector 
+with a list of attributes. Each element in the attributes list provides 
+the value for a given attribute (identified by name) of the entity. 
 Apart from the list of contextElement elements, the payload includes
 also an updateAction element. We use APPEND, which means that we want 
 to add new information.
@@ -988,8 +988,8 @@ EOF
 
 Let's examine in detail the different elements included in the payload:
 
--   entities and attributes for short, in JSON) define which context 
-    elements will be included in  the notification message. 
+-   entities and attributes define which context elements will be included
+    in the notification message. 
     In this example, we are specifying that the notification has to include 
     the temperature attribute for entity Room1.
 -   The callback URL to send notifications is defined with the
@@ -1211,14 +1211,14 @@ one used in ONTIMEINTERVAL, with two exceptions:
     [Update context elements](#update-context-elements) trigger
     the notification. The rule is that if at least one of the attributes
     in the list changes (e.g. some kind of "OR" condition), then a
-    notification is sent. But note that that notification includes the
-    attributes in the attributeList part, which doesn't necessarily
+    notification is sent. But note  that notification includes the
+    attributes in the attribute vector, which doesn't necessarily
     include any attribute in the condValue. For example, in this case,
     when Room1 pressure changes the Room1 temperature value is notified,
     but not pressure itself. If you want also pressure to be notified,
     the request would need to include
-    &lt;attribute&gt;pressure&lt;/attribute&gt; within the attributeList
-    (or to use an empty attributeList, which you already know means "all
+    &lt;attribute&gt;pressure&lt;/attribute&gt; within the attribute vector
+    (or to use an empty attribute vector, which you already know means "all
     the attributes in the entity"). Now, this example here, to be
     notified of the value of *temperature* each time the value of
     *pressure* changes may not be too useful. The example is chosen this
@@ -1496,7 +1496,7 @@ differences:
     operation requests.
 -   The payload of requests and responses in convenience operations are
     very similar to the ones used in standard operations, since
-    contextAttributeList and contextResponseList elements are the same.
+    contextAttribute and contextResponse  elements are the same.
 -   You can replace
     "Room1" by "/type/Room/id/Room1" in the URl to define the type (in
     general: "/type/<type>/id/<id>").
@@ -2130,7 +2130,7 @@ differences:
     operation requests.
 -   The payload of request and response in convenience operations are
     very similar to the ones used in standard operations, the
-    contextAttributeList and contextResponseList elements are the same.
+    contextAttributeList and contextResponse elements are the same.
 -   You can replace
     "Room1" by "/type/Room/id/Room1" in the URl to define the type (in
     general: "/type/<type>/id/<id>").
@@ -2704,7 +2704,7 @@ that match the entity/attribute used in
 subscribeContextAvailability request. That is, the registration
 corresponding to Room1 and Room2 temperature. Note that, although Room1
 and Room2 registered two attributes (temperature and pressure) only
-temperature is shown, as the attributeList in
+temperature is shown, as the attribute vector in
 subscribeContextAvailability only includes temperature.
 
 The NGSI specification is not clear on if an initial
@@ -2790,7 +2790,7 @@ Content-Type: application/json
 We can also check that context registrations not matching the
 subscription doesn't trigger any notifications. For example, let's
 register a room (Room4) with only attribute pressure (remember that the
-subscription only includes temperature in attributeList).
+subscription only includes temperature in attribute vector).
 
 ``` 
 (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
@@ -2828,7 +2828,7 @@ updated (using the NGSI9 updateContextAvailabilitySubscription). The
 request includes the *subscriptionId* that identifies the subscription
 to modify, and the actual update payload. For example, let's change
 subscription entities to something completely different: cars instead of
-rooms and all the attributes are removed (i.e. an empty attributeList
+rooms and all the attributes are removed (i.e. an empty attribute 
 element). As always you have to replace the *subscriptionId* value after
 copy-pasting with the value you got from the
 subscribeContextAvailability response in the previous step).
