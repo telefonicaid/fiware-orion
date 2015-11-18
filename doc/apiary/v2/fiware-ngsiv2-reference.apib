@@ -1124,11 +1124,13 @@ use cases of this functionality is the association of Context Providers.
 
 A context registration is represented by a JSON object with the following fields:
 
-+ `id`: Unique identifier assigned to the registration. Automatically created at creation time.
-+ `subject` : It s an object that describes the subject of the registration.
-+ `callback` : URL pointing to the service which is registered. In the case of a Context Provider
-corresponds to the URL of the provider service.
-+ `duration`: Duration of the registration in ISO8601 format. Default duration is infinite.
++ `id`       : Unique identifier assigned to the registration. Automatically generated at creation time.
++ `subject`  : It is an object that describes the subject of the registration.
++ `callback` : URL which denotes the end point of the registered service. It is optional, as it can be
+undefined under certain conditions, for instance, transient unavailability of the provider.
++ `metadata` : An optional JSON object which allows to associate extra metadata properties to the registration.
+It must follow the same representation conventions as context attribute metadata (See JSON Attribute Representation). 
++ `duration` : Duration of the registration in ISO8601 format. Default duration is infinite.
 
 A `subject` contains the following subfields:
 
@@ -1164,7 +1166,17 @@ Response:
                         "temperature"
                     ]
                 },
-                "callback": "http://localhost:1234",               
+                "callback": "http://weather.example.com/ngsi",
+                "metadata": {
+                    "providingService": {
+                       "value": "weather.example.com",
+                       "type": null
+                     },
+                    "providingAuthority": {
+                       "value": "AEMET - Spain",
+                       "type": null
+                     }
+                },
                 "duration": "PT1M"
             }
         ]
@@ -1194,6 +1206,11 @@ Response:
                 ]
             },
             "callback":  "http://localhost:1234",
+            "metadata" : {
+                "provider": {
+                   "value": "example.com"
+                }
+            },
             "duration": "PT1M"
         }
 
