@@ -8,3 +8,4 @@
 - Fix: wrong notification values (duplicated) when triggering update context operations are too close (race condition)
 - Fix: A bug in the request reading logic that may cause unexpected Parse Errors or even SIGSEGVs
 - Fix: Semaphore releasing bug in unsubscribeContext when subscription ID is the empty string (Issue #1488)
+- Add: Simulated/drop notifications mode is now orthogonal to -notificationMode (Issue #1505)
