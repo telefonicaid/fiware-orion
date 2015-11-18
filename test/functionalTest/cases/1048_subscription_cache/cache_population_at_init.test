@@ -252,23 +252,21 @@ Date: REGEX(.*)
 06. Statistics in JSON
 ======================
 HTTP/1.1 200 OK
-Content-Length: REGEX((391|393))
+Content-Length: REGEX((353|355))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "measuring_interval_in_secs": "REGEX(1?\d)",
-        "statisticsRequests": "2",
-        "subCache": "REGEX([0-9a-f, ]{76})",
-        "subCacheInserts": "3",
-        "subCacheItems": "3",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "uptime_in_secs": "REGEX(1?\d)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "measuring_interval_in_secs": "REGEX(1?\d)",
+    "statisticsRequests": "2",
+    "subCache": "REGEX([0-9a-f, ]{76})",
+    "subCacheInserts": "3",
+    "subCacheItems": "3",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "uptime_in_secs": "REGEX(1?\d)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 

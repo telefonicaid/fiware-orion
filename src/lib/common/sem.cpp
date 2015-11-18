@@ -42,6 +42,7 @@
 static sem_t           reqSem;
 static sem_t           transSem;
 static sem_t           cacheSem;
+static sem_t           timeStatSem;
 static SemRequestType  reqPolicy;
 
 
@@ -50,9 +51,10 @@ static SemRequestType  reqPolicy;
 *
 * Time measuring variables - 
 */
-static struct timespec accReqSemTime   = { 0, 0 };
-static struct timespec accTransSemTime = { 0, 0 };
-static struct timespec accCacheSemTime = { 0, 0 };
+static struct timespec accReqSemTime      = { 0, 0 };
+static struct timespec accTransSemTime    = { 0, 0 };
+static struct timespec accCacheSemTime    = { 0, 0 };
+static struct timespec accTimeStatSemTime = { 0, 0 };
 
 
 
@@ -85,6 +87,12 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
   if (sem_init(&cacheSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'cache' semaphore: %s)", strerror(errno)));
+    return -1;
+  }
+
+  if (sem_init(&timeStatSem, shared, takenInitially) == -1)
+  {
+    LM_E(("Runtime Error (error initializing 'timeStat' semaphore: %s)", strerror(errno)));
     return -1;
   }
 
@@ -221,6 +229,24 @@ void semTimeCacheGet(char* buf, int bufLen)
 
 /* ****************************************************************************
 *
+* semTimeTimeStatGet - get accumulated trans semaphore waiting time
+*/
+void semTimeTimeStatGet(char* buf, int bufLen)
+{
+  if (semTimeStatistics) 
+  {
+    snprintf(buf, bufLen, "%lu.%09d", accTimeStatSemTime.tv_sec, (int) accTimeStatSemTime.tv_nsec);
+  }
+  else
+  {
+    snprintf(buf, bufLen, "Disabled");
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * semTimeReqReset - 
 */
 void semTimeReqReset(void)
@@ -251,6 +277,18 @@ void semTimeCacheReset(void)
 {
   accCacheSemTime.tv_sec  = 0;
   accCacheSemTime.tv_nsec = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* semTimeTimeStatReset - 
+*/
+void semTimeTimeStatReset(void)
+{
+  accTimeStatSemTime.tv_sec  = 0;
+  accTimeStatSemTime.tv_nsec = 0;
 }
 
 
@@ -389,6 +427,63 @@ int cacheSemGive(const char* who, const char* what)
 
   return sem_post(&cacheSem);
 }
+
+
+
+/* ****************************************************************************
+*
+* timeStatSemTake -
+*/
+int timeStatSemTake(const char* who, const char* what)
+{
+  int r;
+
+  LM_T(LmtTimeStatSem, ("%s taking the 'timeStat' semaphore for '%s'", who, what));
+
+  struct timespec startTime;
+  struct timespec endTime;
+  struct timespec diffTime;
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &startTime);
+  }
+
+  r = sem_wait(&timeStatSem);
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &endTime);
+
+    clock_difftime(&endTime, &startTime, &diffTime);
+    clock_addtime(&accTimeStatSemTime, &diffTime);
+  }
+
+  LM_T(LmtTimeStatSem, ("%s has the 'timeStat' semaphore", who));
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
+* timeStatSemGive -
+*/
+int timeStatSemGive(const char* who, const char* what)
+{
+  if (what != NULL)
+  {
+    LM_T(LmtTimeStatSem, ("%s gives the 'timeStat' semaphore for '%s'", who, what));
+  }
+  else
+  {
+    LM_T(LmtTimeStatSem, ("%s gives the 'timeStat' semaphore", who));
+  }
+
+  return sem_post(&timeStatSem);
+}
+
 
 
 /* ****************************************************************************

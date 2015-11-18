@@ -43,7 +43,7 @@ echo
 --REGEXPECT--
 +++++ 1. statistics in XML
 HTTP/1.1 200 OK
-Content-Length: 392
+Content-Length: REGEX((392|394))
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -63,22 +63,20 @@ Date: REGEX(.*)
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: REGEX((258|260))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "measuring_interval_in_secs": "REGEX(1?\d)",
-        "statisticsRequests": "2",
-        "subCacheInserts": "0",
-        "subCacheItems": "0",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "uptime_in_secs": "REGEX(1?\d)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "measuring_interval_in_secs": "REGEX(1?\d)",
+    "statisticsRequests": "2",
+    "subCacheInserts": "0",
+    "subCacheItems": "0",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "uptime_in_secs": "REGEX(1?\d)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 --TEARDOWN--

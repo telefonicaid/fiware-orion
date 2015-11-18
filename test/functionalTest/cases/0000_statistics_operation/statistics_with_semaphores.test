@@ -25,7 +25,7 @@ statistics
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -mutexTimeStat
+brokerStart CB 0 IPv4 -mutexTimeStat -reqTimeStat
 
 --SHELL--
 # curl localhost:${CB_PORT}/statistics 2> /dev/null | xmllint --format -
@@ -43,7 +43,7 @@ echo
 --REGEXPECT--
 +++++ 1. statistics in XML
 HTTP/1.1 200 OK
-Content-Length: REGEX((767|769))
+Content-Length: REGEX((842|844))
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -56,6 +56,7 @@ Date: REGEX(.*)
   <transactionSemaphoreWaitingTime>REGEX(\d+.\d+)</transactionSemaphoreWaitingTime>
   <subCacheSemaphoreWaitingTime>REGEX(\d+.\d+)</subCacheSemaphoreWaitingTime>
   <curlContextMutexWaitingTime>REGEX(\d+.\d+)</curlContextMutexWaitingTime>
+  <timeStatSemaphoreWaitingTime>REGEX(\d+.\d+)</timeStatSemaphoreWaitingTime>
   <uptime_in_secs>REGEX(1?\d)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(1?\d)</measuring_interval_in_secs>
   <subCacheRefreshs>1</subCacheRefreshs>
@@ -68,27 +69,34 @@ Date: REGEX(.*)
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: REGEX((554|556))
+Content-Length: REGEX((693|695))
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
-        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
-        "measuring_interval_in_secs": "REGEX(1?\d)",
-        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-        "statisticsRequests": "2",
-        "subCacheInserts": "0",
-        "subCacheItems": "0",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-        "subCacheUpdates": "0",
-        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-        "uptime_in_secs": "REGEX(1?\d)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
+    "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
+    "measuring_interval_in_secs": "REGEX(1?\d)",
+    "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "statisticsRequests": "2",
+    "subCacheInserts": "0",
+    "subCacheItems": "0",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "subCacheUpdates": "0",
+    "timeStatSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "timing": {
+        "accumulated": {
+            "request": "REGEX(\d+.\d+)"
+        },
+        "last": {
+            "request": "REGEX(\d+.\d+)"
+        }
+    },
+    "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "uptime_in_secs": "REGEX(1?\d)",
+    "versionRequests": "REGEX((0|1))"
 }
 
 --TEARDOWN--

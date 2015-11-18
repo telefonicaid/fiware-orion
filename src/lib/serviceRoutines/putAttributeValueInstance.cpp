@@ -27,6 +27,9 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
@@ -85,7 +88,9 @@ std::string putAttributeValueInstance
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
     
     response.fill(SccBadRequest, details);
-    answer = response.render(ciP->outFormat, "", false, false);
+
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
+
     parseDataP->upcar.res.release();
 
     return answer;
@@ -104,7 +109,7 @@ std::string putAttributeValueInstance
 
 
   // 05. Render result
-  answer = response.render(ciP->outFormat, "", false, false);
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
 
   // 06. Cleanup and return result
