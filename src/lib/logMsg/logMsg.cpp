@@ -2098,11 +2098,22 @@ LmStatus lmOut
   bool         use_hook
 )
 {
+  INIT_CHECK();
+  POINTER_CHECK(text);
+
   int   i;
   char* line = (char*) calloc(1, LINE_MAX);
   int   sz;
   char* format = (char*) calloc(1, FORMAT_LEN + 1);
   char* tmP;
+
+  if ((line == NULL) || (format == NULL))
+  {
+    if (line   == NULL)   free(line);
+    if (format == NULL)   free(format);
+
+    return LmsNull;
+  }
 
   tmP = strrchr((char*) file, '/');
   if (tmP != NULL)
@@ -2118,10 +2129,6 @@ LmStatus lmOut
 
     return LmsOk;
   }
-
-  INIT_CHECK();
-  POINTER_CHECK(format);
-  POINTER_CHECK(text);
 
   memset(format, 0, FORMAT_LEN + 1);
 
@@ -2574,6 +2581,7 @@ LmStatus lmReopen(int index)
   if ((fd = open(tmpName, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1)
   {
     lseek(fds[index].fd, fdPos, SEEK_SET);
+    fclose(fP);
     return LmsOpen;
   }
 
@@ -2845,6 +2853,9 @@ typedef struct LineRemove
 */
 LmStatus lmClear(int index, int keepLines, int lastLines)
 {
+  INIT_CHECK();
+  INDEX_CHECK(index);
+
   LineRemove* lrV;
   void*       initialLrv;
   char*       line = (char*) calloc(1, LINE_MAX);
@@ -2861,11 +2872,11 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   int         fd;
   static int  headerLines = 4;
 
-  INIT_CHECK();
-  INDEX_CHECK(index);
+  POINTER_CHECK(line);
 
   if (logLines < (keepLines + lastLines))
   {
+    free(line);
     return LmsOk;
   }
 
@@ -2874,10 +2885,12 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     atLines += 1000;
     if (atLines > 20000)
     {
+      free(line);
       doClear = false;
       return LmsFopen;
     }
 
+    free(line);
     return LmsFopen;
   }
 
@@ -2888,6 +2901,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   if (lrV == NULL)
   {
     semGive();
+    free(line);
     return LmsMalloc;
   }
 
@@ -2970,6 +2984,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                                            \
   lrV = NULL;                              \
   unlink(tmpName);                         \
+  free(line);                              \
   semGive();                               \
                                            \
   return s;                                \
@@ -3019,6 +3034,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
       ++newLogLines;
       free(line);
+      line = NULL;
     }
   }
 
@@ -3044,6 +3060,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   {
     fds[index].state = Free;
     semGive();
+    if (line) free(line);
     return LmsOpen;
   }
 
@@ -3051,7 +3068,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
   logLines = newLogLines;
   LOG_OUT(("Set logLines to %d", logLines));
-  free(line);
+  if (line) free(line);
 
   semGive();
   return LmsOk;
