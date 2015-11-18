@@ -124,7 +124,8 @@ static void *workerFunc(void* pSyncQ)
         statisticsUpdate(NotifyContextSent, params->format);
       }
 
-      // FIXME: These counters should be incremented in the other notification modes
+      // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
+      // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
       if (r != "error" && r != "")
       {
         QueueStatistics::incSentOK();
