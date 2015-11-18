@@ -1217,7 +1217,7 @@ static void mongoSubCacheRefresh(std::string database)
 
   // Call the treat function for each subscription
   int subNo = 0;
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj sub = cursor->next();
     int     r;

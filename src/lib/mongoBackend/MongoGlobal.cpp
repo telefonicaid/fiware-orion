@@ -492,7 +492,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   }
 
   // Call the treat function for each subscription
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj sub;
     try
@@ -1368,7 +1368,7 @@ bool entitiesQuery
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj  r;
     try
@@ -1808,7 +1808,7 @@ bool registrationsQuery
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
     try

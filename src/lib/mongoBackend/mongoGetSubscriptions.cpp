@@ -193,7 +193,7 @@ void mongoListSubscriptions
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
     try
@@ -259,7 +259,7 @@ void mongoGetSubscription
   }
 
   /* Process query result */
-  if (cursor->more())
+  if (moreSafe(cursor))
   {
     BSONObj r;
     try
@@ -289,7 +289,7 @@ void mongoGetSubscription
     setNotification(sub, r);
     setExpires(sub, r);
 
-    if (cursor->more())
+    if (moreSafe(cursor))
     {
       // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));

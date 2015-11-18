@@ -195,3 +195,33 @@ BSONElement getField(const BSONObj& b, const std::string& field)
   LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
   return BSONElement();
 }
+
+/* ****************************************************************************
+*
+* moreSafe -
+*
+* This is a safe version of the more() method for cursors in order to avoid
+* exception that may crash the broker. However, if the more() method is returning
+* an exception something really bad is happening, it is considered a Fatal Error.
+*
+* (The name resembles the same relationship between next() and nextSafe() in the
+* mongo driver)
+*
+*/
+bool moreSafe(const std::auto_ptr<mongo::DBClientCursor>& cursor)
+{
+  try
+  {
+    return cursor->more();
+  }
+  catch (std::exception &e)
+  {
+    LM_E(("Fatal Error (more() exception: %s)", e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    LM_E(("Fatal Error (more() exception: generic)"));
+    return false;
+  }
+}

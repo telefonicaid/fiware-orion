@@ -232,7 +232,7 @@ static bool addTriggeredSubscriptions
   }
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj sub;
     try

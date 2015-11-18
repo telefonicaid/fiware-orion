@@ -64,7 +64,7 @@ static std::string attributeType
     return "";
   }
 
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
     try

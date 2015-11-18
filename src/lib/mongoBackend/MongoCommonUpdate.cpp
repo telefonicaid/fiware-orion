@@ -1181,7 +1181,7 @@ static bool addTriggeredSubscriptions_withCache
   }
 
   /* For each of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj sub;
     try
@@ -1421,7 +1421,7 @@ static bool addTriggeredSubscriptions_noCache
 
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj sub;
     try
@@ -2753,7 +2753,7 @@ void processContextElement
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
 
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
     try

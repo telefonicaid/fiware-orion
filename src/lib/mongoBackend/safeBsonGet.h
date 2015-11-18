@@ -70,4 +70,10 @@ extern bool getBoolField(const mongo::BSONObj& b, const std::string& field);
 */
 extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field);
 
+/* ****************************************************************************
+*
+* moreSafe -
+*/
+extern bool moreSafe(const std::auto_ptr<mongo::DBClientCursor>& cursor);
+
 #endif // SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_
