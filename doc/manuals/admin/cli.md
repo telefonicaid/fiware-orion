@@ -127,20 +127,20 @@ The list of available options is the following:
 -   **-noCache**. Disables context subscription cache, so subscriptions searches are
     always done at DB (not recommended but useful for debugging).
 -   **-notificationMode** *(Experimental option)*. Allows to select notification mode, either:
-    `transient`, `permanent`, `threadpool:q:n` or  `none`. Default mode is `transient`.
+    `transient`, `permanent` or `threadpool:q:n`. Default mode is `transient`.
     * In transient mode, connections are closed by CB just after sending the notification.
     * In permanent connection mode, a permanent connection is created the first time a notification
       is sent to a given URL path (if the receiver support permanent connections). Following notifications to the same
       URL path will reuse the connection, saving HTTP connection time.
     * In threadpool mode, notifications are enqueued into a queue of size `q` and `n` threads take the notifications
       from the queue and do the outgoing requests asynchronously.
-    * The `none` mode is not aimed at production usage, but it is useful for debugging. In this case
-      notifications are not sent, but recorded internally and shown in the [statistics](management_api.md#statistics)
-      operation (`droppedNotifications` counter). This can be useful to calculate a maximum upper limit
-      in notification rate from a CB internal logic point of view.
--   **-connectionMemory**. sets the size of the connection memory buffer (in Kb) per connection used internally
-       by the HTTP server library. Default value is 64 Kb.
-
--   **-maxConnections**. maximum number of simultaneous connections. Default value is "unlimited" (limited by max file descriptors of operating system).
--   **-reqPoolSize**. size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
+-   **-simulatedNotification**. Notifications are not sent, but recorded internally and shown in the 
+    [statistics](statistics.md) operation (`simulatedNotifications` counter). This is not aimed for production
+    usage, but it may be useful for debugging to calculate a maximum upper limit in notification rate from a CB
+    internal logic point of view.
+-   **-connectionMemory**. Sets the size of the connection memory buffer (in Kb) per connection used internally
+    by the HTTP server library. Default value is 64 Kb.
+-   **-maxConnections**. Maximum number of simultaneous connections. Default value is "unlimited" (limited by 
+    max file descriptors of operating system).
+-   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
 -   **-reqTimeStat.** turn on request-time-measuring in run-time. By default it is turned off (turned on, the broker will be somewhat slower in execution).

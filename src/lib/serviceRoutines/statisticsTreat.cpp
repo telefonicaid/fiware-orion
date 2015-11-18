@@ -142,7 +142,7 @@ std::string statisticsTreat
     noOfSubCacheLookups                             = -1;
     noOfSubCacheRemovals                            = -1;
     noOfSubCacheRemovalFailures                     = -1;
-    noOfDroppedNotifications                        = -1;
+    noOfSimulatedNotifications                      = -1;
 
     semTimeReqReset();
     semTimeTransReset();
@@ -457,14 +457,6 @@ std::string statisticsTreat
     out += TAG_ADD_COUNTER("subCacheRemovalFailures", noOfSubCacheRemovalFailures);
   }
 
-  {
-    int noOfDroppedNotifications = __sync_fetch_and_add(&noOfDroppedNotifications, 0);
-    if (noOfDroppedNotifications != -1)
-    {
-      // Given that the noOfDroppedNotifications starts at -1, a +1 adjustement is needed
-      out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications + 1);
-    }
-  }
 
   if (semTimeStatistics)
   {
@@ -548,6 +540,13 @@ std::string statisticsTreat
   if (timingStatString != "")
   {
     out += timingStatString;
+  }
+  {
+    int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
+    if (nSimNotif != -1)
+    {
+      out += TAG_ADD_COUNTER("noOfSimulatedNotifications", nSimNotif);
+    }
   }
 
   out += endTag(indent, tag, ciP->outFormat, false, false, true, false);

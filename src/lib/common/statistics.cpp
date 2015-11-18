@@ -180,7 +180,7 @@ int noOfEntityTypeRequest                                = -1;
 int noOfEntityAllTypesRequest                            = -1;
 int noOfSubscriptionsRequest                             = -1;
 int noOfIndividualSubscriptionRequest                    = -1;
-int noOfDroppedNotifications                             = -1;
+int noOfSimulatedNotifications                           = -1;
 
 
 
