@@ -2109,8 +2109,8 @@ LmStatus lmOut
 
   if ((line == NULL) || (format == NULL))
   {
-    if (line   == NULL)   free(line);
-    if (format == NULL)   free(format);
+    if (line   != NULL)   free(line);
+    if (format != NULL)   free(format);
 
     return LmsNull;
   }
