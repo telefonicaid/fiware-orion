@@ -61,3 +61,21 @@ void clock_addtime(struct timespec* accTime, const struct timespec* diffTime)
     accTime->tv_nsec -= 1000000000;
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* clock_subtime - 
+*/
+void clock_subtime(struct timespec* subtrahend, const struct timespec* minuend)
+{
+  subtrahend->tv_sec  -= minuend->tv_sec;
+  subtrahend->tv_nsec -= minuend->tv_nsec;
+
+  if (subtrahend->tv_nsec < 0)
+  {
+    subtrahend->tv_sec  -= 1;
+    subtrahend->tv_nsec += 1000000000;
+  }
+}

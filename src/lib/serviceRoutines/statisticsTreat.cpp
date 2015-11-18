@@ -36,6 +36,7 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/rest.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoSubCache.h"
@@ -67,7 +68,7 @@ std::string statisticsTreat
   std::string out     = "";
   std::string tag     = "orion";
   std::string indent  = "";
-  std::string indent2 = (ciP->outFormat == JSON)? indent + "    " : indent + "  ";
+  std::string indent2 = "  ";
 
   if (ciP->method == "DELETE")
   {
@@ -141,24 +142,26 @@ std::string statisticsTreat
     noOfSubCacheLookups                             = -1;
     noOfSubCacheRemovals                            = -1;
     noOfSubCacheRemovalFailures                     = -1;
-    noOfDroppedNotifications                        = -1;
+    noOfSimulatedNotifications                      = -1;
 
     semTimeReqReset();
     semTimeTransReset();
     semTimeCacheReset();
+    semTimeTimeStatReset();
     mongoPoolConnectionSemWaitingTimeReset();
     mutexTimeCCReset();
 
     mongoSubCacheStatisticsReset("statisticsTreat::DELETE");
+    timingStatisticsReset();
 
-    out += startTag(indent, tag, ciP->outFormat, true, true);
+    out += startTag(indent, tag, "", ciP->outFormat, false, false, false);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
-    indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
-    out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);
+    out += endTag(indent, tag, ciP->outFormat, false, false, true, false);
+
     return out;
   }
 
-  out += startTag(indent, tag, ciP->outFormat, true, true);
+  out += startTag(indent, tag, "", ciP->outFormat, false, false, false);
 
   if (noOfXmlRequests != -1)
   {
@@ -169,7 +172,6 @@ std::string statisticsTreat
   {
     out += TAG_ADD_COUNTER("jsonRequests", noOfJsonRequests);
   }
-
 
   if (noOfRegistrations != -1)
   {
@@ -455,14 +457,6 @@ std::string statisticsTreat
     out += TAG_ADD_COUNTER("subCacheRemovalFailures", noOfSubCacheRemovalFailures);
   }
 
-  {
-    int noOfDroppedNotifications = __sync_fetch_and_add(&noOfDroppedNotifications, 0);
-    if (noOfDroppedNotifications != -1)
-    {
-      // Given that the noOfDroppedNotifications starts at -1, a +1 adjustement is needed
-      out += TAG_ADD_COUNTER("droppedNotifications", noOfDroppedNotifications + 1);
-    }
-  }
 
   if (semTimeStatistics)
   {
@@ -485,6 +479,10 @@ std::string statisticsTreat
     char ccMutexWaitingTime[64];
     mutexTimeCCGet(ccMutexWaitingTime, sizeof(ccMutexWaitingTime));
     out += TAG_ADD_STRING("curlContextMutexWaitingTime", ccMutexWaitingTime);
+
+    char timeStatSemaphoreWaitingTime[64];
+    semTimeTimeStatGet(timeStatSemaphoreWaitingTime, sizeof(timeStatSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("timeStatSemaphoreWaitingTime", timeStatSemaphoreWaitingTime);
   }
 
   int now = getCurrentTime();
@@ -512,11 +510,17 @@ std::string statisticsTreat
     out += TAG_ADD_STRING("subCache",          listBuffer);
   }
 
+  std::string timingStatString      = timingStatistics(indent2, ciP->outFormat, ciP->apiVersion);
+  bool        timingStat            = (timingStatString != "");
+  bool        threadpool            = (strcmp(notificationMode, "threadpool") == 0);
+  bool        commaAfterThreadpool  = timingStat;
+  bool        commaAfterSubCache    = timingStat || threadpool;
+
   out += TAG_ADD_INTEGER("subCacheRefreshs", mscRefreshs, true);
   out += TAG_ADD_INTEGER("subCacheInserts",  mscInserts,  true);
   out += TAG_ADD_INTEGER("subCacheRemoves",  mscRemoves,  true);
   out += TAG_ADD_INTEGER("subCacheUpdates",  mscUpdates,  true);
-  out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  false);
+  out += TAG_ADD_INTEGER("subCacheItems",    cacheItems,  commaAfterSubCache);
 
   if (strcmp(notificationMode, "threadpool") == 0)
   {
@@ -530,11 +534,22 @@ std::string statisticsTreat
     QueueStatistics::getTimeInQ(queueTime, sizeof(queueTime));
     out += TAG_ADD_STRING("notificationQueueTimeInQueue", queueTime);
 
-    out += TAG_ADD_INTEGER("notificationQueueSizeSnapshot", QueueStatistics::getQSize(), false);
+    out += TAG_ADD_INTEGER("notificationQueueSizeSnapshot", QueueStatistics::getQSize(), commaAfterThreadpool);
   }
 
-  indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
-  out += endTag(indent2, tag, ciP->outFormat, false, false, true, true);
+  if (timingStatString != "")
+  {
+    out += timingStatString;
+  }
+  {
+    int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
+    if (nSimNotif != -1)
+    {
+      out += TAG_ADD_COUNTER("noOfSimulatedNotifications", nSimNotif);
+    }
+  }
+
+  out += endTag(indent, tag, ciP->outFormat, false, false, true, false);
 
   ciP->httpStatusCode = SccOk;
   return out;

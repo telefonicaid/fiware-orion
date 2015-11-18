@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "apiTypesV2/Entities.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -78,7 +81,8 @@ std::string postEntity
 
     ciP->httpStatusCode = SccBadRequest;
     
-    res = error.render(ciP, "");
+    TIMED_RENDER(res = error.render(ciP, ""));
+
     return res;
   }
 
@@ -99,9 +103,7 @@ std::string postEntity
       std::string  res;
 
       ciP->httpStatusCode = error.code;
-
-      res = error.render(ciP, "");
-
+      TIMED_RENDER(res = error.render(ciP, ""));
       eP->release();
 
       return res;      

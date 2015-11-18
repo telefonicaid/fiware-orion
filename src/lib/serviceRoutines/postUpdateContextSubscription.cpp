@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
@@ -52,14 +55,15 @@ std::string postUpdateContextSubscription
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
   Format  notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
-  ciP->httpStatusCode  = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
-                                                        &ucsr,
-                                                        notifyFormat,
-                                                        ciP->tenant,
-                                                        ciP->httpHeaders.xauthToken,
-                                                        ciP->servicePathV);
 
-  answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, "");
+  TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
+                                                                   &ucsr,
+                                                                   notifyFormat,
+                                                                   ciP->tenant,
+                                                                   ciP->httpHeaders.xauthToken,
+                                                                   ciP->servicePathV));
+
+  TIMED_RENDER(answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, ""));
 
   return answer;
 }

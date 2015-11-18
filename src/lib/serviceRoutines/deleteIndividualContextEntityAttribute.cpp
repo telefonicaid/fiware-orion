@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -88,7 +91,8 @@ std::string deleteIndividualContextEntityAttribute
 
 
   // 4. Cleanup and return result
-  answer = response.render(ciP->outFormat, "", false, false);
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
+
   response.release();
   parseDataP->upcr.res.release();
 
