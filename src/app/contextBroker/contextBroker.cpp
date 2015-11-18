@@ -251,6 +251,7 @@ int             notificationQueueSize;
 int             notificationThreadNum;
 bool            noCache;
 unsigned int    connectionMemory;
+bool            reqTimeStat;
 unsigned int    maxConnections;
 unsigned int    reqPoolSize;
 bool            simulatedNotification;
@@ -297,7 +298,9 @@ bool            simulatedNotification;
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+#define REQ_TIME_STAT_DESC     "turn on request-time-measuring in run-time"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
+
 
 
 /* ****************************************************************************
@@ -351,6 +354,7 @@ PaArgument paArgs[] =
   { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,              0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },
+  { "-reqTimeStat",      &reqTimeStat,      "REQ_TIME_STAT",     PaBool,   PaOpt, false,          false, true,     REQ_TIME_STAT_DESC     },
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
@@ -1721,6 +1725,11 @@ int main(int argC, char* argV[])
   {
     restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
+
+  // FIXME P5: Ugly way of setting reqTimeStatistics (from common lib) - commonInit()?
+  extern bool reqTimeStatistics;
+  reqTimeStatistics = reqTimeStat;
+
 
   LM_I(("Startup completed"));
   if (simulatedNotification)

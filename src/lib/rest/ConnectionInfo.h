@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <stdint.h>
+#include <time.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -166,6 +167,9 @@ public:
   HttpStatusCode            httpStatusCode;
   std::vector<std::string>  httpHeader;
   std::vector<std::string>  httpHeaderValue;
+
+  // Timing
+  struct timespec           reqStartTime;
 };
 
 

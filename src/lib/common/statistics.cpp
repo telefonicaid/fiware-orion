@@ -23,8 +23,46 @@
 * Author: Ken Zangelin
 */
 #include "common/statistics.h"
+#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "logMsg/logMsg.h"
+
+
+
+/* ****************************************************************************
+*
+* STAT_ADD - 
+*/
+#define STAT_ADD(out, format, indent, buf, tag, comma)                        \
+do                                                                            \
+{                                                                             \
+  if (format == JSON)                                                         \
+  {                                                                           \
+    if (comma)                                                                \
+    {                                                                         \
+      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + ",\n";           \
+    }                                                                         \
+    else                                                                      \
+    {                                                                         \
+      out += indent + JSON_STR(tag) + ": " + JSON_STR(buf) + "\n";            \
+    }                                                                         \
+  }                                                                           \
+  else                                                                        \
+  {                                                                           \
+    out += indent + "<" + tag + ">" + buf + "</" + tag + ">\n";               \
+  }                                                                           \
+} while (0)
+
+
+
+/* ****************************************************************************
+*
+* Statistic time counters -
+*/
+TimeStat           accTimeStat;
+TimeStat           lastTimeStat;
+__thread TimeStat  threadLastTimeStat;
+bool               reqTimeStatistics = false;
 
 
 
@@ -143,6 +181,235 @@ int noOfEntityAllTypesRequest                            = -1;
 int noOfSubscriptionsRequest                             = -1;
 int noOfIndividualSubscriptionRequest                    = -1;
 int noOfSimulatedNotifications                           = -1;
+
+
+
+/* ****************************************************************************
+*
+* timingStatistics - 
+*
+* xxxReqTime           - the total time that the LAST request took.
+*                        Measuring from the first MHD callback to 'connectionTreat',
+*                        until the MHD callback to 'requestCompleted'.
+* xxxXmlParseTime      - the time that the XML Parse of the LAST request took.
+* xxxJsonV1ParseTime   - the time that the JSON parse+treat of the LAST request took.
+* xxxJsonV2ParseTime   - the time that the JSON parse+treat of the LAST request took.
+* xxxMongoBackendTime  - the time that the mongoBackend took to treat the last request
+* xxxReadWaitTime      - 
+* xxxWriteWaitTime     - 
+* xxxCommandWaitTime   - 
+* xxxRenderTime        - the time that the last render took to render the response
+*
+*/
+std::string timingStatistics(std::string indent, Format format, std::string apiVersion)
+{
+  if (reqTimeStatistics == false)
+  {
+    return "";
+  }
+
+  char buf[64];
+
+  timeStatSemTake(__FUNCTION__, "putting stats together");
+
+  bool accJsonV1ParseTime      = (accTimeStat.jsonV1ParseTime.tv_sec != 0)        || (accTimeStat.jsonV1ParseTime.tv_nsec != 0);
+  bool accJsonV2ParseTime      = (accTimeStat.jsonV2ParseTime.tv_sec != 0)        || (accTimeStat.jsonV2ParseTime.tv_nsec != 0);
+  bool accMongoBackendTime     = (accTimeStat.mongoBackendTime.tv_sec != 0)       || (accTimeStat.mongoBackendTime.tv_nsec != 0);
+  bool accMongoReadWaitTime    = (accTimeStat.mongoReadWaitTime.tv_sec != 0)      || (accTimeStat.mongoReadWaitTime.tv_nsec != 0);
+  bool accMongoWriteWaitTime   = (accTimeStat.mongoWriteWaitTime.tv_sec != 0)     || (accTimeStat.mongoWriteWaitTime.tv_nsec != 0);
+  bool accMongoCommandWaitTime = (accTimeStat.mongoCommandWaitTime.tv_sec != 0)   || (accTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool accRenderTime           = (accTimeStat.renderTime.tv_sec != 0)             || (accTimeStat.renderTime.tv_nsec != 0);
+  bool accReqTime              = (accTimeStat.reqTime.tv_sec != 0)                || (accTimeStat.reqTime.tv_nsec != 0);
+  bool accXmlParseTime         = (accTimeStat.xmlParseTime.tv_sec != 0)           || (accTimeStat.xmlParseTime.tv_nsec != 0);
+
+  bool lastJsonV1ParseTime      = (lastTimeStat.jsonV1ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV1ParseTime.tv_nsec != 0);
+  bool lastJsonV2ParseTime      = (lastTimeStat.jsonV2ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV2ParseTime.tv_nsec != 0);
+  bool lastMongoBackendTime     = (lastTimeStat.mongoBackendTime.tv_sec != 0)     || (lastTimeStat.mongoBackendTime.tv_nsec != 0);
+  bool lastMongoReadWaitTime    = (lastTimeStat.mongoReadWaitTime.tv_sec != 0)    || (lastTimeStat.mongoReadWaitTime.tv_nsec != 0);
+  bool lastMongoWriteWaitTime   = (lastTimeStat.mongoWriteWaitTime.tv_sec != 0)   || (lastTimeStat.mongoWriteWaitTime.tv_nsec != 0);
+  bool lastMongoCommandWaitTime = (lastTimeStat.mongoCommandWaitTime.tv_sec != 0) || (lastTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool lastRenderTime           = (lastTimeStat.renderTime.tv_sec != 0)           || (lastTimeStat.renderTime.tv_nsec != 0);
+  bool lastReqTime              = (lastTimeStat.reqTime.tv_sec != 0)              || (lastTimeStat.reqTime.tv_nsec != 0);
+  bool lastXmlParseTime         = (lastTimeStat.xmlParseTime.tv_sec != 0)         || (lastTimeStat.xmlParseTime.tv_nsec != 0);
+
+  bool  accXmlParseTimeComma         = false;
+  bool  accReqTimeComma              = accXmlParseTime           || accXmlParseTimeComma;
+  bool  accRenderTimeComma           = accReqTime                || accReqTimeComma;
+  bool  accMongoBackendTimeComma     = accRenderTime             || accRenderTimeComma;
+  bool  accMongoReadWaitTimeComma    = accMongoBackendTime       || accMongoBackendTimeComma;
+  bool  accMongoWriteWaitTimeComma   = accMongoReadWaitTime      || accMongoReadWaitTimeComma;
+  bool  accMongoCommandWaitTimeComma = accMongoWriteWaitTime     || accMongoWriteWaitTimeComma;
+  bool  accJsonV2ParseTimeComma      = accMongoCommandWaitTime   || accMongoCommandWaitTimeComma;
+  bool  accJsonV1ParseTimeComma      = accJsonV2ParseTime        || accJsonV2ParseTimeComma;
+
+  bool  lastXmlParseTimeComma         = false;
+  bool  lastReqTimeComma              = lastXmlParseTime         || lastXmlParseTimeComma;
+  bool  lastRenderTimeComma           = lastReqTime              || lastReqTimeComma;
+  bool  lastMongoBackendTimeComma     = lastRenderTime           || lastRenderTimeComma;
+  bool  lastMongoReadWaitTimeComma    = lastMongoBackendTime     || lastMongoBackendTimeComma; 
+  bool  lastMongoWriteWaitTimeComma   = lastMongoReadWaitTime    || lastMongoReadWaitTimeComma;
+  bool  lastMongoCommandWaitTimeComma = lastMongoWriteWaitTime   || lastMongoWriteWaitTimeComma;
+  bool  lastJsonV2ParseTimeComma      = lastMongoCommandWaitTime || lastMongoCommandWaitTimeComma;
+  bool  lastJsonV1ParseTimeComma      = lastJsonV2ParseTime      || lastJsonV2ParseTimeComma;
+
+  bool last = lastJsonV1ParseTime || lastJsonV2ParseTime || lastMongoBackendTime || lastRenderTime || lastReqTime || lastXmlParseTime;
+  bool acc  = accJsonV1ParseTime || accJsonV2ParseTime || accMongoBackendTime || accRenderTime || accReqTime || accXmlParseTime;
+
+  std::string  out     = "";
+  std::string  indent2 = indent;
+
+  if (!acc && !last)
+  {
+    timeStatSemGive(__FUNCTION__, "no stats to report");
+    return "";
+  }
+
+  if (format == JSON)
+  {
+    indent2 = indent + "    ";
+    out     = indent + JSON_STR("timing") + ": {\n";
+
+    if (acc)
+    {
+      out += indent + "  " + JSON_STR("accumulated") + ": {\n";
+
+      if (accJsonV1ParseTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.jsonV1ParseTime.tv_sec, (int) accTimeStat.jsonV1ParseTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "jsonV1Parse", accJsonV1ParseTimeComma);
+      }
+
+      if (accJsonV2ParseTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.jsonV2ParseTime.tv_sec, (int) accTimeStat.jsonV2ParseTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "jsonV2Parse", accJsonV2ParseTimeComma);
+      }
+
+      if (accMongoBackendTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.mongoBackendTime.tv_sec, (int) accTimeStat.mongoBackendTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoBackend", accMongoBackendTimeComma);
+      }
+
+      if (accMongoReadWaitTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.mongoReadWaitTime.tv_sec, (int) accTimeStat.mongoReadWaitTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoReadWait", accMongoReadWaitTimeComma);
+      }
+
+      if (accMongoWriteWaitTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.mongoWriteWaitTime.tv_sec, (int) accTimeStat.mongoWriteWaitTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoWriteWait", accMongoWriteWaitTimeComma);
+      }
+
+      if (accMongoCommandWaitTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.mongoCommandWaitTime.tv_sec, (int) accTimeStat.mongoCommandWaitTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoCommandWait", accMongoCommandWaitTimeComma);
+      }
+
+      if (accRenderTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.renderTime.tv_sec, (int) accTimeStat.renderTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "render", accRenderTimeComma);
+      }
+
+      if (accReqTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.reqTime.tv_sec, (int) accTimeStat.reqTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "request", accReqTimeComma);
+      }
+
+      if (accXmlParseTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", accTimeStat.xmlParseTime.tv_sec, (int) accTimeStat.xmlParseTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "xmlParse", accXmlParseTimeComma);
+      }
+
+      out += indent2 + "  " + "}" + (last? ",\n" : "\n");
+    }
+
+    if (last)
+    {
+      out += indent + "  " + JSON_STR("last") + ": {\n";
+
+      if (lastJsonV1ParseTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.jsonV1ParseTime.tv_sec, (int) lastTimeStat.jsonV1ParseTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "jsonV1Parse", lastJsonV1ParseTimeComma);
+      }
+
+      if (lastJsonV2ParseTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.jsonV2ParseTime.tv_sec, (int) lastTimeStat.jsonV2ParseTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "jsonV2Parse", lastJsonV2ParseTimeComma);
+      }
+
+      if (lastMongoBackendTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.mongoBackendTime.tv_sec, (int) lastTimeStat.mongoBackendTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoBackend", lastMongoBackendTimeComma);
+      }
+
+      if (lastMongoReadWaitTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.mongoReadWaitTime.tv_sec, (int) lastTimeStat.mongoReadWaitTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoReadWait", lastMongoReadWaitTimeComma);
+      }
+
+      if (lastMongoWriteWaitTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.mongoWriteWaitTime.tv_sec, (int) lastTimeStat.mongoWriteWaitTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoWriteWait", lastMongoWriteWaitTimeComma);
+      }
+
+      if (lastMongoCommandWaitTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.mongoCommandWaitTime.tv_sec, (int) lastTimeStat.mongoCommandWaitTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "mongoCommandWait", lastMongoCommandWaitTimeComma);
+      }
+
+      if (lastRenderTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.renderTime.tv_sec, (int) lastTimeStat.renderTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "render", lastRenderTimeComma);
+      }
+
+      if (lastReqTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.reqTime.tv_sec, (int) lastTimeStat.reqTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "request", lastReqTimeComma);
+      }
+
+      if (lastXmlParseTime)
+      {
+        snprintf(buf, sizeof(buf), "%lu.%09d", lastTimeStat.xmlParseTime.tv_sec, (int) lastTimeStat.xmlParseTime.tv_nsec);
+        STAT_ADD(out, format, indent2, buf, "xmlParse", lastXmlParseTimeComma);
+      }
+
+      out += indent2 + "}\n";
+    }
+
+     out += indent + "}\n";
+  }
+  
+  timeStatSemGive(__FUNCTION__, "putting stats together");
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* timingStatisticsReset - 
+*/
+void timingStatisticsReset(void)
+{
+  memset(&accTimeStat, 0, sizeof(accTimeStat));
+}
+
+
 
 /* ****************************************************************************
 *

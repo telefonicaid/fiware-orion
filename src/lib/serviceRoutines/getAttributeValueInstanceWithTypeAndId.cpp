@@ -27,6 +27,9 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
@@ -118,8 +121,8 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
+  TIMED_RENDER(answer = response.render(ciP, AttributeValueInstance, ""));
 
-  answer = response.render(ciP, AttributeValueInstance, "");
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
   response.release();

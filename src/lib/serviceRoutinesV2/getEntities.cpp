@@ -25,7 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 #include "common/string.h"
+
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -33,6 +36,8 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
+
+
 
 /* ****************************************************************************
 *
@@ -74,12 +79,13 @@ std::string getEntities
   std::string  q          = ciP->uriParam["q"];
   std::string  geometry   = ciP->uriParam["geometry"];
   std::string  coords     = ciP->uriParam["coords"];
-
+  std::string  out;
 
   if ((idPattern != "") && (id != ""))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern");
-    answer = oe.render(ciP, "");
+
+    TIMED_RENDER(answer = oe.render(ciP, ""));
     return answer;
   }
   else if (id != "")
@@ -93,8 +99,9 @@ std::string getEntities
     {
       if (ix != 0)
       {
-          pattern += "|";
+        pattern += "|";
       }
+
       pattern += idsV[ix];
     }
   }
@@ -107,13 +114,18 @@ std::string getEntities
   // Making sure geometry and coords are not used individually
   if ((coords != "") && (geometry == ""))
   {
-    OrionError oe(SccBadRequest, "URI param /coords/ used without /geometry/");
-    return oe.render(ciP, "");
+    OrionError   oe(SccBadRequest, "URI param /coords/ used without /geometry/");
+
+    TIMED_RENDER(out = oe.render(ciP, ""));
+    return out;
   }
   else if ((geometry != "") && (coords == ""))
   {
     OrionError oe(SccBadRequest, "URI param /geometry/ used without /coords/");
-    return oe.render(ciP, "");
+
+    TIMED_RENDER(out = oe.render(ciP, ""));
+
+    return out;
   }
 
   // Making sure geometry is valid (if present)
@@ -122,18 +134,24 @@ std::string getEntities
 
   if (geometry != "")
   {
-    std::string      errorString;
+    std::string  errorString;
 
     if (geo.parse(geometry.c_str(), &errorString) != 0)
     {
       OrionError oe(SccBadRequest, std::string("error parsing geometry: ") + errorString);
-      return oe.render(ciP, "");
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+
+      return out;
     }
 
     if ((geo.areaType != "polygon") && (geo.areaType != "circle"))
     {
       OrionError oe(SccBadRequest, "URI param /geometry/ must be either /polygon/ or /circle/");
-      return oe.render(ciP, "");
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+
+      return out;
     }
 
     //
@@ -144,19 +162,28 @@ std::string getEntities
     if (noOfCoords == 0)
     {
       OrionError oe(SccBadRequest, "URI param /coords/ has no coordinates");
-      return oe.render(ciP, "");
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+
+      return out;
     }
 
     if ((geo.areaType == "circle") && (noOfCoords != 1))
     {
       OrionError oe(SccBadRequest, "Too many coordinates for circle");
-      return oe.render(ciP, "");
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+
+      return out;
     }
 
     if ((geo.areaType == "polygon") && (noOfCoords < 3))
     {
       OrionError oe(SccBadRequest, "Too few coordinates for polygon");
-      return oe.render(ciP, "");
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+
+      return out;
     }
   }
 
@@ -184,7 +211,10 @@ std::string getEntities
     if (scopeP->fill(&geo, coordsV, &errorString) != 0)
     {
       OrionError oe(SccBadRequest, errorString);
-      return oe.render(ciP, "");
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+
+      return out;
     }
 
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
@@ -197,6 +227,9 @@ std::string getEntities
   if (ciP->httpStatusCode != SccOk)
   {
     // Something went wrong in the query, an invalid pattern for example
+
+    parseDataP->qcr.res.release();
+
     return answer;
   }
 
@@ -209,7 +242,8 @@ std::string getEntities
   else
   {
     entities.fill(&parseDataP->qcrs.res);
-    answer = entities.render(ciP, EntitiesResponse);
+
+    TIMED_RENDER(answer = entities.render(ciP, EntitiesResponse));
   }
 
   // 04. Cleanup and return result

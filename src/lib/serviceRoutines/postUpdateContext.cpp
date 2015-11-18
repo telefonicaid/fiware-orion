@@ -27,9 +27,14 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
+#include "jsonParse/jsonRequest.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -38,7 +43,6 @@
 #include "rest/httpRequestSend.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "xmlParse/xmlRequest.h"
-#include "jsonParse/jsonRequest.h"
 
 
 
@@ -116,11 +120,11 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 */
 static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP, Format format)
 {
-  std::string     ip;
-  std::string     protocol;
-  int             port;
-  std::string     prefix;
-  std::string     answer;
+  std::string      ip;
+  std::string      protocol;
+  int              port;
+  std::string      prefix;
+  std::string      answer;
 
 
   //
@@ -145,7 +149,9 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   char*        cleanPayload;
 
   ciP->outFormat  = format;
-  payload         = upcrP->render(ciP, UpdateContext, "");
+
+  TIMED_RENDER(payload = upcrP->render(ciP, UpdateContext, ""));
+
   ciP->outFormat  = outFormat;
   cleanPayload    = (char*) payload.c_str();
 
@@ -465,6 +471,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
+
   //
   // 01. Check service-path consistency
   //
@@ -476,7 +483,9 @@ std::string postUpdateContext
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     LM_W(("Bad Input (more than one service path for an update request)"));
-    answer = upcrsP->render(ciP, UpdateContext, "");
+
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+
     return answer;
   }
   else if (ciP->servicePathV.size() == 0)
@@ -488,7 +497,9 @@ std::string postUpdateContext
   if (res != "OK")
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
-    answer = upcrsP->render(ciP, UpdateContext, "");
+
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+
     return answer;
   }
 
@@ -498,7 +509,10 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance);
+  
+  HttpStatusCode httpStatusCode;
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance));
+
   if (ciP->httpStatusCode != SccCreated)
   {
     ciP->httpStatusCode = httpStatusCode;
@@ -516,7 +530,8 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    answer = upcrsP->render(ciP, UpdateContext, "");
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+
     upcrP->release();
     return answer;
   }
@@ -677,7 +692,7 @@ std::string postUpdateContext
     response.merge(&upcrs);
   }
 
-  answer = response.render(ciP, UpdateContext, "");
+  TIMED_RENDER(answer = response.render(ciP, UpdateContext, ""));
 
   //
   // Cleanup

@@ -88,6 +88,7 @@ extern int reqSemTryToTake(void);
 extern int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken);
 extern int transSemTake(const char* who, const char* what);
 extern int cacheSemTake(const char* who, const char* what);
+extern int timeStatSemTake(const char* who, const char* what);
 
 
 
@@ -98,6 +99,7 @@ extern int cacheSemTake(const char* who, const char* what);
 extern int reqSemGive(const char* who, const char* what = NULL, bool taken = true);
 extern int transSemGive(const char* who, const char* what = NULL);
 extern int cacheSemGive(const char* who, const char* what = NULL);
+extern int timeStatSemGive(const char* who, const char* what = NULL);
 
 
 
@@ -108,6 +110,7 @@ extern int cacheSemGive(const char* who, const char* what = NULL);
 extern void semTimeReqGet(char* buf, int bufLen);
 extern void semTimeTransGet(char* buf, int bufLen);
 extern void semTimeCacheGet(char* buf, int bufLen);
+extern void semTimeTimeStatGet(char* buf, int bufLen);
 
 
 
@@ -118,6 +121,7 @@ extern void semTimeCacheGet(char* buf, int bufLen);
 extern void semTimeReqReset(void);
 extern void semTimeTransReset(void);
 extern void semTimeCacheReset(void);
+extern void semTimeTimeStatReset(void);
 
 
 

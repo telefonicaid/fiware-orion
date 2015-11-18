@@ -143,3 +143,4 @@ The list of available options is the following:
 -   **-maxConnections**. Maximum number of simultaneous connections. Default value is "unlimited" (limited by 
     max file descriptors of operating system).
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
+-   **-reqTimeStat.** turn on request-time-measuring in run-time. By default it is turned off (turned on, the broker will be somewhat slower in execution).

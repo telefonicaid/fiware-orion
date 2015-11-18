@@ -214,21 +214,19 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "3",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "1",
-        "statisticsRequests": "1",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "1",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "jsonRequests": "3",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "notificationsSent": "1",
+    "statisticsRequests": "1",
+    "subCache": "REGEX(.*)",
+    "subCacheInserts": "1",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "0",
+    "subCacheUpdates": "0",
+    "subscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "0"
 }
 
 
@@ -259,22 +257,20 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "4",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "1",
-        "statisticsRequests": "2",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "2",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "1",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "1",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "jsonRequests": "4",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "notificationsSent": "1",
+    "statisticsRequests": "2",
+    "subCache": "REGEX(.*)",
+    "subCacheInserts": "2",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "1",
+    "subCacheRemoves": "1",
+    "subCacheUpdates": "1",
+    "subscriptionUpdates": "1",
+    "subscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "0"
 }
 
 
@@ -290,22 +286,20 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "4",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "1",
-        "statisticsRequests": "3",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "3",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "2",
-        "subCacheRemoves": "1",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "1",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "jsonRequests": "4",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "notificationsSent": "1",
+    "statisticsRequests": "3",
+    "subCache": "REGEX(.*)",
+    "subCacheInserts": "3",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "2",
+    "subCacheRemoves": "1",
+    "subCacheUpdates": "1",
+    "subscriptionUpdates": "1",
+    "subscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "0"
 }
 
 
@@ -344,22 +338,20 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "10",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "4",
-        "statisticsRequests": "4",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "3",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "2",
-        "subCacheRemoves": "1",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "1",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "jsonRequests": "10",
+    "measuring_interval_in_secs": "REGEX(\d+)",
+    "notificationsSent": "4",
+    "statisticsRequests": "4",
+    "subCache": "REGEX(.*)",
+    "subCacheInserts": "3",
+    "subCacheItems": "1",
+    "subCacheRefreshs": "2",
+    "subCacheRemoves": "1",
+    "subCacheUpdates": "1",
+    "subscriptionUpdates": "1",
+    "subscriptions": "1",
+    "uptime_in_secs": "REGEX(\d+)",
+    "versionRequests": "0"
 }
 
 

@@ -38,6 +38,9 @@
 #include "common/wsStrip.h"
 #include "common/globals.h"
 #include "common/defaultValues.h"
+#include "common/clockFunctions.h"
+#include "common/statistics.h"
+#include "common/tag.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -451,7 +454,6 @@ static void serve(ConnectionInfo* ciP)
 }
 
 
-
 /* ****************************************************************************
 *
 * requestCompleted -
@@ -464,17 +466,59 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+  ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+  struct timespec  reqEndTime;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
   }
 
-  delete(ciP);
   *con_cls = NULL;
 
   LM_TRANSACTION_END();  // Incoming REST request ends
+
+  if (reqTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &reqEndTime);
+    clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
+  }  
+
+  delete(ciP);
+
+  //
+  // Statistics
+  //
+  // Flush this requests timing measures onto a global var to be read by "GET /statistics".
+  // Also, increment the accumulated measures.
+  //
+  if (reqTimeStatistics)
+  {
+    timeStatSemTake(__FUNCTION__, "updating statistics");
+
+    memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
+
+    //
+    // "Fix" mongoBackendTime
+    //   Substract times waiting at mongo driver operation (in mongo[Read|Write|Command]WaitTime counters) so mongoBackendTime
+    //   contains at the end the time passed in our logic, i.e. a kind of "self-time" for mongoBackend
+    //
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);
+
+    clock_addtime(&accTimeStat.jsonV1ParseTime,       &threadLastTimeStat.jsonV1ParseTime);
+    clock_addtime(&accTimeStat.jsonV2ParseTime,       &threadLastTimeStat.jsonV2ParseTime);
+    clock_addtime(&accTimeStat.mongoBackendTime,      &threadLastTimeStat.mongoBackendTime);
+    clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
+    clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
+    clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
+    clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
+    clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
+    clock_addtime(&accTimeStat.xmlParseTime,          &threadLastTimeStat.xmlParseTime);
+
+    timeStatSemGive(__FUNCTION__, "updating statistics");
+  }
 }
 
 
@@ -927,6 +971,15 @@ static int connectionTreat
 
 
     //
+    // Reset time measuring?
+    //
+    if (reqTimeStatistics)
+    {
+      memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
+    }
+
+
+    //
     // ConnectionInfo
     //
     // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
@@ -940,6 +993,11 @@ static int connectionTreat
     {
       LM_E(("Runtime Error (error allocating ConnectionInfo)"));
       return MHD_NO;
+    }
+
+    if (reqTimeStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }
 
     LM_T(LmtRequest, (""));
@@ -1167,7 +1225,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
   if (threadPoolSize != 0)
   {
     serverMode = MHD_USE_SELECT_INTERNALLY;
-    LM_M(("threadPoolSize: %d", threadPoolSize));
   }
 
 
