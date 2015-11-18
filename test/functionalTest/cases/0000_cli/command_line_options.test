@@ -65,6 +65,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-maxConnections' <maximum number of simultaneous connections>]
                       [option '-reqPoolSize' <size of thread pool for incoming connections>]
                       [option '-notificationMode' <notification mode (persistent|transient|threadpool:q:n)>]
-                      [option '-simulatedNotification' (drop outgoing notifications (testing))]
+                      [option '-simulatedNotification' (simulate notifications instead of actual sending them (only for testing))]
 
 --TEARDOWN--
