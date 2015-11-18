@@ -77,6 +77,13 @@ HttpStatusCode mongoUnsubscribeContextAvailability
       LM_W(("Bad Input (invalid OID format)"));
       return SccOk;
   }
+  catch (...)
+  {
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)", reqSemTaken);
+      responseP->statusCode.fill(SccReceiverInternalError);
+      LM_E(("Runtime Error (generic exception getting OID)"));
+      return SccOk;
+  }
 
   if (!collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << id), &sub, &err))
   {

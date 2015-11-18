@@ -73,8 +73,14 @@ static std::string attributeType
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    catch (...)
+    {
+      err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
       continue;
     }
 

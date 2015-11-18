@@ -465,7 +465,6 @@ bool collectionCreateIndex
     connection->createIndex(col.c_str(), indexes);
     releaseMongoConnection(connection);
     LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
-
   }
   catch (const DBException &e)
   {
@@ -671,7 +670,8 @@ extern bool connectionAuth
   std::string*        err
 )
 {
-  try {
+  try
+  {
     std::string authErr;
     if (!connection->auth(db, user, password, authErr))
     {

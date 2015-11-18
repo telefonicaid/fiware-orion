@@ -99,6 +99,15 @@ HttpStatusCode mongoRegisterContext
       LM_W(("Bad Input (invalid OID format)"));
       return SccOk;
     }
+    catch (...)
+    {
+      reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
+      responseP->errorCode.fill(SccReceiverInternalError);
+      responseP->registrationId = requestP->registrationId;
+      ++noOfRegistrationUpdateErrors;
+      LM_E(("Runtime Error (generic exception getting OID)"));
+      return SccOk;
+    }
 
     if (!collectionFindOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << REG_SERVICE_PATH << sPath), &reg, &err))
     {

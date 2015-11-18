@@ -73,14 +73,15 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     catch (const AssertionException &e)
     {
       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo assertion exception)", reqSemTaken);
-      //
-      // This happens when OID format is wrong
-      // FIXME: this checking should be done at parsing stage, without progressing to
-      // mongoBackend. For the moment we can live this here, but we should remove in the future
-      // (old issue #95)
-      //
       responseP->statusCode.fill(SccContextElementNotFound);
       LM_W(("Bad Input (invalid OID format)"));
+      return SccOk;
+    }
+    catch (...)
+    {
+      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo generic exception)", reqSemTaken);
+      responseP->statusCode.fill(SccReceiverInternalError);
+      LM_E(("Runtime Error (generic exception getting OID)"));
       return SccOk;
     }
 

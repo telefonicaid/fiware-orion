@@ -78,6 +78,13 @@ HttpStatusCode mongoUpdateContextSubscription
     LM_W(("Bad Input (invalid OID format)"));
     return SccOk;
   }
+  catch (...)
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)", reqSemTaken);
+    responseP->subscribeError.errorCode.fill(SccReceiverInternalError);
+    LM_E(("Runtime Error (generic exception getting OID)"));
+    return SccOk;
+  }
 
   if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
   {

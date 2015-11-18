@@ -1190,8 +1190,14 @@ static bool addTriggeredSubscriptions_withCache
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    catch (...)
+    {
+      err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
       continue;
     }
     BSONElement  idField  = getField(sub, "_id");
@@ -1424,8 +1430,14 @@ static bool addTriggeredSubscriptions_noCache
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    catch (...)
+    {
+      err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
       continue;
     }
     BSONElement  idField  = sub.getField("_id");
@@ -2750,8 +2762,14 @@ void processContextElement
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    catch (...)
+    {
+      err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));

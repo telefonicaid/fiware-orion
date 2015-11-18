@@ -501,8 +501,14 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    catch (...)
+    {
+      err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
       continue;
     }
 
@@ -1371,7 +1377,7 @@ bool entitiesQuery
     }
     catch (const AssertionException &e)
     {
-      std::string err              = e.what();
+      std::string exErr            = e.what();
       ContextElementResponse*  cer = new ContextElementResponse();
 
       //
@@ -1381,15 +1387,15 @@ bool entitiesQuery
       const char* invalidPolygon      = "Exterior shell of polygon is invalid";
       const char* defaultErrorString  = "Error at querying MongoDB";
 
-      LM_W(("Database Error (%s)", err.c_str()));
+      LM_W(("Database Error (%s)", exErr.c_str()));
 
-      if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
+      if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
       {
-        err = invalidPolygon;
+        exErr = invalidPolygon;
       }
       else
       {
-        err = defaultErrorString;
+        exErr = defaultErrorString;
       }
 
       //
@@ -1408,9 +1414,15 @@ bool entitiesQuery
         cer->contextElement.entityId.fill("", "", "");
       }
 
-      cer->statusCode.fill(SccReceiverInternalError, err);
+      cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
       return true;
+    }
+    catch (...)
+    {
+      *err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      return false;
     }
 
     // Build CER from BSON retrieved from DB
@@ -1805,8 +1817,14 @@ bool registrationsQuery
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      *err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    catch (...)
+    {
+      *err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));

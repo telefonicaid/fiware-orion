@@ -202,8 +202,14 @@ void mongoListSubscriptions
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      continue;
+    }
+    catch (...)
+    {
+      err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -262,10 +268,18 @@ void mongoGetSubscription
     }
     catch (const AssertionException &e)
     {
-      // $err raised
+      err = e.what();
       LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccReceiverInternalError, std::string("Assertion exception in nextSafe(): ") + e.what());
+      return;
+    }
+    catch (...)
+    {
+      err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
+      *oe = OrionError(SccReceiverInternalError, std::string("Generic exception in nextSafe()"));
       return;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
