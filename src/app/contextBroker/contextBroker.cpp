@@ -297,7 +297,7 @@ bool            simulatedNotification;
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
-#define DROP_NOTIF_DESC        "drop outgoing notifications (testing)"
+#define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
 
 
 /* ****************************************************************************
@@ -355,7 +355,7 @@ PaArgument paArgs[] =
   { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
   { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
-  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, DROP_NOTIF_DESC        },
+  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },
 
   PA_END_OF_ARGS
 };
