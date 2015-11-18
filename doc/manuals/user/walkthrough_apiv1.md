@@ -319,11 +319,11 @@ The updateContext request payload contains a list of contextElement
 elements. Each contextElement is associated to an entity (whose
 identification is provided in the entityId element, in this case we
 provide the identification for Room1) and contains a list of
-contextAttribute elements ('attributes' for short, in JSON). Each
-contextAttribute provides the value for a given attribute (identified by
-name and type) of the entity. Apart from the list of contextElement
-elements, the payload includes also an updateAction element. We use
-APPEND, which means that we wa      nt to add new information.
+attributes elements . Each contextAttribute provides the value 
+for a given attribute (identified by name and type) of the entity. 
+Apart from the list of contextElement elements, the payload includes
+also an updateAction element. We use APPEND, which means that we want 
+to add new information.
 
 Orion Context Broker doesn't perform any checking on types (e.g. it doesn't
 check that when a context producer application updates the value of the
@@ -988,17 +988,16 @@ EOF
 
 Let's examine in detail the different elements included in the payload:
 
--   entityIdList and attributeList ('entities' and 'attributes' for
-    short, in JSON) define which context elements will be included in
-    the notification message. 
+-   entities and attributes for short, in JSON) define which context 
+    elements will be included in  the notification message. 
     In this example, we are specifying that the notification has to include 
     the temperature attribute for entity Room1.
 -   The callback URL to send notifications is defined with the
     reference element. We are using the URL of the accumulator-server.py
     program started before. Only one reference can be included per
     subscribeContext request. However, you can have several
-    subscriptions on the same context elements (i.e. same entityIdList
-    and attributeList) without any problem. Default URL schema (in the
+    subscriptions on the same context elements (i.e. same entity
+    and attribute) without any problem. Default URL schema (in the
     case you don't specify any) is "http", e.g. using "localhost:1028"
     as reference will be actually interpreted as
     "<http://localhost:1028>".
@@ -2601,8 +2600,7 @@ EOF
 
 The payload has the following elements:
 
--   entityIdList and attributeList ('entities' and 'attributes' for
-    short, in JSON) define which context availability information we are
+-   entities and attributes define which context availability information we are
     interested in. They are used to select the context registrations to
     include in the notifications.
     In this case, we are stating that we are interested in context
@@ -2614,7 +2612,7 @@ The payload has the following elements:
     accumulator-server.py program started before. Only one reference can
     be included per subscribeContextAvailability request. However, you
     can have several subscriptions on the same context availability
-    elements (i.e. same entityIdList and attributeList) without
+    elements (i.e. same entity and attribute) without
     any problem. Default URL schema (in the case you don't specify any)
     is "http", e.g. using "localhost:1028" as reference will be actually
     interpreted as "<http://localhost:1028>".
@@ -2702,7 +2700,7 @@ Currently, the originator is always "localhost". We will look into a
 more flexible way of using this in a later version.
 
 The initial notification includes all the currently registered entities
-that match the entityIdList/attributeList used in
+that match the entity/attribute used in
 subscribeContextAvailability request. That is, the registration
 corresponding to Room1 and Room2 temperature. Note that, although Room1
 and Room2 registered two attributes (temperature and pressure) only
@@ -2921,7 +2919,7 @@ EOF
 }
 EOF
 ```
-As both registrations match the entityIdList and attributeList used in
+As both registrations match the entity and attribute used in
 the updateContextAvailabilitySubscription, we will get a notification
 for each car registration, as can be seen in accumulator-server.py:
 
