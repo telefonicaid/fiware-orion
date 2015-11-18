@@ -22,6 +22,10 @@
 * Author: Orion dev team
 */
 
+#include <stdio.h>
+
+#include "common/clockFunctions.h"
+
 #include "ngsiNotify/QueueStatistics.h"
 
 // This implementation could be 'improved' when boost >=1.53.0 || C++ 11
@@ -32,6 +36,10 @@ volatile int QueueStatistics::noOfNotificationsQueueOut;
 volatile int QueueStatistics::noOfNotificationsQueueReject;
 volatile int QueueStatistics::noOfNotificationsQueueSentOK;
 volatile int QueueStatistics::noOfNotificationsQueueSentError;
+
+boost::mutex QueueStatistics::mtxTimeInQ;
+struct timespec QueueStatistics::timeInQ;
+size_t QueueStatistics::queueSize;
 
 /* ****************************************************************************
 *
@@ -121,4 +129,39 @@ int  QueueStatistics::getSentError()
 void QueueStatistics::incSentError()
 {
   __sync_fetch_and_add(&noOfNotificationsQueueSentError, 1);
+}
+/* ****************************************************************************
+*
+* getTimInQ -
+*/
+void QueueStatistics::getTimeInQ(char* buf, size_t bufLen)
+{
+  boost::mutex::scoped_lock lock(mtxTimeInQ);
+
+  // As the others time statistics
+  snprintf(buf, bufLen, "%lu.%09d", timeInQ.tv_sec, (int) timeInQ.tv_nsec);
+}
+
+/* ****************************************************************************
+*
+* addTimInQ -
+*/
+void QueueStatistics::addTimeInQWithSize(const struct timespec* diff, size_t qSize)
+{
+  boost::mutex::scoped_lock lock(mtxTimeInQ);
+
+  queueSize = qSize;
+  clock_addtime(&timeInQ, diff);
+
+}
+
+/* ****************************************************************************
+*
+* getQSize() -
+*/
+size_t QueueStatistics::getQSize()
+{
+  boost::mutex::scoped_lock lock(mtxTimeInQ);
+
+  return  queueSize;
 }

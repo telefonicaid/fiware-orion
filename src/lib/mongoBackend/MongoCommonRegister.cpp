@@ -42,6 +42,7 @@
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/dbConstants.h"
 
 using std::string;
 using std::map;

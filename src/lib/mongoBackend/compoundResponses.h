@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
-#define SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
+#ifndef SRC_LIB_MONGOBACKEND_COMPOUNDRESPONSES_H_
+#define SRC_LIB_MONGOBACKEND_COMPOUNDRESPONSES_H_
 
 /*
 *
@@ -23,34 +23,25 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermín Galán
 */
-#include <time.h>
 
-
+#include "parse/CompoundValueNode.h"
+#include "mongo/client/dbclient.h"
 
 /* ****************************************************************************
 *
-* clock_difftime - 
+* compoundVectorResponse -
+*
 */
-extern void clock_difftime(const struct timespec* endTime, const struct timespec* startTime, struct timespec* diffTime);
-
-
+extern void compoundVectorResponse(orion::CompoundValueNode* cvP, const mongo::BSONElement& be);
 
 /* ****************************************************************************
 *
-* clock_addtime - 
-*/
-extern void clock_addtime(struct timespec* accTime, const struct timespec* diffTime);
-
-
-
-/* ****************************************************************************
+* compoundObjectResponse -
 *
-* clock_subtime - 
 */
-extern void clock_subtime(struct timespec* subtrahend, const struct timespec* minuend);
+extern void compoundObjectResponse(orion::CompoundValueNode* cvP, const mongo::BSONElement& be);
 
-#endif  // SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
-
+#endif // SRC_LIB_MONGOBACKEND_COMPOUNDRESPONSES_H_
 

@@ -34,7 +34,10 @@
 #include "parse/forbiddenChars.h"
 #include "ngsi/Metadata.h"
 
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/safeBsonGet.h"
 
+using namespace mongo;
 
 /* ****************************************************************************
 *
@@ -123,6 +126,37 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
   boolValue  = _value;
 }
 
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const BSONObj& mdB)
+{
+  name = getStringField(mdB, ENT_ATTRS_MD_NAME);
+  type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE) : "";
+  switch (getField(mdB, ENT_ATTRS_MD_VALUE).type())
+  {
+  case String:
+    valueType   = orion::ValueTypeString;
+    stringValue = getStringField(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
+  case NumberDouble:
+    valueType   = orion::ValueTypeNumber;
+    numberValue = getField(mdB, ENT_ATTRS_MD_VALUE).Number();
+    break;
+
+  case Bool:
+    valueType = orion::ValueTypeBoolean;
+    boolValue = getBoolField(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
+  default:
+    valueType = orion::ValueTypeUnknown;
+    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
+    break;
+  }
+}
 
 
 /* ****************************************************************************

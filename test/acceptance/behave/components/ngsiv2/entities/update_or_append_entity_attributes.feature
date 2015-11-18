@@ -2770,8 +2770,8 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     Then verify that receive an "Created" http code
     And verify that an entity is updated in mongo
 
-  @op_qp_append_unknown
-  Scenario Outline:  try to append an attribute by entity ID using NGSI v2 with unkwnown "op" query parameter
+  @op_qp_append_unknown_value
+  Scenario Outline:  try to append an attribute by entity ID using NGSI v2 with unkwnown "op" query parameter value
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2814,10 +2814,9 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | random=100      |
       | random=1000     |
       | random=10000    |
-      | random=50000    |
 
-  @op_qp_append_unknown
-  Scenario Outline:  append an attribute by entity ID using NGSI v2 with unkwnown query parameter
+  @op_qp_append_unknown_name
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with unkwnown query parameter name
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |

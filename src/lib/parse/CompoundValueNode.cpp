@@ -224,6 +224,11 @@ CompoundValueNode::~CompoundValueNode()
     }
   }
 
+  while (childV.size() != 0)
+  {
+    childV.erase(childV.begin());
+  }
+
   childV.clear();
 }
 

@@ -242,7 +242,6 @@ SET (STATIC_LIBS
     ${GTESTMAIN_LIBRARY}
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
-    mongoBackend
     rest
     jsonParse
     jsonParseV2
@@ -256,6 +255,7 @@ SET (STATIC_LIBS
     ngsi9
     ngsi10
     ngsi
+    mongoBackend
     orionTypes
     common
     lm

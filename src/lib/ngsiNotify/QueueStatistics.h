@@ -32,6 +32,7 @@
 // A newer version of boost (>=1.53.0) or c++11 could provide better
 // alternatives to this implementation
 
+#include "boost/thread/mutex.hpp"
 
 class QueueStatistics
 {
@@ -97,6 +98,25 @@ public:
   */
   static void incSentError();
 
+  /* ****************************************************************************
+  *
+  * getTimInQ -
+  */
+  static void getTimeInQ(char* buf, size_t bufLen);
+
+  /* ****************************************************************************
+  *
+  * addTimInQ -
+  */
+  static void addTimeInQWithSize(const struct timespec* diff, size_t qSize);
+
+
+  /* ****************************************************************************
+  *
+  * getQSize -
+  */
+  static size_t getQSize();
+
 private:
    QueueStatistics();
    static volatile int noOfNotificationsQueueIn;
@@ -104,6 +124,11 @@ private:
    static volatile int noOfNotificationsQueueReject;
    static volatile int noOfNotificationsQueueSentOK;
    static volatile int noOfNotificationsQueueSentError;
+
+   static boost::mutex    mtxTimeInQ;
+   static struct timespec timeInQ;
+   static size_t          queueSize;
+
 };
 
 #endif // SRC_LIB_NGSINOTIFY_QUEUESTATISTICS_H

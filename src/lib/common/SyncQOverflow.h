@@ -48,6 +48,7 @@ public:
     SyncQOverflow(size_t sz): max_size(sz) {}
     bool try_push(Data element);
     Data pop();
+    size_t size() const;
 };
 
 /* ****************************************************************************
@@ -87,4 +88,15 @@ Data SyncQOverflow<Data>::pop()
   return element;
 }
 
+/* ****************************************************************************
+*
+* SyncQOverflow<Data>::size -
+*/
+template <typename Data>
+size_t SyncQOverflow<Data>::size() const
+{
+  boost::mutex::scoped_lock lock(mtx);
+
+  return queue.size();
+}
 #endif // SRC_LIB_COMMON_SYNCQOVERFLOW_H

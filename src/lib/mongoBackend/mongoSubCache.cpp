@@ -55,6 +55,7 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/dbConstants.h"
 
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/SubscribeContextRequest.h"

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
-#define SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
+#ifndef SRC_LIB_MONGOBACKEND_DBFIELDENCODING_H_
+#define SRC_LIB_MONGOBACKEND_DBFIELDENCODING_H_
 
 /*
 *
@@ -23,34 +23,60 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermín Galán
 */
-#include <time.h>
 
-
+#include <string>
 
 /* ****************************************************************************
 *
-* clock_difftime - 
+* basePart, idPart -
+*
+* Helper functions for entitysQuery to split the attribute name string into part,
+* e.g. "A1__ID1" into "A1" and "ID1"
 */
-extern void clock_difftime(const struct timespec* endTime, const struct timespec* startTime, struct timespec* diffTime);
+inline std::string basePart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just 'name' */
+    return name;
+  }
 
+  /* If found, return substring */
+  return name.substr(0, pos);
 
+}
+
+inline std::string idPart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just "" */
+    return "";
+  }
+
+  /* If found, return substring */
+  return name.substr(pos + 2, name.length());
+
+}
 
 /* ****************************************************************************
 *
-* clock_addtime - 
+* dbDotEncode -
+*
 */
-extern void clock_addtime(struct timespec* accTime, const struct timespec* diffTime);
-
-
+extern std::string dbDotEncode(std::string fromString);
 
 /* ****************************************************************************
 *
-* clock_subtime - 
+* dbDotDecode -
+*
 */
-extern void clock_subtime(struct timespec* subtrahend, const struct timespec* minuend);
+extern std::string dbDotDecode(std::string fromString);
 
-#endif  // SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
-
-
+#endif // SRC_LIB_MONGOBACKEND_DBFIELDENCODING_H_

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
-#define SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,34 +20,43 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermín Galán
 */
-#include <time.h>
 
+#include <algorithm>
+#include "mongoBackend/dbFieldEncoding.h"
+
+/* ****************************************************************************
+*
+* Characters for attribute value encoding
+*/
+#define ESCAPE_1_DECODED  '.'
+#define ESCAPE_1_ENCODED  '='
 
 
 /* ****************************************************************************
 *
-* clock_difftime - 
+* dbDotEncode -
+*
+* Replace:
+*   . => =
 */
-extern void clock_difftime(const struct timespec* endTime, const struct timespec* startTime, struct timespec* diffTime);
-
+std::string dbDotEncode(std::string s)
+{
+  std::replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
+  return s;
+}
 
 
 /* ****************************************************************************
 *
-* clock_addtime - 
-*/
-extern void clock_addtime(struct timespec* accTime, const struct timespec* diffTime);
-
-
-
-/* ****************************************************************************
+* dbDotDecode -
 *
-* clock_subtime - 
+* Replace:
+*   = => .
 */
-extern void clock_subtime(struct timespec* subtrahend, const struct timespec* minuend);
-
-#endif  // SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
-
-
+std::string dbDotDecode(std::string s)
+{
+  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
+  return s;
+}

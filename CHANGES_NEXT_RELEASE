@@ -1,9 +1,11 @@
-- Fix: safer treatment of database fields lastNotification, expiration and throttling in 
-       the 'csub' collection, assuming that the field can be either int or long (it is always written as long)
-- Fix: number/bool correct rendering in NGSIv1 compound values
 - Add: Add queue+threads for notifications (notificationMode thread:<queue size>:<num threads>) (Issue #1449)
 - Add: possibility to limit the maximum number of simultaneous connections, using the CLI option -maxConnections (Issue #1384)
 - Add: possibility to use thread pool for incoming connections, using CLI option -reqPoolSize (Issue #1384)
+- Fix: safer treatment of database fields lastNotification, expiration and throttling in 
+       the 'csub' collection, assuming that the field can be either int or long (it is always written as long)
+- Fix: number/bool correct rendering in NGSIv1 compound values
+- Fix: ONCHANGE notifications triggered by update context operation are filled avoiding querying entities collection (#881)
+- Fix: wrong notification values (duplicated) when triggering update context operations are too close (race condition)
 - Fix: A bug in the request reading logic that may cause unexpected Parse Errors or even SIGSEGVs
 - Fix: Semaphore releasing bug in unsubscribeContext when subscription ID is the empty string (Issue #1488)
 - Add: Built-in Timing/Profiling when using the -reqTimeStat (#Issue 1367)
