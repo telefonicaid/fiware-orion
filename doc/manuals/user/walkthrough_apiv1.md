@@ -316,11 +316,11 @@ EOF
 ```
 
 The updateContext request payload contains a list of contextElement
-elements. Each contextElement is associated to an entity (whose
-identification is provided by the id, type and isPattern fields, in this case
-we provide the identification for Room1) and contains  an attribute vector 
-with a list of attributes. Each element in the attributes list provides 
-the value for a given attribute (identified by name) of the entity. 
+elements. Each contextElement is associated to an entity, whose
+identification is provided by the `id`, `type` and `isPattern` fields (in this case
+the identification for Room1 is provided) and contains a list of attributes. 
+Each element in the attributes list provides the value for a given attribute 
+(identified by name) of the entity. 
 Apart from the list of contextElement elements, the payload includes
 also an updateAction element. We use APPEND, which means that we want 
 to add new information.
@@ -1075,7 +1075,7 @@ Orion Context Broker notifies NGSI10 subscribeContext using the POST
 HTTP method (on the URL used as reference for the subscription) with a
 notifyContextRequest payload. Apart from the subscriptionId element
 (that matches the one in the response to subscribeContext request) and
-the originator element, there is a contextResponseList element which is
+the originator element, there is a contextResponse vector which is
 the same that the one used in the [queryContext
 responses](#query-context-operation).
 
@@ -1204,7 +1204,7 @@ Having a look at the payload we can check that it is very similar to the
 one used in ONTIMEINTERVAL, with two exceptions:
 
 -   The notifyCondition element uses the type ONCHANGE (obviously :)
-    but, in this case the condValueList contains an actual list of
+    but, in this case the condValue vector contains an actual list of
     condValue elements, each one with an attribute name. They define the
     "triggering attributes", i.e. attributes that upon creation/change
     due to [Entity Creation](#entity-creation) or
@@ -2692,7 +2692,7 @@ the POST HTTP method (on the URL used as reference for the subscription)
 with a notifyContextAvailabilityRequest payload. Apart from the
 subscriptionId element (that matches the one in the response to
 subscribeContextAvailability request) and the originator element, the
-contextResponseList element is the same than the one used in [the
+contextResponse vector is the same than the one used in [the
 discoverContextAvailability
 responses](#discover-context-availability-operation).
 
