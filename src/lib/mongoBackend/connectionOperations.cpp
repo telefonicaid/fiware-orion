@@ -78,7 +78,7 @@ bool collectionQuery
     TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     releaseMongoConnection(connection);       
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -158,7 +158,7 @@ extern bool collectionRangedQuery
     TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -222,7 +222,7 @@ bool collectionCount
 
     return c;
   }
-  catch (const DBException& e)
+  catch (const std::exception& e)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -284,7 +284,7 @@ extern bool collectionFindOne
     TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_I(("Database Operation Successful (findOne: %s)", q.toString().c_str()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -346,7 +346,7 @@ bool collectionInsert
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
     LM_I(("Database Operation Successful (insert: %s)", doc.toString().c_str()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
@@ -410,7 +410,7 @@ bool collectionUpdate
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
     LM_I(("Database Operation Successful (update: <%s, %s>)", q.toString().c_str(), doc.toString().c_str()));
   }
-  catch (const DBException& e)
+  catch (const std::exception& e)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
@@ -472,7 +472,7 @@ bool collectionRemove
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
     LM_I(("Database Operation Successful (remove: %s)", q.toString().c_str()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_WRITE_WAIT_STOP();
@@ -533,7 +533,7 @@ bool collectionCreateIndex
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     LM_I(("Database Operation Successful (createIndex: %s)", indexes.toString().c_str()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
@@ -632,7 +632,7 @@ bool runCollectionCommand
     }
     LM_I(("Database Operation Successful (command: %s)", command.toString().c_str()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     if (releaseConnection)
     {
@@ -686,7 +686,7 @@ bool setWriteConcern
     connection->setWriteConcern(wc);
     LM_I(("Database Operation Successful (setWriteConcern: %d)", wc.nodes()));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     // FIXME: include wc.nodes() in the output message, + operator doesn't work with integers
     std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() +*/
@@ -728,7 +728,7 @@ bool getWriteConcern
     *wc = connection->getWriteConcern();
     LM_I(("Database Operation Successful (getWriteConcern)"));
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     std::string msg = std::string("getWritteConern()") +
       " - exception: " + e.what();
@@ -780,7 +780,7 @@ extern bool connectionAuth
       return false;
     }
   }
-  catch (const DBException &e)
+  catch (const std::exception &e)
   {
     std::string msg = std::string("authentication fails: db=") + db +
         ", username='" + user + "'" +

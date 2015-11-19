@@ -495,23 +495,11 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   while (moreSafe(cursor))
   {
     BSONObj sub;
-    try
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      err = e.what();
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-    catch (...)
-    {
-      err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe())"));
-      continue;
-    }
-
     treatFunction(tenant, sub);
   }
 }
@@ -1373,6 +1361,7 @@ bool entitiesQuery
     BSONObj  r;
     try
     {
+      // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
       r = cursor->nextSafe();
     }
     catch (const AssertionException &e)
@@ -1417,6 +1406,12 @@ bool entitiesQuery
       cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
       return true;
+    }
+    catch (const std::exception &e)
+    {
+      *err = e.what();
+      LM_E(("Runtime Error (exception in nextSafe(): %s)", e.what()));
+      return false;
     }
     catch (...)
     {
@@ -1811,20 +1806,9 @@ bool registrationsQuery
   while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      *err = e.what();
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
-      continue;
-    }
-    catch (...)
-    {
-      *err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err->c_str()));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));

@@ -26,6 +26,10 @@
 * Author: Fermin Galan Marquez
 */
 
+#include "ngsi/SubscriptionId.h"
+#include "ngsi/RegistrationId.h"
+#include "ngsi/StatusCode.h"
+
 #include "mongo/client/dbclient.h"
 
 /* ****************************************************************************
@@ -75,5 +79,26 @@ extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& f
 * moreSafe -
 */
 extern bool moreSafe(const std::auto_ptr<mongo::DBClientCursor>& cursor);
+
+/* ****************************************************************************
+*
+* nextSafeOrError -
+*
+*/
+extern bool nextSafeOrError(const std::auto_ptr<mongo::DBClientCursor>& cursor, mongo::BSONObj* r, std::string* err);
+
+/* ****************************************************************************
+*
+* safeGetSubId -
+*
+*/
+extern bool safeGetSubId(const SubscriptionId& subId, mongo::OID* id, StatusCode* sc);
+
+/* ****************************************************************************
+*
+* safeGetRegId -
+*
+*/
+extern bool safeGetRegId(const RegistrationId& regId, mongo::OID* id, StatusCode* sc);
 
 #endif // SRC_LIB_MONGOBACKEND_SAFEBSONGET_H_

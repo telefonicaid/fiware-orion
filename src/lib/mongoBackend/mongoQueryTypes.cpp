@@ -67,23 +67,11 @@ static std::string attributeType
   while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      err = e.what();
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-    catch (...)
-    {
-      err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe())"));
-      continue;
-    }
-
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     /* It could happen that different entities within the same entity type may have attributes with the same name

@@ -35,6 +35,7 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/safeBsonGet.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -83,29 +84,19 @@ HttpStatusCode mongoRegisterContext
     std::string err;
     OID         id;
 
-    try
+    if (!safeGetRegId(requestP->registrationId, &id, &(responseP->errorCode)))
     {
-      id = OID(requestP->registrationId.get());
-    }
-    catch (const AssertionException &e)
-    {
-      reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
-      /* This happens when OID format is wrong */
-      // FIXME: this checking should be done at parsing stage, without progressing to
-      // mongoBackend. By the moment we can live this here, but we should remove in the future
-      responseP->errorCode.fill(SccContextElementNotFound);
+      reqSemGive(__FUNCTION__, "ngsi9 register request (safeGetRegId fail)", reqSemTaken);
       responseP->registrationId = requestP->registrationId;
       ++noOfRegistrationUpdateErrors;
-      LM_W(("Bad Input (invalid OID format)"));
-      return SccOk;
-    }
-    catch (...)
-    {
-      reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
-      responseP->errorCode.fill(SccReceiverInternalError);
-      responseP->registrationId = requestP->registrationId;
-      ++noOfRegistrationUpdateErrors;
-      LM_E(("Runtime Error (generic exception getting OID)"));
+      if (responseP->errorCode.code == SccContextElementNotFound)
+      {
+        LM_W(("Bad Input (invalid OID format: %s)", requestP->registrationId.get().c_str()));
+      }
+      else // SccReceiverInternalError
+      {
+        LM_E(("Runtime Error (exception getting OID: %s)", responseP->errorCode.details.c_str()));
+      }
       return SccOk;
     }
 

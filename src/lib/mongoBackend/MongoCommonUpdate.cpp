@@ -1181,22 +1181,12 @@ static bool addTriggeredSubscriptions_withCache
 
   /* For each of the subscriptions found, add it to the map (if not already there) */
   while (moreSafe(cursor))
-  {
-    BSONObj sub;
-    try
+  {    
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      err = e.what();
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
-      continue;
-    }
-    catch (...)
-    {
-      err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     BSONElement  idField  = getField(sub, "_id");
@@ -1421,21 +1411,11 @@ static bool addTriggeredSubscriptions_noCache
   /* For each one of the subscriptions found, add it to the map (if not already there) */
   while (moreSafe(cursor))
   {
-    BSONObj sub;
-    try
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      err = e.what();
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
-      continue;
-    }
-    catch (...)
-    {
-      err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     BSONElement  idField  = sub.getField("_id");
@@ -2754,20 +2734,9 @@ void processContextElement
   while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      err = e.what();
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
-      continue;
-    }
-    catch (...)
-    {
-      err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));

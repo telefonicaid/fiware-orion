@@ -44,7 +44,7 @@ typedef struct SubscriptionId
   SubscriptionId(const std::string& subId);
 
   void          set(const std::string& value);
-  std::string   get(void);
+  std::string   get(void) const;
   bool          isEmpty(void);
   std::string   render(RequestType container, Format format, const std::string& indent, bool comma = false);
   void          present(const std::string& indent);

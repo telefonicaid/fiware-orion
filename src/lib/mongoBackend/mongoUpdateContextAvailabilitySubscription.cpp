@@ -60,28 +60,18 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   BSONObj     sub;
   std::string err;
   OID         id;
-  try
+
+  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->errorCode)))
   {
-    id = OID(requestP->subscriptionId.get());
-  }
-  catch (const AssertionException &e)
-  {
-    //
-    // This happens when OID format is wrong
-    // FIXME: this checking should be done at parsing stage, without progressing to
-    // mongoBackend. By the moment we can live this here, but we should remove in the future
-    // (old issue #95)
-    //
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
-    responseP->errorCode.fill(SccContextElementNotFound);
-    LM_W(("Bad Input (invalid OID format)"));
-    return SccOk;
-  }
-  catch (...)
-  {
-    reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)", reqSemTaken);
-    responseP->errorCode.fill(SccReceiverInternalError);
-    LM_E(("Runtime Error (generic exception getting OID)"));
+    if (responseP->errorCode.code == SccContextElementNotFound)
+    {
+      LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+    }
+    else // SccReceiverInternalError
+    {
+      LM_E(("Runtime Error (exception getting OID: %s)", responseP->errorCode.details.c_str()));
+    }
     return SccOk;
   }
 

@@ -234,24 +234,13 @@ static bool addTriggeredSubscriptions
   /* For each one of the subscriptions found, add it to the map (if not already there) */
   while (moreSafe(cursor))
   {
-    BSONObj sub;
-    try
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      err = e.what();
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-    catch (...)
-    {
-      err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe())"));
-      continue;
-    }
-
     BSONElement idField = getField(sub, "_id");
 
     //
