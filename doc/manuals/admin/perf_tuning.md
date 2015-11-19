@@ -10,4 +10,9 @@ should be covered in the final document:
   Drawbacks (queue/connection saturation)
 * Changing the thread limit per process (ulimit). The "thread cannot be created error"
 * Identifying bootleneck looking to sem statistics
+* Logging impact on performance
+* Mutext policy impact on performance
+* Write concern impact on performance
+* httpTimeout impact on performance
+* subCacheIval impact on performance (trade off between "too frequent" and "too infrequent")
 * Any other?
