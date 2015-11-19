@@ -1838,7 +1838,7 @@ In order to star the accumulator server;
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue element</td>
   </tr>
   <tr>
     <th>Payload Information Response</th>
@@ -1888,7 +1888,7 @@ Let's examine in detail the different elements included in the payload:
         http://localhost:1028.
 
 * Subscriptions have a duration, specified using the ISO 8601 standard format. Once that duration is expired, the subscription is simply ignored (however, it is still stored in the broker database and needs to be purged). You can extend the duration of a subscription by updating it. We are using "P1M" which means "one month".
-* The notifyCondition element defines the "trigger" for the subscription. There is a type element (which value in this case is ONTIMERINTERVAL) and a condValueList element. The condValueList element structure depends on the type. In the case of ONTIMEINTERVAL, it includes exactly one condValue child element whose value is a time interval (using again, as usual in NGSI, the ISO 8601 format). A notification is sent with a frequency equal to that interval. In the example above we are using 10 seconds as interval.
+* The notifyCondition element defines the "trigger" for the subscription. There is a type element (which value in this case is ONTIMERINTERVAL) and a condValue element. The condValue vector structure depends on the type. In the case of ONTIMEINTERVAL, it includes exactly one condValue child element whose value is a time interval (using again, as usual in NGSI, the ISO 8601 format). A notification is sent with a frequency equal to that interval. In the example above we are using 10 seconds as interval.
 * Actually, there are two kinds of contextSubscriptions: ONTIMEINTERVAL and ONCHANGE subscription.
 * If you look at the accumulator-script.py terminal window, you will see that a message resembling the following one is received each 10 seconds:
         
@@ -1999,7 +1999,7 @@ Subscriptions can be updated.The request includes a subscriptionId that identifi
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue vector</td>
   </tr>
   <tr>
     <th>Payload Information Response</th>
@@ -2467,7 +2467,7 @@ Apart from deleting individual attributes from a given entity,  you can also del
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
- In order to delete an entity, the updateContext operation is used, with DELETE as actionType and with an empty attributeList:
+ In order to delete an entity, the updateContext operation is used, with DELETE as actionType and with an empty attribute vector:
 <center>
 
 |Payload Information Request  |Description  |              |Value          |
@@ -3225,7 +3225,7 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue vector</td>
   </tr>
   <tr>
     <th>Payload Information Response</th>
@@ -3301,7 +3301,7 @@ If you look at the accumulator-script.py terminal window, you will see that a me
                 ]
         }
 
-Orion Context Broker notifies NGSI10 subscribeContext using the POST HTTP method (on the URL used as reference for the subscription) with a notifyContextRequest payload. Apart from the subscriptionId element (that matches the one in the response to subscribeContext request) and the originator element, there is a contextResponseList element which is the same that the one used in the queryContext responses.
+Orion Context Broker notifies NGSI10 subscribeContext using the POST HTTP method (on the URL used as reference for the subscription) with a notifyContextRequest payload. Apart from the subscriptionId element (that matches the one in the response to subscribeContext request) and the originator element, there is a contextResponse vector which is the same that the one used in the queryContext responses.
 
 + ONCHANGE
 
@@ -3334,7 +3334,7 @@ The following is the request corresponding to an ONCHANGE subscription:
   </tr>
   <tr>
     <td><b>NotifyConditions</b></td>
-    <td>There is a type element and a condValueList element</td>
+    <td>There is a type element and a condValue vector</td>
   </tr>
   <tr>
     <td><b>Throttling</b></td>
@@ -3351,7 +3351,7 @@ The following is the request corresponding to an ONCHANGE subscription:
   <tr bgcolor="silver"><td></td><td></td></tr>
 </table>
 
-*The notifyCondition element uses the type ONCHANGE (obviously :) but, in this case the condValueList contains an actual list of condValue elements, each one with an attribute name. They define the "triggering attributes", i.e. attributes that upon creation/change due to entity creation or update trigger the notification. The rule is that if at least one of the attributes in the list changes (e.g. some kind of "OR" condition), then a notification is sent. But note that that notification includes the attributes in the attributeList part, which doesn't necessarily include any attribute in the condValue.
+*The notifyCondition element uses the type ONCHANGE (obviously :) but, in this case the condValue vector contains an actual list of condValue elements, each one with an attribute name. They define the "triggering attributes", i.e. attributes that upon creation/change due to entity creation or update trigger the notification. The rule is that if at least one of the attributes in the list changes (e.g. some kind of "OR" condition), then a notification is sent. But note that that notification includes the attributes in the attribute vector part, which doesn't necessarily include any attribute in the condValue.
 
 *The throttling element is used to specify a minimum inter-notification arrival time. So, setting throttling to 5 seconds as in the example above makes that a notification will not be sent if a previous notification was sent less than 5 seconds ago, no matter how many actual changes take place in that period.his is to not stress the notification receptor in case of having context producers that update attribute values too frequently. Actually, throttling is not an "exclusive" field for ONCHANGE subscriptions: from a theoretical point of view it can be used in ONTIMEINTERVAL subscriptions but, given that in that case you can precisely control the notification frequency it doesn't have any practical sense.
 
