@@ -161,8 +161,8 @@ it is only shown if `-notificationMode` uses threadpool.
     "in" : "579619",
     "out" : "579619",
     "reject" : "0",
-    "sentOk" : "579543",  // Probably will be generalized for all transmision modes at the end
-    "sentError" : "76",   // Probably will be generalized for all transmision modes at the end
+    "sentOk" : "579543",  // Probably will be generalized for all notification modes at the end
+    "sentError" : "76",   // Probably will be generalized for all notification modes at the end
     "timeInQueue" : "44.884263230",
     "size" : "0"
   }
