@@ -510,7 +510,6 @@ void curl_context_cleanup(void)
     curl_easy_cleanup(it->second.curl);
     it->second.curl = NULL;
     release_curl_context(&it->second, true);
-    contexts.erase(it);
   }
 
   contexts.clear();
