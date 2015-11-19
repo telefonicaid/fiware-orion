@@ -44,8 +44,8 @@ static std::string attributeType
 (
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
-  const std::string                     entityType,
-  const std::string                     attrName
+  const std::string&                    entityType,
+  const std::string&                    attrName
 )
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;

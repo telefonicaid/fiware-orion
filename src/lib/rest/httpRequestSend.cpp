@@ -275,12 +275,10 @@ std::string httpRequestSendWithCurl
   if (useRush)
   {
     char         rushHeaderPortAsString[16];
-    uint16_t     rushHeaderPort     = 0;
-    std::string  rushHeaderIP       = "";
-    std::string  headerRushHttp     = "";
+    uint16_t     rushHeaderPort     = port;
+    std::string  rushHeaderIP       = ip;
+    std::string  headerRushHttp;
 
-    rushHeaderIP   = ip;
-    rushHeaderPort = port;
     ip             = rushHost;
     port           = rushPort;
 
