@@ -316,14 +316,14 @@ EOF
 ```
 
 The updateContext request payload contains a list of contextElement
-elements. Each contextElement is associated to an entity (whose
-identification is provided in the entityId element, in this case we
-provide the identification for Room1) and contains a list of
-contextAttribute elements ('attributes' for short, in JSON). Each
-contextAttribute provides the value for a given attribute (identified by
-name and type) of the entity. Apart from the list of contextElement
-elements, the payload includes also an updateAction element. We use
-APPEND, which means that we wa      nt to add new information.
+elements. Each contextElement is associated to an entity, whose
+identification is provided by the `id`, `type` and `isPattern` fields (in this case
+the identification for Room1 is provided) and contains a list of attributes. 
+Each element in the attributes list provides the value for a given attribute 
+(identified by name) of the entity. 
+Apart from the list of contextElement elements, the payload includes
+also an updateAction element. We use APPEND, which means that we want 
+to add new information.
 
 Orion Context Broker doesn't perform any checking on types (e.g. it doesn't
 check that when a context producer application updates the value of the
@@ -988,17 +988,16 @@ EOF
 
 Let's examine in detail the different elements included in the payload:
 
--   entityIdList and attributeList ('entities' and 'attributes' for
-    short, in JSON) define which context elements will be included in
-    the notification message. 
+-   entities and attributes define which context elements will be included
+    in the notification message. 
     In this example, we are specifying that the notification has to include 
     the temperature attribute for entity Room1.
 -   The callback URL to send notifications is defined with the
     reference element. We are using the URL of the accumulator-server.py
     program started before. Only one reference can be included per
     subscribeContext request. However, you can have several
-    subscriptions on the same context elements (i.e. same entityIdList
-    and attributeList) without any problem. Default URL schema (in the
+    subscriptions on the same context elements (i.e. same entity
+    and attribute) without any problem. Default URL schema (in the
     case you don't specify any) is "http", e.g. using "localhost:1028"
     as reference will be actually interpreted as
     "<http://localhost:1028>".
@@ -1076,7 +1075,7 @@ Orion Context Broker notifies NGSI10 subscribeContext using the POST
 HTTP method (on the URL used as reference for the subscription) with a
 notifyContextRequest payload. Apart from the subscriptionId element
 (that matches the one in the response to subscribeContext request) and
-the originator element, there is a contextResponseList element which is
+the originator element, there is a contextResponse vector which is
 the same that the one used in the [queryContext
 responses](#query-context-operation).
 
@@ -1205,21 +1204,21 @@ Having a look at the payload we can check that it is very similar to the
 one used in ONTIMEINTERVAL, with two exceptions:
 
 -   The notifyCondition element uses the type ONCHANGE (obviously :)
-    but, in this case the condValueList contains an actual list of
+    but, in this case the condValue vector contains an actual list of
     condValue elements, each one with an attribute name. They define the
     "triggering attributes", i.e. attributes that upon creation/change
     due to [Entity Creation](#entity-creation) or
     [Update context elements](#update-context-elements) trigger
     the notification. The rule is that if at least one of the attributes
     in the list changes (e.g. some kind of "OR" condition), then a
-    notification is sent. But note that that notification includes the
-    attributes in the attributeList part, which doesn't necessarily
+    notification is sent. But note  that notification includes the
+    attributes in the attribute vector, which doesn't necessarily
     include any attribute in the condValue. For example, in this case,
     when Room1 pressure changes the Room1 temperature value is notified,
     but not pressure itself. If you want also pressure to be notified,
     the request would need to include
-    &lt;attribute&gt;pressure&lt;/attribute&gt; within the attributeList
-    (or to use an empty attributeList, which you already know means "all
+    &lt;attribute&gt;pressure&lt;/attribute&gt; within the attribute vector
+    (or to use an empty attribute vector, which you already know means "all
     the attributes in the entity"). Now, this example here, to be
     notified of the value of *temperature* each time the value of
     *pressure* changes may not be too useful. The example is chosen this
@@ -1497,7 +1496,7 @@ differences:
     operation requests.
 -   The payload of requests and responses in convenience operations are
     very similar to the ones used in standard operations, since
-    contextAttributeList and contextResponseList elements are the same.
+    contextAttribute and contextResponse  elements are the same.
 -   You can replace
     "Room1" by "/type/Room/id/Room1" in the URl to define the type (in
     general: "/type/<type>/id/<id>").
@@ -2131,7 +2130,7 @@ differences:
     operation requests.
 -   The payload of request and response in convenience operations are
     very similar to the ones used in standard operations, the
-    contextAttributeList and contextResponseList elements are the same.
+    contextAttributeList and contextResponse elements are the same.
 -   You can replace
     "Room1" by "/type/Room/id/Room1" in the URl to define the type (in
     general: "/type/<type>/id/<id>").
@@ -2601,8 +2600,7 @@ EOF
 
 The payload has the following elements:
 
--   entityIdList and attributeList ('entities' and 'attributes' for
-    short, in JSON) define which context availability information we are
+-   entities and attributes define which context availability information we are
     interested in. They are used to select the context registrations to
     include in the notifications.
     In this case, we are stating that we are interested in context
@@ -2614,7 +2612,7 @@ The payload has the following elements:
     accumulator-server.py program started before. Only one reference can
     be included per subscribeContextAvailability request. However, you
     can have several subscriptions on the same context availability
-    elements (i.e. same entityIdList and attributeList) without
+    elements (i.e. same entity and attribute) without
     any problem. Default URL schema (in the case you don't specify any)
     is "http", e.g. using "localhost:1028" as reference will be actually
     interpreted as "<http://localhost:1028>".
@@ -2694,7 +2692,7 @@ the POST HTTP method (on the URL used as reference for the subscription)
 with a notifyContextAvailabilityRequest payload. Apart from the
 subscriptionId element (that matches the one in the response to
 subscribeContextAvailability request) and the originator element, the
-contextResponseList element is the same than the one used in [the
+contextResponse vector is the same than the one used in [the
 discoverContextAvailability
 responses](#discover-context-availability-operation).
 
@@ -2702,11 +2700,11 @@ Currently, the originator is always "localhost". We will look into a
 more flexible way of using this in a later version.
 
 The initial notification includes all the currently registered entities
-that match the entityIdList/attributeList used in
+that match the entity/attribute used in
 subscribeContextAvailability request. That is, the registration
 corresponding to Room1 and Room2 temperature. Note that, although Room1
 and Room2 registered two attributes (temperature and pressure) only
-temperature is shown, as the attributeList in
+temperature is shown, as the attribute vector in
 subscribeContextAvailability only includes temperature.
 
 The NGSI specification is not clear on if an initial
@@ -2792,7 +2790,7 @@ Content-Type: application/json
 We can also check that context registrations not matching the
 subscription doesn't trigger any notifications. For example, let's
 register a room (Room4) with only attribute pressure (remember that the
-subscription only includes temperature in attributeList).
+subscription only includes temperature in attribute vector).
 
 ``` 
 (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
@@ -2830,7 +2828,7 @@ updated (using the NGSI9 updateContextAvailabilitySubscription). The
 request includes the *subscriptionId* that identifies the subscription
 to modify, and the actual update payload. For example, let's change
 subscription entities to something completely different: cars instead of
-rooms and all the attributes are removed (i.e. an empty attributeList
+rooms and all the attributes are removed (i.e. an empty attribute 
 element). As always you have to replace the *subscriptionId* value after
 copy-pasting with the value you got from the
 subscribeContextAvailability response in the previous step).
@@ -2921,7 +2919,7 @@ EOF
 }
 EOF
 ```
-As both registrations match the entityIdList and attributeList used in
+As both registrations match the entity and attribute used in
 the updateContextAvailabilitySubscription, we will get a notification
 for each car registration, as can be seen in accumulator-server.py:
 

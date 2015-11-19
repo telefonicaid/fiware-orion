@@ -142,7 +142,7 @@ operation filter.
 
 ## String filter
 
-The scope corresponding to this type is "FIWARE::StringFilter".
+The scope corresponding to this type is "FIWARE::StringQuery".
 
 ```
 ...
@@ -150,7 +150,7 @@ The scope corresponding to this type is "FIWARE::StringFilter".
         "restriction": {
             "scopes": [
                 {
-                    "type": "FIWARE::StringFilter",
+                    "type": "FIWARE::StringQuery",
                     "value": "temperature<24;humidity==75..90;status=running"
                 }
             ]
