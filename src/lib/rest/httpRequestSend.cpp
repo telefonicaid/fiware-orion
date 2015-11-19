@@ -98,8 +98,6 @@ void httpRequestInit(long defaultTimeoutInMilliseconds)
 *
 * [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
 */
-//#define USE_OLD_SENDHTTPSOCKET
-#ifndef USE_OLD_SENDHTTPSOCKET
 
 struct MemoryStruct
 {
@@ -493,6 +491,3 @@ std::string httpRequestSend
   release_curl_context(&cc);
   return resp;
 }
-
-
-#endif
