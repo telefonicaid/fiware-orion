@@ -23,8 +23,8 @@ The statistics JSON is composed of four conditional blocks and two unconditional
   "semWait" : { ... },
   "timing" : { ... },
   "notifQueue": { ... },
-  "uptime_in_secs" : "65697",
-  "measuring_interval_in_secs" : "65697"
+  "uptime_in_secs" : 65697,
+  "measuring_interval_in_secs" : 65697
 }
 ```
 
@@ -53,18 +53,18 @@ The counter block provides information about counters for the times a particular
 {
   ...
   "counters" : {
-    "jsonRequests" : "75916",
-    "queries" : "3698",
-    "updates" : "2416",
-    "subscriptions" : "138",
-    "unsubscriptions" : "6",
-    "notificationsReceived" : "216936",
-    "notificationsSent" : "579542",
-    "individualContextEntity" : "360",
-    "allContextEntitiesRequests" : "3",
-    "versionRequests" : "1109",
-    "statisticsRequests" : "13",
-    "invalidRequests" : "2"
+    "jsonRequests" : 75916,
+    "queries" : 3698,
+    "updates" : 2416,
+    "subscriptions" : 138,
+    "unsubscriptions" : 6,
+    "notificationsReceived" : 216936,
+    "notificationsSent" : 579542,
+    "individualContextEntity" : 360,
+    "allContextEntitiesRequests" : 3,
+    "versionRequests" : 1109,
+    "statisticsRequests" : 13,
+    "invalidRequests" : 2
   },
   ...
 }
@@ -82,12 +82,12 @@ if your DB is too slow or your DB pool is undersized, then `dbConnectionPool` ti
 {
   ...
   "semWait" : {
-    "request" : "0.000000000",
-    "dbConnectionPool" : "2.917002794",
-    "transaction" : "0.567478849",
-    "subCache" : "0.784979145",
-    "curlContext" : "0.000000000",
-    "timeStat" : "0.124000605"
+    "request" : 0.000000000,
+    "dbConnectionPool" : 2.917002794,
+    "transaction" : 0.567478849,
+    "subCache" : 0.784979145,
+    "curlContext" : 0.000000000,
+    "timeStat" : 0.124000605
   },
   ...
 }
@@ -102,22 +102,22 @@ Provides timing information, i.e. the time that CB passes executing in different
   ...
   "timing": {
     "accumulated": {
-      "jsonV1Parse": "7.860908311",
-      "mongoBackend": "416.796091597",
-      "mongoReadWait": "4656.924425628",
-      "mongoWriteWait": "259.347915990",
-      "mongoCommandWait": "0.514811318",
-      "render": "108.162782114",
-      "total": "186476.593504743",
-      "xmlParse": "44.490766332"
+      "jsonV1Parse": 7.860908311,
+      "mongoBackend": 416.796091597,
+      "mongoReadWait": 4656.924425628,
+      "mongoWriteWait": 259.347915990,
+      "mongoCommandWait": 0.514811318,
+      "render": 108.162782114,
+      "total": 186476.593504743,
+      "xmlParse": 44.490766332
         },
     "last": {
-      "mongoBackend": "0.014752309",
-      "mongoReadWait": "0.012018445",
-      "mongoWriteWait": "0.000574611",
-      "render": "0.000019136",
-      "total": "0.015148915",
-      "xmlParse": "0.000153878"
+      "mongoBackend": 0.014752309,
+      "mongoReadWait": 0.012018445,
+      "mongoWriteWait": 0.000574611,
+      "render": 0.000019136,
+      "total": 0.015148915,
+      "xmlParse": 0.000153878
       }
   }
   ...
@@ -157,13 +157,13 @@ it is only shown if `-notificationMode` is set to threadpool.
 {
   ...
   "notifQueue" : {
-    "in" : "579619",
-    "out" : "579619",
-    "reject" : "0",
-    "sentOk" : "579543",  // Probably will be generalized for all notification modes at the end
-    "sentError" : "76",   // Probably will be generalized for all notification modes at the end
-    "timeInQueue" : "44.884263230",
-    "size" : "0"
+    "in" : 579619,
+    "out" : 579619,
+    "reject" : 0,
+    "sentOk" : 579543,  // Probably will be generalized for all notification modes at the end
+    "sentError" : 76,   // Probably will be generalized for all notification modes at the end
+    "timeInQueue" : 44.884263230,
+    "size" : 0
   }
   ...
 }
@@ -188,11 +188,11 @@ with the current number of cached items.
 ```
 {
   ...
-  "refreshs" : "1",
-  "inserts" : "1433",
-  "removes" : "6",
-  "updates" : "0",
-  "items" : "1427"
+  "refreshs" : 1,
+  "inserts" : 1433,
+  "removes" : 6,
+  "updates" : 0,
+  "items" : 1427
   ...
 }
 ```
