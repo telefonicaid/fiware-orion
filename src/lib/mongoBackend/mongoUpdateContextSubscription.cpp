@@ -30,7 +30,7 @@
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "mongoBackend/mongoSubCache.h"
@@ -62,20 +62,17 @@ HttpStatusCode mongoUpdateContextSubscription
   std::string err;
   OID         id;
 
-  try
+  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->subscribeError.errorCode)))
   {
-    id = OID(requestP->subscriptionId.get());
-  }
-  catch (const AssertionException &e)
-  {
-    /* This happens when OID format is wrong */
-    // FIXME P4: this checking should be done at the parsing stage, without progressing to
-    // mongoBackend. For the moment we can leave this here, but we should remove it in the future
-    // (old issue #95)
-    //
-    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)", reqSemTaken);
-    responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-    LM_W(("Bad Input (invalid OID format)"));
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (safeGetSubId fail)", reqSemTaken);
+    if (responseP->subscribeError.errorCode.code == SccContextElementNotFound)
+    {
+      LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+    }
+    else // SccReceiverInternalError
+    {
+      LM_E(("Runtime Error (exception getting OID: %s)", responseP->subscribeError.errorCode.details.c_str()));
+    }
     return SccOk;
   }
 

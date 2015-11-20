@@ -108,7 +108,7 @@ void SubscriptionId::set(const std::string& value)
 *
 * SubscriptionId::get -
 */
-std::string SubscriptionId::get(void)
+std::string SubscriptionId::get(void) const
 {
   return string;
 }

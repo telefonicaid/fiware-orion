@@ -23,7 +23,10 @@
 * Author: Fermin Galan Marquez
 */
 
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
+#include "ngsi/SubscriptionId.h"
+#include "ngsi/RegistrationId.h"
+#include "ngsi/StatusCode.h"
 #include "logMsg/logMsg.h"
 
 using namespace mongo;
@@ -194,4 +197,120 @@ BSONElement getField(const BSONObj& b, const std::string& field)
 
   LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
   return BSONElement();
+}
+
+/* ****************************************************************************
+*
+* moreSafe -
+*
+* This is a safe version of the more() method for cursors in order to avoid
+* exception that may crash the broker. However, if the more() method is returning
+* an exception something really bad is happening, it is considered a Fatal Error.
+*
+* (The name resembles the same relationship between next() and nextSafe() in the
+* mongo driver)
+*
+*/
+bool moreSafe(const std::auto_ptr<DBClientCursor>& cursor)
+{
+  try
+  {
+    return cursor->more();
+  }
+  catch (std::exception &e)
+  {
+    LM_E(("Fatal Error (more() exception: %s)", e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    LM_E(("Fatal Error (more() exception: generic)"));
+    return false;
+  }
+}
+
+/* ****************************************************************************
+*
+* nextSafeOrError -
+*
+*/
+bool nextSafeOrError(const std::auto_ptr<DBClientCursor>& cursor, BSONObj* r, std::string* err)
+{
+  try
+  {
+    *r = cursor->nextSafe();
+    return true;
+  }
+  catch (const std::exception &e)
+  {
+    *err = e.what();
+    return false;
+  }
+  catch (...)
+  {
+    *err = "generic exception";
+    return false;
+  }
+}
+
+/* ****************************************************************************
+*
+* safeGetSubId -
+*
+*/
+bool safeGetSubId(const SubscriptionId& subId, OID* id, StatusCode* sc)
+{
+  try
+  {
+    *id = OID(subId.get());
+    return true;
+  }
+  catch (const AssertionException &e)
+  {
+    // FIXME P3: this check is "defensive", but from a efficiency perspective this should be short-cut at
+    // parsing stage. To check it. The check should be for: [0-9a-fA-F]{24}.
+    sc->fill(SccContextElementNotFound);
+    return false;
+  }
+  catch (const std::exception &e)
+  {
+    sc->fill(SccReceiverInternalError, e.what());
+    return false;
+  }
+  catch (...)
+  {
+    sc->fill(SccReceiverInternalError, "generic exception");
+    return false;
+  }
+}
+
+/* ****************************************************************************
+*
+* safeGetRegId -
+*
+*/
+bool safeGetRegId(const RegistrationId& regId, OID* id, StatusCode* sc)
+{
+  try
+  {
+    *id = OID(regId.get());
+    return true;
+  }
+  catch (const AssertionException &e)
+  {
+    // FIXME P3: this check is "defensive", but from a efficiency perspective this should be short-cut at
+    // parsing stage. To check it. The check should be for: [0-9a-fA-F]{24}.
+    sc->fill(SccContextElementNotFound);
+    return false;
+  }
+  catch (const std::exception &e)
+  {
+    sc->fill(SccReceiverInternalError, e.what());
+    return false;
+  }
+  catch (...)
+  {
+    sc->fill(SccReceiverInternalError, "generic exception");
+    return false;
+  }
 }
