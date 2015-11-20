@@ -1774,7 +1774,7 @@ inline void LM_TRANSACTION_START_URL(const char *url)
 */
 inline void LM_TRANSACTION_END()
 {
-  LM_I(("Transaction ended"));ok,
+  LM_I(("Transaction ended"));
   LM_TRANSACTION_RESET();
 }
 
