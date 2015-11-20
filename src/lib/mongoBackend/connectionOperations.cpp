@@ -219,8 +219,6 @@ bool collectionCount
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_I(("Database Operation Successful (count: %s)", q.toString().c_str()));
-
-    return c;
   }
   catch (const std::exception& e)
   {

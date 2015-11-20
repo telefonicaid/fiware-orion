@@ -267,8 +267,8 @@ bool safeGetSubId(const SubscriptionId& subId, OID* id, StatusCode* sc)
   }
   catch (const AssertionException &e)
   {
-    // FIXME: this check is "defensive", but from a efficiency perspective this should be short-cut at
-    // parsing stage. Check it.
+    // FIXME P3: this check is "defensive", but from a efficiency perspective this should be short-cut at
+    // parsing stage. To check it.
     sc->fill(SccContextElementNotFound);
     return false;
   }
@@ -298,6 +298,8 @@ bool safeGetRegId(const RegistrationId& regId, OID* id, StatusCode* sc)
   }
   catch (const AssertionException &e)
   {
+    // FIXME P3: this check is "defensive", but from a efficiency perspective this should be short-cut at
+    // parsing stage. To check it.
     sc->fill(SccContextElementNotFound);
     return false;
   }
