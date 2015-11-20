@@ -228,6 +228,9 @@ echo
 echo
 
 
+# Avoid throttling (1 second) for the subscription
+sleep 2
+
 echo "11. Update E1/T1/A1"
 echo "==================="
 payload='{

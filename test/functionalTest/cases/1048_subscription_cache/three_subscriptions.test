@@ -242,7 +242,7 @@ Date: REGEX(.*)
 04. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((676|678))
+Content-Length: REGEX((702|704))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -253,9 +253,9 @@ Date: REGEX(.*)
     "measuring_interval_in_secs": "REGEX(\d+)",
     "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "statisticsRequests": "1",
-    "subCache": "REGEX([0-9a-f, ]{50})",
-    "subCacheInserts": "2",
-    "subCacheItems": "2",
+    "subCache": "REGEX([0-9a-f, ]{76})",
+    "subCacheInserts": "3",
+    "subCacheItems": "3",
     "subCacheRefreshs": "1",
     "subCacheRemoves": "0",
     "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
@@ -299,10 +299,10 @@ Date: REGEX(.*)
     "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "statisticsRequests": "2",
     "subCache": "REGEX([0-9a-f, ]{50})",
-    "subCacheInserts": "2",
+    "subCacheInserts": "3",
     "subCacheItems": "2",
     "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
+    "subCacheRemoves": "1",
     "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "subCacheUpdates": "0",
     "subscriptions": "3",
@@ -345,10 +345,10 @@ Date: REGEX(.*)
     "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "statisticsRequests": "3",
     "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "REGEX((2|3))",
+    "subCacheInserts": "REGEX((3|4))",
     "subCacheItems": "1",
     "subCacheRefreshs": "REGEX((1|2))",
-    "subCacheRemoves": "1",
+    "subCacheRemoves": "2",
     "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "subCacheUpdates": "0",
     "subscriptions": "3",

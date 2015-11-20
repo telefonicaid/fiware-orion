@@ -50,6 +50,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/string.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -68,12 +69,21 @@ using namespace mongo;
 *
 * EntityInfo::EntityInfo - 
 */
-EntityInfo::EntityInfo(const std::string& idPattern, const std::string& _entityType)
+EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern)
 {
-  regcomp(&entityIdPattern, idPattern.c_str(), 0);
+  entityId     = _entityId;
+  entityType   = _entityType;
+  isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
 
-  entityType               = _entityType;
-  entityIdPatternToBeFreed = true;
+  if (isPattern)
+  {
+    regcomp(&entityIdPattern, _entityId.c_str(), 0);
+    entityIdPatternToBeFreed = true;
+  }
+  else
+  {
+    entityIdPatternToBeFreed = false;
+  }
 }
 
 
@@ -97,8 +107,13 @@ bool EntityInfo::match
     return false;
   }
 
-  // REGEX-comparison this->entityIdPattern VS id
-  return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
+  if (isPattern)
+  {
+    // REGEX-comparison this->entityIdPattern VS id
+    return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
+  }
+
+  return (id == entityId);
 }
 
 
@@ -124,8 +139,9 @@ void EntityInfo::release(void)
 */
 void EntityInfo::present(const std::string& prefix)
 {
-  LM_F(("%sid:    regex describing EntityId::id (the original string is not saved)", prefix.c_str()));
-  LM_F(("%stype:  %s", prefix.c_str(), entityType.c_str()));
+  LM_F(("%sid:       %s", prefix.c_str(), entityId.c_str()));
+  LM_F(("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
+  LM_F(("%stype:     %s", prefix.c_str(), entityType.c_str()));
 }
 
 
@@ -394,47 +410,60 @@ void mongoSubCacheMatch
 */
 static void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 {
+  LM_M(("Here"));
   if (cSubP->tenant != NULL)
   {
     free(cSubP->tenant);
     cSubP->tenant = NULL;
   }
 
+  LM_M(("Here"));
   if (cSubP->servicePath != NULL)
   {
     free(cSubP->servicePath);
     cSubP->servicePath = NULL;
   }
 
+  LM_M(("Here"));
   if (cSubP->subscriptionId != NULL)
   {
     free(cSubP->subscriptionId);
     cSubP->subscriptionId = NULL;
   }
 
+  LM_M(("Here"));
   if (cSubP->reference != NULL)
   {
     free(cSubP->reference);
     cSubP->reference = NULL;
   }
 
+  LM_M(("entityIdInfos.size: %lu", cSubP->entityIdInfos.size()));
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
+    LM_M(("Here. ix == %d, cSubP->entityIdInfos[ix] at %p", ix, cSubP->entityIdInfos[ix]));
     cSubP->entityIdInfos[ix]->release();
+    LM_M(("Here"));
     delete cSubP->entityIdInfos[ix];
+    LM_M(("Here"));
   }
+  LM_M(("Here"));
   cSubP->entityIdInfos.clear();
+  LM_M(("Here"));
 
   while (cSubP->attributes.size() > 0)
   {
     cSubP->attributes.erase(cSubP->attributes.begin());
   }
   cSubP->attributes.clear();
+  LM_M(("Here"));
 
   cSubP->notifyConditionVector.release();
   cSubP->notifyConditionVector.vec.clear();
 
+  LM_M(("Here"));
   cSubP->next = NULL;
+  LM_M(("Here"));
 }
 
 
@@ -566,7 +595,6 @@ static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
     return;
   }
 
-  
   mongoSubCache.tail->next  = cSubP;
   mongoSubCache.tail        = cSubP;
 }
@@ -648,26 +676,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       continue;
     }
 
-    std::string id = entity.getStringField(ENT_ENTITY_ID);
-    
-    if (!entity.hasField(CSUB_ENTITY_ISPATTERN))
-    {
-      continue;
-    }
+    std::string id        = entity.getStringField(ENT_ENTITY_ID);
+    std::string isPattern = entity.hasField(CSUB_ENTITY_ISPATTERN)? entity.getStringField(CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type      = entity.hasField(CSUB_ENTITY_TYPE)?      entity.getStringField(CSUB_ENTITY_TYPE)      : "";
+    EntityInfo* eiP       = new EntityInfo(id, type, isPattern);
 
-    std::string isPattern = entity.getStringField(CSUB_ENTITY_ISPATTERN);
-    if (isPattern != "true")
-    {
-      continue;
-    }
-
-    std::string type;
-    if (entity.hasField(CSUB_ENTITY_TYPE))
-    {
-      type = entity.getStringField(CSUB_ENTITY_TYPE);
-    }
-
-    EntityInfo* eiP = new EntityInfo(id, type);
     cSubP->entityIdInfos.push_back(eiP);
   }
 
@@ -748,7 +761,15 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -4: Subscription not valid for sub-cache (no patterns)
 *  -5: Subscription notvalid for sub-cache (empty notify-condition vector)
 */
-int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* subscriptionId, const char* servicePath, int lastNotificationTime, long long expirationTime)
+int mongoSubCacheItemInsert
+(
+  const char*     tenant,
+  const BSONObj&  sub,
+  const char*     subscriptionId,
+  const char*     servicePath,
+  int             lastNotificationTime,
+  long long       expirationTime
+)
 {
   //
   // 01. Check incoming parameters
@@ -796,26 +817,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
       continue;
     }
 
-    std::string id = entity.getStringField(ENT_ENTITY_ID);
-    
-    if (!entity.hasField(CSUB_ENTITY_ISPATTERN))
-    {
-      continue;
-    }
+    std::string id        = entity.getStringField(ENT_ENTITY_ID);
+    std::string isPattern = entity.hasField(CSUB_ENTITY_ISPATTERN)? entity.getStringField(CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type      = entity.hasField(CSUB_ENTITY_TYPE)?      entity.getStringField(CSUB_ENTITY_TYPE)      : "";
+    EntityInfo* eiP       = new EntityInfo(id, type, isPattern);
 
-    std::string isPattern = entity.getStringField(CSUB_ENTITY_ISPATTERN);
-    if (isPattern != "true")
-    {
-      continue;
-    }
-
-    std::string type;
-    if (entity.hasField(CSUB_ENTITY_TYPE))
-    {
-      type = entity.getStringField(CSUB_ENTITY_TYPE);
-    }
-
-    EntityInfo* eiP = new EntityInfo(id, type);
     cSubP->entityIdInfos.push_back(eiP);
   }
 
@@ -917,12 +923,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
 /* ****************************************************************************
 *
 * mongoSubCacheItemInsert - create a new sub, fill it in, and add it to cache
-*
-* NOTE, this function receives the information as a SubscribeContextRequest, as it
-*       is used from mongoBackend/mongoSubscribeContext and this SubscribeContextRequest
-*       is checked to contain isPatterned ONCHANGE subscriptions prior to calling this
-*       function. Doing the very same check inside mongoSubCacheItemInsert would just
-*       be a waste of time.
 */
 void mongoSubCacheItemInsert
 (
@@ -944,20 +944,8 @@ void mongoSubCacheItemInsert
   //
   // 00. Check that the subscription is pattern based an ONCHANGE
   //
-  bool patternBased = false;
-  bool onchange     = false;
+  bool onchange = false;
 
-  // 00.1. Any entity pattern-based?
-  for (unsigned int ix = 0; ix < scrP->entityIdVector.size(); ++ix)
-  {
-    if (scrP->entityIdVector[ix]->isPattern == "true")
-    {
-      patternBased = true;
-      break;
-    }
-  }
-
-  // 00.2. ONCHANGE?
   for (unsigned int ix = 0; ix < scrP->notifyConditionVector.size(); ++ix)
   {
     if (strcasecmp(scrP->notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
@@ -967,7 +955,7 @@ void mongoSubCacheItemInsert
     }
   }
 
-  if (!patternBased || !onchange)
+  if (!onchange)
   {
     return;
   }
@@ -1005,7 +993,7 @@ void mongoSubCacheItemInsert
 
 
   //
-  // 3. Convert all patterned EntityId to EntityInfo
+  // 3. Convert all EntityIds to EntityInfo
   //
   for (unsigned int ix = 0; ix < scrP->entityIdVector.vec.size(); ++ix)
   {
@@ -1013,12 +1001,7 @@ void mongoSubCacheItemInsert
 
     eIdP = scrP->entityIdVector.vec[ix];
 
-    if (eIdP->isPattern == "false")
-    {
-      continue;
-    }
-
-    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type);
+    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type, eIdP->isPattern);
     
     cSubP->entityIdInfos.push_back(eP);
   }
@@ -1170,7 +1153,9 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
       ++mongoSubCache.noOfRemoves;
 
       cachedSubscriptionDestroy(cSubP);
+      LM_M(("Here"));
       delete cSubP;
+      LM_M(("Here"));
       return 0;
     }
 

@@ -10,3 +10,4 @@
 - Fix: Semaphore releasing bug in unsubscribeContext when subscription ID is the empty string (Issue #1488)
 - Add: Built-in Timing/Profiling when using the -reqTimeStat (Issue #1367)
 - Add: Simulated/drop notifications mode is now orthogonal to -notificationMode (Issue #1505)
+- Add: Unpatterned subscriptions now also in subscription cache (Issue #1475)
