@@ -31,7 +31,7 @@
 
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 
@@ -1060,7 +1060,7 @@ static bool deleteAttribute
 *    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | ^/a1/a2/a3/#$ | ^/a1/a2/a3$
 *
 */
-std::string servicePathSubscriptionRegex(const std::string servicePath, std::vector<std::string>& spathV)
+std::string servicePathSubscriptionRegex(const std::string& servicePath, std::vector<std::string>& spathV)
 {
   std::string  spathRegex;
   int          spathComponents = 0;
@@ -1134,7 +1134,7 @@ static bool addTriggeredSubscriptions_withCache
   const std::vector<std::string>&           servicePathV
 )
 {
-  std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
+  std::string   servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
@@ -1233,14 +1233,13 @@ static bool addTriggeredSubscriptions_noCache
 )
 {
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
-  std::string               spathRegex      = "";
   std::vector<std::string>  spathV;
+  std::string               spathRegex      = servicePathSubscriptionRegex(servicePath, spathV);
 
 
   //
   // Create the REGEX for the Service Path
   //
-  spathRegex = servicePathSubscriptionRegex(servicePath, spathV);
   spathRegex = std::string("/") + spathRegex + "/";
 
 
@@ -1313,17 +1312,13 @@ static bool addTriggeredSubscriptions_noCache
 
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj sub;
-    try
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     BSONElement  idField  = sub.getField("_id");
@@ -2639,17 +2634,12 @@ void processContextElement
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
 
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));

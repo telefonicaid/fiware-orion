@@ -124,8 +124,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string      protocol;
   int              port;
   std::string      prefix;
-  std::string      answer;
-
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path

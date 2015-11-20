@@ -31,7 +31,7 @@
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 
 #include "mongo/client/dbclient.h"
@@ -193,17 +193,12 @@ void mongoListSubscriptions
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj r;
-    try
+    BSONObj r;    
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -253,19 +248,14 @@ void mongoGetSubscription
   }
 
   /* Process query result */
-  if (cursor->more())
+  if (moreSafe(cursor))
   {
-    BSONObj r;
-    try
+    BSONObj r;    
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
-      *oe = OrionError(SccReceiverInternalError, std::string("Assertion exception in nextSafe(): ") + e.what());
+      *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -275,7 +265,7 @@ void mongoGetSubscription
     setNotification(sub, r);
     setExpires(sub, r);
 
-    if (cursor->more())
+    if (moreSafe(cursor))
     {
       // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));

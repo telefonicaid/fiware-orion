@@ -121,7 +121,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
 
   // 04. Call Standard Operation
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+ postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 05. Fill in response from UpdateContextResponse

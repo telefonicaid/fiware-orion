@@ -83,7 +83,7 @@ std::string deleteIndividualContextEntityAttribute
 
 
   // 2. Call postUpdateContext standard service routine
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 3. Translate UpdateContextResponse to StatusCode

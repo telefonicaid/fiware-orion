@@ -31,7 +31,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
 
@@ -44,8 +44,8 @@ static std::string attributeType
 (
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
-  const std::string                     entityType,
-  const std::string                     attrName
+  const std::string&                    entityType,
+  const std::string&                    attrName
 )
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
@@ -64,20 +64,14 @@ static std::string attributeType
     return "";
   }
 
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     /* It could happen that different entities within the same entity type may have attributes with the same name
@@ -278,7 +272,7 @@ HttpStatusCode mongoEntityTypes
   {
     if (details)
     {      
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %d. Offset is %d", (int) resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
@@ -414,7 +408,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (details)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %d", (int) resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else

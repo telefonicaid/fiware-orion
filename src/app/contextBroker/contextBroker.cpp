@@ -1488,13 +1488,12 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   char* first_colon;
   int   flds_num;
 
-  mode = (char *) malloc(strlen(notifModeArg) + 1);
-  if (mode == NULL)
+  errno = 0;
+  flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
+  if (errno != 0)
   {
-     LM_X(1, ("Fatal Error parsing notification mode: malloc (%s)", strerror(errno)));
+    LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
   }
-
-  flds_num = sscanf(notifModeArg, "%[^:]:%d:%d", mode, pQueueSize, pNumThreads);
   if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
   {
     if (*pQueueSize <= 0)

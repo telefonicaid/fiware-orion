@@ -247,6 +247,8 @@ std::string xmlTreat
 
     return errorReply;
   }
+  // in this case the try/catch block is not using a 'catch (const std::exception &e)' clause, as we are not using
+  // e.what(), so it wouldn't be useful
   catch (...)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
