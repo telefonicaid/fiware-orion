@@ -285,18 +285,6 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 }
 ```
 
-* `geo:point`: identifies the location of the entity in geo-location queries. If an entity have several attributes
-  of this type all them define a possible location for the entity from a geo-location query point of view. (TBD:
-  check feasibility). An example can be found below (only the referred entity attribute is shown). 
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.1864475,14",
-    "type": "geo:point"
-  }
-}
-```
 
 ## Error responses
 
@@ -307,19 +295,134 @@ In the case of being present, the error payload is JSON object including the fol
 + `affectedItems` (optional, array[string]): a list of elements affected by the error. Depending on the operation, it may
   refer to entities, registrations or subscriptions.
 
-Error list (HTTP response code in paranthesis):
+Error list (HTTP response code in parenthesis):
 
-* ParseError (400). The incoming JSON payload is incorrect.
-* BadRequest (400). The incoming request is somehow invalid.
-* NotFound (404). The context element referred in the request has not been found.
-* TooManyResults (409). There are several results that match with the resource identification used
+* ParseError            (`400`). The incoming JSON payload cannot be parsed.
+* BadRequest            (`400`). The incoming request is invalid in this context.
+* NotFound              (`404`). The Context Element referred in the request has not been found.
+* TooManyResults        (`409`). There are several results that match with the resource identification used
   in the request. This typically the case of requesting an entity with not enough information and the
   solution is to enhance entity identification adding more information, e.g. adding entity type
   and/or service path.
-* LengthRequired (411). Zero/No Content-Length in PUT/POST/PATCH request
-* RequestEntityTooLarge (413). Payload too large
-* UnsupportedMediaType (415). Request content type is not supported.
-* InvalidModification (422). Some piece of information is missing in payload.
+* LengthRequired        (`411`). Zero/No Content-Length in PUT/POST/PATCH request.
+* RequestEntityTooLarge (`413`). Payload is too large.
+* UnsupportedMediaType  (`415`). Request content type is not supported.
+* InvalidModification   (`422`). Some piece of information is missing in payload.
+* NotSupportedQuery     (`422`). The implementation does not support the query issued.
+* NoResourcesAvailable  (`413`). There are no server resources to fulfill the client request. 
+
+## Geospatial properties of entities
+
+The geospatial properties of a context entity can be represented by means of regular context attributes.
+The provision of geospatial properties enables the resolution of geographical queries.
+
+Two different syntaxes must be supported by compliant implementations: 
+
+* *Simple Location Format*. It is meant as a very lightweight format that developers and users can quickly
+and easily add to their existing entities with little effort.
+
+* *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06)
+is a geospatial data interchange format based on the JavaScript Object Notation (JSON). GeoJSON provides greater flexibility
+allowing the representation of point altitudes or even more complex geospatial shapes, for instance
+[multi geometries](http://www.macwright.org/2015/03/23/geojson-second-bite.html#multi-geometries).
+
+Client applications are responsible for defining which entity attributes convey geospatial properties (by providing
+an appropriate NGSI attribute type). Typically it will be an entity attribute named `location`,
+but nothing prevents use cases where an entity contains more than one geospatial attribute. For instance,
+locations specified at different granularity levels or provided by different location methods with different accuracy. 
+Nonetheless, it is noteworthy the fact that spatial properties
+need special indexes which can be under resource constraints imposed by backend databases.
+Thus, implementations may raise errors when spatial index limits are exceeded.
+The recommended HTTP status code for those situations is ``413``, *Request entity too large*, and the reported error
+on the response payload must be ``NoResourcesAvailable``.
+
+*Note: At the time of writing it is still under discussion if supporting both syntaxes is really needed* 
+
+### Simple Location Format
+
+Simple Location Format supports basic geometries ( *point* , *line* , *box* , *polygon* ) and covers the typical
+use cases when encoding geographical locations. It has been inspired by [GeoRSS Simple](http://www.georss.org/simple.html).
+
+It is noteworthy that the Simple Location Format is not intended to represent complex positions on Earth surface.
+For instance, those applications which require to capture altitude coordinates will have to use GeoJSON as
+representation format for the geospatial properties of their entities. 
+
+A context attribute  which represents a location encoded using the Simple Location Format
+must conform to the following syntax:
+
+* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or `geo:polygon`).
+* The attribute value must be a list of coordinates. By default coordinates will be defined
+using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
+[EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
+with latitude and longitude units of decimal degrees. Such coordinate list will allow to encode the geometry
+specified by the `type` attribute and will be encoded according with the specific rules defined below:
+
+  * Type `geo:point`:   the attribute value must contain a string containing a
+  valid latitude-longitude pair, separated by a comma. 
+  * Type `geo:line`:    the attribute value must contain a string array of
+  valid latitude-longitude pairs. There must be at least two pairs.
+  * Type `geo:polygon`: the attribute value must contain a string array
+  of valid latitude-longitude pairs.
+There must be at least four pairs, with the last being identical to the first
+(so a polygon has a minimum of three actual points).
+Coordinate pairs should be properly ordered so that the line segments
+that compose the polygon remain on the ​outer ​edge of the area defined.
+For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid polygon definition. 
+Implementations should raise an error when none of the former conditions are met by input data. 
+  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of a map or
+a rough area of interest. A box is represented by a two-length string array of latitude-longitude pairs.
+The first pair is the lower corner, the second is the upper corner.
+
+Note: Circle geometries are not supported, as the [literature](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)
+describes different shortcomings for implementations. 
+
+The examples below illustrate the referred syntax:
+
+```
+{
+  "location": {
+    "value": "41.3763726, 2.186447514",
+    "type": "geo:point"
+  }
+}
+```
+
+```
+{
+  "location": {
+    "value": [
+              "40.63913831188419, -8.653321266174316",
+              "40.63881265804603, -8.653149604797363"
+    ],
+    "type": "geo:box"
+  }
+}
+```
+
+### GeoJSON
+
+A context attribute which represents a location encoded using GeoJSON must conform to the following syntax:
+
+* The NGSI type of the attribute must be the MIME type assigned by IETF to the GeoJSON format.
+Currently 'application/vnd.geo+json'.
+* The attribute value must be a valid GeoJSON object. It is noteworthy that longitude comes first in GeoJSON coordinates.
+
+The example below illustrates the usage of GeoJSON.
+More GeoJSON examples can be found at [GeoJSON IETF Spec](https://tools.ietf.org/html/draft-butler-geojson-06#page-14).
+Additionally, the following [GeoJSON Tutorial](http://www.macwright.org/2015/03/23/geojson-second-bite.html)
+can be useful in urderstanding the format. 
+
+```
+{
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [2.186447514, 41.3763726]
+    }
+    "type": "application/vnd.geo+json"
+  }
+}
+```
 
 ## Simple Query Language
 
@@ -360,24 +463,24 @@ The list of operators (and the format of the values they use) is as follows:
       be used with attributes which contain dates or numbers. E.g. `temperature!=10..20` matches if
       the temperature is lower than 10 or greater than 20 (it will not match if the tempeature is 10 or the
       temperature is 20).
-+ **Greater than**: `&gt;`. The value is a single element, e.g. `temperature&gt;40`. It
++ **Greater than**: `>`. The value is a single element, e.g. `temperature>40`. It
   matches entities which attribute value is strictly greater than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser than**: `&lt`. The value is a single element, e.g. `temperature&lt;40`. It
++ **Lesser than**: `<`. The value is a single element, e.g. `temperature<40`. It
   matches entities which attribute value is strictly lesser than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Greater or equal than**: `&gt;=`. The value is a single element, e.g. `temperature&gt;=40`.
++ **Greater or equal than**: `>=`. The value is a single element, e.g. `temperature>=40`.
   It matches entities which attribute value is greater than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser or equal than**: `&lt;=`. The value is a single element, e.g. `temperature&lt;=40`. It
++ **Lesser or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
   matches entities which attribute value is lesser than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
 
-In the case of equal or inequal, if the value to match include a `,`, you can use simple quote
+In the case of equal or unequal, if the value to match include a `,`, you can use simple quote
 (`'`), e.g: `color=='light,green','deep,blue'`.
 
 Unary statements are composed of a unary operator (either `+`or `-`) and are used in two situations:
@@ -390,27 +493,81 @@ Unary statements are composed of a unary operator (either `+`or `-`) and are use
  
 ## Geographical Queries
 
-Geographical queries are specified by means of the `geometry` and `coords` parameters.
+Geographical queries are specified by means of the following parameters:
 
-**geometry** defines a geografical area so that only those entities located in such area match the query.
-It is composed of a token list separated by ';'. The first token is the shape of the geometry,
-the rest of tokens (if any) depends on the shape. 
+``georel`` is intended to specify a spatial relationship (a predicate)
+between matching entities and a reference shape (`geometry`).
+It is composed of a token list separated by ';'.
+The first token is the relationship name, the rest of tokens (if any) are modifiers which
+provide more information about such a relationship. The following values are allowed:
 
-In particular, the following geometries are supported:
++ `georel=near`. The ``near`` relationship means that matching entities must be located at certain threshold
+distance to the reference geometry. It supports the following modifiers:
+  + `maxDistance`.  Express, in meters, the maximum distance at which matching entities must be located.
+  + `minDistance`.  Express, in meters, the minimum distance at which matching entities must be located.
++ `georel=coveredBy`. Denotes that matching entities are those which exist entirely within the reference geometry.
+When resolving this query the border of a shape must be considered to be part of the shape. 
++ `georel=intersects`. Denotes that matching entities will be those intersecting with the reference geometry.
++ `georel=equals`. The geometry associated to the position of matching entities
+and the reference geometry must be exactly the same.
++ `georel=disjoint`. Denotes that matching entities will be those NOT intersecting with the reference geometry. 
 
-+ `geometry=circle;radius:4000`, inside a circle (radius is in meters).
-+ `geometry=circle;radius:4000;external`, outside a circle (radius is in meters).
-+ `geometry=polygon`, inside a polygon.
-+ `geometry=polygon;external`, outside a polygon.
+`geometry` allows to define the reference shape to be used when resolving the query.
+ The following geometries (see Simple Location Format) must be supported:
 
-**coords** represents a a list of pairs of geographical coordinates (latitude, longitude) separated by ','.
-Every pair of coordinates represent a geographical point. The list length and its semantics depend on the shape
-specified by the **geometry** parameter:
++ `geometry=point`, defines a point on the Earth surface.
++ `geometry=line`, defines a polygonal line.
++ `geometry=polygon`, defines a polygon.
++ `geometry=box`, defines a bounding box.
 
-+ In the case of `circle` geometry, the parameter includes just one element, which
-  is the center of the circle.
-+ In the case of `polygon` includes a list of elements, which are the vertices of the polygon.
+**coords** must be a string containing a comma separated list of pairs of geographical coordinates
+in accordance with the geometry specified and the rules mandated by the Simple Location Format:
 
+* `geometry=point`.   `coords` will contain a pair of WGS-84 geo-coordinates.
+* `geometry=line`.    `coords` will contain a list of pairs of WGS-84 geo-coordinates.
+* `geometry=polygon`. `coords` will be composed by at least four pairs of WGS-84 geo-coordinates.
+* `geometry=box`.     `coords` will be composed by two pairs of WGS-84 geo-coordinates.
+
+Examples:
+
+`georel=near;maxDistance=1000&geometry=point&coords=-40.4,-3.5`.
+Matching entities will be located, at a maximum, 1000 meters far away from the reference point.
+
+`georel=near;minDistance=5000&geometry=point&coords=-40.4,-3.5`.
+Matching entities will be at least 5000 meters far away from the reference point. 
+
+`georel=coveredBy&geometry=polygon&coords=25.774,-80.190,18.466,-66.118,32.321,-64.757,25.774,-80.190`
+Matching entities will be those located within the referred polygon.
+
+### Query Resolution
+
+If an implementation is not able to resolve a geographical query, the HTTP Status code of the response
+must be ```422```, *Unprocessable Entity*. The error name present in the error payload must be
+``NotSupportedQuery``. 
+
+When resolving geographical queries, through the Simple Query Language,
+the API implementation is responsible for determining which entity attribute
+contains the geographical location to be used for matching purposes.
+To this aim, the following rules must be followed:
+
+* If an entity has no attribute which corresponds to a location (encoded as GeoJSON or the
+Simple Location Format), then such an entity has not declared any geospatial property and will not match any
+geographical query.
+
+* If an entity only exposes one attribute corresponding to a location, then such an attribute will be used when
+resolving geographical queries.
+
+* If an entity exposes more than one location, then the attribute which contains a metadata property
+named ``defaultLocation``, with boolean value ``true``
+will be taken as the reference location used for resolving geographical queries.
+
+* If there is more than one attribute exposing location but none of them has been labeled as being the
+default location, then the query will be declared as ambigous and an HTTP error response with code ``409``
+must be sent.
+
+* If there is more than one attribute exposing location which has been labeled as being the
+*default location*, then the query will be declared as ambigous and an HTTP error response with code ``409``
+must be sent. 
 
 ## Group API Entry Point
 
