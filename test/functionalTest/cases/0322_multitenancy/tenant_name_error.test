@@ -117,7 +117,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 167
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -125,13 +125,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters</details>
+  <details>bad length - a tenant name can be max 50 characters long</details>
 </orionError>
 
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 197
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -139,7 +139,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters</details>
+  <details>bad character in tenant name - only underscore and alphanumeric characters are allowed</details>
 </orionError>
 
 
