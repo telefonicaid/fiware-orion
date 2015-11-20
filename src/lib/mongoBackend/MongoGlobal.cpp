@@ -1366,8 +1366,8 @@ bool entitiesQuery
     }
     catch (const AssertionException &e)
     {
-      std::string exErr            = e.what();
-      ContextElementResponse*  cer = new ContextElementResponse();
+      std::string              exErr = e.what();
+      ContextElementResponse*  cer   = new ContextElementResponse();
 
       //
       // We can't return the error 'as is', as it may contain forbidden characters.
