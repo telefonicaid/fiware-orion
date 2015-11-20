@@ -1760,7 +1760,7 @@ inline void LM_TRANSACTION_START(const char *keyword, const char *ip, int port, 
 *
 * LM_TRANSACTION_START_URL -
 */
-inline void LM_TRANSACTION_START_URL(const char *url)                                                                                  \
+inline void LM_TRANSACTION_START_URL(const char *url)
 {
   transactionIdSet();
   LM_I(("Starting transaction from %s", url));
@@ -1772,10 +1772,10 @@ inline void LM_TRANSACTION_START_URL(const char *url)                           
 *
 * LM_TRANSACTION_END -
 */
-inline void LM_TRANSACTION_END()                                                                                     \
+inline void LM_TRANSACTION_END()
 {
-  LM_I(("Transaction ended"));                            \
-  LM_TRANSACTION_RESET();                                 \
+  LM_I(("Transaction ended"));ok,
+  LM_TRANSACTION_RESET();
 }
 
 #endif  // SRC_LIB_LOGMSG_LOGMSG_H_
