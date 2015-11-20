@@ -35,7 +35,7 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"

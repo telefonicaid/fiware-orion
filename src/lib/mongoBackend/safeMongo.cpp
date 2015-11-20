@@ -23,7 +23,7 @@
 * Author: Fermin Galan Marquez
 */
 
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/RegistrationId.h"
 #include "ngsi/StatusCode.h"
