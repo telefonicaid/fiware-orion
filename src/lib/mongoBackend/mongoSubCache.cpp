@@ -104,15 +104,18 @@ bool EntityInfo::match
   //
   if ((type != "") && (entityType != type) && (entityType != ""))
   {
+    LM_M(("entityType: '%s', type: '%s'", entityType.c_str(), type.c_str()));
     return false;
   }
 
   if (isPattern)
   {
+    LM_M(("isPattern: id == '%s', entityId == '%s'",id.c_str(), entityId.c_str()));
     // REGEX-comparison this->entityIdPattern VS id
     return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
   }
 
+  LM_M(("id == '%s', entityId == '%s'", id.c_str(), entityId.c_str()));
   return (id == entityId);
 }
 
@@ -139,9 +142,9 @@ void EntityInfo::release(void)
 */
 void EntityInfo::present(const std::string& prefix)
 {
-  LM_F(("%sid:       %s", prefix.c_str(), entityId.c_str()));
+  LM_F(("%sid:        %s", prefix.c_str(), entityId.c_str()));
   LM_F(("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
-  LM_F(("%stype:     %s", prefix.c_str(), entityType.c_str()));
+  LM_F(("%stype:      %s", prefix.c_str(), entityType.c_str()));
 }
 
 
@@ -1179,16 +1182,15 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
 *
 * NOTE
 *   The query for the database ONLY extracts the interesting subscriptions:
-*   - "conditions.type" << "ONCHANGE"   AND
-*   - CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true"
+*   - "conditions.type" << "ONCHANGE"
 *
-*   I.e. the subscriptions is for ONCHANGE, and it uses wildcards in entityId.
+*   I.e. the subscriptions is for ONCHANGE.
 */
 static void mongoSubCacheRefresh(std::string database)
 {
   LM_T(LmtMongoSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                   query       = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
+  BSONObj                   query       = BSON("conditions.type" << "ONCHANGE");
   std::string               tenant      = tenantFromDb(database);
   std::string               collection  = getSubscribeContextCollectionName(tenant);
   auto_ptr<DBClientCursor>  cursor;
