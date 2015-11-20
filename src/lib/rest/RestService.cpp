@@ -442,8 +442,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // A tenant string must not be longer than 50 characters and may only contain
     // underscores and alphanumeric characters.
     //
-    std::string result;
-    if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+    if ((ciP->tenant != "") && (tenantCheck(ciP->tenant)) != "OK")
     {
       OrionError  error(SccBadRequest,
                         "tenant name not accepted - a tenant string must not be longer than " MAX_TENANT_NAME_LEN_STRING " characters"
