@@ -101,7 +101,7 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  if (reqData->ucsr.scopeP->type == FIWARE_LOCATION || reqData->ucsr.scopeP->type == FIWARE_LOCATION)
+  if (reqData->ucsr.scopeP->type == FIWARE_LOCATION || reqData->ucsr.scopeP->type == FIWARE_LOCATION_DEPRECATED)
   {
     //
     // If the scope type is FIWARE_LOCATION (or its deprecated variant), then the value of this scope is stored in 'circle' or 'polygon'.

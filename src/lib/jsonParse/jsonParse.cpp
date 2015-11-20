@@ -371,7 +371,6 @@ static std::string jsonParse
   int                         noOfChildren = subtree.size();
   if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
   {
-    std::string s;
 
     LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
     eatCompound(ciP, NULL, v, "");

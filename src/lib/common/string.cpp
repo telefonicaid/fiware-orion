@@ -95,7 +95,6 @@ bool isIPv6(const std::string& in)
 {
   size_t      pos;
   std::string partip;
-  std::string resu;
   std::string staux = in;
   int         cont  = 0;
 
@@ -104,7 +103,6 @@ bool isIPv6(const std::string& in)
   {
     cont++;
     partip = staux.substr(0, pos+1);
-    resu  += partip;
 
     if (checkGroupIPv6(partip) == false)
     {
