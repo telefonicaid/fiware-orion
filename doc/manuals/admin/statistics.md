@@ -173,7 +173,8 @@ The particular counters are as follows:
 
 * `in`: number of notifications that get into the queue
 * `out`: numbers of notifications that get out of the queue
-* `reject`: number of notifications that get rejected, due to queue full.
+* `reject`: number of notifications that get rejected, due to queue full. In other words, notifications that are not even
+  enqueued.
 * `sentOk`: number of successfully sent notifications
 * `sentError`: number of unsuccessful notification-attempts
 * `timeInQueue`: accumulated time of notifications waiting in queue
