@@ -104,18 +104,15 @@ bool EntityInfo::match
   //
   if ((type != "") && (entityType != type) && (entityType != ""))
   {
-    LM_M(("entityType: '%s', type: '%s'", entityType.c_str(), type.c_str()));
     return false;
   }
 
   if (isPattern)
   {
-    LM_M(("isPattern: id == '%s', entityId == '%s'",id.c_str(), entityId.c_str()));
     // REGEX-comparison this->entityIdPattern VS id
     return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
   }
 
-  LM_M(("id == '%s', entityId == '%s'", id.c_str(), entityId.c_str()));
   return (id == entityId);
 }
 
@@ -413,60 +410,48 @@ void mongoSubCacheMatch
 */
 static void cachedSubscriptionDestroy(CachedSubscription* cSubP)
 {
-  LM_M(("Here"));
   if (cSubP->tenant != NULL)
   {
     free(cSubP->tenant);
     cSubP->tenant = NULL;
   }
 
-  LM_M(("Here"));
   if (cSubP->servicePath != NULL)
   {
     free(cSubP->servicePath);
     cSubP->servicePath = NULL;
   }
 
-  LM_M(("Here"));
   if (cSubP->subscriptionId != NULL)
   {
     free(cSubP->subscriptionId);
     cSubP->subscriptionId = NULL;
   }
 
-  LM_M(("Here"));
   if (cSubP->reference != NULL)
   {
     free(cSubP->reference);
     cSubP->reference = NULL;
   }
 
-  LM_M(("entityIdInfos.size: %lu", cSubP->entityIdInfos.size()));
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
-    LM_M(("Here. ix == %d, cSubP->entityIdInfos[ix] at %p", ix, cSubP->entityIdInfos[ix]));
     cSubP->entityIdInfos[ix]->release();
-    LM_M(("Here"));
     delete cSubP->entityIdInfos[ix];
-    LM_M(("Here"));
   }
-  LM_M(("Here"));
+
   cSubP->entityIdInfos.clear();
-  LM_M(("Here"));
 
   while (cSubP->attributes.size() > 0)
   {
     cSubP->attributes.erase(cSubP->attributes.begin());
   }
   cSubP->attributes.clear();
-  LM_M(("Here"));
 
   cSubP->notifyConditionVector.release();
   cSubP->notifyConditionVector.vec.clear();
 
-  LM_M(("Here"));
   cSubP->next = NULL;
-  LM_M(("Here"));
 }
 
 
@@ -1156,9 +1141,8 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
       ++mongoSubCache.noOfRemoves;
 
       cachedSubscriptionDestroy(cSubP);
-      LM_M(("Here"));
       delete cSubP;
-      LM_M(("Here"));
+
       return 0;
     }
 

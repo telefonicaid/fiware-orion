@@ -31,7 +31,7 @@ brokerStart CB 101,38 IPv4 -reqTimeStat
 --SHELL--
 
 #
-# 01. Initial call to GET /statistics (gives NO time stats as LAST /statistics is excluded)
+# 01. Pre-call to GET /statistics to give VALGRIND a possibility
 # 02. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
 # 03. Create entity E1/A1-A5 with XML
 # 04. GET /statistics
@@ -43,11 +43,8 @@ brokerStart CB 101,38 IPv4 -reqTimeStat
 # 10. GET /statistics
 #
 
-echo "01. Initial call to GET /statistics (gives NO time stats as LAST /statistics is excluded)"
-echo "=================================================================="
-orionCurl --url /statistics --json
-echo
-echo
+# 01. Pre-call to GET /statistics to give VALGRIND a possibility
+orionCurl --url /statistics --json > /dev/null 2>&1
 
 
 echo "02. Second call to GET /statistics (gives time stat of FIRST request for /statistics)"
@@ -287,26 +284,6 @@ echo
 
 
 --REGEXPECT--
-01. Initial call to GET /statistics (gives NO time stats as LAST /statistics is excluded)
-==================================================================
-HTTP/1.1 200 OK
-Content-Length: REGEX((258|260))
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "1",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
-}
-
-
 02. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
 =====================================================================================
 HTTP/1.1 200 OK
@@ -331,7 +308,7 @@ Date: REGEX(.*)
         }
     },
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -459,7 +436,7 @@ Date: REGEX(.*)
     },
     "updates": "1",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
+    "versionRequests": "REGEX((0|1))",
     "xmlRequests": "1"
 }
 
@@ -589,7 +566,7 @@ Date: REGEX(.*)
     },
     "updates": "2",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
+    "versionRequests": "REGEX((0|1))",
     "xmlRequests": "1"
 }
 
@@ -643,7 +620,7 @@ Date: REGEX(.*)
     },
     "updates": "2",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
+    "versionRequests": "REGEX((0|1))",
     "xmlRequests": "1"
 }
 
@@ -713,7 +690,7 @@ Date: REGEX(.*)
     },
     "updates": "2",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
+    "versionRequests": "REGEX((0|1))",
     "xmlRequests": "1"
 }
 

@@ -55,7 +55,6 @@ echo
 
 # to avoid race conditions in the order of notifications
 sleep 0.5s
-valgrindSleep 1
 
 
 #Subscribe for a LONG period of time (99 years - should give overflow in an int)
@@ -72,7 +71,7 @@ payload='<?xml version="1.0"?>
     <attribute>temperature</attribute>
   </attributeList>
   <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
-  <duration>P99Y</duration>
+  <duration>PT11S</duration>
   <notifyConditions>
     <notifyCondition>
       <type>ONTIMEINTERVAL</type>
@@ -128,7 +127,7 @@ Date: REGEX(.*)
 
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 192
+Content-Length: 193
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -136,7 +135,7 @@ Date: REGEX(.*)
 <subscribeContextResponse>
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>P99Y</duration>
+    <duration>PT11S</duration>
   </subscribeResponse>
 </subscribeContextResponse>
 

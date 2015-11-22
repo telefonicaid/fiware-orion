@@ -89,6 +89,7 @@ echo
 
 echo "03. Statistics - just for fun"
 echo "============================="
+valgrindSleep 1
 orionCurl --url /statistics --json
 echo
 echo
@@ -214,7 +215,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "3",
+    "jsonRequests": "REGEX((2|3))",
     "measuring_interval_in_secs": "REGEX(\d+)",
     "notificationsSent": "1",
     "statisticsRequests": "1",
@@ -226,7 +227,7 @@ Date: REGEX(.*)
     "subCacheUpdates": "0",
     "subscriptions": "1",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -262,15 +263,15 @@ Date: REGEX(.*)
     "notificationsSent": "1",
     "statisticsRequests": "2",
     "subCache": "REGEX(.*)",
-    "subCacheInserts": "2",
+    "subCacheInserts": "REGEX((2|3))",
     "subCacheItems": "1",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((1|2))",
     "subCacheRemoves": "1",
     "subCacheUpdates": "1",
     "subscriptionUpdates": "1",
     "subscriptions": "1",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -299,7 +300,7 @@ Date: REGEX(.*)
     "subscriptionUpdates": "1",
     "subscriptions": "1",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
+    "versionRequests": "REGEX((0|1))"
 }
 
 
@@ -343,15 +344,15 @@ Date: REGEX(.*)
     "notificationsSent": "4",
     "statisticsRequests": "4",
     "subCache": "REGEX(.*)",
-    "subCacheInserts": "3",
+    "subCacheInserts": "REGEX((3|4))",
     "subCacheItems": "1",
-    "subCacheRefreshs": "2",
+    "subCacheRefreshs": "REGEX((2|3))",
     "subCacheRemoves": "1",
     "subCacheUpdates": "1",
     "subscriptionUpdates": "1",
     "subscriptions": "1",
     "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
+    "versionRequests": "REGEX((0|1))"
 }
 
 
