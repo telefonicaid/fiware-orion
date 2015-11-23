@@ -646,6 +646,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->count                 = sub.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLong(sub, CSUB_COUNT)            : 0;
+
   cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
 
@@ -969,6 +971,7 @@ void mongoSubCacheItemInsert
   cSubP->pendingNotifications  = 0;
   cSubP->notifyFormat          = notifyFormat;
   cSubP->next                  = NULL;
+  cSubP->count                 = 0;
 
   LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
@@ -1276,6 +1279,122 @@ void mongoSubCacheRefresh(void)
 #endif
 
   cacheSemGive(__FUNCTION__, "subscription cache for refresh");
+}
+
+
+
+/* ****************************************************************************
+*
+* CachedSubSaved - 
+*/
+typedef struct CachedSubSaved
+{
+  std::string   subscriptionId;
+  int64_t       lastNotificationTime;
+  int64_t       count;
+} CachedSubSaved;
+
+
+
+/* ****************************************************************************
+*
+* savedSubV - 
+*/
+static std::map<std::string, CachedSubSaved*> savedSubV;
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheSync - 
+*
+* 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
+* 2. Refresh cache (count set to 0)
+* 3. Compare lastNotificationTime in savedSubV with the new cache-contents and:
+*    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
+*    3.2 Remember this more correct lastNotificationTime (must be flushed to mongo) -
+*        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
+* 4. Update 'count' for each item in savedSubV where count != 0
+* 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+*/
+static void mongoSubCacheSync(void)
+{
+  cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
+
+
+  //
+  // 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
+  //
+  CachedSubscription* cSubP = mongoSubCache.head;
+
+  while (cSubP != null)
+  {
+    CachedSubSaved* cssP       = new CachedSubSaved();
+
+    cssP->lastNotificationTime = cSubP->lastNotificationTime;
+    cssP->count                = cSubP->count;
+
+    savedSubV[cSubP->subscriptionId]= cssP;
+    cSubP = cSubP->next;
+  }
+
+  LM_T(LmtMongoCacheSync, ("Pushed back %d items to savedSubV", savedSubV.size()));
+
+  //
+  // 2. Refresh cache (count set to 0)
+  //
+  cacheRefresh();  // semaphore ...
+
+
+  //
+  // 3. Compare lastNotificationTime in savedSubV with the new cache-contents
+  //
+  cSubP = mongoSubCache.head;
+  while (cSubP != null)
+  {
+    CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
+    if ((cssP != null) && (cssP->lastNotificationTime <= cSubP->lastNotificationTime))
+    {
+      // cssP->lastNotificationTime older than what's currently in DB => throw away
+      cssP->lastNotificationTime = 0;
+    }
+    cSubP = cSubP->next;
+  }
+
+
+  //
+  // 4. Update 'count' for each item in savedSubV where count != 0
+  // 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+  //
+  cSubP = mongoSubCache.head;
+  while (cSubP != null)
+  {
+    CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
+
+    if (cssP == null)
+    {
+      continue;
+    }
+
+    if ((cssP->count != 0) && (cssP->lastNotificationTime != 0))
+    {
+      // Update BOTH
+    }
+    else if (cssP->count != 0)
+    {
+      // Update COUNT
+    }
+    else if (cssP->lastNotificationTime != 0)
+    {
+      // Update lastNotificationTime
+    }
+  }
+
+
+  //
+  //
+
+  cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
 }
 
 

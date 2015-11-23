@@ -1337,7 +1337,7 @@ static bool addTriggeredSubscriptions_noCache
 
     std::string subIdStr = idField.OID().toString();
 
-    if (subs.count(subIdStr) == 0)
+    if (subs.count(subIdStr) == 0)  // KZ: count
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
@@ -1522,48 +1522,39 @@ static bool processSubscriptions
                                                  tenant,
                                                  xauthToken))
     {
-      BSONObj query = BSON("_id" << OID(mapSubId));
-      BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << (long long) getCurrentTime()) <<
-                            "$inc" << BSON(CSUB_COUNT << 1));
-
-      if (collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err))
+      //
+      // Saving lastNotificationTime and count for cached subscription
+      //
+      if (trigs->cacheSubId != "")
       {
-        //
-        // Saving lastNotificationTime for cached subscription
-        //
-        if (trigs->cacheSubId != "")
+        cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
+
+        CachedSubscription*  cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
+
+        if (cSubP != NULL)
         {
-          cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
+          cSubP->pendingNotifications -= 1;
+          LM_T(LmtMongoSubCache, ("Found sub '%s', set its pendingNotifications to %d", trigs->cacheSubId.c_str(), cSubP->pendingNotifications));
 
-          CachedSubscription*  cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
-
-          if (cSubP != NULL)
+          if (cSubP->pendingNotifications == 0)
           {
-            cSubP->pendingNotifications -= 1;
-            LM_T(LmtMongoSubCache, ("Found sub '%s', set its pendingNotifications to %d", trigs->cacheSubId.c_str(), cSubP->pendingNotifications));
+            cSubP->lastNotificationTime = getCurrentTime();
+            cSubP->count               += 1;  // DOUBT:  What if we had three notifications? Do we count updates of actual notifs?
 
-            if (cSubP->pendingNotifications == 0)
-            {
-              cSubP->lastNotificationTime = getCurrentTime();
-              LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s'", cSubP->lastNotificationTime, cSubP->subscriptionId));
-            }
-            else
-            {
-              LM_T(LmtMongoSubCache, ("Not touching lastNotificationTime for sub '%s' - its pendingNotifications == %d", cSubP->subscriptionId, cSubP->pendingNotifications));
-            }
+            LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
           }
           else
           {
-            LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
-                  trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
+            LM_T(LmtMongoSubCache, ("Not touching lastNotificationTime for sub '%s' - its pendingNotifications == %d", cSubP->subscriptionId, cSubP->pendingNotifications));
           }
-
-          cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
         }
-      }
-      else
-      {
-        ret = false;
+        else
+        {
+          LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
+                trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
+        }
+
+        cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
       }
     }
 
