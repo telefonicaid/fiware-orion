@@ -71,7 +71,7 @@ payload='<?xml version="1.0"?>
     <attribute>temperature</attribute>
   </attributeList>
   <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
-  <duration>PT11S</duration>
+  <duration>P99Y</duration>
   <notifyConditions>
     <notifyCondition>
       <type>ONTIMEINTERVAL</type>
@@ -88,8 +88,12 @@ echo
 
 
 # Sleep 11 seconds. 6 subscriptions arrive (at time 0, 2, 4, 6, 8, 10) as subscription doesn't expires.
-sleep 11s
-
+if [ "$VALGRIND" == "" ]
+then
+  sleep 11s
+else
+  sleep 10s
+fi
 
 echo "2: ++++++++++++++++++++"
 accumulatorDump
@@ -127,7 +131,7 @@ Date: REGEX(.*)
 
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 193
+Content-Length: 192
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -135,7 +139,7 @@ Date: REGEX(.*)
 <subscribeContextResponse>
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT11S</duration>
+    <duration>P99Y</duration>
   </subscribeResponse>
 </subscribeContextResponse>
 
