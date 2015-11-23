@@ -50,12 +50,14 @@ using namespace mongo;
 */
 typedef struct EntityInfo
 {
+  bool          isPattern;
   regex_t       entityIdPattern;
+  std::string   entityId;
   std::string   entityType;
   bool          entityIdPatternToBeFreed;
 
   EntityInfo() {}
-  EntityInfo(const std::string& idPattern, const std::string& _entityType);
+  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern);
   ~EntityInfo() { release(); }
 
   bool          match(const std::string& idPattern, const std::string& type);

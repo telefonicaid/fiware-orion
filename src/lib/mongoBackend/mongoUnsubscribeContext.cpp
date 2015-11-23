@@ -110,8 +110,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
 
-    // FIXME P7: mongoSubCache stuff could be avoided if subscription is not patterned
-
     //
     // Removing subscription from mongo subscription cache
     //
@@ -121,7 +119,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
 
     CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
-    if (cSubP != NULL)  // Will only enter here if wildcard subscription
+    if (cSubP != NULL)
     {
       mongoSubCacheItemRemove(cSubP);
     }
