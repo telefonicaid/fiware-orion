@@ -185,6 +185,13 @@ echo
 echo
 
 
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1))"
+# When the broker is started with -noCache, there are no refreshes performed
+#
+
+
 --REGEXPECT--
 00. Making sure only ONE ftest database exists
 ==============================================
@@ -256,7 +263,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f, ]{76})",
     "subCacheInserts": "3",
     "subCacheItems": "3",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "0",
     "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "subCacheUpdates": "0",
@@ -301,7 +308,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f, ]{50})",
     "subCacheInserts": "3",
     "subCacheItems": "2",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "1",
     "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "subCacheUpdates": "0",
@@ -347,7 +354,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f]{24})",
     "subCacheInserts": "REGEX((3|4))",
     "subCacheItems": "1",
-    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "2",
     "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
     "subCacheUpdates": "0",

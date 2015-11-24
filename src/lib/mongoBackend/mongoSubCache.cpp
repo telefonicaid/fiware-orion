@@ -212,7 +212,7 @@ int mongoSubCacheItems(void)
 *
 * attributeMatch - 
 */
-static bool attributeMatch(CachedSubscription* cSubP, const char* attr)
+static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::string>& attrV)
 {
   for (unsigned int ncvIx = 0; ncvIx < cSubP->notifyConditionVector.size(); ++ncvIx)
   {
@@ -220,9 +220,12 @@ static bool attributeMatch(CachedSubscription* cSubP, const char* attr)
 
     for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
     {
-      if (ncP->condValueList[cvIx] == attr)
+      for (unsigned int aIx = 0; aIx < attrV.size(); ++aIx)
       {
-        return true;
+        if (ncP->condValueList[cvIx] == attrV[aIx])
+        {
+          return true;
+        }
       }
     }
   }
@@ -313,12 +316,12 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 */
 static bool subMatch
 (
-  CachedSubscription*  cSubP,
-  const char*          tenant,
-  const char*          servicePath,
-  const char*          entityId,
-  const char*          entityType,
-  const char*          attr
+  CachedSubscription*              cSubP,
+  const char*                      tenant,
+  const char*                      servicePath,
+  const char*                      entityId,
+  const char*                      entityType,
+  const std::vector<std::string>&  attrV
 )
 {
   if ((cSubP->tenant == NULL) || (tenant == NULL) || (cSubP->tenant[0] == 0) || (tenant[0] == 0))
@@ -352,7 +355,7 @@ static bool subMatch
   // If ONCHANGE and one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
   //
-  if (!attributeMatch(cSubP, attr))
+  if (!attributeMatch(cSubP, attrV))
   {
     LM_T(LmtMongoSubCacheMatch, ("No match due to attributes"));
     return false;
@@ -392,7 +395,41 @@ void mongoSubCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attr))
+    std::vector<std::string> attrV;
+
+    attrV.push_back(attr);
+
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
+    {
+      subVecP->push_back(cSubP);
+      LM_T(LmtMongoSubCache, ("added subscription '%s': lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
+    }
+
+    cSubP = cSubP->next;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheMatch - 
+*/
+void mongoSubCacheMatch
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const char*                        entityId,
+  const char*                        entityType,
+  const std::vector<std::string>&    attrV,
+  std::vector<CachedSubscription*>*  subVecP
+)
+{
+  CachedSubscription* cSubP = mongoSubCache.head;
+
+  while (cSubP != NULL)
+  {
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtMongoSubCache, ("added subscription '%s': lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
