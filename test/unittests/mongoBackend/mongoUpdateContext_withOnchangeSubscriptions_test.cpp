@@ -1815,7 +1815,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     CachedSubscription* subP = mongoSubCacheItemLookup("", "51307b66f481db11bf860001");
 
     ASSERT_TRUE(subP != NULL);
-    EXPECT_EQ(20000000, subP->lastNotificationTime);
+    EXPECT_EQ(1360232700, subP->lastNotificationTime);
+    EXPECT_EQ(1, subP->count);
 
 
     /* Release mock */
@@ -1883,7 +1884,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     CachedSubscription* subP = mongoSubCacheItemLookup("", "51307b66f481db11bf860001");
 
     ASSERT_TRUE(subP != NULL);
-    EXPECT_EQ(20000000, subP->lastNotificationTime);
+    EXPECT_EQ(1360232700, subP->lastNotificationTime);
+    EXPECT_EQ(1, subP->count);
 
 
     /* Release mock */
@@ -2798,7 +2800,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     CachedSubscription* subP = mongoSubCacheItemLookup("", "51307b66f481db11bf860002");
 
     ASSERT_TRUE(subP != NULL);
-    EXPECT_EQ(30000000, subP->lastNotificationTime);
+    EXPECT_EQ(1360232700, subP->lastNotificationTime);
+    EXPECT_EQ(1, subP->count);
 
 
     /* Release mock */
@@ -2866,7 +2869,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     CachedSubscription* subP = mongoSubCacheItemLookup("", "51307b66f481db11bf860002");
 
     ASSERT_TRUE(subP != NULL);
-    EXPECT_EQ(30000000, subP->lastNotificationTime);
+    EXPECT_EQ(1360232700, subP->lastNotificationTime);
+    EXPECT_EQ(1, subP->count);
 
 
     /* Release mock */

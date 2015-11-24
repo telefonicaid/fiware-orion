@@ -648,8 +648,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->count                 = sub.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLong(sub, CSUB_COUNT)            : 0;
-
-  cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
 
   LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
@@ -849,7 +847,6 @@ int mongoSubCacheItemInsert
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->pendingNotifications  = 0;
   cSubP->next                  = NULL;
 
   LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
@@ -971,7 +968,6 @@ void mongoSubCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->pendingNotifications  = 0;
   cSubP->notifyFormat          = notifyFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
@@ -1054,12 +1050,11 @@ void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int*
       // FIXME P5: To be removed once sub-update is OK in QA
       //
       int now = getCurrentTime();
-      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d|DUR:%lu",
+      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|DUR:%lu",
                cSubP->subscriptionId,
                cSubP->lastNotificationTime,
                cSubP->expirationTime,
                cSubP->throttling,
-               cSubP->pendingNotifications,
                cSubP->expirationTime - now);
 #else
         snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
@@ -1261,14 +1256,13 @@ void mongoSubCacheRefresh(bool semAlreadyTaken)
 
   while (cSubP != NULL)
   {
-    LM_T(LmtMongoSubCache, ("%s: TEN:%s, SPath:%s, THR:%lu, EXP:%lu, LNT:%lu PN:%d, REF:%s, Es:%d, As:%d, NCs:%d",
+    LM_T(LmtMongoSubCache, ("%s: TEN:%s, SPath:%s, THR:%lu, EXP:%lu, LNT:%lu REF:%s, Es:%d, As:%d, NCs:%d",
                             cSubP->subscriptionId,
                             cSubP->tenant,
                             cSubP->servicePath,
                             cSubP->throttling,
                             cSubP->expirationTime,
                             cSubP->lastNotificationTime,
-                            cSubP->pendingNotifications,
                             cSubP->reference,
                             cSubP->entityIdInfos.size(),
                             cSubP->attributes.size(),

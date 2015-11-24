@@ -83,7 +83,6 @@ typedef struct CachedSubscription
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
   int64_t                     count;
-  int                         pendingNotifications;
   Format                      notifyFormat;
   char*                       reference;
   struct CachedSubscription*  next;
