@@ -13,3 +13,4 @@
 - Hardening: exhaustive try/catch (mainly at mongoBackend module) 
 - Add: Unpatterned subscriptions now also in subscription cache (Issue #1475)
 - Fix: Fixed an uptil now unknown bug with throttling
+- Fix: 'count' and 'lastNotificationTime' now maintained by subCache (and synched via DB) (Issue #1476)
