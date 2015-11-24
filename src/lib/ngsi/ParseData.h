@@ -63,6 +63,7 @@
 */
 typedef struct RegisterContextData
 {
+  RegisterContextData(): crP(0), entityIdP(0), attributeP(0), attributeMetadataP(0), registrationMetadataP(0) {}
   RegisterContextRequest         res;
   ContextRegistration*           crP;
   EntityId*                      entityIdP;
@@ -88,12 +89,13 @@ typedef struct RegisterContextResponseData
 *
 * DiscoverContextAvailabilityData -
 */
-typedef struct DiscoverContextAvailabilityData
+struct DiscoverContextAvailabilityData
 {
+  DiscoverContextAvailabilityData(): entityIdP(0), scopeP(0) {}
   DiscoverContextAvailabilityRequest  res;
   EntityId*                           entityIdP;
   Scope*                              scopeP;
-} DiscoverContextAvailabilityData;
+};
 
 
 
@@ -112,13 +114,14 @@ typedef struct DiscoverContextAvailabilityResponseData
 *
 * QueryContextData -
 */
-typedef struct QueryContextData
+struct QueryContextData
 {
+  QueryContextData(): entityIdP(0), scopeP(0), vertexP(0) {}
   QueryContextRequest  res;
   EntityId*            entityIdP;
   Scope*               scopeP;
   orion::Point*        vertexP;
-} QueryContextData;
+};
 
 
 
@@ -126,14 +129,15 @@ typedef struct QueryContextData
 *
 * QueryContextResponseData - 
 */
-typedef struct QueryContextResponseData
+struct QueryContextResponseData
 {
+  QueryContextResponseData(): cerP(0), attributeP(0), metadataP(0), domainMetadataP(0) {}
   QueryContextResponse     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
   Metadata*                domainMetadataP;
-} QueryContextResponseData;
+};
 
 
 
@@ -141,12 +145,13 @@ typedef struct QueryContextResponseData
 *
 * SubscribeContextAvailabilityData - 
 */
-typedef struct SubscribeContextAvailabilityData
+struct SubscribeContextAvailabilityData
 {
+  SubscribeContextAvailabilityData(): entityIdP(0), scopeP(0) {}
   SubscribeContextAvailabilityRequest  res;
   EntityId*                            entityIdP;
   Scope*                               scopeP;
-} SubscribeContextAvailabilityData;
+};
 
 
 
@@ -154,8 +159,9 @@ typedef struct SubscribeContextAvailabilityData
 *
 * SubscribeContextData -
 */
-typedef struct SubscribeContextData
+struct SubscribeContextData
 {
+  SubscribeContextData():entityIdP(0), attributeMetadataP(0), restrictionP(0), notifyConditionP(0), scopeP(0), vertexP(0) {}
   SubscribeContextRequest        res;
   EntityId*                      entityIdP;
   Metadata*                      attributeMetadataP;
@@ -163,7 +169,7 @@ typedef struct SubscribeContextData
   NotifyCondition*               notifyConditionP;
   Scope*                         scopeP;
   orion::Point*                  vertexP;
-} SubscribeContextData;
+};
 
 
 
@@ -193,14 +199,15 @@ typedef struct UnsubscribeContextData
 *
 * NotifyContextData -
 */
-typedef struct NotifyContextData
+struct NotifyContextData
 {
+  NotifyContextData(): cerP(0), attributeP(0), attributeMetadataP(0), domainMetadataP(0) {}
   NotifyContextRequest     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                attributeMetadataP;
   Metadata*                domainMetadataP;
-} NotifyContextData;
+} ;
 
 
 
@@ -208,15 +215,16 @@ typedef struct NotifyContextData
 *
 * NotifyContextAvailabilityData -
 */
-typedef struct NotifyContextAvailabilityData
+struct NotifyContextAvailabilityData
 {
+  NotifyContextAvailabilityData(): crrP(0), entityIdP(0), craP(0), attributeMetadataP(0), regMetadataP(0) {}
   NotifyContextAvailabilityRequest     res;
   ContextRegistrationResponse*         crrP;
   EntityId*                            entityIdP;
   ContextRegistrationAttribute*        craP;
   Metadata*                            attributeMetadataP;
   Metadata*                            regMetadataP;
-} NotifyContextAvailabilityData;
+};
 
 
 
@@ -224,12 +232,13 @@ typedef struct NotifyContextAvailabilityData
 *
 * UpdateContextAvailabilitySubscriptionData -
 */
-typedef struct UpdateContextAvailabilitySubscriptionData
+struct UpdateContextAvailabilitySubscriptionData
 {
+  UpdateContextAvailabilitySubscriptionData(): entityIdP(0), scopeP(0) {}
   UpdateContextAvailabilitySubscriptionRequest  res;
   EntityId*                                     entityIdP;
   Scope*                                        scopeP;
-} UpdateContextAvailabilitySubscriptionData;
+};
 
 
 
@@ -237,15 +246,16 @@ typedef struct UpdateContextAvailabilitySubscriptionData
 *
 * UpdateContextData -
 */
-typedef struct UpdateContextData
+struct UpdateContextData
 {
+  UpdateContextData(): ceP(0), entityIdP(0), attributeP(0), contextMetadataP(0), domainMetadataP(0) {}
   UpdateContextRequest   res;
   ContextElement*        ceP;
   EntityId*              entityIdP;
   ContextAttribute*      attributeP;
   Metadata*              contextMetadataP;
   Metadata*              domainMetadataP;
-} UpdateContextData;
+};
 
 
 
@@ -253,14 +263,15 @@ typedef struct UpdateContextData
 *
 * UpdateContextResponseData - 
 */
-typedef struct UpdateContextResponseData
+struct UpdateContextResponseData
 {
+  UpdateContextResponseData(): cerP(0), attributeP(0), metadataP(0), domainMetadataP(0) {}
   UpdateContextResponse    res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
   Metadata*                domainMetadataP;
-} UpdateContextResponseData;
+};
 
 
 
@@ -268,13 +279,14 @@ typedef struct UpdateContextResponseData
 *
 * UpdateContextSubscriptionData - 
 */
-typedef struct UpdateContextSubscriptionData
+struct UpdateContextSubscriptionData
 {
+  UpdateContextSubscriptionData(): notifyConditionP(0), scopeP(0), vertexP(0) {}
   UpdateContextSubscriptionRequest  res;
   NotifyCondition*                  notifyConditionP;
   Scope*                            scopeP;
   orion::Point*                     vertexP;
-} UpdateContextSubscriptionData;
+};
 
 
 
@@ -282,11 +294,12 @@ typedef struct UpdateContextSubscriptionData
 *
 * RegisterProviderRequestData -
 */
-typedef struct RegisterProviderRequestData
+struct RegisterProviderRequestData
 {
+  RegisterProviderRequestData(): metadataP(0) {}
   RegisterProviderRequest  res;
   Metadata*                metadataP;
-} RegisterProviderRequestData;
+};
 
 
 
@@ -294,12 +307,13 @@ typedef struct RegisterProviderRequestData
 *
 * UpdateContextElementData -
 */
-typedef struct UpdateContextElementData
+struct UpdateContextElementData
 {
+  UpdateContextElementData(): attributeP(0), metadataP(0) {}
   UpdateContextElementRequest  res;
   ContextAttribute*            attributeP;
   Metadata*                    metadataP;
-} UpdateContextElementData;
+};
 
 
 
@@ -307,13 +321,14 @@ typedef struct UpdateContextElementData
 *
 * AppendContextElementData -
 */
-typedef struct AppendContextElementData
+struct AppendContextElementData
 {
+  AppendContextElementData(): attributeP(0), metadataP(0), domainMetadataP(0) {}
   AppendContextElementRequest  res;
   ContextAttribute*            attributeP;
   Metadata*                    metadataP;
   Metadata*                    domainMetadataP;
-} AppendContextElementData;
+};
 
 
 
@@ -321,12 +336,13 @@ typedef struct AppendContextElementData
 *
 * UpdateContextAttributeData -
 */
-typedef struct UpdateContextAttributeData
+struct UpdateContextAttributeData
 {
+  UpdateContextAttributeData(): metadataP(0) {}
   UpdateContextAttributeRequest  res;
   Metadata*                      metadataP;
   ContextAttribute               attribute;
-} UpdateContextAttributeData;
+};
 
 
 
