@@ -107,17 +107,17 @@ for doc in db[COL].find().sort('expiration', DESCENDING):
     doc.pop('count', None)
     doc.pop('expiration', None)
 
-    # The following fields are list that need to be ordered: entities, attrs, conditions
-    # fields using a dictionary use hashlib/pickle to avoid processing internal fields
-    doc['entities'] = sorted(doc['entities'], key=lambda k: hashlib.md5(pickle.dumps(k)).hexdigest())
-    doc['conditions'] = sorted(doc['conditions'], key=lambda k: hashlib.md5(pickle.dumps(k)).hexdigest())
-    doc['attrs'].sort()
-
     # In conditions of type ONCHANGE, the conditions value is a list of attribute string that
     # also needs to be ordered
     for cond in doc['conditions']:
         if cond['type'] == 'ONCHANGE':
             cond['value'].sort()
+
+    # The following fields are list that need to be ordered: entities, attrs, conditions
+    # fields using a dictionary use hashlib/pickle to avoid processing internal fields
+    doc['entities'] = sorted(doc['entities'], key=lambda k: hashlib.md5(pickle.dumps(k)).hexdigest())
+    doc['conditions'] = sorted(doc['conditions'], key=lambda k: hashlib.md5(pickle.dumps(k)).hexdigest())
+    doc['attrs'].sort()
 
     # Get the hash
     hash = hashlib.md5(pickle.dumps(doc)).hexdigest()
@@ -148,17 +148,16 @@ msg('INFO: documents to delete: %d' % len(to_delete))
 
 # Third stage: removing
 n = 0
-if not dry_run:
-    need_restart = False
-    for csub_id in to_delete:
-        n += 1
-        print 'INFO: csub to be removed: %s' % csub_id
-        if not dry_run:
-            # FIXME: a bulk delete would be more efficient
-            db[COL].remove({'_id': ObjectId(csub_id)})
-            need_restart = True
-    msg('INFO: processed %d documents' % n)
+need_restart = False
+for csub_id in to_delete:
+    n += 1
+    print 'INFO: csub to be removed: %s' % csub_id
+    if not dry_run:
+        # FIXME: a bulk delete would be more efficient
+        db[COL].remove({'_id': ObjectId(csub_id)})
+        need_restart = True
+msg('INFO: processed %d documents' % n)
 
-    if need_restart and with_restart:
-        call(['/etc/init.d/contextBroker', 'restart'])
-        log_status_restart()
+if need_restart and with_restart and not dry_run:
+    call(['/etc/init.d/contextBroker', 'restart'])
+    log_status_restart()

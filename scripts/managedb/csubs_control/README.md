@@ -12,6 +12,7 @@ The scripts are:
 
 * csub_dups_checker.py: removes csubs duplicates. Have a look to script implementation in order to know which
   csub fields are considered part of the 'signature' of the subscription that is used to detect duplicates.
+  * csub_dups_test.sh is a helper script that can be used to test this program.
 * csub_localhost_reference_checker.py: it checks subscriptions using "localhost" in the callback, removing them
   if they are not allowed (based on the result of the valid_localhost_url() function; you would need to modify it
   to implement your own checkings).
