@@ -84,9 +84,9 @@ std::string NotifyContextAvailabilityResponse::render(RequestType requestType, F
 */
 void NotifyContextAvailabilityResponse::present(const std::string& indent)
 {
-  LM_F(("%sNotifyContextAvailabilityResponse:", indent.c_str()));
+  LM_T(LmtPresent, ("%sNotifyContextAvailabilityResponse:", indent.c_str()));
   responseCode.present(indent + "  ");
-  LM_F(("\n"));
+  LM_T(LmtPresent, ("\n"));
 }
 
 

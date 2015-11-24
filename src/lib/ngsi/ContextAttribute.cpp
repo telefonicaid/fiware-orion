@@ -672,31 +672,45 @@ std::string ContextAttribute::check
 */
 void ContextAttribute::present(const std::string& indent, int ix)
 {
-  LM_F(("%sAttribute %d:",    indent.c_str(), ix));
-  LM_F(("%s  Name:      %s", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:      %s", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent, ("%sAttribute %d:",    
+		    indent.c_str(), 
+		    ix));
+  LM_T(LmtPresent, ("%s  Name:      %s", 
+		    indent.c_str(), 
+		    name.c_str()));
+  LM_T(LmtPresent, ("%s  Type:      %s", 
+		    indent.c_str(), 
+		    type.c_str()));
 
   if (compoundValueP == NULL)
   {
     if (valueType == orion::ValueTypeString)
     {
-      LM_F(("%s  String Value:      %s", indent.c_str(), stringValue.c_str()));
+      LM_T(LmtPresent, ("%s  String Value:      %s", 
+			indent.c_str(), 
+			stringValue.c_str()));
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      LM_F(("%s  Number Value:      %f", indent.c_str(), numberValue));
+      LM_T(LmtPresent, ("%s  Number Value:      %f", 
+			indent.c_str(), 
+			numberValue));
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      LM_F(("%s  Boolean Value:      %s", indent.c_str(), (boolValue == false)? "false" : "true"));
+      LM_T(LmtPresent, ("%s  Boolean Value:      %s", 
+			indent.c_str(), 
+			(boolValue == false)? "false" : "true"));
     }
     else if (valueType == orion::ValueTypeNone)
     {
-      LM_F(("%s  No Value", indent.c_str()));
+      LM_T(LmtPresent, ("%s  No Value", indent.c_str()));
     }
     else
     {
-      LM_F(("%s  Unknown value type (%d)", indent.c_str(), valueType));
+      LM_T(LmtPresent, ("%s  Unknown value type (%d)", 
+			indent.c_str(), 
+			valueType));
     }
   }
   else
@@ -704,9 +718,16 @@ void ContextAttribute::present(const std::string& indent, int ix)
     compoundValueP->show(indent + "  ");
   }
 
-  LM_F(("%s  PA:       %s (%s)", indent.c_str(), providingApplication.get().c_str(), formatToString(providingApplication.getFormat())));
-  LM_F(("%s  found:    %s", indent.c_str(), FT(found)));
-  LM_F(("%s  skip:     %s", indent.c_str(), FT(skip)));
+  LM_T(LmtPresent, ("%s  PA:       %s (%s)", 
+		    indent.c_str(), 
+		    providingApplication.get().c_str(), 
+		    formatToString(providingApplication.getFormat())));
+  LM_T(LmtPresent, ("%s  found:    %s", 
+		    indent.c_str(), 
+		    FT(found)));
+  LM_T(LmtPresent, ("%s  skip:     %s", 
+		    indent.c_str(), 
+		    FT(skip)));
 
   metadataVector.present("Attribute", indent + "  ");
 }

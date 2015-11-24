@@ -410,7 +410,7 @@ void qcrPresent(ParseData* reqDataP)
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump, ("\n\n"));
   reqDataP->qcr.res.present("");
 }
 

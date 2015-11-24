@@ -92,7 +92,7 @@ PaArgument paArgs[] =
 */
 void sigHandler(int sigNo)
 {
-  LM_F(("In sigHandler - caught signal %d", sigNo));
+  LM_T(("In sigHandler - caught signal %d", sigNo));
 
   switch (sigNo)
   {

@@ -385,7 +385,7 @@ void rcrPresent(ParseData* parseDataP)
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump, ("\n\n"));
   parseDataP->rcr.res.contextRegistrationVector.present("");
   parseDataP->rcr.res.duration.present("");
   parseDataP->rcr.res.registrationId.present("");

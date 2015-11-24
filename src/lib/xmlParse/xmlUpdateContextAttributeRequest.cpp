@@ -77,7 +77,7 @@ void upcarPresent(ParseData* reqData)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump, ("\n\n"));
   reqData->upcar.res.present("");
 }
 

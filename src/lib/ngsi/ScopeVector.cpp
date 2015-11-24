@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/tag.h"
@@ -97,11 +98,13 @@ void ScopeVector::present(const std::string& indent)
 {
   if (vec.size() == 0)
   {
-    LM_F(("%sNo scopes", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo scopes", indent.c_str()));
   }
   else
   {
-    LM_F(("%s%lu Scopes:", indent.c_str(), (uint64_t) vec.size()));
+    LM_T(LmtPresent, ("%s%lu Scopes:", 
+		      indent.c_str(), 
+		      (uint64_t) vec.size()));
   }
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)

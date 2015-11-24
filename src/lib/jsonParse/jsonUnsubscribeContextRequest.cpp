@@ -102,7 +102,7 @@ void jsonUncrPresent(ParseData* parseDataP)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump,("\n\n"));
 
   parseDataP->uncr.res.subscriptionId.present("");
 }

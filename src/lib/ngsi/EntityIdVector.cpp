@@ -108,7 +108,7 @@ std::string EntityIdVector::check
 */
 void EntityIdVector::present(const std::string& indent)
 {
-  LM_F(("%lu EntityIds:\n", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu EntityIds:\n", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

@@ -85,7 +85,7 @@ void ncrPresent(ParseData* parseDataP)
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump, ("\n\n"));
   parseDataP->ncr.res.subscriptionId.present("");
 }
 

@@ -269,7 +269,7 @@ void jsonDcarPresent(ParseData* reqDataP)
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump,("\n\n"));
   reqDataP->dcar.res.present("");
 }
 

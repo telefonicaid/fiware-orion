@@ -132,11 +132,13 @@ void Throttling::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sThrottling: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sThrottling: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo Throttling\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo Throttling\n", indent.c_str()));
   }
 }
 

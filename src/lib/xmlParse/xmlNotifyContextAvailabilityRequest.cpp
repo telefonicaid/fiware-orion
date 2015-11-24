@@ -86,7 +86,7 @@ void ncarPresent(ParseData* parseDataP)
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump,("\n\n"));
   parseDataP->ncar.res.present("");
 }
 

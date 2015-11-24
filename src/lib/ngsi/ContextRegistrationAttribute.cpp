@@ -26,6 +26,8 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -139,10 +141,18 @@ std::string ContextRegistrationAttribute::check
 */
 void ContextRegistrationAttribute::present(int ix, const std::string& indent)
 {
-  LM_F(("%sAttribute %d:\n",    indent.c_str(), ix));
-  LM_F(("%s  Name:       %s\n", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:       %s\n", indent.c_str(), type.c_str()));
-  LM_F(("%s  isDomain:   %s\n", indent.c_str(), isDomain.c_str()));
+  LM_T(LmtPresent, ("%sAttribute %d:\n",    
+		    indent.c_str(), 
+		    ix));
+  LM_T(LmtPresent, ("%s  Name:       %s\n", 
+		    indent.c_str(), 
+		    name.c_str()));
+  LM_T(LmtPresent, ("%s  Type:       %s\n", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%s  isDomain:   %s\n", 
+		    indent.c_str(), 
+		    isDomain.c_str()));
 
   metadataVector.present("Attribute", indent + "  ");
 }

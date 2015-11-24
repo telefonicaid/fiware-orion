@@ -266,7 +266,9 @@ std::string ContextAttributeVector::check
 */
 void ContextAttributeVector::present(const std::string& indent)
 {
-  LM_F(("%s%lu ContextAttributes", indent.c_str(), (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%s%lu ContextAttributes", 
+		    indent.c_str(), 
+		    (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

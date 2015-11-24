@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "common/tag.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
@@ -117,9 +118,15 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 */
 void Entity::present(const std::string& indent)
 {
-  LM_F(("%sid:        %s", indent.c_str(), id.c_str()));
-  LM_F(("%stype:      %s", indent.c_str(), type.c_str()));
-  LM_F(("%sisPattern: %s", indent.c_str(), isPattern.c_str()));
+  LM_T(LmtPresent, ("%sid:        %s", 
+		    indent.c_str(), 
+		    id.c_str()));
+  LM_T(LmtPresent, ("%stype:      %s", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%sisPattern: %s", 
+		    indent.c_str(), 
+		    isPattern.c_str()));
 
   attributeVector.present(indent + "  ");
 }

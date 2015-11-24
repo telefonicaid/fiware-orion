@@ -106,11 +106,13 @@ std::string AttributeList::check
 */
 void AttributeList::present(const std::string& indent)
 {
-  LM_F(("%sAttribute List",    indent.c_str()));
+  LM_T(LmtPresent, ("%sAttribute List",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    LM_F(("%s  %s", indent.c_str(), attributeV[ix].c_str()));
+    LM_T(LmtPresent, ("%s  %s", 
+		      indent.c_str(), 
+		      attributeV[ix].c_str()));
   }
 }
 

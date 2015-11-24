@@ -188,7 +188,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType request
 */
 void QueryContextResponse::present(const std::string& indent, const std::string& caller)
 {
-  LM_F(("QueryContextResponse presented by %s", caller.c_str()));
+  LM_T(LmtPresent, ("QueryContextResponse presented by %s", caller.c_str()));
   contextElementResponseVector.present(indent + "  ");
   errorCode.present(indent + "  ");
 }

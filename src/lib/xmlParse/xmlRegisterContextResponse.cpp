@@ -164,7 +164,7 @@ void rcrsPresent(ParseData* reqData)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump,("\n\n"));
   reqData->rcrs.res.duration.present("");
   reqData->rcrs.res.registrationId.present("");
   reqData->rcrs.res.errorCode.present("");

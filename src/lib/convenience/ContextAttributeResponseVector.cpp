@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
@@ -95,7 +96,7 @@ std::string ContextAttributeResponseVector::check
 */
 void ContextAttributeResponseVector::present(std::string indent)
 {
-  LM_F(("%lu ContextAttributeResponses", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu ContextAttributeResponses", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

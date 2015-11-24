@@ -400,7 +400,7 @@ void jsonUpcrPresent(ParseData* reqDataP)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtDump, ("\n\n"));
 
   reqDataP->upcr.res.contextElementVector.present("");
   reqDataP->upcr.res.updateActionType.present("");
