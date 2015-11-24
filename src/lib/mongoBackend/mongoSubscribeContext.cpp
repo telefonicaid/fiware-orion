@@ -141,9 +141,13 @@ HttpStatusCode mongoSubscribeContext
                                              xauthToken,
                                              servicePathV);
     sub.append(CSUB_CONDITIONS, conds);
+
+    long long lastNotificationTime = 0;
     if (notificationDone)
     {
-      sub.append(CSUB_LASTNOTIFICATION, (long long) getCurrentTime());
+      lastNotificationTime = (long long) getCurrentTime();
+
+      sub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
       sub.append(CSUB_COUNT, 1);
     }
 
@@ -167,7 +171,15 @@ HttpStatusCode mongoSubscribeContext
     LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
 
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-    mongoSubCacheItemInsert(tenant.c_str(), servicePath.c_str(), requestP, oidString.c_str(), expiration, throttling, notifyFormat);
+    mongoSubCacheItemInsert(tenant.c_str(),
+                            servicePath.c_str(),
+                            requestP,
+                            oidString.c_str(),
+                            expiration,
+                            throttling,
+                            notifyFormat,
+                            notificationDone,
+                            lastNotificationTime);
     cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);

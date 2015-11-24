@@ -151,7 +151,9 @@ extern void mongoSubCacheItemInsert
   const char*               subscriptionId,
   int64_t                   expiration,
   int64_t                   throttling,
-  Format                    notifyFormat
+  Format                    notifyFormat,
+  bool                      notificationDone,
+  int64_t                   lastNotificationTime
 );
 
 
@@ -184,7 +186,15 @@ extern int mongoSubCacheItemRemove(CachedSubscription* cSubP);
 *
 * mongoSubCacheRefresh - 
 */
-extern void mongoSubCacheRefresh(void);
+extern void mongoSubCacheRefresh(bool semAlreadyTaken = false);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheSync - 
+*/
+extern void mongoSubCacheSync(void);
 
 
 

@@ -62,6 +62,7 @@
 #include "ngsi10/SubscribeContextRequest.h"
 
 using namespace mongo;
+using std::map;
 
 
 
@@ -922,7 +923,9 @@ void mongoSubCacheItemInsert
   const char*               subscriptionId,
   int64_t                   expirationTime,
   int64_t                   throttling,
-  Format                    notifyFormat
+  Format                    notifyFormat,
+  bool                      notificationDone,
+  int64_t                   lastNotificationTime
 )
 {
   //
@@ -967,11 +970,11 @@ void mongoSubCacheItemInsert
   cSubP->reference             = strdup(scrP->reference.get().c_str());
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
-  cSubP->lastNotificationTime  = 0;
+  cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->pendingNotifications  = 0;
   cSubP->notifyFormat          = notifyFormat;
   cSubP->next                  = NULL;
-  cSubP->count                 = 0;
+  cSubP->count                 = (notificationDone == true)? 1 : 0;
 
   LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
@@ -1213,12 +1216,16 @@ static void mongoSubCacheRefresh(std::string database)
 *
 * mongoSubCacheRefresh - 
 */
-void mongoSubCacheRefresh(void)
+void mongoSubCacheRefresh(bool semAlreadyTaken)
 {
   std::vector<std::string> databases;
 
   LM_T(LmtMongoSubCache, ("Refreshing subscription cache"));
-  cacheSemTake(__FUNCTION__, "subscription cache for refresh");
+
+  if (!semAlreadyTaken)
+  {
+    cacheSemTake(__FUNCTION__, "subscription cache for refresh");
+  }
 
 
   // Empty the cache
@@ -1278,7 +1285,10 @@ void mongoSubCacheRefresh(void)
   //
 #endif
 
-  cacheSemGive(__FUNCTION__, "subscription cache for refresh");
+  if (!semAlreadyTaken)
+  {
+    cacheSemGive(__FUNCTION__, "subscription cache for refresh");
+  }
 }
 
 
@@ -1290,17 +1300,9 @@ void mongoSubCacheRefresh(void)
 typedef struct CachedSubSaved
 {
   std::string   subscriptionId;
-  int64_t       lastNotificationTime;
-  int64_t       count;
+  long long     lastNotificationTime;
+  long long     count;
 } CachedSubSaved;
-
-
-
-/* ****************************************************************************
-*
-* savedSubV - 
-*/
-static std::map<std::string, CachedSubSaved*> savedSubV;
 
 
 
@@ -1308,7 +1310,7 @@ static std::map<std::string, CachedSubSaved*> savedSubV;
 *
 * mongoSubCacheSync - 
 *
-* 1. Save subscriptionId, lastNotificationTime, and count for all items in cache
+* 1. Save subscriptionId, lastNotificationTime, and count for all items in cache (savedSubV)
 * 2. Refresh cache (count set to 0)
 * 3. Compare lastNotificationTime in savedSubV with the new cache-contents and:
 *    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
@@ -1316,9 +1318,12 @@ static std::map<std::string, CachedSubSaved*> savedSubV;
 *        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
 * 4. Update 'count' for each item in savedSubV where count != 0
 * 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
+* 6. Free the vector created in step 1 - savedSubV
 */
-static void mongoSubCacheSync(void)
+void mongoSubCacheSync(void)
 {
+  std::map<std::string, CachedSubSaved*> savedSubV;
+
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
 
 
@@ -1327,7 +1332,7 @@ static void mongoSubCacheSync(void)
   //
   CachedSubscription* cSubP = mongoSubCache.head;
 
-  while (cSubP != null)
+  while (cSubP != NULL)
   {
     CachedSubSaved* cssP       = new CachedSubSaved();
 
@@ -1340,20 +1345,21 @@ static void mongoSubCacheSync(void)
 
   LM_T(LmtMongoCacheSync, ("Pushed back %d items to savedSubV", savedSubV.size()));
 
+
   //
   // 2. Refresh cache (count set to 0)
   //
-  cacheRefresh();  // semaphore ...
+  mongoSubCacheRefresh(true);
 
 
   //
   // 3. Compare lastNotificationTime in savedSubV with the new cache-contents
   //
   cSubP = mongoSubCache.head;
-  while (cSubP != null)
+  while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
-    if ((cssP != null) && (cssP->lastNotificationTime <= cSubP->lastNotificationTime))
+    if ((cssP != NULL) && (cssP->lastNotificationTime <= cSubP->lastNotificationTime))
     {
       // cssP->lastNotificationTime older than what's currently in DB => throw away
       cssP->lastNotificationTime = 0;
@@ -1367,32 +1373,58 @@ static void mongoSubCacheSync(void)
   // 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
   //
   cSubP = mongoSubCache.head;
-  while (cSubP != null)
+  while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
-    if (cssP == null)
+    if (cssP == NULL)
     {
       continue;
     }
 
+
+    std::string  collection  = getSubscribeContextAvailabilityCollectionName(cSubP->tenant);
+    BSONObj      query       = BSON("_id" << OID(cSubP->subscriptionId));
+    BSONObj      update;
+    std::string  err;
+
     if ((cssP->count != 0) && (cssP->lastNotificationTime != 0))
     {
-      // Update BOTH
+      // Update count AND lastNotificationTime
+      update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << cssP->lastNotificationTime) << "$inc" << BSON(CASUB_COUNT << cssP->count));
     }
     else if (cssP->count != 0)
     {
-      // Update COUNT
+      // Update count
+      update = BSON("$inc" << BSON(CASUB_COUNT << cssP->count));
     }
     else if (cssP->lastNotificationTime != 0)
     {
       // Update lastNotificationTime
+      update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << cssP->lastNotificationTime));
+    }
+    else
+    {
+      // Can't reach this point
+      continue;
+    }
+
+    if (collectionUpdate(collection, query, update, false, &err) != true)
+    {
+      LM_E(("Internal Error (error updating 'count' and 'lastNotification' for a subscription)"));
     }
   }
 
 
   //
+  // 6. Free the vector savedSubV
   //
+  for (std::map<std::string, CachedSubSaved*>::iterator it = savedSubV.begin(); it != savedSubV.end(); ++it)
+  {
+    delete it->second;
+  }
+  savedSubV.clear();
+
 
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
 }

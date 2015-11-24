@@ -1337,7 +1337,7 @@ static bool addTriggeredSubscriptions_noCache
 
     std::string subIdStr = idField.OID().toString();
 
-    if (subs.count(subIdStr) == 0)  // KZ: count
+    if (subs.count(subIdStr) == 0)
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
@@ -1539,7 +1539,7 @@ static bool processSubscriptions
           if (cSubP->pendingNotifications == 0)
           {
             cSubP->lastNotificationTime = getCurrentTime();
-            cSubP->count               += 1;  // DOUBT:  What if we had three notifications? Do we count updates of actual notifs?
+            cSubP->count               += 1;
 
             LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
           }
