@@ -45,11 +45,9 @@ using namespace ngsiv2;
 *
 * setSubscriptionId -
 */
-static std::string setSubscriptionId(Subscription* s, const BSONObj& r)
+static void setSubscriptionId(Subscription* s, const BSONObj& r)
 {
   s->id = getField(r, "_id").OID().toString();
-
-  return s->id;
 }
 
 
@@ -141,7 +139,7 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
     if (cSubP->count != 0)
     {
       //
-      // First, compensate for eventual -1 in 'timesSent'
+      // First, compensate for -1 in 'timesSent'
       //
       if (s->notification.timesSent == -1)
       {

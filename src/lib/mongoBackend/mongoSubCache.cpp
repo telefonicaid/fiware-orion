@@ -639,7 +639,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
 
 
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? sub.getField(CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
@@ -1293,9 +1293,8 @@ void mongoSubCacheRefresh(bool semAlreadyTaken)
 */
 typedef struct CachedSubSaved
 {
-  std::string   subscriptionId;
-  long long     lastNotificationTime;
-  long long     count;
+  long long  lastNotificationTime;
+  long long  count;
 } CachedSubSaved;
 
 
@@ -1373,11 +1372,12 @@ void mongoSubCacheSync(void)
 
     if (cssP == NULL)
     {
+      cSubP = cSubP->next;
       continue;
     }
 
-
-    std::string  collection  = getSubscribeContextAvailabilityCollectionName(cSubP->tenant);
+    std::string  tenant      = (cSubP->tenant == NULL)? "" : cSubP->tenant;
+    std::string  collection  = getSubscribeContextCollectionName(tenant);
     BSONObj      query       = BSON("_id" << OID(cSubP->subscriptionId));
     BSONObj      update;
     std::string  err;
@@ -1385,21 +1385,21 @@ void mongoSubCacheSync(void)
     if ((cssP->count != 0) && (cssP->lastNotificationTime != 0))
     {
       // Update count AND lastNotificationTime
-      update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << cssP->lastNotificationTime) << "$inc" << BSON(CASUB_COUNT << cssP->count));
+      update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << cssP->lastNotificationTime) << "$inc" << BSON(CSUB_COUNT << cssP->count));
     }
     else if (cssP->count != 0)
     {
       // Update count
-      update = BSON("$inc" << BSON(CASUB_COUNT << cssP->count));
+      update = BSON("$inc" << BSON(CSUB_COUNT << cssP->count));
     }
     else if (cssP->lastNotificationTime != 0)
     {
       // Update lastNotificationTime
-      update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << cssP->lastNotificationTime));
+      update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << cssP->lastNotificationTime));
     }
     else
     {
-      // Can't reach this point
+      cSubP = cSubP->next;
       continue;
     }
 
@@ -1407,6 +1407,8 @@ void mongoSubCacheSync(void)
     {
       LM_E(("Internal Error (error updating 'count' and 'lastNotification' for a subscription)"));
     }
+
+    cSubP = cSubP->next;
   }
 
 
@@ -1436,7 +1438,7 @@ static void* mongoSubCacheRefresherThread(void* vP)
   while (1)
   {
     sleep(subCacheInterval);
-    mongoSubCacheRefresh();
+    mongoSubCacheSync();
   }
 
   return NULL;
