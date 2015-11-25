@@ -182,12 +182,12 @@ std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUpcarPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_T(LmtDump, ("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqData->upcar.res.present("");
 }
 

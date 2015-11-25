@@ -397,10 +397,10 @@ std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUpcrPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_T(LmtDump, ("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
 
   reqDataP->upcr.res.contextElementVector.present("");
   reqDataP->upcr.res.updateActionType.present("");

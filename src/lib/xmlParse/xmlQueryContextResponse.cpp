@@ -373,7 +373,7 @@ std::string qcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void qcrsPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
   parseDataP->qcrs.res.present("", "xmlQueryContextResponse");

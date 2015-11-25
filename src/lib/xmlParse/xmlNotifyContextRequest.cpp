@@ -80,12 +80,12 @@ std::string ncrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void ncrPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_T(LmtDump, ("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   parseDataP->ncr.res.subscriptionId.present("");
 }
 

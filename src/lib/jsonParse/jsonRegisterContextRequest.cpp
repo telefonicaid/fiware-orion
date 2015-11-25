@@ -447,12 +447,12 @@ std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonRcrPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_T(LmtDump,("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
 
   reqDataP->rcr.res.contextRegistrationVector.present("");
   reqDataP->rcr.res.duration.present("");

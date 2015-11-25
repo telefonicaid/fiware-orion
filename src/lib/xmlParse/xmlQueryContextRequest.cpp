@@ -405,12 +405,12 @@ std::string qcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 */
 void qcrPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_T(LmtDump, ("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqDataP->qcr.res.present("");
 }
 

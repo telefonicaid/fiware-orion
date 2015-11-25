@@ -402,10 +402,10 @@ std::string ucsrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void ucsrPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_T(LmtDump, ("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqData->ucsr.res.present("");
 }
 

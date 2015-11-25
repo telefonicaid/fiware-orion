@@ -461,6 +461,6 @@ void jsonUpcrsPresent(ParseData* reqDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_T(LmtParse, ("UpdateContextResponse:"));
+  LM_T(LmtPresent, ("UpdateContextResponse:"));
   reqDataP->upcrs.res.present("  ");
 }

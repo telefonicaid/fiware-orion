@@ -304,7 +304,7 @@ std::string jsonUcasCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUcasPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

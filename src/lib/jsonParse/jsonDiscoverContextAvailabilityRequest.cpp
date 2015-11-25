@@ -264,12 +264,12 @@ std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 */
 void jsonDcarPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_T(LmtDump,("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   reqDataP->dcar.res.present("");
 }
 

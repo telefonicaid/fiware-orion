@@ -482,7 +482,7 @@ void jsonUcsrPresent(ParseData* parseDataP)
 {
   printf("jsonUcsrPresent\n");
 
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
