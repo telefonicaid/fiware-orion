@@ -52,10 +52,9 @@ Point::Point()
 *
 * Point::Point - 
 */
-Point::Point(::std::string latitude, ::std::string longitude)
+Point::Point(::std::string latitude, ::std::string longitude): _latitude(latitude), _longitude(longitude)
 {
-  _latitude  = latitude;
-  _longitude = longitude;
+
 }
 
 
@@ -325,11 +324,9 @@ void Polygon::release(void)
 *
 * Geometry::Geometry - 
 */
-Geometry::Geometry()
+Geometry::Geometry(): areaType(""), radius(-1), external(false)
 {
-  areaType  = "";
-  radius    = -1;
-  external  = false;
+
 }
 
 
