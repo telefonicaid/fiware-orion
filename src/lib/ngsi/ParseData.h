@@ -61,16 +61,16 @@
 *
 * RegisterContextData - output data and help pointers for RegisterContextRequest
 */
-typedef struct RegisterContextData
+struct RegisterContextData
 {
-  RegisterContextData(): crP(0), entityIdP(0), attributeP(0), attributeMetadataP(0), registrationMetadataP(0) {}
+  RegisterContextData(): crP(NULL), entityIdP(NULL), attributeP(NULL), attributeMetadataP(NULL), registrationMetadataP(NULL) {}
   RegisterContextRequest         res;
   ContextRegistration*           crP;
   EntityId*                      entityIdP;
   ContextRegistrationAttribute*  attributeP;
   Metadata*                      attributeMetadataP;
   Metadata*                      registrationMetadataP;
-} RegisterContextData;
+};
 
 
 
@@ -91,7 +91,7 @@ typedef struct RegisterContextResponseData
 */
 struct DiscoverContextAvailabilityData
 {
-  DiscoverContextAvailabilityData(): entityIdP(0), scopeP(0) {}
+  DiscoverContextAvailabilityData(): entityIdP(NULL), scopeP(NULL) {}
   DiscoverContextAvailabilityRequest  res;
   EntityId*                           entityIdP;
   Scope*                              scopeP;
@@ -116,7 +116,7 @@ typedef struct DiscoverContextAvailabilityResponseData
 */
 struct QueryContextData
 {
-  QueryContextData(): entityIdP(0), scopeP(0), vertexP(0) {}
+  QueryContextData(): entityIdP(NULL), scopeP(NULL), vertexP(NULL) {}
   QueryContextRequest  res;
   EntityId*            entityIdP;
   Scope*               scopeP;
@@ -131,7 +131,7 @@ struct QueryContextData
 */
 struct QueryContextResponseData
 {
-  QueryContextResponseData(): cerP(0), attributeP(0), metadataP(0), domainMetadataP(0) {}
+  QueryContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
   QueryContextResponse     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
@@ -147,7 +147,7 @@ struct QueryContextResponseData
 */
 struct SubscribeContextAvailabilityData
 {
-  SubscribeContextAvailabilityData(): entityIdP(0), scopeP(0) {}
+  SubscribeContextAvailabilityData(): entityIdP(NULL), scopeP(NULL) {}
   SubscribeContextAvailabilityRequest  res;
   EntityId*                            entityIdP;
   Scope*                               scopeP;
@@ -161,7 +161,7 @@ struct SubscribeContextAvailabilityData
 */
 struct SubscribeContextData
 {
-  SubscribeContextData():entityIdP(0), attributeMetadataP(0), restrictionP(0), notifyConditionP(0), scopeP(0), vertexP(0) {}
+  SubscribeContextData():entityIdP(NULL), attributeMetadataP(NULL), restrictionP(NULL), notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
   SubscribeContextRequest        res;
   EntityId*                      entityIdP;
   Metadata*                      attributeMetadataP;
@@ -201,13 +201,13 @@ typedef struct UnsubscribeContextData
 */
 struct NotifyContextData
 {
-  NotifyContextData(): cerP(0), attributeP(0), attributeMetadataP(0), domainMetadataP(0) {}
+  NotifyContextData(): cerP(NULL), attributeP(NULL), attributeMetadataP(NULL), domainMetadataP(NULL) {}
   NotifyContextRequest     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                attributeMetadataP;
   Metadata*                domainMetadataP;
-} ;
+};
 
 
 
@@ -217,7 +217,7 @@ struct NotifyContextData
 */
 struct NotifyContextAvailabilityData
 {
-  NotifyContextAvailabilityData(): crrP(0), entityIdP(0), craP(0), attributeMetadataP(0), regMetadataP(0) {}
+  NotifyContextAvailabilityData(): crrP(NULL), entityIdP(NULL), craP(NULL), attributeMetadataP(NULL), regMetadataP(NULL) {}
   NotifyContextAvailabilityRequest     res;
   ContextRegistrationResponse*         crrP;
   EntityId*                            entityIdP;
@@ -234,7 +234,7 @@ struct NotifyContextAvailabilityData
 */
 struct UpdateContextAvailabilitySubscriptionData
 {
-  UpdateContextAvailabilitySubscriptionData(): entityIdP(0), scopeP(0) {}
+  UpdateContextAvailabilitySubscriptionData(): entityIdP(NULL), scopeP(NULL) {}
   UpdateContextAvailabilitySubscriptionRequest  res;
   EntityId*                                     entityIdP;
   Scope*                                        scopeP;
@@ -248,7 +248,7 @@ struct UpdateContextAvailabilitySubscriptionData
 */
 struct UpdateContextData
 {
-  UpdateContextData(): ceP(0), entityIdP(0), attributeP(0), contextMetadataP(0), domainMetadataP(0) {}
+  UpdateContextData(): ceP(NULL), entityIdP(NULL), attributeP(NULL), contextMetadataP(NULL), domainMetadataP(NULL) {}
   UpdateContextRequest   res;
   ContextElement*        ceP;
   EntityId*              entityIdP;
@@ -265,7 +265,7 @@ struct UpdateContextData
 */
 struct UpdateContextResponseData
 {
-  UpdateContextResponseData(): cerP(0), attributeP(0), metadataP(0), domainMetadataP(0) {}
+  UpdateContextResponseData(): cerP(NULL), attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
   UpdateContextResponse    res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
@@ -281,7 +281,7 @@ struct UpdateContextResponseData
 */
 struct UpdateContextSubscriptionData
 {
-  UpdateContextSubscriptionData(): notifyConditionP(0), scopeP(0), vertexP(0) {}
+  UpdateContextSubscriptionData(): notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
   UpdateContextSubscriptionRequest  res;
   NotifyCondition*                  notifyConditionP;
   Scope*                            scopeP;
@@ -296,7 +296,7 @@ struct UpdateContextSubscriptionData
 */
 struct RegisterProviderRequestData
 {
-  RegisterProviderRequestData(): metadataP(0) {}
+  RegisterProviderRequestData(): metadataP(NULL) {}
   RegisterProviderRequest  res;
   Metadata*                metadataP;
 };
@@ -309,7 +309,7 @@ struct RegisterProviderRequestData
 */
 struct UpdateContextElementData
 {
-  UpdateContextElementData(): attributeP(0), metadataP(0) {}
+  UpdateContextElementData(): attributeP(NULL), metadataP(NULL) {}
   UpdateContextElementRequest  res;
   ContextAttribute*            attributeP;
   Metadata*                    metadataP;
@@ -323,7 +323,7 @@ struct UpdateContextElementData
 */
 struct AppendContextElementData
 {
-  AppendContextElementData(): attributeP(0), metadataP(0), domainMetadataP(0) {}
+  AppendContextElementData(): attributeP(NULL), metadataP(NULL), domainMetadataP(NULL) {}
   AppendContextElementRequest  res;
   ContextAttribute*            attributeP;
   Metadata*                    metadataP;
@@ -338,7 +338,7 @@ struct AppendContextElementData
 */
 struct UpdateContextAttributeData
 {
-  UpdateContextAttributeData(): metadataP(0) {}
+  UpdateContextAttributeData(): metadataP(NULL) {}
   UpdateContextAttributeRequest  res;
   Metadata*                      metadataP;
   ContextAttribute               attribute;
@@ -384,10 +384,7 @@ typedef struct AttributeValueData
 */
 typedef struct ParseData
 {
-  ParseData()
-  {
-    lastContextAttribute = NULL;
-  }
+  ParseData():  lastContextAttribute(NULL) { }
 
   std::string                                 errorString;
   ContextAttribute*                           lastContextAttribute;

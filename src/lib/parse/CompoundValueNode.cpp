@@ -47,8 +47,8 @@ CompoundValueNode::CompoundValueNode():
   valueType   (orion::ValueTypeUnknown),
   numberValue (0.0),
   boolValue   (false),
-  container   (0),
-  rootP       (0),
+  container   (NULL),
+  rootP       (NULL),
   siblingNo   (0),
   path        ("Unset"),
   level       (0)
