@@ -185,7 +185,7 @@ extern int mongoSubCacheItemRemove(CachedSubscription* cSubP);
 *
 * mongoSubCacheRefresh - 
 */
-extern void mongoSubCacheRefresh(bool semAlreadyTaken = false);
+extern void mongoSubCacheRefresh(void);
 
 
 

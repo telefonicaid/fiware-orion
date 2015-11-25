@@ -188,7 +188,7 @@ HttpStatusCode mongoUpdateContextSubscription
   int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
 
   //
-  // Update from cached value, is applicable
+  // Update from cached value, if applicable
   //
   CachedSubscription*  cSubP                = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
   long long            lastNotificationTime = 0;

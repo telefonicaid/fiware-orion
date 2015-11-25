@@ -1171,12 +1171,13 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
 *
 *   I.e. the subscriptions is for ONCHANGE.
 */
-static void mongoSubCacheRefresh(std::string database)
+static void mongoSubCacheRefresh(const std::string& database)
 {
   LM_T(LmtMongoSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
   BSONObj                   query       = BSON("conditions.type" << "ONCHANGE");
-  std::string               tenant      = tenantFromDb(database);
+  std::string               db          = database;
+  std::string               tenant      = tenantFromDb(db);
   std::string               collection  = getSubscribeContextCollectionName(tenant);
   auto_ptr<DBClientCursor>  cursor;
   std::string               errorString;
@@ -1210,18 +1211,17 @@ static void mongoSubCacheRefresh(std::string database)
 /* ****************************************************************************
 *
 * mongoSubCacheRefresh - 
+*
+* WARNING
+*  The cache semaphore must be taken before this function is called:
+*    cacheSemTake(__FUNCTION__, "Reason");
+*  And released after mongoSubCacheRefresh finishes, of course.
 */
-void mongoSubCacheRefresh(bool semAlreadyTaken)
+void mongoSubCacheRefresh(void)
 {
   std::vector<std::string> databases;
 
   LM_T(LmtMongoSubCache, ("Refreshing subscription cache"));
-
-  if (!semAlreadyTaken)
-  {
-    cacheSemTake(__FUNCTION__, "subscription cache for refresh");
-  }
-
 
   // Empty the cache
   mongoSubCacheDestroy();
@@ -1278,11 +1278,6 @@ void mongoSubCacheRefresh(bool semAlreadyTaken)
   // DEBUG ENDS HERE
   //
 #endif
-
-  if (!semAlreadyTaken)
-  {
-    cacheSemGive(__FUNCTION__, "subscription cache for refresh");
-  }
 }
 
 
@@ -1342,7 +1337,7 @@ void mongoSubCacheSync(void)
   //
   // 2. Refresh cache (count set to 0)
   //
-  mongoSubCacheRefresh(true);
+  mongoSubCacheRefresh();
 
 
   //
@@ -1378,24 +1373,21 @@ void mongoSubCacheSync(void)
 
     std::string  tenant      = (cSubP->tenant == NULL)? "" : cSubP->tenant;
     std::string  collection  = getSubscribeContextCollectionName(tenant);
-    BSONObj      query       = BSON("_id" << OID(cSubP->subscriptionId));
+    BSONObj      condition;
     BSONObj      update;
     std::string  err;
 
-    if ((cssP->count != 0) && (cssP->lastNotificationTime != 0))
-    {
-      // Update count AND lastNotificationTime
-      update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << cssP->lastNotificationTime) << "$inc" << BSON(CSUB_COUNT << cssP->count));
-    }
-    else if (cssP->count != 0)
+    if (cssP->count != 0)
     {
       // Update count
-      update = BSON("$inc" << BSON(CSUB_COUNT << cssP->count));
+      condition = BSON("_id" << OID(cSubP->subscriptionId));
+      update    = BSON("$inc" << BSON(CSUB_COUNT << cssP->count));
     }
     else if (cssP->lastNotificationTime != 0)
     {
       // Update lastNotificationTime
-      update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << cssP->lastNotificationTime));
+      condition = BSON("_id" << OID(cSubP->subscriptionId) << CSUB_LASTNOTIFICATION << BSON("$lt" << cssP->lastNotificationTime));
+      update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << cssP->lastNotificationTime));
     }
     else
     {
@@ -1403,7 +1395,7 @@ void mongoSubCacheSync(void)
       continue;
     }
 
-    if (collectionUpdate(collection, query, update, false, &err) != true)
+    if (collectionUpdate(collection, condition, update, false, &err) != true)
     {
       LM_E(("Internal Error (error updating 'count' and 'lastNotification' for a subscription)"));
     }
