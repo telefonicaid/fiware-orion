@@ -192,7 +192,7 @@ int main(int argC, char* argV[])
 
     for (ix = 0; ix < 5000; ix++)
     {
-      LM_T(("FORCED   %d", ix));  // This LM_T use is for a test program for the ParseArgs library
+      LM_F(("FORCED   %d", ix));  // This LM_F use is for a test program for the ParseArgs library
       LM_M(("MESSAGE  %d", ix));  // This LM_M use is for a test program for the ParseArgs library
       LM_W(("WARNING  %d", ix));
       LM_E(("ERROR    %d", ix));
