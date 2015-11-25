@@ -155,6 +155,16 @@ echo
 echo
 
 
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1|2))",
+#
+# If started with -noCache:  0
+# Normal start:              1
+# Under valgrind:            2 (possibly, depending on timing)
+#
+
+
 --REGEXPECT--
 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs
 ===========================================================================================
@@ -184,9 +194,9 @@ Date: REGEX(.*)
     "measuring_interval_in_secs": "REGEX(\d+)",
     "statisticsRequests": "1",
     "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "2",
+    "subCacheInserts": "REGEX((1|2))",
     "subCacheItems": "1",
-    "subCacheRefreshs": "2",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "0",
     "subCacheUpdates": "0",
     "subscriptions": "1",

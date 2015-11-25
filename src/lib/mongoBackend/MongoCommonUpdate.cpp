@@ -1134,25 +1134,11 @@ static bool addTriggeredSubscriptions_withCache
   const std::vector<std::string>&           servicePathV
 )
 {  
-#define DIRTY_HACK
-#ifdef DIRTY_HACK
-  // FIXME P10: quick and dirty hack... a mongoSubCacheMatch() supporting std::vector passing is needed
-  std::string attr;
-  if (modifiedAttrs.size() > 0)
-  {
-    attr = modifiedAttrs[0];
-  }
-  else
-  {
-    attr = "";
-  }
-#endif
-
   std::string   servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
+  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
 
   LM_T(LmtMongoSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 

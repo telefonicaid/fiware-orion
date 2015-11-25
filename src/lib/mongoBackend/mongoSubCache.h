@@ -215,6 +215,22 @@ extern void mongoSubCacheMatch
 
 /* ****************************************************************************
 *
+* mongoSubCacheMatch - 
+*/
+extern void mongoSubCacheMatch
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const char*                        entityId,
+  const char*                        entityType,
+  const std::vector<std::string>&    attrV,
+  std::vector<CachedSubscription*>*  subVecP
+);
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheStatisticsGet - 
 */
 extern void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize);
