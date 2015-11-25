@@ -42,16 +42,17 @@ namespace orion
 *
 * CompoundValueNode - constructor for toplevel 'node'
 */
-CompoundValueNode::CompoundValueNode()
+CompoundValueNode::CompoundValueNode():
+  name        ("Unset"),
+  valueType   (orion::ValueTypeUnknown),
+  numberValue (0.0),
+  boolValue   (false),
+  container   (NULL),
+  rootP       (NULL),
+  siblingNo   (0),
+  path        ("Unset"),
+  level       (0)
 {
-  rootP      = NULL;
-  valueType  = orion::ValueTypeUnknown;
-  container  = NULL;
-  level      = 0;
-  name       = "Unset";
-  path       = "Unset";
-  siblingNo  = 0;
-
   LM_T(LmtCompoundValue, ("Created EMPTY compound node at %p", this));
 }
 
@@ -61,16 +62,17 @@ CompoundValueNode::CompoundValueNode()
 *
 * CompoundValueNode - constructor for toplevel 'node'
 */
-CompoundValueNode::CompoundValueNode(orion::ValueType _type)
+CompoundValueNode::CompoundValueNode(orion::ValueType _type):
+  name        ("toplevel"),
+  valueType   (_type),
+  numberValue (0.0),
+  boolValue   (false),
+  container   (this),
+  rootP       (this),
+  siblingNo   (0),
+  path        ("/"),
+  level       (0)
 {
-  rootP      = this;
-  valueType  = _type;
-  container  = this;
-  level      = 0;
-  name       = "toplevel";
-  path       = "/";
-  siblingNo  = 0;
-
   LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (valueType == orion::ValueTypeVector)? "Vector" : "Object", this));
 }
 
@@ -89,17 +91,18 @@ CompoundValueNode::CompoundValueNode
   int                 _siblingNo,
   orion::ValueType    _type,
   int                 _level
-)
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (_value),
+  numberValue (0.0),
+  boolValue   (false),
+  container   (_container),
+  rootP       (container->rootP),
+  siblingNo   (_siblingNo),
+  path        (_path),
+  level       (container->level + 1)
 {
-  container    = _container;
-  rootP        = container->rootP;
-  name         = _name;
-  stringValue  = _value;
-  path         = _path;
-  level        = container->level + 1;
-  siblingNo    = _siblingNo;
-  valueType    = _type;
-
   LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
                           level,
@@ -108,10 +111,12 @@ CompoundValueNode::CompoundValueNode
                           this));
 }
 
+
 /* ****************************************************************************
 *
 * CompoundValueNode - constructor for all nodes except toplevel (char*)
 */
+
 CompoundValueNode::CompoundValueNode
 (
   CompoundValueNode*  _container,
@@ -121,17 +126,18 @@ CompoundValueNode::CompoundValueNode
   int                 _siblingNo,
   orion::ValueType    _type,
   int                 _level
-)
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (std::string(_value)),
+  numberValue (0.0),
+  boolValue   (false),
+  container   (_container),
+  rootP       (container->rootP),
+  siblingNo   (_siblingNo),
+  path        (_path),
+  level       (container->level + 1)
 {
-  container    = _container;
-  rootP        = container->rootP;
-  name         = _name;
-  stringValue  = std::string(_value);
-  path         = _path;
-  level        = container->level + 1;
-  siblingNo    = _siblingNo;
-  valueType    = _type;
-
   LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
                           level,
@@ -140,9 +146,11 @@ CompoundValueNode::CompoundValueNode
                           this));
 }
 
+
+
 /* ****************************************************************************
 *
-* CompoundValueNode - constructor for all nodes except toplevel (string)
+* CompoundValueNode - constructor for all nodes except toplevel (number)
 */
 CompoundValueNode::CompoundValueNode
 (
@@ -153,17 +161,18 @@ CompoundValueNode::CompoundValueNode
   int                 _siblingNo,
   orion::ValueType    _type,
   int                 _level
-)
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (),
+  numberValue (_value),
+  boolValue   (false),
+  container   (_container),
+  rootP       (container->rootP),
+  siblingNo   (_siblingNo),
+  path        (_path),
+  level       (container->level + 1)
 {
-  container    = _container;
-  rootP        = container->rootP;
-  name         = _name;
-  numberValue  = _value;
-  path         = _path;
-  level        = container->level + 1;
-  siblingNo    = _siblingNo;
-  valueType    = _type;
-
   LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
                           level,
@@ -174,7 +183,7 @@ CompoundValueNode::CompoundValueNode
 
 /* ****************************************************************************
 *
-* CompoundValueNode - constructor for all nodes except toplevel (string)
+* CompoundValueNode - constructor for all nodes except toplevel (bool)
 */
 CompoundValueNode::CompoundValueNode
 (
@@ -185,17 +194,18 @@ CompoundValueNode::CompoundValueNode
   int                 _siblingNo,
   orion::ValueType    _type,
   int                 _level
-)
+):
+  name        (_name),
+  valueType   (_type),
+  stringValue (""),
+  numberValue (0.0),
+  boolValue   (_value),
+  container   (_container),
+  rootP       (container->rootP),
+  siblingNo   (_siblingNo),
+  path        (_path),
+  level       (container->level + 1)
 {
-  container  = _container;
-  rootP      = container->rootP;
-  name       = _name;
-  boolValue  = _value;
-  path       = _path;
-  level      = container->level + 1;
-  siblingNo  = _siblingNo;
-  valueType  = _type;
-
   LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
                           level,
@@ -880,17 +890,6 @@ bool CompoundValueNode::isString(void)
 const char* CompoundValueNode::cname(void)
 {
   return name.c_str();
-}
-
-
-
-/* ****************************************************************************
-*
-* cvalue -
-*/
-const char* CompoundValueNode::cvalue(void)
-{
-  return stringValue.c_str();
 }
 
 
