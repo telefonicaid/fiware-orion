@@ -449,23 +449,6 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
 /* ****************************************************************************
 *
-* coords2string - 
-*/
-void coords2string(std::string* s, double latitude, double longitude, int decimals)
-{
-  char buf[256];
-  char format[32];
-
-  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
-  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
-
-  *s = buf;
-}
-
-
-
-/* ****************************************************************************
-*
 * versionParse -
 */
 bool versionParse(const std::string& version, int& mayor, int& minor, std::string& bugFix)

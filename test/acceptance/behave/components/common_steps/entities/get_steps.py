@@ -24,9 +24,9 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 import behave
 from behave import step
+import copy
 
 from iotqatools.helpers_utils import *
-
 from tools.NGSI_v2 import NGSI
 
 
@@ -74,8 +74,28 @@ def get_an_attribute_by_id(context, attribute_name, entity_id):
     context.resp = context.cb.list_an_attribute_by_id(attribute_name, entity_id)
     __logger__.info("...returned an attribute by id")
 
+
+@step(u'initialize the accumulator context of entities')
+def initialize_the_accumulator_context_of_entities(context):
+    """
+    initialize the accumulator context of entities
+    """
+    context.entities_accumulate = []
+
+@step(u'accumulate context of entities for use with lists')
+def accumulate_entities_to_list(context):
+    """
+    accumulate context of entities for use with the returned lists
+    :param context:It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    entity = None
+    entity = context.cb.get_entity_context()
+    context.entities_accumulate.append(copy.deepcopy(entity))
+    __logger__.debug("accumulate after: %s" % str(context.entities_accumulate))
+
 # ------------------------------------- validations ----------------------------------------------
 
+@step(u'verify that any entities are returned')
 @step(u'verify that all entities are returned')
 def verify_get_all_entities(context):
     """
@@ -84,9 +104,8 @@ def verify_get_all_entities(context):
     """
     __logger__.debug("Verifying all entities are returned in get request...")
     queries_parameters = context.cb.get_entities_parameters()
-    entities_context = context.cb.get_entity_context()
     ngsi = NGSI()
-    ngsi.verify_get_all_entities(queries_parameters, entities_context, context.resp)
+    ngsi.verify_get_all_entities(queries_parameters, context.entities_accumulate, context.resp)
     __logger__.info("...Verified all entities are returned in get request...")
 
 

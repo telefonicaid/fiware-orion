@@ -14,3 +14,4 @@
 - Add: Unpatterned subscriptions now also in subscription cache (Issue #1475)
 - Fix: Fixed an uptil now unknown bug with throttling
 - Fix: Only 1 query at csubs collection/cache is done per context element processing at updateContext (previously one query per attribute were done) (Issue #1475)
+- Fix: 'count' and 'lastNotificationTime' now maintained by subCache (and synched via DB) (Issue #1476)

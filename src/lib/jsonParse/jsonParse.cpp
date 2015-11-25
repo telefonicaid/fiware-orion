@@ -89,11 +89,10 @@ static const char* compoundRootV[] =
 */
 static bool isCompoundPath(const char* path)
 {
-  unsigned int len;
 
   for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
   {
-    len = strlen(compoundRootV[ix]);
+    size_t len = strlen(compoundRootV[ix]);
 
     if (strlen(path) < len)
     {
