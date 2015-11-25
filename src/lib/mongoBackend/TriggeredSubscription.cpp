@@ -42,15 +42,16 @@ TriggeredSubscription::TriggeredSubscription
   AttributeList        _attrL,
   const std::string&   _cacheSubId,
   const char*          _tenant
-)
+):
+  throttling        (_throttling),
+  lastNotification  (_lastNotification),
+  format            (_format),
+  reference         (_reference),
+  attrL             (_attrL),
+  cacheSubId        (_cacheSubId),
+  tenant            ((_tenant == NULL)? "" : _tenant)
 {
-  throttling        = _throttling;
-  lastNotification  = _lastNotification;
-  format            = _format;
-  reference         = _reference;
-  attrL             = _attrL;
-  cacheSubId        = _cacheSubId;
-  tenant            = (_tenant == NULL)? "" : _tenant;
+
 }
 
 
@@ -66,15 +67,16 @@ TriggeredSubscription::TriggeredSubscription
   Format             _format,
   const std::string& _reference,
   AttributeList      _attrL
-)
+):
+  throttling        (-1),
+  lastNotification  (-1),
+  format            (_format),
+  reference         (_reference),
+  attrL             (_attrL),
+  cacheSubId        (""),
+  tenant            ("")
 {
-  throttling        = -1;
-  lastNotification  = -1;
-  format            = _format;
-  reference         = _reference;
-  attrL             = _attrL;
-  cacheSubId        = "";
-  tenant            = "";
+
 }
 
 
