@@ -58,7 +58,7 @@ UpdateContextRequest::UpdateContextRequest()
 *
 * UpdateContextRequest::UpdateContextRequest - 
 */
-UpdateContextRequest::UpdateContextRequest(const std::string _contextProvider, EntityId* eP)
+UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, EntityId* eP)
 {
   contextProvider = _contextProvider;
   contextElementVector.push_back(new ContextElement(eP));

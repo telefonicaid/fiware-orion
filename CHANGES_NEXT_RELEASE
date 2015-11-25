@@ -15,3 +15,5 @@
 - Fix: Fixed an uptil now unknown bug with throttling
 - Add: clearer statistics in GET /statistics and GET /cache/statistics operations
 - Add: finer-grain statistics switches: -statCounters, -statSemWait (old -mutexTimeStat), -statTiming and -statNotifQueue
+- Fix: Only 1 query at csubs collection/cache is done per context element processing at updateContext (previously one query per attribute were done) (Issue #1475)
+- Fix: 'count' and 'lastNotificationTime' now maintained by subCache (and synched via DB) (Issue #1476)

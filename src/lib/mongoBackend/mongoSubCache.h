@@ -82,7 +82,7 @@ typedef struct CachedSubscription
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
-  int                         pendingNotifications;
+  int64_t                     count;
   Format                      notifyFormat;
   char*                       reference;
   struct CachedSubscription*  next;
@@ -150,7 +150,9 @@ extern void mongoSubCacheItemInsert
   const char*               subscriptionId,
   int64_t                   expiration,
   int64_t                   throttling,
-  Format                    notifyFormat
+  Format                    notifyFormat,
+  bool                      notificationDone,
+  int64_t                   lastNotificationTime
 );
 
 
@@ -189,6 +191,14 @@ extern void mongoSubCacheRefresh(void);
 
 /* ****************************************************************************
 *
+* mongoSubCacheSync - 
+*/
+extern void mongoSubCacheSync(void);
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCacheMatch - 
 */
 extern void mongoSubCacheMatch
@@ -198,6 +208,22 @@ extern void mongoSubCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const char*                        attr,
+  std::vector<CachedSubscription*>*  subVecP
+);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheMatch - 
+*/
+extern void mongoSubCacheMatch
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const char*                        entityId,
+  const char*                        entityType,
+  const std::vector<std::string>&    attrV,
   std::vector<CachedSubscription*>*  subVecP
 );
 

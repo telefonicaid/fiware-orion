@@ -237,6 +237,16 @@ echo
 echo
 
 
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1|2))",
+#
+# If started with -noCache:  0
+# Normal start:              1
+# Under valgrind:            2 (possibly, depending on timing)
+#
+
+
 --REGEXPECT--
 01. Create subscription S1 - without pattern
 ============================================
@@ -268,7 +278,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f]{24})",
     "subCacheInserts": "1",
     "subCacheItems": "1",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "0",
     "subCacheUpdates": "0",
     "subscriptions": "1",
@@ -307,7 +317,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f]{24})",
     "subCacheInserts": "2",
     "subCacheItems": "1",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "1",
     "subCacheUpdates": "1",
     "subscriptionUpdates": "1",
@@ -347,7 +357,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f, ]{50})",
     "subCacheInserts": "3",
     "subCacheItems": "2",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "1",
     "subCacheUpdates": "1",
     "subscriptionUpdates": "1",
@@ -387,7 +397,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f, ]{76})",
     "subCacheInserts": "REGEX((4|7))",
     "subCacheItems": "3",
-    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "1",
     "subCacheUpdates": "1",
     "subscriptionUpdates": "1",
@@ -427,7 +437,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f, ]{76})",
     "subCacheInserts": "REGEX((5|8))",
     "subCacheItems": "3",
-    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "2",
     "subCacheUpdates": "2",
     "subscriptionUpdates": "2",
@@ -467,7 +477,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f, ]{50})",
     "subCacheInserts": "REGEX((5|8))",
     "subCacheItems": "2",
-    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "3",
     "subCacheUpdates": "2",
     "subscriptionUpdates": "2",
@@ -508,7 +518,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f, ]{50})",
     "subCacheInserts": "REGEX((6|9))",
     "subCacheItems": "2",
-    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "4",
     "subCacheUpdates": "3",
     "subscriptionUpdates": "3",
@@ -549,7 +559,7 @@ Date: REGEX(.*)
     "subCache": "REGEX([0-9a-f]{24})",
     "subCacheInserts": "REGEX((6|9))",
     "subCacheItems": "1",
-    "subCacheRefreshs": "REGEX((1|2))",
+    "subCacheRefreshs": "REGEX((0|1|2))",
     "subCacheRemoves": "5",
     "subCacheUpdates": "3",
     "subscriptionUpdates": "3",

@@ -125,6 +125,13 @@ echo
 echo
 
 
+#
+# About
+#   <subCacheRefreshs>REGEX((0|1))</subCacheRefreshs>
+# When the broker is started with -noCache, there are no refreshes performed
+#
+
+
 --REGEXPECT--
 0. Query all entities using convop /v1/contextEntities
 ======================================================
@@ -322,7 +329,7 @@ Date: REGEX(.*)
   <statisticsRequests>1</statisticsRequests>
   <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
-  <subCacheRefreshs>1</subCacheRefreshs>
+  <subCacheRefreshs>REGEX((0|1))</subCacheRefreshs>
   <subCacheInserts>0</subCacheInserts>
   <subCacheRemoves>0</subCacheRemoves>
   <subCacheUpdates>0</subCacheUpdates>

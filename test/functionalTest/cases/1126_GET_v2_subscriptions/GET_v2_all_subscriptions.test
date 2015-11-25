@@ -312,7 +312,7 @@ Date: REGEX(.*)
                 "speed",
                 "location"
             ],
-            "callback": "http://127.0.0.1:REGEX(\d+)/notify",            
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify",
             "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
             "timesSent": 1
         },

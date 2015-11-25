@@ -28,23 +28,23 @@
 #
 
 
-Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
+Feature: list all entities with get request and queries parameters using NGSI v2. "GET" - /v2/entities/
   As a context broker user
-  I would like to list all entities with get requests using NGSI v2
+  I would like to list all entities with get request and queries parameter using NGSI v2
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
-     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-     Setup: update contextBroker config file
-     Setup: start ContextBroker
-     Check: verify contextBroker is installed successfully
-     Check: verify mongo is installed successfully
+  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+  Setup: update contextBroker config file
+  Setup: start ContextBroker
+  Check: verify contextBroker is installed successfully
+  Check: verify mongo is installed successfully
 
   Actions After each Scenario:
-     Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
-     Setup: stop ContextBroker
+  Setup: stop ContextBroker
 
   @happy_path
   Scenario:  list all entities using NGSI v2
@@ -53,9 +53,23 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_happy_path |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     And create "5" entities with "2" attributes
       | parameter        | value                   |
-      | entities_type    | room                    |
+      | entities_type    | house                   |
       | entities_id      | room2                   |
       | attributes_name  | timestamp               |
       | attributes_value | 017-06-17T07:21:24.238Z |
@@ -65,10 +79,26 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value     |
+      | entities_type    | car       |
+      | entities_id      | vehicle   |
+      | attributes_name  | speed     |
+      | attributes_value | 89        |
+      | attributes_type  | km/h      |
+      | metadatas_number | 2         |
+      | metadatas_name   | very_hot  |
+      | metadatas_type   | alarm     |
+      | metadatas_value  | random=10 |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
-      | parameter | value |
-      | limit     | 3     |
-      | offset    | 2     |
+      | parameter | value   |
+      | limit     | 9       |
+      | offset    | 3       |
+      | id        | vehicle |
+      | type      | car     |
     Then verify that receive an "OK" http code
     And verify that all entities are returned
 
@@ -80,6 +110,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | <service>        |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
+    And initialize the accumulator context of entities
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -87,6 +118,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -108,6 +140,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
+    And initialize the accumulator context of entities
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -115,6 +148,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -152,6 +186,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_service_path |
       | Fiware-ServicePath | <service_path>    |
       | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -159,6 +194,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -183,6 +219,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | parameter      | value                     |
       | Fiware-Service | test_service_path_without |
       | Content-Type   | application/json          |
+    And initialize the accumulator context of entities
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -190,6 +227,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -286,6 +324,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
+    And initialize the accumulator context of entities
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -293,6 +332,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_name  | temperature       |
       | attributes_value | <attribute_value> |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -328,6 +368,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
+    And initialize the accumulator context of entities
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -335,6 +376,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
     And verify that receive an "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -365,6 +407,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_with_attribute_type |
       | Fiware-ServicePath | /test                         |
       | Content-Type       | application/json              |
+    And initialize the accumulator context of entities
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -373,6 +416,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_value | <attribute value> |
       | attributes_type  | celcius           |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -408,6 +452,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
+    And initialize the accumulator context of entities
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -416,6 +461,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | attributes_value | <attributes_value> |
       | attributes_type  | "celcius"          |
     And verify that receive an "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -446,6 +492,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_happy_path |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
+    And initialize the accumulator context of entities
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -457,6 +504,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_type   | alarm             |
       | metadatas_value  | random=10         |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -492,6 +540,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
+    And initialize the accumulator context of entities
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -503,6 +552,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_type   | "alarm"            |
       | metadatas_value  | "hot"              |
     And verify that receive an "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -533,6 +583,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_without_metadata_type |
       | Fiware-ServicePath | /test                           |
       | Content-Type       | application/json                |
+    And initialize the accumulator context of entities
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -543,6 +594,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_name   | very_hot          |
       | metadatas_value  | random=10         |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -578,6 +630,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
+    And initialize the accumulator context of entities
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -588,6 +641,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_name   | "very_hot"         |
       | metadatas_value  | "hot"              |
     And verify that receive an "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -610,8 +664,9 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
       | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
       | "room17"  | null                                                                          | NoneType |
-  # ------------------ queries parameters -------------------------------
 
+  # ------------------ queries parameters -------------------------------
+  # --- limit and offset ---
   @only_limit
   Scenario Outline:  list all entities using NGSI v2 with only limit query parameter
     Given  a definition of headers
@@ -619,6 +674,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_only_limit |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
+    And initialize the accumulator context of entities
     And create "10" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
@@ -631,6 +687,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value   |
       | limit     | <limit> |
@@ -711,6 +768,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_only_offset |
       | Fiware-ServicePath | /test                 |
       | Content-Type       | application/json      |
+    And initialize the accumulator context of entities
     And create "10" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
@@ -723,6 +781,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value    |
       | offset    | <offset> |
@@ -776,6 +835,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | Fiware-Service     | test_list_limit_offset |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
+    And initialize the accumulator context of entities
     And create "10" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
@@ -788,6 +848,7 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
     When get all entities
       | parameter | value    |
       | limit     | <limit>  |
@@ -800,3 +861,923 @@ Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
       | 20    | 1      |
       | 1     | 20     |
       | 5     | 3      |
+
+  # --- id, id pattern and type ---
+  @only_id
+  Scenario Outline:  list all entities using NGSI v2 with only id query parameter
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | speed           |
+      | attributes_value | 89              |
+      | attributes_type  | km/h            |
+      | metadatas_number | 2               |
+      | metadatas_name   | very_hot        |
+      | metadatas_type   | alarm           |
+      | metadatas_value  | random=10       |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value                                  |
+      | id        | the same value of the previous request |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | entities_type | entities_id |
+      | room_1        | vehicle     |
+      | room_2        | 34          |
+      | room_3        | false       |
+      | room_4        | true        |
+      | room_5        | 34.4E-34    |
+      | room_6        | temp.34     |
+      | room_7        | temp_34     |
+      | room_8        | temp-34     |
+      | room_9        | TEMP34      |
+      | room_10       | house_flat  |
+      | room_11       | house.flat  |
+      | room_12       | house-flat  |
+      | room_13       | house@flat  |
+      | room_14       | habitación  |
+      | room_15       | españa      |
+      | room_16       | barça       |
+      | room_17       | random=10   |
+      | room_18       | random=100  |
+      | room_19       | random=900  |
+
+  @only_id_list
+  Scenario Outline:  list all entities using NGSI v2 with only id query parameter with a list of ids
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value     |
+      | entities_type    | vehicle   |
+      | entities_id      | car       |
+      | attributes_name  | speed     |
+      | attributes_value | 89        |
+      | attributes_type  | km/h      |
+      | metadatas_number | 2         |
+      | metadatas_name   | very_hot  |
+      | metadatas_type   | alarm     |
+      | metadatas_value  | random=10 |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value |
+      | id        | <id>  |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | id                       |
+      | room1                    |
+      | room1,room2              |
+      | room1,room2,car          |
+      | room1,room2,car,sdfsdfsd |
+
+  @only_id_same
+  Scenario Outline:  list all entities using NGSI v2 with only id query parameter and the same entity id in several entities
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value         |
+      | entities_type    | home          |
+      | entities_id      | <entities_id> |
+      | attributes_name  | temperature   |
+      | attributes_value | 34            |
+      | attributes_type  | celsius       |
+      | metadatas_number | 2             |
+      | metadatas_name   | very_hot      |
+      | metadatas_type   | alarm         |
+      | metadatas_value  | random=10     |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | <entities_id>           |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | speed           |
+      | attributes_value | 89              |
+      | attributes_type  | km/h            |
+      | metadatas_number | 2               |
+      | metadatas_name   | very_hot        |
+      | metadatas_type   | alarm           |
+      | metadatas_value  | random=10       |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value                                  |
+      | id        | the same value of the previous request |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | entities_type | entities_id |
+      | room_1        | vehicle     |
+      | room_2        | 34          |
+      | room_3        | false       |
+      | room_4        | true        |
+      | room_5        | 34.4E-34    |
+      | room_6        | temp.34     |
+      | room_7        | temp_34     |
+      | room_8        | temp-34     |
+      | room_9        | TEMP34      |
+      | room_10       | house_flat  |
+      | room_11       | house.flat  |
+      | room_12       | house-flat  |
+      | room_13       | house@flat  |
+      | room_14       | habitación  |
+      | room_15       | españa      |
+      | room_16       | barça       |
+      | room_17       | random=10   |
+      | room_18       | random=100  |
+      | room_19       | random=900  |
+
+  @only_id_unknown
+  Scenario:  list any entity using NGSI v2 with only id query parameter but unknown value
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value       |
+      | id        | fdgfdgfdgfd |
+    Then verify that receive an "OK" http code
+    And verify that any entities are returned
+
+  @only_id_invalid
+  Scenario Outline:  try to list all entities using NGSI v2 with only id query parameter but invalid value
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_only_id |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value       |
+      | id        | <entity_id> |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                              |
+      | error       | BadRequest                         |
+      | description | invalid character in URI parameter |
+    Examples:
+      | entity_id           |
+      | house<flat>         |
+      | house=flat          |
+      | house'flat'         |
+      | house\'flat\'       |
+      | house;flat          |
+      | house(flat)         |
+      | {\'a\':34}          |
+      | [\'34\', \'a\', 45] |
+
+  @only_type
+  Scenario Outline:  list all entities using NGSI v2 with only type query parameter
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | speed           |
+      | attributes_value | 89              |
+      | attributes_type  | km/h            |
+      | metadatas_number | 2               |
+      | metadatas_name   | very_hot        |
+      | metadatas_type   | alarm           |
+      | metadatas_value  | random=10       |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value                                  |
+      | type      | the same value of the previous request |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | entities_id | entities_type |
+      | room_1      | vehicle       |
+      | room_2      | 34            |
+      | room_3      | false         |
+      | room_4      | true          |
+      | room_5      | 34.4E-34      |
+      | room_6      | temp.34       |
+      | room_7      | temp_34       |
+      | room_8      | temp-34       |
+      | room_9      | TEMP34        |
+      | room_10     | temp_flat     |
+      | room_11     | temp.flat     |
+      | room_12     | temp-flat     |
+      | room_13     | temp@flat     |
+      | room_14     | habitación    |
+      | room_15     | españa        |
+      | room_16     | barça         |
+      | room_17     | random=10     |
+      | room_18     | random=100    |
+      | room_19     | random=900    |
+
+  @only_type_list
+  Scenario Outline:  list all entities using NGSI v2 with only type query parameter with a list of types
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value     |
+      | entities_type    | vehicle   |
+      | entities_id      | car       |
+      | attributes_name  | speed     |
+      | attributes_value | 89        |
+      | attributes_type  | km/h      |
+      | metadatas_number | 2         |
+      | metadatas_name   | very_hot  |
+      | metadatas_type   | alarm     |
+      | metadatas_value  | random=10 |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value  |
+      | type      | <type> |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | type                     |
+      | room1                    |
+      | room1,room2              |
+      | room1,room2,car          |
+      | room1,room2,car,sdfsdfsd |
+
+  @only_type_same
+  Scenario Outline:  list all entities using NGSI v2 with only type query parameter and the same entity type in several entities
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | room1           |
+      | attributes_name  | temperature     |
+      | attributes_value | 34              |
+      | attributes_type  | celsius         |
+      | metadatas_number | 2               |
+      | metadatas_name   | very_hot        |
+      | metadatas_type   | alarm           |
+      | metadatas_value  | random=10       |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | <entities_type>         |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | speed           |
+      | attributes_value | 89              |
+      | attributes_type  | km/h            |
+      | metadatas_number | 2               |
+      | metadatas_name   | very_hot        |
+      | metadatas_type   | alarm           |
+      | metadatas_value  | random=10       |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value                                  |
+      | type      | the same value of the previous request |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | entities_id | entities_type |
+      | room_1      | vehicle       |
+      | room_2      | 34            |
+      | room_3      | false         |
+      | room_4      | true          |
+      | room_5      | 34.4E-34      |
+      | room_6      | temp.34       |
+      | room_7      | temp_34       |
+      | room_8      | temp-34       |
+      | room_9      | TEMP34        |
+      | room_10     | house_flat    |
+      | room_11     | house.flat    |
+      | room_12     | house-flat    |
+      | room_13     | house@flat    |
+      | room_14     | habitación    |
+      | room_15     | españa        |
+      | room_16     | barça         |
+      | room_17     | random=10     |
+      | room_18     | random=100    |
+      | room_19     | random=900    |
+
+  @only_type_unknown
+  Scenario:  list any entity using NGSI v2 with only type query parameter but unknown value
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value       |
+      | type      | fdgfdgfdgfd |
+    Then verify that receive an "OK" http code
+    And verify that any entities are returned
+
+  @only_type_invalid
+  Scenario Outline:  try to list all entities using NGSI v2 with only type query parameter but invalid value
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_list_only_type |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value       |
+      | type      | <entity_id> |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                              |
+      | error       | BadRequest                         |
+      | description | invalid character in URI parameter |
+    Examples:
+      | entity_id           |
+      | house<flat>         |
+      | house=flat          |
+      | house'flat'         |
+      | house\'flat\'       |
+      | house;flat          |
+      | house(flat)         |
+      | {\'a\':34}          |
+      | [\'34\', \'a\', 45] |
+
+  @only_idPattern
+  Scenario Outline:  list all entities using NGSI v2 with only idPattern query parameter
+    Given  a definition of headers
+      | parameter          | value                     |
+      | Fiware-Service     | test_list_only_id_pattern |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "1" entities with "2" attributes
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | speed           |
+      | attributes_value | 89              |
+      | attributes_type  | km/h            |
+      | metadatas_number | 2               |
+      | metadatas_name   | very_hot        |
+      | metadatas_type   | alarm           |
+      | metadatas_value  | random=10       |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value        |
+      | idPattern | <id_pattern> |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | entities_type | entities_id | id_pattern   |
+      | room_1        | vehicle     | veh.*        |
+      | room_2        | 34          | ^3.?         |
+      | room_3        | false       | .*als.*      |
+      | room_4        | true        | .*ru.*       |
+      | room_5        | 34.4E-34    | .*34$        |
+      | room_6        | tete.34     | ^te+.*       |
+      | room_7        | aBc56       | [A-Za-z0-9]+ |
+      | room_8        | defG        | \a+          |
+      | room_9        | def45       | \w+          |
+      | room_10       | 23445       | \d+          |
+      | room_11       | house flat  | \s+          |
+      | room_12       | afaffasf    | \D+          |
+      | room_13       | hOUSEFLAT   | \u+          |
+
+  @only_idPattern_wrong
+  Scenario:  list any entity using NGSI v2 with only idPattern query parameter but the pattern is wrong
+    Given  a definition of headers
+      | parameter          | value                     |
+      | Fiware-Service     | test_list_only_id_pattern |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "1" entities with "2" attributes
+      | parameter        | value     |
+      | entities_type    | vehicles  |
+      | entities_id      | car       |
+      | attributes_name  | speed     |
+      | attributes_value | 89        |
+      | attributes_type  | km/h      |
+      | metadatas_number | 2         |
+      | metadatas_name   | very_hot  |
+      | metadatas_type   | alarm     |
+      | metadatas_value  | random=10 |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value   |
+      | idPattern | dfgdg.* |
+    Then verify that receive an "OK" http code
+    And verify that any entities are returned
+
+  @only_id_pattern_invalid @BUG_1523 @skip
+  Scenario Outline:  try to list all entities using NGSI v2 with only idPattern query parameter but invalid value
+    Given  a definition of headers
+      | parameter          | value                     |
+      | Fiware-Service     | test_list_only_id_pattern |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value        |
+      | idPattern | <id_pattern> |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                              |
+      | error       | BadRequest                         |
+      | description | invalid character in URI parameter |
+    Examples:
+      | id_pattern    |
+      | house<flat>   |
+      | house=flat    |
+      | house'flat'   |
+      | house\'flat\' |
+      | house;flat    |
+      | house(flat)   |
+
+  @id_and_id_pattern
+  Scenario:  try to list all entities using NGSI v2 with id and idPattern queries parameters (incompatibles)
+    Given  a definition of headers
+      | parameter          | value                     |
+      | Fiware-Service     | test_list_only_id_pattern |
+      | Fiware-ServicePath | /test                     |
+      | Content-Type       | application/json          |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value  |
+      | id        | room1  |
+      | idPattern | room.* |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                  |
+      | error       | BadRequest                             |
+      | description | Incompatible parameters: id, IdPattern |
+
+  @id_type
+  Scenario Outline:  list all entities using NGSI v2 with id and type queries parameters
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_id_type |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "10" entities with "2" attributes
+      | parameter        | value     |
+      | entities_type    | <type>    |
+      | entities_id      | <id>      |
+      | attributes_name  | speed     |
+      | attributes_value | 78        |
+      | attributes_type  | km/h      |
+      | metadatas_number | 2         |
+      | metadatas_name   | very_hot  |
+      | metadatas_type   | alarm     |
+      | metadatas_value  | random=10 |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value  |
+      | id        | <id>   |
+      | type      | <type> |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | id        | type    |
+      | door      | house   |
+      | car       | vehicle |
+      | light     | park    |
+      | semaphore | street  |
+
+  @idPattern_type
+  Scenario Outline:  list all entities using NGSI v2 with idPattern and type queries parameters
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_id_type |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "10" entities with "2" attributes
+      | parameter        | value     |
+      | entities_type    | vehicle   |
+      | entities_id      | car       |
+      | attributes_name  | speed     |
+      | attributes_value | 78        |
+      | attributes_type  | km/h      |
+      | metadatas_number | 2         |
+      | metadatas_name   | very_hot  |
+      | metadatas_type   | alarm     |
+      | metadatas_value  | random=10 |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value        |
+      | idPattern | <id_pattern> |
+      | type      | <type>       |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | id_pattern | type    |
+      | room2.*    | house   |
+      | ^car       | vehicle |
+      | \w+        | home    |
+
+  @id_type_limit_offset
+  Scenario Outline:  list all entities using NGSI v2 with id, type, limit and offset queries parameters
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_list_id_type |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    And initialize the accumulator context of entities
+    And create "5" entities with "2" attributes
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room1       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "5" entities with "2" attributes
+      | parameter        | value                   |
+      | entities_type    | house                   |
+      | entities_id      | room2                   |
+      | attributes_name  | timestamp               |
+      | attributes_value | 017-06-17T07:21:24.238Z |
+      | attributes_type  | date                    |
+      | metadatas_number | 2                       |
+      | metadatas_name   | very_hot                |
+      | metadatas_type   | alarm                   |
+      | metadatas_value  | random=10               |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    And create "10" entities with "2" attributes
+      | parameter        | value     |
+      | entities_type    | <type>    |
+      | entities_id      | <id>      |
+      | attributes_name  | speed     |
+      | attributes_value | 78        |
+      | attributes_type  | km/h      |
+      | metadatas_number | 2         |
+      | metadatas_name   | very_hot  |
+      | metadatas_type   | alarm     |
+      | metadatas_value  | random=10 |
+    And verify that receive several "Created" http code
+    And accumulate context of entities for use with lists
+    When get all entities
+      | parameter | value    |
+      | limit     | <limit>  |
+      | offset    | <offset> |
+      | id        | <id>     |
+      | type      | <type>   |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | limit | offset | id        | type    |
+      | 1     | 1      | door      | house   |
+      | 20    | 1      | car       | vehicle |
+      | 1     | 20     | light     | park    |
+      | 5     | 3      | semaphore | street  |
