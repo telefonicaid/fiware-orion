@@ -82,7 +82,7 @@ typedef struct CachedSubscription
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
-  int                         pendingNotifications;
+  int64_t                     count;
   Format                      notifyFormat;
   char*                       reference;
   struct CachedSubscription*  next;
@@ -150,7 +150,9 @@ extern void mongoSubCacheItemInsert
   const char*               subscriptionId,
   int64_t                   expiration,
   int64_t                   throttling,
-  Format                    notifyFormat
+  Format                    notifyFormat,
+  bool                      notificationDone,
+  int64_t                   lastNotificationTime
 );
 
 
@@ -184,6 +186,14 @@ extern int mongoSubCacheItemRemove(CachedSubscription* cSubP);
 * mongoSubCacheRefresh - 
 */
 extern void mongoSubCacheRefresh(void);
+
+
+
+/* ****************************************************************************
+*
+* mongoSubCacheSync - 
+*/
+extern void mongoSubCacheSync(void);
 
 
 
