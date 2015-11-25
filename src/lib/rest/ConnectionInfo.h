@@ -51,68 +51,72 @@ struct ParseData;
 class ConnectionInfo
 {
 public:
-  ConnectionInfo()
+  ConnectionInfo():
+    connection             (NULL),
+    verb                   (NOVERB),
+    inFormat               (XML),
+    outFormat              (XML),
+    tenant                 (""),
+    servicePath            (""),
+    payload                (NULL),
+    payloadSize            (0),
+    callNo                 (1),
+    parseDataP             (NULL),
+    port                   (0),
+    ip                     (""),
+    apiVersion             ("v1"),
+    inCompoundValue        (false),
+    compoundValueP         (NULL),
+    compoundValueRoot      (NULL),
+    httpStatusCode         (SccOk)
   {
-    connection             = NULL;
-    payload                = NULL;
-    payloadSize            = 0;
-    inFormat               = XML;
-    outFormat              = XML;
-    httpStatusCode         = SccOk;
-    callNo                 = 1;
-    inCompoundValue        = false;
-    compoundValueRoot      = NULL;
-    compoundValueP         = NULL;
-    parseDataP             = NULL;
-    verb                   = NOVERB;
-    tenant                 = "";
-    servicePath            = "";
-    ip                     = "";
-    port                   = 0;
-    apiVersion             = "v1";
-
     memset(payloadWord, 0, sizeof(payloadWord));
   }
 
-  ConnectionInfo(Format _outFormat)
+  ConnectionInfo(Format _outFormat):
+    connection             (NULL),
+    verb                   (NOVERB),
+    inFormat               (XML),
+    outFormat              (_outFormat),
+    tenant                 (""),
+    servicePath            (""),
+    payload                (NULL),
+    payloadSize            (0),
+    callNo                 (1),
+    parseDataP             (NULL),
+    port                   (0),
+    ip                     (""),
+    apiVersion             ("v1"),
+    inCompoundValue        (false),
+    compoundValueP         (NULL),
+    compoundValueRoot      (NULL),
+    httpStatusCode         (SccOk)
   {
-    connection             = NULL;
-    payload                = NULL;
-    payloadSize            = 0;
-    inFormat               = XML;
-    outFormat              = _outFormat;
-    httpStatusCode         = SccOk;
-    callNo                 = 1;
-    inCompoundValue        = false;
-    compoundValueRoot      = NULL;
-    compoundValueP         = NULL;
-    parseDataP             = NULL;
-    verb                   = NOVERB;
-    tenant                 = "";
-    servicePath            = "";
-    ip                     = "";
-    port                   = 0;
-    apiVersion             = "v1";
-
     memset(payloadWord, 0, sizeof(payloadWord));
   }
 
-  ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL) : url(_url), method(_method), version(_version)
+  ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
+    connection             (_connection),
+    verb                   (NOVERB),
+    inFormat               (XML),
+    outFormat              (XML),
+    url                    (_url),
+    method                 (_method),
+    version                (_version),
+    tenant                 (""),
+    servicePath            (""),
+    payload                (NULL),
+    payloadSize            (0),
+    callNo                 (1),
+    parseDataP             (NULL),
+    port                   (0),
+    ip                     (""),
+    apiVersion             ("v1"),
+    inCompoundValue        (false),
+    compoundValueP         (NULL),
+    compoundValueRoot      (NULL),
+    httpStatusCode         (SccOk)
   {
-    connection             = _connection;
-    payload                = NULL;
-    payloadSize            = 0;
-    inFormat               = XML;
-    outFormat              = XML;
-    httpStatusCode         = SccOk;
-    callNo                 = 1;
-    inCompoundValue        = false;
-    compoundValueRoot      = NULL;
-    compoundValueP         = NULL;
-    parseDataP             = NULL;
-    tenant                 = "";
-    servicePath            = "";
-    apiVersion             = "v1";
 
     memset(payloadWord, 0, sizeof(payloadWord));
 
