@@ -48,7 +48,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   struct timespec  start;
   struct timespec  end;
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &start);
   }
@@ -109,7 +109,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   }
   
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
     clock_difftime(&end, &start, &threadLastTimeStat.jsonV2ParseTime);

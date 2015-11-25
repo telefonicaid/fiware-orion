@@ -76,11 +76,15 @@ extern bool               harakiri;
 extern int                startTime;
 extern int                statisticsTime;
 extern OrionExitFunction  orionExitFunction;
-extern bool               semTimeStatistics;
 extern unsigned           cprForwardLimit;
 extern char               notificationMode[];
 extern bool               noCache;
 extern bool               simulatedNotification;
+
+extern bool               semWaitStatistics;
+extern bool               timingStatistics;
+extern bool               countersStatistics;
+extern bool               notifQueueStatistics;
 
 
 
@@ -88,7 +92,16 @@ extern bool               simulatedNotification;
 *
 * orionInit - 
 */
-extern void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy, bool semTimeStat);
+extern void orionInit
+(
+  OrionExitFunction exitFunction,
+  const char* version,
+  SemRequestType reqPolicy,
+  bool _countersStatistics,
+  bool _semWaitStatistics,
+  bool _timingStatistics,
+  bool _notifQueueStatistics
+);
 
 
 

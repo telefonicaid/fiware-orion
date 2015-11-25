@@ -102,7 +102,7 @@ public:
   *
   * getTimInQ -
   */
-  static void getTimeInQ(char* buf, size_t bufLen);
+  static float getTimeInQ(void);
 
   /* ****************************************************************************
   *

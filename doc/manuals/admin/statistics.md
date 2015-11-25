@@ -188,13 +188,12 @@ with the current number of cached items.
 
 ```
 {
-  ...
+  "ids": "897123ab123, 231bbdc21221, 12321878909da",
   "refreshs" : 1,
   "inserts" : 1433,
   "removes" : 6,
   "updates" : 0,
-  "items" : 1427
-  ...
+  "items" : 1427  
 }
 ```
 

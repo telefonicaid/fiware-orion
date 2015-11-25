@@ -434,7 +434,7 @@ std::string jsonParse
   struct timespec    start;
   struct timespec    end;
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &start);
   }
@@ -455,7 +455,7 @@ std::string jsonParse
     }
   }
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
     clock_difftime(&end, &start, &threadLastTimeStat.jsonV1ParseTime);

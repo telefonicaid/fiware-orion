@@ -119,8 +119,6 @@ The list of available options is the following:
     execute concurrently) and "none" (which allows all the requests
     being executed concurrently). Default value is "all". For
     Active-Active Orion configuration "none" is recommended.
--   **-mutexTimeStat**. Include semaphore waiting time in the
-    "/statistics" information. It may have performance impact.
 -   **-subCacheIval**. Interval in seconds between calls to subscription cache refresh. A zero
     value means "no refresh" (default value and the recommended one for mono-CB
     deployments).
@@ -143,4 +141,5 @@ The list of available options is the following:
 -   **-maxConnections**. Maximum number of simultaneous connections. Default value is "unlimited" (limited by 
     max file descriptors of operating system).
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
--   **-reqTimeStat.** turn on request-time-measuring in run-time. By default it is turned off (turned on, the broker will be somewhat slower in execution).
+-   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
+    generation. See [statistics documentation](statistics.md).

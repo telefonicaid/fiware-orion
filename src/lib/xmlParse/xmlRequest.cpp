@@ -228,7 +228,7 @@ std::string xmlTreat
 
   try
   {
-    if (reqTimeStatistics)
+    if (timingStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &start);
     }
@@ -366,7 +366,7 @@ std::string xmlTreat
 
   xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP, errorMsgP);
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
     clock_difftime(&end, &start, &threadLastTimeStat.xmlParseTime);

@@ -169,6 +169,20 @@ void JsonHelper::addNumber(const std::string& key, long long value)
   empty = false;
 }
 
+/* ****************************************************************************
+*
+* JsonHelper::addFloat -
+*/
+void JsonHelper::addFloat(const std::string& key, float  value)
+{
+  if (!empty)
+  {
+    ss << ',';
+  }
+  ss << toJsonString(key) << ':' << value;
+
+  empty = false;
+}
 
 /* ****************************************************************************
 *

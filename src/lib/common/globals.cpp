@@ -42,13 +42,15 @@
 *
 * Globals
 */
-static Timer*          timer             = NULL;
-int                    startTime         = -1;
-int                    statisticsTime    = -1;
-OrionExitFunction      orionExitFunction = NULL;
+static Timer*          timer                = NULL;
+int                    startTime            = -1;
+int                    statisticsTime       = -1;
+OrionExitFunction      orionExitFunction    = NULL;
 static struct timeval  logStartTime;
-bool                   semTimeStatistics = false;
-
+bool                   countersStatistics   = false;
+bool                   semWaitStatistics    = false;
+bool                   timingStatistics     = false;
+bool                   notifQueueStatistics = false;
 
 
 /* ****************************************************************************
@@ -91,7 +93,16 @@ void transactionIdSet(void)
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy, bool semTimeStat)
+void orionInit
+(
+  OrionExitFunction exitFunction,
+  const char* version,
+  SemRequestType reqPolicy,
+  bool _countersStatistics,
+  bool _semWaitStatistics,
+  bool _timingStatistics,
+  bool _notifQueueStatistics
+)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -100,7 +111,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestTy
   orionExitFunction = exitFunction;
 
   // Initialize the semaphore used by mongoBackend
-  semInit(reqPolicy, semTimeStat);
+  semInit(reqPolicy, _semWaitStatistics);
 
   // Set timer object (singleton)
   setTimer(new Timer());
@@ -115,6 +126,11 @@ void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestTy
   // Set start time and statisticsTime used by REST interface
   startTime      = logStartTime.tv_sec;
   statisticsTime = startTime;
+
+  // Set other flags related with statistics
+  countersStatistics   = _countersStatistics;
+  timingStatistics     = _timingStatistics;
+  notifQueueStatistics = _notifQueueStatistics;
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
 }

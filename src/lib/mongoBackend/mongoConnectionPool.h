@@ -81,7 +81,7 @@ extern void mongoPoolConnectionRelease(DBClientBase* connection);
 *
 * mongoPoolConnectionSemWaitingTimeGet - 
 */
-extern char* mongoPoolConnectionSemWaitingTimeGet(char* buf, int bufLen);
+extern float mongoPoolConnectionSemWaitingTimeGet(void);
 
 
 

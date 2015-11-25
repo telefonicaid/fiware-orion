@@ -38,7 +38,7 @@
   struct timespec renderStart;                                         \
   struct timespec renderEnd;                                           \
                                                                        \
-  if (reqTimeStatistics)                                               \
+  if (timingStatistics)                                               \
   {                                                                    \
     clock_gettime(CLOCK_REALTIME, &renderStart);                       \
   }
@@ -50,7 +50,7 @@
 * TIME_STAT_RENDER_STOP - 
 */
 #define TIME_STAT_RENDER_STOP()                                                   \
-  if (reqTimeStatistics)                                                          \
+  if (timingStatistics)                                                          \
   {                                                                               \
     struct timespec diff;                                                         \
     clock_gettime(CLOCK_REALTIME, &renderEnd);                                    \
@@ -81,7 +81,7 @@
   struct timespec mongoStart;                                          \
   struct timespec mongoEnd;                                            \
                                                                        \
-  if (reqTimeStatistics)                                               \
+  if (timingStatistics)                                               \
   {                                                                    \
     clock_gettime(CLOCK_REALTIME, &mongoStart);                        \
   }
@@ -93,7 +93,7 @@
 * TIME_STAT_MONGO_STOP - 
 */
 #define TIME_STAT_MONGO_STOP()                                                    \
-  if (reqTimeStatistics)                                                          \
+  if (timingStatistics)                                                          \
   {                                                                               \
     struct timespec diff;                                                         \
     clock_gettime(CLOCK_REALTIME, &mongoEnd);                                     \
@@ -124,7 +124,7 @@
   struct timespec mongoReadWaitStart;                                         \
   struct timespec mongoReadWaitEnd;                                           \
                                                                               \
-  if (reqTimeStatistics)                                                      \
+  if (timingStatistics)                                                      \
   {                                                                           \
     clock_gettime(CLOCK_REALTIME, &mongoReadWaitStart);                       \
   }
@@ -136,7 +136,7 @@
 * TIME_STAT_MONGO_READ_WAIT_STOP - 
 */
 #define TIME_STAT_MONGO_READ_WAIT_STOP()                                \
-  if (reqTimeStatistics)                                                \
+  if (timingStatistics)                                                \
   {                                                                     \
     struct timespec diff;                                               \
     clock_gettime(CLOCK_REALTIME, &mongoReadWaitEnd);                   \
@@ -154,7 +154,7 @@
   struct timespec mongoWriteWaitStart;                                         \
   struct timespec mongoWriteWaitEnd;                                           \
                                                                                \
-  if (reqTimeStatistics)                                                       \
+  if (timingStatistics)                                                       \
   {                                                                            \
     clock_gettime(CLOCK_REALTIME, &mongoWriteWaitStart);                       \
   }
@@ -166,7 +166,7 @@
 * TIME_STAT_MONGO_WRITE_WAIT_STOP - 
 */
 #define TIME_STAT_MONGO_WRITE_WAIT_STOP()                             \
-  if (reqTimeStatistics)                                              \
+  if (timingStatistics)                                              \
   {                                                                   \
     struct timespec diff;                                             \
     clock_gettime(CLOCK_REALTIME, &mongoWriteWaitEnd);                \
@@ -184,7 +184,7 @@
   struct timespec mongoCommandWaitStart;                                         \
   struct timespec mongoCommandWaitEnd;                                           \
                                                                                  \
-  if (reqTimeStatistics)                                                         \
+  if (timingStatistics)                                                         \
   {                                                                              \
     clock_gettime(CLOCK_REALTIME, &mongoCommandWaitStart);                       \
   }
@@ -196,7 +196,7 @@
 * TIME_STAT_MONGO_COMMAND_WAIT_STOP - 
 */
 #define TIME_STAT_MONGO_COMMAND_WAIT_STOP()                              \
-  if (reqTimeStatistics)                                                 \
+  if (timingStatistics)                                                 \
   {                                                                      \
     struct timespec diff;                                                \
     clock_gettime(CLOCK_REALTIME, &mongoCommandWaitEnd);                 \
@@ -226,7 +226,7 @@ typedef struct TimeStat
 extern TimeStat           accTimeStat;
 extern TimeStat           lastTimeStat;
 extern __thread TimeStat  threadLastTimeStat;
-extern bool               reqTimeStatistics;
+//extern bool               reqTimeStatistics;
 
 
 
@@ -304,10 +304,12 @@ extern int noOfRtUnsubscribeContextResponse;
 extern int noOfRtSubscribeResponse;
 extern int noOfRtSubscribeError;
 
+/*
 extern int noOfSubCacheEntries;
 extern int noOfSubCacheLookups;
 extern int noOfSubCacheRemovals;
 extern int noOfSubCacheRemovalFailures;
+*/
 
 extern int noOfSimulatedNotifications;
 
@@ -315,9 +317,9 @@ extern int noOfSimulatedNotifications;
 
 /* ****************************************************************************
 *
-* timingStatistics - 
+* renderTimingStatistics -
 */
-extern std::string timingStatistics(std::string indent, Format format, std::string apiVersion);
+extern std::string renderTimingStatistics(void);
 
 
 
