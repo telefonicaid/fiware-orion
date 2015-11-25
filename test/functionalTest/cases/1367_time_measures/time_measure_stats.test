@@ -293,6 +293,15 @@ echo
 echo
 
 
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1))",
+#
+# If started with -noCache:  0
+# Normal start:              1
+#
+
+
 --REGEXPECT--
 01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
 =====================================================================================
@@ -306,7 +315,7 @@ Date: REGEX(.*)
     "statisticsRequests": "2",
     "subCacheInserts": "0",
     "subCacheItems": "0",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "0",
     "subCacheUpdates": "0",
     "timing": {
@@ -421,7 +430,7 @@ Date: REGEX(.*)
     "statisticsRequests": "3",
     "subCacheInserts": "0",
     "subCacheItems": "0",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "0",
     "subCacheUpdates": "0",
     "timing": {
@@ -550,7 +559,7 @@ Date: REGEX(.*)
     "statisticsRequests": "4",
     "subCacheInserts": "0",
     "subCacheItems": "0",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "0",
     "subCacheUpdates": "0",
     "timing": {
@@ -603,7 +612,7 @@ Date: REGEX(.*)
     "statisticsRequests": "5",
     "subCacheInserts": "0",
     "subCacheItems": "0",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "0",
     "subCacheUpdates": "0",
     "timing": {
@@ -675,7 +684,7 @@ Date: REGEX(.*)
     "statisticsRequests": "6",
     "subCacheInserts": "0",
     "subCacheItems": "0",
-    "subCacheRefreshs": "1",
+    "subCacheRefreshs": "REGEX((0|1))",
     "subCacheRemoves": "0",
     "subCacheUpdates": "0",
     "timing": {
