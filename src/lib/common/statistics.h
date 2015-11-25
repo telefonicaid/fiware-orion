@@ -50,7 +50,7 @@
 * TIME_STAT_RENDER_STOP - 
 */
 #define TIME_STAT_RENDER_STOP()                                                   \
-  if (timingStatistics)                                                          \
+  if (timingStatistics)                                                           \
   {                                                                               \
     struct timespec diff;                                                         \
     clock_gettime(CLOCK_REALTIME, &renderEnd);                                    \
@@ -81,7 +81,7 @@
   struct timespec mongoStart;                                          \
   struct timespec mongoEnd;                                            \
                                                                        \
-  if (timingStatistics)                                               \
+  if (timingStatistics)                                                \
   {                                                                    \
     clock_gettime(CLOCK_REALTIME, &mongoStart);                        \
   }
@@ -93,7 +93,7 @@
 * TIME_STAT_MONGO_STOP - 
 */
 #define TIME_STAT_MONGO_STOP()                                                    \
-  if (timingStatistics)                                                          \
+  if (timingStatistics)                                                           \
   {                                                                               \
     struct timespec diff;                                                         \
     clock_gettime(CLOCK_REALTIME, &mongoEnd);                                     \
@@ -124,7 +124,7 @@
   struct timespec mongoReadWaitStart;                                         \
   struct timespec mongoReadWaitEnd;                                           \
                                                                               \
-  if (timingStatistics)                                                      \
+  if (timingStatistics)                                                       \
   {                                                                           \
     clock_gettime(CLOCK_REALTIME, &mongoReadWaitStart);                       \
   }
@@ -136,7 +136,7 @@
 * TIME_STAT_MONGO_READ_WAIT_STOP - 
 */
 #define TIME_STAT_MONGO_READ_WAIT_STOP()                                \
-  if (timingStatistics)                                                \
+  if (timingStatistics)                                                 \
   {                                                                     \
     struct timespec diff;                                               \
     clock_gettime(CLOCK_REALTIME, &mongoReadWaitEnd);                   \
@@ -154,7 +154,7 @@
   struct timespec mongoWriteWaitStart;                                         \
   struct timespec mongoWriteWaitEnd;                                           \
                                                                                \
-  if (timingStatistics)                                                       \
+  if (timingStatistics)                                                        \
   {                                                                            \
     clock_gettime(CLOCK_REALTIME, &mongoWriteWaitStart);                       \
   }
@@ -166,7 +166,7 @@
 * TIME_STAT_MONGO_WRITE_WAIT_STOP - 
 */
 #define TIME_STAT_MONGO_WRITE_WAIT_STOP()                             \
-  if (timingStatistics)                                              \
+  if (timingStatistics)                                               \
   {                                                                   \
     struct timespec diff;                                             \
     clock_gettime(CLOCK_REALTIME, &mongoWriteWaitEnd);                \
@@ -184,7 +184,7 @@
   struct timespec mongoCommandWaitStart;                                         \
   struct timespec mongoCommandWaitEnd;                                           \
                                                                                  \
-  if (timingStatistics)                                                         \
+  if (timingStatistics)                                                          \
   {                                                                              \
     clock_gettime(CLOCK_REALTIME, &mongoCommandWaitStart);                       \
   }
@@ -196,7 +196,7 @@
 * TIME_STAT_MONGO_COMMAND_WAIT_STOP - 
 */
 #define TIME_STAT_MONGO_COMMAND_WAIT_STOP()                              \
-  if (timingStatistics)                                                 \
+  if (timingStatistics)                                                  \
   {                                                                      \
     struct timespec diff;                                                \
     clock_gettime(CLOCK_REALTIME, &mongoCommandWaitEnd);                 \

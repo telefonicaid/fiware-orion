@@ -123,12 +123,6 @@ static void resetStatistics(void)
   noOfInvalidRequests                             = -1;
   noOfRegisterResponses                           = -1;
 
-  /*
-  noOfSubCacheEntries                             = -1;
-  noOfSubCacheLookups                             = -1;
-  noOfSubCacheRemovals                            = -1;
-  noOfSubCacheRemovalFailures                     = -1;
-  */
   noOfSimulatedNotifications                      = -1;
 
   semTimeReqReset();
@@ -222,13 +216,6 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "registrationErrors", noOfRegistrationErrors);
   renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors);
   renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors);
-
-  // FIXME P10: old implementation overriden by mscRefreshs, mscInserts, mscRemoves, mscUpdates, cacheItems
-  // no longer used?
-  /*renderUsedCounter(&js, "subCacheEntries", noOfSubCacheEntries);
-  renderUsedCounter(&js, "subCacheLookups", noOfSubCacheLookups);
-  renderUsedCounter(&js, "subCacheRemovals", noOfSubCacheRemovals);
-  renderUsedCounter(&js, "subCacheRemovalFailures", noOfSubCacheRemovalFailures);*/
 
   return js.str();
 }
