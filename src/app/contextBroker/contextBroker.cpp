@@ -1489,6 +1489,8 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   int   flds_num;
 
   errno = 0;
+  // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
+  // cppcheck-suppress invalidscanf
   flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
   if (errno != 0)
   {
