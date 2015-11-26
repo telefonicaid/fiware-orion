@@ -387,7 +387,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
 *
 * Cond1_updateMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -446,7 +446,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
 *
 * Cond1_appendMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -506,7 +506,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
 *
 * Cond1_deleteMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -563,7 +563,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
 *
 * Cond1_updateMatch_noType -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noType)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -628,7 +628,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
 *
 * Cond1_appendMatch_noType -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noType)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -695,7 +695,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
 *
 * Cond1_deleteMatch_noType -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noType)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -758,7 +758,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
 *
 * Cond1_updateMatch_pattern -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_pattern)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -818,7 +818,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
 *
 * Cond1_appendMatch_pattern -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_pattern)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -880,7 +880,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
 *
 * Cond1_deleteMatch_pattern -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_pattern)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -937,7 +937,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
 *
 * Cond1_updateMatch_pattern_noType -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noType)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_pattern_noType)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -996,7 +996,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
 *
 * Cond1_appendMatch_pattern_noType -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noType)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_pattern_noType)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1057,7 +1057,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
 *
 * Cond1_deleteMatch_pattern_noType -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noType)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_pattern_noType)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1114,7 +1114,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
 *
 * Cond1_updateMatchDisjoint -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchDisjoint)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1173,7 +1173,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
 *
 * Cond1_appendMatchDisjoint -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatchDisjoint)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1232,7 +1232,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
 *
 * Cond1_deleteMatchDisjoint -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatchDisjoint)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1291,7 +1291,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
 *
 * Cond1_updateNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1339,7 +1339,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
 *
 * Cond1_appendNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1387,7 +1387,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
 *
 * Cond1_deleteNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1435,7 +1435,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
 *
 * Cond1_updateMatchWithoutChange -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChange)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchWithoutChange)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1483,7 +1483,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
 *
 *  Cond1_updateMixMatchNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMixMatchNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1544,7 +1544,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
 *
 * Cond1_appendMixMatchNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMixMatchNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1607,7 +1607,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
 *
 * Cond1_deleteMixMatchNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMixMatchNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1666,7 +1666,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
 *
 * Cond1_update2Matches1Notification -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notification)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_update2Matches1Notification)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1727,7 +1727,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
 *
 * Cond1_append2Matches1Notification -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notification)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_append2Matches1Notification)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1790,7 +1790,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
 *
 * Cond1_delete2Matches1Notification -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notification)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_delete2Matches1Notification)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1847,7 +1847,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
 *
 * CondN_updateMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1907,7 +1907,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
 *
 * CondN_appendMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -1968,7 +1968,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
 *
 * CondN_deleteMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2025,7 +2025,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
 *
 * CondN_updateMatchDisjoint -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchDisjoint)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2084,7 +2084,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
 *
 * CondN_appendMatchDisjoint -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjoint)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2143,7 +2143,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
 *
 * CondN_deleteMatchDisjoint -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatchDisjoint)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2202,7 +2202,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
 *
 * CondN_updateNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2250,7 +2250,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
 *
 * CondN_appendNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2298,7 +2298,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
 *
 * CondN_deleteNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2346,7 +2346,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
 *
 * CondN_updateMatchWithoutChange -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChange)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchWithoutChange)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2394,7 +2394,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
 *
 *  CondN_updateMixMatchNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMixMatchNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2455,7 +2455,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
 *
 * CondN_appendMixMatchNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMixMatchNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2518,7 +2518,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
 *
 * CondN_deleteMixMatchNoMatch -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMixMatchNoMatch)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2577,7 +2577,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
 *
 * CondN_update2Matches1Notification -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notification)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_update2Matches1Notification)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2638,7 +2638,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
 *
 * CondN_append2Matches1Notification -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notification)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_append2Matches1Notification)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2701,7 +2701,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
 *
 * CondN_delete2Matches1Notification -
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notification)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_delete2Matches1Notification)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2764,7 +2764,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
 * finalization of this tests (current version is not working) upon resolution of
 * old issue #87
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbQueryFail)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -2834,7 +2834,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
 *
 * FIXME: waiting to solve old issues #87
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbUpdateFail)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbUpdateFail)
 {
 
 }
@@ -2849,7 +2849,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbUpdateFail)
 * is that we need the dobule-query on csubs, then we need this tests. By the moment, we leave the
 * stub, marked with DISABLED.
 */
-TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbFindOneFail)
+TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, DISABLED_MongoDbFindOneFail)
 {
 
 }
