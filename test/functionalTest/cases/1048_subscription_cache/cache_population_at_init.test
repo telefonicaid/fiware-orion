@@ -243,7 +243,7 @@ Date: REGEX(.*)
     "ids": "REGEX([0-9a-f, ]{76})",
     "inserts": REGEX((3|0)),
     "items": REGEX((3|0)),
-    "refresh": 1,
+    "refresh": REGEX((0|1)),
     "removes": 0,
     "updates": 0
 }

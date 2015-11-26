@@ -68,7 +68,7 @@ Date: REGEX(.*)
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
