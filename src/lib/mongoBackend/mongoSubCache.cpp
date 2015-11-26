@@ -169,7 +169,8 @@ typedef struct MongoSubCache
 *
 * mongoSubCache - 
 */
-MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
+MongoSubCache  mongoSubCache       = { NULL, NULL, 0 };
+bool           mongoSubCacheActive = false;
 
 
 
@@ -185,6 +186,8 @@ void mongoSubCacheInit(void)
   mongoSubCache.tail   = NULL;
 
   mongoSubCacheStatisticsReset("mongoSubCacheInit");
+
+  mongoSubCacheActive = true;
 }
 
 
@@ -1229,10 +1232,16 @@ static void mongoSubCacheRefresh(const std::string& database)
   int subNo = 0;
   while (moreSafe(cursor))
   {
-    BSONObj sub = cursor->next();
-    int     r;
+    BSONObj      sub;
+    std::string  err;
 
-    r = mongoSubCacheItemInsert(tenant.c_str(), sub);
+    if (!nextSafeOrError(cursor, &sub, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      continue;
+    }
+
+    int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
 
     if (r == 0)
     {

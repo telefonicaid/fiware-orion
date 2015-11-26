@@ -1522,6 +1522,25 @@ static bool processSubscriptions
                                                  tenant,
                                                  xauthToken))
     {
+      long long rightNow = getCurrentTime();
+
+      //
+      // If broker running without subscription cache, put lastNotificationTime and count in DB 
+      //
+      if (mongoSubCacheActive == false)
+      {
+        BSONObj query  = BSON("_id" << OID(mapSubId));
+        BSONObj update = BSON("$set" <<
+                              BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                              "$inc" << BSON(CSUB_COUNT << 1));
+        
+        if (collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err) == false)
+        {
+          ret = false;
+        }
+      }
+
+
       //
       // Saving lastNotificationTime and count for cached subscription
       //
@@ -1533,7 +1552,7 @@ static bool processSubscriptions
 
         if (cSubP != NULL)
         {
-          cSubP->lastNotificationTime = getCurrentTime();
+          cSubP->lastNotificationTime = rightNow;
           cSubP->count               += 1;
 
           LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
