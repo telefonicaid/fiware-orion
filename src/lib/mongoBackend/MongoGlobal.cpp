@@ -1012,8 +1012,9 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
   char* str         = strdup(in.c_str());
   char* toFree      = str;
   char* s;
+  char* saver;
 
-  while ((s = strtok(str, ";")) != NULL)
+  while ((s = strtok_r(str, ";", &saver)) != NULL)
   {
     char*               left;
     char*               op;
@@ -1090,7 +1091,9 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
     left  = wsStrip(left);
     right = wsStrip(right);
 
-    if ((std::string(op) == "==") || (std::string(op) == "!="))
+    std::string opr = op;
+
+    if ((opr == "==") || (opr == "!="))
     {
       char* del;
 
@@ -1170,21 +1173,29 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
       }
     }
 
-    str = NULL;  // So that strtok continues eating the initial string
+    str = NULL;  // So that strtok_r continues eating the initial string
 
     /* Build the BSON filter */
-    std::string k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
-    bool pushBackFilter = true;
-    BSONObj f;
-    if (std::string(op) == "==")
+    std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+    bool           pushBackFilter = true;
+    BSONObj        f;
+    BSONObjBuilder bob;
+    BSONObjBuilder bb;
+    BSONObjBuilder bb2;
+
+    if (opr == "==")
     {
       if (std::string(rangeFrom) != "")
       {
-        f = BSON(k << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo)));
+        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+        // f = BSON(k << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo)));
       }
       else if (valVector.size() > 0)
       {
         BSONArrayBuilder ba;
+
         for (unsigned int ix = 0; ix < valVector.size(); ++ix)
         {
           double d;
@@ -1199,7 +1210,11 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
             ba.append(valVector[ix]);
           }
         }
-        f = BSON(k << BSON("$in" << ba.arr()));
+
+        bb.append("$in", ba.arr());
+        bob.append(k, bb.obj());
+        f = bob.obj();
+        // f = BSON(k << BSON("$in" << ba.arr()));
       }
       else
       {
@@ -1209,24 +1224,35 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         if (str2double(right, &d))
         {
           // number
-          f = BSON(k << BSON("$in" << BSON_ARRAY(d)));
+          bb.append("$in", BSON_ARRAY(d));
+          bob.append(k, bb.obj());
+          f = bob.obj();
+          // f = BSON(k << BSON("$in" << BSON_ARRAY(d)));
         }
         else
         {
           // string
-          f = BSON(k << BSON("$in" << BSON_ARRAY(right)));
+          bb.append("$in", BSON_ARRAY(right));
+          bob.append(k, bb.obj());
+          f = bob.obj();
+          // f = BSON(k << BSON("$in" << BSON_ARRAY(right)));
         }
       }
     }
-    else if (std::string(op) == "!=")
+    else if (opr == "!=")
     {
       if (std::string(rangeFrom) != "")
       {
-        f = BSON(k << BSON("$exists" << true << "$not" << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo))));
+        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+        bb2.append("$exists", true).append("$not", bb.obj());
+        bob.append(k, bb2.obj());
+        f = bob.obj();
+        // f = BSON(k << BSON("$exists" << true << "$not" << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo))));
       }
       else if (valVector.size() > 0)
       {
         BSONArrayBuilder ba;
+
         for (unsigned int ix = 0; ix < valVector.size(); ++ix)
         {
           double d;
@@ -1242,7 +1268,12 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
             ba.append(valVector[ix]);
           }
         }
-        f = BSON(k << BSON("$exists" << true << "$nin" << ba.arr()));
+
+        bb.append("$exists", true).append("$nin", ba.arr());
+        bob.append(k, bb.obj());
+        f = bob.obj();
+        
+        // f = BSON(k << BSON("$exists" << true << "$nin" << ba.arr()));
       }
       else
       {
@@ -1252,59 +1283,89 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         if (str2double(right, &d))
         {
           // number
-          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(d)));
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
+          bob.append(k, bb.obj());
+          f = bob.obj();
+          // f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(d)));
         }
         else
         {
           // string
-          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(right)));
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+          bob.append(k, bb.obj());
+          f = bob.obj();
+          // f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(right)));
         }
       }
     }
-    else if (std::string(op) == ">")
+    else if (opr == ">")
     {
-      f = BSON(k << BSON("$gt" << atof(right)));
+      bb.append("$gt", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
+      // f = BSON(k << BSON("$gt" << atof(right)));
     }
-    else if (std::string(op) == "<")
+    else if (opr == "<")
     {
-      f = BSON(k << BSON("$lt" << atof(right)));
+      bb.append("lt", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
+      // f = BSON(k << BSON("$lt" << atof(right)));
     }
-    else if (std::string(op) == ">=")
+    else if (opr == ">=")
     {
-      f = BSON(k << BSON("$gte" << atof(right)));
+      bb.append("$gte", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
+      // f = BSON(k << BSON("$gte" << atof(right)));
     }
-    else if (std::string(op) == "<=")
+    else if (opr == "<=")
     {
-      f = BSON(k << BSON("$lte" << atof(right)));
+      bb.append("$lte", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
+      // f = BSON(k << BSON("$lte" << atof(right)));
     }
-    else if (std::string(op) == "EXISTS")
+    else if (opr == "EXISTS")
     {
       if (std::string(right) == ENT_ENTITY_TYPE)
       {
         // Special case: entity type
         k = std::string("_id.") + ENT_ENTITY_TYPE;
-        f = BSON(k << BSON("$exists" << true << "$ne" << ""));
+
+        bb.append("$exists", true).append("$ne", "");
+        bob.append(k, bb.obj());
+        f = bob.obj();        
+        // f = BSON(k << BSON("$exists" << true << "$ne" << ""));
       }
       else
       {
         // Regular attribute
         k = std::string(ENT_ATTRS) + "." + right;
-        f = BSON(k << BSON("$exists" << true));
+
+        bob.append("$exists", true);
+        f = bob.obj();
+        // f = BSON(k << BSON("$exists" << true));
       }
     }
-    else if (std::string(op) == "NOT EXISTS")
+    else if (opr == "NOT EXISTS")
     {
       if (std::string(right) == ENT_ENTITY_TYPE)
       {
         // Special case: entity type
         k = std::string("_id.") + ENT_ENTITY_TYPE;
-        f = BSON("$or" << BSON_ARRAY(BSON(k << "") << BSON(k << BSON("$exists" << false))));
+        bb.append("$exists", false);
+        bb2.append(k, bb.obj());
+        f =  BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
+        // f = BSON("$or" << BSON_ARRAY(BSON(k << "") << BSON(k << BSON("$exists" << false))));
       }
       else
       {
         // Regular attribute
         k = std::string(ENT_ATTRS) + "." + right;
-        f = BSON(k << BSON("$exists" << false));
+        bob.append("$exists", false);
+        f = bob.obj();
+        // f = BSON(k << BSON("$exists" << false));
       }
     }
     else
