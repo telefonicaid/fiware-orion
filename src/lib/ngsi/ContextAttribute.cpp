@@ -766,6 +766,9 @@ std::string ContextAttribute::toStringValue(void)
     return "<unknown type>";
     break;
   }
+
+  // Added to avoid warning when compiling with -fstack-check -fstack-protector 
+  return "";
 }
 
 

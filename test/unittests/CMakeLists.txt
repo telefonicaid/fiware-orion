@@ -51,6 +51,14 @@ find_path(GMOCK_INCLUDE_DIR gmock/gmock.h
           PATHS /usr/includes
           PATH_SUFFIXES gmock)
 
+
+#
+# Stack protection is activated only in debug compilation.
+# However, our unit tests don't pass the compilation with "stack protection", so we turn it off using
+# remove_definitions().
+#
+remove_definitions(-fstack-check -fstack-protector)
+
 SET (SOURCES
     main_UnitTest.cpp
     testDataFromFile.cpp

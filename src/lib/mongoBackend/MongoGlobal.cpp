@@ -878,8 +878,9 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
   char* str         = strdup(in.c_str());
   char* toFree      = str;
   char* s;
+  char* saver;
 
-  while ((s = strtok(str, ";")) != NULL)
+  while ((s = strtok_r(str, ";", &saver)) != NULL)
   {
     char*               left;
     char*               op;
@@ -948,7 +949,6 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
     }
     else
     {
-      printf("\nNo OP found\n");
       op    = (char*) "";
       right = (char*) "";
     }
@@ -956,7 +956,9 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
     left  = wsStrip(left);
     right = wsStrip(right);
 
-    if ((std::string(op) == "==") || (std::string(op) == "!="))
+    std::string opr = op;
+
+    if ((opr == "==") || (opr == "!="))
     {
       char* del;
 
@@ -1036,21 +1038,28 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
       }
     }
 
-    str = NULL;  // So that strtok continues eating the initial string
+    str = NULL;  // So that strtok_r continues eating the initial string
 
     /* Build the BSON filter */
-    std::string k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
-    bool pushBackFilter = true;
-    BSONObj f;
-    if (std::string(op) == "==")
+    std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+    bool           pushBackFilter = true;
+    BSONObj        f;
+    BSONObjBuilder bob;
+    BSONObjBuilder bb;
+    BSONObjBuilder bb2;
+
+    if (opr == "==")
     {
       if (std::string(rangeFrom) != "")
       {
-        f = BSON(k << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo)));
+        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
       else if (valVector.size() > 0)
       {
         BSONArrayBuilder ba;
+
         for (unsigned int ix = 0; ix < valVector.size(); ++ix)
         {
           double d;
@@ -1065,7 +1074,10 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
             ba.append(valVector[ix]);
           }
         }
-        f = BSON(k << BSON("$in" << ba.arr()));
+
+        bb.append("$in", ba.arr());
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
       else
       {
@@ -1075,24 +1087,32 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
         if (str2double(right, &d))
         {
           // number
-          f = BSON(k << BSON("$in" << BSON_ARRAY(d)));
+          bb.append("$in", BSON_ARRAY(d));
+          bob.append(k, bb.obj());
+          f = bob.obj();
         }
         else
         {
           // string
-          f = BSON(k << BSON("$in" << BSON_ARRAY(right)));
+          bb.append("$in", BSON_ARRAY(right));
+          bob.append(k, bb.obj());
+          f = bob.obj();
         }
       }
     }
-    else if (std::string(op) == "!=")
+    else if (opr == "!=")
     {
       if (std::string(rangeFrom) != "")
       {
-        f = BSON(k << BSON("$exists" << true << "$not" << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo))));
+        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+        bb2.append("$exists", true).append("$not", bb.obj());
+        bob.append(k, bb2.obj());
+        f = bob.obj();
       }
       else if (valVector.size() > 0)
       {
         BSONArrayBuilder ba;
+
         for (unsigned int ix = 0; ix < valVector.size(); ++ix)
         {
           double d;
@@ -1108,7 +1128,11 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
             ba.append(valVector[ix]);
           }
         }
-        f = BSON(k << BSON("$exists" << true << "$nin" << ba.arr()));
+
+        bb.append("$exists", true).append("$nin", ba.arr());
+        bob.append(k, bb.obj());
+        f = bob.obj();
+        
       }
       else
       {
@@ -1118,59 +1142,81 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
         if (str2double(right, &d))
         {
           // number
-          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(d)));
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
+          bob.append(k, bb.obj());
+          f = bob.obj();
         }
         else
         {
           // string
-          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(right)));
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+          bob.append(k, bb.obj());
+          f = bob.obj();
         }
       }
     }
-    else if (std::string(op) == ">")
+    else if (opr == ">")
     {
-     f = BSON(k << BSON("$gt" << atof(right)));
+      bb.append("$gt", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
     }
-    else if (std::string(op) == "<")
+    else if (opr == "<")
     {
-      f = BSON(k << BSON("$lt" << atof(right)));
+      bb.append("$lt", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
     }
-    else if (std::string(op) == ">=")
+    else if (opr == ">=")
     {
-      f = BSON(k << BSON("$gte" << atof(right)));
+      bb.append("$gte", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
     }
-    else if (std::string(op) == "<=")
+    else if (opr == "<=")
     {
-      f = BSON(k << BSON("$lte" << atof(right)));
+      bb.append("$lte", atof(right));
+      bob.append(k, bb.obj());
+      f = bob.obj();
     }
-    else if (std::string(op) == "EXISTS")
+    else if (opr == "EXISTS")
     {
       if (std::string(right) == ENT_ENTITY_TYPE)
       {
         // Special case: entity type
         k = std::string("_id.") + ENT_ENTITY_TYPE;
-        f = BSON(k << BSON("$exists" << true << "$ne" << ""));
+
+        bb.append("$exists", true).append("$ne", "");
+        bob.append(k, bb.obj());
+        f = bob.obj();        
       }
       else
       {
         // Regular attribute
         k = std::string(ENT_ATTRS) + "." + right;
-        f = BSON(k << BSON("$exists" << true));
+
+        bb.append("$exists", true);
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
     }
-    else if (std::string(op) == "NOT EXISTS")
+    else if (opr == "NOT EXISTS")
     {
       if (std::string(right) == ENT_ENTITY_TYPE)
       {
         // Special case: entity type
         k = std::string("_id.") + ENT_ENTITY_TYPE;
-        f = BSON("$or" << BSON_ARRAY(BSON(k << "") << BSON(k << BSON("$exists" << false))));
+        bb.append("$exists", false);
+        bb2.append(k, bb.obj());
+        f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
       }
       else
       {
         // Regular attribute
         k = std::string(ENT_ATTRS) + "." + right;
-        f = BSON(k << BSON("$exists" << false));
+        bb.append("$exists", false);
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
     }
     else
@@ -1534,7 +1580,7 @@ void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementR
      * domain attributes are not implemented */
     newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
 
-    // FIXME P10: not sure if this is the right way of doing, maybe we need a fill() method for this
+    // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
     newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;
     newCerP->statusCode.fill(&cerP->statusCode);
 
@@ -1705,7 +1751,7 @@ bool registrationsQuery
 {
 
   /* Build query based on arguments */
-  // FIXME P2: this implementation need to be refactored for cleanup
+  // FIXME P2: this implementation needs to be refactored for cleanup
   std::string       contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
   std::string       contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
   std::string       contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
@@ -1976,7 +2022,7 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+      // FIXME P10: we are using a dummy scope for the moment, until subscription scopes get implemented
       if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
