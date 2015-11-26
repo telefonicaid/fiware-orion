@@ -43,7 +43,7 @@ static sem_t           reqSem;
 static sem_t           transSem;
 static sem_t           cacheSem;
 static sem_t           timeStatSem;
-static SemType  reqPolicy;
+static SemOpType  reqPolicy;
 
 
 
@@ -70,7 +70,7 @@ static struct timespec accTimeStatSemTime = { 0, 0 };
 *  -1 on failure
 *
 */
-int semInit(SemType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
+int semInit(SemOpType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
 {
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
@@ -122,7 +122,7 @@ int reqSemTryToTake(void)
 *
 * reqSemTake -
 */
-int reqSemTake(const char* who, const char* what, SemType reqType, bool* taken)
+int reqSemTake(const char* who, const char* what, SemOpType reqType, bool* taken)
 {
   int r;
 
@@ -179,7 +179,7 @@ int reqSemTake(const char* who, const char* what, SemType reqType, bool* taken)
 */
 float semTimeReqGet(void)
 {
-  return accReqSemTime.tv_sec + ((float)accReqSemTime.tv_nsec) / 1E9;
+  return accReqSemTime.tv_sec + ((float) accReqSemTime.tv_nsec) / 1E9;
 }
 
 
@@ -212,7 +212,7 @@ float semTimeCacheGet(void)
 */
 float semTimeTimeStatGet(void)
 {
-  return accTimeStatSemTime.tv_sec + ((float)accTimeStatSemTime.tv_nsec) / 1E9;
+  return accTimeStatSemTime.tv_sec + ((float) accTimeStatSemTime.tv_nsec) / 1E9;
 }
 
 

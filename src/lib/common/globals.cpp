@@ -95,13 +95,13 @@ void transactionIdSet(void)
 */
 void orionInit
 (
-  OrionExitFunction exitFunction,
-  const char* version,
-  SemType reqPolicy,
-  bool _countersStatistics,
-  bool _semWaitStatistics,
-  bool _timingStatistics,
-  bool _notifQueueStatistics
+  OrionExitFunction  exitFunction,
+  const char*        version,
+  SemOpType          reqPolicy,
+  bool               _countersStatistics,
+  bool               _semWaitStatistics,
+  bool               _timingStatistics,
+  bool               _notifQueueStatistics
 )
 {
   // Give the rest library the correct version string of this executable

@@ -38,7 +38,6 @@
 std::string toJsonString(const std::string& input)
 {
   std::ostringstream ss;
-  ss << std::fixed << std::setprecision(9);
 
   ss << '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)

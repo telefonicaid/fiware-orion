@@ -335,7 +335,6 @@ std::string statisticsTreat
 *
 * statisticsCacheTreat -
 *
-* FIXME P3: maybe this function should be in the cache/ library?
 */
 std::string statisticsCacheTreat
 (
@@ -368,11 +367,10 @@ std::string statisticsCacheTreat
   int   mscUpdates  = 0;
   int   cacheItems  = 0;
   char  listBuffer[1024];
-  bool  cacheSemTake;
 
-  cacheSemTake(__FUNCTION__, "mongoSubCacheStatisticsGet", SemReadOp, &cacheSemTake);
+  cacheSemTake(__FUNCTION__, "mongoSubCacheStatisticsGet");
   mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems, listBuffer, sizeof(listBuffer));
-  cacheSemGive(__FUNCTION__, "mongoSubCacheStatisticsGet", cacheSemTake);
+  cacheSemGive(__FUNCTION__, "mongoSubCacheStatisticsGet");
 
   js.addString("ids", listBuffer);    // FIXME P10: this seems not printing anything... is listBuffer working fine?
   js.addNumber("refresh", mscRefreshs);

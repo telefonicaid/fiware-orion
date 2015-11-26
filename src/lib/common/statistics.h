@@ -226,7 +226,6 @@ typedef struct TimeStat
 extern TimeStat           accTimeStat;
 extern TimeStat           lastTimeStat;
 extern __thread TimeStat  threadLastTimeStat;
-//extern bool               reqTimeStatistics;
 
 
 

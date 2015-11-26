@@ -39,13 +39,13 @@
 *
 * SemOpType -
 */
-typedef enum SemType
+typedef enum SemOpType
 {
   SemReadOp,
   SemWriteOp,
   SemReadWriteOp,
   SemNoneOp
-} SemType;
+} SemOpType;
 
 
 
@@ -55,7 +55,7 @@ typedef enum SemType
 */
 extern int semInit
 (
-  SemType  _reqPolicy     = SemReadWriteOp,
+  SemOpType  _reqPolicy     = SemReadWriteOp,
   bool            semTimeStat    = false,
   int             shared         = 0,
   int             takenInitially = 1
@@ -85,7 +85,7 @@ extern int reqSemTryToTake(void);
 *
 * xxxSemTake -
 */
-extern int reqSemTake(const char* who, const char* what, SemType reqType, bool* taken);
+extern int reqSemTake(const char* who, const char* what, SemOpType reqType, bool* taken);
 extern int transSemTake(const char* who, const char* what);
 extern int cacheSemTake(const char* who, const char* what);
 extern int timeStatSemTake(const char* who, const char* what);
@@ -165,7 +165,6 @@ extern int release_curl_context(struct curl_context *pcc, bool final = false);
 *
 * mutexTimeCCGet -
 */
-//extern void mutexTimeCCGet(char* buf, int bufLen);
 extern float mutexTimeCCGet(void);
 
 
