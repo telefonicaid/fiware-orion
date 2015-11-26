@@ -117,7 +117,9 @@ std::string vectorToJson(std::vector<std::string> &list)
 */
 JsonHelper::JsonHelper(): empty(true)
 {
+  /* Set format  for floats (it doesn't affect integers) */
   ss << std::fixed << std::setprecision(9);
+
   ss << '{';
 }
 
@@ -181,7 +183,7 @@ void JsonHelper::addFloat(const std::string& key, float  value)
   {
     ss << ',';
   }  
-  ss << toJsonString(key) << ':' << std::fixed << std::setprecision(9) << value;
+  ss << toJsonString(key) << ':' << value;
 
   empty = false;
 }
