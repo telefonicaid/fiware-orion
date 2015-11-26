@@ -1232,10 +1232,16 @@ static void mongoSubCacheRefresh(const std::string& database)
   int subNo = 0;
   while (moreSafe(cursor))
   {
-    BSONObj sub = cursor->nextSafe();
-    int     r;
+    BSONObj      sub;
+    std::string  err;
 
-    r = mongoSubCacheItemInsert(tenant.c_str(), sub);
+    if (!nextSafeOrError(cursor, &sub, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      continue;
+    }
+
+    int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
 
     if (r == 0)
     {
