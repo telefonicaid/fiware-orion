@@ -29,6 +29,8 @@
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 
+#include "mongoBackend/safeMongo.h"
+
 /* Collection names used for testing */
 #define DBPREFIX                    "utest"
 #define REGISTRATIONS_COLL          DBPREFIX ".registrations"
@@ -42,6 +44,8 @@
 #define RES_CER(i)              res.contextElementResponseVector.get(i)->contextElement
 #define RES_CER_STATUS(i)       res.contextElementResponseVector.get(i)->statusCode
 #define RES_CER_ATTR(i, j)      res.contextElementResponseVector.get(i)->contextElement.contextAttributeVector.get(j)
+
+#define C_STR_FIELD(b, f)       getStringField(b, f).c_str()
 
 /* ****************************************************************************
 *

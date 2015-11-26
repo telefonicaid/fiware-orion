@@ -83,7 +83,7 @@ echo "$SUB_OUT"
 echo
 
 echo 'Notification count from mongo:'
-mongoCmd ${CB_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 echo "2: ++++++++++++++++++++"
@@ -114,7 +114,7 @@ orionCurl --url "$url" --payload "$payload"
 echo
 
 echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 echo "3: ++++++++++++++++++++"
@@ -168,7 +168,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 
@@ -230,7 +230,7 @@ orionCurl --url "$url" --payload "$payload"
 echo
 
 echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+mongoCmd ${CB_DB_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 echo "7: ++++++++++++++++++++"

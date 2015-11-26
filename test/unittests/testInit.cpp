@@ -48,23 +48,18 @@ void setupDatabase(void)
     /* mongoStart is needed one time to create the connection pool */
     if (mongoStarted == false)
     {
+      /* In fact, the mongoStart() parameters related with the pool, e.g. pool size, are irrelevant, given that the connection
+       * creation is mocked under UNIT_TEST in the mongoBackend library */
       mongoStart("localhost", "", "", "", "", false, 0, 10);
       mongoStarted = true;
     }
 
     connection = getMongoConnection();
-    if (connection == NULL)
-    {
-      connection = mongoInitialConnectionGetForUnitTest();
-      setMongoConnectionForUnitTest(connection);
-    }
 
     connection->dropCollection(REGISTRATIONS_COLL);
     connection->dropCollection(ENTITIES_COLL);
     connection->dropCollection(SUBSCRIBECONTEXT_COLL);
-    connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
-
-    releaseMongoConnection(connection);
+    connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);    
 
     setDbPrefix(DBPREFIX);
     setRegistrationsCollectionName("registrations");

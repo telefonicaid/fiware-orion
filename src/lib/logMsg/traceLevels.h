@@ -57,6 +57,7 @@ typedef enum TraceLevels
   LmtIpVersion,
   LmtCtxProviders,
   LmtRequest = 38,          // ONLY to be used in ONE place - incoming requests
+  LmtPayload,
 
   /* Parser (40-59) */
   LmtParse    = 40,
@@ -87,6 +88,8 @@ typedef enum TraceLevels
   /* MongoBackend (100-119) */
   LmtMongo = 100,
   LmtMongoSubCache,
+  LmtMongoSubCacheMatch,
+  LmtMongoCacheSync,
 
   /* Cleanup (120-139) */
   LmtDestructor = 120,
@@ -109,10 +112,12 @@ typedef enum TraceLevels
   LmtPartialPayload,
   LmtClientOutputPayloadDump,
 
-  /* Semaphores (200-202) */
+  /* Semaphores (200-204) */
   LmtReqSem = 200,
   LmtMongoSem,
   LmtTransSem,
+  LmtCacheSem,
+  LmtTimeStatSem,
 
   /* Others (>=210) */
   LmtCm = 210,

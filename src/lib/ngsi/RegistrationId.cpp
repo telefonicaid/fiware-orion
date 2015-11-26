@@ -86,7 +86,7 @@ void RegistrationId::set(const std::string& value)
 *
 * RegistrationId::get -
 */
-std::string RegistrationId::get(void)
+std::string RegistrationId::get(void) const
 {
   return string;
 }

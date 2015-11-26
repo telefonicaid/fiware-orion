@@ -38,48 +38,45 @@ echo
 echo "+++++ 2. statistics in JSON"
 orionCurl --url /statistics --json
 echo
+echo
 
+#
+# About
+#   <versionRequests>REGEX((0|1))</versionRequests>   AND
+#   "versionRequests": "REGEX((0|1))"
+# When running under valgrind, an additional "GET /version" is issued to make sure the broker is running
+#
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1))"   AND
+#   <subCacheRefreshs>REGEX((0|1))</subCacheRefreshs>
+# When the broker is started with -noCache, there are no refreshes performed
+#
 
 --REGEXPECT--
 +++++ 1. statistics in XML
 HTTP/1.1 200 OK
-Content-Length: 392
+Content-Length: 91
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
-  <versionRequests>REGEX((0|1))</versionRequests>
-  <statisticsRequests>1</statisticsRequests>
-  <uptime_in_secs>REGEX(1?\d)</uptime_in_secs>
-  <measuring_interval_in_secs>REGEX(1?\d)</measuring_interval_in_secs>
-  <subCacheRefreshs>1</subCacheRefreshs>
-  <subCacheInserts>0</subCacheInserts>
-  <subCacheRemoves>0</subCacheRemoves>
-  <subCacheUpdates>0</subCacheUpdates>
-  <subCacheItems>0</subCacheItems>
+  <message>XML not supported in statistics operations, use JSON</message>
 </orion>
 
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "measuring_interval_in_secs": "REGEX(1?\d)",
-        "statisticsRequests": "2",
-        "subCacheInserts": "0",
-        "subCacheItems": "0",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "uptime_in_secs": "REGEX(1?\d)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "measuring_interval_in_secs": REGEX(1?\d),
+    "uptime_in_secs": REGEX(1?\d)
 }
+
 
 --TEARDOWN--
 brokerStop CB

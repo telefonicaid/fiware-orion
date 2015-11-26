@@ -60,12 +60,12 @@ typedef struct UpdateContextRequest
   int                     jsons;                 // Not part of the payload - used internally only
 
   UpdateContextRequest();
-  UpdateContextRequest(const std::string _contextProvider, EntityId* eP);
+  UpdateContextRequest(const std::string& _contextProvider, EntityId* eP);
 
   void               init(void);
   Format             format(void);
   std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string        check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string        check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
 

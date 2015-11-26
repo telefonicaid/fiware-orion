@@ -77,8 +77,8 @@ cannot be updated:
 
 -   subscriptionId (although you must include it in
     updateContextSubscription to refer to the subscription)
--   entityIdList
--   attributeList
+-   entities 
+-   attributes
 -   reference
 
 However, the following fields can be modified:
@@ -101,7 +101,7 @@ particular, the following is not updatable:
 
 Thus, the following is updatable:
 
--   entityIdList (in fact, it is mandatory in
+-   entities (in fact, it is mandatory in
     every updateContextAvailabilitySubscription).
--   attributeList
+-   attributes
 -   duration

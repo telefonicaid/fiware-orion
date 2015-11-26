@@ -20,6 +20,9 @@
  For those usages not covered by this license please contact with
  iot_support at tid dot es
 """
+import copy
+import re
+
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 from iotqatools.helpers_utils import *
@@ -195,7 +198,6 @@ class NGSI:
         for i in range(int(entities_contexts["entities_number"])):
             # verify if the entity is stored in mongo
             if stored:
-                #for entity in curs_list:  # manages N entities
                 __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
                 assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
                 entity = curs_list[i]  # manages N entities
@@ -249,23 +251,73 @@ class NGSI:
                 'ERROR - description error: "%s" is not the expected: "%s"' % (str(resp_list["description"]),
                                                                                str(error["description"]))
 
-    def verify_get_all_entities(self, queries_parameters, entities_context, resp):
+    def __get_entities_context_group(self, accumulate, elements):
+        """
+        get entities context groups
+        :param accumulate: accumulate of entities context
+        :param elements: elements to compare to get entities context (id, type, etc)
+        :return: list of dict
+        """
+        entities_list = []
+        for entities_group in accumulate:
+            group_exists = False
+            for key, value in elements.items():
+                if key == "idPattern":
+                    result = re.search(value, entities_group["entities_id"])
+                else:
+                    result = re.search(entities_group[key], value)
+                if result is not None:
+                    group_exists = True
+                else:
+                    group_exists = False
+                    break
+            if group_exists:
+                entities_list.append(copy.deepcopy(entities_group))
+        return entities_list
+
+    def verify_get_all_entities(self, queries_parameters, accumulate_entities_context, resp):
         """
         verify get all entities
         :param queries_parameters: queries parameters used
         :param entities_context: context values
         :param resp: http response
         """
-        total = int(entities_context["entities_number"])
+        total = 0
+        limit = 10000000000
+        offset = 0
+        ids = []
+        types = []
+        elements = {}
+        group = []
+        for entities_group in accumulate_entities_context:
+            total = total + int(entities_group["entities_number"])
+            ids.append(entities_group["entities_id"])
+            types.append(entities_group["entities_type"])
         if "limit" in queries_parameters:
             limit = int(queries_parameters["limit"])
-        else:
-            limit = 10000000000
         if "offset" in queries_parameters:
             offset = int(queries_parameters["offset"])
-        else:
-            offset = 0
-        # determinate number od items and position in response
+        if "id" in queries_parameters:
+            del ids[:]
+            ids = convert_str_to_list(queries_parameters["id"], ",")
+            elements ["entities_id"] = queries_parameters["id"]
+        if "idPattern" in queries_parameters:
+            del ids[:]
+            ids = [queries_parameters["idPattern"]]
+            elements ["idPattern"] = queries_parameters["idPattern"]
+        if "type" in queries_parameters:
+            del types[:]
+            types = convert_str_to_list(queries_parameters["type"], ",")
+            elements ["entities_type"] = queries_parameters["type"]
+
+        if elements != {}:
+            total = 0
+            group = self.__get_entities_context_group(accumulate_entities_context, elements)
+            if group != []:
+                for it in group:
+                    total = total + it["entities_number"]
+
+        # determinate number of items and position in response
         if offset >= total:
             items = 0
             position = 0
@@ -275,63 +327,81 @@ class NGSI:
         else:
             items = limit
             position = offset
+
+        # info in log
         __logger__.debug("total:  %s" % str(total))
         __logger__.debug("limit:  %s" % str(limit))
         __logger__.debug("offset: %s" % str(offset))
         __logger__.debug("items:  %s" % str(items))
         __logger__.debug("pos:    %s" % str(position))
+        __logger__.debug("ids:    %s" % str(ids))
+        __logger__.debug("types:  %s" % str(types))
 
-        # verify entities
-        pos = position
-        items_list = convert_str_to_dict(resp.text, JSON)
+        # verify entities number
+        items_list = convert_str_to_dict(resp.content, JSON)
         assert len(items_list) == items, "ERROR - in number of items in response\n  received: %s \n  expected: %s" % \
                                          (str(len(items_list)), str(items))
+
         for i in range(items):
-            assert "%s_%s" % (entities_context["entities_id"], str(pos)) == items_list[i]["id"], \
-                'ERROR - in id "%s" in position %s' % (items_list[i]["id"], str(pos))
-            if "entities_type" in entities_context:
-                assert "%s" % (entities_context["entities_type"]) == items_list[i]["type"], \
-                    'ERROR - in type "%s" in position %s' % (items_list[i]["type"], str(pos))
-            # verify attributes
-            for a in range(int(entities_context["attributes_number"])):
-                if int(entities_context["attributes_number"]) == 1:
-                    attr_name = entities_context["attributes_name"]
+            # verify entity id and entity type
+            id_exists = False
+            type_exists = False
+            for id in ids:
+                if re.search(id, items_list[i]["id"]) is not None:
+                    id_exists = True
+                    break
+            assert id_exists, 'ERROR - id %s does not exist' % items_list[i]["id"]
+            for tp in types:
+                if items_list[i]["type"].find(tp) >= 0:
+                    type_exists = True
+                    break
+            assert type_exists, 'ERROR - type %s does not exist' % items_list[i]["type"]
+
+            # verify attributes names
+            sub_elements = {"entities_id": items_list[i]["id"],
+                           "entities_type": items_list[i]["type"]}
+            sub_group_list = self.__get_entities_context_group(accumulate_entities_context, sub_elements)
+            assert len(sub_group_list) == 1, " ERROR - the id and type do not exist"
+            sub_group = sub_group_list[0]
+            if int(sub_group["attributes_number"]) == 1:
+                attr_name = sub_group["attributes_name"]
+            else:
+                # prefix plus _<consecutive>. ex: room1_2
+                for a in range(int(sub_group["attributes_number"])):
+                    attr_name = "%s_%s" % (sub_group["attributes_name"], str(a))
+            assert attr_name in items_list[i], \
+                'ERROR - attribute name "%s" does not exist in position:%s' % (attr_name, str(i))
+
+            # verify attributes type and attributes values
+            attribute = items_list[i][attr_name]
+            if sub_group["attributes_type"] is not None:
+                assert sub_group["attributes_type"] == attribute["type"], \
+                    'ERROR - in attribute type "%s" in position: %s' % (sub_group["attributes_type"], str(i))
+                assert sub_group["attributes_value"] == attribute["value"], \
+                    'ERROR - in attribute value "%s" in position: %s' % (sub_group["attributes_value"], str(i))
+            else:
+                if sub_group["metadatas_number"] > 0:
+                    assert sub_group["attributes_value"] == attribute["value"], \
+                        'ERROR - in attribute value "%s" in position: %s without attribute type nor metadatas' % (sub_group["attributes_value"], str(i))
                 else:
-                    # prefix plus _<consecutive>. ex: room1_2
-                    attr_name = "%s_%s" % (entities_context["attributes_name"], str(a))
-                assert attr_name in items_list[i], \
-                    'ERROR - attribute name "%s" does not exist in position:%s' % (attr_name, str(i))
-                attribute = items_list[i][attr_name]
-                if entities_context["attributes_type"] is not None:
-                    assert entities_context["attributes_type"] == attribute["type"], \
-                        'ERROR - in attribute type "%s" in position: %s' % (entities_context["attributes_type"], str(i))
-                    assert entities_context["attributes_value"] == attribute["value"], \
-                        'ERROR - in attribute value "%s" in position: %s' % (entities_context["attributes_value"], str(i))
-                else:
-                    if entities_context["metadatas_number"] > 0:
-                        assert entities_context["attributes_value"] == attribute["value"], \
-                            'ERROR - in attribute value "%s" in position: %s without attribute type nor metadatas' % (entities_context["attributes_value"], str(i))
+                    assert sub_group["attributes_value"] == attribute, \
+                        'ERROR - in attribute value "%s" in position: %s without attribute type but with metadatas' % (sub_group["attributes_value"], str(i))
+
+            # verify attribute metadatas
+            if sub_group["metadatas_number"] > 0:
+                for m in range(int(sub_group["metadatas_number"])):
+                    assert "%s_%s" % (sub_group["metadatas_name"], str(m)) in attribute,\
+                        'ERROR - attribute metadata name "%s_%s" does not exist in position:%s' \
+                        % (sub_group["metadatas_name"], str(a), str(m))
+                    metadata = attribute["%s_%s" % (sub_group["metadatas_name"], str(m))]
+                    if sub_group["metadatas_type"] is not None:
+                        assert sub_group["metadatas_type"] == metadata["type"], \
+                            'ERROR - in attribute metadata type "%s" in position: %s' % (sub_group["metadatas_type"], str(i))
+                        assert sub_group["metadatas_value"] == metadata["value"], \
+                            'ERROR - in attribute metadata value "%s" in position: %s' % (sub_group["metadatas_value"], str(i))
                     else:
-                        assert entities_context["attributes_value"] == attribute, \
-                            'ERROR - in attribute value "%s" in position: %s without attribute type but with metadatas' % (entities_context["attributes_value"], str(i))
-                # verify attribute metadatas
-                if entities_context["metadatas_number"] > 0:
-                    for m in range(int(entities_context["metadatas_number"])):
-                        assert "%s_%s" % (entities_context["metadatas_name"], str(m)) in attribute,\
-                            'ERROR - attribute metadata name "%s_%s" does not exist in position:%s' \
-                            % (entities_context["metadatas_name"], str(a), str(m))
-                        metadata = attribute["%s_%s" % (entities_context["metadatas_name"], str(m))]
-                        if entities_context["metadatas_type"] is not None:
-                            assert entities_context["metadatas_type"] == metadata["type"], \
-                                'ERROR - in attribute metadata type "%s" in position: %s' % (entities_context["metadatas_type"],
-                                                                                             str(i))
-                            assert entities_context["metadatas_value"] == metadata["value"], \
-                                'ERROR - in attribute metadata value "%s" in position: %s' % (entities_context["metadatas_value"],
-                                                                                              str(i))
-                        else:
-                            assert entities_context["metadatas_value"] == metadata, \
-                                'ERROR - in attribute metadata value "%s" in position: %s' % (entities_context["metadatas_value"], str(i))
-            pos += 1
+                        assert sub_group["metadatas_value"] == metadata, \
+                            'ERROR - in attribute metadata value "%s" in position: %s' % (sub_group["metadatas_value"], str(i))
 
     @staticmethod
     def __remove_quote(text):
@@ -559,3 +629,24 @@ class NGSI:
                 assert str(type(attribute)) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type and ' \
                     'without metadatas' % (str(attribute), field_type)
+
+    def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers):
+        """
+        verify if the attribute has been deleted
+        :param entity_context:
+        :param headers:
+        """
+        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
+
+        # verify entities
+        __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
+        for i in range(int(entities_contexts["entities_number"])):
+            # verify if the entity is stored in mongo
+            __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
+            __logger__.debug("attribute name to verify: %s" % entities_contexts["attributes_name"])
+            assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
+            entity = curs_list[i]  # manages N entities
+            assert entities_contexts["attributes_name"] not in entity["attrNames"], " ERROR - the attribute: %s exists in the entity No: %s" % \
+                                                                                (entities_contexts["attributes_name"], str(i+1))
+        mongo_driver.disconnect()
+

@@ -31,7 +31,9 @@
 
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -55,6 +57,7 @@ using std::string;
 using std::map;
 using std::auto_ptr;
 using namespace orion;
+using namespace mongo;
 
 
 /* ****************************************************************************
@@ -285,12 +288,12 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
   if (md1.hasField(ENT_ATTRS_MD_TYPE))
   {
     return md2.hasField(ENT_ATTRS_MD_TYPE) &&
-      STR_FIELD(md1, ENT_ATTRS_MD_TYPE) == STR_FIELD(md2, ENT_ATTRS_MD_TYPE) &&
-      STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
+      getStringField(md1, ENT_ATTRS_MD_TYPE) == getStringField(md2, ENT_ATTRS_MD_TYPE) &&
+      getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
   }
 
   return !md2.hasField(ENT_ATTRS_MD_TYPE) &&
-    STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
+    getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
 }
 
 /* ****************************************************************************
@@ -325,7 +328,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       return getBoolField(md1, ENT_ATTRS_MD_VALUE) == getBoolField(md2, ENT_ATTRS_MD_VALUE);
 
     case String:
-      return STR_FIELD(md1, ENT_ATTRS_MD_VALUE) == STR_FIELD(md2, ENT_ATTRS_MD_VALUE);
+      return getStringField(md1, ENT_ATTRS_MD_VALUE) == getStringField(md2, ENT_ATTRS_MD_VALUE);
 
     default:
       LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getField(md1, ENT_ATTRS_MD_VALUE).type()));
@@ -443,7 +446,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolField(attr, ENT_ATTRS_VALUE);
 
     case String:
-      return caP->valueType != ValueTypeString || caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeString || caP->stringValue != getStringField(attr, ENT_ATTRS_VALUE);
 
     default:
       LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
@@ -540,7 +543,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
         break;
 
       case String:
-        ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+        ab.append(ENT_ATTRS_VALUE, getStringField(attr, ENT_ATTRS_VALUE));
         break;
 
       default:
@@ -557,7 +560,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   {
     if (attr.hasField(ENT_ATTRS_TYPE))
     {
-      ab.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+      ab.append(ENT_ATTRS_TYPE, getStringField(attr, ENT_ATTRS_TYPE));
     }
   }
 
@@ -587,8 +590,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
-      BSONObj    mdB = i.next().embeddedObject();
-      Metadata*  md  = bsonToMetadata(mdB);
+      Metadata*  md = new Metadata(i.next().embeddedObject());
 
       mdVSize++;
 
@@ -628,7 +630,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      */
       actualUpdate = (attrValueChanges(attr, caP) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
-                                             STR_FIELD(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
+                                             getStringField(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
   }
   else
@@ -1058,7 +1060,7 @@ static bool deleteAttribute
 *    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | ^/a1/a2/a3/#$ | ^/a1/a2/a3$
 *
 */
-std::string servicePathSubscriptionRegex(const std::string servicePath, std::vector<std::string>& spathV)
+std::string servicePathSubscriptionRegex(const std::string& servicePath, std::vector<std::string>& spathV)
 {
   std::string  spathRegex;
   int          spathComponents = 0;
@@ -1125,109 +1127,20 @@ static bool addTriggeredSubscriptions_withCache
 (
   std::string                               entityId,
   std::string                               entityType,
-  std::string                               attr,
+  const std::vector<std::string>&           modifiedAttrs,
   std::map<string, TriggeredSubscription*>& subs,
   std::string&                              err,
   std::string                               tenant,
   const std::vector<std::string>&           servicePathV
 )
-{
-  std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
-  std::string               spathRegex      = "";
-  std::vector<std::string>  spathV;
+{  
+  std::string   servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
+  std::vector<CachedSubscription*>  subVec;
 
+  cacheSemTake(__FUNCTION__, "match subs for notifications");
+  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
 
-  //
-  // Create the REGEX for the Service Path
-  //
-  spathRegex = servicePathSubscriptionRegex(servicePath, spathV);
-  spathRegex = std::string("/") + spathRegex + "/";
-
-
-  /* Build query */
-  std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
-  std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
-  std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
-  std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-  std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
-  std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
-  BSONObj     spBson       = fromjson(inRegex);
-
-  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type. Only
-   * subscriptions for no pattern entities are queried, subscriptions for pattern entities are searched
-   * in the cache */
-  BSONObj query = BSON(
-                entIdQ << entityId <<
-                "$or" << BSON_ARRAY(
-                    BSON(entTypeQ << entityType) <<
-                    BSON(entTypeQ << BSON("$exists" << false))) <<
-                entPatternQ << "false" <<
-                condTypeQ << ON_CHANGE_CONDITION <<
-                condValueQ << attr <<
-                CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                CSUB_SERVICE_PATH << spBson);
-
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getSubscribeContextCollectionName(tenant).c_str(),
-                  query.toString().c_str()));
-
-  /* Do the query */
-  auto_ptr<DBClientCursor> cursor;
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), query, &cursor, &err))
-  {
-    return false;
-  }
-
-  /* For each of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
-  {
-    BSONObj      sub      = cursor->next();
-    BSONElement  idField  = getField(sub, "_id");
-
-    //
-    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
-    //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get
-    // an exception and the broker crashes.
-    //
-    if (idField.eoo() == true)
-    {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
-      continue;
-    }
-
-    std::string subIdStr = idField.OID().toString();
-
-    if (subs.count(subIdStr) == 0)
-    {
-      LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
-
-      long long throttling       = sub.hasField(CSUB_THROTTLING) ? getField(sub, CSUB_THROTTLING).numberLong() : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? getIntField(sub, CSUB_LASTNOTIFICATION) : -1;
-
-      TriggeredSubscription* trigs = new TriggeredSubscription
-        (
-          throttling,
-          lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
-          STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub),
-          "",  // No subscriptionId as the sub-cache is not used for non-isPattern subscriptions
-          ""   // No tenant as the sub-cache is not used for non-isPattern subscriptions
-        );
-
-      subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
-    }
-  }
-
-
-  //
-  // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
-  //
-
-  std::vector<CachedSubscription*> subVec;
-
-  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
+  LM_T(LmtMongoSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
@@ -1237,6 +1150,7 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
+      LM_T(LmtMongoSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
 
@@ -1249,13 +1163,17 @@ static bool addTriggeredSubscriptions_withCache
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
-        LM_T(LmtMongoSubCache, ("subscription '%s' ignored due to throttling", cSubP->subscriptionId));
+        LM_T(LmtMongoSubCache, ("subscription '%s' ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                                cSubP->subscriptionId,
+                                cSubP->throttling,
+                                cSubP->lastNotificationTime,
+                                now,
+                                now - cSubP->lastNotificationTime,
+                                cSubP->throttling));
         continue;
       }
       else
       {
-        cSubP->pendingNotifications += 1;
-
         LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                                 cSubP->subscriptionId,
                                 cSubP->throttling,
@@ -1267,8 +1185,6 @@ static bool addTriggeredSubscriptions_withCache
     }
     else
     {
-      cSubP->pendingNotifications += 1;
-
       LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                               cSubP->subscriptionId,
                               cSubP->throttling,
@@ -1288,6 +1204,8 @@ static bool addTriggeredSubscriptions_withCache
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
+  cacheSemGive(__FUNCTION__, "match subs for notifications");
+
   return true;
 }
 
@@ -1303,7 +1221,7 @@ static bool addTriggeredSubscriptions_noCache
 (
   std::string                               entityId,
   std::string                               entityType,
-  std::string                               attr,
+  const std::vector<std::string>&           modifiedAttrs,
   std::map<string, TriggeredSubscription*>& subs,
   std::string&                              err,
   std::string                               tenant,
@@ -1311,14 +1229,13 @@ static bool addTriggeredSubscriptions_noCache
 )
 {
   std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
-  std::string               spathRegex      = "";
   std::vector<std::string>  spathV;
+  std::string               spathRegex      = servicePathSubscriptionRegex(servicePath, spathV);
 
 
   //
   // Create the REGEX for the Service Path
   //
-  spathRegex = servicePathSubscriptionRegex(servicePath, spathV);
   spathRegex = std::string("/") + spathRegex + "/";
 
 
@@ -1331,6 +1248,14 @@ static bool addTriggeredSubscriptions_noCache
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
+  /* Build attribute list */
+  BSONArrayBuilder ba;
+  for (unsigned int ix = 0; ix < modifiedAttrs.size(); ++ix)
+  {
+    ba.append(modifiedAttrs[ix]);
+  }
+  BSONArray attrs = ba.arr();
+
   /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
   BSONObj queryNoPattern = BSON(
                 entIdQ << entityId <<
@@ -1339,7 +1264,7 @@ static bool addTriggeredSubscriptions_noCache
                     BSON(entTypeQ << BSON("$exists" << false))) <<
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
-                condValueQ << attr <<
+                condValueQ << BSON("$in" << attrs) <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_SERVICE_PATH << spBson);
 
@@ -1368,7 +1293,7 @@ static bool addTriggeredSubscriptions_noCache
 
   queryPattern.append(entPatternQ, "true");
   queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
-  queryPattern.append(condValueQ, attr);
+  queryPattern.append(condValueQ, BSON("$in" << attrs));
   queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.append(CSUB_SERVICE_PATH, spBson);
   queryPattern.appendCode("$where", function);
@@ -1391,9 +1316,15 @@ static bool addTriggeredSubscriptions_noCache
 
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj      sub      = cursor->next();
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      continue;
+    }
     BSONElement  idField  = sub.getField("_id");
 
     //
@@ -1414,15 +1345,15 @@ static bool addTriggeredSubscriptions_noCache
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
+      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
+      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
-          STR_FIELD(sub, CSUB_REFERENCE),
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
+          getStringField(sub, CSUB_REFERENCE),
           //subToAttributeList(sub)); signature changed in TriggeredSubscription() constructor in 0.24.0
           subToAttributeList(sub), "", "");
 
@@ -1439,16 +1370,12 @@ static bool addTriggeredSubscriptions_noCache
 *
 * addTriggeredSubscriptions - 
 *
-* FIXME P3: The functions addTriggeredSubscriptions_noCache and
-*           addTriggeredSubscriptions_withCache share a lot of code and a few
-*           helper functions should be extracted to avoid the copies of source code.
-*           
 */
 static bool addTriggeredSubscriptions
 (
   std::string                               entityId,
   std::string                               entityType,
-  std::string                               attr,
+  const std::vector<std::string>&           modifiedAttrs,
   std::map<string, TriggeredSubscription*>& subs,
   std::string&                              err,
   std::string                               tenant,
@@ -1459,12 +1386,91 @@ static bool addTriggeredSubscriptions
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
   }
+}
+
+/* ****************************************************************************
+*
+* processOnChangeConditionForUpdateContext -
+*
+* This method returns true if the notification was actually send. Otherwise, false
+* is returned. This is used in the caller to know if lastNotification field in the
+* subscription document in csubs collection has to be modified or not.
+*/
+static bool processOnChangeConditionForUpdateContext
+(
+  ContextElementResponse*          notifyCerP,
+  const AttributeList&             attrL,
+  std::string                      subId,
+  std::string                      notifyUrl,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken
+)
+{
+  NotifyContextRequest   ncr;
+  ContextElementResponse cer;
+  cer.contextElement.entityId.fill(&notifyCerP->contextElement.entityId);
+
+  /* Fill NotifyContextRequest with cerP, filtering by attrL */
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+
+    if (attrL.size() == 0)
+    {
+      /* Empty attribute list in the subscription mean that all attributes are added */
+      cer.contextElement.contextAttributeVector.push_back(caP);
+    }
+    else
+    {
+      for (unsigned int jx = 0; jx < attrL.size(); jx++)
+      {
+        /* 'skip' field is used to mark deleted attributes that must not be included in the
+         * notification (see deleteAttrInNotifyCer function for details) */
+        if (caP->name == attrL.get(jx) && !caP->skip)
+        {
+          cer.contextElement.contextAttributeVector.push_back(caP);
+        }
+      }
+    }
+  }
+
+  /* Early exit without sending notification if attribute list is empty */
+  if (cer.contextElement.contextAttributeVector.size() == 0)
+  {
+    ncr.contextElementResponseVector.release();
+    return false;
+  }
+
+  /* Setting status code in CER */
+  cer.statusCode.fill(SccOk);
+
+  ncr.contextElementResponseVector.push_back(&cer);
+
+  /* Complete the fields in NotifyContextRequest */
+  ncr.subscriptionId.set(subId);
+  // FIXME: we use a proper origin name
+  ncr.originator.set("localhost");
+
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* processOntimeIntervalCondition -
+*/
+void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant)
+{
+  getNotifier()->createIntervalThread(subId, interval, tenant);
 }
 
 
@@ -1474,12 +1480,11 @@ static bool addTriggeredSubscriptions
 */
 static bool processSubscriptions
 (
-  const EntityId*                           enP,
   std::map<string, TriggeredSubscription*>& subs,
+  ContextElementResponse*                   notifyCerP,
   std::string*                              err,
   const std::string&                        tenant,
-  const std::string&                        xauthToken,
-  std::vector<std::string>                  servicePathV
+  const std::string&                        xauthToken
 )
 {
   bool ret = true;
@@ -1499,7 +1504,7 @@ static bool processSubscriptions
       if (trigs->throttling > sinceLastNotification)
       {
         LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
-
+        LM_T(LmtMongoSubCache, ("ignored '%s' due to throttling, current time is: %l", trigs->cacheSubId.c_str(), current));
         trigs->attrL.release();
         delete trigs;
 
@@ -1507,71 +1512,67 @@ static bool processSubscriptions
       }
     }
 
-    /* Build entities vector */
-    EntityIdVector enV;
-    enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
-
     /* Send notification */
-    if (processOnChangeCondition(enV,
-                                 trigs->attrL,
-                                 NULL,
-                                 mapSubId,
-                                 trigs->reference,
-                                 trigs->format,
-                                 tenant,
-                                 xauthToken,
-                                 servicePathV))
+    LM_T(LmtMongoSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
+    if (processOnChangeConditionForUpdateContext(notifyCerP,
+                                                 trigs->attrL,
+                                                 mapSubId,
+                                                 trigs->reference,
+                                                 trigs->format,
+                                                 tenant,
+                                                 xauthToken))
     {
-      BSONObj query = BSON("_id" << OID(mapSubId));
-      BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) <<
-                            "$inc" << BSON(CSUB_COUNT << 1));
+      long long rightNow = getCurrentTime();
 
-      if (collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err))
+      //
+      // If broker running without subscription cache, put lastNotificationTime and count in DB 
+      //
+      if (mongoSubCacheActive == false)
       {
-        //
-        // Saving lastNotificationTime for cached subscription
-        //
-        if (trigs->cacheSubId != "")
-        {
-          CachedSubscription* cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
-
-          if (cSubP != NULL)
-          {
-            cSubP->pendingNotifications -= 1;
-            LM_T(LmtMongoSubCache, ("Found sub '%s', set its pendingNotifications to %d", trigs->cacheSubId.c_str(), cSubP->pendingNotifications));
-
-            if (cSubP->pendingNotifications == 0)
-            {
-              cSubP->lastNotificationTime = getCurrentTime();
-              LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s'", cSubP->lastNotificationTime, cSubP->subscriptionId));
-            }
-            else
-            {
-              LM_T(LmtMongoSubCache, ("Not touching lastNotificationTime for sub '%s' - its pendingNotifications == %d", cSubP->subscriptionId, cSubP->pendingNotifications));
-            }
-          }
-          else
-          {
-            LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
-                  trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
-          }
-        }
+        BSONObj query  = BSON("_id" << OID(mapSubId));
+        BSONObj update = BSON("$set" <<
+                              BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                              "$inc" << BSON(CSUB_COUNT << 1));
+        
+        ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
-      else
+
+
+      //
+      // Saving lastNotificationTime and count for cached subscription
+      //
+      if (trigs->cacheSubId != "")
       {
-        ret = false;
+        cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
+
+        CachedSubscription*  cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
+
+        if (cSubP != NULL)
+        {
+          cSubP->lastNotificationTime = rightNow;
+          cSubP->count               += 1;
+
+          LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
+        }
+        else
+        {
+          LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
+                trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
+        }
+
+        cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
       }
     }
 
     /* Release object created dynamically (including the value in the map created by addTriggeredSubscriptions */
     trigs->attrL.release();
-    enV.release();
     delete trigs;
   }
 
   subs.clear();
   return ret;
 }
+
 
 
 /* ****************************************************************************
@@ -1671,6 +1672,107 @@ static unsigned int howManyAttrs(BSONObj& attrs, std::string& attrName)
 
 /* ****************************************************************************
 *
+* updateAttrInNotifyCer -
+*
+*/
+static void updateAttrInNotifyCer
+(
+  ContextElementResponse* notifyCerP,
+  ContextAttribute*       targetAttr
+)
+{
+  /* Try to find the attribute in the notification CER */
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+
+    if (caP->name == targetAttr->name)
+    {
+      if (targetAttr->valueType != ValueTypeNone)
+      {
+        caP->valueType      = targetAttr->valueType;
+        caP->stringValue    = targetAttr->stringValue;
+        caP->boolValue      = targetAttr->boolValue;
+        caP->numberValue    = targetAttr->numberValue;
+
+        // Free memory used by the all compound value (if any)
+        if (caP->compoundValueP != NULL)
+        {
+          delete caP->compoundValueP;
+        }
+        caP->compoundValueP = targetAttr->compoundValueP == NULL ? NULL : targetAttr->compoundValueP->clone();
+      }
+      if (targetAttr->type != "")
+      {
+        caP->type = targetAttr->type;
+      }
+
+      /* Metadata */
+      for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
+      {
+        Metadata* targetMdP = targetAttr->metadataVector.get(jx);
+        /* Search for matching medatat in the CER attribute */
+        bool matchMd = false;
+        for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
+        {
+          Metadata* mdP = caP->metadataVector.get(kx);
+          if (mdP->name == targetMdP->name)
+          {
+            mdP->valueType   = targetMdP->valueType;
+            mdP->stringValue = targetMdP->stringValue;
+            mdP->boolValue   = targetMdP->boolValue;
+            mdP->numberValue = targetMdP->numberValue;
+            if (targetMdP->type != "")
+            {
+              mdP->type = targetMdP->type;
+            }
+            matchMd = true;
+            break;   /* kx  loop */
+          }
+        }
+
+        /* If the attribute in target attr was not found, then it has to be added*/
+        if (!matchMd)
+        {
+          Metadata* newMdP = new Metadata(targetMdP);
+          caP->metadataVector.push_back(newMdP);
+        }
+      }
+
+      return;
+    }
+  }
+
+  /* Reached this point, it means that it is a new attribute (APPEND case) */
+  ContextAttribute* caP = new ContextAttribute(targetAttr);
+  notifyCerP->contextElement.contextAttributeVector.push_back(caP);
+}
+
+/* ****************************************************************************
+*
+* deleteAttrInNotifyCer -
+*
+* The deletion algorithm is based on using the 'skip' flag in CA in order to
+* mark attributes that must not be render in the notificationMode
+*/
+static void deleteAttrInNotifyCer
+(
+  ContextElementResponse* notifyCerP,
+  ContextAttribute*       targetAttr
+)
+{  
+  for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
+  {
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.get(ix);
+    if (caP->name == targetAttr->name)
+    {
+      caP->skip = true;
+    }
+  }
+}
+
+/* ****************************************************************************
+*
 * updateContextAttributeItem -
 *
 */
@@ -1680,6 +1782,7 @@ static bool updateContextAttributeItem
   ContextAttribute*         ca,
   BSONObj&                  attrs,
   ContextAttribute*         targetAttr,
+  ContextElementResponse*   notifyCerP,
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
@@ -1695,6 +1798,7 @@ static bool updateContextAttributeItem
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace))
   {
     entityModified = actualUpdate || entityModified;
+    updateAttrInNotifyCer(notifyCerP, targetAttr);
   }
   else
   {
@@ -1761,9 +1865,9 @@ static bool updateContextAttributeItem
 static bool appendContextAttributeItem
 (
   ContextElementResponse*   cerP,
-  ContextAttribute*         ca,
   BSONObj&                  attrs,
   ContextAttribute*         targetAttr,
+  ContextElementResponse*   notifyCerP,
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
   BSONArrayBuilder*         toPush,
@@ -1778,6 +1882,7 @@ static bool appendContextAttributeItem
   {
     appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
     entityModified = actualUpdate || entityModified;
+    updateAttrInNotifyCer(notifyCerP, targetAttr);
 
     /* Check aspects related with location */
     if (targetAttr->getLocation().length() > 0)
@@ -1851,6 +1956,7 @@ static bool deleteContextAttributeItem
   ContextAttribute*                     ca,
   BSONObj&                              attrs,
   ContextAttribute*                     targetAttr,
+  ContextElementResponse*               notifyCerP,
   EntityId*                             eP,
   BSONObjBuilder*                       toUnset,
   bool&                                 entityModified,
@@ -1860,6 +1966,7 @@ static bool deleteContextAttributeItem
 {
   if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
   {
+    deleteAttrInNotifyCer(notifyCerP, targetAttr);
     entityModified = true;
 
     /* Check aspects related with location */
@@ -1916,6 +2023,7 @@ static bool processContextAttributeVector
   ContextElement*                            ceP,
   std::string                                action,
   std::map<string, TriggeredSubscription*>&  subsToNotify,
+  ContextElementResponse*                    notifyCerP,
   BSONObj&                                   attrs,
   BSONObjBuilder*                            toSet,
   BSONObjBuilder*                            toUnset,
@@ -1926,8 +2034,7 @@ static bool processContextAttributeVector
   double&                                    coordLat,
   double&                                    coordLong,
   std::string                                tenant,
-  const std::vector<std::string>&            servicePathV,
-  const std::string&                         apiVersion
+  const std::vector<std::string>&            servicePathV
 )
 {
   EntityId*                            eP              = &cerP->contextElement.entityId;
@@ -1935,6 +2042,7 @@ static bool processContextAttributeVector
   std::string                          entityType      = cerP->contextElement.entityId.type;
   bool                                 entityModified  = false;
   std::map<std::string, unsigned int>  deletedAttributesCounter;  // Aux var for DELETE operations
+  std::vector<std::string>             modifiedAttrs;
 
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
@@ -1960,6 +2068,7 @@ static bool processContextAttributeVector
                                       ca,
                                       attrs,
                                       targetAttr,
+                                      notifyCerP,
                                       eP,
                                       toSet,
                                       toPush,
@@ -1975,14 +2084,34 @@ static bool processContextAttributeVector
     }
     else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
     {
-      if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
+      if (!appendContextAttributeItem(cerP,
+                                      attrs,
+                                      targetAttr,
+                                      notifyCerP,
+                                      eP,
+                                      toSet,
+                                      toPush,
+                                      actualUpdate,
+                                      entityModified,
+                                      locAttr,
+                                      coordLat,
+                                      coordLong))
       {
         return false;
       }
     }
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
-      if (!deleteContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toUnset, entityModified, locAttr, &deletedAttributesCounter))
+      if (!deleteContextAttributeItem(cerP,
+                                      ca,
+                                      attrs,
+                                      targetAttr,
+                                      notifyCerP,
+                                      eP,
+                                      toUnset,
+                                      entityModified,
+                                      locAttr,
+                                      &deletedAttributesCounter))
       {
         return false;
       }
@@ -1996,18 +2125,12 @@ static bool processContextAttributeVector
       return false;
     }
 
-    /* Add those ONCHANGE subscription triggered by the just processed attribute. Note that
-     * actualUpdate is always true in the case of  "delete" or "append", so the if statement
-     * is "bypassed" */
+    /* Add the attribute to the list of modifiedAttrs, in order to check at the end if it triggers some
+     * ONCHANGE subscription. Note that actualUpdate is always true in the case of  "delete" or "append",
+     * so the if statement is "bypassed" */
     if (actualUpdate)
     {
-      std::string err;
-
-      if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
-      {
-        cerP->statusCode.fill(SccReceiverInternalError, err);
-        return false;
-      }
+      modifiedAttrs.push_back(ca->name);
     }
   }
 
@@ -2032,6 +2155,14 @@ static bool processContextAttributeVector
         toPull->append(attrName);
       }
     }
+  }
+
+  /* Add triggered ONCHANGE subscriptions */
+  std::string err;
+  if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  {
+    cerP->statusCode.fill(SccReceiverInternalError, err);
+    return false;
   }
 
 #if 0
@@ -2324,31 +2455,17 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 }
 
 
-
 /* ****************************************************************************
 *
-* processContextElement -
-*
-* 0. Preparations
-* 1. Preconditions
-* 2. Get the complete list of entities from mongo
-*
+* contextElementPreconditionsCheck -
 */
-void processContextElement
+static bool contextElementPreconditionsCheck
 (
-  ContextElement*                      ceP,
-  UpdateContextResponse*               responseP,
-  const std::string&                   action,
-  const std::string&                   tenant,
-  const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
-  const std::string&                   xauthToken,
-  const std::string&                   apiVersion,
-  bool                                 checkEntityExistance
+  ContextElement*         ceP,
+  UpdateContextResponse*  responseP,
+  const std::string&      action
 )
 {
-  bool          attributeAlreadyExistsError = false;
-  std::string   attributeAlreadyExistsList  = "[ ";
 
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
@@ -2357,7 +2474,7 @@ void processContextElement
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    return;  // Error already in responseP
+    return false;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
@@ -2379,17 +2496,49 @@ void processContextElement
                                   " - offending attribute: " + aP->name +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return; // Error already in responseP
+        return false; // Error already in responseP
       }
     }
   }
 
+  return true;
+
+}
+
+/* ****************************************************************************
+*
+* processContextElement -
+*
+* 1. Preconditions
+* 2. Get the complete list of entities from mongo
+*
+*/
+void processContextElement
+(
+  ContextElement*                      ceP,
+  UpdateContextResponse*               responseP,
+  const std::string&                   action,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
+  const std::string&                   xauthToken,
+  const std::string&                   apiVersion,
+  bool                                 checkEntityExistance
+)
+{
+  /* Check preconditions */
+  if (!contextElementPreconditionsCheck(ceP, responseP, action))
+  {
+    return; // Error already in responseP
+  }
 
   /* Find entities (could be several, in the case of no type or isPattern=true) */
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
   BSONObjBuilder     bob;
+
+  EntityId* enP = &ceP->entityId;
 
   bob.append(idString, enP->id);
 
@@ -2480,10 +2629,18 @@ void processContextElement
   //
   int docs = 0;
 
-  while (cursor->more())
-  {
-    BSONObj r = cursor->next();
+  // Used to accumulate error response information, checked at the end
+  bool         attributeAlreadyExistsError = false;
+  std::string  attributeAlreadyExistsList  = "[ ";
 
+  while (moreSafe(cursor))
+  {
+    BSONObj r;
+    if (!nextSafeOrError(cursor, &r, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      continue;
+    }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
     ++docs;
 
@@ -2501,9 +2658,9 @@ void processContextElement
       continue;
     }
 
-    std::string entityId    = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_ID);
-    std::string entityType  = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_TYPE);
-    std::string entitySPath = STR_FIELD(idField.embeddedObject(), ENT_SERVICE_PATH);
+    std::string entityId    = getStringField(idField.embeddedObject(), ENT_ENTITY_ID);
+    std::string entityType  = getStringField(idField.embeddedObject(), ENT_ENTITY_TYPE);
+    std::string entitySPath = getStringField(idField.embeddedObject(), ENT_SERVICE_PATH);
 
     LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
@@ -2585,9 +2742,14 @@ void processContextElement
       attributeAlreadyExistsList += " ]";
     }
 
+    /* Build CER used for notifying (if needed) */
+    AttributeList emptyAttrL;
+    ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
+
     if (!processContextAttributeVector(ceP,
                                        action,
                                        subsToNotify,
+                                       notifyCerP,
                                        attrs,
                                        &toSet,
                                        &toUnset,
@@ -2598,15 +2760,21 @@ void processContextElement
                                        coordLat,
                                        coordLong,
                                        tenant,
-                                       servicePathV,
-                                       apiVersion))
+                                       servicePathV))
     {
-      /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
+      // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
+
+      //
       // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
       // in only one place
+      //
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
       responseP->contextElementResponseVector.push_back(cerP);
       releaseTriggeredSubscriptions(subsToNotify);
+
+      notifyCerP->release();
+      delete notifyCerP;
+      
       continue;
     }
 
@@ -2707,13 +2875,20 @@ void processContextElement
       cerP->statusCode.fill(SccReceiverInternalError, err);
       responseP->contextElementResponseVector.push_back(cerP);
       releaseTriggeredSubscriptions(subsToNotify);
+
+      notifyCerP->release();
+      delete notifyCerP;
+
       continue;
     }
 
     /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
      * previous addTriggeredSubscriptions() invocations */
     std::string err;
-    processSubscriptions(enP, subsToNotify, &err, tenant, xauthToken, servicePathV);
+
+    processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken);
+    notifyCerP->release();
+    delete notifyCerP;
 
     //
     // processSubscriptions cleans up the triggered subscriptions; this call here to
@@ -2722,7 +2897,7 @@ void processContextElement
     // ONE function.
     // The memory to free is allocated in the function addTriggeredSubscriptions.
     //
-    releaseTriggeredSubscriptions(subsToNotify);
+    releaseTriggeredSubscriptions(subsToNotify);    
 
     /* To finish with this entity processing, search for CPrs in not found attributes and
      * add the corresponding ContextElementResponse to the global response */
@@ -2801,25 +2976,35 @@ void processContextElement
         /* Successful creation: send potential notifications */
         std::map<string, TriggeredSubscription*> subsToNotify;
 
+        std::vector<std::string> attrNames;
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
         {
-          std::string err;
-
-          if (!addTriggeredSubscriptions(enP->id,
-                                         enP->type,
-                                         ceP->contextAttributeVector.get(ix)->name,
-                                         subsToNotify,
-                                         err,
-                                         tenant,
-                                         servicePathV))
-          {
-            cerP->statusCode.fill(SccReceiverInternalError, err);
-            responseP->contextElementResponseVector.push_back(cerP);
-            return;  // Error already in responseP
-          }
+          attrNames.push_back(ceP->contextAttributeVector.get(ix)->name);
+        }
+        if (!addTriggeredSubscriptions(enP->id,
+                                       enP->type,
+                                       attrNames,
+                                       subsToNotify,
+                                       err,
+                                       tenant,
+                                       servicePathV))
+        {
+          cerP->statusCode.fill(SccReceiverInternalError, err);
+          responseP->contextElementResponseVector.push_back(cerP);
+          return;  // Error already in responseP
         }
 
-        processSubscriptions(enP, subsToNotify, &errReason, tenant, xauthToken, servicePathV);
+        //
+        // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
+        // one item, so it should be safe to get item 0
+        //
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP);
+
+        notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
+        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
+
+        notifyCerP->release();
+        delete notifyCerP;
       }
 
       responseP->contextElementResponseVector.push_back(cerP);

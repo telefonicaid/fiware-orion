@@ -29,7 +29,6 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <algorithm>  // std::replace
 
 #include "mongo/client/dbclient.h"
 
@@ -46,7 +45,10 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/compoundResponses.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
@@ -54,7 +56,6 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
-#include "parse/CompoundValueNode.h"
 
 #include "common/wsStrip.h"
 
@@ -73,14 +74,6 @@ static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
-
-
-/* ****************************************************************************
-*
-* Forward declarations
-*/
-static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
-static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 
 
 /* ****************************************************************************
@@ -166,22 +159,6 @@ static DBClientBase* connection = NULL;
 
 /* ****************************************************************************
 *
-* mongoConnect -
-*
-* This method is intended for unit testing, that needs the DBClientConnection
-* object to be mocked.
-*
-*/
-bool mongoConnect(DBClientConnection* c)
-{
-  connection = c;
-
-  return true;
-}
-
-
-/* ****************************************************************************
-*
 * For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
 * given out using the function getMongoConnection().
 */
@@ -232,7 +209,11 @@ DBClientBase* getMongoConnection(void)
 */
 void releaseMongoConnection(DBClientBase* connection)
 {
-  mongoPoolConnectionRelease(connection);
+#ifdef UNIT_TEST
+  return;
+#else
+  return mongoPoolConnectionRelease(connection);
+#endif
 }
 
 
@@ -260,7 +241,7 @@ void setNotifier(Notifier* n)
 *
 * setDbPrefix -
 */
-void setDbPrefix(std::string _dbPrefix)
+void setDbPrefix(const std::string& _dbPrefix)
 {
   dbPrefix = _dbPrefix;
   LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
@@ -295,7 +276,7 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs)
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
-    std::string  dbName  = STR_FIELD(db, "name");
+    std::string  dbName  = getStringField(db, "name");
     std::string  prefix  = dbPrefix + "-";
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
@@ -318,7 +299,7 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs)
 * corresponding tenant name as result (myservice1) or "" if the string doesn't
 * start with the database prefix
 */
-std::string tenantFromDb(std::string& database)
+std::string tenantFromDb(const std::string& database)
 {
   std::string r;
   std::string prefix  = dbPrefix + "-";
@@ -345,7 +326,7 @@ std::string tenantFromDb(std::string& database)
 *
 * setEntitiesCollectionName -
 */
-void setEntitiesCollectionName(std::string name)
+void setEntitiesCollectionName(const std::string& name)
 {
   entitiesCollectionName = name;
 }
@@ -355,7 +336,7 @@ void setEntitiesCollectionName(std::string name)
 *
 * setRegistrationsCollectionName -
 */
-void setRegistrationsCollectionName(std::string name)
+void setRegistrationsCollectionName(const std::string& name)
 {
   registrationsCollectionName = name;
 }
@@ -365,7 +346,7 @@ void setRegistrationsCollectionName(std::string name)
 *
 * setSubscribeContextCollectionName -
 */
-void setSubscribeContextCollectionName(std::string name)
+void setSubscribeContextCollectionName(const std::string& name)
 {
   subscribeContextCollectionName = name;
 }
@@ -375,7 +356,7 @@ void setSubscribeContextCollectionName(std::string name)
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
-void setSubscribeContextAvailabilityCollectionName(std::string name)
+void setSubscribeContextAvailabilityCollectionName(const std::string& name)
 {
   subscribeContextAvailabilityCollectionName = name;
 }
@@ -399,7 +380,7 @@ static std::string composeCollectionName(std::string tenant, std::string colName
 *
 * Common helper function for composing database names
 */
-std::string composeDatabaseName(std::string tenant)
+std::string composeDatabaseName(const std::string& tenant)
 {
   std::string result;
 
@@ -423,7 +404,7 @@ std::string composeDatabaseName(std::string tenant)
 *
 * getEntitiesCollectionName -
 */
-std::string getEntitiesCollectionName(std::string tenant)
+std::string getEntitiesCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, entitiesCollectionName);
 }
@@ -433,7 +414,7 @@ std::string getEntitiesCollectionName(std::string tenant)
 *
 * getRegistrationsCollectionName -
 */
-std::string getRegistrationsCollectionName(std::string tenant)
+std::string getRegistrationsCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, registrationsCollectionName);
 }
@@ -443,7 +424,7 @@ std::string getRegistrationsCollectionName(std::string tenant)
 *
 * getSubscribeContextCollectionName -
 */
-std::string getSubscribeContextCollectionName(std::string tenant)
+std::string getSubscribeContextCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, subscribeContextCollectionName);
 }
@@ -453,7 +434,7 @@ std::string getSubscribeContextCollectionName(std::string tenant)
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
-std::string getSubscribeContextAvailabilityCollectionName(std::string tenant)
+std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
@@ -479,7 +460,7 @@ bool mongoLocationCapable(void)
 *
 * ensureLocationIndex -
 */
-void ensureLocationIndex(std::string tenant)
+void ensureLocationIndex(const std::string& tenant)
 {
   /* Ensure index for entity locations, in the case of using 2.4 */
   if (mongoLocationCapable())
@@ -511,10 +492,14 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   }
 
   // Call the treat function for each subscription
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj sub = cursor->next();
-
+    BSONObj sub;
+    if (!nextSafeOrError(cursor, &sub, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      continue;
+    }
     treatFunction(tenant, sub);
   }
 }
@@ -550,9 +535,9 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   {
     BSONObj condition = condV[ix].embeddedObject();
 
-    if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
+    if (strcmp(getStringField(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
-      int interval = getIntField(condition, CSUB_CONDITIONS_VALUE);
+      int interval = getField(condition, CSUB_CONDITIONS_VALUE).numberLong();
 
       LM_T(LmtNotifier, ("creating ONTIMEINTERVAL thread for subscription '%s' with interval %d (tenant '%s')",
                          subId.c_str(),
@@ -568,7 +553,7 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 *
 * recoverOntimeIntervalThreads -
 */
-void recoverOntimeIntervalThreads(std::string tenant)
+void recoverOntimeIntervalThreads(const std::string& tenant)
 {
   treatOnTimeIntervalSubscriptions(tenant, recoverOnTimeIntervalThread);
 }
@@ -600,7 +585,7 @@ static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 *
 * This function is only to be used under harakiri mode, not for real use
 */
-void destroyAllOntimeIntervalThreads(std::string tenant)
+void destroyAllOntimeIntervalThreads(const std::string& tenant)
 {
   treatOnTimeIntervalSubscriptions(tenant, destroyOnTimeIntervalThread);
 }
@@ -660,58 +645,23 @@ bool includedEntity(EntityId en, EntityIdVector& entityIdV)
   return false;
 }
 
-
 /* ****************************************************************************
 *
 * includedAttribute -
 */
-bool includedAttribute(ContextRegistrationAttribute attr, AttributeList* attrsV)
+bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV)
 {
   // This i's the case in which the discoverAvailabilityRequest doesn't include attributes,
   // so all the attributes are included in the response
   //
-  if (attrsV->size() == 0)
+  if (attrsV.size() == 0)
   {
     return true;
   }
 
-  for (unsigned int ix = 0; ix < attrsV->size(); ++ix)
+  for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV->get(ix) == attr.name)
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-/* ****************************************************************************
-*
-* includedAttribute -
-*
-* FIXME: note that in the current implementation, in which we only use 'name' to
-* compare, this function is equal to the one for ContextRegistrationAttrribute.
-* However, we keep them separated, as isDomain (present in ContextRegistrationAttribute
-* but not in ContextRegistration could mean a difference). To review once domain attributes
-* get implemented.
-*
-*/
-bool includedAttribute(ContextAttribute attr, AttributeList* attrsV)
-{
-  //
-  // This is the case in which the queryContextRequest doesn't include attributes,
-  // so all the attributes are included in the response
-  //
-  if (attrsV->size() == 0)
-  {
-    return true;
-  }
-
-  for (unsigned int ix = 0; ix < attrsV->size(); ++ix)
-  {
-    if (attrsV->get(ix) == attr.name)
+    if (attrsV.get(ix) == attr.name)
     {
       return true;
     }
@@ -726,7 +676,7 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV)
 * fillQueryEntity -
 *
 */
-static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
+static void fillQueryEntity(BSONArrayBuilder& ba, const EntityId* enP)
 {
   BSONObjBuilder     ent;
   const std::string  idString          = "_id." ENT_ENTITY_ID;
@@ -834,91 +784,6 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 }
 
 
-/* ****************************************************************************
-*
-* addCompoundNode -
-*
-*/
-static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
-{
-  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != Object) && (e.type() != Array))
-  {
-    LM_T(LmtSoftError, ("unknown BSON type"));
-    return;
-  }
-
-  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
-  child->name = e.fieldName();
-
-  switch (e.type())
-  {
-  case String:
-    child->valueType  = orion::ValueTypeString;
-    child->stringValue = e.String();
-    break;
-
-  case Bool:
-    child->valueType  = orion::ValueTypeBoolean;
-    child->boolValue = e.Bool();
-    break;
-
-  case NumberDouble:
-    child->valueType  = orion::ValueTypeNumber;
-    child->numberValue = e.Number();
-    break;
-
-  case Object:
-    compoundObjectResponse(child, e);
-    break;
-
-  case Array:
-    compoundVectorResponse(child, e);
-    break;
-
-  default:
-    //
-    // We need the default clause to avoid 'enumeration value X not handled in switch' errors
-    // due to -Werror=switch at compilation time
-    //
-    break;
-  }
-
-  cvP->add(child);
-}
-
-
-/* ****************************************************************************
-*
-* compoundObjectResponse -
-*/
-static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be)
-{
-  BSONObj obj = be.embeddedObject();
-
-  cvP->valueType = orion::ValueTypeObject;
-  for (BSONObj::iterator i = obj.begin(); i.more();)
-  {
-    BSONElement e = i.next();
-    addCompoundNode(cvP, e);
-  }
-}
-
-
-/* ****************************************************************************
-*
-* compoundVectorResponse -
-*/
-static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be)
-{
-  std::vector<BSONElement> vec = be.Array();
-
-  cvP->valueType = orion::ValueTypeVector;
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    BSONElement e = vec[ix];
-    addCompoundNode(cvP, e);
-  }
-}
 
 
 /* *****************************************************************************
@@ -928,7 +793,7 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
 * Returns true if areaQuery was filled, false otherwise
 *
 */
-static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
+static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 {
   if (!mongoLocationCapable())
   {
@@ -999,6 +864,7 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
   return true;
 }
 
+
 /* ****************************************************************************
 *
 * qStringFilters -
@@ -1007,7 +873,7 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
 * make comparisons work. An smarter solution could be developed.
 *
 */
-static void qStringFilters(std::string& in, std::vector<BSONObj>& filters)
+static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 {
   char* str         = strdup(in.c_str());
   char* toFree      = str;
@@ -1375,7 +1241,7 @@ static void qStringFilters(std::string& in, std::vector<BSONObj>& filters)
 * addFilterScopes -
 *
 */
-static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
+static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
 {
   std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
@@ -1399,35 +1265,6 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
   }
 }
 
-/* ****************************************************************************
-*
-* bsonToMetadata -
-*/
-Metadata* bsonToMetadata(BSONObj& mdB)
-{
-  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE) : "";
-
-  switch (getField(mdB, ENT_ATTRS_MD_VALUE).type())
-  {
-  case String:
-    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getStringField(mdB, ENT_ATTRS_MD_VALUE));
-    break;
-
-  case NumberDouble:
-    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getField(mdB, ENT_ATTRS_MD_VALUE).Number());
-    break;
-
-  case Bool:
-    return new Metadata(getStringField(mdB, ENT_ATTRS_MD_NAME), type, getBoolField(mdB, ENT_ATTRS_MD_VALUE));
-    break;
-
-  default:  // Just to avoid compilation error about missing constants ...
-    break;
-  }
-
-  LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
-  return NULL;  
-}
 
 /* ****************************************************************************
 *
@@ -1445,13 +1282,13 @@ Metadata* bsonToMetadata(BSONObj& mdB)
 */
 bool entitiesQuery
 (
-  EntityIdVector                   enV,
-  AttributeList                    attrL,
-  Restriction                      res,
+  const EntityIdVector&            enV,
+  const AttributeList&             attrL,
+  const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   bool                             includeEmpty,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset,
   int                              limit,
@@ -1511,7 +1348,7 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
-    Scope* sco = res.scopeVector.get(ix);
+    const Scope* sco = res.scopeVector.get(ix);
 
     if (sco->type.find(SCOPE_FILTER) == 0)
     {
@@ -1566,16 +1403,19 @@ bool entitiesQuery
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj                 r    = cursor->next();
-    std::string             err  = getStringField(r, "$err");
-    ContextElementResponse* cer  = new ContextElementResponse();
-
-    LM_T(LmtMongo, ("result: %s", r.toString().c_str()));
-
-    if (err != "")
+    BSONObj  r;
+    try
     {
+      // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
+      r = cursor->nextSafe();
+    }
+    catch (const AssertionException &e)
+    {
+      std::string              exErr = e.what();
+      ContextElementResponse*  cer   = new ContextElementResponse();
+
       //
       // We can't return the error 'as is', as it may contain forbidden characters.
       // So, we can just match the error and send a less descriptive text.
@@ -1583,17 +1423,16 @@ bool entitiesQuery
       const char* invalidPolygon      = "Exterior shell of polygon is invalid";
       const char* defaultErrorString  = "Error at querying MongoDB";
 
-      LM_W(("Database Error (%s)", err.c_str()));
+      LM_W(("Database Error (%s)", exErr.c_str()));
 
-      if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
+      if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
       {
-        err = invalidPolygon;
+        exErr = invalidPolygon;
       }
       else
       {
-        err = defaultErrorString;
+        exErr = defaultErrorString;
       }
-
 
       //
       // It would be nice to fill in the entity but it is difficult to do this.
@@ -1611,141 +1450,27 @@ bool entitiesQuery
         cer->contextElement.entityId.fill("", "", "");
       }
 
-      cer->statusCode.fill(SccReceiverInternalError, err);
+      cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
       return true;
     }
-
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-    cer->statusCode.fill(SccOk);
-
-    /* Entity part */
-
-    BSONObj queryEntity = getObjectField(r, "_id");
-
-    cer->contextElement.entityId.id          = STR_FIELD(queryEntity, ENT_ENTITY_ID);
-    cer->contextElement.entityId.type        = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
-    cer->contextElement.entityId.servicePath = STR_FIELD(queryEntity, ENT_SERVICE_PATH);
-    cer->contextElement.entityId.isPattern   = "false";
-
-    /* Get the location attribute (if it exists) */
-    std::string locAttr;
-    if (r.hasElement(ENT_LOCATION))
+    catch (const std::exception &e)
     {
-      locAttr = getStringField(getObjectField(r, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
-    }
-
-    /* Attributes part */
-    BSONObj queryAttrs;
-
-    //
-    // This try/catch should not be necessary as all document in the entities collection have an attrs embedded document
-    // from creation time. However, it adds an extra protection, just in case.
-    // Somebody *could* manipulate the mongo database and if so, the broker would crash here.
-    // Better to be on the safe side ...
-    //
-    try
-    {
-      queryAttrs = getField(r, ENT_ATTRS).embeddedObject();
+      *err = e.what();
+      LM_E(("Runtime Error (exception in nextSafe(): %s)", e.what()));
+      return false;
     }
     catch (...)
     {
-      LM_E(("Database Error (no attrs array in document of entities collection)"));
-      cer->statusCode.fill(SccReceiverInternalError, "attrs field missing in entity document");
-      cerV->push_back(cer);
-
-      return true;
+      *err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      return false;
     }
 
-    std::set<std::string> attrNames;
-
-    queryAttrs.getFieldNames(attrNames);
-    for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-    {
-      std::string       attrName   = *i;
-      BSONObj           queryAttr  = getField(queryAttrs, attrName).embeddedObject();
-      ContextAttribute  ca;
-
-      ca.name          = dbDotDecode(basePart(attrName));
-      std::string mdId = idPart(attrName);
-      ca.type          = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
-
-      /* Note that includedAttribute decision is based on name and type. Value is set only if
-       * decision is positive
-       */
-      if (includedAttribute(ca, &attrL))
-      {
-        ContextAttribute* caP;
-
-        switch(getField(queryAttr, ENT_ATTRS_VALUE).type())
-        {
-        case String:
-          ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
-          if (!includeEmpty && ca.stringValue.length() == 0)
-          {
-            continue;
-          }
-          caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
-          break;
-
-        case NumberDouble:
-          ca.numberValue = getField(queryAttr, ENT_ATTRS_VALUE).Number();
-          caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
-          break;
-
-        case Bool:
-          ca.boolValue = getBoolField(queryAttr, ENT_ATTRS_VALUE);
-          caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
-          break;
-
-        case Object:
-          caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
-          compoundObjectResponse(caP->compoundValueP, getField(queryAttr, ENT_ATTRS_VALUE));
-          break;
-
-        case Array:
-          caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
-          compoundVectorResponse(caP->compoundValueP, getField(queryAttr, ENT_ATTRS_VALUE));
-          break;
-
-        default:
-          LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(queryAttr, ENT_ATTRS_VALUE).type()));
-          continue;
-        }
-
-        /* Setting ID (if found) */
-        if (mdId != "")
-        {
-          Metadata* md = new Metadata(NGSI_MD_ID, "string", mdId);
-
-          caP->metadataVector.push_back(md);
-        }
-
-        if (locAttr == ca.name)
-        {
-          Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
-
-          caP->metadataVector.push_back(md);
-        }
-
-        /* Setting custom metadata (if any) */
-        if (queryAttr.hasField(ENT_ATTRS_MD))
-        {
-          std::vector<BSONElement> metadataV = getField(queryAttr, ENT_ATTRS_MD).Array();
-
-          for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
-          {
-            BSONObj    metadata = metadataV[ix].embeddedObject();
-            Metadata*  md = bsonToMetadata(metadata);
-            caP->metadataVector.push_back(md);
-          }
-        }
-
-        cer->contextElement.contextAttributeVector.push_back(caP);
-      }
-    }
+    // Build CER from BSON retrieved from DB
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty);
+    cer->statusCode.fill(SccOk);
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
@@ -1898,8 +1623,8 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
 {
   EntityId en;
 
-  en.id = STR_FIELD(entity, REG_ENTITY_ID);
-  en.type = STR_FIELD(entity, REG_ENTITY_TYPE);
+  en.id = getStringField(entity, REG_ENTITY_ID);
+  en.type = getStringField(entity, REG_ENTITY_TYPE);
 
   /* isPattern = true is not allowed in registrations so it is not in the
    * document retrieved with the query; however we will set it to be formally correct
@@ -1920,17 +1645,17 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
 *
 * processAttribute -
 */
-static void processAttribute(ContextRegistrationResponse* crr, AttributeList attrL, BSONObj attribute)
+static void processAttribute(ContextRegistrationResponse* crr, const AttributeList& attrL, const BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
-    STR_FIELD(attribute, REG_ATTRS_NAME),
-    STR_FIELD(attribute, REG_ATTRS_TYPE),
-    STR_FIELD(attribute, REG_ATTRS_ISDOMAIN));
+    getStringField(attribute, REG_ATTRS_NAME),
+    getStringField(attribute, REG_ATTRS_TYPE),
+    getStringField(attribute, REG_ATTRS_ISDOMAIN));
 
   // FIXME: we don't take metadata into account at the moment
   // attr.metadataV = ..
 
-  if (includedAttribute(attr, &attrL))
+  if (includedAttribute(attr, attrL))
   {
     ContextRegistrationAttribute* attrP = new ContextRegistrationAttribute(attr.name, attr.type, attr.isDomain);
     crr->contextRegistration.contextRegistrationAttributeVector.push_back(attrP);
@@ -1946,14 +1671,14 @@ static void processContextRegistrationElement
 (
   BSONObj                             cr,
   EntityIdVector                      enV,
-  AttributeList                       attrL,
+  const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   Format                              format
 )
 {
   ContextRegistrationResponse crr;
 
-  crr.contextRegistration.providingApplication.set(STR_FIELD(cr, REG_PROVIDING_APPLICATION));
+  crr.contextRegistration.providingApplication.set(getStringField(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setFormat(format);
 
   std::vector<BSONElement> queryEntityV = getField(cr, REG_ENTITIES).Array();
@@ -2014,7 +1739,7 @@ static void processContextRegistrationElement
 bool registrationsQuery
 (
   EntityIdVector                      enV,
-  AttributeList                       attrL,
+  const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -2125,17 +1850,21 @@ bool registrationsQuery
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj r = cursor->next();
-
+    BSONObj r;
+    if (!nextSafeOrError(cursor, &r, err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err->c_str()));
+      continue;
+    }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     //
     // Default format is XML, in the case the field is not found in the
     // registrations document (for pre-0.21.0 versions)
     //
-    Format                    format = r.hasField(REG_FORMAT)? stringToFormat(STR_FIELD(r, REG_FORMAT)) : XML;
+    Format                    format = r.hasField(REG_FORMAT)? stringToFormat(getStringField(r, REG_FORMAT)) : XML;
     std::vector<BSONElement>  queryContextRegistrationV = getField(r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
@@ -2197,9 +1926,9 @@ EntityIdVector subToEntityIdVector(BSONObj sub)
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
     BSONObj    subEnt = subEnts[ix].embeddedObject();
-    EntityId*  en     = new EntityId(STR_FIELD(subEnt, CSUB_ENTITY_ID),
-                                     STR_FIELD(subEnt, CSUB_ENTITY_TYPE),
-                                     STR_FIELD(subEnt, CSUB_ENTITY_ISPATTERN));
+    EntityId*  en     = new EntityId(getStringField(subEnt, CSUB_ENTITY_ID),
+                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringField(subEnt, CSUB_ENTITY_TYPE) : "",
+                                     getStringField(subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
 
@@ -2233,36 +1962,32 @@ AttributeList subToAttributeList(BSONObj sub)
 
 /* ****************************************************************************
 *
-* processOnChangeCondition -
+* processOnChangeConditionForSubscription -
 *
-* This function is called from two places:
+* This function is called from initial processing of an ONCHANGE condition in
+* processConditionVector (used from subscribeContext and updateContextSubscription),
+* so an "initial" notification for all the entites/attributes included in the entity
+* in the case that some of them are within the ones in the condValues.
 *
-* 1) initial processing of an ONCHANGE condition in processConditionVector (used from
-*   subscribeContext and updateContextSubscription), so an "initial"
-*   notification for all the entites/attributes included in the entity in the case
-*   that some of them are within the ones in the condValues.
-* 2) updateContext processing logic when attributes under an ONCHANGE condition are
-*   updated
+* Note that ONCHANGE notifications sent due to updateContext are processed by a
+* different function (see processOnChangeConditionForUpdateContext)
 *
 * The argument enV is the entities and attributes in the subscribeContext
-* request (case 1) or the "triggering" entity (case 2). The argument attrL is the
-* attributes in the subscribeContext request. Note that is condValues is NULL, the checking
-* on condValues is omitted (this is the case when this function is called from updateContext,
-* where the previous query on csubs ensures that that condition is true)
+* request. The argument attrL is the attributes in the subscribeContext request.
 *
 * This method returns true if the notification was actually send. Otherwise, false
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeCondition
+bool processOnChangeConditionForSubscription
 (
   EntityIdVector                   enV,
-  AttributeList                    attrL,
+  const AttributeList&             attrL,
   ConditionValueList*              condValues,
-  std::string                      subId,
-  std::string                      notifyUrl,
+  const std::string&               subId,
+  const std::string&               notifyUrl,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 )
@@ -2338,16 +2063,6 @@ bool processOnChangeCondition
 
 /* ****************************************************************************
 *
-* processOntimeIntervalCondition -
-*/
-void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant)
-{
-  getNotifier()->createIntervalThread(subId, interval, tenant);
-}
-
-
-/* ****************************************************************************
-*
 * processConditionVector -
 *
 */
@@ -2355,12 +2070,12 @@ BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
   EntityIdVector                   enV,
-  AttributeList                    attrL,
-  std::string                      subId,
-  std::string                      url,
+  const AttributeList&             attrL,
+  const std::string&               subId,
+  const std::string&               url,
   bool*                            notificationDone,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 )
@@ -2398,15 +2113,15 @@ BSONArray processConditionVector
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
                         CSUB_CONDITIONS_VALUE << condValues.arr()));
 
-      if (processOnChangeCondition(enV,
-                                   attrL,
-                                   &(nc->condValueList),
-                                   subId,
-                                   url,
-                                   format,
-                                   tenant,
-                                   xauthToken,
-                                   servicePathV))
+      if (processOnChangeConditionForSubscription(enV,
+                                                  attrL,
+                                                  &(nc->condValueList),
+                                                  subId,
+                                                  url,
+                                                  format,
+                                                  tenant,
+                                                  xauthToken,
+                                                  servicePathV))
       {
         *notificationDone = true;
       }
@@ -2460,12 +2175,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 */
 bool processAvailabilitySubscription
 (
-  EntityIdVector  enV,
-  AttributeList   attrL,
-  std::string     subId,
-  std::string     notifyUrl,
-  Format          format,
-  std::string     tenant
+  EntityIdVector       enV,
+  const AttributeList& attrL,
+  const std::string&   subId,
+  const std::string&   notifyUrl,
+  Format               format,
+  const std::string&   tenant
 )
 {
   std::string                       err;
@@ -2699,38 +2414,3 @@ void cprLookupByAttribute
   }
 }
 
-
-/* ****************************************************************************
-*
-* Characters for attribute value encoding
-*/
-#define ESCAPE_1_DECODED  '.'
-#define ESCAPE_1_ENCODED  '='
-
-
-/* ****************************************************************************
-*
-* dbDotEncode -
-*
-* Replace:
-*   . => =
-*/
-std::string dbDotEncode(std::string s)
-{
-  replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
-  return s;
-}
-
-
-/* ****************************************************************************
-*
-* dbDotDecode -
-*
-* Replace:
-*   = => .
-*/
-std::string dbDotDecode(std::string s)
-{
-  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
-  return s;
-}

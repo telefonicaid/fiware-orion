@@ -33,19 +33,24 @@
 #include "rest/OrionError.h"
 #include "apiTypesV2/Subscription.h"
 
+
+
 /* ****************************************************************************
 *
 * mongoListSubscriptions -
 */
 extern void mongoListSubscriptions
 (
-  std::vector<ngsiv2::Subscription>   *vec,
-  OrionError                          *oe,
-  std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant,
-  int                                 limit,
-  int                                 offset
+  std::vector<ngsiv2::Subscription>*   vec,
+  OrionError*                          oe,
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   tenant,
+  int                                  limit,
+  int                                  offset,
+  long long*                           count
 );
+
+
 
 /* ****************************************************************************
 *
@@ -53,12 +58,11 @@ extern void mongoListSubscriptions
 */
 extern void mongoGetSubscription
 (
-  ngsiv2::Subscription                *sub,
-  OrionError                          *oe,
-  const std::string&                  idSub,
-  std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant
+  ngsiv2::Subscription*                sub,
+  OrionError*                          oe,
+  const std::string&                   idSub,
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   tenant
 );
 
-
-#endif // MONGOLISTSUBSCRIPTIONS_H
+#endif  // MONGOLISTSUBSCRIPTIONS_H

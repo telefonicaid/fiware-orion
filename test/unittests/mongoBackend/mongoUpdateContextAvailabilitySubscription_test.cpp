@@ -429,14 +429,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -504,14 +499,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern_JSON)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -582,14 +572,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_AttrN_noPattern)
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -662,14 +647,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_Attr0_noPattern)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -746,9 +726,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_AttrN_noPattern)
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -822,13 +799,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_pattern)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -912,14 +885,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1003,13 +971,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll_JSON)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1091,13 +1055,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneSingle)
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A4", attrs[0].String());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1188,13 +1148,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneMulti)
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
-
 }
 
 
@@ -1280,9 +1236,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsSubset)
     ASSERT_EQ(2, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1377,9 +1330,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralCREs)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1471,9 +1421,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralRegistrations)
 
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1582,10 +1529,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntity)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1679,9 +1622,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiAttr)
     EXPECT_EQ("A3", attrs[0].String());
     EXPECT_EQ("A4", attrs[1].String());
     EXPECT_EQ("A5", attrs[2].String());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1788,10 +1728,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntityAttrs)
     ASSERT_EQ(3, attrs.size());
     EXPECT_EQ("A3", attrs[0].String());
     EXPECT_EQ("A4", attrs[1].String());
-    EXPECT_EQ("A5", attrs[2].String());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
+    EXPECT_EQ("A5", attrs[2].String());  
 
     /* Release mock */
     delete notifierMock;
@@ -1898,9 +1835,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternNoType)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
 
     /* Release mock */
     delete notifierMock;
@@ -2000,9 +1934,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern0Attr)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2085,10 +2016,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrSingle)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A4", attrs[0].String());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
 
     /* Release mock */
     delete notifierMock;
@@ -2179,9 +2106,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrMulti)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
 
     /* Release mock */
     delete notifierMock;
@@ -2281,10 +2205,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNAttr)
     ASSERT_EQ(2, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
 
     /* Release mock */
     delete notifierMock;
@@ -2392,9 +2312,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNoType)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A2", attrs[0].String());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2504,10 +2421,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, mixPatternAndNotPattern)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2587,10 +2500,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndEntN_AttrN_noP
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(2, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
+    EXPECT_EQ("A2", attrs[1].String());   
 
     /* Release mock */
     delete notifierMock;
@@ -2676,10 +2586,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndNoPatternAttrs
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2721,10 +2627,6 @@ TEST(mongoUpdateContextAvailabilitySubscription, subscriptionNotFound)
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     /* Release mock */
     delete notifierMock;
 }
@@ -2759,6 +2661,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -2773,11 +2676,12 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
               "- findOne(): { _id: ObjectId('51307b66f481db11bf860010') } "
               "- exception: boom!!)", res.errorCode.details);
 
-    /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */    
     delete notifierMock;
     delete connectionMock;
-
 }
 
 /* ****************************************************************************
@@ -2821,6 +2725,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -2835,12 +2740,11 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
               "- update(): <{ _id: ObjectId('51307b66f481db11bf860010') },{ entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], expiration: 1360250700, reference: \"http://notify1.me\", format: \"XML\" }> "
               "- exception: boom!!)", res.errorCode.details);
 
-    /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */    
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
-
 }
-
-

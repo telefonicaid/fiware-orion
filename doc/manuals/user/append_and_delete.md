@@ -199,7 +199,7 @@ topic](#adding-and-removing-attributes-with-append-and-delete-in-updatecontext))
 you can also delete an entire entity, including all its attributes with
 their corresponding metadata. In order to do so, the updateContext
 operation is used, with DELETE as actionType and with an empty
-attributeList, as in the following example:
+list of attributes, as in the following example:
 
 ```
 (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \

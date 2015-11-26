@@ -33,6 +33,8 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
@@ -58,21 +60,18 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   BSONObj     sub;
   std::string err;
   OID         id;
-  try
+
+  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->errorCode)))
   {
-    id = OID(requestP->subscriptionId.get());
-  }
-  catch (const AssertionException &e)
-  {
-    //
-    // This happens when OID format is wrong
-    // FIXME: this checking should be done at parsing stage, without progressing to
-    // mongoBackend. By the moment we can live this here, but we should remove in the future
-    // (old issue #95)
-    //
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
-    responseP->errorCode.fill(SccContextElementNotFound);
-    LM_W(("Bad Input (invalid OID format)"));
+    if (responseP->errorCode.code == SccContextElementNotFound)
+    {
+      LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+    }
+    else // SccReceiverInternalError
+    {
+      LM_E(("Runtime Error (exception getting OID: %s)", responseP->errorCode.details.c_str()));
+    }
     return SccOk;
   }
 
@@ -126,8 +125,9 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   newSub.append(CASUB_ATTRS, attrs.arr());
 
   /* Duration (optional) */
-  if (requestP->duration.isEmpty()) {
-      newSub.append(CASUB_EXPIRATION, getField(sub, CASUB_EXPIRATION).numberLong());
+  if (requestP->duration.isEmpty())
+  {
+    newSub.append(CASUB_EXPIRATION, getField(sub, CASUB_EXPIRATION).numberLong());
   }
   else {
       long long expiration = getCurrentTime() + requestP->duration.parse();
@@ -136,7 +136,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Reference is not updatable, so it is appended directly */
-  newSub.append(CASUB_REFERENCE, STR_FIELD(sub, CASUB_REFERENCE));
+  newSub.append(CASUB_REFERENCE, getStringField(sub, CASUB_REFERENCE));
 
   int count = sub.hasField(CASUB_COUNT) ? getIntField(sub, CASUB_COUNT) : 0;
 
@@ -160,7 +160,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), STR_FIELD(sub, CASUB_REFERENCE), notifyFormat, tenant);
+  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringField(sub, CASUB_REFERENCE), notifyFormat, tenant);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */

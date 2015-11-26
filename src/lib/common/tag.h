@@ -108,7 +108,8 @@ extern std::string valueTag
   const std::string&  value,
   Format              format,
   bool                showComma           = false,
-  bool                isVectorElement     = false
+  bool                isVectorElement     = false,
+  bool                valueIsNumberOrBool = false
 );
 
 extern std::string valueTag

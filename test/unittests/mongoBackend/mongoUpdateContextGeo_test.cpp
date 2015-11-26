@@ -246,10 +246,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(4, coordY(ent));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -366,8 +363,6 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_EQ(-9, coordX(ent));
     EXPECT_EQ(8, coordY(ent));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -472,8 +467,6 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -570,8 +563,6 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -694,8 +685,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -805,8 +794,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -916,8 +903,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1028,8 +1013,6 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1139,8 +1122,6 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1250,8 +1231,6 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1356,8 +1335,6 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1467,8 +1444,6 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1579,7 +1554,5 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }

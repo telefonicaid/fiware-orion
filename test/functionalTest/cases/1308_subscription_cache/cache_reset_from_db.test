@@ -25,8 +25,8 @@ Possible Bug in Subscription Cache when reloading from database
 
 --SHELL-INIT--
 dbInit CB
-dbInit ftest-t1
-dbInit ftest-t2
+dbInit CB t1
+dbInit CB t2
 brokerStart CB 0-255 IPv4 -multiservice -subCacheIval 5
 accumulatorStart localhost $LISTENER_PORT
 accumulatorStart localhost $LISTENER2_PORT
@@ -663,5 +663,5 @@ accumulatorStop $LISTENER_PORT
 accumulatorStop $LISTENER2_PORT
 accumulatorStop $LISTENER3_PORT
 dbDrop CB
-dbDrop ftest-t1
-dbDrop ftest-t2
+dbDrop CB t1
+dbDrop CB t2

@@ -75,6 +75,16 @@ ContextAttribute::ContextAttribute()
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute - 
+*
+* Note that this constructor moves the compoundValue of the source CA to the
+* CA being constructed (the compoundValueP attribute in the source CA is set to NULL).
+* Another option (closer to copy semantics) would be cloning (using the clone() method in
+* CompoundValueNode class) but by the moment this is not needed by this constructor as
+* all their usage cases suffice with this "move compoundValue instead of cloning" approach.
+*
+* Note however that the treatement of metadata is different: in that case, the metadata
+* in "cloned" from source CA to the CA being constructed.
+*
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
@@ -469,7 +479,7 @@ std::string ContextAttribute::render
       case ValueTypeNumber:
         char num[32];
         snprintf(num, sizeof(num), "%f", numberValue);
-        effectiveValue      = std::string(num);
+        effectiveValue      = num;
         valueIsNumberOrBool = true;
         break;
 
@@ -696,6 +706,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
 
   LM_F(("%s  PA:       %s (%s)", indent.c_str(), providingApplication.get().c_str(), formatToString(providingApplication.getFormat())));
   LM_F(("%s  found:    %s", indent.c_str(), FT(found)));
+  LM_F(("%s  skip:     %s", indent.c_str(), FT(skip)));
 
   metadataVector.present("Attribute", indent + "  ");
 }

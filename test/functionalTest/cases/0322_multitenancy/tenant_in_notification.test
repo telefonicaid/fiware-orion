@@ -178,4 +178,4 @@ Content-Type: application/xml
 brokerStop CB
 accumulatorStop
 dbDrop CB
-dbDrop ${CB_DATABASE_NAME}-kz
+dbDrop ${CB_DB_NAME} kz

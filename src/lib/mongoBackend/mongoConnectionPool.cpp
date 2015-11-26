@@ -35,6 +35,7 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeMongo.h"
 
 
 
@@ -282,6 +283,12 @@ int mongoConnectionPoolInit
   bool         semTimeStat
 )
 {
+#ifdef UNIT_TEST
+  /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods
+   * are mocked in similar way to ensure a coherent behaviour */
+  setMongoConnectionForUnitTest(mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout));
+  return 0;
+#else
   //
   // Create the pool
   //
@@ -329,6 +336,7 @@ int mongoConnectionPoolInit
   semStatistics = semTimeStat;
 
   return 0;
+#endif
 }
 
 
@@ -424,18 +432,9 @@ void mongoPoolConnectionRelease(DBClientBase* connection)
 *
 * mongoPoolConnectionSemWaitingTimeGet - 
 */
-char* mongoPoolConnectionSemWaitingTimeGet(char* buf, int bufLen)
+float mongoPoolConnectionSemWaitingTimeGet(void)
 {
-  if (semStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", semWaitingTime.tv_sec, (int) semWaitingTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
-
-  return buf;
+  return semWaitingTime.tv_sec + ((float) semWaitingTime.tv_nsec) / 1E9;
 }
 
 

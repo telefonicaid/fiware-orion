@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "rest/ConnectionInfo.h"
@@ -92,7 +95,7 @@ std::string postContextEntitiesByEntityIdAndType
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.registrationId.set("000000000000000000000000");
 
-    answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
+    TIMED_RENDER(answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, ""));
 
     parseDataP->rpr.res.release();
 
@@ -105,7 +108,7 @@ std::string postContextEntitiesByEntityIdAndType
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.registrationId.set("000000000000000000000000");
 
-    answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
+    TIMED_RENDER(answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, ""));
 
     parseDataP->rpr.res.release();
 

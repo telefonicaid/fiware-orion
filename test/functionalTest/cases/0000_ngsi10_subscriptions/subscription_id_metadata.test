@@ -184,24 +184,24 @@ Content-Type: application/xml
           <contextAttribute>
             <name>temperature</name>
             <type>degree</type>
-            <contextValue>25.6</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>ceiling</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
             <contextValue>23.5</contextValue>
             <metadata>
               <contextMetadata>
                 <name>ID</name>
                 <type>string</type>
                 <value>floor</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>25.6</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>ID</name>
+                <type>string</type>
+                <value>ceiling</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>

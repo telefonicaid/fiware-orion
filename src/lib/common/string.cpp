@@ -95,7 +95,6 @@ bool isIPv6(const std::string& in)
 {
   size_t      pos;
   std::string partip;
-  std::string resu;
   std::string staux = in;
   int         cont  = 0;
 
@@ -104,7 +103,6 @@ bool isIPv6(const std::string& in)
   {
     cont++;
     partip = staux.substr(0, pos+1);
-    resu  += partip;
 
     if (checkGroupIPv6(partip) == false)
     {
@@ -451,23 +449,6 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
 /* ****************************************************************************
 *
-* coords2string - 
-*/
-void coords2string(std::string* s, double latitude, double longitude, int decimals)
-{
-  char buf[256];
-  char format[32];
-
-  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
-  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
-
-  *s = buf;
-}
-
-
-
-/* ****************************************************************************
-*
 * versionParse -
 */
 bool versionParse(const std::string& version, int& mayor, int& minor, std::string& bugFix)
@@ -662,7 +643,7 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
   {
     if (strncmp(&from[fromIx], oldString, oldLen) == 0)
     {
-      snprintf(to, toLen, "%s", newString);
+      strncat(to, newString, toLen - strlen(to));
       toIx   += newLen;
       fromIx += oldLen;
     }

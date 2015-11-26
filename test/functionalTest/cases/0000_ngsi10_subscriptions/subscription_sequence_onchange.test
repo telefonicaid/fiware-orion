@@ -30,7 +30,6 @@ accumulatorStart
 
 --SHELL--
 
-url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -54,12 +53,12 @@ payload='<?xml version="1.0"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+echo
 echo
 
 echo "1: ++++++++++++++++++++"
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -83,16 +82,12 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
-echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 
 echo "2: ++++++++++++++++++++"
-url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -116,24 +111,20 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
-echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
+
 echo "3: ++++++++++++++++++++"
-url=/v1/updateContextSubscription
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
   <subscriptionId>'$SUB_ID'</subscriptionId>
   <throttling>PT6S</throttling>
 </updateContextSubscriptionRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContextSubscription --payload "$payload"
 echo
-echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 
@@ -141,7 +132,6 @@ echo
 sleep 10
 
 echo "4: ++++++++++++++++++++"
-url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -165,16 +155,12 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
-echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 
 echo "5: ++++++++++++++++++++"
-url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -198,15 +184,14 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
 echo
 
 
 echo "6: ++++++++++++++++++++"
 # Wait - sleep >6s to reset the throttling interval
 sleep 10
-url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -225,15 +210,12 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 echo
-echo Notification count from mongo:
-mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
 
 
 echo "7: ++++++++++++++++++++"
-url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -252,22 +234,22 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
 echo
 
 
 echo "8: ++++++++++++++++++++"
-url=/v1/unsubscribeContext
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
 </unsubscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/unsubscribeContext --payload "$payload"
+echo
 echo
 
 
 echo "9: ++++++++++++++++++++"
-url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -286,7 +268,8 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
 echo
 
 
@@ -294,6 +277,8 @@ echo "Accumulated data:"
 echo "================="
 accumulatorDump
 echo
+echo
+
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -308,6 +293,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -344,8 +330,6 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-Notification count from mongo:
-{ "count" : 1 }
 
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -382,8 +366,6 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-Notification count from mongo:
-{ "count" : 2 }
 
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -400,8 +382,6 @@ Date: REGEX(.*)
   </subscribeResponse>
 </updateContextSubscriptionResponse>
 
-Notification count from mongo:
-{ "count" : 2 }
 
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -438,8 +418,6 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-Notification count from mongo:
-{ "count" : 3 }
 
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -476,6 +454,7 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
+
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 640
@@ -506,8 +485,6 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-Notification count from mongo:
-{ "count" : 4 }
 
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -539,6 +516,7 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
+
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 207
@@ -553,6 +531,7 @@ Date: REGEX(.*)
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
+
 
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -583,6 +562,7 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 
 Accumulated data:
 =================
@@ -729,6 +709,7 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
+
 
 --TEARDOWN--
 brokerStop CB

@@ -25,12 +25,32 @@ Accept header fail
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 38,39
 
 --SHELL--
+
+#
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
-url="/v1/queryContext"
+#
+# 01. Invalid 'Accept' HTTP header
+# 02. Invalid XML payload
+# 03. Explicit 'Accept: application/xml' is ok
+# 04. 'Accept-list' with valid mime-type
+# 05. 'Accept-list' with valid mime-type AND encoding after ';'
+# 06. 'Accept-list' with no valid mime-type and invalid XML payload
+# 07. 'Accept-list' with no valid mime-type, invalid XML payload, and extra encoding after ';'
+# 08. Verify that an explicit 'Accept: application/json' is ok
+# 09. Accept preference is correctly taken into account (XML preferred to JSON), order is JSON, XML
+# 10. Accept preference is correctly taken into account (XML preferred to JSON), order is XML, JSON
+# 11. Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)
+# 12. Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
+# 
+#
+
+
+echo "01. Invalid 'Accept' HTTP header"
+echo "================================"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
   <entityIdList>
@@ -40,78 +60,85 @@ payload='<?xml version="1.0"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out " "
+orionCurl --url /v1/queryContext --payload "${payload}" --out " "
+echo
+echo
 
-echo "1: ++++++++++++++++++++"
 
-# Fails due to error in payload parsing
-url="/v1/queryContext"
+echo "02. Invalid XML payload"
+echo "======================="
 payload='no meaningful payload (failing tests)'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url /v1/queryContext --payload "${payload}"
+echo
+echo
 
-echo "2: ++++++++++++++++++++"
 
-# Explicit "Accept: application/xml" is ok
-url="/v1/queryContext"
+echo "03. Explicit 'Accept: application/xml' is ok"
+echo "============================================"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out "application/xml"
+orionCurl --url /v1/queryContext --payload "${payload}" --out "application/xml"
+echo
+echo
 
-echo "3: ++++++++++++++++++++"
 
-# Uses a list in Accept which a valid type is found is ok
-url="/v1/queryContext"
+echo "04. 'Accept-list' with valid mime-type"
+echo "======================================"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, application/xml"
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/xml"
+echo
+echo
 
-echo "4: ++++++++++++++++++++"
 
-# Uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
-url="/v1/queryContext"
+echo "05. 'Accept-list' with valid mime-type AND encoding after ';'"
+echo "============================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, application/xml; charset=UTF-8"
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/xml; charset=UTF-8"
+echo
+echo
 
-echo "5: ++++++++++++++++++++"
 
-# Uses a list in Accept with no valid type
-url="/v1/queryContext"
+echo "06. 'Accept-list' with no valid mime-type and invalid XML payload"
+echo "================================================================="
 payload='no meaningful payload (failing tests)'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, image/jpeg"
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plane, image/jpeg"
+echo
+echo
 
-echo "6: ++++++++++++++++++++"
 
-# List in Accept with no valid type (with extra encoding after ";")
-url="/v1/queryContext"
+echo "07. 'Accept-list' with no valid mime-type, invalid XML payload, and extra encoding after ';'"
+echo "============================================================================================"
 payload='no meaningful payload (failing tests)'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, image/jpeg; charset=UTF-8"
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plane, image/jpeg; charset=UTF-8"
+echo
+echo
 
-echo "7: ++++++++++++++++++++"
 
-# Verifies that explicit "Accept: application/json" is ok
-url="/v1/queryContext"
+echo "08. Verify that an explicit 'Accept: application/json' is ok"
+echo "============================================================"
 payload='{
 	"entities": [
 		{
@@ -121,11 +148,13 @@ payload='{
 		}
 	]
 }'
-orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json"
+orionCurl --url /v1/queryContext --payload "${payload}" --in "application/json" --out "application/json"
+echo
+echo
 
-echo "8: ++++++++++++++++++++"
-# Accept preference is correctly taken into account (XML preferred to JSON), order is JSON, XML
-url="/v1/queryContext"
+
+echo "09. Accept preference is correctly taken into account (XML preferred to JSON), order is JSON, XML"
+echo "================================================================================================="
 payload='{
   "entities": [
     {
@@ -135,12 +164,13 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json, application/xml"
+orionCurl --url /v1/queryContext --payload "${payload}" --in "application/json" --out "application/json, application/xml"
+echo
+echo
 
 
-echo "9: ++++++++++++++++++++"
-# Accept preference is correctly taken into account (XML preferred to JSON), order is XML, JSON
-url="/v1/queryContext"
+echo "10. Accept preference is correctly taken into account (XML preferred to JSON), order is XML, JSON"
+echo "================================================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -149,13 +179,15 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </entityId>
   </entityIdList>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "application/xml, application/json"
+orionCurl --url /v1/queryContext --payload "${payload}" --in "application/xml" --out "application/xml, application/json"
+echo
+echo
 
-echo "10: ++++++++++++++++++++"
 
-# Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)
-# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
-(curl localhost:${CB_PORT}/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
+# FIXME P6: Once issue #317 is fixed - make this test use orionCurl
+echo "11. Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)"
+echo "================================================================================================================"
+(curl localhost:${CB_PORT}/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 {
   "entities": [
     {
@@ -166,10 +198,13 @@ echo "10: ++++++++++++++++++++"
   ]
 }
 EOF
-echo "11: ++++++++++++++++++++"
+echo
+echo
 
-# Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
-# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
+
+# FIXME P6: Once issue #317 is fixed - make this test use orionCurl
+echo "12. Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)"
+echo "================================================================================================================"
 (curl localhost:${CB_PORT}/v1/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @-) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -180,9 +215,13 @@ echo "11: ++++++++++++++++++++"
   </entityIdList>
 </queryContextRequest>
 EOF
-echo "12: ++++++++++++++++++++"
+echo
+echo
+
 
 --REGEXPECT--
+01. Invalid 'Accept' HTTP header
+================================
 HTTP/1.1 200 OK
 Content-Length: 155
 Content-Type: application/xml
@@ -195,7 +234,10 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-1: ++++++++++++++++++++
+
+
+02. Invalid XML payload
+=======================
 HTTP/1.1 200 OK
 Content-Length: 126
 Content-Type: application/xml
@@ -207,7 +249,10 @@ Date: REGEX(.*)
   <reasonPhrase>Bad Request</reasonPhrase>
   <details>XML Parse Error</details>
 </orionError>
-2: ++++++++++++++++++++
+
+
+03. Explicit 'Accept: application/xml' is ok
+============================================
 HTTP/1.1 200 OK
 Content-Length: 155
 Content-Type: application/xml
@@ -220,7 +265,10 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-3: ++++++++++++++++++++
+
+
+04. 'Accept-list' with valid mime-type
+======================================
 HTTP/1.1 200 OK
 Content-Length: 155
 Content-Type: application/xml
@@ -233,7 +281,10 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-4: ++++++++++++++++++++
+
+
+05. 'Accept-list' with valid mime-type AND encoding after ';'
+=============================================================
 HTTP/1.1 200 OK
 Content-Length: 155
 Content-Type: application/xml
@@ -246,7 +297,10 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-5: ++++++++++++++++++++
+
+
+06. 'Accept-list' with no valid mime-type and invalid XML payload
+=================================================================
 HTTP/1.1 406 Not Acceptable
 Content-Length: 220
 Content-Type: application/xml
@@ -256,9 +310,12 @@ Date: REGEX(.*)
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plain, image/jpeg</details>
+  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plane, image/jpeg</details>
 </orionError>
-6: ++++++++++++++++++++
+
+
+07. 'Accept-list' with no valid mime-type, invalid XML payload, and extra encoding after ';'
+============================================================================================
 HTTP/1.1 406 Not Acceptable
 Content-Length: 243
 Content-Type: application/xml
@@ -268,9 +325,12 @@ Date: REGEX(.*)
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plain, image/jpeg; charset=UTF-8</details>
+  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plane, image/jpeg; charset=UTF-8</details>
 </orionError>
-7: ++++++++++++++++++++
+
+
+08. Verify that an explicit 'Accept: application/json' is ok
+============================================================
 HTTP/1.1 200 OK
 Content-Length: 94
 Content-Type: application/json
@@ -282,7 +342,10 @@ Date: REGEX(.*)
         "reasonPhrase": "No context element found"
     }
 }
-8: ++++++++++++++++++++
+
+
+09. Accept preference is correctly taken into account (XML preferred to JSON), order is JSON, XML
+=================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 155
 Content-Type: application/xml
@@ -295,7 +358,10 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-9: ++++++++++++++++++++
+
+
+10. Accept preference is correctly taken into account (XML preferred to JSON), order is XML, JSON
+=================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 155
 Content-Type: application/xml
@@ -308,7 +374,10 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-10: ++++++++++++++++++++
+
+
+11. Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)
+================================================================================================================
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
@@ -316,14 +385,18 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-11: ++++++++++++++++++++
+
+
+12. Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
+================================================================================================================
 {
   "errorCode" : {
     "code" : "404",
     "reasonPhrase" : "No context element found"
   }
 }
-12: ++++++++++++++++++++
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -32,6 +35,22 @@
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
+
+static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
+
+
+
+/* ****************************************************************************
+*
+* legalEntityLength -
+*
+* Check if the entity length is supported by Mongo
+*/
+
+static bool legalEntityLength(Entity* eP, const std::string& servicePath)
+{
+  return (servicePath.size() + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
+}
 
 
 
@@ -62,6 +81,18 @@ std::string postEntities
 {
   Entity*  eP = &parseDataP->ent.res;
 
+  if (!legalEntityLength(eP, ciP->servicePath))
+  {
+    OrionError oe(SccBadRequest, "Too long entity id/type/servicePath combination");
+    ciP->httpStatusCode = SccBadRequest;
+    eP->release();
+
+    std::string out;
+    TIMED_RENDER(out = oe.render(ciP, ""));
+
+    return out;
+  }
+
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "APPEND_STRICT");
   
@@ -86,7 +117,8 @@ std::string postEntities
   {
     OrionError oe(SccInvalidModification, "Entity already exists");
     ciP->httpStatusCode = SccInvalidModification;
-    answer = oe.render(ciP, "");
+
+    TIMED_RENDER(answer = oe.render(ciP, ""));
   }
 
 

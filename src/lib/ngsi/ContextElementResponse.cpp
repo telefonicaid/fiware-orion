@@ -29,9 +29,16 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementResponse.h"
+#include "ngsi/AttributeList.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "rest/ConnectionInfo.h"
 
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/compoundResponses.h"
+
+using namespace mongo;
 
 
 /* ****************************************************************************
@@ -73,6 +80,189 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
 
   contextElement.fill(cerP->contextElement);
   statusCode.fill(cerP->statusCode);
+}
+
+
+
+/* ****************************************************************************
+*
+* includedAttribute -
+*
+* FIXME: note that in the current implementation, in which we only use 'name' to
+* compare, this function is equal to the one for ContextRegistrationAttrribute.
+* However, we keep them separated, as isDomain (present in ContextRegistrationAttribute
+* but not in ContextRegistration could mean a difference). To review once domain attributes
+* get implemented.
+*
+*/
+static bool includedAttribute(const ContextAttribute& attr, const AttributeList& attrsV)
+{
+  //
+  // This is the case in which the queryContextRequest doesn't include attributes,
+  // so all the attributes are included in the response
+  //
+  if (attrsV.size() == 0)
+  {
+    return true;
+  }
+
+  for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
+  {
+    if (attrsV.get(ix) == attr.name)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::ContextElementResponse -
+*
+* This constructor builds the CER object based in a BSON object taken from the
+* entities collection at DB.
+*
+* Note that statusCode is not touched by this constructor.
+*/
+ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, const AttributeList& attrL, bool includeEmpty)
+{
+  prune = false;
+
+  // Entity
+  BSONObj id = getField(entityDoc, "_id").embeddedObject();
+  contextElement.entityId.fill(getStringField(id, ENT_ENTITY_ID), getStringField(id, ENT_ENTITY_TYPE), "false");
+  contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringField(id, ENT_SERVICE_PATH) : "";
+
+  /* Get the location attribute (if it exists) */
+  std::string locAttr;
+  if (entityDoc.hasElement(ENT_LOCATION))
+  {
+    locAttr = getStringField(getObjectField(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
+  }
+
+
+  //
+  // Attribute vector
+  // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
+  //
+  BSONObj                attrs = getField(entityDoc, ENT_ATTRS).embeddedObject();
+  std::set<std::string>  attrNames;
+
+  attrs.getFieldNames(attrNames);
+  for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
+  {
+    std::string        attrName = *i;
+    BSONObj            attr     = getField(attrs, attrName).embeddedObject();
+    ContextAttribute*  caP      = NULL;
+    ContextAttribute   ca;
+
+    // Name and type
+    ca.name           = dbDotDecode(basePart(attrName));
+    std::string mdId  = idPart(attrName);
+    ca.type           = getStringField(attr, ENT_ATTRS_TYPE);
+
+    // Skip attribute if the attribute is in the list (or attrL is empty)
+    if (!includedAttribute(ca, attrL))
+    {
+      continue;
+    }
+
+    /* It could happen (although very rarely) that the value field is missing in the
+     * DB for the attribute. The following is a safety check measure to protect against that */
+    if (!attr.hasField(ENT_ATTRS_VALUE))
+    {
+      caP = new ContextAttribute(ca.name, ca.type, "");
+    }
+    else
+    {
+      switch(getField(attr, ENT_ATTRS_VALUE).type())
+      {
+      case String:
+        ca.stringValue = getStringField(attr, ENT_ATTRS_VALUE);
+        if (!includeEmpty && ca.stringValue.length() == 0)
+        {
+          continue;
+        }
+        caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
+        break;
+
+      case NumberDouble:
+        ca.numberValue = getField(attr, ENT_ATTRS_VALUE).Number();
+        caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
+        break;
+
+      case NumberInt:
+        ca.numberValue = (double) getIntField(attr, ENT_ATTRS_VALUE);
+        caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
+        break;
+
+      case Bool:
+        ca.boolValue = getBoolField(attr, ENT_ATTRS_VALUE);
+        caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
+        break;
+
+      case Object:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+        compoundObjectResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
+        break;
+
+      case Array:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);  // LEAK
+        compoundVectorResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
+      }
+    }
+
+    /* Setting ID (if found) */
+    if (mdId != "")
+    {
+      Metadata* md = new Metadata(NGSI_MD_ID, "string", mdId);
+      caP->metadataVector.push_back(md);
+    }
+
+    /* Setting location metatda (if found) */
+    if (locAttr == ca.name)
+    {
+      Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
+      caP->metadataVector.push_back(md);
+    }
+
+    /* Setting custom metadata (if any) */
+    if (attr.hasField(ENT_ATTRS_MD))
+    {
+      std::vector<BSONElement> metadataV = getField(attr, ENT_ATTRS_MD).Array();
+
+      for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
+      {
+        Metadata* md = new Metadata(metadataV[ix].embeddedObject());
+        caP->metadataVector.push_back(md);
+      }
+    }
+
+    contextElement.contextAttributeVector.push_back(caP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::ContextElementResponse -
+*
+* This constructor builds the CER from a CEP. Note that statusCode is not touched.
+*/
+ContextElementResponse::ContextElementResponse(ContextElement* ceP)
+{
+  contextElement.fill(ceP);
 }
 
 

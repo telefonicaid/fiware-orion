@@ -101,9 +101,8 @@ TEST(UpdateContextAttributeRequest, check_xml)
   Metadata                       mdata("name", "type", "value");
   Metadata                       mdata2("", "type", "value");
   std::string                    out;
-  const char*                    outfile1 = "ngsi10.updateContextAttributeRequest.check1.valid.xml";
-  const char*                    outfile2 = "ngsi10.updateContextAttributeRequest.check2.valid.xml";
-  const char*                    outfile3 = "ngsi10.updateContextAttributeRequest.check3.valid.xml";
+  const char*                    outfile1 = "ngsi10.updateContextAttributeRequest.check1.valid.xml";  
+  const char*                    outfile2 = "ngsi10.updateContextAttributeRequest.check3.valid.xml";
 
   utInit();
 
@@ -115,10 +114,9 @@ TEST(UpdateContextAttributeRequest, check_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   
-  // 2. empty contextValue
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  // 2. empty contextValue  
   out = ucar.check(UpdateContextAttribute, XML, "", "", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ("OK", out.c_str());
 
   // 3. OK
   ucar.contextValue = "CValue";
@@ -126,7 +124,7 @@ TEST(UpdateContextAttributeRequest, check_xml)
   EXPECT_STREQ("OK", out.c_str());
 
   // 4. bad metadata
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ucar.metadataVector.push_back(&mdata2);
   out = ucar.check(UpdateContextAttribute, XML, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -147,8 +145,7 @@ TEST(UpdateContextAttributeRequest, check_json)
   Metadata                       mdata2("", "type", "value");
   std::string                    out;
   const char*                    outfile1 = "ngsi10.updateContextAttributeRequest.check1.valid.json";
-  const char*                    outfile2 = "ngsi10.updateContextAttributeRequest.check2.valid.json";
-  const char*                    outfile3 = "ngsi10.updateContextAttributeRequest.check3.valid.json";
+  const char*                    outfile2 = "ngsi10.updateContextAttributeRequest.check3.valid.json";
 
   utInit();
 
@@ -161,9 +158,8 @@ TEST(UpdateContextAttributeRequest, check_json)
 
   
   // 2. empty contextValue
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = ucar.check(UpdateContextAttribute, JSON, "", "", 0);
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ("OK", out.c_str());
 
   // 3. OK
   ucar.contextValue = "CValue";
@@ -171,7 +167,7 @@ TEST(UpdateContextAttributeRequest, check_json)
   EXPECT_STREQ("OK", out.c_str());
 
   // 4. bad metadata
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ucar.metadataVector.push_back(&mdata2);
   out = ucar.check(UpdateContextAttribute, JSON, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());

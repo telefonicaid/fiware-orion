@@ -175,7 +175,7 @@ void AttributeList::push_back_if_absent(const std::string& attributeName)
 *
 * AttributeList::size - 
 */
-unsigned int AttributeList::size(void)
+unsigned int AttributeList::size(void) const
 {
   return attributeV.size();
 }
@@ -186,7 +186,7 @@ unsigned int AttributeList::size(void)
 *
 * AttributeList::get - 
 */
-std::string AttributeList::get(int ix)
+std::string AttributeList::get(int ix) const
 {
   return attributeV[ix];
 }
@@ -197,7 +197,7 @@ std::string AttributeList::get(int ix)
 *
 * AttributeList::clone - 
 */
-void AttributeList::clone(AttributeList& aList)
+void AttributeList::clone(const AttributeList& aList)
 {
   for (unsigned int ix = 0; ix < aList.size(); ++ix)
   {

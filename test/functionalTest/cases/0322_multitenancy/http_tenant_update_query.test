@@ -24,8 +24,8 @@
 HTTP-Tenant update and query
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DATABASE_NAME}-t_03
-dbInit ${CB_DATABASE_NAME}-t_04
+dbInit ${CB_DB_NAME} t_03
+dbInit ${CB_DB_NAME} t_04
 brokerStart CB 0-255 IPV4 -multiservice
 
 --SHELL--
@@ -241,5 +241,5 @@ Date: REGEX(.*)
 
 brokerStop CB
 dbDrop CB
-dbDrop ${CB_DATABASE_NAME}-t_03
-dbDrop ${CB_DATABASE_NAME}-t_04
+dbDrop ${CB_DB_NAME} t_03
+dbDrop ${CB_DB_NAME} t_04

@@ -1737,11 +1737,10 @@ extern int lmLogLinesGet(void);
 *
 * LM_TRANSACTION_RESET -
 */
-#define LM_TRANSACTION_RESET()                            \
-do                                                        \
-{                                                         \
-  strncpy(transactionId, "N/A", sizeof(transactionId));   \
-} while (0)
+inline void LM_TRANSACTION_RESET()                                                                              \
+{
+  strncpy(transactionId, "N/A", sizeof(transactionId));
+}
 
 
 
@@ -1749,12 +1748,11 @@ do                                                        \
 *
 * LM_TRANSACTION_START -
 */
-#define LM_TRANSACTION_START(keyword, ip, port, path)                  \
-do                                                                     \
-{                                                                      \
-  transactionIdSet();                                                  \
-  LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));  \
-} while (0)
+inline void LM_TRANSACTION_START(const char *keyword, const char *ip, int port, const char *path)                                                                   \
+{
+  transactionIdSet();
+  LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));
+}
 
 
 
@@ -1762,12 +1760,11 @@ do                                                                     \
 *
 * LM_TRANSACTION_START_URL -
 */
-#define LM_TRANSACTION_START_URL(url)                           \
-do                                                              \
-{                                                               \
-  transactionIdSet();                                           \
-  LM_I(("Starting transaction from %s", url));                  \
-} while (0)
+inline void LM_TRANSACTION_START_URL(const char *url)
+{
+  transactionIdSet();
+  LM_I(("Starting transaction from %s", url));
+}
 
 
 
@@ -1775,11 +1772,10 @@ do                                                              \
 *
 * LM_TRANSACTION_END -
 */
-#define LM_TRANSACTION_END()                              \
-do                                                        \
-{                                                         \
-  LM_I(("Transaction ended"));                            \
-  LM_TRANSACTION_RESET();                                 \
-} while (0)
+inline void LM_TRANSACTION_END()
+{
+  LM_I(("Transaction ended"));
+  LM_TRANSACTION_RESET();
+}
 
 #endif  // SRC_LIB_LOGMSG_LOGMSG_H_

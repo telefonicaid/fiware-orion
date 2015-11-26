@@ -121,17 +121,20 @@ export ORION_DATABASE_PASSWORD=${ORION_DATABASE_PASSWORD:-orion}
 #
 # Name of the database for the instances of the broker doing harness tests
 #
-# o CB_DATABASE_NAME       - database for main broker
+# o CB_DB_NAME       - database for main broker
 #
-# o CP1_DATABASE_NAME      - database for first context provider
-# o CP2_DATABASE_NAME      - database for second context provider
-# o CP3_DATABASE_NAME      - database for third context provider
-# o CP4_DATABASE_NAME      - database for fourth context provider
-# o CP5_DATABASE_NAME      - database for fifth context provider
+# o CP1_DB_NAME      - database for first context provider
+# o CP2_DB_NAME      - database for second context provider
+# o CP3_DB_NAME      - database for third context provider
+# o CP4_DB_NAME      - database for fourth context provider
+# o CP5_DB_NAME      - database for fifth context provider
 #
-export CB_DATABASE_NAME=${CB_DATABASE_NAME:-ftest}
-export CP1_DATABASE_NAME=${CP1_DATABASE_NAME:-ftest_cp1}
-export CP2_DATABASE_NAME=${CP2_DATABASE_NAME:-ftest_cp2}
-export CP3_DATABASE_NAME=${CP3_DATABASE_NAME:-ftest_cp3}
-export CP4_DATABASE_NAME=${CP4_DATABASE_NAME:-ftest_cp4}
-export CP5_DATABASE_NAME=${CP5_DATABASE_NAME:-ftest_cp5}
+
+
+export CB_DB_NAME=${CB_DB_NAME:-ftest}
+export CP1_DB_NAME=${CP1_DB_NAME:-ftest_cp1}
+export CP2_DB_NAME=${CP2_DB_NAME:-ftest_cp2}
+export CP3_DB_NAME=${CP3_DB_NAME:-ftest_cp3}
+export CP4_DB_NAME=${CP4_DB_NAME:-ftest_cp4}
+export CP5_DB_NAME=${CP5_DB_NAME:-ftest_cp5}
+ 

@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -100,9 +103,14 @@ std::string postAllEntitiesWithTypeAndId
   // 02. Check that the entity is NOT filled in in the payload
   if ((reqP->entity.id != "") || (reqP->entity.type != "") || (reqP->entity.isPattern != ""))
   {
+    std::string  out;
+
     LM_W(("Bad Input (unknown field)"));
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
-    return response.render(ciP, IndividualContextEntity, "");
+
+    TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
+
+    return out;
   }
 
 
@@ -114,7 +122,7 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
 
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
 
     parseDataP->acer.res.release();
     return answer;
@@ -126,7 +134,7 @@ std::string postAllEntitiesWithTypeAndId
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");
 
-    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    TIMED_RENDER(answer = response.render(ciP, AllEntitiesWithTypeAndId, ""));
 
     parseDataP->acer.res.release();
     return answer;
@@ -141,7 +149,7 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 05. Call Standard Operation
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 06. Fill in response from UpdateContextReSponse
@@ -149,7 +157,8 @@ std::string postAllEntitiesWithTypeAndId
 
 
   // 07. Cleanup and return result
-  answer = response.render(ciP, IndividualContextEntity, "");
+  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntity, ""));
+
   parseDataP->upcr.res.release();
   response.release();
 

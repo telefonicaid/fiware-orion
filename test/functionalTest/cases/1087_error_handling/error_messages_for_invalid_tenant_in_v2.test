@@ -63,12 +63,12 @@ echo
 01. POST /v2/entities with invalid tenant
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 180
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters", 
+    "description": "bad character in tenant name - only underscore and alphanumeric characters are allowed",
     "error": "BadRequest"
 }
 

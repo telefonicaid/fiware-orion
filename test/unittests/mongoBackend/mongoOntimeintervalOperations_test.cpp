@@ -280,6 +280,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
@@ -291,8 +292,10 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
               "- findOne(): { _id: ObjectId('51307b66f481db11bf860001') } "
               "- exception: boom!!)", err);
 
-    /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */
     delete connectionMock;
 }
 
@@ -510,6 +513,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
@@ -522,8 +526,10 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
               "attrNames: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
               "exception: boom!!)", err);
 
-    /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */
     delete connectionMock;
 }
 
@@ -633,7 +639,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object)
      * Note that we preserve the "actual" connection for future database checking */
     prepareDatabase();
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
@@ -650,15 +656,17 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
 
-    BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    BSONObj sub2 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
+    BSONObj sub1 = connectionDb->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
+    BSONObj sub2 = connectionDb->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(20000000, sub1.getIntField("lastNotification"));
     EXPECT_EQ(20, sub1.getIntField("count"));
     EXPECT_EQ(30000000, sub2.getIntField("lastNotification"));
     EXPECT_EQ(30, sub2.getIntField("count"));
 
-    /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */    
     delete timerMock;
     delete connectionMock;
 }

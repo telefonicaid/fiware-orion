@@ -33,10 +33,10 @@ accumulatorStart
 # the document size, which in sequence depends on (but it is not exactly equal to)
 # the size of the "inflated" attribute, the third parameter has been determined empirically
 #
-dbInsertEntity $CB_DATABASE_NAME E1 1900
-dbInsertEntity $CB_DATABASE_NAME E2 2100
-dbInsertEntity $CB_DATABASE_NAME E3 810000
-dbInsertEntity $CB_DATABASE_NAME E4 840000
+dbInsertEntity $CB_DB_NAME E1 1900
+dbInsertEntity $CB_DB_NAME E2 2100
+dbInsertEntity $CB_DB_NAME E3 810000
+dbInsertEntity $CB_DB_NAME E4 840000
 
 --SHELL--
 

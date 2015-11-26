@@ -35,6 +35,7 @@ src/lib/common/compileInfo.h
 fiware-orion.config
 fiware-orion.creator
 fiware-orion.creator.user
+fiware-orion.creator.user.*
 fiware-orion.files
 fiware-orion.includes
 

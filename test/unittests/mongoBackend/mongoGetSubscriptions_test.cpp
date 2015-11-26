@@ -96,7 +96,7 @@ static void prepareDatabaseV1Subs(void) {
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
                                                        )) <<
-                        "throttling" << 5.0
+                        "throttling" << 5
                         );
 
     BSONObj sub3 = BSON("_id" << OID(SUB_OID3) <<
@@ -114,7 +114,6 @@ static void prepareDatabaseV1Subs(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
-
 }
 
 /* ****************************************************************************
@@ -123,14 +122,15 @@ static void prepareDatabaseV1Subs(void) {
 */
 TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 {
-  OrionError oe;
+  OrionError  oe;
+  long long   count;
 
   /* Prepare database */
   prepareDatabaseV1Subs();
 
   /* Invoke the function in mongoBackend library */
   std::vector<Subscription> subs;
-  mongoListSubscriptions(&subs, &oe, uriParams, "", 20, 0);
+  mongoListSubscriptions(&subs, &oe, uriParams, "", 20, 0, &count);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
@@ -160,7 +160,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   attrs = s.notification.attributes;
   ASSERT_EQ(0, attrs.size());
   EXPECT_EQ("http://notify1.me", s.notification.callback);
-  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ(-1, s.notification.timesSent);
   EXPECT_EQ(-1, s.notification.lastNotification);
   EXPECT_EQ(-1, s.notification.throttling);
   EXPECT_EQ(10000000, s.expires);

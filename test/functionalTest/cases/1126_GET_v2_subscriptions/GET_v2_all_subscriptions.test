@@ -25,7 +25,7 @@ GET Subscriptions V2
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0
 
 --SHELL--
 
@@ -105,9 +105,9 @@ orionCurl --url /v1/subscribeContext --payload "${payload}" --json
 echo
 echo
 
-echo "02. GET /v2/subscriptions"
-echo "========================="
-orionCurl --url /v2/subscriptions --json
+echo "02. GET /v2/subscriptions?options=count"
+echo "======================================="
+orionCurl --url /v2/subscriptions?options=count --json
 echo
 echo
 
@@ -161,11 +161,12 @@ Date: REGEX(.*)
 }
 
 
-02. GET /v2/subscriptions
-=========================
+02. GET /v2/subscriptions?options=count
+=======================================
 HTTP/1.1 200 OK
 Content-Length: 837
 Content-Type: application/json
+X-Total-Count: 2
 Date: REGEX(.*)
 
 [
@@ -311,7 +312,7 @@ Date: REGEX(.*)
                 "speed",
                 "location"
             ],
-            "callback": "http://127.0.0.1:REGEX(\d+)/notify",            
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify",
             "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
             "timesSent": 1
         },

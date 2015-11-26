@@ -158,6 +158,10 @@ with open (file, 'r') as f:
             if re.match('\s*<duration>', line):
                 line = re.sub("REGEX\(.*\)", "PT1M", line)
 
+            # Similar case with providingApplication
+            if re.match('\s*<providingApplication>', line):
+                line = re.sub("REGEX\(.*\)", "9997", line)
+
             buffer.append(line + "\n")
 
             if re.search('<\/'+ root_element + '>', line):              

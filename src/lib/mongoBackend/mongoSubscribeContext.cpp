@@ -30,6 +30,7 @@
 #include "common/Format.h"
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoSubCache.h"
@@ -63,22 +64,29 @@ HttpStatusCode mongoSubscribeContext
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
-    /* If expiration is not present, then use a default one */
-    if (requestP->duration.isEmpty()) {
-        requestP->duration.set(DEFAULT_DURATION);
+    //
+    // Calculate expiration (using the current time and the duration field in the request).
+    // If expiration is not present, use a default value
+    //
+    if (requestP->duration.isEmpty())
+    {
+      requestP->duration.set(DEFAULT_DURATION);
     }
 
-    /* Calculate expiration (using the current time and the duration field in the request) */
     long long expiration = getCurrentTime() + requestP->duration.parse();
+
     LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
 
     /* Create the mongoDB subscription document */
-    BSONObjBuilder sub;
-    OID oid;
+    BSONObjBuilder  sub;
+    OID             oid;
+
     oid.init();
+
     sub.append("_id", oid);
     sub.append(CSUB_EXPIRATION, expiration);
-    sub.append(CSUB_REFERENCE, requestP->reference.get());
+    sub.append(CSUB_REFERENCE,  requestP->reference.get());
+
 
     /* Throttling */
     long long throttling = 0;
@@ -133,9 +141,14 @@ HttpStatusCode mongoSubscribeContext
                                              xauthToken,
                                              servicePathV);
     sub.append(CSUB_CONDITIONS, conds);
-    if (notificationDone) {
-        sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
-        sub.append(CSUB_COUNT, 1);
+
+    long long lastNotificationTime = 0;
+    if (notificationDone)
+    {
+      lastNotificationTime = (long long) getCurrentTime();
+
+      sub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
+      sub.append(CSUB_COUNT, 1);
     }
 
     /* Adding format to use in notifications */
@@ -156,8 +169,18 @@ HttpStatusCode mongoSubscribeContext
     std::string oidString = oid.toString();
 
     LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
-    mongoSubCacheItemInsert(tenant.c_str(), servicePath.c_str(), requestP, oidString.c_str(), expiration, throttling, notifyFormat);
 
+    cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
+    mongoSubCacheItemInsert(tenant.c_str(),
+                            servicePath.c_str(),
+                            requestP,
+                            oidString.c_str(),
+                            expiration,
+                            throttling,
+                            notifyFormat,
+                            notificationDone,
+                            lastNotificationTime);
+    cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
 

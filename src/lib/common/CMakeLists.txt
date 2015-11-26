@@ -45,6 +45,7 @@ SET (HEADERS
     statistics.h
     clockFunctions.h
     JsonHelper.h
+    SyncQOverflow.h
 )
 
 

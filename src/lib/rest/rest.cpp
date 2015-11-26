@@ -38,6 +38,9 @@
 #include "common/wsStrip.h"
 #include "common/globals.h"
 #include "common/defaultValues.h"
+#include "common/clockFunctions.h"
+#include "common/statistics.h"
+#include "common/tag.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -59,10 +62,16 @@
 
 /* ****************************************************************************
 *
-* PAYLOAD_SIZE - 
+* PAYLOAD_MAX_SIZE - 
 */
-#define PAYLOAD_SIZE       (64 * 1024 * 1024)
 #define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
+
+
+
+/* ****************************************************************************
+*
+* STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
+*/
 #define STATIC_BUFFER_SIZE (32 * 1024)
 
 
@@ -87,6 +96,9 @@ static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
+static unsigned int              connMemory;
+static unsigned int              maxConns;
+static unsigned int              threadPoolSize;
 
 
 
@@ -442,7 +454,6 @@ static void serve(ConnectionInfo* ciP)
 }
 
 
-
 /* ****************************************************************************
 *
 * requestCompleted -
@@ -455,18 +466,61 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+  ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+  struct timespec  reqEndTime;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
   }
 
-  delete(ciP);
   *con_cls = NULL;
 
   LM_TRANSACTION_END();  // Incoming REST request ends
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &reqEndTime);
+    clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
+  }  
+
+  delete(ciP);
+
+  //
+  // Statistics
+  //
+  // Flush this requests timing measures onto a global var to be read by "GET /statistics".
+  // Also, increment the accumulated measures.
+  //
+  if (timingStatistics)
+  {
+    timeStatSemTake(__FUNCTION__, "updating statistics");
+
+    memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
+
+    //
+    // "Fix" mongoBackendTime
+    //   Substract times waiting at mongo driver operation (in mongo[Read|Write|Command]WaitTime counters) so mongoBackendTime
+    //   contains at the end the time passed in our logic, i.e. a kind of "self-time" for mongoBackend
+    //
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);
+
+    clock_addtime(&accTimeStat.jsonV1ParseTime,       &threadLastTimeStat.jsonV1ParseTime);
+    clock_addtime(&accTimeStat.jsonV2ParseTime,       &threadLastTimeStat.jsonV2ParseTime);
+    clock_addtime(&accTimeStat.mongoBackendTime,      &threadLastTimeStat.mongoBackendTime);
+    clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
+    clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
+    clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
+    clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
+    clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
+    clock_addtime(&accTimeStat.xmlParseTime,          &threadLastTimeStat.xmlParseTime);
+
+    timeStatSemGive(__FUNCTION__, "updating statistics");
+  }
 }
+
 
 
 /* ****************************************************************************
@@ -897,9 +951,11 @@ static int connectionTreat
     unsigned short  port = 0;
 
     const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+
     if (mciP != NULL)
     {
-      struct sockaddr* addr = (struct sockaddr*)mciP->client_addr;
+      struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
+
       port = (addr->sa_data[0] << 8) + addr->sa_data[1];
       snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
                addr->sa_data[2] & 0xFF,
@@ -915,13 +971,37 @@ static int connectionTreat
 
 
     //
+    // Reset time measuring?
+    //
+    if (timingStatistics)
+    {
+      memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
+    }
+
+
+    //
     // ConnectionInfo
+    //
+    // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
+    // as long as it is properly cleaned up between calls.
+    // We would save the call to new/free for each and every request.
+    // Once we *really* look to scratch some efficiency, this change should be made.
+    //
+    // Also, is ciP->ip really used?
     //
     if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
     {
       LM_E(("Runtime Error (error allocating ConnectionInfo)"));
       return MHD_NO;
     }
+
+    if (timingStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
+    }
+
+    LM_T(LmtRequest, (""));
+    LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
 
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;
@@ -938,6 +1018,9 @@ static int connectionTreat
 
     //
     // URI parameters
+    //
+    // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
+    //           Once we *really* look to scratch some efficiency, this change should be made.
     // 
     ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]      = DEFAULT_PARAM_NOTIFY_FORMAT;
     ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
@@ -966,6 +1049,7 @@ static int connectionTreat
   }
 
 
+  //
   // 2. Data gathering calls
   //
   // 2-1. Data gathering calls, just wait
@@ -973,46 +1057,56 @@ static int connectionTreat
   //
   if (dataLen != 0)
   {
-    if (dataLen == ciP->httpHeaders.contentLength)
+    //
+    // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+    // just silently "eat" the entire message
+    //
+    if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
-      if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
-      {
-        if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-        {
-          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
-        }
-        else
-        {
-          ciP->payload = static_buffer;
-        }
+      *upload_data_size = 0;
+      return MHD_YES;
+    }
 
-        ciP->payloadSize = dataLen;
-        memcpy(ciP->payload, upload_data, dataLen);
-        ciP->payload[dataLen] = 0;
+    //
+    // First call with payload - use the thread variable "static_buffer" if possible,
+    // otherwise allocate a bigger buffer
+    //
+    // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
+    //           Once we *really* look to scratch some efficiency, this change should be made.
+    //
+    if (ciP->payloadSize == 0)  // First call with payload
+    {
+      if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+      {
+        ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
       }
       else
       {
-        char details[256];
-        snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
-
-        ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
-        ciP->httpStatusCode = SccRequestEntityTooLarge;
+        ciP->payload = static_buffer;
       }
-
-      // All payload received, acknowledge!
-      *upload_data_size = 0;
-    }
-    else
-    {
-      LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
     }
 
+    // Copy the chunk
+    LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+    memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
+    
+    // Add to the size of the accumulated read buffer
+    ciP->payloadSize += *upload_data_size;
+
+    // Zero-terminate the payload
+    ciP->payload[ciP->payloadSize] = 0;
+
+    // Acknowledge the data and return
+    *upload_data_size = 0;
     return MHD_YES;
   }
 
+
+  //
   // 3. Finally, serve the request (unless an error has occurred)
   // 
-  // URL and headers checks are delayed to third MHD call 
+  // URL and headers checks are delayed to the "third" MHD call, as no 
+  // errors can be sent before all the request has been read
   //
   
   if (urlCheck(ciP, ciP->url) == false)
@@ -1071,6 +1165,18 @@ static int connectionTreat
     LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
   }
 
+  //
+  // Here, if the incoming request was too big, return error abouyt it
+  //
+  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
+  {
+    char details[256];
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+    ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
+    ciP->httpStatusCode = SccRequestEntityTooLarge;
+  }
+
   if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
   {
     std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
@@ -1093,16 +1199,34 @@ static int connectionTreat
 /* ****************************************************************************
 *
 * restStart - 
+*
+* NOTE, according to MHD documentation, thread pool (MHD_OPTION_THREAD_POOL_SIZE) cannot be used
+* is conjunction with MHD_USE_THREAD_PER_CONNECTION.
+* However, we have seen that if the thread pool size is 0 (the case of NOT using thread pool), then
+* MHD_start_daemon is OK with it.
+*
+* From MHD documentation:
+* MHD_OPTION_THREAD_POOL_SIZE
+*   Number (unsigned int) of threads in thread pool. Enable thread pooling by setting this value to to something greater than 1.
+*   Currently, thread model must be MHD_USE_SELECT_INTERNALLY if thread pooling is enabled (MHD_start_daemon returns NULL for
+*   an unsupported thread model).
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
-  bool   mhdStartError = true;
-  size_t memoryLimit   = 2 * PAYLOAD_SIZE;
+  bool      mhdStartError  = true;
+  size_t    memoryLimit    = connMemory * 1024; // connMemory is expressed in kilobytes
+  MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)
   {
     LM_X(1, ("Fatal Error (please call restInit before starting the REST service)"));
   }
+
+  if (threadPoolSize != 0)
+  {
+    serverMode = MHD_USE_SELECT_INTERNALLY;
+  }
+
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   { 
@@ -1118,7 +1242,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
+      mhdDaemon = MHD_start_daemon(serverMode | MHD_USE_SSL,
                                    htons(port),
                                    NULL,
                                    NULL,
@@ -1126,6 +1250,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                    MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1134,12 +1260,14 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY | MHD_USE_DEBUG
+      mhdDaemon = MHD_start_daemon(serverMode,
                                    htons(port),
                                    NULL,
                                    NULL,
                                    connectionTreat,                     NULL,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1166,7 +1294,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
                                       NULL,
@@ -1174,6 +1302,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                       MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1181,12 +1311,14 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
                                       NULL,
                                       connectionTreat,                     NULL,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1224,6 +1356,9 @@ void restInit
   const char*         _bindAddress,
   unsigned short      _port,
   bool                _multitenant,
+  unsigned int        _connectionMemory,
+  unsigned int        _maxConnections,
+  unsigned int        _mhdThreadPoolSize,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
@@ -1236,14 +1371,17 @@ void restInit
   const char* key  = _httpsKey;
   const char* cert = _httpsCertificate;
 
-  port          = _port;
-  restServiceV  = _restServiceV;
-  ipVersionUsed = _ipVersion;
-  serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
-  acceptTextXml = _acceptTextXml;
-  multitenant   = _multitenant;
-  rushHost      = _rushHost;
-  rushPort      = _rushPort;
+  port             = _port;
+  restServiceV     = _restServiceV;
+  ipVersionUsed    = _ipVersion;
+  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
+  acceptTextXml    = _acceptTextXml;
+  multitenant      = _multitenant;
+  connMemory       = _connectionMemory;
+  maxConns         = _maxConnections;
+  threadPoolSize   = _mhdThreadPoolSize;
+  rushHost         = _rushHost;
+  rushPort         = _rushPort;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

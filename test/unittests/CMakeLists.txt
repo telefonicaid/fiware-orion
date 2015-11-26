@@ -242,20 +242,20 @@ SET (STATIC_LIBS
     ${GTESTMAIN_LIBRARY}
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
-    mongoBackend
     rest
-    ngsiNotify
     jsonParse
     jsonParseV2
     xmlParse
     apiTypesV2
     convenience
     serviceRoutines
+    ngsiNotify
     rest
     parse
     ngsi9
     ngsi10
     ngsi
+    mongoBackend
     orionTypes
     common
     lm
@@ -304,7 +304,7 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS")
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS"))
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
@@ -319,6 +319,11 @@ ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
   MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient
 -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
+ELSEIF(${DISTRO} MATCHES "Debian_8.2")
+  # It seems that Debian 8.2 doesn't like -mt libraries for unit tests... not sure about other Debian versions
+  MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex)
+ELSE()
 ELSEIF(${DISTRO} MATCHES "Debian_.*")
   MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)

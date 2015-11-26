@@ -272,12 +272,8 @@ TEST(mongoRegisterContext_update, updateCase1)
   EXPECT_EQ(SccOk, res.errorCode.code);
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -382,9 +378,6 @@ TEST(mongoRegisterContext_update, updateCase2)
     EXPECT_EQ(SccOk, res.errorCode.code);
     EXPECT_EQ("OK", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -508,9 +501,6 @@ TEST(mongoRegisterContext_update, updateNotFound)
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ("registration id: /51307b66f481db11bf860003/", res.errorCode.details);
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -632,9 +622,6 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ("registration id: /51307b66f481db11bf861111/", res.errorCode.details);
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -760,9 +747,6 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     EXPECT_EQ("Registration Not Found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -880,11 +864,7 @@ TEST(mongoRegisterContext_update, updateFromXmlToJson)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
   utExit();
-
 }
 
 
@@ -994,11 +974,7 @@ TEST(mongoRegisterContext_update, updateFromJsonToXml)
   EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1034,7 +1010,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     prepareDatabase();
 
     /* Set MongoDB connection mock (preserving "actual" connection for later use) */
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -1050,8 +1026,10 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
               "- findOne(): { _id: ObjectId('51307b66f481db11bf860001'), servicePath: \"/\" } "
               "- exception: boom!!)", res.errorCode.details);
 
-    /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mock */    
     delete connectionMock;
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -1059,13 +1037,13 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */   
 
     /* registrations collection: */
-    ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));
+    ASSERT_EQ(2, connectionDb->count(REGISTRATIONS_COLL, BSONObj()));
 
     BSONObj reg, contextRegistration, ent0, attr0, attr1, attr2;
     std::vector<BSONElement> contextRegistrationV, entities, attrs;
 
     /* reg #1 (untouched) */
-    reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
+    reg = connectionDb->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
     EXPECT_EQ(10000000, reg.getIntField("expiration"));
 
@@ -1096,7 +1074,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     EXPECT_STREQ("true", C_STR_FIELD(attr2, "isDomain"));
 
     /* reg #2 (untouched) */
-    reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
+    reg = connectionDb->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
     EXPECT_EQ(20000000, reg.getIntField("expiration"));
 
@@ -1134,12 +1112,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
-
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -1199,14 +1172,9 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability1)
   /* The only collection affected by this operation is registrations, which has been extensively
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
-
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
-
 }
 
 /* ****************************************************************************
@@ -1272,14 +1240,10 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability2)
 
   /* The only collection affected by this operation is registrations, which has been extensively
    * testbed by other unit tests, so we don't include checking in the present unit test */
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
 
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
-
 }
 
 /* ****************************************************************************
@@ -1342,13 +1306,8 @@ TEST(mongoRegisterContext_update, NotifyContextAvailability3)
 
   /* The only collection affected by this operation is registrations, which has been extensively
    * testbed by other unit tests, so we don't include checking in the present unit test */
- 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-
 
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
-
 }

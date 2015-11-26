@@ -24,9 +24,9 @@
 tenant names with upper and lowercase letters in HTTP header
 
 --SHELL-INIT--
-dbInit ${CB_DATABASE_NAME}-case
-dbInit ${CB_DATABASE_NAME}-Case
-dbInit ${CB_DATABASE_NAME}-CASE
+dbInit ${CB_DB_NAME} case
+dbInit ${CB_DB_NAME} Case
+dbInit ${CB_DB_NAME} CASE
 dbInit CB
 brokerStart CB 0 IPV4 -multiservice
 
@@ -264,7 +264,7 @@ Date: REGEX(.*)
 --TEARDOWN--
 
 brokerStop CB
-dbDrop ${CB_DATABASE_NAME}-case
-dbDrop ${CB_DATABASE_NAME}-Case
-dbDrop ${CB_DATABASE_NAME}-CASE
+dbDrop ${CB_DB_NAME} case
+dbDrop ${CB_DB_NAME} Case
+dbDrop ${CB_DB_NAME} CASE
 dbDrop CB
