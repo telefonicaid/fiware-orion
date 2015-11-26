@@ -1624,7 +1624,7 @@ static void processContextRegistrationElement
 (
   BSONObj                             cr,
   EntityIdVector                      enV,
-  AttributeList                       attrL,
+  const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   Format                              format
 )
@@ -1692,7 +1692,7 @@ static void processContextRegistrationElement
 bool registrationsQuery
 (
   EntityIdVector                      enV,
-  AttributeList                       attrL,
+  const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -1935,7 +1935,7 @@ AttributeList subToAttributeList(BSONObj sub)
 bool processOnChangeConditionForSubscription
 (
   EntityIdVector                   enV,
-  AttributeList                    attrL,
+  const AttributeList&             attrL,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const std::string&               notifyUrl,
@@ -2020,9 +2020,10 @@ bool processOnChangeConditionForSubscription
 *
 */
 BSONArray processConditionVector
-(NotifyConditionVector*           ncvP,
+(
+  NotifyConditionVector*           ncvP,
   EntityIdVector                   enV,
-  AttributeList                    attrL,
+  const AttributeList&             attrL,
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
@@ -2127,12 +2128,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 */
 bool processAvailabilitySubscription
 (
-  EntityIdVector     enV,
-  AttributeList      attrL,
-  const std::string& subId,
-  const std::string& notifyUrl,
-  Format             format,
-  const std::string& tenant
+  EntityIdVector       enV,
+  const AttributeList& attrL,
+  const std::string&   subId,
+  const std::string&   notifyUrl,
+  Format               format,
+  const std::string&   tenant
 )
 {
   std::string                       err;

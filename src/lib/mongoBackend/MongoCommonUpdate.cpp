@@ -1405,7 +1405,7 @@ static bool addTriggeredSubscriptions
 static bool processOnChangeConditionForUpdateContext
 (
   ContextElementResponse*          notifyCerP,
-  AttributeList                    attrL,
+  const AttributeList&             attrL,
   std::string                      subId,
   std::string                      notifyUrl,
   Format                           format,

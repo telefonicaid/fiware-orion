@@ -293,7 +293,7 @@ extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextE
 extern bool registrationsQuery
 (
   EntityIdVector                      enV,
-  AttributeList                       attrL,
+  const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -339,7 +339,7 @@ extern void processOntimeIntervalCondition(const std::string& subId, int interva
 extern bool processOnChangeConditionForSubscription
 (
   EntityIdVector                   enV,
-  AttributeList                    attrV,
+  const AttributeList&             attrV,
   ConditionValueList*              condValues,
   const std::string&               subId,
   const std::string&               notifyUrl,
@@ -358,7 +358,7 @@ extern BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
   EntityIdVector                   enV,
-  AttributeList                    attrL,
+  const AttributeList&             attrL,
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
@@ -374,12 +374,12 @@ extern BSONArray processConditionVector
 *
 */
 extern bool processAvailabilitySubscription(
-    EntityIdVector     enV,
-    AttributeList      attrL,
-    const std::string& subId,
-    const std::string& notifyUrl,
-    Format             format,
-    const std::string& tenant
+    EntityIdVector       enV,
+    const AttributeList& attrL,
+    const std::string&   subId,
+    const std::string&   notifyUrl,
+    Format               format,
+    const std::string&   tenant
 );
 
 /* ****************************************************************************
