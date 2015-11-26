@@ -241,7 +241,7 @@ void setNotifier(Notifier* n)
 *
 * setDbPrefix -
 */
-void setDbPrefix(std::string _dbPrefix)
+void setDbPrefix(const std::string& _dbPrefix)
 {
   dbPrefix = _dbPrefix;
   LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
@@ -299,7 +299,7 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs)
 * corresponding tenant name as result (myservice1) or "" if the string doesn't
 * start with the database prefix
 */
-std::string tenantFromDb(std::string& database)
+std::string tenantFromDb(const std::string& database)
 {
   std::string r;
   std::string prefix  = dbPrefix + "-";
@@ -326,7 +326,7 @@ std::string tenantFromDb(std::string& database)
 *
 * setEntitiesCollectionName -
 */
-void setEntitiesCollectionName(std::string name)
+void setEntitiesCollectionName(const std::string& name)
 {
   entitiesCollectionName = name;
 }
@@ -336,7 +336,7 @@ void setEntitiesCollectionName(std::string name)
 *
 * setRegistrationsCollectionName -
 */
-void setRegistrationsCollectionName(std::string name)
+void setRegistrationsCollectionName(const std::string& name)
 {
   registrationsCollectionName = name;
 }
@@ -346,7 +346,7 @@ void setRegistrationsCollectionName(std::string name)
 *
 * setSubscribeContextCollectionName -
 */
-void setSubscribeContextCollectionName(std::string name)
+void setSubscribeContextCollectionName(const std::string& name)
 {
   subscribeContextCollectionName = name;
 }
@@ -356,7 +356,7 @@ void setSubscribeContextCollectionName(std::string name)
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
-void setSubscribeContextAvailabilityCollectionName(std::string name)
+void setSubscribeContextAvailabilityCollectionName(const std::string& name)
 {
   subscribeContextAvailabilityCollectionName = name;
 }
@@ -380,7 +380,7 @@ static std::string composeCollectionName(std::string tenant, std::string colName
 *
 * Common helper function for composing database names
 */
-std::string composeDatabaseName(std::string tenant)
+std::string composeDatabaseName(const std::string& tenant)
 {
   std::string result;
 
@@ -404,7 +404,7 @@ std::string composeDatabaseName(std::string tenant)
 *
 * getEntitiesCollectionName -
 */
-std::string getEntitiesCollectionName(std::string tenant)
+std::string getEntitiesCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, entitiesCollectionName);
 }
@@ -414,7 +414,7 @@ std::string getEntitiesCollectionName(std::string tenant)
 *
 * getRegistrationsCollectionName -
 */
-std::string getRegistrationsCollectionName(std::string tenant)
+std::string getRegistrationsCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, registrationsCollectionName);
 }
@@ -424,7 +424,7 @@ std::string getRegistrationsCollectionName(std::string tenant)
 *
 * getSubscribeContextCollectionName -
 */
-std::string getSubscribeContextCollectionName(std::string tenant)
+std::string getSubscribeContextCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, subscribeContextCollectionName);
 }
@@ -434,7 +434,7 @@ std::string getSubscribeContextCollectionName(std::string tenant)
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
-std::string getSubscribeContextAvailabilityCollectionName(std::string tenant)
+std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant)
 {
   return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
@@ -460,7 +460,7 @@ bool mongoLocationCapable(void)
 *
 * ensureLocationIndex -
 */
-void ensureLocationIndex(std::string tenant)
+void ensureLocationIndex(const std::string& tenant)
 {
   /* Ensure index for entity locations, in the case of using 2.4 */
   if (mongoLocationCapable())
@@ -553,7 +553,7 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 *
 * recoverOntimeIntervalThreads -
 */
-void recoverOntimeIntervalThreads(std::string tenant)
+void recoverOntimeIntervalThreads(const std::string& tenant)
 {
   treatOnTimeIntervalSubscriptions(tenant, recoverOnTimeIntervalThread);
 }
@@ -585,7 +585,7 @@ static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 *
 * This function is only to be used under harakiri mode, not for real use
 */
-void destroyAllOntimeIntervalThreads(std::string tenant)
+void destroyAllOntimeIntervalThreads(const std::string& tenant)
 {
   treatOnTimeIntervalSubscriptions(tenant, destroyOnTimeIntervalThread);
 }
@@ -676,7 +676,7 @@ bool includedAttribute(const ContextRegistrationAttribute& attr, const Attribute
 * fillQueryEntity -
 *
 */
-static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
+static void fillQueryEntity(BSONArrayBuilder& ba, const EntityId* enP)
 {
   BSONObjBuilder     ent;
   const std::string  idString          = "_id." ENT_ENTITY_ID;
@@ -793,7 +793,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 * Returns true if areaQuery was filled, false otherwise
 *
 */
-static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
+static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 {
   if (!mongoLocationCapable())
   {
@@ -873,7 +873,7 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
 * make comparisons work. An smarter solution could be developed.
 *
 */
-static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
+static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 {
   char* str         = strdup(in.c_str());
   char* toFree      = str;
@@ -1194,7 +1194,7 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
 * addFilterScopes -
 *
 */
-static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
+static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
 {
   std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
@@ -1235,13 +1235,13 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
 */
 bool entitiesQuery
 (
-  EntityIdVector                   enV,
-  AttributeList                    attrL,
-  Restriction                      res,
+  const EntityIdVector&            enV,
+  const AttributeList&             attrL,
+  const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   bool                             includeEmpty,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset,
   int                              limit,
@@ -1301,7 +1301,7 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
-    Scope* sco = res.scopeVector.get(ix);
+    const Scope* sco = res.scopeVector.get(ix);
 
     if (sco->type.find(SCOPE_FILTER) == 0)
     {
@@ -1937,10 +1937,10 @@ bool processOnChangeConditionForSubscription
   EntityIdVector                   enV,
   AttributeList                    attrL,
   ConditionValueList*              condValues,
-  std::string                      subId,
-  std::string                      notifyUrl,
+  const std::string&               subId,
+  const std::string&               notifyUrl,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 )
@@ -2020,15 +2020,14 @@ bool processOnChangeConditionForSubscription
 *
 */
 BSONArray processConditionVector
-(
-  NotifyConditionVector*           ncvP,
+(NotifyConditionVector*           ncvP,
   EntityIdVector                   enV,
   AttributeList                    attrL,
-  std::string                      subId,
-  std::string                      url,
+  const std::string&               subId,
+  const std::string&               url,
   bool*                            notificationDone,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 )
@@ -2128,12 +2127,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 */
 bool processAvailabilitySubscription
 (
-  EntityIdVector  enV,
-  AttributeList   attrL,
-  std::string     subId,
-  std::string     notifyUrl,
-  Format          format,
-  std::string     tenant
+  EntityIdVector     enV,
+  AttributeList      attrL,
+  const std::string& subId,
+  const std::string& notifyUrl,
+  Format             format,
+  const std::string& tenant
 )
 {
   std::string                       err;

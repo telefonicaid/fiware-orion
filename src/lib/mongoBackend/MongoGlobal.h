@@ -129,7 +129,7 @@ extern void releaseMongoConnection(DBClientBase* connection);
 *
 * setDbPrefix -
 */
-extern void setDbPrefix(std::string dbPrefix);
+extern void setDbPrefix(const std::string& dbPrefix);
 
 /*****************************************************************************
 *
@@ -155,62 +155,62 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs);
 *
 * tenantFromDb -
 */
-extern std::string tenantFromDb(std::string& database);
+extern std::string tenantFromDb(const std::string& database);
 
 /*****************************************************************************
 *
 * setEntitiesCollectionName -
 */
-extern void setEntitiesCollectionName(std::string name);
+extern void setEntitiesCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * setRegistrationsCollectionName -
 */
-extern void setRegistrationsCollectionName(std::string name);
+extern void setRegistrationsCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * setSubscribeContextCollectionName -
 */
-extern void setSubscribeContextCollectionName(std::string name);
+extern void setSubscribeContextCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
-extern void setSubscribeContextAvailabilityCollectionName(std::string name);
+extern void setSubscribeContextAvailabilityCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * composeDatabaseName -
 *
 */
-extern std::string composeDatabaseName(std::string tenant);
+extern std::string composeDatabaseName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getEntitiesCollectionName -
 */
-extern std::string getEntitiesCollectionName(std::string tenant);
+extern std::string getEntitiesCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getRegistrationsCollectionName -
 */
-extern std::string getRegistrationsCollectionName(std::string tenant);
+extern std::string getRegistrationsCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getSubscribeContextCollectionName -
 */
-extern std::string getSubscribeContextCollectionName(std::string tenant);
+extern std::string getSubscribeContextCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
-extern std::string getSubscribeContextAvailabilityCollectionName(std::string tenant);
+extern std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
@@ -222,13 +222,13 @@ extern bool mongoLocationCapable(void);
 *
 * ensureLocationIndex -
 */
-extern void ensureLocationIndex(std::string tenant);
+extern void ensureLocationIndex(const std::string& tenant);
 
 /* ****************************************************************************
 *
 * recoverOntimeIntervalThreads -
 */
-extern void recoverOntimeIntervalThreads(std::string tenant);
+extern void recoverOntimeIntervalThreads(const std::string& tenant);
 
 /* ****************************************************************************
 *
@@ -236,7 +236,7 @@ extern void recoverOntimeIntervalThreads(std::string tenant);
 *
 * This function is only to be used under harakiri mode, not for real use
 */
-extern void destroyAllOntimeIntervalThreads(std::string tenant);
+extern void destroyAllOntimeIntervalThreads(const std::string& tenant);
 
 /* ****************************************************************************
 *
@@ -264,13 +264,13 @@ extern bool includedAttribute(const ContextRegistrationAttribute& attr, const At
 */
 extern bool entitiesQuery
 (
-  EntityIdVector                   enV,
-  AttributeList                    attrL,
-  Restriction                      res,
+  const EntityIdVector&            enV,
+  const AttributeList&             attrL,
+  const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   bool                             includeEmpty,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset       = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit        = DEFAULT_PAGINATION_LIMIT_INT,
@@ -329,7 +329,7 @@ extern AttributeList subToAttributeList(BSONObj attrL);
 * processOntimeIntervalCondition -
 *
 */
-extern void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant);
+extern void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant);
 
 /* ****************************************************************************
 *
@@ -341,10 +341,10 @@ extern bool processOnChangeConditionForSubscription
   EntityIdVector                   enV,
   AttributeList                    attrV,
   ConditionValueList*              condValues,
-  std::string                      subId,
-  std::string                      notifyUrl,
+  const std::string&               subId,
+  const std::string&               notifyUrl,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 );
@@ -359,11 +359,11 @@ extern BSONArray processConditionVector
   NotifyConditionVector*           ncvP,
   EntityIdVector                   enV,
   AttributeList                    attrL,
-  std::string                      subId,
-  std::string                      url,
+  const std::string&               subId,
+  const std::string&               url,
   bool*                            notificationDone,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 );
@@ -373,7 +373,14 @@ extern BSONArray processConditionVector
 * processAvailabilitySubscriptions -
 *
 */
-extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant);
+extern bool processAvailabilitySubscription(
+    EntityIdVector     enV,
+    AttributeList      attrL,
+    const std::string& subId,
+    const std::string& notifyUrl,
+    Format             format,
+    const std::string& tenant
+);
 
 /* ****************************************************************************
 *
