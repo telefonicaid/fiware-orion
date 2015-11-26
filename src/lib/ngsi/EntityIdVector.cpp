@@ -193,13 +193,18 @@ EntityId* EntityIdVector::get(int ix)
   return vec[ix];
 }
 
+const EntityId* EntityIdVector::get(int ix) const
+{
+  return vec[ix];
+}
+
 
 
 /* ****************************************************************************
 *
 * EntityIdVector::size -
 */
-unsigned int EntityIdVector::size(void)
+unsigned int EntityIdVector::size(void) const
 {
   return vec.size();
 }

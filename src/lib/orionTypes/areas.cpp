@@ -75,7 +75,7 @@ void Point::fill(Point* p)
 *
 * Point::latitude -
 */
-double Point::latitude(void)
+double Point::latitude(void) const
 {
   return atof(_latitude.c_str());
 }
@@ -85,7 +85,7 @@ double Point::latitude(void)
 *
 * Point::longitude -
 */
-double Point::longitude(void)
+double Point::longitude(void) const
 {
   return atof(_longitude.c_str());
 }
@@ -138,7 +138,7 @@ void Point::longitudeSet(::std::string longitude)
 *
 * Circle::inverted -
 */
-bool Circle::inverted(void)
+bool Circle::inverted(void) const
 {
   if ((_inverted == "true") || (_inverted == "1"))
   {
@@ -155,7 +155,7 @@ bool Circle::inverted(void)
 * Circle::radius -
 *
 */
-double Circle::radius(void)
+double Circle::radius(void) const
 {
   return atof(_radius.c_str());
 }
@@ -166,7 +166,7 @@ double Circle::radius(void)
 *
 * Circle::radiusString -
 */
-::std::string Circle::radiusString(void)
+::std::string Circle::radiusString(void) const
 {
   return  _radius;
 }
@@ -178,7 +178,7 @@ double Circle::radius(void)
 * Circle::invertedString -
 *
 */
-::std::string Circle::invertedString(void)
+::std::string Circle::invertedString(void) const
 {
   return  _inverted;
 }
@@ -247,7 +247,7 @@ void Circle::centerSet(Point* _center)
 *
 * Polygon::inverted - 
 */
-bool Polygon::inverted(void)
+bool Polygon::inverted(void) const
 {
   if ((_inverted == "true") || (_inverted == "1"))
   {
@@ -286,7 +286,7 @@ void Polygon::invertedSet(bool inverted)
 *
 * Polygon::invertedString - 
 */
-::std::string Polygon::invertedString(void)
+::std::string Polygon::invertedString(void) const
 {
   return _inverted;
 }

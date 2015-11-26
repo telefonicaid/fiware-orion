@@ -43,8 +43,9 @@ typedef struct ScopeVector
   std::string  render(Format format, const std::string& indent, bool comma);
   void         present(const std::string& indent);
   void         push_back(Scope* item);
-  unsigned int size(void);
+  unsigned int size(void) const;
   Scope*       get(int ix);
+  const Scope* get(int ix) const;
   void         release();
 
   std::string  check(RequestType         requestType,

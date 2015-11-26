@@ -61,8 +61,8 @@ class Point
   Point(::std::string latitude, ::std::string longitude);
 
   void   fill(Point* p);
-  double latitude(void);
-  double longitude(void);
+  double latitude(void) const;
+  double longitude(void) const;
   void   latitudeSet(::std::string latitude);
   void   longitudeSet(::std::string longitude);
   ::std::string latitudeString(void);
@@ -83,11 +83,11 @@ class Circle
 
  public:
   Point          center;
-  bool           inverted(void);
-  double         radius(void);
+  bool           inverted(void) const;
+  double         radius(void) const;
 
-  ::std::string  radiusString(void);
-  ::std::string  invertedString(void);
+  ::std::string  radiusString(void) const;
+  ::std::string  invertedString(void) const;
   void           radiusSet(::std::string radius);
   void           radiusSet(float _radius);
   void           invertedSet(::std::string inverted);
@@ -108,10 +108,10 @@ class Polygon
 
  public:
   ::std::vector<Point*> vertexList;
-  bool                  inverted(void);
+  bool                  inverted(void) const;
   void                  invertedSet(::std::string inverted);
   void                  invertedSet(bool inverted);
-  ::std::string         invertedString(void);
+  ::std::string         invertedString(void) const;
   void                  vertexAdd(Point* p);
   void                  release(void);
 };
