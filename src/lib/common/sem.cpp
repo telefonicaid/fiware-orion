@@ -43,7 +43,7 @@ static sem_t           reqSem;
 static sem_t           transSem;
 static sem_t           cacheSem;
 static sem_t           timeStatSem;
-static SemRequestType  reqPolicy;
+static SemOpType  reqPolicy;
 
 
 
@@ -70,7 +70,7 @@ static struct timespec accTimeStatSemTime = { 0, 0 };
 *  -1 on failure
 *
 */
-int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
+int semInit(SemOpType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
 {
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
@@ -99,7 +99,7 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
   reqPolicy = _reqPolicy;
 
   // Measure accumulated semaphore waiting time?
-  semTimeStatistics = semTimeStat;
+  semWaitStatistics = semTimeStat;
   return 0;
 }
 
@@ -122,7 +122,7 @@ int reqSemTryToTake(void)
 *
 * reqSemTake -
 */
-int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken)
+int reqSemTake(const char* who, const char* what, SemOpType reqType, bool* taken)
 {
   int r;
 
@@ -150,14 +150,14 @@ int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* 
   struct timespec endTime;
   struct timespec diffTime;
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &startTime);
   }
 
   r = sem_wait(&reqSem);
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &endTime);
 
@@ -177,16 +177,9 @@ int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* 
 *
 * semTimeReqGet - get accumulated req semaphore waiting time
 */
-void semTimeReqGet(char* buf, int bufLen)
+float semTimeReqGet(void)
 {
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accReqSemTime.tv_sec, (int) accReqSemTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accReqSemTime.tv_sec + ((float) accReqSemTime.tv_nsec) / 1E9;
 }
 
 
@@ -195,16 +188,9 @@ void semTimeReqGet(char* buf, int bufLen)
 *
 * semTimeTransGet - get accumulated trans semaphore waiting time
 */
-void semTimeTransGet(char* buf, int bufLen)
+float semTimeTransGet(void)
 {
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accTransSemTime.tv_sec, (int) accTransSemTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accTransSemTime.tv_sec + ((float) accTransSemTime.tv_nsec) / 1E9;
 }
 
 
@@ -213,16 +199,9 @@ void semTimeTransGet(char* buf, int bufLen)
 *
 * semTimeCacheGet - get accumulated cache semaphore waiting time
 */
-void semTimeCacheGet(char* buf, int bufLen)
+float semTimeCacheGet(void)
 {
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accCacheSemTime.tv_sec, (int) accCacheSemTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accCacheSemTime.tv_sec + ((float) accCacheSemTime.tv_nsec)/ 1E9;
 }
 
 
@@ -231,16 +210,9 @@ void semTimeCacheGet(char* buf, int bufLen)
 *
 * semTimeTimeStatGet - get accumulated trans semaphore waiting time
 */
-void semTimeTimeStatGet(char* buf, int bufLen)
+float semTimeTimeStatGet(void)
 {
-  if (semTimeStatistics) 
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accTimeStatSemTime.tv_sec, (int) accTimeStatSemTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accTimeStatSemTime.tv_sec + ((float) accTimeStatSemTime.tv_nsec) / 1E9;
 }
 
 
@@ -307,14 +279,14 @@ int transSemTake(const char* who, const char* what)
   struct timespec endTime;
   struct timespec diffTime;
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &startTime);
   }
 
   r = sem_wait(&transSem);
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &endTime);
 
@@ -343,14 +315,14 @@ int cacheSemTake(const char* who, const char* what)
   struct timespec endTime;
   struct timespec diffTime;
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &startTime);
   }
 
   r = sem_wait(&cacheSem);
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &endTime);
 
@@ -444,14 +416,14 @@ int timeStatSemTake(const char* who, const char* what)
   struct timespec endTime;
   struct timespec diffTime;
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &startTime);
   }
 
   r = sem_wait(&timeStatSem);
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &endTime);
 
@@ -588,7 +560,7 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
     struct timespec  endTime;
     struct timespec  diffTime;
 
-    if (semTimeStatistics)
+    if (semWaitStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &startTime);
     }
@@ -600,7 +572,7 @@ static int get_curl_context_reuse(const std::string& key, struct curl_context* p
       return s;
     }
 
-    if (semTimeStatistics)
+    if (semWaitStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &endTime);
       clock_difftime(&endTime, &startTime, &diffTime);
@@ -742,14 +714,8 @@ void mutexTimeCCReset(void)
 *
 * mutexTimeCCGet - get accumulated curl contexts mutex waiting time
 */
-void mutexTimeCCGet(char* buf, int bufLen)
+float mutexTimeCCGet(void)
 {
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accCCMutexTime.tv_sec, (int) accCCMutexTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accCCMutexTime.tv_sec + ((float) accCCMutexTime.tv_nsec) / 1E9;
 }
+

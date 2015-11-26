@@ -134,12 +134,12 @@ void QueueStatistics::incSentError()
 *
 * getTimInQ -
 */
-void QueueStatistics::getTimeInQ(char* buf, size_t bufLen)
+float QueueStatistics::getTimeInQ(void)
 {
   boost::mutex::scoped_lock lock(mtxTimeInQ);
 
   // As the others time statistics
-  snprintf(buf, bufLen, "%lu.%09d", timeInQ.tv_sec, (int) timeInQ.tv_nsec);
+  return timeInQ.tv_sec + ((float) timeInQ.tv_nsec ) / 1E9;
 }
 
 /* ****************************************************************************

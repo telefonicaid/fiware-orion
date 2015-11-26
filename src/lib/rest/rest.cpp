@@ -478,7 +478,7 @@ static void requestCompleted
 
   LM_TRANSACTION_END();  // Incoming REST request ends
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &reqEndTime);
     clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
@@ -492,7 +492,7 @@ static void requestCompleted
   // Flush this requests timing measures onto a global var to be read by "GET /statistics".
   // Also, increment the accumulated measures.
   //
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     timeStatSemTake(__FUNCTION__, "updating statistics");
 
@@ -973,7 +973,7 @@ static int connectionTreat
     //
     // Reset time measuring?
     //
-    if (reqTimeStatistics)
+    if (timingStatistics)
     {
       memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
     }
@@ -995,7 +995,7 @@ static int connectionTreat
       return MHD_NO;
     }
 
-    if (reqTimeStatistics)
+    if (timingStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
     }

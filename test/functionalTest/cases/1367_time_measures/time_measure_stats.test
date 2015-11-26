@@ -25,7 +25,7 @@ Time Measuring Statisticss
 
 --SHELL-INIT--
 dbInit CB 
-brokerStart CB 101,38 IPv4 -reqTimeStat
+brokerStart CB 101,38 IPv4 -statTiming
 
 
 --SHELL--
@@ -306,28 +306,21 @@ echo
 01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((393|395))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "2",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "REGEX((0|1))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "request": "REGEX(\d+.\d+)"
+            "total": REGEX(.*.A*)
         },
         "last": {
-            "request": "REGEX(\d+.\d+)"
+            "total": REGEX(.*.A*)
         }
     },
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
@@ -421,42 +414,33 @@ Date: REGEX(.*)
 03. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((873|875))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "3",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "REGEX((0|1))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         }
     },
-    "updates": "1",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
@@ -549,44 +533,34 @@ Date: REGEX(.*)
 05. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((936|938))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "1",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "4",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "REGEX((0|1))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
         }
     },
-    "updates": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
@@ -602,45 +576,35 @@ Date: REGEX(.*)
 07. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((972|974))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "2",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "5",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "REGEX((0|1))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "jsonV2Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "jsonV2Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "jsonV2Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)"
+            "jsonV2Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
         }
     },
-    "updates": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
@@ -674,43 +638,33 @@ Date: REGEX(.*)
 09. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((897|899))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "2",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "6",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "REGEX((0|1))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "jsonV2Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "jsonV2Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)"
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
         }
     },
-    "updates": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
