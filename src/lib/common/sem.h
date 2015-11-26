@@ -37,15 +37,15 @@
 
 /* ****************************************************************************
 *
-* SemRequestType - 
+* SemOpType -
 */
-typedef enum SemRequestType
+typedef enum SemType
 {
   SemReadOp,
   SemWriteOp,
   SemReadWriteOp,
   SemNoneOp
-} SemRequestType;
+} SemType;
 
 
 
@@ -55,7 +55,7 @@ typedef enum SemRequestType
 */
 extern int semInit
 (
-  SemRequestType  _reqPolicy     = SemReadWriteOp,
+  SemType  _reqPolicy     = SemReadWriteOp,
   bool            semTimeStat    = false,
   int             shared         = 0,
   int             takenInitially = 1
@@ -85,7 +85,7 @@ extern int reqSemTryToTake(void);
 *
 * xxxSemTake -
 */
-extern int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken);
+extern int reqSemTake(const char* who, const char* what, SemType reqType, bool* taken);
 extern int transSemTake(const char* who, const char* what);
 extern int cacheSemTake(const char* who, const char* what);
 extern int timeStatSemTake(const char* who, const char* what);

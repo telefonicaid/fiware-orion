@@ -1476,7 +1476,7 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 *
 * policyGet - 
 */
-static SemRequestType policyGet(std::string mutexPolicy)
+static SemType policyGet(std::string mutexPolicy)
 {
   if (mutexPolicy == "read")
   {
@@ -1689,7 +1689,7 @@ int main(int argC, char* argV[])
   //
 
   pidFile();
-  SemRequestType policy = policyGet(reqMutexPolicy);
+  SemType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);

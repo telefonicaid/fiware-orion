@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <iomanip>
 
 
 /* ****************************************************************************
@@ -37,6 +38,7 @@
 std::string toJsonString(const std::string& input)
 {
   std::ostringstream ss;
+  ss << std::fixed << std::setprecision(9);
 
   ss << '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
@@ -116,6 +118,7 @@ std::string vectorToJson(std::vector<std::string> &list)
 */
 JsonHelper::JsonHelper(): empty(true)
 {
+  ss << std::fixed << std::setprecision(9);
   ss << '{';
 }
 
@@ -178,8 +181,8 @@ void JsonHelper::addFloat(const std::string& key, float  value)
   if (!empty)
   {
     ss << ',';
-  }
-  ss << toJsonString(key) << ':' << value;
+  }  
+  ss << toJsonString(key) << ':' << std::fixed << std::setprecision(9) << value;
 
   empty = false;
 }

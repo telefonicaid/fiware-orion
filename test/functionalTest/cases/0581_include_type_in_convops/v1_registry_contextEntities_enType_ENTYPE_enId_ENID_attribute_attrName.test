@@ -25,7 +25,7 @@ Convenience Entity By Id Attribute By Name
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255 IPv4 -statCounters
 
 --SHELL--
 
@@ -228,23 +228,20 @@ Date: REGEX(.*)
 06. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((351|353))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "entityByIdAttributeByNameIdAndType": "5",
-    "jsonRequests": "1",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "1",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "REGEX((0|1))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))",
-    "xmlRequests": "1"
+    "counters": {
+        "entityByIdAttributeByNameIdAndType": 5,
+        "jsonRequests": 1,
+        "statisticsRequests": 1,
+        "versionRequests": REGEX((0|1)),
+        "xmlRequests": 1
+    },
+    "measuring_interval_in_secs": REGEX(\d+),
+    "uptime_in_secs": REGEX(\d+)
 }
 
 

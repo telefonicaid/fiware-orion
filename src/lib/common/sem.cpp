@@ -43,7 +43,7 @@ static sem_t           reqSem;
 static sem_t           transSem;
 static sem_t           cacheSem;
 static sem_t           timeStatSem;
-static SemRequestType  reqPolicy;
+static SemType  reqPolicy;
 
 
 
@@ -70,7 +70,7 @@ static struct timespec accTimeStatSemTime = { 0, 0 };
 *  -1 on failure
 *
 */
-int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
+int semInit(SemType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
 {
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
@@ -122,7 +122,7 @@ int reqSemTryToTake(void)
 *
 * reqSemTake -
 */
-int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken)
+int reqSemTake(const char* who, const char* what, SemType reqType, bool* taken)
 {
   int r;
 

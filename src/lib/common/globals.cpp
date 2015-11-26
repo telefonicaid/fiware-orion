@@ -97,7 +97,7 @@ void orionInit
 (
   OrionExitFunction exitFunction,
   const char* version,
-  SemRequestType reqPolicy,
+  SemType reqPolicy,
   bool _countersStatistics,
   bool _semWaitStatistics,
   bool _timingStatistics,

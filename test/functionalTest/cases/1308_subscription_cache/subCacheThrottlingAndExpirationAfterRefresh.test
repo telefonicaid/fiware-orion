@@ -73,7 +73,7 @@ echo
 echo "02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh"
 echo "============================================================================================"
 sleep 11
-orionCurl --url /statistics --json
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -185,23 +185,17 @@ Date: REGEX(.*)
 02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((352|354))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "1",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "1",
-    "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "REGEX((1|2))",
-    "subCacheItems": "1",
-    "subCacheRefreshs": "REGEX((0|1|2))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "subscriptions": "1",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": REGEX((1|2)),
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 0,
+    "updates": 0
 }
 
 

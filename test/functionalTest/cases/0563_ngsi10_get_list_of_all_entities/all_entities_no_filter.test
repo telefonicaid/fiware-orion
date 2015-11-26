@@ -25,7 +25,7 @@
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0 -statCounters
 
 --SHELL--
 
@@ -120,14 +120,15 @@ echo
 
 echo "5. Statistics"
 echo "============="
-orionCurl --url /v1/admin/statistics
+orionCurl --url /v1/admin/statistics --json
 echo
 echo
 
 
 #
 # About
-#   <subCacheRefreshs>REGEX((0|1))</subCacheRefreshs>
+#   "reefresh": REGEX((0|1))
+#
 # When the broker is started with -noCache, there are no refreshes performed
 #
 
@@ -316,25 +317,14 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: REGEX((507|509))
-Content-Type: application/xml
+Content-Length: 51
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orion>
-  <xmlRequests>3</xmlRequests>
-  <updates>3</updates>
-  <allContextEntitiesRequests>2</allContextEntitiesRequests>
-  <versionRequests>REGEX((0|1))</versionRequests>
-  <statisticsRequests>1</statisticsRequests>
-  <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
-  <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
-  <subCacheRefreshs>REGEX((0|1))</subCacheRefreshs>
-  <subCacheInserts>0</subCacheInserts>
-  <subCacheRemoves>0</subCacheRemoves>
-  <subCacheUpdates>0</subCacheUpdates>
-  <subCacheItems>0</subCacheItems>
-</orion>
+{
+    "measuring_interval_in_secs": REGEX(\d+),
+    "uptime_in_secs": REGEX(\d+)
+}
 
 
 --TEARDOWN--
