@@ -197,7 +197,7 @@ std::string AttributeList::get(int ix) const
 *
 * AttributeList::clone - 
 */
-void AttributeList::clone(AttributeList& aList)
+void AttributeList::clone(const AttributeList& aList)
 {
   for (unsigned int ix = 0; ix < aList.size(); ++ix)
   {
