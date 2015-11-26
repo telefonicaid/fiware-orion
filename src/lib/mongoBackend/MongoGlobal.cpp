@@ -1007,7 +1007,7 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
 * make comparisons work. An smarter solution could be developed.
 *
 */
-static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
+static void qStringFilters(std::string& in, std::vector<BSONObj>& filters)
 {
   char* str         = strdup(in.c_str());
   char* toFree      = str;
@@ -1190,7 +1190,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
         bob.append(k, bb.obj());
         f = bob.obj();
-        // f = BSON(k << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo)));
       }
       else if (valVector.size() > 0)
       {
@@ -1214,7 +1213,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         bb.append("$in", ba.arr());
         bob.append(k, bb.obj());
         f = bob.obj();
-        // f = BSON(k << BSON("$in" << ba.arr()));
       }
       else
       {
@@ -1227,7 +1225,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
           bb.append("$in", BSON_ARRAY(d));
           bob.append(k, bb.obj());
           f = bob.obj();
-          // f = BSON(k << BSON("$in" << BSON_ARRAY(d)));
         }
         else
         {
@@ -1235,7 +1232,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
           bb.append("$in", BSON_ARRAY(right));
           bob.append(k, bb.obj());
           f = bob.obj();
-          // f = BSON(k << BSON("$in" << BSON_ARRAY(right)));
         }
       }
     }
@@ -1247,7 +1243,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         bb2.append("$exists", true).append("$not", bb.obj());
         bob.append(k, bb2.obj());
         f = bob.obj();
-        // f = BSON(k << BSON("$exists" << true << "$not" << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo))));
       }
       else if (valVector.size() > 0)
       {
@@ -1273,7 +1268,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         bob.append(k, bb.obj());
         f = bob.obj();
         
-        // f = BSON(k << BSON("$exists" << true << "$nin" << ba.arr()));
       }
       else
       {
@@ -1286,7 +1280,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
           bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
           bob.append(k, bb.obj());
           f = bob.obj();
-          // f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(d)));
         }
         else
         {
@@ -1294,7 +1287,6 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
           bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
           bob.append(k, bb.obj());
           f = bob.obj();
-          // f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(right)));
         }
       }
     }
@@ -1303,28 +1295,24 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
       bb.append("$gt", atof(right));
       bob.append(k, bb.obj());
       f = bob.obj();
-      // f = BSON(k << BSON("$gt" << atof(right)));
     }
     else if (opr == "<")
     {
-      bb.append("lt", atof(right));
+      bb.append("$lt", atof(right));
       bob.append(k, bb.obj());
       f = bob.obj();
-      // f = BSON(k << BSON("$lt" << atof(right)));
     }
     else if (opr == ">=")
     {
       bb.append("$gte", atof(right));
       bob.append(k, bb.obj());
       f = bob.obj();
-      // f = BSON(k << BSON("$gte" << atof(right)));
     }
     else if (opr == "<=")
     {
       bb.append("$lte", atof(right));
       bob.append(k, bb.obj());
       f = bob.obj();
-      // f = BSON(k << BSON("$lte" << atof(right)));
     }
     else if (opr == "EXISTS")
     {
@@ -1336,16 +1324,15 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         bb.append("$exists", true).append("$ne", "");
         bob.append(k, bb.obj());
         f = bob.obj();        
-        // f = BSON(k << BSON("$exists" << true << "$ne" << ""));
       }
       else
       {
         // Regular attribute
         k = std::string(ENT_ATTRS) + "." + right;
 
-        bob.append("$exists", true);
+        bb.append("$exists", true);
+        bob.append(k, bb.obj());
         f = bob.obj();
-        // f = BSON(k << BSON("$exists" << true));
       }
     }
     else if (opr == "NOT EXISTS")
@@ -1356,16 +1343,15 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         k = std::string("_id.") + ENT_ENTITY_TYPE;
         bb.append("$exists", false);
         bb2.append(k, bb.obj());
-        f =  BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
-        // f = BSON("$or" << BSON_ARRAY(BSON(k << "") << BSON(k << BSON("$exists" << false))));
+        f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
       }
       else
       {
         // Regular attribute
         k = std::string(ENT_ATTRS) + "." + right;
-        bob.append("$exists", false);
+        bb.append("$exists", false);
+        bob.append(k, bb.obj());
         f = bob.obj();
-        // f = BSON(k << BSON("$exists" << false));
       }
     }
     else
