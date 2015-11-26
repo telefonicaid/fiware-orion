@@ -56,9 +56,9 @@ typedef enum SemOpType
 extern int semInit
 (
   SemOpType  _reqPolicy     = SemReadWriteOp,
-  bool            semTimeStat    = false,
-  int             shared         = 0,
-  int             takenInitially = 1
+  bool       semTimeStat    = false,
+  int        shared         = 0,
+  int        takenInitially = 1
 );
 
 

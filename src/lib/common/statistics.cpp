@@ -62,7 +62,6 @@ do                                                                            \
 TimeStat           accTimeStat;
 TimeStat           lastTimeStat;
 __thread TimeStat  threadLastTimeStat;
-//bool               reqTimeStatistics = false;
 
 
 

@@ -127,7 +127,7 @@ echo
 
 #
 # About
-#   "reefresh": REGEX((0|1))
+#   "refresh": REGEX((0|1))
 #
 # When the broker is started with -noCache, there are no refreshes performed
 #
