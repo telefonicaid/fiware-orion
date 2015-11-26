@@ -949,7 +949,6 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
     }
     else
     {
-      //printf("\nNo OP found\n");
       op    = (char*) "";
       right = (char*) "";
     }
@@ -1581,7 +1580,7 @@ void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementR
      * domain attributes are not implemented */
     newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
 
-    // FIXME P10: not sure if this is the right way of doing, maybe we need a fill() method for this
+    // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
     newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;
     newCerP->statusCode.fill(&cerP->statusCode);
 
@@ -1752,7 +1751,7 @@ bool registrationsQuery
 {
 
   /* Build query based on arguments */
-  // FIXME P2: this implementation need to be refactored for cleanup
+  // FIXME P2: this implementation needs to be refactored for cleanup
   std::string       contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
   std::string       contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
   std::string       contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
@@ -2023,7 +2022,7 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+      // FIXME P10: we are using a dummy scope for the moment, until subscription scopes get implemented
       if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
