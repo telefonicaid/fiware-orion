@@ -79,6 +79,15 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
     MESSAGE("cmake: DEBUG compilation")
     add_definitions(-DDEBUG -DDEBUG_$ENV{USER} -DDEBUG_${USER})
+
+    #
+    # Note that stack protection is activated only in debug compilation.
+    # This is due that this directive makes the compiler introduce code at the beginning/end of each functions,
+    # so it has a pretty big impact on performance
+    #
+    # Our unit tests don't pass the compilation with "stack protection", so we turn it off using
+    # remove_definitions().
+    #
     add_definitions(-fstack-check -fstack-protector)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     if (COVERAGE)
