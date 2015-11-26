@@ -1534,7 +1534,10 @@ static bool processSubscriptions
                               BSON(CSUB_LASTNOTIFICATION << rightNow) <<
                               "$inc" << BSON(CSUB_COUNT << 1));
         
-        collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
+        if (collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err) == false)
+        {
+          ret = false;
+        }
       }
 
 
