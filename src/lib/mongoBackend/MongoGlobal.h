@@ -242,13 +242,13 @@ extern void destroyAllOntimeIntervalThreads(const std::string& tenant);
 *
 * matchEntity -
 */
-extern bool matchEntity(EntityId* en1, EntityId* en2);
+extern bool matchEntity(const EntityId* en1, const EntityId* en2);
 
 /* ****************************************************************************
 *
 * includedEntity -
 */
-extern bool includedEntity(EntityId en, EntityIdVector& entityIdV);
+extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 
 /* ****************************************************************************
 *
@@ -292,7 +292,7 @@ extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextE
 */
 extern bool registrationsQuery
 (
-  EntityIdVector                      enV,
+  const EntityIdVector&               enV,
   const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
@@ -338,7 +338,7 @@ extern void processOntimeIntervalCondition(const std::string& subId, int interva
 */
 extern bool processOnChangeConditionForSubscription
 (
-  EntityIdVector                   enV,
+  const EntityIdVector&            enV,
   const AttributeList&             attrV,
   ConditionValueList*              condValues,
   const std::string&               subId,
@@ -357,7 +357,7 @@ extern bool processOnChangeConditionForSubscription
 extern BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
-  EntityIdVector                   enV,
+  const EntityIdVector&            enV,
   const AttributeList&             attrL,
   const std::string&               subId,
   const std::string&               url,
@@ -374,12 +374,12 @@ extern BSONArray processConditionVector
 *
 */
 extern bool processAvailabilitySubscription(
-    EntityIdVector       enV,
-    const AttributeList& attrL,
-    const std::string&   subId,
-    const std::string&   notifyUrl,
-    Format               format,
-    const std::string&   tenant
+    const EntityIdVector& enV,
+    const AttributeList&  attrL,
+    const std::string&    subId,
+    const std::string&    notifyUrl,
+    Format                format,
+    const std::string&    tenant
 );
 
 /* ****************************************************************************

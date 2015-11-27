@@ -61,7 +61,7 @@ using std::auto_ptr;
 */
 static bool processSubscriptions
 (
-  EntityIdVector                        triggerEntitiesV,
+  const EntityIdVector&                 triggerEntitiesV,
   map<string, TriggeredSubscription*>&  subs,
   std::string&                          err,
   const std::string&                    tenant

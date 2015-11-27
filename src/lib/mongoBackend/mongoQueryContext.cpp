@@ -167,7 +167,7 @@ void addContextProviderAttribute
 * matchEntityInCrr -
 *
 */
-bool matchEntityInCrr(ContextRegistration& cr, EntityId* enP)
+bool matchEntityInCrr(ContextRegistration& cr, const EntityId* enP)
 {
   for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix)
   {
@@ -197,7 +197,7 @@ bool matchEntityInCrr(ContextRegistration& cr, EntityId* enP)
 * processGenericEntities() function)
 *
 */
-void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached, EntityId* enP = NULL)
+void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached, const EntityId* enP = NULL)
 {
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
@@ -244,11 +244,11 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 * limit has been reached with local entities.
 *
 */
-void processGenericEntities(EntityIdVector& enV, ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached)
+void processGenericEntities(const EntityIdVector& enV, ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached)
 {
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    EntityId* enP = enV.get(ix);
+    const EntityId* enP = enV.get(ix);
     if (enP->type == "" || isTrue(enP->isPattern))
     {
       addContextProviders(cerV, crrV, limitReached, enP);
