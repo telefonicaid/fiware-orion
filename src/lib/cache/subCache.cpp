@@ -593,13 +593,22 @@ void subCacheUpdateStatisticsIncrement(void)
 /* ****************************************************************************
 *
 * subCacheItemInsert - 
+*
+* First of all, insertion is done at the end of the list, so, 
+* cSubP->next must ALWAYS be zero at insertion time
+*
+* Note that this is the insert function that *really inserts* the
+* CachedSubscription in the list of CachedSubscriptions.
+*
+* All other subCacheItemInsert functions crea<te the subscription and then
+* calls this function.
+*
+* So, the subscription itself is untouched by this function, is it ONLY inserted
+* in the list (only the 'next' field is modified).
+*
 */
 void subCacheItemInsert(CachedSubscription* cSubP)
 {
-  //
-  // First of all, insertion is done at the end of the list, so, 
-  // cSubP->next must ALWAYS be zero at insertion time
-  //
   cSubP->next = NULL;
 
   LM_T(LmtSubCache, ("inserting sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
@@ -624,6 +633,10 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 /* ****************************************************************************
 *
 * subCacheItemInsert - create a new sub, fill it in, and add it to cache
+*
+* Note that 'count', which is the counter of how many times a notification has been
+* fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
+* has made a notification to be triggered/fired upon creation-time of the subscription. 
 */
 void subCacheItemInsert
 (

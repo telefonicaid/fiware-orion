@@ -55,6 +55,9 @@ using namespace mongo;
 *  -3:  No patterned entity found
 *  -4:  The vector of notify-conditions is empty
 *
+*
+* Note that the 'count' of the inserted subscription is set to ZERO.
+*
 */
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 {
@@ -203,6 +206,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -3: Out of memory (either this or EXIT)
 *  -4: Subscription not valid for sub-cache (no patterns)
 *  -5: Subscription notvalid for sub-cache (empty notify-condition vector)
+*
+*
+* Note that the 'count' of the inserted subscription is set to ZERO.
 */
 int mongoSubCacheItemInsert
 (
