@@ -35,7 +35,7 @@
 #include "rest/ConnectionInfo.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
 

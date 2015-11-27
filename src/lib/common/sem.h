@@ -37,15 +37,15 @@
 
 /* ****************************************************************************
 *
-* SemRequestType - 
+* SemOpType -
 */
-typedef enum SemRequestType
+typedef enum SemOpType
 {
   SemReadOp,
   SemWriteOp,
   SemReadWriteOp,
   SemNoneOp
-} SemRequestType;
+} SemOpType;
 
 
 
@@ -55,10 +55,10 @@ typedef enum SemRequestType
 */
 extern int semInit
 (
-  SemRequestType  _reqPolicy     = SemReadWriteOp,
-  bool            semTimeStat    = false,
-  int             shared         = 0,
-  int             takenInitially = 1
+  SemOpType  _reqPolicy     = SemReadWriteOp,
+  bool       semTimeStat    = false,
+  int        shared         = 0,
+  int        takenInitially = 1
 );
 
 
@@ -85,7 +85,7 @@ extern int reqSemTryToTake(void);
 *
 * xxxSemTake -
 */
-extern int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken);
+extern int reqSemTake(const char* who, const char* what, SemOpType reqType, bool* taken);
 extern int transSemTake(const char* who, const char* what);
 extern int cacheSemTake(const char* who, const char* what);
 extern int timeStatSemTake(const char* who, const char* what);
@@ -107,10 +107,10 @@ extern int timeStatSemGive(const char* who, const char* what = NULL);
 *
 * semTimeXxxGet - get accumulated semaphore waiting time
 */
-extern void semTimeReqGet(char* buf, int bufLen);
-extern void semTimeTransGet(char* buf, int bufLen);
-extern void semTimeCacheGet(char* buf, int bufLen);
-extern void semTimeTimeStatGet(char* buf, int bufLen);
+extern float semTimeReqGet(void);
+extern float semTimeTransGet(void);
+extern float semTimeCacheGet(void);
+extern float semTimeTimeStatGet(void);
 
 
 
@@ -165,7 +165,7 @@ extern int release_curl_context(struct curl_context *pcc, bool final = false);
 *
 * mutexTimeCCGet -
 */
-extern void mutexTimeCCGet(char* buf, int bufLen);
+extern float mutexTimeCCGet(void);
 
 
 

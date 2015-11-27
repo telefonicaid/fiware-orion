@@ -10261,6 +10261,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 
     /* Release mocks */
     delete connectionMock;    
+    delete cursorMockCsub;
 
     utExit();
 

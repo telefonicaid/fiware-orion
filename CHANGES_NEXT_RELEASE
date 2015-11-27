@@ -8,5 +8,12 @@
 - Fix: wrong notification values (duplicated) when triggering update context operations are too close (race condition)
 - Fix: A bug in the request reading logic that may cause unexpected Parse Errors or even SIGSEGVs
 - Fix: Semaphore releasing bug in unsubscribeContext when subscription ID is the empty string (Issue #1488)
-- Add: Built-in Timing/Profiling when using the -reqTimeStat (Issue #1367)
+- Add: Built-in Timing/Profiling (Issue #1367)
 - Add: Simulated/drop notifications mode is now orthogonal to -notificationMode (Issue #1505)
+- Hardening: exhaustive try/catch (mainly at mongoBackend module) 
+- Add: Unpatterned subscriptions now also in subscription cache (Issue #1475)
+- Fix: Fixed an uptil now unknown bug with throttling
+- Add: clearer statistics in GET /statistics and GET /cache/statistics operations
+- Add: finer-grain statistics switches: -statCounters, -statSemWait (old -mutexTimeStat), -statTiming and -statNotifQueue
+- Fix: Only 1 query at csubs collection/cache is done per context element processing at updateContext (previously one query per attribute were done) (Issue #1475)
+- Fix: 'count' and 'lastNotificationTime' now maintained by subCache (and synched via DB) (Issue #1476)

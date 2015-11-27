@@ -39,9 +39,9 @@
 *
 * EntityType::EntityType -
 */
-EntityType::EntityType()
+EntityType::EntityType(): count(0)
 {
-  type = "";
+
 }
 
 
@@ -50,9 +50,9 @@ EntityType::EntityType()
 *
 * EntityType::EntityType -
 */
-EntityType::EntityType(std::string  _type)
+EntityType::EntityType(std::string _type): type(_type), count(0)
 {
-  type = _type;
+
 }
 
 

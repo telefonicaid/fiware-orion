@@ -445,9 +445,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError  error(SccBadRequest,
-                        "tenant name not accepted - a tenant string must not be longer than " MAX_TENANT_NAME_LEN_STRING " characters"
-                        " and may only contain underscores and alphanumeric characters");
+      OrionError  error(SccBadRequest, result);
 
       std::string  response = error.render(ciP, "");
 

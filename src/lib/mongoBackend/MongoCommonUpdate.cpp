@@ -31,7 +31,7 @@
 
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 
@@ -1127,119 +1127,18 @@ static bool addTriggeredSubscriptions_withCache
 (
   std::string                               entityId,
   std::string                               entityType,
-  std::string                               attr,
+  const std::vector<std::string>&           modifiedAttrs,
   std::map<string, TriggeredSubscription*>& subs,
   std::string&                              err,
   std::string                               tenant,
   const std::vector<std::string>&           servicePathV
 )
-{
-  std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
-  std::vector<std::string>  spathV;
-  std::string               spathRegex      = servicePathSubscriptionRegex(servicePath, spathV);
-
-
-  //
-  // Create the REGEX for the Service Path
-  //
-  spathRegex = std::string("/") + spathRegex + "/";
-
-
-  /* Build query */
-  std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
-  std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
-  std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
-  std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-  std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
-  std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
-  BSONObj     spBson       = fromjson(inRegex);
-
-  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type. Only
-   * subscriptions for no pattern entities are queried, subscriptions for pattern entities are searched
-   * in the cache */
-  BSONObj query = BSON(
-                entIdQ << entityId <<
-                "$or" << BSON_ARRAY(
-                    BSON(entTypeQ << entityType) <<
-                    BSON(entTypeQ << BSON("$exists" << false))) <<
-                entPatternQ << "false" <<
-                condTypeQ << ON_CHANGE_CONDITION <<
-                condValueQ << attr <<
-                CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                CSUB_SERVICE_PATH << spBson);
-
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getSubscribeContextCollectionName(tenant).c_str(),
-                  query.toString().c_str()));
-
-  /* Do the query */
-  auto_ptr<DBClientCursor> cursor;
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), query, &cursor, &err))
-  {
-    return false;
-  }
-
-  /* For each of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
-  {
-    BSONObj sub;
-    try
-    {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
-      continue;
-    }
-    BSONElement  idField  = getField(sub, "_id");
-
-    //
-    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
-    //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get
-    // an exception and the broker crashes.
-    //
-    if (idField.eoo() == true)
-    {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
-      continue;
-    }
-
-    std::string subIdStr = idField.OID().toString();
-
-    if (subs.count(subIdStr) == 0)
-    {
-      LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
-
-      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
-
-      TriggeredSubscription* trigs = new TriggeredSubscription
-        (
-          throttling,
-          lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
-          getStringField(sub, CSUB_REFERENCE),
-          subToAttributeList(sub),
-          "",  // No subscriptionId as the sub-cache is not used for non-isPattern subscriptions
-          ""   // No tenant as the sub-cache is not used for non-isPattern subscriptions
-        );
-
-      subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
-    }
-  }
-
-
-  //
-  // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
-  //
-
+{  
+  std::string   servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str(), &subVec);
+  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
 
   LM_T(LmtMongoSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
@@ -1275,8 +1174,6 @@ static bool addTriggeredSubscriptions_withCache
       }
       else
       {
-        cSubP->pendingNotifications += 1;
-
         LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                                 cSubP->subscriptionId,
                                 cSubP->throttling,
@@ -1288,8 +1185,6 @@ static bool addTriggeredSubscriptions_withCache
     }
     else
     {
-      cSubP->pendingNotifications += 1;
-
       LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
                               cSubP->subscriptionId,
                               cSubP->throttling,
@@ -1326,7 +1221,7 @@ static bool addTriggeredSubscriptions_noCache
 (
   std::string                               entityId,
   std::string                               entityType,
-  std::string                               attr,
+  const std::vector<std::string>&           modifiedAttrs,
   std::map<string, TriggeredSubscription*>& subs,
   std::string&                              err,
   std::string                               tenant,
@@ -1353,6 +1248,14 @@ static bool addTriggeredSubscriptions_noCache
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
+  /* Build attribute list */
+  BSONArrayBuilder ba;
+  for (unsigned int ix = 0; ix < modifiedAttrs.size(); ++ix)
+  {
+    ba.append(modifiedAttrs[ix]);
+  }
+  BSONArray attrs = ba.arr();
+
   /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
   BSONObj queryNoPattern = BSON(
                 entIdQ << entityId <<
@@ -1361,7 +1264,7 @@ static bool addTriggeredSubscriptions_noCache
                     BSON(entTypeQ << BSON("$exists" << false))) <<
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
-                condValueQ << attr <<
+                condValueQ << BSON("$in" << attrs) <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_SERVICE_PATH << spBson);
 
@@ -1390,7 +1293,7 @@ static bool addTriggeredSubscriptions_noCache
 
   queryPattern.append(entPatternQ, "true");
   queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
-  queryPattern.append(condValueQ, attr);
+  queryPattern.append(condValueQ, BSON("$in" << attrs));
   queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.append(CSUB_SERVICE_PATH, spBson);
   queryPattern.appendCode("$where", function);
@@ -1413,17 +1316,13 @@ static bool addTriggeredSubscriptions_noCache
 
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj sub;
-    try
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     BSONElement  idField  = sub.getField("_id");
@@ -1471,16 +1370,12 @@ static bool addTriggeredSubscriptions_noCache
 *
 * addTriggeredSubscriptions - 
 *
-* FIXME P3: The functions addTriggeredSubscriptions_noCache and
-*           addTriggeredSubscriptions_withCache share a lot of code and a few
-*           helper functions should be extracted to avoid the copies of source code.
-*           
 */
 static bool addTriggeredSubscriptions
 (
   std::string                               entityId,
   std::string                               entityType,
-  std::string                               attr,
+  const std::vector<std::string>&           modifiedAttrs,
   std::map<string, TriggeredSubscription*>& subs,
   std::string&                              err,
   std::string                               tenant,
@@ -1491,11 +1386,11 @@ static bool addTriggeredSubscriptions
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, modifiedAttrs, subs, err, tenant, servicePathV);
   }
 }
 
@@ -1627,48 +1522,45 @@ static bool processSubscriptions
                                                  tenant,
                                                  xauthToken))
     {
-      BSONObj query = BSON("_id" << OID(mapSubId));
-      BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << (long long) getCurrentTime()) <<
-                            "$inc" << BSON(CSUB_COUNT << 1));
+      long long rightNow = getCurrentTime();
 
-      if (collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err))
+      //
+      // If broker running without subscription cache, put lastNotificationTime and count in DB 
+      //
+      if (mongoSubCacheActive == false)
       {
-        //
-        // Saving lastNotificationTime for cached subscription
-        //
-        if (trigs->cacheSubId != "")
-        {
-          cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
-
-          CachedSubscription*  cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
-
-          if (cSubP != NULL)
-          {
-            cSubP->pendingNotifications -= 1;
-            LM_T(LmtMongoSubCache, ("Found sub '%s', set its pendingNotifications to %d", trigs->cacheSubId.c_str(), cSubP->pendingNotifications));
-
-            if (cSubP->pendingNotifications == 0)
-            {
-              cSubP->lastNotificationTime = getCurrentTime();
-              LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s'", cSubP->lastNotificationTime, cSubP->subscriptionId));
-            }
-            else
-            {
-              LM_T(LmtMongoSubCache, ("Not touching lastNotificationTime for sub '%s' - its pendingNotifications == %d", cSubP->subscriptionId, cSubP->pendingNotifications));
-            }
-          }
-          else
-          {
-            LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
-                  trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
-          }
-
-          cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
-        }
+        BSONObj query  = BSON("_id" << OID(mapSubId));
+        BSONObj update = BSON("$set" <<
+                              BSON(CSUB_LASTNOTIFICATION << rightNow) <<
+                              "$inc" << BSON(CSUB_COUNT << 1));
+        
+        ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
-      else
+
+
+      //
+      // Saving lastNotificationTime and count for cached subscription
+      //
+      if (trigs->cacheSubId != "")
       {
-        ret = false;
+        cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
+
+        CachedSubscription*  cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
+
+        if (cSubP != NULL)
+        {
+          cSubP->lastNotificationTime = rightNow;
+          cSubP->count               += 1;
+
+          LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
+        }
+        else
+        {
+          LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
+                trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
+        }
+
+        cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
       }
     }
 
@@ -2150,6 +2042,7 @@ static bool processContextAttributeVector
   std::string                          entityType      = cerP->contextElement.entityId.type;
   bool                                 entityModified  = false;
   std::map<std::string, unsigned int>  deletedAttributesCounter;  // Aux var for DELETE operations
+  std::vector<std::string>             modifiedAttrs;
 
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
@@ -2232,18 +2125,12 @@ static bool processContextAttributeVector
       return false;
     }
 
-    /* Add those ONCHANGE subscription triggered by the just processed attribute. Note that
-     * actualUpdate is always true in the case of  "delete" or "append", so the if statement
-     * is "bypassed" */
+    /* Add the attribute to the list of modifiedAttrs, in order to check at the end if it triggers some
+     * ONCHANGE subscription. Note that actualUpdate is always true in the case of  "delete" or "append",
+     * so the if statement is "bypassed" */
     if (actualUpdate)
     {
-      std::string err;
-
-      if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
-      {
-        cerP->statusCode.fill(SccReceiverInternalError, err);
-        return false;
-      }
+      modifiedAttrs.push_back(ca->name);
     }
   }
 
@@ -2268,6 +2155,14 @@ static bool processContextAttributeVector
         toPull->append(attrName);
       }
     }
+  }
+
+  /* Add triggered ONCHANGE subscriptions */
+  std::string err;
+  if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
+  {
+    cerP->statusCode.fill(SccReceiverInternalError, err);
+    return false;
   }
 
 #if 0
@@ -2631,7 +2526,6 @@ void processContextElement
   bool                                 checkEntityExistance
 )
 {
-
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(ceP, responseP, action))
   {
@@ -2739,17 +2633,12 @@ void processContextElement
   bool         attributeAlreadyExistsError = false;
   std::string  attributeAlreadyExistsList  = "[ ";
 
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -3087,22 +2976,22 @@ void processContextElement
         /* Successful creation: send potential notifications */
         std::map<string, TriggeredSubscription*> subsToNotify;
 
+        std::vector<std::string> attrNames;
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
         {
-          std::string err;
-
-          if (!addTriggeredSubscriptions(enP->id,
-                                         enP->type,
-                                         ceP->contextAttributeVector.get(ix)->name,
-                                         subsToNotify,
-                                         err,
-                                         tenant,
-                                         servicePathV))
-          {
-            cerP->statusCode.fill(SccReceiverInternalError, err);
-            responseP->contextElementResponseVector.push_back(cerP);
-            return;  // Error already in responseP
-          }
+          attrNames.push_back(ceP->contextAttributeVector.get(ix)->name);
+        }
+        if (!addTriggeredSubscriptions(enP->id,
+                                       enP->type,
+                                       attrNames,
+                                       subsToNotify,
+                                       err,
+                                       tenant,
+                                       servicePathV))
+        {
+          cerP->statusCode.fill(SccReceiverInternalError, err);
+          responseP->contextElementResponseVector.push_back(cerP);
+          return;  // Error already in responseP
         }
 
         //

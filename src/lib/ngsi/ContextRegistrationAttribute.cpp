@@ -107,7 +107,6 @@ std::string ContextRegistrationAttribute::check
   int                 counter
 )
 {
-  std::string errorString;
 
   if (name == "")
   {

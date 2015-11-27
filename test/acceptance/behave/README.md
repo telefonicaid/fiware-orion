@@ -222,7 +222,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
 | create_entity                               |    580       | POST    | /v2/entities/                                        | Yes       | No             |    
-| list_entities                               |    200       | GET     | /v2/entities/                                        | No        | Yes            |
+| list_entities                               |    334       | GET     | /v2/entities/                                        | No        | Yes            |
 |                                                                                                                                                          |
 | update_or_append_entity_attributes          |    766       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
 | retrieve_entity                             |    209       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |

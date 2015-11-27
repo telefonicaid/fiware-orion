@@ -89,6 +89,7 @@ typedef enum TraceLevels
   LmtMongo = 100,
   LmtMongoSubCache,
   LmtMongoSubCacheMatch,
+  LmtMongoCacheSync,
 
   /* Cleanup (120-139) */
   LmtDestructor = 120,

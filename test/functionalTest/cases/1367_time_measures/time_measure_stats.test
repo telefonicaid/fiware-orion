@@ -25,39 +25,46 @@ Time Measuring Statisticss
 
 --SHELL-INIT--
 dbInit CB 
-brokerStart CB 101,38 IPv4 -reqTimeStat
+brokerStart CB 101,38 IPv4 -statTiming
 
 
 --SHELL--
 
 #
-# 01. Initial call to GET /statistics (gives NO time stats as LAST /statistics is excluded)
-# 02. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
-# 03. Create entity E1/A1-A5 with XML
-# 04. GET /statistics
-# 05. Create entity E2/A1-A5 (identical) with v1 JSON
-# 06. GET /statistics
-# 07. Create entity E3/A1-A5 (identical) with v2 JSON
-# 08. GET /statistics
-# 09. GET /v1/contextTypes
-# 10. GET /statistics
+# The valgrind test suite uses a call to "GET /version" to check that the broker is alive.
+# This request is reflected in the statistics so the first call to "GET /statistics"
+# gets the "timing" stuff (as there are non-zero counters) when under valgrind.
+# When running as a normal functest, there is no prevoius "GET /version" and thus no timing counters.
+#
+# Now, as we have no means to do REGEXPs about missing lines, with this "Pre-Call" to "GET /statistics",
+# a first request is forced and the second call will give "timing" counters,
+# both as normal functest and when under valgrind.
+#
+# 00. Pre-call to GET /statistics to give VALGRIND a possibility
+#
+# 01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
+# 02. Create entity E1/A1-A5 with XML
+# 03. GET /statistics
+# 04. Create entity E2/A1-A5 (identical) with v1 JSON
+# 05. GET /statistics
+# 06. Create entity E3/A1-A5 (identical) with v2 JSON
+# 07. GET /statistics
+# 08. GET /v1/contextTypes
+# 09. GET /statistics
 #
 
-echo "01. Initial call to GET /statistics (gives NO time stats as LAST /statistics is excluded)"
-echo "=================================================================="
-orionCurl --url /statistics --json
-echo
-echo
+# 00. Pre-call to GET /statistics to give VALGRIND a possibility
+orionCurl --url /statistics --json > /dev/null 2>&1
 
 
-echo "02. Second call to GET /statistics (gives time stat of FIRST request for /statistics)"
+echo "01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)"
 echo "====================================================================================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
-echo "03. Create entity E1/A1-A5 with XML"
+echo "02. Create entity E1/A1-A5 with XML"
 echo "==================================="
 payload='<?xml version="1.0"?>
 <updateContextRequest>
@@ -137,14 +144,14 @@ echo
 echo
 
 
-echo "04. GET /statistics"
+echo "03. GET /statistics"
 echo "==================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
-echo "05. Create entity E2/A1-A5 (identical) with v1 JSON"
+echo "04. Create entity E2/A1-A5 (identical) with v1 JSON"
 echo "==================================================="
 payload='{
   "contextElements": [
@@ -222,14 +229,14 @@ echo
 echo
 
 
-echo "06. GET /statistics"
+echo "05. GET /statistics"
 echo "==================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
-echo "07. Create entity E3/A1-A5 (identical) with v2 JSON"
+echo "06. Create entity E3/A1-A5 (identical) with v2 JSON"
 echo "==================================================="
 payload='{
   "id": "E3",
@@ -265,77 +272,59 @@ echo
 echo
 
 
-echo "08. GET /statistics"
+echo "07. GET /statistics"
 echo "==================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
-echo "09. GET /v1/contextTypes"
+echo "08. GET /v1/contextTypes"
 echo "========================"
 orionCurl --url /v1/contextTypes --json
 echo
 echo
 
 
-echo "10. GET /statistics"
+echo "09. GET /statistics"
 echo "==================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1))",
+#
+# If started with -noCache:  0
+# Normal start:              1
+#
+
+
 --REGEXPECT--
-01. Initial call to GET /statistics (gives NO time stats as LAST /statistics is excluded)
-==================================================================
-HTTP/1.1 200 OK
-Content-Length: REGEX((258|260))
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "1",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
-}
-
-
-02. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
+01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((393|395))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "2",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "request": "REGEX(\d+.\d+)"
+            "total": REGEX(.*.A*)
         },
         "last": {
-            "request": "REGEX(\d+.\d+)"
+            "total": REGEX(.*.A*)
         }
     },
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
-03. Create entity E1/A1-A5 with XML
+02. Create entity E1/A1-A5 with XML
 ===================================
 HTTP/1.1 200 OK
 Content-Length: 2360
@@ -422,49 +411,40 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-04. GET /statistics
+03. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((873|875))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "3",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         }
     },
-    "updates": "1",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
-05. Create entity E2/A1-A5 (identical) with v1 JSON
+04. Create entity E2/A1-A5 (identical) with v1 JSON
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 1702
@@ -550,51 +530,41 @@ Date: REGEX(.*)
 }
 
 
-06. GET /statistics
+05. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((936|938))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "1",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "4",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
         }
     },
-    "updates": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
-07. Create entity E3/A1-A5 (identical) with v2 JSON
+06. Create entity E3/A1-A5 (identical) with v2 JSON
 ===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -603,52 +573,42 @@ Date: REGEX(.*)
 
 
 
-08. GET /statistics
+07. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((972|974))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "2",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "5",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "jsonV2Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "jsonV2Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "jsonV2Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)"
+            "jsonV2Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
         }
     },
-    "updates": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
-09. GET /v1/contextTypes
+08. GET /v1/contextTypes
 ========================
 HTTP/1.1 200 OK
 Content-Length: 227
@@ -675,46 +635,36 @@ Date: REGEX(.*)
 }
 
 
-10. GET /statistics
+09. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX((897|899))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "2",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "6",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
+    "measuring_interval_in_secs": REGEX(\d+),
     "timing": {
         "accumulated": {
-            "jsonV1Parse": "REGEX(\d+.\d+)",
-            "jsonV2Parse": "REGEX(\d+.\d+)",
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "mongoWriteWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)",
-            "xmlParse": "REGEX(\d+.\d+)"
+            "jsonV1Parse": REGEX(.*.A*),
+            "jsonV2Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*),
+            "xmlParse": REGEX(.*.A*)
         },
         "last": {
-            "mongoBackend": "REGEX(\d+.\d+)",
-            "mongoCommandWait": "REGEX(\d+.\d+)",
-            "mongoReadWait": "REGEX(\d+.\d+)",
-            "render": "REGEX(\d+.\d+)",
-            "request": "REGEX(\d+.\d+)"
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
         }
     },
-    "updates": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "0",
-    "xmlRequests": "1"
+    "uptime_in_secs": REGEX(\d+)
 }
 
 

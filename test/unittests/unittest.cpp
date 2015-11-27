@@ -136,7 +136,7 @@ void utInit(void)
   //
   servicePathVector.clear();
 
-  // Init subs cache (this initialization is overriden in test that use csubs)
+  // Init subs cache (this initialization is overridden in test that use csubs)
   mongoSubCacheInit();
 }
 

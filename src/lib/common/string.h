@@ -98,20 +98,6 @@ extern bool string2coords(const std::string& s, double& latitude, double& longit
 
 /* ****************************************************************************
 *
-* coords2string - 
-*/
-extern void coords2string
-(
-  std::string*  s,
-  double        latitude,
-  double        longitude,
-  int           decimals = 6
-);
-
-
-
-/* ****************************************************************************
-*
 * versionParse -
 */
 bool versionParse

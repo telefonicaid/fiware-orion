@@ -32,21 +32,21 @@ accumulatorStart
 
 #
 # 01. Create subscription S1 - without pattern
-# 02. Check statistics, see NO entries in subCache
+# 02. Check statistics, see ONE entry in subCache
 # 03. Update S1
-# 04. Check statistics, see no entries in subCache
+# 04. Check statistics, see ONE entry in subCache
 # 05. Create subscription S2 - with pattern 's0.*' 
-# 06. Check statistics, see ONE entry in subCache
+# 06. Check statistics, see TWO entries in subCache
 # 07. Create subscription S3 - without pattern
-# 08. Check statistics, see ONE subCacheItem in subCache
+# 08. Check statistics, see THREE subCacheItems in subCache
 # 09. Update S3
-# 10. Check statistics, see ONE subCacheItem in subCache
+# 10. Check statistics, see THREE subCacheItems in subCache
 # 11. Remove S1
-# 12. Check statistics, see ONE subCacheItem in subCache
+# 12. Check statistics, see TWO subCacheItems in subCache
 # 13. Update S2
-# 14. Check statistics, see ONE subCacheItem in subCache
+# 14. Check statistics, see TWO subCacheItem in subCache
 # 15. Remove S2
-# 16. Check statistics, see NO entries in subCache
+# 16. Check statistics, see ONE entry in subCache
 #
 
 
@@ -75,9 +75,9 @@ echo
 echo
 
 
-echo "02. Check statistics, see NO entries in subCache"
-echo "================================================"
-orionCurl --url /statistics --json
+echo "02. Check statistics, see ONE entry in subCache"
+echo "==============================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -94,9 +94,9 @@ echo
 echo
 
 
-echo "04. Check statistics, see no entries in subCache"
-echo "================================================"
-orionCurl --url /statistics --json
+echo "04. Check statistics, see ONE entry in subCache"
+echo "==============================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -126,9 +126,9 @@ echo
 echo
 
 
-echo "06. Check statistics, see ONE subCacheItem in subCache"
-echo "======================================================"
-orionCurl --url /statistics --json
+echo "06. Check statistics, see TWO entries in subCache"
+echo "================================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -158,9 +158,9 @@ echo
 echo
 
 
-echo "08. Check statistics, see ONE subCacheItem in subCache"
-echo "======================================================"
-orionCurl --url /statistics --json
+echo "08. Check statistics, see THREE subCacheItems in subCache"
+echo "========================================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -177,9 +177,9 @@ echo
 echo
 
 
-echo "10. Check statistics, see ONE subCacheItem in subCache"
-echo "======================================================"
-orionCurl --url /statistics --json
+echo "10. Check statistics, see THREE subCacheItems in subCache"
+echo "========================================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -194,9 +194,9 @@ echo
 echo
 
 
-echo "12. Check statistics, see ONE subCacheItem in subCache"
-echo "======================================================"
-orionCurl --url /statistics --json
+echo "12. Check statistics, see TWO subCacheItems in subCache"
+echo "======================================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -213,9 +213,9 @@ echo
 echo
 
 
-echo "14. Check statistics, see ONE subCacheItem in subCache"
-echo "======================================================"
-orionCurl --url /statistics --json
+echo "14. Check statistics, see TWO subCacheItems in subCache"
+echo "======================================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -230,11 +230,21 @@ echo
 echo
 
 
-echo "16. Check statistics, see NO entries in subCache"
-echo "================================================"
-orionCurl --url /statistics --json
+echo "16. Check statistics, see ONE entry in subCache"
+echo "==============================================="
+orionCurl --url /cache/statistics --json
 echo
 echo
+
+
+#
+# About
+#   "refresh": REGEX((0|1|2)),
+#
+# If started with -noCache:  0
+# Normal start:              1
+# Under valgrind:            2 (possibly, depending on timing)
+#
 
 
 --REGEXPECT--
@@ -254,25 +264,20 @@ Date: REGEX(.*)
 }
 
 
-02. Check statistics, see NO entries in subCache
-================================================
+02. Check statistics, see ONE entry in subCache
+===============================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((307||309))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "1",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "1",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "subscriptions": "1",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": 1,
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 0,
+    "updates": 0
 }
 
 
@@ -292,26 +297,20 @@ Date: REGEX(.*)
 }
 
 
-04. Check statistics, see no entries in subCache
-================================================
+04. Check statistics, see ONE entry in subCache
+===============================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((338|340))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "2",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "2",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "subscriptionUpdates": "1",
-    "subscriptions": "1",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": 2,
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
 }
 
 
@@ -331,27 +330,20 @@ Date: REGEX(.*)
 }
 
 
-06. Check statistics, see ONE subCacheItem in subCache
-======================================================
+06. Check statistics, see TWO entries in subCache
+=================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((381|383))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "3",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "3",
-    "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "1",
-    "subCacheItems": "1",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "subscriptionUpdates": "1",
-    "subscriptions": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f, ]{50})",
+    "inserts": 3,
+    "items": 2,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
 }
 
 
@@ -371,27 +363,20 @@ Date: REGEX(.*)
 }
 
 
-08. Check statistics, see ONE subCacheItem in subCache
-======================================================
+08. Check statistics, see THREE subCacheItems in subCache
+=========================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((381|383))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "4",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "4",
-    "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "REGEX((1|2))",
-    "subCacheItems": "1",
-    "subCacheRefreshs": "REGEX((1|2))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "subscriptionUpdates": "1",
-    "subscriptions": "3",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f, ]{76})",
+    "inserts": REGEX((4|7)),
+    "items": 3,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
 }
 
 
@@ -411,27 +396,20 @@ Date: REGEX(.*)
 }
 
 
-10. Check statistics, see ONE subCacheItem in subCache
-======================================================
+10. Check statistics, see THREE subCacheItems in subCache
+=========================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((381|383))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "5",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "5",
-    "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "REGEX((1|2))",
-    "subCacheItems": "REGEX((1|2))",
-    "subCacheRefreshs": "REGEX((1|2))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "subscriptionUpdates": "2",
-    "subscriptions": "3",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f, ]{76})",
+    "inserts": REGEX((5|8)),
+    "items": 3,
+    "refresh": REGEX((0|1|2)),
+    "removes": 2,
+    "updates": 2
 }
 
 
@@ -451,28 +429,20 @@ Date: REGEX(.*)
 }
 
 
-12. Check statistics, see ONE subCacheItem in subCache
-======================================================
+12. Check statistics, see TWO subCacheItems in subCache
+=======================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((408|410))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "6",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "6",
-    "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "REGEX((1|2))",
-    "subCacheItems": "1",
-    "subCacheRefreshs": "REGEX((1|2))",
-    "subCacheRemoves": "0",
-    "subCacheUpdates": "0",
-    "subscriptionUpdates": "2",
-    "subscriptions": "3",
-    "unsubscriptions": "1",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f, ]{50})",
+    "inserts": REGEX((5|8)),
+    "items": 2,
+    "refresh": REGEX((0|1|2)),
+    "removes": 3,
+    "updates": 2
 }
 
 
@@ -492,28 +462,20 @@ Date: REGEX(.*)
 }
 
 
-14. Check statistics, see ONE subCacheItem in subCache
-======================================================
+14. Check statistics, see TWO subCacheItems in subCache
+=======================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((408|410))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "7",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "7",
-    "subCache": "REGEX([0-9a-f]{24})",
-    "subCacheInserts": "REGEX((2|3))",
-    "subCacheItems": "1",
-    "subCacheRefreshs": "REGEX((1|2))",
-    "subCacheRemoves": "1",
-    "subCacheUpdates": "1",
-    "subscriptionUpdates": "3",
-    "subscriptions": "3",
-    "unsubscriptions": "1",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f, ]{50})",
+    "inserts": REGEX((6|9)),
+    "items": 2,
+    "refresh": REGEX((0|1|2)),
+    "removes": 4,
+    "updates": 3
 }
 
 
@@ -533,27 +495,20 @@ Date: REGEX(.*)
 }
 
 
-16. Check statistics, see NO entries in subCache
-================================================
+16. Check statistics, see ONE entry in subCache
+===============================================
 HTTP/1.1 200 OK
-Content-Length: REGEX((365||367))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "jsonRequests": "8",
-    "measuring_interval_in_secs": "REGEX(\d+)",
-    "statisticsRequests": "8",
-    "subCacheInserts": "REGEX((2|3))",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "REGEX((1|2))",
-    "subCacheRemoves": "2",
-    "subCacheUpdates": "1",
-    "subscriptionUpdates": "3",
-    "subscriptions": "3",
-    "unsubscriptions": "2",
-    "uptime_in_secs": "REGEX(\d+)",
-    "versionRequests": "REGEX((0|1))"
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": REGEX((6|9)),
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 5,
+    "updates": 3
 }
 
 

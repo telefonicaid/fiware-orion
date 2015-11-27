@@ -25,7 +25,7 @@ statistics
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -mutexTimeStat -reqTimeStat
+brokerStart CB 0 IPv4 -statSemWait -statTiming
 
 --SHELL--
 # curl localhost:${CB_PORT}/statistics 2> /dev/null | xmllint --format -
@@ -38,66 +38,48 @@ echo
 echo "+++++ 2. statistics in JSON"
 orionCurl --url /statistics --json
 echo
-
+echo
 
 --REGEXPECT--
 +++++ 1. statistics in XML
 HTTP/1.1 200 OK
-Content-Length: REGEX((842|844))
+Content-Length: 91
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
-  <versionRequests>REGEX((0|1))</versionRequests>
-  <statisticsRequests>1</statisticsRequests>
-  <requestSemaphoreWaitingTime>REGEX(\d+.\d+)</requestSemaphoreWaitingTime>
-  <dbConnectionPoolWaitingTime>REGEX(\d+.\d+)</dbConnectionPoolWaitingTime>
-  <transactionSemaphoreWaitingTime>REGEX(\d+.\d+)</transactionSemaphoreWaitingTime>
-  <subCacheSemaphoreWaitingTime>REGEX(\d+.\d+)</subCacheSemaphoreWaitingTime>
-  <curlContextMutexWaitingTime>REGEX(\d+.\d+)</curlContextMutexWaitingTime>
-  <timeStatSemaphoreWaitingTime>REGEX(\d+.\d+)</timeStatSemaphoreWaitingTime>
-  <uptime_in_secs>REGEX(1?\d)</uptime_in_secs>
-  <measuring_interval_in_secs>REGEX(1?\d)</measuring_interval_in_secs>
-  <subCacheRefreshs>1</subCacheRefreshs>
-  <subCacheInserts>0</subCacheInserts>
-  <subCacheRemoves>0</subCacheRemoves>
-  <subCacheUpdates>0</subCacheUpdates>
-  <subCacheItems>0</subCacheItems>
+  <message>XML not supported in statistics operations, use JSON</message>
 </orion>
 
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: REGEX((693|695))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
-    "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
-    "measuring_interval_in_secs": "REGEX(1?\d)",
-    "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-    "statisticsRequests": "2",
-    "subCacheInserts": "0",
-    "subCacheItems": "0",
-    "subCacheRefreshs": "1",
-    "subCacheRemoves": "0",
-    "subCacheSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-    "subCacheUpdates": "0",
-    "timeStatSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+    "measuring_interval_in_secs": REGEX(1?\d),
+    "semWait": {
+        "curlContext": REGEX(.*.A*),
+        "dbConnectionPool": REGEX(.*.A*),
+        "request": REGEX(.*.A*),
+        "subCache": REGEX(.*.A*),
+        "timeStat": REGEX(.*.A*),
+        "transaction": REGEX(.*.A*)
+    },
     "timing": {
         "accumulated": {
-            "request": "REGEX(\d+.\d+)"
+            "total": REGEX(.*.A*)
         },
         "last": {
-            "request": "REGEX(\d+.\d+)"
+            "total": REGEX(.*.A*)
         }
     },
-    "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
-    "uptime_in_secs": "REGEX(1?\d)",
-    "versionRequests": "REGEX((0|1))"
+    "uptime_in_secs": REGEX(1?\d)
 }
+
 
 --TEARDOWN--
 brokerStop CB

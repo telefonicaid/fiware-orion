@@ -35,7 +35,7 @@
 #include "ngsi/Metadata.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 
 using namespace mongo;
 

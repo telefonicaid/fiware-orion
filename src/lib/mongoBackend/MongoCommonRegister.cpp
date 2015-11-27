@@ -41,7 +41,7 @@
 #include "mongoBackend/TriggeredSubscription.h"
 
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 
 using std::string;
@@ -232,17 +232,13 @@ static bool addTriggeredSubscriptions
   }
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj sub;
-    try
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     BSONElement idField = getField(sub, "_id");

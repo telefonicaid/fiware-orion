@@ -48,7 +48,12 @@ execute_process(COMMAND            sh ../scripts/build/osDistro.sh
 execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
                 OUTPUT_VARIABLE    RAPIDXML_VERSION)
 
+# TRACES: To remove LM_T
+#           [ and 15 log macros more, of which only LM_T is used by the broker.
+#             The important ones: LM_W, LM_E, LM_X, LM_I are all kept as is ]
+#         comment the following line
 add_definitions(-DLM_ON)
+
 add_definitions(-fPIC)
 # add_definitions(-fstack-check -fstack-protector)
 add_definitions(${RAPIDXML_VERSION})

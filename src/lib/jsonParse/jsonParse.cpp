@@ -89,11 +89,10 @@ static const char* compoundRootV[] =
 */
 static bool isCompoundPath(const char* path)
 {
-  unsigned int len;
 
   for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
   {
-    len = strlen(compoundRootV[ix]);
+    size_t len = strlen(compoundRootV[ix]);
 
     if (strlen(path) < len)
     {
@@ -371,7 +370,6 @@ static std::string jsonParse
   int                         noOfChildren = subtree.size();
   if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
   {
-    std::string s;
 
     LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
     eatCompound(ciP, NULL, v, "");
@@ -435,7 +433,7 @@ std::string jsonParse
   struct timespec    start;
   struct timespec    end;
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &start);
   }
@@ -456,7 +454,7 @@ std::string jsonParse
     }
   }
 
-  if (reqTimeStatistics)
+  if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &end);
     clock_difftime(&end, &start, &threadLastTimeStat.jsonV1ParseTime);

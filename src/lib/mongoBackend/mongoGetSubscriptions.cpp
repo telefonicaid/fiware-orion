@@ -31,8 +31,9 @@
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
+#include "mongoBackend/mongoSubCache.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -48,6 +49,7 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 {
   s->id = getField(r, "_id").OID().toString();
 }
+
 
 
 /* ****************************************************************************
@@ -107,7 +109,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 *
 * setNotification -
 */
-static void setNotification(Subscription* s, const BSONObj& r)
+static void setNotification(Subscription* s, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
   std::vector<BSONElement> attrs = getField(r, CSUB_ATTRS).Array();
@@ -122,6 +124,31 @@ static void setNotification(Subscription* s, const BSONObj& r)
   s->notification.throttling       = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(r, CSUB_THROTTLING)       : -1;
   s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(r, CSUB_LASTNOTIFICATION) : -1;
   s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getField(r, CSUB_COUNT).numberLong()              : -1;
+
+  //
+  // Check values from subscription cache, update object from cache-values if necessary
+  //
+  CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), s->id.c_str());
+  if (cSubP)
+  {
+    if (cSubP->lastNotificationTime > s->notification.lastNotification)
+    {
+      s->notification.lastNotification = cSubP->lastNotificationTime;
+    }
+
+    if (cSubP->count != 0)
+    {
+      //
+      // First, compensate for -1 in 'timesSent'
+      //
+      if (s->notification.timesSent == -1)
+      {
+        s->notification.timesSent = 0;
+      }
+
+      s->notification.timesSent += cSubP->count;
+    }
+  }
 }
 
 
@@ -193,26 +220,24 @@ void mongoListSubscriptions
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj r;
-    try
+    BSONObj r;    
+
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-    Subscription s;
+    Subscription  s;
+
     setSubscriptionId(&s, r);
     setSubject(&s, r);
-    setNotification(&s, r);
     setExpires(&s, r);
+    setNotification(&s, r, tenant);
+
     subs->push_back(s);
   }
 
@@ -253,29 +278,24 @@ void mongoGetSubscription
   }
 
   /* Process query result */
-  if (cursor->more())
+  if (moreSafe(cursor))
   {
-    BSONObj r;
-    try
+    BSONObj r;    
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
-      *oe = OrionError(SccReceiverInternalError, std::string("Assertion exception in nextSafe(): ") + e.what());
+      *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     setSubscriptionId(sub, r);
     setSubject(sub, r);
-    setNotification(sub, r);
+    setNotification(sub, r, tenant);
     setExpires(sub, r);
 
-    if (cursor->more())
+    if (moreSafe(cursor))
     {
       // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));

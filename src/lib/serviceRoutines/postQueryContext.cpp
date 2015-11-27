@@ -97,8 +97,6 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   std::string     protocol;
   int             port;
   std::string     prefix;
-  std::string     answer;
-
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path

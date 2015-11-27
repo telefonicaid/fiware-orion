@@ -45,7 +45,7 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/compoundResponses.h"
@@ -492,20 +492,14 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   }
 
   // Call the treat function for each subscription
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj sub;
-    try
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-
     treatFunction(tenant, sub);
   }
 }
@@ -1362,17 +1356,18 @@ bool entitiesQuery
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj  r;
     try
     {
+      // nextSafeOrError cannot be used here, as AssertionException has a special treatment in this case
       r = cursor->nextSafe();
     }
     catch (const AssertionException &e)
     {
-      std::string err              = e.what();
-      ContextElementResponse*  cer = new ContextElementResponse();
+      std::string              exErr = e.what();
+      ContextElementResponse*  cer   = new ContextElementResponse();
 
       //
       // We can't return the error 'as is', as it may contain forbidden characters.
@@ -1381,15 +1376,15 @@ bool entitiesQuery
       const char* invalidPolygon      = "Exterior shell of polygon is invalid";
       const char* defaultErrorString  = "Error at querying MongoDB";
 
-      LM_W(("Database Error (%s)", err.c_str()));
+      LM_W(("Database Error (%s)", exErr.c_str()));
 
-      if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
+      if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
       {
-        err = invalidPolygon;
+        exErr = invalidPolygon;
       }
       else
       {
-        err = defaultErrorString;
+        exErr = defaultErrorString;
       }
 
       //
@@ -1408,9 +1403,21 @@ bool entitiesQuery
         cer->contextElement.entityId.fill("", "", "");
       }
 
-      cer->statusCode.fill(SccReceiverInternalError, err);
+      cer->statusCode.fill(SccReceiverInternalError, exErr);
       cerV->push_back(cer);
       return true;
+    }
+    catch (const std::exception &e)
+    {
+      *err = e.what();
+      LM_E(("Runtime Error (exception in nextSafe(): %s)", e.what()));
+      return false;
+    }
+    catch (...)
+    {
+      *err = "generic exception at nextSafe()";
+      LM_E(("Runtime Error (generic exception in nextSafe())"));
+      return false;
     }
 
     // Build CER from BSON retrieved from DB
@@ -1796,17 +1803,12 @@ bool registrationsQuery
   }
 
   /* Process query result */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err->c_str()));
       continue;
     }
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
