@@ -1008,10 +1008,10 @@ Let's examine in detail the different elements included in the payload:
     [Update context elements](#update-context-elements) trigger
     the notification. The rule is that if at least one of the attributes
     in the list changes (e.g. some kind of "OR" condition), then a
-    notification is sent. But note  that notification includes the
+    notification is sent. But note that a notification includes the
     attributes in the attribute vector, which doesn't necessarily
     include any attribute in the condValue. For example, in this case,
-    when Room1 pressure changes the Room1 temperature value is notified,
+    when Room1 pressure changes, the Room1 temperature value is notified,
     but not pressure itself. If you want also pressure to be notified,
     the request would need to include
     &lt;attribute&gt;pressure&lt;/attribute&gt; within the attribute vector
@@ -1022,12 +1022,11 @@ Let's examine in detail the different elements included in the payload:
     way only to show the enormous flexibility of subscriptions.
 -   The throttling element is used to specify a minimum
     inter-notification arrival time. So, setting throttling to 5 seconds
-    as in the example above makes that a notification will not be sent
+    as in the example above, makes a notification not to be sent
     if a previous notification was sent less than 5 seconds ago, no
-    matter how many actual changes take place in that period. This is to
-    not stress the notification receptor in case of having context
-    producers that update attribute values too frequently.
-
+    matter how many actual changes take place in that period. This is give the 
+   notification receptor a means to protect itself against context producers 
+   that update attribute values too frequently.
 
 The response corresponding to that request contains a subscription ID (a
 24 hexadecimal number used for updating and cancelling the subscription
@@ -1106,7 +1105,7 @@ behavior could be changed in a later version. What's your opinion? :)
 
 Now, do the following exercise, based on what you know from [update
 context](#update-context-elements): Do the following 4
-updates, in sequence and letting pass more than 5 seconds between one
+updates in sequence, letting pass more than 5 seconds between one
 and the next (to avoid losing notifications due to throttling):
 
 -   update Room1 temperature to 27: nothing happens, as temperature is
@@ -1114,8 +1113,8 @@ and the next (to avoid losing notifications due to throttling):
 -   update Room1 pressure to 765: you will get a notification with the
     current value of Room1 temperature (27)
 -   update Room1 pressure to 765: nothing happens, as the broker is
-    clever enough to know that the previous value to the updateContext
-    request was also 765 so no actual update have occurred and
+    clever enough to know that the value previous to the updateContext
+    request was also 765 so no actual update has occurred and
     consequently no notification is sent.
 -   update Room2 pressure to 740: nothing happens, as the subscription
     is for Room1, not Room2.
@@ -1181,7 +1180,7 @@ successful.
 }
 ```
 
-You can do some more updates a look at accumulator-server.py to check that the
+You can do some more updates and look at accumulator-server.py to check that the
 notification flow has stopped.
 
 [Top](#top)
