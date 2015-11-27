@@ -2470,6 +2470,24 @@ static bool contextElementPreconditionsCheck
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
 
+  /* Checking there aren't duplicate attributes */
+  for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+  {
+    std::string name = ceP->contextAttributeVector.get(ix)->name;
+    std::string id   = ceP->contextAttributeVector.get(ix)->getId();
+    for (unsigned int jx = ix + 1; jx < ceP->contextAttributeVector.size(); ++jx)
+    {
+      if ((name == ceP->contextAttributeVector.get(jx)->name) && (id == ceP->contextAttributeVector.get(jx)->getId()))
+      {
+        ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector.get(ix));
+        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
+                                  "duplicated attribute name and id [" + name + "," + id + "]");
+        LM_W(("Bad Input (duplicated attribute name: name=<%s> id=<%s>)", name.c_str(), id.c_str()));
+        return false; // Error already in responseP
+      }
+    }
+  }
+
   /* Not supporting isPattern = true currently */
   if (isTrue(enP->isPattern))
   {

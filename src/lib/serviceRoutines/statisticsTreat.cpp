@@ -324,7 +324,7 @@ std::string statisticsTreat
 
   // Special case: simulated notifications
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
-  renderUsedCounter(&js, "simulatedNotificaitons", nSimNotif);
+  renderUsedCounter(&js, "simulatedNotifications", nSimNotif);
 
   ciP->httpStatusCode = SccOk;
   return js.str();

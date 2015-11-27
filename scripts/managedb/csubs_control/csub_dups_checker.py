@@ -103,7 +103,7 @@ for doc in db[COL].find().sort('expiration', DESCENDING):
     # The following fields are removed from signature calculation: _id, lastNotification, count and expiration
     # (not sure about throttling... as I have the doubt, I'm leaving it byt the moment)
     doc.pop('_id', None)
-    doc.pop('latsNotification', None)
+    doc.pop('lastNotification', None)
     doc.pop('count', None)
     doc.pop('expiration', None)
 

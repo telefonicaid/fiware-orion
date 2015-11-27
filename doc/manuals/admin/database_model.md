@@ -244,9 +244,7 @@ Fields:
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type** and **isPattern**.
 -   **attrs**: an array of attribute names (strings) (optional).
--   **conditions**: a list of conditions that trigger notifications. The
-    two different cases currently supported are shown in the example
-    below (we think they're quite straightforward)
+-   **conditions**: a list of conditions that trigger notifications.
 -   **count**: the number of notifications sent associated to
     the subscription.
 -   **format**: the format to use to send notification, either "XML" or "JSON".
@@ -273,10 +271,6 @@ Example document:
         "A2"
    ],
    "conditions": [
-       {
-           "type": "ONTIMEINTERVAL",
-           "value": 60
-       },
        {
            "type": "ONCHANGE",
            "value": [
