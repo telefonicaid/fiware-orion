@@ -86,55 +86,55 @@ Fields:
 Example document:
 
 ```
- {
-   "_id":
-       "id": "E1",
-       "type": "T1",
-       "servicePath": "/"
-   },
-   "attrs": {
-       "A1": {
-           "type": "TA1",
-           "value": "282",
-           "creDate" : 1389376081,
-           "modDate" : 1389376120,
-           "md" : [
-              { 
-                 "name" : "customMD1",
-                 "type" : "string",
-                 "value" : "AKAKA"
-              },
-              {
-                 "name" : "customMD2",
-                 "type" : "integer",
-                 "value" : "23232"
-              }
-           ]
-       },
-       "A2_ID101": {
-           "type": "TA2",
-           "value": "176",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
-       },
-       "position": {
-           "type": "location",
-           "value": "40.418889, -3.691944",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
-       }
-   },
-   "attrNames": [ "A1", "A2", "position" ],
-   "creDate": 1389376081,
-   "modDate": 1389376244,
-   "location": {
-       "attrName": "position",
-       "coords": {
-           "type": "Point",
-           "coordinates": [ -3.691944, 40.418889 ]
-       }
-   }
- }
+ {
+   "_id":
+       "id": "E1",
+       "type": "T1",
+       "servicePath": "/"
+   },
+   "attrs": {
+       "A1": {
+           "type": "TA1",
+           "value": "282",
+           "creDate" : 1389376081,
+           "modDate" : 1389376120,
+           "md" : [
+              { 
+                 "name" : "customMD1",
+                 "type" : "string",
+                 "value" : "AKAKA"
+              },
+              {
+                 "name" : "customMD2",
+                 "type" : "integer",
+                 "value" : "23232"
+              }
+           ]
+       },
+       "A2_ID101": {
+           "type": "TA2",
+           "value": "176",
+           "creDate" : 1389376244,
+           "modDate" : 1389376244
+       },
+       "position": {
+           "type": "location",
+           "value": "40.418889, -3.691944",
+           "creDate" : 1389376244,
+           "modDate" : 1389376244
+       }
+   },
+   "attrNames": [ "A1", "A2", "position" ],
+   "creDate": 1389376081,
+   "modDate": 1389376244,
+   "location": {
+       "attrName": "position",
+       "coords": {
+           "type": "Point",
+           "coordinates": [ -3.691944, 40.418889 ]
+       }
+   }
+ }
 ```
 [Top](#top)
 
@@ -178,40 +178,40 @@ Fields:
 Example document:
 
 ```
- {
-   "_id": ObjectId("5149f60cf0075f2fabca43da"),
-   "fwdRegId": "5149f60cf0075f241bca22f1",
-   "expiration": 1360232760,
-   "contextRegistration": [
-       {
-           "entities": [
-               {
-                   "id": "E1",
-                   "type": "T1",
-                   "isPattern": "false"
-               },
-               {
-                   "id": "E2",
-                   "type": "T2",
-                   "isPattern": "false"
-               }
-           ],
-           "attrs": [
-               {
-                   "name": "A1",
-                   "type": "TA1",
-                   "isDomain": "false"
-               },
-               {
-                   "name": "A2",
-                  "type": "TA2",
-                   "isDomain": "true"
-               }
-           ],
-           "providingApplication": "http://foo.bar/notif"
-      },
-  ]
- }
+ {
+   "_id": ObjectId("5149f60cf0075f2fabca43da"),
+   "fwdRegId": "5149f60cf0075f241bca22f1",
+   "expiration": 1360232760,
+   "contextRegistration": [
+       {
+           "entities": [
+               {
+                   "id": "E1",
+                   "type": "T1",
+                   "isPattern": "false"
+               },
+               {
+                   "id": "E2",
+                   "type": "T2",
+                   "isPattern": "false"
+               }
+           ],
+           "attrs": [
+               {
+                   "name": "A1",
+                   "type": "TA1",
+                   "isDomain": "false"
+               },
+               {
+                   "name": "A2",
+                  "type": "TA2",
+                   "isDomain": "true"
+               }
+           ],
+           "providingApplication": "http://foo.bar/notif"
+      },
+  ]
+ }
 ```
 [Top](#top)
 
@@ -253,35 +253,35 @@ Fields:
 Example document:
 
 ```
- {
-   "_id": ObjectId("5149fd46f0075f83a4ca0300"),
-   "expiration": 1360236300,
-   "lastNotification": 1360232700,
-   "throttling": 10,
-   "reference": "http://notify.me",
-   "entities": [
-       {
-           "id": "E1",
-           "type": "T1",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-        "A1",
-        "A2"
-   ],
-   "conditions": [
-       {
-           "type": "ONCHANGE",
-           "value": [
-               "A1",
-               "A2"
-           ]
-       }
-   ],
-   "count": 27,
-   "format": "JSON"
- }
+ {
+   "_id": ObjectId("5149fd46f0075f83a4ca0300"),
+   "expiration": 1360236300,
+   "lastNotification": 1360232700,
+   "throttling": 10,
+   "reference": "http://notify.me",
+   "entities": [
+       {
+           "id": "E1",
+           "type": "T1",
+           "isPattern": "false"
+       }
+   ],
+   "attrs": [
+        "A1",
+        "A2"
+   ],
+   "conditions": [
+       {
+           "type": "ONCHANGE",
+           "value": [
+               "A1",
+               "A2"
+           ]
+       }
+   ],
+   "count": 27,
+   "format": "JSON"
+ }
 ```
 [Top](#top)
 
@@ -317,29 +317,29 @@ Fields:
 Example document:
 
 ```
- {
-   "_id": ObjectId("51756c2220be8dc1b5f415ff"),
-   "expiration": 1360236300,
-   "reference": "`[`http://notify.me`](http://notify.me)`",
-   "entities": [
-       {
-           "id": "E5",
-           "type": "T5",
-           "isPattern": "false"
-       },
-       {
-           "id": "E6",
-           "type": "T6",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-       "A1",
-       "A2"
-   ],
-   "lastNotification" : 1381132312,
-   "count": 42,
-   "format": "JSON"
- }
+ {
+   "_id": ObjectId("51756c2220be8dc1b5f415ff"),
+   "expiration": 1360236300,
+   "reference": "`[`http://notify.me`](http://notify.me)`",
+   "entities": [
+       {
+           "id": "E5",
+           "type": "T5",
+           "isPattern": "false"
+       },
+       {
+           "id": "E6",
+           "type": "T6",
+           "isPattern": "false"
+       }
+   ],
+   "attrs": [
+       "A1",
+       "A2"
+   ],
+   "lastNotification" : 1381132312,
+   "count": 42,
+   "format": "JSON"
+ }
 ```
 [Top](#top)
