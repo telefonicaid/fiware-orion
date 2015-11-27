@@ -258,7 +258,7 @@ void Metadata::fill(const struct Metadata& md)
 *
 * toStringValue -
 */
-std::string Metadata::toStringValue(void)
+std::string Metadata::toStringValue(void) const
 {
   char buffer[64];
 
