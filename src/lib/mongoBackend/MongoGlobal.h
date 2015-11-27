@@ -67,9 +67,9 @@ typedef void (*MongoTreatFunction)(std::string tenant, BSONObj& bobj);
 
 /* ****************************************************************************
 *
-* mongoSubCacheActive - 
+* mongoMultitenant -
 */
-extern bool mongoSubCacheActive;
+extern bool mongoMultitenant(void);
 
 
 

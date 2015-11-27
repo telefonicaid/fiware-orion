@@ -39,7 +39,7 @@
 #include "rest/rest.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "mongoBackend/mongoConnectionPool.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 
 #include "ngsiNotify/QueueStatistics.h"
 
@@ -353,7 +353,7 @@ std::string statisticsCacheTreat
 
   if (ciP->method == "DELETE")
   {
-    mongoSubCacheStatisticsReset("statisticsTreat::DELETE");
+    subCacheStatisticsReset("statisticsTreat::DELETE");
     js.addString("message", "All statistics counter reset");
     return js.str();
   }
@@ -368,9 +368,9 @@ std::string statisticsCacheTreat
   int   cacheItems  = 0;
   char  listBuffer[1024];
 
-  cacheSemTake(__FUNCTION__, "mongoSubCacheStatisticsGet");
-  mongoSubCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems, listBuffer, sizeof(listBuffer));
-  cacheSemGive(__FUNCTION__, "mongoSubCacheStatisticsGet");
+  cacheSemTake(__FUNCTION__, "statisticsCacheTreat");
+  subCacheStatisticsGet(&mscRefreshs, &mscInserts, &mscRemoves, &mscUpdates, &cacheItems, listBuffer, sizeof(listBuffer));
+  cacheSemGive(__FUNCTION__, "statisticsCacheTreat");
 
   js.addString("ids", listBuffer);    // FIXME P10: this seems not printing anything... is listBuffer working fine?
   js.addNumber("refresh", mscRefreshs);
