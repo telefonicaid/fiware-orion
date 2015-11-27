@@ -12,8 +12,6 @@
 	  * [Query Context operation](#query-context-operation)
 	  * [Update Context elements](#update-context-elements)
 	  * [Context Subscriptions](#context-subscriptions)
-		* [ONTIMEINTERVAL](#ontimeinterval)
-		* [ONCHANGE](#onchange)
 	  * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
     * [NGSI10 convenience operations](#ngsi10-convenience-operations)
 	  * [Convenience Entity Creation](#convenience-entity-creation)
@@ -945,228 +943,6 @@ Before starting to play with feature, [start the accumulator
 server](#starting-accumulator-server-for-the-tutorials) to
 capture notifications.
 
-Actually, there are two kinds of subscribeContext: ONTIMEINTERVAL and
-ONCHANGE subscriptions, described in the next two subsections.
-
-NGSI standard describes a third subscription type, called ONVALUE, but the
-current version of the Orion Context Broker doesn't support it.
-
-[Top](#top)
-
-##### ONTIMEINTERVAL
-
-The following is the request corresponding to an ONTIMEINTERVAL
-subscription:
-
-```
-(curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "entities": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1"
-        }
-    ],
-    "attributes": [
-        "temperature"
-    ],
-    "reference": "http://localhost:1028/accumulate",
-    "duration": "P1M",
-    "notifyConditions": [
-        {
-            "type": "ONTIMEINTERVAL",
-            "condValues": [
-                "PT10S"
-            ]
-        }
-    ]
-}
-EOF
-```
-
-Let's examine in detail the different elements included in the payload:
-
--   entities and attributes define which context elements will be included
-    in the notification message. 
-    In this example, we are specifying that the notification has to include 
-    the temperature attribute for entity Room1.
--   The callback URL to send notifications is defined with the
-    reference element. We are using the URL of the accumulator-server.py
-    program started before. Only one reference can be included per
-    subscribeContext request. However, you can have several
-    subscriptions on the same context elements (i.e. same entity
-    and attribute) without any problem. Default URL schema (in the
-    case you don't specify any) is "http", e.g. using "localhost:1028"
-    as reference will be actually interpreted as
-    "<http://localhost:1028>".
--   Subscriptions have a duration, specified using the [ISO
-    8601](http://www.wikipedia.org/wiki/ISO_8601) standard format. Once
-    that duration is expired, the subscription is simply ignored
-    (however, it is still stored in the broker database and needs to be
-    purged using the procedure described in the [administration
-    manual](../admin/database_admin.md#deleting-expired-documents)).
-    You can extend the duration of a subscription by updating it, as
-    described [later in this document](duration.md#extending-duration).
-    We are using "P1M" which means "one month".
--   The notifyCondition element defines the "trigger" for
-    the subscription. There is a type element (which value in this case
-    is ONTIMERINTERVAL) and a condValueList element. The condValueList
-    element structure depends on the type. In the case of
-    ONTIMEINTERVAL, it includes exactly one condValue child element
-    whose value is a time interval (using again, as usual in NGSI, the
-    ISO 8601 format). A notification is sent with a frequency equal to
-    that interval. In the example above we are using 10 seconds
-    as interval.
-
-The response corresponding to that request contains a subscription ID (a
-24 hexadecimal number used for updating and cancelling the subscription
--Write it down because you will need it later in this tutorial) and a
-duration acknowledgement:
-
-```
-{
-    "subscribeResponse": {
-        "duration": "P1M",
-        "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-    }
-}
-```
-
-If you look at the accumulator-script.py terminal window, you will see
-that a message resembling the following one is received each 10 seconds:
-
-```
-POST http://localhost:1028/accumulate
-Content-Length: 492
-User-Agent: orion/0.9.0
-Host: localhost:1028
-Accept: application/xml, application/json
-Content-Type: application/json
-
-{
-    "subscriptionId": "51c04a21d714fb3b37d7d5a7",
-    "originator": "localhost",
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "temperature",
-                        "type": "float",
-                        "value": "26.5"
-                    }
-                ],
-                "type": "Room",
-                "isPattern": "false",
-                "id": "Room1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-```
-
-Orion Context Broker notifies NGSI10 subscribeContext using the POST
-HTTP method (on the URL used as reference for the subscription) with a
-notifyContextRequest payload. Apart from the subscriptionId element
-(that matches the one in the response to subscribeContext request) and
-the originator element, there is a contextResponse vector which is
-the same that the one used in the [queryContext
-responses](#query-context-operation).
-
-Currently, the originator is always "localhost". We will look into a
-more flexible way of using this in a later version.
-
-You can do a small exercise: change the temperature value of Room1 (have
-a look at the [update context elements
-section](#update-context-elements) in this manual to see how
-to do it) and after that, check that in the next received
-notifyContextRequest for accumulator-server.py the contextValue element
-contains the new value. This exercise demanstrates that the Orion
-Context Broker always notifies the updated value in ONTIMEINTERVAL
-subscriptions.
-
-Subscriptions can be updated using the NGSI10 updateContextSubcription.
-The request includes a subscriptionId that identifies the subscription
-to modify and the actual update payload. For example, if we want to
-change the notification interval to 5 seconds we will use the following
-(of course, replace the subscriptionId value after copy-paste with the
-one that you have got in the subscribeContext response in the previous
-step) command:
-
-```
-(curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "subscriptionId": "51c04a21d714fb3b37d7d5a7",
-    "notifyConditions": [
-        {
-            "type": "ONTIMEINTERVAL",
-            "condValues": [
-                "PT5S"
-            ]
-        }
-    ]
-} 
-EOF
-```
-
-The response is very similar to the one for subscribeContext request:
-
-```
-{
-    "subscribeResponse": {
-        "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-       
-    }
-}
-```
-
-You can check in accumulator-server.py that the notification frequency
-has changed to 5 seconds.
-
-Finally, you can cancel a subscription using the NGSI10
-unsubscribeContext operation, that just uses de subscriptionId in the
-request payload (replace the subscriptionId value after copy-paste with
-the one that you get in the subscribeContext response in the previous
-step):
-
-```
-(curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-} 
-EOF
-```
-The response is just an acknowledgement of that the cancellation was
-successful.
-
-```
-{
-    "statusCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-    },
-    "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-}
-```
-You can have a look at accumulator-server.py to check that the
-notification flow has stopped.
-
-[Top](#top)
-
-##### ONCHANGE
-
-We assume that the accumulator-server.py program is still running.
-Otherwise, start it as described
-here [Starting accumulator server for the tutorials](#starting-accumulator-server-for-the-tutorials).
-
 ONCHANGE subscriptions are used when you want to be notified not when a
 given time interval has passed but when some attribute changes. Let's
 consider the following example:
@@ -1200,12 +976,33 @@ consider the following example:
 EOF
 ```
 
-Having a look at the payload we can check that it is very similar to the
-one used in ONTIMEINTERVAL, with two exceptions:
+Let's examine in detail the different elements included in the payload:
 
--   The notifyCondition element uses the type ONCHANGE (obviously :)
-    but, in this case the condValue vector contains an actual list of
-    condValue elements, each one with an attribute name. They define the
+-   entities and attributes define which context elements will be included
+    in the notification message.
+    In this example, we are specifying that the notification has to include
+    the temperature attribute for entity Room1.
+-   The callback URL to send notifications is defined with the
+    reference element. We are using the URL of the accumulator-server.py
+    program started before. Only one reference can be included per
+    subscribeContext request. However, you can have several
+    subscriptions on the same context elements (i.e. same entity
+    and attribute) without any problem. Default URL schema (in the
+    case you don't specify any) is "http", e.g. using "localhost:1028"
+    as reference will be actually interpreted as
+    "<http://localhost:1028>".
+-   Subscriptions have a duration, specified using the [ISO
+    8601](http://www.wikipedia.org/wiki/ISO_8601) standard format. Once
+    that duration is expired, the subscription is simply ignored
+    (however, it is still stored in the broker database and needs to be
+    purged using the procedure described in the [administration
+    manual](../admin/database_admin.md#deleting-expired-documents)).
+    You can extend the duration of a subscription by updating it, as
+    described [later in this document](duration.md#extending-duration).
+    We are using "P1M" which means "one month".
+-   The notifyCondition element defines the "trigger" for
+    the subscription. It uses the type ONCHANGE. The condValues vector contains a list of
+    attribute names. They define the
     "triggering attributes", i.e. attributes that upon creation/change
     due to [Entity Creation](#entity-creation) or
     [Update context elements](#update-context-elements) trigger
@@ -1229,22 +1026,19 @@ one used in ONTIMEINTERVAL, with two exceptions:
     if a previous notification was sent less than 5 seconds ago, no
     matter how many actual changes take place in that period. This is to
     not stress the notification receptor in case of having context
-    producers that update attribute values too frequently. Actually,
-    throttling is not an "exclusive" field for ONCHANGE subscriptions:
-    from a theoretical point of view it can be used in ONTIMEINTERVAL
-    subscriptions but, given that in that case you can precisely control
-    the notification frequency it doesn't have any practical sense.
+    producers that update attribute values too frequently.
 
-As in ONTIMEINTERVAL subscriptions, the response consists of a
-subscription ID, a duration acknowledgement and (given that we used
-throttling in the request) a throttling acknowledgement:
+
+The response corresponding to that request contains a subscription ID (a
+24 hexadecimal number used for updating and cancelling the subscription
+-Write it down because you will need it later in this tutorial) and a
+duration/throttling acknowledgement:
 
 ```
 {
     "subscribeResponse": {
         "duration": "P1M",
-        "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
-        "throttling": "PT5S"
+        "subscriptionId": "51c0ac9ed714fb3b37d7d5a8"
     }
 }
 ```
@@ -1287,6 +1081,17 @@ Content-Type: application/json
 }
 ```
 
+Orion Context Broker notifies NGSI10 subscribeContext using the POST
+HTTP method (on the URL used as reference for the subscription) with a
+notifyContextRequest payload. Apart from the subscriptionId element
+(that matches the one in the response to subscribeContext request) and
+the originator element, there is a contextResponses vector which is
+the same that the one used in the [queryContext
+responses](#query-context-operation).
+
+Currently, the originator is always "localhost". We will look into a
+more flexible way of using this in a later version.
+
 You may wonder why accumulator-server.py is getting this message if you
 don't actually do any update. This is because the Orion Context Broker
 considers the transition from "non existing subscription" to
@@ -1319,10 +1124,65 @@ Next, try to check how throttling is enforced. Update Room1 pressure
 fast, without letting pass 5 seconds and you will see that the second
 notification doesn't arrive to accumulator-server.py.
 
-You can update and cancel ONCHANGE subscriptions in the same way as
-ONTIMEINTERVAL subscriptions. You can do that as a final exercise in
-this section of the tutorial, e.g try to set a new throttling value,
-check that it works as expected and cancel after that.
+Subscriptions can be updated using the NGSI10 updateContextSubcription.
+The request includes a subscriptionId that identifies the subscription
+to modify and the actual update payload. For example, if we want to
+change the duration interval to extend duration
+(of course, replace the subscriptionId value after copy-paste with the
+one that you have got in the subscribeContext response in the previous
+step) command:
+
+```
+(curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
+    "duration": "P2M"
+}
+EOF
+```
+
+The response is very similar to the one for subscribeContext request:
+
+```
+{
+    "subscribeResponse": {
+        "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
+        "duration": "P2M"
+    }
+}
+```
+
+Finally, you can cancel a subscription using the NGSI10
+unsubscribeContext operation, that just uses de subscriptionId in the
+request payload (replace the subscriptionId value after copy-paste with
+the one that you get in the subscribeContext response in the previous
+step):
+
+```
+(curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "subscriptionId": "51c0ac9ed714fb3b37d7d5a8"
+}
+EOF
+```
+
+The response is just an acknowledgement of that the cancellation was
+successful.
+
+```
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "51c0ac9ed714fb3b37d7d5a8"
+}
+```
+
+You can do some more updates a look at accumulator-server.py to check that the
+notification flow has stopped.
 
 [Top](#top)
 
@@ -2154,7 +2014,7 @@ subscriptions:
 -   PUT /v1/contextSubscriptions/{subscriptionID}, to update the
     subscription identified by {subscriptionID}, using the same payload
     as [standard updateContextSubscription
-    operation](#ontimeinterval). The ID in the payload must
+    operation](#context-subscriptions). The ID in the payload must
     match the ID in the URL.
 -   DELETE /v1/contextSubscriptions/{subscriptionID}, to cancel the
     subscription identified by {subscriptionID}. In this case, payload
