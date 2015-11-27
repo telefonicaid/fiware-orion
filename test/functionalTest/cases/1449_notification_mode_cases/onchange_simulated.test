@@ -152,7 +152,7 @@ Date: REGEX(.*)
 
 {
     "measuring_interval_in_secs": REGEX(\d+),
-    "simulatedNotificaitons": 1,
+    "simulatedNotifications": 1,
     "uptime_in_secs": REGEX(\d+)
 }
 
