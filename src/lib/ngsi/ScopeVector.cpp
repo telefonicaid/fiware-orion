@@ -134,6 +134,10 @@ Scope* ScopeVector::get(int ix)
 {
   return vec[ix];
 }
+const Scope* ScopeVector::get(int ix) const
+{
+  return vec[ix];
+}
 
 
 
@@ -141,7 +145,7 @@ Scope* ScopeVector::get(int ix)
 *
 * ScopeVector::size -
 */
-unsigned int ScopeVector::size(void)
+unsigned int ScopeVector::size(void) const
 {
   return vec.size();
 }

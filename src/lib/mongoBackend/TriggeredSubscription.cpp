@@ -39,7 +39,7 @@ TriggeredSubscription::TriggeredSubscription
   long long            _lastNotification,
   Format               _format,
   const std::string&   _reference,
-  AttributeList        _attrL,
+  const AttributeList& _attrL,
   const std::string&   _cacheSubId,
   const char*          _tenant
 ):
@@ -64,9 +64,9 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  Format             _format,
-  const std::string& _reference,
-  AttributeList      _attrL
+  Format                _format,
+  const std::string&   _reference,
+  const AttributeList& _attrL
 ):
   throttling        (-1),
   lastNotification  (-1),

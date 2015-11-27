@@ -44,7 +44,7 @@ def msg(s):
 def log_status_restart():
     now = time.strftime('%d-%m-%Y %H:%M:%S')
     with open(status_file, 'a') as file:
-        file.write('%s - contextBroker restart by %' %(now, basename))
+        file.write('%s - contextBroker restart by %s\n' %(now, basename))
 
 # Argument parsing
 basename = __file__

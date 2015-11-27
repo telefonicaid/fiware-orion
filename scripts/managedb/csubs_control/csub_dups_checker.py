@@ -42,7 +42,7 @@ def usage():
 def log_status_restart():
     now = time.strftime('%d-%m-%Y %H:%M:%S')
     with open(status_file, 'a') as file:
-        file.write('%s - contextBroker restart by %' %(now, basename))
+        file.write('%s - contextBroker restart by %s\n' %(now, basename))
 
 # Argument parsing
 basename = __file__
@@ -103,7 +103,7 @@ for doc in db[COL].find().sort('expiration', DESCENDING):
     # The following fields are removed from signature calculation: _id, lastNotification, count and expiration
     # (not sure about throttling... as I have the doubt, I'm leaving it byt the moment)
     doc.pop('_id', None)
-    doc.pop('latsNotification', None)
+    doc.pop('lastNotification', None)
     doc.pop('count', None)
     doc.pop('expiration', None)
 
