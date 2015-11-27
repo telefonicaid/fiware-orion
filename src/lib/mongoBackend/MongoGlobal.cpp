@@ -599,7 +599,7 @@ void destroyAllOntimeIntervalThreads(const std::string& tenant)
 * commutative: en1 is interpreted as the entity to match *in* en2 (i.e.
 * it is assumed that the pattern is in en2)
 */
-bool matchEntity(EntityId* en1, EntityId* en2)
+bool matchEntity(const EntityId* en1, const EntityId* en2)
 {
   bool idMatch;
 
@@ -633,7 +633,7 @@ bool matchEntity(EntityId* en1, EntityId* en2)
 *
 * includedEntity -
 */
-bool includedEntity(EntityId en, EntityIdVector& entityIdV)
+bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
 {
   for (unsigned int ix = 0; ix < entityIdV.size(); ++ix)
   {
@@ -1618,7 +1618,7 @@ void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementR
 *
 * processEntity -
 */
-static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, BSONObj entity)
+static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector& enV, BSONObj entity)
 {
   EntityId en;
 
@@ -1669,7 +1669,7 @@ static void processAttribute(ContextRegistrationResponse* crr, const AttributeLi
 static void processContextRegistrationElement
 (
   BSONObj                             cr,
-  EntityIdVector                      enV,
+  const EntityIdVector&               enV,
   const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   Format                              format
@@ -1737,7 +1737,7 @@ static void processContextRegistrationElement
 */
 bool registrationsQuery
 (
-  EntityIdVector                      enV,
+  const EntityIdVector&               enV,
   const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
@@ -1762,7 +1762,7 @@ bool registrationsQuery
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    EntityId* en = enV.get(ix);
+    const EntityId* en = enV.get(ix);
 
     if (isTrue(en->isPattern))
     {
@@ -1980,7 +1980,7 @@ AttributeList subToAttributeList(BSONObj sub)
 */
 bool processOnChangeConditionForSubscription
 (
-  EntityIdVector                   enV,
+  const EntityIdVector&            enV,
   const AttributeList&             attrL,
   ConditionValueList*              condValues,
   const std::string&               subId,
@@ -2068,7 +2068,7 @@ bool processOnChangeConditionForSubscription
 BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
-  EntityIdVector                   enV,
+  const EntityIdVector&            enV,
   const AttributeList&             attrL,
   const std::string&               subId,
   const std::string&               url,
@@ -2174,12 +2174,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 */
 bool processAvailabilitySubscription
 (
-  EntityIdVector       enV,
-  const AttributeList& attrL,
-  const std::string&   subId,
-  const std::string&   notifyUrl,
-  Format               format,
-  const std::string&   tenant
+  const EntityIdVector& enV,
+  const AttributeList&  attrL,
+  const std::string&    subId,
+  const std::string&    notifyUrl,
+  Format                format,
+  const std::string&    tenant
 )
 {
   std::string                       err;
