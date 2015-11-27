@@ -14,7 +14,7 @@ trace the discussions checking the archives of the mailing list:
 https://lists.fiware.org/private/fiware-ngsi/ (list subscription
 required).
 
-Please check the following [FI-WARE Open Specification Legal Notice (implicit patents license)]
+Please check the following [FIWARE Open Specification Legal Notice (implicit patents license)]
 (http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license))
 to understand the rights to use this document.
 
@@ -42,7 +42,7 @@ This resource allows you to obtain a list of subresources published by the API:
 
 ## List all entities [/v2/entities]
 
-### Normalized mode [GET /v2/entities]
+### Default mode [GET /v2/entities]
 
 + Response 200 (application/json)
 
@@ -102,7 +102,8 @@ This resource allows you to obtain a list of subresources published by the API:
     + Headers
 
             X-Total-Count: 30
-            Link: http://context.example.org/v2/entities?offset=4&limit=2; rel="next", http://context.example.org/v2/entities?offset=28&limit=2; rel="last", http://context.example.org/v2/entities?offset=0&limit=2; rel="first", http://context.example.org/v2/entities?offset=2&limit=2; rel="prev"
+            Link: http://example.org/v2/entities?offset=4&limit=2; rel="next", http://example.org/v2/entities?offset=28&limit=2; rel="last",
+            http://example.org/v2/entities?offset=0&limit=2; rel="first", http://example.org/v2/entities?offset=2&limit=2; rel="prev"
 
     + Body
 
@@ -277,7 +278,7 @@ This resource allows you to obtain a list of subresources published by the API:
 ### By pattern matching [GET /v2/entities{?idPattern,options}]
 
 + Parameters
-    + idPattern: DC_* (optional, string) - Only retrieve entities which id matches this pattern.
+    + idPattern: DC_.* (optional, string) - Only retrieve entities having a matching id.
     + options: keyValues (optional, string) - rendering options
 
 + Response 200 (application/json)
@@ -366,7 +367,7 @@ This resource allows you to obtain a list of subresources published by the API:
 
         {
            "type": "Room",
-            "id": "Boe_Idearium"
+           "id": "Boe_Idearium"
         }
 
 ### Several entity attributes [GET /v2/entities/{entityId}{?attrs}]
@@ -408,7 +409,7 @@ This resource allows you to obtain a list of subresources published by the API:
     of the region, for instance, 'polygon;exterior'
     + limit: 20 - Limit the number of results (optional, number) - Maximum number of results to return
     + attrs: seatsNumber (optional, string) - Attributes to be returned
-    + options: count,keyValues (optional, string) - count indicates that the total number of records must be returned
+    + options: count,keyValues (optional, string) - query options (count total, keyValues mode)
 
 + Response 200 (application/json)
 
