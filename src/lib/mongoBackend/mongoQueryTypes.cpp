@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/statistics.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -59,11 +60,17 @@ static std::string attributeType
   std::auto_ptr<DBClientCursor> cursor;
   std::string                   err;
 
-  if (!collectionQuery(getEntitiesCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return "";
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
+  std::string ret = "";
   while (moreSafe(cursor))
   {
     BSONObj r;
@@ -79,10 +86,12 @@ static std::string attributeType
      * NGSIv2 operations only allow to set one type */
     BSONObj attrs = getField(r, ENT_ATTRS).embeddedObject();
     BSONObj attr = getField(attrs, attrName).embeddedObject();
-    return getStringField(attr, ENT_ATTRS_TYPE);
+    ret = getStringField(attr, ENT_ATTRS_TYPE);
+    break;
   }
+  releaseMongoConnection(connection);
 
-  return "";
+  return ret;
 }
 
 

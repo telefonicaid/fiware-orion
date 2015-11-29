@@ -59,6 +59,8 @@
 
 #include "common/wsStrip.h"
 
+#include "common/statistics.h"
+
 using namespace mongo;
 using std::auto_ptr;
 
@@ -486,10 +488,15 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   auto_ptr<DBClientCursor>  cursor;
   std::string               err;
 
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), query, &cursor, &err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   // Call the treat function for each subscription
   while (moreSafe(cursor))
@@ -502,6 +509,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
     }
     treatFunction(tenant, sub);
   }
+  releaseMongoConnection(connection);
 }
 
 
@@ -1396,10 +1404,15 @@ bool entitiesQuery
 
   query.sort(BSON(ENT_CREATION_DATE << 1));
 
-  if (!collectionRangedQuery(getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
   while (moreSafe(cursor))
@@ -1457,12 +1470,14 @@ bool entitiesQuery
     {
       *err = e.what();
       LM_E(("Runtime Error (exception in nextSafe(): %s)", e.what()));
+      releaseMongoConnection(connection);
       return false;
     }
     catch (...)
     {
       *err = "generic exception at nextSafe()";
       LM_E(("Runtime Error (generic exception in nextSafe())"));
+      releaseMongoConnection(connection);
       return false;
     }
 
@@ -1496,6 +1511,7 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
+  releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
    * entities are added. Only if limitReached is being used, i.e. not NULL
@@ -1843,10 +1859,15 @@ bool registrationsQuery
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-  if (!collectionRangedQuery(getRegistrationsCollectionName(tenant), query, limit, offset, &cursor, countP, err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
   while (moreSafe(cursor))
@@ -1878,6 +1899,7 @@ bool registrationsQuery
      * same registration ID. Thus, it could be interesting to post-process the response vector, to
      * "compact" removing duplicated responses.*/
   }
+  releaseMongoConnection(connection);
 
   return true;
 }

@@ -24,6 +24,7 @@
 */
 
 #include "common/sem.h"
+#include "common/statistics.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -212,12 +213,17 @@ void mongoListSubscriptions
 
   q.sort(BSON("_id" << 1));
 
-  if (!collectionRangedQuery(getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, count, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection, getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, count, &err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
   while (moreSafe(cursor))
@@ -240,6 +246,7 @@ void mongoListSubscriptions
 
     subs->push_back(s);
   }
+  releaseMongoConnection(connection);
 
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
   *oe = OrionError(SccOk);
@@ -270,12 +277,17 @@ void mongoGetSubscription
   std::string                    err;
   BSONObj                        q     = BSON("_id" << OID(idSub));
 
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
   if (moreSafe(cursor))
@@ -283,6 +295,7 @@ void mongoGetSubscription
     BSONObj r;    
     if (!nextSafeOrError(cursor, &r, &err))
     {
+      releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
@@ -297,6 +310,7 @@ void mongoGetSubscription
 
     if (moreSafe(cursor))
     {
+      releaseMongoConnection(connection);
       // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
@@ -306,11 +320,13 @@ void mongoGetSubscription
   }
   else
   {
+    releaseMongoConnection(connection);
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccSubscriptionIdNotFound);
     return;
   }
+  releaseMongoConnection(connection);
 
   reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
   *oe = OrionError(SccOk);

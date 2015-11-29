@@ -226,10 +226,15 @@ static bool addTriggeredSubscriptions
   auto_ptr<DBClientCursor> cursor;
   BSONObj                  query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
 
-  if (!collectionQuery(getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
   {
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    releaseMongoConnection(connection);
     return false;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
   while (moreSafe(cursor))
@@ -269,6 +274,7 @@ static bool addTriggeredSubscriptions
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
+  releaseMongoConnection(connection);
 
   return true;
 }

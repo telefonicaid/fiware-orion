@@ -19,3 +19,4 @@
 - Fix: 'count' and 'lastNotificationTime' now maintained by subCache (and synched via DB) (Issue #1476)
 - Fix: updates including several attributes with the same name are now reported as InvalidModification (Issue #908)
 - Deprecated: ONTIMEINTERVAL subscriptions
+- Fix: avoid indirect usage of DB connections concurrently due to cursors (Issue #1558)

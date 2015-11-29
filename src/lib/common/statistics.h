@@ -27,6 +27,7 @@
 */
 #include "ngsi/Request.h"
 #include "common/Format.h"
+#include "common/clockFunctions.h"
 
 
 
