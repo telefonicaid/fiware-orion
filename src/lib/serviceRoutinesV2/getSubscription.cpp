@@ -38,6 +38,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "common/idCheck.h"
 
 
 
@@ -60,12 +61,19 @@ std::string getSubscription
   std::string          idSub = compV[2];
   OrionError           oe;
   std::string          out;
+  std::string          err;
+
+  if ((err = idCheck(idSub)) != "OK")
+  {
+    OrionError oe(SccBadRequest, err);
+    return oe.render(ciP, "Invalid subscription ID");
+  }
 
   TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
 
   if (oe.code != SccOk)
   {
-    TIMED_RENDER(out = oe.render(ciP,""));
+    TIMED_RENDER(out = oe.render(ciP, "Invalid subscription ID"));
     return out;
   }
 

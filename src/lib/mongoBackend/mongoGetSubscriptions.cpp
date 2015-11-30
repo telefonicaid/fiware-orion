@@ -22,20 +22,21 @@
 *
 * Author: Orion dev team
 */
+#include <string>
 
-#include "common/sem.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/sem.h"
+#include "common/idCheck.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "cache/subCache.h"
-
-#include "mongo/client/dbclient.h"
 
 using namespace ngsiv2;
 
@@ -247,6 +248,7 @@ void mongoListSubscriptions
 }
 
 
+
 /* ****************************************************************************
 *
 * mongoGetSubscription -
@@ -260,14 +262,20 @@ void mongoGetSubscription
   const std::string&                  tenant
 )
 {
-  bool  reqSemTaken = false;
+  bool         reqSemTaken = false;
+  std::string  err;
+
+  if ((err = idCheck(idSub)) != "OK")
+  {
+    *oe = OrionError(SccBadRequest, err);
+    return;
+  }
 
   reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Get Subscription"));
 
   std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
   BSONObj                        q     = BSON("_id" << OID(idSub));
 
   if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
