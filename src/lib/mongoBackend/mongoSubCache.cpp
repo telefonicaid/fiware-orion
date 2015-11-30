@@ -32,6 +32,7 @@
 
 #include "common/sem.h"
 #include "common/string.h"
+#include "common/statistics.h"
 
 #include "cache/subCache.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -394,11 +395,16 @@ void mongoSubCacheRefresh(const std::string& database)
   auto_ptr<DBClientCursor>  cursor;
   std::string               errorString;
 
-  if (collectionQuery(collection, query, &cursor, &errorString) != true)
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
     LM_E(("Database Error (%s)", errorString.c_str()));
+    releaseMongoConnection(connection, &cursor);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   int subNo = 0;
   while (moreSafe(cursor))
@@ -419,6 +425,7 @@ void mongoSubCacheRefresh(const std::string& database)
       ++subNo;
     }
   }
+  releaseMongoConnection(connection, &cursor);
 
   LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
 }

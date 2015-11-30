@@ -59,6 +59,8 @@
 
 #include "common/wsStrip.h"
 
+#include "common/statistics.h"
+
 using namespace mongo;
 using std::auto_ptr;
 
@@ -219,13 +221,22 @@ DBClientBase* getMongoConnection(void)
 *
 * releaseMongoConnection - give back mongo connection to connection pool
 */
-void releaseMongoConnection(DBClientBase* connection)
+void releaseMongoConnection(DBClientBase* connection, std::auto_ptr<DBClientCursor>*  cursor)
 {
 #ifdef UNIT_TEST
   return;
 #else
+#if MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
+  // it seems that the kill() method was added in a MongoDB C++ driver version newer than the one
+  // we officially use (legacy-1.0.2). Thus, I'm leaving this block of code to be prepared to the
+  // time we have this. See issue: https://github.com/telefonicaid/fiware-orion/issues/1568
+  if (cursor != NULL)
+  {
+    cursor->kill();
+  }
+#endif // MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
   return mongoPoolConnectionRelease(connection);
-#endif
+#endif // UNIT_TEST
 }
 
 
@@ -498,10 +509,15 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   auto_ptr<DBClientCursor>  cursor;
   std::string               err;
 
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), query, &cursor, &err))
   {
+    releaseMongoConnection(connection, &cursor);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   // Call the treat function for each subscription
   while (moreSafe(cursor))
@@ -514,6 +530,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
     }
     treatFunction(tenant, sub);
   }
+  releaseMongoConnection(connection, &cursor);
 }
 
 
@@ -1408,10 +1425,15 @@ bool entitiesQuery
 
   query.sort(BSON(ENT_CREATION_DATE << 1));
 
-  if (!collectionRangedQuery(getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
+    releaseMongoConnection(connection, &cursor);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
   while (moreSafe(cursor))
@@ -1469,12 +1491,14 @@ bool entitiesQuery
     {
       *err = e.what();
       LM_E(("Runtime Error (exception in nextSafe(): %s)", e.what()));
+      releaseMongoConnection(connection, &cursor);
       return false;
     }
     catch (...)
     {
       *err = "generic exception at nextSafe()";
       LM_E(("Runtime Error (generic exception in nextSafe())"));
+      releaseMongoConnection(connection, &cursor);
       return false;
     }
 
@@ -1508,6 +1532,7 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
+  releaseMongoConnection(connection, &cursor);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
    * entities are added. Only if limitReached is being used, i.e. not NULL
@@ -1855,10 +1880,15 @@ bool registrationsQuery
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-  if (!collectionRangedQuery(getRegistrationsCollectionName(tenant), query, limit, offset, &cursor, countP, err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
+    releaseMongoConnection(connection, &cursor);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
   while (moreSafe(cursor))
@@ -1890,6 +1920,7 @@ bool registrationsQuery
      * same registration ID. Thus, it could be interesting to post-process the response vector, to
      * "compact" removing duplicated responses.*/
   }
+  releaseMongoConnection(connection, &cursor);
 
   return true;
 }

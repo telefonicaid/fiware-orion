@@ -40,21 +40,22 @@ using namespace mongo;
 /* ****************************************************************************
 *
 * collectionQuery -
+*
+* Different from others, this function doesn't use getMongoConnection() and
+* releaseMongoConnection(). It is assumed that the caller will do, as the
+* connection cannot be released before the cursor has been used.
 */
 bool collectionQuery
 (
+  DBClientBase*                   connection,
   const std::string&              col,
   const BSONObj&                  q,
   std::auto_ptr<DBClientCursor>*  cursor,
   std::string*                    err
 )
 {
-  TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
-
   if (connection == NULL)
   {
-    TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
     return false;
@@ -74,15 +75,10 @@ bool collectionQuery
     {
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
-    releaseMongoConnection(connection);       
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
     std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: " + e.what();
@@ -92,9 +88,6 @@ bool collectionQuery
   }
   catch (...)
   {
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
     std::string msg = std::string("collection: ") + col +
       " - query(): " + q.toString() +
       " - exception: generic";
@@ -111,9 +104,15 @@ bool collectionQuery
 /* ****************************************************************************
 *
 * collectionRangedQuery -
+*
+* Different from others, this function doesn't use getMongoConnection() and
+* releaseMongoConnection(). It is assumed that the caller will do, as the
+* connection cannot be released before the cursor has been used.
+*
 */
 extern bool collectionRangedQuery
 (
+  DBClientBase*                   connection,
   const std::string&              col,
   const Query&                    q,
   int                             limit,
@@ -123,15 +122,10 @@ extern bool collectionRangedQuery
   std::string*                    err
 )
 {
-  TIME_STAT_MONGO_READ_WAIT_START();
-  DBClientBase* connection = getMongoConnection();
-
   if (connection == NULL)
   {
-    TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_E(("Fatal Error (null DB connection)"));
     *err = "null DB connection";
-
     return false;
   }
 
@@ -154,15 +148,10 @@ extern bool collectionRangedQuery
     {
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
     LM_I(("Database Operation Successful (query: %s)", q.toString().c_str()));
   }
   catch (const std::exception &e)
   {
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: " + e.what();
@@ -172,9 +161,6 @@ extern bool collectionRangedQuery
   }
   catch (...)
   {
-    releaseMongoConnection(connection);
-    TIME_STAT_MONGO_READ_WAIT_STOP();
-
     std::string msg = std::string("collection: ") + col.c_str() +
       " - query(): " + q.toString() +
       " - exception: generic";
