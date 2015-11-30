@@ -32,8 +32,8 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
-#include "mongoBackend/mongoSubCache.h"
 #include "mongoBackend/safeMongo.h"
+#include "cache/subCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
@@ -113,15 +113,15 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     //
     // Removing subscription from mongo subscription cache
     //
-    LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
+    LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
 
     cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
-    CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
     if (cSubP != NULL)
     {
-      mongoSubCacheItemRemove(cSubP);
+      subCacheItemRemove(cSubP);
     }
 
     cacheSemGive(__FUNCTION__, "Removing subscription from cache");
