@@ -1,6 +1,7 @@
 #<a name="top"></a>Orion Context Broker
 
 [![license badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
+[![Documentation Status](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion.readthedocs.org/en/latest/?badge=latest)
 
 * [Introduction](#introduction)
 * [GEi overall description](#gei-overall-description)
