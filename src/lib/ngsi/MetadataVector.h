@@ -44,22 +44,23 @@ typedef struct MetadataVector
 
   MetadataVector(const std::string& _tag = "registrationMetadata");
 
-  void          tagSet(const std::string& tagName);
-  std::string   render(Format format, const std::string& indent, bool comma = false);
-  std::string   toJson(bool isLastElement);
-  std::string   check(RequestType requestType,
+  void            tagSet(const std::string& tagName);
+  std::string     render(Format format, const std::string& indent, bool comma = false);
+  std::string     toJson(bool isLastElement);
+  std::string     check(RequestType requestType,
                       Format format,
                       const std::string& indent,
                       const std::string& predetectedError,
                       int counter);
 
-  void          present(const std::string& metadataType, const std::string& indent);
-  void          push_back(Metadata* item);
-  unsigned int  size(void);
-  Metadata*     get(int ix);
-  Metadata*     lookupByName(const std::string& _name);
-  void          release();
-  void          fill(MetadataVector* mV);
+  void            present(const std::string& metadataType, const std::string& indent);
+  void            push_back(Metadata* item);
+  unsigned int    size(void) const;
+  Metadata*       get(int ix);
+  const Metadata* get(int ix) const;
+  Metadata*       lookupByName(const std::string& _name);
+  void            release();
+  void            fill(MetadataVector* mV);
 } MetadataVector;
 
 #endif  // SRC_LIB_NGSI_METADATAVECTOR_H_

@@ -313,13 +313,19 @@ ContextAttribute* ContextAttributeVector::get(unsigned int ix)
   return NULL;
 }
 
+const ContextAttribute* ContextAttributeVector::get(unsigned int ix) const
+{
+  if (ix < vec.size())
+    return vec[ix];
+  return NULL;
+}
 
 
 /* ****************************************************************************
 *
 * ContextAttributeVector::size - 
 */
-unsigned int ContextAttributeVector::size(void)
+unsigned int ContextAttributeVector::size(void) const
 {
   return vec.size();
 }

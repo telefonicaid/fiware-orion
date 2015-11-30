@@ -78,7 +78,7 @@ typedef struct Metadata
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
-  std::string  toStringValue(void);
+  std::string  toStringValue(void) const;
 
   std::string  check(RequestType         requestType,
                      Format              format,

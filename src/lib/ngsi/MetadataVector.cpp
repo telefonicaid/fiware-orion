@@ -222,13 +222,16 @@ Metadata* MetadataVector::get(int ix)
   return vec[ix];
 }
 
-
+const Metadata* MetadataVector::get(int ix) const
+{
+  return vec[ix];
+}
 
 /* ****************************************************************************
 *
 * MetadataVector::size -
 */
-unsigned int MetadataVector::size(void)
+unsigned int MetadataVector::size(void) const
 {
   return vec.size();
 }
