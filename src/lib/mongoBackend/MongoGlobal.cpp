@@ -35,6 +35,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "common/globals.h"
 #include "common/sem.h"
 #include "common/string.h"
@@ -329,7 +330,7 @@ std::string tenantFromDb(const std::string& database)
 
   if (strncmp(prefix.c_str(), database.c_str(), strlen(prefix.c_str())) == 0)
   {
-    char tenant[MAX_SERVICE_NAME_LEN];
+    char tenant[SERVICE_NAME_MAX_LEN];
 
     strncpy(tenant, database.c_str() + strlen(prefix.c_str()), sizeof(tenant));
     r = std::string(tenant);
@@ -777,7 +778,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
         nullAdded = true;
       }
 
-      char path[MAX_SERVICE_NAME_LEN];
+      char path[SERVICE_NAME_MAX_LEN * 2];
       slashEscape(servicePath[ix].c_str(), path, sizeof(path));
 
       if (path[strlen(path) - 1] == '#')
