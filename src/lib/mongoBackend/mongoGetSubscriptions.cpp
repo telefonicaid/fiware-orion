@@ -264,10 +264,12 @@ void mongoGetSubscription
 {
   bool         reqSemTaken = false;
   std::string  err;
+  OID          oid;
+  StatusCode   sc;
 
-  if ((err = idCheck(idSub)) != "OK")
+  if (safeGetSubId(idSub, &oid, &sc) == false)
   {
-    *oe = OrionError(SccBadRequest, err);
+    *oe = OrionError(sc);
     return;
   }
 
@@ -276,7 +278,7 @@ void mongoGetSubscription
   LM_T(LmtMongo, ("Mongo Get Subscription"));
 
   std::auto_ptr<DBClientCursor>  cursor;
-  BSONObj                        q     = BSON("_id" << OID(idSub));
+  BSONObj                        q     = BSON("_id" << oid);
 
   if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
