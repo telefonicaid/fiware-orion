@@ -95,7 +95,7 @@ std::string EntityVector::check
 */
 void EntityVector::present(const std::string& indent)
 {
-  LM_F(("%lu Entities:\n", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu Entities:\n", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

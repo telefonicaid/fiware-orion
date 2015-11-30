@@ -84,9 +84,9 @@ std::string NotifyContextResponse::render(RequestType requestType, Format format
 */
 void NotifyContextResponse::present(const std::string& indent)
 {
-  LM_F(("%sNotifyContextResponse:", indent.c_str()));
+  LM_T(LmtPresent, ("%sNotifyContextResponse:", indent.c_str()));
   responseCode.present(indent + "  ");
-  LM_F(("\n"));
+  LM_T(LmtPresent, ("\n"));
 }
 
 

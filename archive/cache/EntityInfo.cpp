@@ -26,6 +26,7 @@
 #include <semaphore.h>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "cache/EntityInfo.h"
 
@@ -95,8 +96,10 @@ void EntityInfo::release(void)
 */
 void EntityInfo::present(const std::string& prefix)
 {
-  LM_F(("%sid:    regex describing EntityId::id (the original string is not saved)", prefix.c_str()));
-  LM_F(("%stype:  %s", prefix.c_str(), entityType.c_str()));
+  LM_T(LmtPresent, ("%sid:    regex describing EntityId::id (the original string is not saved)", prefix.c_str()));
+  LM_T(LmtPresent, ("%stype:  %s", 
+		    prefix.c_str(), 
+		    entityType.c_str()));
 }
 
 }

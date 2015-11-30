@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/tag.h"
@@ -105,7 +106,9 @@ std::string ContextElementResponseVector::check
 */
 void ContextElementResponseVector::present(const std::string& indent)
 {
-  LM_F(("%s%lu ContextElementResponses", indent.c_str(), (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%s%lu ContextElementResponses", 
+		    indent.c_str(), 
+		    (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

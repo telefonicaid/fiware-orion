@@ -38,6 +38,7 @@ using std::auto_ptr;
 */
 extern bool collectionQuery
 (
+  DBClientBase*                   connection,
   const std::string&              col,
   const BSONObj&                  q,
   std::auto_ptr<DBClientCursor>*  cursor,
@@ -51,6 +52,7 @@ extern bool collectionQuery
 */
 extern bool collectionRangedQuery
 (
+  DBClientBase*                   connection,
   const std::string&              col,
   const Query&                    q,
   int                             limit,

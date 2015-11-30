@@ -1285,17 +1285,13 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
   /* If we use a queue for notifications, start worker threads */
   if (strcmp(notificationMode, "threadpool") == 0)
   {
-    LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
-    SyncQOverflow<SenderThreadParams*>* pQueue = new SyncQOverflow<SenderThreadParams*>(notificationQueueSize);
-    QueueWorkers*                       qws    = new QueueWorkers(pQueue, notificationThreadNum);
-
-    pNotifier = new QueueNotifier(pQueue);
-
-    int rc = qws->start();
+    QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
+    int rc = pQNotifier->start();
     if (rc != 0)
     {
       LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
     }
+    pNotifier = pQNotifier;
   }
   else
   {

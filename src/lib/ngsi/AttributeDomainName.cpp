@@ -99,11 +99,11 @@ void AttributeDomainName::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sAttributeDomainName: %s", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sAttributeDomainName: %s", indent.c_str(), string.c_str()));
   }
   else
   {
-    LM_F(("%sNo AttributeDomainName", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo AttributeDomainName", indent.c_str()));
   }
 }
 

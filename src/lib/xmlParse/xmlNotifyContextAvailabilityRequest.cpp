@@ -81,12 +81,12 @@ std::string ncarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void ncarPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   parseDataP->ncar.res.present("");
 }
 

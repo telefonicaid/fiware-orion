@@ -418,33 +418,50 @@ void CompoundValueNode::shortShow(const std::string& indent)
 {
   if ((rootP == this) && (valueType == orion::ValueTypeVector))
   {
-    LM_F(("%s%s (toplevel vector)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (toplevel vector)", 
+				indent.c_str(), 
+				name.c_str()));
   }
   else if (rootP == this)
   {
-    LM_F(("%s%s (toplevel object)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (toplevel object)", 
+				indent.c_str(), 
+				name.c_str()));
   }
   else if (valueType == orion::ValueTypeVector)
   {
-    LM_F(("%s%s (vector)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (vector)", 
+				indent.c_str(), 
+				name.c_str()));
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    LM_F(("%s%s (object)", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (object)", 
+				indent.c_str(), 
+				name.c_str()));
   }
   else if (valueType == orion::ValueTypeString)
   {
-    LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), stringValue.c_str()));
+    LM_T(LmtCompoundValue,      ("%s%s (%s)", 
+				indent.c_str(), 
+				name.c_str(), 
+				stringValue.c_str()));
     return;
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), (boolValue == true)? "true" : "false"));
+    LM_T(LmtCompoundValue,      ("%s%s (%s)", 
+				indent.c_str(), 
+				name.c_str(), 
+				(boolValue == true)? "true" : "false"));
     return;
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    LM_F(("%s%s (%f)", indent.c_str(), name.c_str(), numberValue));
+    LM_T(LmtCompoundValue,      ("%s%s (%f)", 
+				indent.c_str(), 
+				name.c_str(), 
+				numberValue));
     return;
   }
 
@@ -464,27 +481,47 @@ void CompoundValueNode::show(const std::string& indent)
 {
   if (name != "")
   {
-    LM_F(("%sname:      %s", indent.c_str(), name.c_str()));
+    LM_T(LmtCompoundValueShow, ("%sname:      %s", 
+				indent.c_str(), 
+				name.c_str()));
   }
 
-  LM_F(("%scontainer: %s", indent.c_str(), container->name.c_str()));
-  LM_F(("%slevel:     %d", indent.c_str(), level));
-  LM_F(("%ssibling:   %d", indent.c_str(), siblingNo));
-  LM_F(("%stype:      %s", indent.c_str(), orion::valueTypeName(valueType)));
-  LM_F(("%spath:      %s", indent.c_str(), path.c_str()));
-  LM_F(("%srootP:     %s", indent.c_str(), rootP->name.c_str()));
+  LM_T(LmtCompoundValueShow, ("%scontainer: %s", 
+			       indent.c_str(), 
+			       container->name.c_str()));
+  LM_T(LmtCompoundValueShow, ("%slevel:     %d", 
+			      indent.c_str(), 
+			      level));
+  LM_T(LmtCompoundValueShow, ("%ssibling:   %d", 
+			      indent.c_str(), 
+			      siblingNo));
+  LM_T(LmtCompoundValueShow, ("%stype:      %s", 
+			      indent.c_str(), 
+			      orion::valueTypeName(valueType)));
+  LM_T(LmtCompoundValueShow, ("%spath:      %s", 
+			      indent.c_str(), 
+			      path.c_str()));
+  LM_T(LmtCompoundValueShow, ("%srootP:     %s", 
+			      indent.c_str(), 
+			      rootP->name.c_str()));
 
   if (valueType == orion::ValueTypeString)
   {
-    LM_F(("%sString Value:     %s", indent.c_str(), stringValue.c_str()));
+    LM_T(LmtCompoundValueShow, ("%sString Value:     %s", 
+				indent.c_str(), 
+				stringValue.c_str()));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    LM_F(("%sBool Value:     %s", indent.c_str(), (boolValue == false)? "false" : "true"));
+    LM_T(LmtCompoundValueShow, ("%sBool Value:     %s", 
+				indent.c_str(), 
+				(boolValue == false)? "false" : "true"));
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    LM_F(("%sNumber Value:     %f", indent.c_str(), numberValue));
+    LM_T(LmtCompoundValueShow, ("%sNumber Value:     %f", 
+				indent.c_str(), 
+				numberValue));
   }
   else if (childV.size() != 0)
   {
@@ -499,7 +536,10 @@ void CompoundValueNode::show(const std::string& indent)
       }
     }
 
-    LM_F(("%s%lu children (%s)", indent.c_str(), childV.size(), childrenString.c_str()));
+    LM_T(LmtCompoundValueShow, ("%s%lu children (%s)", 
+				indent.c_str(), 
+				childV.size(), 
+				childrenString.c_str()));
 
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
@@ -507,7 +547,7 @@ void CompoundValueNode::show(const std::string& indent)
     }
   }
 
-  LM_F((""));
+  LM_T(LmtCompoundValueShow, (""));
 }
 
 

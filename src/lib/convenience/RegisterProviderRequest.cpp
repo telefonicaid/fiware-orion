@@ -125,12 +125,12 @@ std::string RegisterProviderRequest::check
 */
 void RegisterProviderRequest::present(std::string indent)
 {
-  LM_F(("%sRegisterProviderRequest:\n", indent.c_str()));
+  LM_T(LmtPresent, ("%sRegisterProviderRequest:\n", indent.c_str()));
   metadataVector.present("Registration", indent + "  ");
   duration.present(indent + "  ");
   providingApplication.present(indent + "  ");
   registrationId.present(indent + "  ");
-  LM_F(("\n"));
+  LM_T(LmtPresent, ("\n"));
 }
 
 

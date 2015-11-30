@@ -93,11 +93,13 @@ void RestrictionString::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sRestrictionString: %s", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sRestrictionString: %s", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo RestrictionString", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo RestrictionString", indent.c_str()));
   }
 }
 

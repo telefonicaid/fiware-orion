@@ -500,6 +500,6 @@ void jsonQcrPresent(ParseData* reqDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqDataP->qcr.res.present("");
 }

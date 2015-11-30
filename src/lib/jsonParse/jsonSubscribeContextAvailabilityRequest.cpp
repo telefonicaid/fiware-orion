@@ -309,7 +309,7 @@ void jsonScarPresent(ParseData* reqDataP)
 {
   printf("jsonScarPresent\n");
 
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

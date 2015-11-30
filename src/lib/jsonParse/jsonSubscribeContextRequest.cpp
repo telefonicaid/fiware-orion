@@ -572,7 +572,7 @@ void jsonScrPresent(ParseData* parseDataP)
 {
   printf("jsonScrPresent\n");
 
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

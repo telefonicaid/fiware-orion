@@ -29,8 +29,11 @@
 
 
 #include "common/SyncQOverflow.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 #include "ngsiNotify/Notifier.h"
 #include "ngsiNotify/senderThread.h"
+#include "ngsiNotify/QueueWorkers.h"
 
 // default queue size
 #define DEFAULT_NOTIF_QS 100
@@ -44,11 +47,13 @@
 class QueueNotifier : public Notifier
 {
 public:
-  QueueNotifier(SyncQOverflow<SenderThreadParams*> *pQ): pQueue(pQ) {}
+  QueueNotifier(size_t queueSize, int numThreads);
   void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format);
-
+  int start();
 private:
- SyncQOverflow<SenderThreadParams*>* pQueue;
+ SyncQOverflow<SenderThreadParams*> queue;
+ QueueWorkers workers;
+
 };
 
 #endif // SRC_LIB_NGSINOTIFY_QUEUENOTIFIER_H

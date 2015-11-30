@@ -161,10 +161,10 @@ std::string rcrsCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void rcrsPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   reqData->rcrs.res.duration.present("");
   reqData->rcrs.res.registrationId.present("");
   reqData->rcrs.res.errorCode.present("");
