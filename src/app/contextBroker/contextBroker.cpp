@@ -65,7 +65,8 @@
 #include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "mongoBackend/dbConstants.h"
+#include "cache/subCache.h"
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
@@ -86,10 +87,14 @@
 #include "common/globals.h"
 #include "common/Timer.h"
 #include "common/compileInfo.h"
+#include "common/SyncQOverflow.h"
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
+#include "ngsiNotify/QueueNotifier.h"
+#include "ngsiNotify/QueueWorkers.h"
+#include "ngsiNotify/senderThread.h"
 #include "serviceRoutines/logTraceTreat.h"
 #include "serviceRoutines/getEntityTypes.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
@@ -237,13 +242,21 @@ long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
-bool            mutexTimeStat;
 int             writeConcern;
 unsigned int    cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
+int             notificationQueueSize;
+int             notificationThreadNum;
 bool            noCache;
 unsigned int    connectionMemory;
+unsigned int    maxConnections;
+unsigned int    reqPoolSize;
+bool            simulatedNotification;
+bool            statCounters;
+bool            statSemWait;
+bool            statTiming;
+bool            statNotifQueue;
 
 
 
@@ -278,17 +291,38 @@ unsigned int    connectionMemory;
 #define DBPS_DESC              "database connection pool size"
 #define MAX_L                  900000
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
-#define MUTEX_TIMESTAT_DESC    "measure total semaphore waiting time"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
-#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
+#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
 #define NO_CACHE               "disable subscription cache for lookups"
-#define CONN_MEMORY_DESC       "maximum memory size per connection in kilobytes"
+#define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
+#define MAX_CONN_DESC          "maximum number of simultaneous connections"
+#define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+#define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
+
+#define STAT_COUNTERS          "enable request/notification counters statistics"
+#define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
+#define STAT_TIMING            "enable request-time-measuring statistics"
+#define STAT_NOTIF_QUEUE       "enalle thread pool notifications queue statistics"
+
+
+
 
 /* ****************************************************************************
 *
-* Parse arguments
+* paArgs - option vector for the Parse CLI arguments library
+*
+* NOTE
+*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
+*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
+*
+*   MHD_OPTION_CONNECTION_LIMIT
+*     Maximum number of concurrent connections to accept.
+*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
+*     select minus four for stdin, stdout, stderr and the server socket). In other words,
+*    the default is as large as possible.
+*
 */
 PaArgument paArgs[] =
 {
@@ -317,16 +351,24 @@ PaArgument paArgs[] =
   { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
+  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },  
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,             0,     3600,     SUB_CACHE_IVAL_DESC    },
-  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,              0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
-  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     UINT_MAX, CONN_MEMORY_DESC       },
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
+
+  { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
+  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },
+
+  { "-statCounters",   &statCounters,   "STAT_COUNTERS",    PaBool, PaOpt, false, false, true, STAT_COUNTERS     },
+  { "-statSemWait",    &statSemWait,    "STAT_SEM_WAIT",    PaBool, PaOpt, false, false, true, STAT_SEM_WAIT     },
+  { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
+  { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
   PA_END_OF_ARGS
 };
@@ -611,9 +653,11 @@ PaArgument paArgs[] =
 #define LOG2T_COMPS_V1     4, { "v1", "admin", "log", "traceLevel"       }
 #define LOG2TL_COMPS_V1    5, { "v1", "admin", "log", "traceLevel", "*"  }
 
-#define STAT               StatisticsRequest
-#define STAT_COMPS_V0      1, { "statistics"                             }
-#define STAT_COMPS_V1      3, { "v1", "admin", "statistics"              }
+#define STAT                 StatisticsRequest
+#define STAT_COMPS_V0        1, { "statistics"                             }
+#define STAT_COMPS_V1        3, { "v1", "admin", "statistics"              }
+#define STAT_CACHE_COMPS_V0  2, { "cache", "statistics"                    }
+#define STAT_CACHE_COMPS_V1  4, { "v1", "admin", "cache", "statistics"     }
 
 
 
@@ -972,6 +1016,16 @@ PaArgument paArgs[] =
   { "DELETE", STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
   { "*",      STAT, STAT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }
 
+#define STAT_CACHE_REQUESTS_V0                                                       \
+  { "GET",    STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
+  { "DELETE", STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
+  { "*",      STAT, STAT_CACHE_COMPS_V0,    "",  badVerbGetDeleteOnly             }
+
+#define STAT_CACHE_REQUESTS_V1                                                       \
+  { "GET",    STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
+  { "DELETE", STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
+  { "*",      STAT, STAT_CACHE_COMPS_V1,    "",  badVerbGetDeleteOnly             }
+
 #define VERSION_REQUESTS                                                             \
   { "GET",    VERS, VERS_COMPS,    "",  versionTreat                              }, \
   { "*",      VERS, VERS_COMPS,    "",  badVerbGetOnly                            }
@@ -1024,6 +1078,8 @@ RestService restServiceV[] =
   LOG_REQUESTS_V1,
   STAT_REQUESTS_V0,
   STAT_REQUESTS_V1,
+  STAT_CACHE_REQUESTS_V0,
+  STAT_CACHE_REQUESTS_V1,
   VERSION_REQUESTS,
 
 #ifdef DEBUG
@@ -1184,10 +1240,10 @@ void exitFunc(void)
 
 #ifdef DEBUG
   // Take mongo req-sem ?  
-  LM_T(LmtMongoSubCache, ("try-taking req semaphore"));
+  LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();
-  LM_T(LmtMongoSubCache, ("calling mongoSubCacheDestroy"));
-  mongoSubCacheDestroy();
+  LM_T(LmtSubCache, ("calling subCacheDestroy"));
+  subCacheDestroy();
 #endif
 
   curl_context_cleanup();
@@ -1223,8 +1279,27 @@ const char* description =
 */
 static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
+
+  Notifier* pNotifier = NULL;
+
+  /* If we use a queue for notifications, start worker threads */
+  if (strcmp(notificationMode, "threadpool") == 0)
+  {
+    QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
+    int rc = pQNotifier->start();
+    if (rc != 0)
+    {
+      LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
+    }
+    pNotifier = pQNotifier;
+  }
+  else
+  {
+    pNotifier = new Notifier();
+  }
+
   /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
+  setNotifier(pNotifier);
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
   recoverOntimeIntervalThreads("");
@@ -1397,7 +1472,7 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 *
 * policyGet - 
 */
-static SemRequestType policyGet(std::string mutexPolicy)
+static SemOpType policyGet(std::string mutexPolicy)
 {
   if (mutexPolicy == "read")
   {
@@ -1422,7 +1497,57 @@ static SemRequestType policyGet(std::string mutexPolicy)
   return SemReadWriteOp;
 }
 
+/* ****************************************************************************
+*
+* notificationModeParse -
+*/
+static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
+{
+  char* mode;
+  char* first_colon;
+  int   flds_num;
 
+  errno = 0;
+  // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
+  // cppcheck-suppress invalidscanf
+  flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
+  if (errno != 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
+  }
+  if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
+  {
+    if (*pQueueSize <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid queue size (%d)", *pQueueSize));
+    }
+    if (*pNumThreads <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid number of threads (%d)",*pNumThreads));
+    }
+  }
+  else if (flds_num == 1 && strcmp(mode, "threadpool") == 0)
+  {
+    *pQueueSize = DEFAULT_NOTIF_QS;
+    *pNumThreads = DEFAULT_NOTIF_TN;
+  }
+  else if (!(
+             flds_num == 1 &&
+             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0)
+             ))
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
+  }
+
+  // get rid of params, if any, in notifModeArg
+  first_colon = strchr(notifModeArg, ':');
+  if (first_colon != NULL)
+  {
+    *first_colon = '\0';
+  }
+
+  free(mode);
+}
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
@@ -1522,6 +1647,9 @@ int main(int argC, char* argV[])
     }
   }
 
+  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+
   LM_I(("Orion Context Broker is running"));
 
   if (fg == false)
@@ -1553,10 +1681,15 @@ int main(int argC, char* argV[])
     ipVersion = IPV6;
   }
 
+
+  //
+  //  Where everything begins
+  //
+
   pidFile();
-  SemRequestType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
+  SemOpType policy = policyGet(reqMutexPolicy);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 
@@ -1568,22 +1701,22 @@ int main(int argC, char* argV[])
 
   if (noCache == false)
   {
-    mongoSubCacheInit();
+    subCacheInit();
 
     if (subCacheInterval == 0)
     {
       // Populate subscription cache from database
-      mongoSubCacheRefresh();
+      subCacheRefresh();
     }
     else
     {
       // Populate subscription cache AND start sub-cache-refresh-thread
-      mongoSubCacheStart();
+      subCacheStart();
     }
   }
   else
   {
-    LM_T(LmtMongoSubCache, ("noCache == false"));
+    LM_T(LmtSubCache, ("noCache == false"));
   }
 
   if (https)
@@ -1603,21 +1736,20 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));
-
-  if (strcmp(notificationMode, "none") == 0)
+  if (simulatedNotification)
   {
-    LM_W(("notification mode 'none'"));
+    LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
   while (1)

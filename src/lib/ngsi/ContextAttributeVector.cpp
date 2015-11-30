@@ -266,7 +266,9 @@ std::string ContextAttributeVector::check
 */
 void ContextAttributeVector::present(const std::string& indent)
 {
-  LM_F(("%s%lu ContextAttributes", indent.c_str(), (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%s%lu ContextAttributes", 
+		    indent.c_str(), 
+		    (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -311,13 +313,19 @@ ContextAttribute* ContextAttributeVector::get(unsigned int ix)
   return NULL;
 }
 
+const ContextAttribute* ContextAttributeVector::get(unsigned int ix) const
+{
+  if (ix < vec.size())
+    return vec[ix];
+  return NULL;
+}
 
 
 /* ****************************************************************************
 *
 * ContextAttributeVector::size - 
 */
-unsigned int ContextAttributeVector::size(void)
+unsigned int ContextAttributeVector::size(void) const
 {
   return vec.size();
 }

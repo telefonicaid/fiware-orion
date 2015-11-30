@@ -48,20 +48,21 @@ Comments:
  
 Properties:
 ```
-		* HOST           - CB host or balancer (default: localhost)
-		* PORT           - CB port (default: 1026)
-		* THREADS        - number of concurrent threads (default: 1)
-		* RAMP_UP        - the amount of time for creating the total number of threads (default: 1)
-	    * TEST_TIME      - test duration time in seconds (default:30)
-		* SERVICE        - service header (default: update_ngsiv2)
-		* SERVICE_PATH   - service path header (default: /)	    
-	    * ATTRIBUTES     - number of attributes per entity (default:1)
-	    * METADATA       - if true is appended a metadata in each attribute (default: false)
-	    * TIME_INSTANT   - if true is appended a "timeInstant" attribute in each entity (default: false)
-	    * SUBSC          - number of subscriptions (default: 0)
-	    * SUBSC_DURATION - Duration of the subscriptions in seconds (default: 60)
-		* LISTEN_HOST    - host to receive notifications (mock) (default:localhost)
-		* LISTEN_PORT    - port to receive notifications (mock) (default:8090)				
+		* HOST                - CB host or balancer (default: localhost)
+		* PORT                - CB port (default: 1026)
+		* THREADS             - number of concurrent threads (default: 1)
+		* RAMP_UP             - the amount of time for creating the total number of threads (default: 1)
+		* TEST_TIME           - test duration time in seconds (default:30)
+		* SERVICE             - service header (default: no service is used, i.e. Fiware-Service header is omitted) 
+		* SERVICE_PATH        - service path header (default: /)	    
+		* ATTRIBUTES          - number of attributes per entity (default:1)
+		* METADATA            - if true is appended a metadata in each attribute (default: false)
+		* TIME_INSTANT        - if true is appended a "timeInstant" attribute in each entity (default: true)
+		* RANDOM_TIME_INSTANT - if this is greater than 0 is generated a string of N random characters, else it is generated a date with zulu format. (default: 0)
+		* SUBSC               - number of subscriptions (default: 0)
+		* SUBSC_DURATION      - Duration of the subscriptions in seconds (default: 60)
+		* LISTEN_HOST         - host to receive notifications (mock) (default:localhost)
+		* LISTEN_PORT         - port to receive notifications (mock) (default:8090)				
 ```
 
 Report files (listeners):

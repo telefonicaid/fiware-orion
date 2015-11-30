@@ -157,6 +157,7 @@ In certain cases, could be useful to define actions before or/and after of the f
 
 Recommend append labels defined (`Actions Before the Feature`, `Actions Before each Scenario`, `Actions After each Scenario`,`Actions After the Feature`)
 into de feature description, these labels are Optional. And define steps with `Setup:` or `Check:` prefix (must be `:` in the step prefix). See `environment.py` in root path.
+
 Example:
 ```
 Feature: feature name...
@@ -184,24 +185,26 @@ Feature: feature name...
 
 Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
 To activate/deactivate this summary, modify `SHOW_SUMMARY` variable (boolean).
+
 Example:
 ```
                     SUMMARY:
 -------------------------------------------------
-  - components/ngsiv2/entities/create_entities.feature >> passed: 440, failed: 0, skipped: 138 and total: 578 with duration: 62.688 seconds.
-  - components/ngsiv2/entities/delete_entities.feature >> passed: 64, failed: 0, skipped: 1 and total: 65 with duration: 9.605 seconds.
-  - components/ngsiv2/entities/list_all_entities.feature >> passed: 132, failed: 0, skipped: 68 and total: 200 with duration: 44.388 seconds.
-  - components/ngsiv2/entities/list_an_attribute_by_id_and_name.feature >> passed: 130, failed: 0, skipped: 68 and total: 198 with duration: 32.760 seconds.
-  - components/ngsiv2/entities/list_an_entity_by_id.feature >> passed: 141, failed: 0, skipped: 68 and total: 209 with duration: 28.082 seconds.
-  - components/ngsiv2/entities/replace_attributes_by_id.feature >> passed: 253, failed: 0, skipped: 307 and total: 560 with duration: 55.864 seconds.
-  - components/ngsiv2/entities/update_an_attribute_by_id_and_name.feature >> passed: 1, failed: 0, skipped: 0 and total: 1 with duration: 0.237 seconds.
-  - components/ngsiv2/entities/update_append_attributes_by_id.feature >> passed: 402, failed: 0, skipped: 364 and total: 766 with duration: 74.562 seconds.
-  - components/ngsiv2/entities/update_attributes_by_id.feature >> passed: 307, failed: 0, skipped: 347 and total: 654 with duration: 59.563 seconds.
+  - components/ngsiv2/attributes/get_attribute_data.feature >> passed: 141, failed: 0, skipped: 77 and total: 218 with duration: 27.799 seconds.
+  - components/ngsiv2/attributes/update_attribute_data.feature >> passed: 260, failed: 0, skipped: 347 and total: 607 with duration: 53.619 seconds.
+  - components/ngsiv2/entities/create_entity.feature >> passed: 444, failed: 0, skipped: 136 and total: 580 with duration: 50.480 seconds.
+  - components/ngsiv2/entities/list_entities.feature >> passed: 123, failed: 0, skipped: 77 and total: 200 with duration: 28.104 seconds.
+  - components/ngsiv2/entities/remove_entity.feature >> passed: 55, failed: 0, skipped: 10 and total: 65 with duration: 6.725 seconds.
+  - components/ngsiv2/entities/replace_all_entity_attributes.feature >> passed: 245, failed: 0, skipped: 315 and total: 560 with duration: 46.318 seconds.
+  - components/ngsiv2/entities/retrieve_entity.feature >> passed: 132, failed: 0, skipped: 77 and total: 209 with duration: 22.966 seconds.
+  - components/ngsiv2/entities/update_existing_entity_attributes.feature >> passed: 298, failed: 0, skipped: 356 and total: 654 with duration: 51.908 seconds.
+  - components/ngsiv2/entities/update_or_append_entity_attributes.feature >> passed: 384, failed: 0, skipped: 382 and total: 766 with duration: 64.614 seconds.
+  - components/ngsiv2/api_entry_point/retrieve_api_resource.feature >> passed: 20, failed: 0, skipped: 0 and total: 20 with duration: 0.127 seconds.
 -------------------------------------------------
-9 features passed, 0 failed, 0 skipped
-1870 scenarios passed, 0 failed, 1361 skipped
-9784 steps passed, 0 failed, 7313 skipped, 0 undefined
-Took 6m7.748s
+10 features passed, 0 failed, 0 skipped
+2102 scenarios passed, 0 failed, 1777 skipped
+11072 steps passed, 0 failed, 9618 skipped, 0 undefined
+Took 5m52.659s
 ```
 
 
@@ -212,28 +215,31 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 
 ### Tests Suites Coverage (features):
 
-|           FEATURE                           |  TEST CASES  | METHOD  |            URL                                      |  PAYLOAD       |  
-|:--------------------------------------------|:------------:|--------:|:----------------------------------------------------|:--------------:|      
-|**general folder**                                                                                                                           |
-| - general_operations                        |      16      | GET     | /version   /statistics    /v2                       | No             |
-|                                                                                                                                             |
-|**entities folder**                                                                                                                          |
-| - create_entities                           |     578      | POST   | /v2/entities/                                        | Yes            |      
-| - list_all_entities                         |     200      | GET    | /v2/entities/                                        | No             | 
-|                                                                                                                                             |
-| - update_append_attributes_by_id            |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   
-| - list_an_entity_by_id                      |     209      | GET    | /v2/entities/`<entity_id>`                           | No             | 
-| - replace_attributes_by_id                  |     511      | PUT    | /v2/entities/`<entity_id>`                           | Yes            |   
-| - update_attributes_by_id                   |     654      | PATCH  | /v2/entities/`<entity_id>`                           | Yes            | 
-| - delete_entity_by_id                       |      65      | DELETE | /v2/entities/`<entity_id>`                           | No             |
-|                                                                                                                                             |
-| - list_an_attribute_by_id_and_name          |     198      | GET    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |   
-| - update_an_attribute_by_id_and_name        |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes            | 
-| - delete_an_attribute_by_id_and_name        |  (pending)   | DELETE | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |
-|                                                                                                                                             |
-| - update_an_attribute_value_by_id_and_name  |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes            |   
-|                                                                                                                                             |
-|**alarms folder**                            |  (pending)   |                                                                                |
+|       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
+|:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
+|**api_entry_point**                                                                                                                                       |
+|  retrieve_api_resource                      |     20       | GET     | /version   /statistics    /v2                        | No        | No             |
+|                                                                                                                                                          |
+|**entities folder**                                                                                                                                       |
+| create_entity                               |    580       | POST    | /v2/entities/                                        | Yes       | No             |    
+| list_entities                               |    334       | GET     | /v2/entities/                                        | No        | Yes            |
+|                                                                                                                                                          |
+| update_or_append_entity_attributes          |    766       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| retrieve_entity                             |    209       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| replace_all_entity_attributes               |    560       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | No             |  
+| update_existing_entity_attributes           |    654       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | No             |
+| remove_entity                               |     65       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
+|                                                                                                                                                          |
+|**attributes folder**                                                                                                                                     |
+| get_attribute_data                          |    218       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |   
+| update_attribute_data                       |    607       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | No             |
+| remove_a_single_attribute                   |     95       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
+|                                                                                                                                                          |
+|**attributes_value folder**                                                                                                                               |
+| get_attribute_value                         |  (pending)   | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
+| update_attribute_value                      |    234       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
+|                                                                                                                                                          |
+|**alarms folder**                            |  (pending)   |                                                                                             |
 
   
 ### Hints:

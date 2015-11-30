@@ -99,7 +99,7 @@ void UpdateContextRequestVector::release(void)
 */
 void UpdateContextRequestVector::present(const std::string& indent)
 {
-  LM_F(("%s Presenting UpdateContextRequestVector of %d UpdateContextRequests", indent.c_str(), vec.size()));
+  LM_T(LmtPresent, ("%s Presenting UpdateContextRequestVector of %d UpdateContextRequests", indent.c_str(), vec.size()));
   for (unsigned int qcrIx = 0; qcrIx < vec.size(); ++qcrIx)
   {
     vec[qcrIx]->present(indent + "  ");

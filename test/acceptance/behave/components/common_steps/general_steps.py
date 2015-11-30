@@ -129,7 +129,7 @@ def delete_database_in_mongo(context):
 
 # ------------------------------------- validations ----------------------------------------------
 
-@step(u'verify that receive an "([^"]*)" http code')
+@step(u'verify that receive a.? "([^"]*)" http code')
 def verify_that_receive_an_http_code(context, http_code):
     """
     verify that receive an http code
@@ -168,27 +168,28 @@ def verify_entry_point(context, url, value):
 
 
 @step(u'verify statistics "([^"]*)" field does exists')
-def verify_stat_fields(context, field):
+def verify_stat_fields(context, field_to_test):
     """
     verify statistics fields in response.
     Ex:
-            {
-              "orion" : {
-                    "xmlRequests" : "5",
+             {
                     "versionRequests" : "1",
-                    "statisticsRequests" : "2",
-                    "uptime_in_secs" : "364",
-                    "measuring_interval_in_secs" : "364"
-              }
-            }
+                    "statisticsRequests" : "1",
+                    "uptime_in_secs" : "1",
+                    "measuring_interval_in_secs" : "1",
+                    "subCacheRefreshs" : "1",
+                    "subCacheInserts" : "0",
+                    "subCacheRemoves" : "0",
+                    "subCacheUpdates" : "0",
+                    "subCacheItems" : "0"
+             }
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
-    :param field: field to verify if it does exists
+    :param field_to_test: field to verify if it does exists
     """
-    __logger__.debug("Verifying statistics field: %s does exists..." % field)
+    __logger__.debug("Verifying statistics field: %s does exists..." % field_to_test)
     resp_dict = convert_str_to_dict(context.resp.text, "JSON")
-    assert "orion" in resp_dict, "ERROR - orion field does no exist in statistics response"
-    assert field in resp_dict["orion"], "ERROR - %s field does no exist in statistics response" % field
-    __logger__.info("...Verified that statistics field %s is correct" % field)
+    assert field_to_test in resp_dict.keys(), "ERROR - \"%s\" field does no exist in statistics response" % field_to_test
+    __logger__.info("...Verified that statistics field %s is correct" % field_to_test)
 
 
 @step(u'verify version "([^"]*)" field does exists')

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -70,6 +73,7 @@ std::string deleteEntity
     ca->name = compV[4];
     eP->attributeVector.push_back(ca);
   }
+
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "DELETE");
 
@@ -91,28 +95,31 @@ std::string deleteEntity
       OrionError oe;
 
       ciP->httpStatusCode = scc;
+
       if (scc == SccContextElementNotFound)
       {
-        oe.code = scc;
-        oe.reasonPhrase ="NotFound";
-        oe.details = "The requested entity has not been found. Check type and id";
+        oe.code          = scc;
+        oe.reasonPhrase  = "NotFound";
+        oe.details       = "The requested entity has not been found. Check type and id";
       }
       else if (scc == SccInvalidParameter)
       {
-        oe.code = SccContextElementNotFound;
-        oe.reasonPhrase ="NotFound";
-        oe.details = "Attribute not found";
-        ciP->httpStatusCode = SccContextElementNotFound; // We don't want a 472
+        oe.code              = SccContextElementNotFound;
+        oe.reasonPhrase      = "NotFound";
+        oe.details           = "Attribute not found";
+        ciP->httpStatusCode  = SccContextElementNotFound; // We don't want a 472
       }
       else
       {
-        oe.code = scc;
-        oe.reasonPhrase = sc.reasonPhrase;
+        oe.code          = scc;
+        oe.reasonPhrase  = sc.reasonPhrase;
       }
-      answer = oe.render(ciP, "");
+
+      TIMED_RENDER(answer = oe.render(ciP, ""));
 
       eP->release();
       delete eP;
+
       return answer;
     }
   }

@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postUnsubscribeContextAvailability.h"
@@ -48,8 +51,8 @@ std::string postUnsubscribeContextAvailability
   UnsubscribeContextAvailabilityResponse  ucar;
   std::string                             answer;
 
-  ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, ciP->tenant);
-  answer = ucar.render(UnsubscribeContextAvailability, ciP->outFormat, "");
+  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar, ciP->tenant));
+  TIMED_RENDER(answer = ucar.render(UnsubscribeContextAvailability, ciP->outFormat, ""));
 
   return answer;
 }

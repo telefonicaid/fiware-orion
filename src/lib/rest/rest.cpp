@@ -38,6 +38,9 @@
 #include "common/wsStrip.h"
 #include "common/globals.h"
 #include "common/defaultValues.h"
+#include "common/clockFunctions.h"
+#include "common/statistics.h"
+#include "common/tag.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -47,7 +50,6 @@
 #include "mongoBackend/MongoGlobal.h"  // MAX_SERVICE_NAME_LEN
 
 
-extern unsigned connectionMemory;
 
 /* ****************************************************************************
 *
@@ -94,6 +96,9 @@ static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
+static unsigned int              connMemory;
+static unsigned int              maxConns;
+static unsigned int              threadPoolSize;
 
 
 
@@ -449,7 +454,6 @@ static void serve(ConnectionInfo* ciP)
 }
 
 
-
 /* ****************************************************************************
 *
 * requestCompleted -
@@ -462,18 +466,61 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+  ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+  struct timespec  reqEndTime;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
   }
 
-  delete(ciP);
   *con_cls = NULL;
 
   LM_TRANSACTION_END();  // Incoming REST request ends
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &reqEndTime);
+    clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
+  }  
+
+  delete(ciP);
+
+  //
+  // Statistics
+  //
+  // Flush this requests timing measures onto a global var to be read by "GET /statistics".
+  // Also, increment the accumulated measures.
+  //
+  if (timingStatistics)
+  {
+    timeStatSemTake(__FUNCTION__, "updating statistics");
+
+    memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
+
+    //
+    // "Fix" mongoBackendTime
+    //   Substract times waiting at mongo driver operation (in mongo[Read|Write|Command]WaitTime counters) so mongoBackendTime
+    //   contains at the end the time passed in our logic, i.e. a kind of "self-time" for mongoBackend
+    //
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);
+
+    clock_addtime(&accTimeStat.jsonV1ParseTime,       &threadLastTimeStat.jsonV1ParseTime);
+    clock_addtime(&accTimeStat.jsonV2ParseTime,       &threadLastTimeStat.jsonV2ParseTime);
+    clock_addtime(&accTimeStat.mongoBackendTime,      &threadLastTimeStat.mongoBackendTime);
+    clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
+    clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
+    clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
+    clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
+    clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
+    clock_addtime(&accTimeStat.xmlParseTime,          &threadLastTimeStat.xmlParseTime);
+
+    timeStatSemGive(__FUNCTION__, "updating statistics");
+  }
 }
+
 
 
 /* ****************************************************************************
@@ -924,6 +971,15 @@ static int connectionTreat
 
 
     //
+    // Reset time measuring?
+    //
+    if (timingStatistics)
+    {
+      memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
+    }
+
+
+    //
     // ConnectionInfo
     //
     // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
@@ -938,6 +994,14 @@ static int connectionTreat
       LM_E(("Runtime Error (error allocating ConnectionInfo)"));
       return MHD_NO;
     }
+
+    if (timingStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
+    }
+
+    LM_T(LmtRequest, (""));
+    LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
 
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;
@@ -1029,8 +1093,8 @@ static int connectionTreat
     // Add to the size of the accumulated read buffer
     ciP->payloadSize += *upload_data_size;
 
-    // Zero the payload (not really necessary)
-    ciP->payload[ciP->payloadSize + 1] = 0;
+    // Zero-terminate the payload
+    ciP->payload[ciP->payloadSize] = 0;
 
     // Acknowledge the data and return
     *upload_data_size = 0;
@@ -1135,16 +1199,34 @@ static int connectionTreat
 /* ****************************************************************************
 *
 * restStart - 
+*
+* NOTE, according to MHD documentation, thread pool (MHD_OPTION_THREAD_POOL_SIZE) cannot be used
+* is conjunction with MHD_USE_THREAD_PER_CONNECTION.
+* However, we have seen that if the thread pool size is 0 (the case of NOT using thread pool), then
+* MHD_start_daemon is OK with it.
+*
+* From MHD documentation:
+* MHD_OPTION_THREAD_POOL_SIZE
+*   Number (unsigned int) of threads in thread pool. Enable thread pooling by setting this value to to something greater than 1.
+*   Currently, thread model must be MHD_USE_SELECT_INTERNALLY if thread pooling is enabled (MHD_start_daemon returns NULL for
+*   an unsupported thread model).
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
-  bool   mhdStartError = true;
-  size_t memoryLimit   = connectionMemory * 1024; // connectionMemory are kilobytes
+  bool      mhdStartError  = true;
+  size_t    memoryLimit    = connMemory * 1024; // connMemory is expressed in kilobytes
+  MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)
   {
     LM_X(1, ("Fatal Error (please call restInit before starting the REST service)"));
   }
+
+  if (threadPoolSize != 0)
+  {
+    serverMode = MHD_USE_SELECT_INTERNALLY;
+  }
+
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   { 
@@ -1160,7 +1242,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
+      mhdDaemon = MHD_start_daemon(serverMode | MHD_USE_SSL,
                                    htons(port),
                                    NULL,
                                    NULL,
@@ -1168,6 +1250,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                    MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1176,12 +1260,14 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY | MHD_USE_DEBUG
+      mhdDaemon = MHD_start_daemon(serverMode,
                                    htons(port),
                                    NULL,
                                    NULL,
                                    connectionTreat,                     NULL,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1208,7 +1294,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
                                       NULL,
@@ -1216,6 +1302,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                       MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1223,12 +1311,14 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
                                       NULL,
                                       connectionTreat,                     NULL,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1266,6 +1356,9 @@ void restInit
   const char*         _bindAddress,
   unsigned short      _port,
   bool                _multitenant,
+  unsigned int        _connectionMemory,
+  unsigned int        _maxConnections,
+  unsigned int        _mhdThreadPoolSize,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
@@ -1278,14 +1371,17 @@ void restInit
   const char* key  = _httpsKey;
   const char* cert = _httpsCertificate;
 
-  port          = _port;
-  restServiceV  = _restServiceV;
-  ipVersionUsed = _ipVersion;
-  serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
-  acceptTextXml = _acceptTextXml;
-  multitenant   = _multitenant;
-  rushHost      = _rushHost;
-  rushPort      = _rushPort;
+  port             = _port;
+  restServiceV     = _restServiceV;
+  ipVersionUsed    = _ipVersion;
+  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
+  acceptTextXml    = _acceptTextXml;
+  multitenant      = _multitenant;
+  connMemory       = _connectionMemory;
+  maxConns         = _maxConnections;
+  threadPoolSize   = _mhdThreadPoolSize;
+  rushHost         = _rushHost;
+  rushPort         = _rushPort;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

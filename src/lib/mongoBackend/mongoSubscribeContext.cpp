@@ -30,9 +30,10 @@
 #include "common/Format.h"
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
@@ -140,9 +141,13 @@ HttpStatusCode mongoSubscribeContext
                                              xauthToken,
                                              servicePathV);
     sub.append(CSUB_CONDITIONS, conds);
+
+    long long lastNotificationTime = 0;
     if (notificationDone)
     {
-      sub.append(CSUB_LASTNOTIFICATION, (long long) getCurrentTime());
+      lastNotificationTime = (long long) getCurrentTime();
+
+      sub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
       sub.append(CSUB_COUNT, 1);
     }
 
@@ -163,10 +168,18 @@ HttpStatusCode mongoSubscribeContext
     //
     std::string oidString = oid.toString();
 
-    LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
+    LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
 
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-    mongoSubCacheItemInsert(tenant.c_str(), servicePath.c_str(), requestP, oidString.c_str(), expiration, throttling, notifyFormat);
+    subCacheItemInsert(tenant.c_str(),
+                       servicePath.c_str(),
+                       requestP,
+                       oidString.c_str(),
+                       expiration,
+                       throttling,
+                       notifyFormat,
+                       notificationDone,
+                       lastNotificationTime);
     cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);

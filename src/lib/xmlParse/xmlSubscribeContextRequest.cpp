@@ -487,7 +487,7 @@ std::string scrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void scrPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
   reqData->scr.res.present("");

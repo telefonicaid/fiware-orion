@@ -69,7 +69,7 @@ static void prepareDatabase(void) {
 
   DBClientBase* connection = getMongoConnection();
 
-  connection->createIndex("unittest.entities", BSON("location.coords" << "2dsphere" ));
+  connection->createIndex("utest.entities", BSON("location.coords" << "2dsphere" ));
 
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
                      "attrNames" << BSON_ARRAY("pos" << "foo") <<

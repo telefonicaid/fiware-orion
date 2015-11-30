@@ -28,10 +28,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/statistics.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
 
@@ -44,8 +45,8 @@ static std::string attributeType
 (
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
-  const std::string                     entityType,
-  const std::string                     attrName
+  const std::string&                    entityType,
+  const std::string&                    attrName
 )
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
@@ -59,25 +60,25 @@ static std::string attributeType
   std::auto_ptr<DBClientCursor> cursor;
   std::string                   err;
 
-  if (!collectionQuery(getEntitiesCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
+    releaseMongoConnection(connection, &cursor);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return "";
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
-  while (cursor->more())
+  std::string ret = "";
+  while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrError(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
     /* It could happen that different entities within the same entity type may have attributes with the same name
@@ -85,10 +86,12 @@ static std::string attributeType
      * NGSIv2 operations only allow to set one type */
     BSONObj attrs = getField(r, ENT_ATTRS).embeddedObject();
     BSONObj attr = getField(attrs, attrName).embeddedObject();
-    return getStringField(attr, ENT_ATTRS_TYPE);
+    ret = getStringField(attr, ENT_ATTRS_TYPE);
+    break;
   }
+  releaseMongoConnection(connection, &cursor);
 
-  return "";
+  return ret;
 }
 
 
@@ -278,7 +281,7 @@ HttpStatusCode mongoEntityTypes
   {
     if (details)
     {      
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %d. Offset is %d", (int) resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
@@ -414,7 +417,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (details)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %d", (int) resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else

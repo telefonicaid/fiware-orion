@@ -25,14 +25,16 @@
 #include <string>
 #include <vector>
 
-#include "serviceRoutinesV2/getEntityAttribute.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 
+#include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/getEntityAttribute.h"
 
-#include "apiTypesV2/Attribute.h"
 
 
 /* ****************************************************************************
@@ -72,7 +74,9 @@ std::string getEntityAttribute
 
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
-  answer = attribute.render(ciP, EntityAttributeResponse);
+
+  TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+
   if (attribute.errorCode.error == "TooManyResults")
   {
     ciP->httpStatusCode = SccConflict;
@@ -83,7 +87,7 @@ std::string getEntityAttribute
   }
   else
   {
-      // the same of the wrapped operation
+    // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
   }
 

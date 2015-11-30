@@ -48,81 +48,6 @@
 
 using namespace mongo;
 
-/*****************************************************************************
-* Constant string for collections names */
-#define COL_ENTITIES       "entities"
-#define COL_REGISTRATIONS  "registrations"
-#define COL_CSUBS          "csubs"
-#define COL_CASUBS         "casubs"
-
-/*****************************************************************************
-* Constant string for field names in collection (first characters
-* are the code name: REG_, ENT_, ASUB_, CSUB */
-
-#define REG_FWS_REGID               "fwdRegId"
-#define REG_CONTEXT_REGISTRATION    "contextRegistration"
-#define REG_PROVIDING_APPLICATION   "providingApplication"
-#define REG_ENTITIES                "entities"
-#define REG_ATTRS                   "attrs"
-#define REG_EXPIRATION              "expiration"
-#define REG_ENTITY_ID               "id"
-#define REG_ENTITY_TYPE             "type"
-#define REG_ATTRS_NAME              "name"
-#define REG_ATTRS_TYPE              "type"
-#define REG_ATTRS_ISDOMAIN          "isDomain"
-#define REG_SERVICE_PATH            "servicePath"
-#define REG_FORMAT                  "format"
-
-#define ENT_ATTRS                    "attrs"
-#define ENT_ATTRNAMES                "attrNames"
-#define ENT_ENTITY_ID                "id"
-#define ENT_ENTITY_TYPE              "type"
-#define ENT_SERVICE_PATH             "servicePath"
-#define ENT_ATTRS_TYPE               "type"
-#define ENT_ATTRS_VALUE              "value"
-#define ENT_ATTRS_CREATION_DATE      "creDate"
-#define ENT_ATTRS_MODIFICATION_DATE  "modDate"
-#define ENT_ATTRS_MD                 "md"
-#define ENT_ATTRS_MD_NAME            "name"
-#define ENT_ATTRS_MD_TYPE            "type"
-#define ENT_ATTRS_MD_VALUE           "value"
-#define ENT_CREATION_DATE            "creDate"
-#define ENT_MODIFICATION_DATE        "modDate"
-#define ENT_LOCATION                 "location"
-#define ENT_LOCATION_ATTRNAME        "attrName"
-#define ENT_LOCATION_COORDS          "coords"
-
-#define CSUB_EXPIRATION         "expiration"
-#define CSUB_LASTNOTIFICATION   "lastNotification"
-#define CSUB_REFERENCE          "reference"
-#define CSUB_CONDITIONS         "conditions"
-#define CSUB_CONDITIONS_TYPE    "type"
-#define CSUB_CONDITIONS_VALUE   "value"
-#define CSUB_THROTTLING         "throttling"
-#define CSUB_ENTITIES           "entities"
-#define CSUB_ATTRS              "attrs"
-#define CSUB_ENTITY_ID          "id"
-#define CSUB_ENTITY_TYPE        "type"
-#define CSUB_ENTITY_ISPATTERN   "isPattern"
-#define CSUB_COUNT              "count"
-#define CSUB_FORMAT             "format"
-#define CSUB_SERVICE_PATH       "servicePath"
-
-#define CASUB_EXPIRATION        "expiration"
-#define CASUB_REFERENCE         "reference"
-#define CASUB_ENTITIES          "entities"
-#define CASUB_ATTRS             "attrs"
-#define CASUB_ENTITY_ID         "id"
-#define CASUB_ENTITY_TYPE       "type"
-#define CASUB_ENTITY_ISPATTERN  "isPattern"
-#define CASUB_LASTNOTIFICATION  "lastNotification"
-#define CASUB_COUNT             "count"
-#define CASUB_FORMAT            "format"
-
-#define EARTH_RADIUS_METERS     6371000
-
-#define LOCATION_WGS84          "WGS84"
-#define LOCATION_WGS84_LEGACY   "WSG84"    /* We fixed the right string at 0.17.0, but the old one needs to be mantained */
 
 /*****************************************************************************
 *
@@ -137,6 +62,14 @@ using namespace mongo;
 * MongoTreatFunction - callback signature for Mongo callback functions
 */
 typedef void (*MongoTreatFunction)(std::string tenant, BSONObj& bobj);
+
+
+
+/* ****************************************************************************
+*
+* mongoMultitenant -
+*/
+extern bool mongoMultitenant(void);
 
 
 
@@ -190,13 +123,13 @@ extern DBClientBase* getMongoConnection(void);
 *
 * releaseMongoConnection - 
 */
-extern void releaseMongoConnection(DBClientBase* connection);
+extern void releaseMongoConnection(DBClientBase* connection, std::auto_ptr<DBClientCursor>*  cursor = NULL);
 
 /*****************************************************************************
 *
 * setDbPrefix -
 */
-extern void setDbPrefix(std::string dbPrefix);
+extern void setDbPrefix(const std::string& dbPrefix);
 
 /*****************************************************************************
 *
@@ -222,62 +155,62 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs);
 *
 * tenantFromDb -
 */
-extern std::string tenantFromDb(std::string& database);
+extern std::string tenantFromDb(const std::string& database);
 
 /*****************************************************************************
 *
 * setEntitiesCollectionName -
 */
-extern void setEntitiesCollectionName(std::string name);
+extern void setEntitiesCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * setRegistrationsCollectionName -
 */
-extern void setRegistrationsCollectionName(std::string name);
+extern void setRegistrationsCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * setSubscribeContextCollectionName -
 */
-extern void setSubscribeContextCollectionName(std::string name);
+extern void setSubscribeContextCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
-extern void setSubscribeContextAvailabilityCollectionName(std::string name);
+extern void setSubscribeContextAvailabilityCollectionName(const std::string& name);
 
 /*****************************************************************************
 *
 * composeDatabaseName -
 *
 */
-extern std::string composeDatabaseName(std::string tenant);
+extern std::string composeDatabaseName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getEntitiesCollectionName -
 */
-extern std::string getEntitiesCollectionName(std::string tenant);
+extern std::string getEntitiesCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getRegistrationsCollectionName -
 */
-extern std::string getRegistrationsCollectionName(std::string tenant);
+extern std::string getRegistrationsCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getSubscribeContextCollectionName -
 */
-extern std::string getSubscribeContextCollectionName(std::string tenant);
+extern std::string getSubscribeContextCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
-extern std::string getSubscribeContextAvailabilityCollectionName(std::string tenant);
+extern std::string getSubscribeContextAvailabilityCollectionName(const std::string& tenant);
 
 /*****************************************************************************
 *
@@ -289,13 +222,13 @@ extern bool mongoLocationCapable(void);
 *
 * ensureLocationIndex -
 */
-extern void ensureLocationIndex(std::string tenant);
+extern void ensureLocationIndex(const std::string& tenant);
 
 /* ****************************************************************************
 *
 * recoverOntimeIntervalThreads -
 */
-extern void recoverOntimeIntervalThreads(std::string tenant);
+extern void recoverOntimeIntervalThreads(const std::string& tenant);
 
 /* ****************************************************************************
 *
@@ -303,37 +236,26 @@ extern void recoverOntimeIntervalThreads(std::string tenant);
 *
 * This function is only to be used under harakiri mode, not for real use
 */
-extern void destroyAllOntimeIntervalThreads(std::string tenant);
+extern void destroyAllOntimeIntervalThreads(const std::string& tenant);
 
 /* ****************************************************************************
 *
 * matchEntity -
 */
-extern bool matchEntity(EntityId* en1, EntityId* en2);
+extern bool matchEntity(const EntityId* en1, const EntityId* en2);
 
 /* ****************************************************************************
 *
 * includedEntity -
 */
-extern bool includedEntity(EntityId en, EntityIdVector& entityIdV);
+extern bool includedEntity(EntityId en, const EntityIdVector& entityIdV);
 
 /* ****************************************************************************
 *
 * includedAttribute -
 */
-extern bool includedAttribute(ContextRegistrationAttribute attr, AttributeList* attrsV);
+extern bool includedAttribute(const ContextRegistrationAttribute& attr, const AttributeList& attrsV);
 
-/* ****************************************************************************
-*
-* includedAttribute -
-*/
-extern bool includedAttribute(ContextAttribute attr, AttributeList* attrsV);
-
-/* ****************************************************************************
-*
-* bsonToMetadata -
-*/
-extern Metadata* bsonToMetadata(BSONObj& mdB);
 
 /* ****************************************************************************
 *
@@ -342,13 +264,13 @@ extern Metadata* bsonToMetadata(BSONObj& mdB);
 */
 extern bool entitiesQuery
 (
-  EntityIdVector                   enV,
-  AttributeList                    attrL,
-  Restriction                      res,
+  const EntityIdVector&            enV,
+  const AttributeList&             attrL,
+  const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   bool                             includeEmpty,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset       = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit        = DEFAULT_PAGINATION_LIMIT_INT,
@@ -370,8 +292,8 @@ extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextE
 */
 extern bool registrationsQuery
 (
-  EntityIdVector                      enV,
-  AttributeList                       attrL,
+  const EntityIdVector&               enV,
+  const AttributeList&                attrL,
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
@@ -407,22 +329,22 @@ extern AttributeList subToAttributeList(BSONObj attrL);
 * processOntimeIntervalCondition -
 *
 */
-extern void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant);
+extern void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant);
 
 /* ****************************************************************************
 *
-* processOnChangeCondition -
+* processOnChangeConditionForSubscription -
 *
 */
-extern bool processOnChangeCondition
+extern bool processOnChangeConditionForSubscription
 (
-  EntityIdVector                   enV,
-  AttributeList                    attrV,
+  const EntityIdVector&            enV,
+  const AttributeList&             attrV,
   ConditionValueList*              condValues,
-  std::string                      subId,
-  std::string                      notifyUrl,
+  const std::string&               subId,
+  const std::string&               notifyUrl,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 );
@@ -435,13 +357,13 @@ extern bool processOnChangeCondition
 extern BSONArray processConditionVector
 (
   NotifyConditionVector*           ncvP,
-  EntityIdVector                   enV,
-  AttributeList                    attrL,
-  std::string                      subId,
-  std::string                      url,
+  const EntityIdVector&            enV,
+  const AttributeList&             attrL,
+  const std::string&               subId,
+  const std::string&               url,
   bool*                            notificationDone,
   Format                           format,
-  std::string                      tenant,
+  const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV
 );
@@ -451,7 +373,14 @@ extern BSONArray processConditionVector
 * processAvailabilitySubscriptions -
 *
 */
-extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant);
+extern bool processAvailabilitySubscription(
+    const EntityIdVector& enV,
+    const AttributeList&  attrL,
+    const std::string&    subId,
+    const std::string&    notifyUrl,
+    Format                format,
+    const std::string&    tenant
+);
 
 /* ****************************************************************************
 *
@@ -504,57 +433,5 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  Format*                            perEntPaFormat,
                                  std::string*                       perAttrPa,
                                  Format*                            perAttrPaFormat);
-
-
-/* ****************************************************************************
-*
-* basePart, idPart -
-*
-* Helper functions for entitysQuery to split the attribute name string into part,
-* e.g. "A1__ID1" into "A1" and "ID1"
-*/
-inline std::string basePart(std::string name)
-{
-  /* Search for "__" */
-  std::size_t pos = name.find("__");
-  if (pos == std::string::npos)
-  {
-    /* If not found, return just 'name' */
-    return name;
-  }
-
-  /* If found, return substring */
-  return name.substr(0, pos);
-
-}
-
-inline std::string idPart(std::string name)
-{
-  /* Search for "__" */
-  std::size_t pos = name.find("__");
-  if (pos == std::string::npos)
-  {
-    /* If not found, return just "" */
-    return "";
-  }
-
-  /* If found, return substring */
-  return name.substr(pos + 2, name.length());
-
-}
-
-/* ****************************************************************************
-*
-* dbDotEncode -
-*
-*/
-extern std::string dbDotEncode(std::string fromString);
-
-/* ****************************************************************************
-*
-* dbDotDecode -
-*
-*/
-extern std::string dbDotDecode(std::string fromString);
 
 #endif

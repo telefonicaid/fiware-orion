@@ -108,7 +108,7 @@ std::string EntityIdVector::check
 */
 void EntityIdVector::present(const std::string& indent)
 {
-  LM_F(("%lu EntityIds:\n", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu EntityIds:\n", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -193,13 +193,18 @@ EntityId* EntityIdVector::get(int ix)
   return vec[ix];
 }
 
+const EntityId* EntityIdVector::get(int ix) const
+{
+  return vec[ix];
+}
+
 
 
 /* ****************************************************************************
 *
 * EntityIdVector::size -
 */
-unsigned int EntityIdVector::size(void)
+unsigned int EntityIdVector::size(void) const
 {
   return vec.size();
 }

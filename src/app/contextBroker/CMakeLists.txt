@@ -28,11 +28,9 @@ SET (HEADERS
 
 SET (STATIC_LIBS
     common
-    mongoBackend
     ngsiNotify
     serviceRoutines
     serviceRoutinesV2
-    mongoBackend
     rest
     jsonParse
     jsonParseV2
@@ -42,6 +40,8 @@ SET (STATIC_LIBS
     ngsi9
     ngsi10
     ngsi
+    cache
+    mongoBackend
     parse
     orionTypes
     common

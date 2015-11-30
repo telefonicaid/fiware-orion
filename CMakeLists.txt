@@ -48,9 +48,13 @@ execute_process(COMMAND            sh ../scripts/build/osDistro.sh
 execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
                 OUTPUT_VARIABLE    RAPIDXML_VERSION)
 
+# TRACES: To remove LM_T
+#           [ and 15 log macros more, of which only LM_T is used by the broker.
+#             The important ones: LM_W, LM_E, LM_X, LM_I are all kept as is ]
+#         comment the following line
 add_definitions(-DLM_ON)
+
 add_definitions(-fPIC)
-# add_definitions(-fstack-check -fstack-protector)
 add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types
@@ -75,6 +79,16 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
     MESSAGE("cmake: DEBUG compilation")
     add_definitions(-DDEBUG -DDEBUG_$ENV{USER} -DDEBUG_${USER})
+
+    #
+    # Note that stack protection is activated only in debug compilation.
+    # This is due that this directive makes the compiler introduce code at the beginning/end of each functions,
+    # so it has a pretty big impact on performance
+    #
+    # Our unit tests don't pass the compilation with "stack protection", so we turn it off using
+    # remove_definitions().
+    #
+    add_definitions(-fstack-check -fstack-protector)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     if (COVERAGE)
         MESSAGE("cmake: Coverage compilation")
@@ -171,6 +185,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/xmlParse)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
+  ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")

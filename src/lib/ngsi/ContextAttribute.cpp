@@ -75,6 +75,16 @@ ContextAttribute::ContextAttribute()
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute - 
+*
+* Note that this constructor moves the compoundValue of the source CA to the
+* CA being constructed (the compoundValueP attribute in the source CA is set to NULL).
+* Another option (closer to copy semantics) would be cloning (using the clone() method in
+* CompoundValueNode class) but by the moment this is not needed by this constructor as
+* all their usage cases suffice with this "move compoundValue instead of cloning" approach.
+*
+* Note however that the treatement of metadata is different: in that case, the metadata
+* in "cloned" from source CA to the CA being constructed.
+*
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
@@ -265,7 +275,7 @@ ContextAttribute::ContextAttribute
 *
 * ContextAttribute::getId() -
 */
-std::string ContextAttribute::getId(void)
+std::string ContextAttribute::getId(void) const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
@@ -284,7 +294,7 @@ std::string ContextAttribute::getId(void)
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation()
+std::string ContextAttribute::getLocation() const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
@@ -662,31 +672,45 @@ std::string ContextAttribute::check
 */
 void ContextAttribute::present(const std::string& indent, int ix)
 {
-  LM_F(("%sAttribute %d:",    indent.c_str(), ix));
-  LM_F(("%s  Name:      %s", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:      %s", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent, ("%sAttribute %d:",    
+		    indent.c_str(), 
+		    ix));
+  LM_T(LmtPresent, ("%s  Name:      %s", 
+		    indent.c_str(), 
+		    name.c_str()));
+  LM_T(LmtPresent, ("%s  Type:      %s", 
+		    indent.c_str(), 
+		    type.c_str()));
 
   if (compoundValueP == NULL)
   {
     if (valueType == orion::ValueTypeString)
     {
-      LM_F(("%s  String Value:      %s", indent.c_str(), stringValue.c_str()));
+      LM_T(LmtPresent, ("%s  String Value:      %s", 
+			indent.c_str(), 
+			stringValue.c_str()));
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      LM_F(("%s  Number Value:      %f", indent.c_str(), numberValue));
+      LM_T(LmtPresent, ("%s  Number Value:      %f", 
+			indent.c_str(), 
+			numberValue));
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      LM_F(("%s  Boolean Value:      %s", indent.c_str(), (boolValue == false)? "false" : "true"));
+      LM_T(LmtPresent, ("%s  Boolean Value:      %s", 
+			indent.c_str(), 
+			(boolValue == false)? "false" : "true"));
     }
     else if (valueType == orion::ValueTypeNone)
     {
-      LM_F(("%s  No Value", indent.c_str()));
+      LM_T(LmtPresent, ("%s  No Value", indent.c_str()));
     }
     else
     {
-      LM_F(("%s  Unknown value type (%d)", indent.c_str(), valueType));
+      LM_T(LmtPresent, ("%s  Unknown value type (%d)", 
+			indent.c_str(), 
+			valueType));
     }
   }
   else
@@ -694,8 +718,16 @@ void ContextAttribute::present(const std::string& indent, int ix)
     compoundValueP->show(indent + "  ");
   }
 
-  LM_F(("%s  PA:       %s (%s)", indent.c_str(), providingApplication.get().c_str(), formatToString(providingApplication.getFormat())));
-  LM_F(("%s  found:    %s", indent.c_str(), FT(found)));
+  LM_T(LmtPresent, ("%s  PA:       %s (%s)", 
+		    indent.c_str(), 
+		    providingApplication.get().c_str(), 
+		    formatToString(providingApplication.getFormat())));
+  LM_T(LmtPresent, ("%s  found:    %s", 
+		    indent.c_str(), 
+		    FT(found)));
+  LM_T(LmtPresent, ("%s  skip:     %s", 
+		    indent.c_str(), 
+		    FT(skip)));
 
   metadataVector.present("Attribute", indent + "  ");
 }
@@ -732,7 +764,7 @@ std::string ContextAttribute::toString(void)
 *
 * toStringValue -
 */
-std::string ContextAttribute::toStringValue(void)
+std::string ContextAttribute::toStringValue(void) const
 {
   char buffer[64];
 
@@ -755,6 +787,9 @@ std::string ContextAttribute::toStringValue(void)
     return "<unknown type>";
     break;
   }
+
+  // Added to avoid warning when compiling with -fstack-check -fstack-protector 
+  return "";
 }
 
 

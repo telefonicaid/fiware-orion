@@ -95,7 +95,6 @@ bool isIPv6(const std::string& in)
 {
   size_t      pos;
   std::string partip;
-  std::string resu;
   std::string staux = in;
   int         cont  = 0;
 
@@ -104,7 +103,6 @@ bool isIPv6(const std::string& in)
   {
     cont++;
     partip = staux.substr(0, pos+1);
-    resu  += partip;
 
     if (checkGroupIPv6(partip) == false)
     {
@@ -445,23 +443,6 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
   free(initial);
   return ret;
-}
-
-
-
-/* ****************************************************************************
-*
-* coords2string - 
-*/
-void coords2string(std::string* s, double latitude, double longitude, int decimals)
-{
-  char buf[256];
-  char format[32];
-
-  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
-  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
-
-  *s = buf;
 }
 
 

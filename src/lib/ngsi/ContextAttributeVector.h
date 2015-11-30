@@ -44,13 +44,14 @@ typedef struct ContextAttributeVector
 
   ContextAttributeVector();
 
-  void               present(const std::string& indent);
-  void               push_back(ContextAttribute* item);
-  void               push_back(ContextAttributeVector* aVec);
-  unsigned int       size(void);
-  ContextAttribute*  get(unsigned int ix);
-  void               release(void);
-  void               fill(struct ContextAttributeVector* cavP);
+  void                     present(const std::string& indent);
+  void                     push_back(ContextAttribute* item);
+  void                     push_back(ContextAttributeVector* aVec);
+  unsigned int             size(void) const;
+  ContextAttribute*        get(unsigned int ix);
+  const ContextAttribute*  get(unsigned int ix) const;
+  void                     release(void);
+  void                     fill(struct ContextAttributeVector* cavP);
 
   ContextAttribute*  operator[](unsigned int ix)
   {

@@ -33,6 +33,7 @@
 #include "orionTypes/EntityTypeResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
 
 
 /* Some string tokens used for aggregation commands */

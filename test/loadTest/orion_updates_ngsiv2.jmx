@@ -58,6 +58,7 @@
             <stringProp name="Argument.name">RAMP_UP</stringProp>
             <stringProp name="Argument.value">${__P(RAMP_UP, 1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">the amount of time for creating the total number of threads</stringProp>
           </elementProp>
           <elementProp name="TEST_TIME" elementType="Argument">
             <stringProp name="Argument.name">TEST_TIME</stringProp>
@@ -67,7 +68,7 @@
           </elementProp>
           <elementProp name="SERVICE" elementType="Argument">
             <stringProp name="Argument.name">SERVICE</stringProp>
-            <stringProp name="Argument.value">${__P(SERVICE,update_ngsiv2)}</stringProp>
+            <stringProp name="Argument.value">${__P(SERVICE,)}</stringProp>
             <stringProp name="Argument.desc">service header</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
@@ -93,6 +94,12 @@
             <stringProp name="Argument.name">TIME_INSTANT</stringProp>
             <stringProp name="Argument.value">${__P(TIME_INSTANT,true)}</stringProp>
             <stringProp name="Argument.desc">if true is appended a timeInstant attribute  in each entity</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="RANDOM_TIME_INSTANT" elementType="Argument">
+            <stringProp name="Argument.name">RANDOM_TIME_INSTANT</stringProp>
+            <stringProp name="Argument.value">${__P(RANDOM_TIME_INSTANT,0)}</stringProp>
+            <stringProp name="Argument.desc">if this is greater than 0 is generated a string of N random characters</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="SUBSC" elementType="Argument">
@@ -355,6 +362,7 @@ df = new DecimalFormat(&quot;00&quot;);
 tempRequest = &quot; &quot;;
 maxAttributes = Integer.parseInt(vars.get(&quot;MAX_ATTRIBUTES&quot;));
 attributesNumber = Integer.parseInt(vars.get(&quot;ATTRIBUTES&quot;));
+randomTimeInstantLen = Integer.parseInt(vars.get(&quot;RANDOM_TIME_INSTANT&quot;));
 attributePrefix = vars.get(&quot;ATTRIBUTE_PREFIX&quot;);
 metadata = vars.get(&quot;METADATA&quot;);
 timeInstant = vars.get(&quot;TIME_INSTANT&quot;);
@@ -368,10 +376,19 @@ meta = &quot;&quot;;
 
 //begin
 // if TIME_INSTANT property is true, the TimeInstant attribute is appended in each entity
+// if RANDOM_TIME_INSTANT is greater than 0 is generated a string witn N random characters, else it is generated a date with zulu format.
 if (timeInstant.toLowerCase().equals(&quot;true&quot;)) {
-	timeInstant = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.SSS&apos;Z&apos;&quot;).format(new Date());
-	request = request + &quot;\&quot;TimeInstant\&quot;: { \&quot;value\&quot;: \&quot;&quot;+timeInstant.toString()+&quot;\&quot;, \&quot;type\&quot;: \&quot;T\&quot;},&quot;;	
+     if (randomTimeInstantLen &gt; 0) {
+          timeInstant = &quot;&quot;;
+          for( int i = 0; i &lt; randomTimeInstantLen; i++ ) {
+              timeInstant = timeInstant + chars.charAt(rnd.nextInt(chars.length()));	
+          }			
+     } else {
+          timeInstant = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.SSS&apos;Z&apos;&quot;).format(new Date());
+	}
+     request = request + &quot;\&quot;TimeInstant\&quot;: { \&quot;value\&quot;: \&quot;&quot;+timeInstant.toString()+&quot;\&quot;, \&quot;type\&quot;: \&quot;T\&quot;},&quot;;
 }
+
 // determine number of attributes.
 // attribute max is 20.
 // if ATTRIBUTES property is zero or negative value, the attribute number will be a random value.

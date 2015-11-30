@@ -222,12 +222,12 @@ std::string dcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 */
 void dcarPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqDataP->dcar.res.present("");
 }
 

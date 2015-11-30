@@ -29,7 +29,7 @@
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 
 /* Collection names used for testing */
 #define DBPREFIX                    "utest"

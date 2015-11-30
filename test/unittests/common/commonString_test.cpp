@@ -360,49 +360,6 @@ TEST(string, string2coords)
 
 /* ****************************************************************************
 *
-* coords2string - 
-*/
-TEST(string, coords2string)
-{
-  std::string s;
-
-  coords2string(&s, 0, 1, 0);
-  EXPECT_EQ("0, 1", s);
-
-  coords2string(&s, 0.123, 1.123, 3);
-  EXPECT_STREQ("0.123, 1.123", s.c_str());
-}
-
-/* ****************************************************************************
-*
-* coords2string -
-*/
-TEST(string, versionParse)
-{
-  bool r;
-  std::string bugFix;
-  int mayor, minor;
-
-  r = versionParse("2.4.5-rc", mayor, minor, bugFix);
-  EXPECT_TRUE(r);
-  EXPECT_EQ(2, mayor);
-  EXPECT_EQ(4, minor);
-  EXPECT_EQ("5-rc", bugFix);
-
-  r = versionParse("2.4", mayor, minor, bugFix);
-  EXPECT_TRUE(r);
-  EXPECT_EQ(2, mayor);
-  EXPECT_EQ(4, minor);
-  EXPECT_EQ("", bugFix);
-
-  r = versionParse("wrong version", mayor, minor, bugFix);
-  EXPECT_FALSE(r);
-}
-
-
-
-/* ****************************************************************************
-*
 * atoF - 
 */
 TEST(string, atoF)

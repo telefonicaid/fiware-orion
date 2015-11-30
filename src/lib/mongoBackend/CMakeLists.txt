@@ -43,10 +43,13 @@ SET (SOURCES
     mongoGetSubscriptions.cpp
     connectionOperations.cpp
     mongoSubCache.cpp
-    safeBsonGet.cpp
+    safeMongo.cpp
+    dbFieldEncoding.cpp
+    compoundResponses.cpp
 )
 
 SET (HEADERS
+    dbConstants.h
     MongoGlobal.h
     MongoCommonUpdate.h
     MongoCommonRegister.h
@@ -69,7 +72,9 @@ SET (HEADERS
     mongoGetSubscriptions.h
     connectionOperations.h
     mongoSubCache.h
-    safeBsonGet.h
+    safeMongo.h
+    dbFieldEncoding.h
+    compoundResponses.h
 )
 
 

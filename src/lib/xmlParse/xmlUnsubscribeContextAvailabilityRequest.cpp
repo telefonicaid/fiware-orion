@@ -87,10 +87,10 @@ std::string ucarCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void ucarPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqData->ucar.res.subscriptionId.present("");
 }
 

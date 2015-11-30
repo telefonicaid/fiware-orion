@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoNotifyContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -50,10 +53,10 @@ std::string postNotifyContext
 )
 {
   NotifyContextResponse  ncr;
+  std::string            answer;
 
-  ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV);
-
-  std::string answer = ncr.render(NotifyContext, ciP->outFormat, "");
+  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV));
+  TIMED_RENDER(answer = ncr.render(NotifyContext, ciP->outFormat, ""));
 
   return answer;
 }

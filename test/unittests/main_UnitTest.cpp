@@ -67,8 +67,7 @@ unsigned int  cprForwardLimit       = 1000;
 bool          noCache               = false;
 char          fwdHost[64];
 char          notificationMode[64];
-unsigned int  connectionMemory      = 64;
-
+bool          simulatedNotification;
 
 
 /* ****************************************************************************
@@ -110,7 +109,7 @@ int main(int argC, char** argV)
     paParse(paArgs, 1, argV, 1, false);
 
   LM_M(("Init tests"));
-  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false);
+  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false);
   setupDatabase();
 
   LM_M(("Run all tests"));

@@ -32,7 +32,8 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "mongoBackend/safeMongo.h"
+#include "cache/subCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
@@ -57,6 +58,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
 
     if (responseP->subscriptionId.get() == "")
     {
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
         responseP->statusCode.fill(SccContextElementNotFound);
         LM_W(("Bad Input (no subscriptionId)"));
         return SccOk;
@@ -65,21 +67,18 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     /* Look for document */
     BSONObj sub;
     OID     id;
-    try
+
+    if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
     {
-      id = OID(requestP->subscriptionId.get());
-    }
-    catch (const AssertionException &e)
-    {
-      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo assertion exception)", reqSemTaken);
-      //
-      // This happens when OID format is wrong
-      // FIXME: this checking should be done at parsing stage, without progressing to
-      // mongoBackend. For the moment we can live this here, but we should remove in the future
-      // (old issue #95)
-      //
-      responseP->statusCode.fill(SccContextElementNotFound);
-      LM_W(("Bad Input (invalid OID format)"));
+      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (safeGetSubId fail)", reqSemTaken);
+      if (responseP->statusCode.code == SccContextElementNotFound)
+      {
+        LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+      }
+      else // SccReceiverInternalError
+      {
+        LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
+      }
       return SccOk;
     }
 
@@ -93,7 +92,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     if (sub.isEmpty())
     {
        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
-
        responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
        return SccOk;
     }
@@ -112,20 +110,18 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
 
-    // FIXME P7: mongoSubCache stuff could be avoided if subscription is not patterned
-
     //
     // Removing subscription from mongo subscription cache
     //
-    LM_T(LmtMongoSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
+    LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
 
     cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
-    CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
-    if (cSubP != NULL)  // Will only enter here if wildcard subscription
+    if (cSubP != NULL)
     {
-      mongoSubCacheItemRemove(cSubP);
+      subCacheItemRemove(cSubP);
     }
 
     cacheSemGive(__FUNCTION__, "Removing subscription from cache");

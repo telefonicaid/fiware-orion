@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -38,9 +39,9 @@
 *
 * EntityType::EntityType -
 */
-EntityType::EntityType()
+EntityType::EntityType(): count(0)
 {
-  type = "";
+
 }
 
 
@@ -49,9 +50,9 @@ EntityType::EntityType()
 *
 * EntityType::EntityType -
 */
-EntityType::EntityType(std::string  _type)
+EntityType::EntityType(std::string _type): type(_type), count(0)
 {
-  type = _type;
+
 }
 
 
@@ -135,7 +136,7 @@ std::string EntityType::check
 */
 void EntityType::present(const std::string& indent)
 {
-  LM_F(("%stype:   %s", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent,("%stype:   %s", indent.c_str(), type.c_str()));
   contextAttributeVector.present(indent);
 }
 

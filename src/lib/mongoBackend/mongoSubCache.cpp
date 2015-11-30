@@ -22,25 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-
-/*
-*
-* The mongo subscription cache maintains in memory all subscriptions of type ONCHANGE that has
-* a patterned Entity::id. The reason for this cache is to avoid a very slow mongo operation ... (Fermin)
-*
-* The cache is implementged in mongoBackend/mongoSubCache.cpp/h and used in:
-*   - MongoCommonUpdate.cpp               (function addTriggeredSubscriptions_withCache)
-*   - mongoSubscribeContext.cpp           (function mongoSubscribeContext)
-*   - mongoUnsubscribeContext.cpp         (function mongoUnsubscribeContext)
-*   - mongoUpdateContextSubscription.cpp  (function mongoUpdateContextSubscription)
-*   - mongoSubCache.cpp                   (function mongoSubCacheRefresh)
-*
-* To manipulate the subscription cache, a semaphore is necessary, as various threads can be
-* reading/inserting/removing subs at the same time.
-* This semaphore is NOT optional, like the mongo request semaphore.
-*
-* Two functions have been added to common/sem.cpp|h for this: cacheSemTake/Give.
-*/
 #include <string>
 #include <regex.h>
 
@@ -50,525 +31,17 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/string.h"
+#include "common/statistics.h"
 
+#include "cache/subCache.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoSubCache.h"
-#include "mongoBackend/safeBsonGet.h"
-
-#include "ngsi/NotifyConditionVector.h"
-#include "ngsi10/SubscribeContextRequest.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
 
 using namespace mongo;
-
-
-
-/* ****************************************************************************
-*
-* EntityInfo::EntityInfo - 
-*/
-EntityInfo::EntityInfo(const std::string& idPattern, const std::string& _entityType)
-{
-  regcomp(&entityIdPattern, idPattern.c_str(), 0);
-
-  entityType               = _entityType;
-  entityIdPatternToBeFreed = true;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityInfo::match - 
-*/
-bool EntityInfo::match
-(
-  const std::string&  id,
-  const std::string&  type
-)
-{
-  //
-  // If type non-empty - perfect match is mandatory
-  // If type is empty - always matches
-  //
-  if ((type != "") && (entityType != type) && (entityType != ""))
-  {
-    return false;
-  }
-
-  // REGEX-comparison this->entityIdPattern VS id
-  return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityInfo::release - 
-*/
-void EntityInfo::release(void)
-{
-  if (entityIdPatternToBeFreed)
-  {
-    regfree(&entityIdPattern);
-    entityIdPatternToBeFreed = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityInfo::present - 
-*/
-void EntityInfo::present(const std::string& prefix)
-{
-  LM_F(("%sid:    regex describing EntityId::id (the original string is not saved)", prefix.c_str()));
-  LM_F(("%stype:  %s", prefix.c_str(), entityType.c_str()));
-}
-
-
-
-/* ****************************************************************************
-*
-* MongoSubCache - 
-*/
-typedef struct MongoSubCache
-{
-  CachedSubscription* head;
-  CachedSubscription* tail;
-
-  // Statistics counters
-  int                 noOfRefreshes;
-  int                 noOfInserts;
-  int                 noOfRemoves;
-  int                 noOfUpdates;
-} MongoSubCache;
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCache - 
-*/
-MongoSubCache  mongoSubCache = { NULL, NULL, 0 };
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheInit - 
-*/
-void mongoSubCacheInit(void)
-{
-  LM_T(LmtMongoSubCache, ("Initializing subscription cache"));
-
-  mongoSubCache.head   = NULL;
-  mongoSubCache.tail   = NULL;
-
-  mongoSubCacheStatisticsReset("mongoSubCacheInit");
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheItems - 
-*/
-int mongoSubCacheItems(void)
-{
-  CachedSubscription* cSubP = mongoSubCache.head;
-  int                 items = 0;
-
-  while (cSubP != NULL)
-  {
-    ++items;
-    cSubP = cSubP->next;
-  }
-
-  return items;
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeMatch - 
-*/
-static bool attributeMatch(CachedSubscription* cSubP, const char* attr)
-{
-  for (unsigned int ncvIx = 0; ncvIx < cSubP->notifyConditionVector.size(); ++ncvIx)
-  {
-    NotifyCondition* ncP = cSubP->notifyConditionVector[ncvIx];
-
-    for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
-    {
-      if (ncP->condValueList[cvIx] == attr)
-      {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* servicePathMatch - 
-*/
-static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
-{
-  const char*  spath;
-
-  // Special case. "/#" matches EVERYTHING
-  if ((strlen(servicePath) == 2) && (servicePath[0] == '/') && (servicePath[1] == '#') && (servicePath[2] == 0))
-  {
-    return true;
-  }
-
-  //
-  // Empty service path?
-  //
-  if ((strlen(servicePath) == 0) && (strlen(cSubP->servicePath) == 0))
-  {
-    return true;
-  }
-
-  //
-  // Default service path for a subscription is "/".
-  // So, if empty, set it to "/"
-  //
-  if (servicePath[0] == 0)
-  {
-    servicePath = (char*) "/";
-  }
-
-  spath = cSubP->servicePath;
-
-  //
-  // No wildcard - exact match
-  //
-  if (spath[strlen(spath) - 1] != '#')
-  {
-    return (strcmp(servicePath, cSubP->servicePath) == 0);
-  }
-
-
-  //
-  // Wildcard - remove '#' and compare to the length of _servicePath.
-  //            If equal upto the length of _servicePath, then it is a match
-  //
-  // Actually, there is more than one way to match here:
-  // If we have a servicePath of the subscription as 
-  // "/a/b/#", then the following service-paths must match:
-  //   1. /a/b
-  //   2. /a/b/ AND /a/b/.+  (any path below /a/b/)
-  //
-  // What should NOT match is "/a/b2".
-  //
-  unsigned int len = strlen(spath) - 2;
-
-  // 1. /a/b - (removing 2 chars from the cache-subscription removes "/#"
-
-  if ((spath[len] == '/') && (strlen(servicePath) == len) && (strncmp(spath, servicePath, len) == 0))
-  {
-    return true;
-  }
-
-  // 2. /a/b/.+
-  len = strlen(spath) - 1;
-  if (strncmp(spath, servicePath, len) == 0)
-  {
-    return true;
-  }
-  
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* subMatch - 
-*/
-static bool subMatch
-(
-  CachedSubscription*  cSubP,
-  const char*          tenant,
-  const char*          servicePath,
-  const char*          entityId,
-  const char*          entityType,
-  const char*          attr
-)
-{
-  if ((cSubP->tenant == NULL) || (tenant == NULL) || (cSubP->tenant[0] == 0) || (tenant[0] == 0))
-  {
-    if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
-    {
-      LM_T(LmtMongoSubCacheMatch, ("No match due to tenant I"));
-      return false;
-    }
-
-    if ((tenant != NULL) && (tenant[0] != 0))
-    {
-      LM_T(LmtMongoSubCacheMatch, ("No match due to tenant II"));
-      return false;
-    }
-  }
-  else if (strcmp(cSubP->tenant, tenant) != 0)
-  {
-    LM_T(LmtMongoSubCacheMatch, ("No match due to tenant III"));
-    return false;
-  }
-
-  if (servicePathMatch(cSubP, (char*) servicePath) == false)
-  {
-    LM_T(LmtMongoSubCacheMatch, ("No match due to servicePath"));
-    return false;
-  }
-
-
-  //
-  // If ONCHANGE and one of the attribute names in the scope vector
-  // of the subscription has the same name as the incoming attribute. there is a match.
-  //
-  if (!attributeMatch(cSubP, attr))
-  {
-    LM_T(LmtMongoSubCacheMatch, ("No match due to attributes"));
-    return false;
-  }
-
-  for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
-  {
-    EntityInfo* eiP = cSubP->entityIdInfos[ix];
-
-    if (eiP->match(entityId, entityType))
-    {
-      return true;
-    }
-  }
-
-  LM_T(LmtMongoSubCacheMatch, ("No match due to EntityInfo"));
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheMatch - 
-*/
-void mongoSubCacheMatch
-(
-  const char*                        tenant,
-  const char*                        servicePath,
-  const char*                        entityId,
-  const char*                        entityType,
-  const char*                        attr,
-  std::vector<CachedSubscription*>*  subVecP
-)
-{
-  CachedSubscription* cSubP = mongoSubCache.head;
-
-  while (cSubP != NULL)
-  {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attr))
-    {
-      subVecP->push_back(cSubP);
-      LM_T(LmtMongoSubCache, ("added subscription '%s': lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
-    }
-
-    cSubP = cSubP->next;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* cachedSubscriptionDestroy - 
-*/
-static void cachedSubscriptionDestroy(CachedSubscription* cSubP)
-{
-  if (cSubP->tenant != NULL)
-  {
-    free(cSubP->tenant);
-    cSubP->tenant = NULL;
-  }
-
-  if (cSubP->servicePath != NULL)
-  {
-    free(cSubP->servicePath);
-    cSubP->servicePath = NULL;
-  }
-
-  if (cSubP->subscriptionId != NULL)
-  {
-    free(cSubP->subscriptionId);
-    cSubP->subscriptionId = NULL;
-  }
-
-  if (cSubP->reference != NULL)
-  {
-    free(cSubP->reference);
-    cSubP->reference = NULL;
-  }
-
-  for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
-  {
-    cSubP->entityIdInfos[ix]->release();
-    delete cSubP->entityIdInfos[ix];
-  }
-  cSubP->entityIdInfos.clear();
-
-  while (cSubP->attributes.size() > 0)
-  {
-    cSubP->attributes.erase(cSubP->attributes.begin());
-  }
-  cSubP->attributes.clear();
-
-  cSubP->notifyConditionVector.release();
-  cSubP->notifyConditionVector.vec.clear();
-
-  cSubP->next = NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheDestroy - 
-*/
-void mongoSubCacheDestroy(void)
-{
-  LM_T(LmtMongoSubCache, ("destroying subscription cache"));
-
-  CachedSubscription* cSubP  = mongoSubCache.head;
-
-  if (mongoSubCache.head == NULL)
-  {
-    return;
-  }
-
-  while (cSubP->next)
-  {
-    CachedSubscription* prev = cSubP;
-
-    cSubP = cSubP->next;
-    cachedSubscriptionDestroy(prev);
-    LM_T(LmtMongoSubCache,  ("removing CachedSubscription at %p", prev));
-    delete prev;
-  }
-
-  cachedSubscriptionDestroy(cSubP);
-  LM_T(LmtMongoSubCache,  ("removing CachedSubscription at %p", cSubP));
-  delete cSubP;
-
-  mongoSubCache.head  = NULL;
-  mongoSubCache.tail  = NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* tenantMatch - 
-*/
-static bool tenantMatch(const char* tenant1, const char* tenant2)
-{
-  //
-  // Removing complications with NULL, giving NULL tenants the value of an empty string;
-  //
-  tenant1 = (tenant1 == NULL)? "" : tenant1;
-  tenant2 = (tenant2 == NULL)? "" : tenant2;
-
-  if (strlen(tenant1) != strlen(tenant2))
-  {
-    return false;
-  }
-
-  if (strcmp(tenant1, tenant2) == 0)
-  {
-    return true;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheItemLookup - 
-*
-* FIXME P7: lookups would be A LOT faster if the subCache used a hash-table instead of
-*           just a single linked link for the subscriptions.
-*           The hash could be adding each char in 'tenant' and 'subscriptionId' to a 8-bit
-*           integer and then we'd have a vector of 256 linked lists.
-*           Another way of implementing this would be to use a std::vector or std::map.
-*/
-CachedSubscription* mongoSubCacheItemLookup(const char* tenant, const char* subscriptionId)
-{
-  CachedSubscription* cSubP = mongoSubCache.head;
-
-  while (cSubP != NULL)
-  {
-    if ((tenantMatch(tenant, cSubP->tenant)) && (strcmp(subscriptionId, cSubP->subscriptionId) == 0))
-    {
-      return cSubP;
-    }
-
-    cSubP = cSubP->next;
-  }
-
-  return NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheUpdateStatisticsIncrement - 
-*/
-void mongoSubCacheUpdateStatisticsIncrement(void)
-{
-  ++mongoSubCache.noOfUpdates;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheItemInsert - 
-*/
-static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
-{
-  //
-  // First of all, insertion is done at the end of the list, so, 
-  // cSubP->next must ALWAYS be zero at insertion time
-  //
-  cSubP->next = NULL;
-
-  LM_T(LmtMongoSubCache, ("inserting sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
-
-  ++mongoSubCache.noOfInserts;
-
-  // First insertion?
-  if ((mongoSubCache.head == NULL) && (mongoSubCache.tail == NULL))
-  {
-    mongoSubCache.head   = cSubP;
-    mongoSubCache.tail   = cSubP;
-
-    return;
-  }
-
-  
-  mongoSubCache.tail->next  = cSubP;
-  mongoSubCache.tail        = cSubP;
-}
 
 
 
@@ -582,6 +55,9 @@ static void mongoSubCacheItemInsert(CachedSubscription* cSubP)
 *  -2:  Out of memory (either returns -2 or exit the entire broker)
 *  -3:  No patterned entity found
 *  -4:  The vector of notify-conditions is empty
+*
+*
+* Note that the 'count' of the inserted subscription is set to ZERO.
 *
 */
 int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
@@ -602,7 +78,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   // 03. Create CachedSubscription
   //
   CachedSubscription* cSubP = new CachedSubscription();
-  LM_T(LmtMongoSubCache,  ("allocated CachedSubscription at %p", cSubP));
+  LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
   if (cSubP == NULL)
   {
@@ -621,7 +97,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
 
 
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? sub.getField(CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    sub.getField(CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
@@ -629,10 +105,10 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->pendingNotifications  = 0;
+  cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
-  LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
+  LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
   //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
@@ -647,33 +123,18 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
       continue;
     }
 
-    std::string id = entity.getStringField(ENT_ENTITY_ID);
-    
-    if (!entity.hasField(CSUB_ENTITY_ISPATTERN))
-    {
-      continue;
-    }
+    std::string id        = entity.getStringField(ENT_ENTITY_ID);
+    std::string isPattern = entity.hasField(CSUB_ENTITY_ISPATTERN)? entity.getStringField(CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type      = entity.hasField(CSUB_ENTITY_TYPE)?      entity.getStringField(CSUB_ENTITY_TYPE)      : "";
+    EntityInfo* eiP       = new EntityInfo(id, type, isPattern);
 
-    std::string isPattern = entity.getStringField(CSUB_ENTITY_ISPATTERN);
-    if (isPattern != "true")
-    {
-      continue;
-    }
-
-    std::string type;
-    if (entity.hasField(CSUB_ENTITY_TYPE))
-    {
-      type = entity.getStringField(CSUB_ENTITY_TYPE);
-    }
-
-    EntityInfo* eiP = new EntityInfo(id, type);
     cSubP->entityIdInfos.push_back(eiP);
   }
 
   if (cSubP->entityIdInfos.size() == 0)
   {
     LM_E(("ERROR (no patterned entityId) - cleaning up"));
-    cachedSubscriptionDestroy(cSubP);
+    subCacheItemDestroy(cSubP);
     delete cSubP;
     return -3;
   }
@@ -723,12 +184,12 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   if (cSubP->notifyConditionVector.size() == 0)  // Cleanup
   {
     LM_E(("ERROR (empty notifyConditionVector) - cleaning up"));
-    cachedSubscriptionDestroy(cSubP);
+    subCacheItemDestroy(cSubP);
     delete cSubP;
     return -4;
   }
 
-  mongoSubCacheItemInsert(cSubP);
+  subCacheItemInsert(cSubP);
 
   return 0;
 }
@@ -746,8 +207,19 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 *  -3: Out of memory (either this or EXIT)
 *  -4: Subscription not valid for sub-cache (no patterns)
 *  -5: Subscription notvalid for sub-cache (empty notify-condition vector)
+*
+*
+* Note that the 'count' of the inserted subscription is set to ZERO.
 */
-int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* subscriptionId, const char* servicePath, int lastNotificationTime, long long expirationTime)
+int mongoSubCacheItemInsert
+(
+  const char*     tenant,
+  const BSONObj&  sub,
+  const char*     subscriptionId,
+  const char*     servicePath,
+  int             lastNotificationTime,
+  long long       expirationTime
+)
 {
   //
   // 01. Check incoming parameters
@@ -768,7 +240,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
   //
   CachedSubscription* cSubP = new CachedSubscription();
 
-  LM_T(LmtMongoSubCache,  ("allocated CachedSubscription at %p", cSubP));
+  LM_T(LmtSubCache,  ("allocated CachedSubscription at %p", cSubP));
 
   if (cSubP == NULL)
   {
@@ -795,32 +267,17 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
       continue;
     }
 
-    std::string id = entity.getStringField(ENT_ENTITY_ID);
-    
-    if (!entity.hasField(CSUB_ENTITY_ISPATTERN))
-    {
-      continue;
-    }
+    std::string id        = entity.getStringField(ENT_ENTITY_ID);
+    std::string isPattern = entity.hasField(CSUB_ENTITY_ISPATTERN)? entity.getStringField(CSUB_ENTITY_ISPATTERN) : "false";
+    std::string type      = entity.hasField(CSUB_ENTITY_TYPE)?      entity.getStringField(CSUB_ENTITY_TYPE)      : "";
+    EntityInfo* eiP       = new EntityInfo(id, type, isPattern);
 
-    std::string isPattern = entity.getStringField(CSUB_ENTITY_ISPATTERN);
-    if (isPattern != "true")
-    {
-      continue;
-    }
-
-    std::string type;
-    if (entity.hasField(CSUB_ENTITY_TYPE))
-    {
-      type = entity.getStringField(CSUB_ENTITY_TYPE);
-    }
-
-    EntityInfo* eiP = new EntityInfo(id, type);
     cSubP->entityIdInfos.push_back(eiP);
   }
 
   if (cSubP->entityIdInfos.size() == 0)
   {
-    cachedSubscriptionDestroy(cSubP);
+    subCacheItemDestroy(cSubP);
     delete cSubP;
     return -4;
   }
@@ -851,10 +308,10 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->pendingNotifications  = 0;
+  cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
-  LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
+  LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
 
   //
@@ -900,286 +357,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub, const char* 
 
   if (cSubP->notifyConditionVector.size() == 0)
   {
-    cachedSubscriptionDestroy(cSubP);
+    subCacheItemDestroy(cSubP);
     delete cSubP;
     return -5;
   }
 
-  mongoSubCacheItemInsert(cSubP);
+  subCacheItemInsert(cSubP);
 
   return 0;
 }
 
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheItemInsert - create a new sub, fill it in, and add it to cache
-*
-* NOTE, this function receives the information as a SubscribeContextRequest, as it
-*       is used from mongoBackend/mongoSubscribeContext and this SubscribeContextRequest
-*       is checked to contain isPatterned ONCHANGE subscriptions prior to calling this
-*       function. Doing the very same check inside mongoSubCacheItemInsert would just
-*       be a waste of time.
-*/
-void mongoSubCacheItemInsert
-(
-  const char*               tenant,
-  const char*               servicePath,
-  SubscribeContextRequest*  scrP,
-  const char*               subscriptionId,
-  int64_t                   expirationTime,
-  int64_t                   throttling,
-  Format                    notifyFormat
-)
-{
-  //
-  // Add the subscription to the subscription cache.
-  // But only if any of the entities in entityIdVector is pattern based -
-  // AND it is a subscription of type ONCHANGE
-  //
-
-  //
-  // 00. Check that the subscription is pattern based an ONCHANGE
-  //
-  bool patternBased = false;
-  bool onchange     = false;
-
-  // 00.1. Any entity pattern-based?
-  for (unsigned int ix = 0; ix < scrP->entityIdVector.size(); ++ix)
-  {
-    if (scrP->entityIdVector[ix]->isPattern == "true")
-    {
-      patternBased = true;
-      break;
-    }
-  }
-
-  // 00.2. ONCHANGE?
-  for (unsigned int ix = 0; ix < scrP->notifyConditionVector.size(); ++ix)
-  {
-    if (strcasecmp(scrP->notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
-    {
-      onchange = true;
-      break;
-    }
-  }
-
-  if (!patternBased || !onchange)
-  {
-    return;
-  }
-
-    
-  //
-  // Now allocate the subscription
-  //
-  CachedSubscription* cSubP = new CachedSubscription();
-  LM_T(LmtMongoSubCache,  ("allocated CachedSubscription at %p", cSubP));
-
-
-  //
-  // 1. First the non-complex values
-  //
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
-  cSubP->servicePath           = strdup(servicePath);
-  cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->reference             = strdup(scrP->reference.get().c_str());
-  cSubP->expirationTime        = expirationTime;
-  cSubP->throttling            = throttling;
-  cSubP->lastNotificationTime  = 0;
-  cSubP->pendingNotifications  = 0;
-  cSubP->notifyFormat          = notifyFormat;
-  cSubP->next                  = NULL;
-
-  LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
-
-
-  //
-  // 2. Then the values that have functions/methods for filling/parsing
-  //
-  cSubP->throttling = scrP->throttling.parse();
-  cSubP->notifyConditionVector.fill(scrP->notifyConditionVector);
-
-
-  //
-  // 3. Convert all patterned EntityId to EntityInfo
-  //
-  for (unsigned int ix = 0; ix < scrP->entityIdVector.vec.size(); ++ix)
-  {
-    EntityId* eIdP;
-
-    eIdP = scrP->entityIdVector.vec[ix];
-
-    if (eIdP->isPattern == "false")
-    {
-      continue;
-    }
-
-    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type);
-    
-    cSubP->entityIdInfos.push_back(eP);
-  }
-
-
-  //
-  // 4. Insert all attributes 
-  //
-  for (unsigned int ix = 0; ix < scrP->attributeList.attributeV.size(); ++ix)
-  {
-    cSubP->attributes.push_back(scrP->attributeList.attributeV[ix]);
-  }
-
-
-  //
-  // 5. Now, insert the subscription in the cache
-  //
-  LM_T(LmtMongoSubCache, ("Inserting NEW sub '%s', lastNotificationTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
-  mongoSubCacheItemInsert(cSubP);
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheStatisticsGet - 
-*/
-void mongoSubCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize)
-{
-  *refreshes = mongoSubCache.noOfRefreshes;
-  *inserts   = mongoSubCache.noOfInserts;
-  *removes   = mongoSubCache.noOfRemoves;
-  *updates   = mongoSubCache.noOfUpdates;
-  *items     = mongoSubCacheItems();
-
-  CachedSubscription* cSubP = mongoSubCache.head;
-
-  //
-  // NOTE
-  //   If the listBuffer is not big enough to hold the entire list of cached subscriptions,
-  //   mongoSubCacheStatisticsGet returns the empty string and the list is excluded from
-  //   the response of "GET /statistics".
-  //   Minimum size of the list is set to 128 bytes and the needed size is detected later.
-  //   Again, if the list-buffer is not big enough to hold the entire text, no list is shown.
-  //
-  *list = 0;
-  if (listSize > 128)
-  {
-    while (cSubP != NULL)
-    {
-      char          msg[256];
-      unsigned int  bytesLeft = listSize - strlen(list);
-
-#if 0
-      //
-      // FIXME P5: To be removed once sub-update is OK in QA
-      //
-      int now = getCurrentTime();
-      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|P:%d|DUR:%lu",
-               cSubP->subscriptionId,
-               cSubP->lastNotificationTime,
-               cSubP->expirationTime,
-               cSubP->throttling,
-               cSubP->pendingNotifications,
-               cSubP->expirationTime - now);
-#else
-        snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
-#endif
-      //
-      // If "msg" and ", " has no room in the "list", then no list is shown.
-      // (the '+ 2' if for the string ", ")
-      //
-      if (strlen(msg) + 2 > bytesLeft)
-      {
-        *list = 0;
-        break;
-      }
-      
-      if (list[0] != 0)
-        strcat(list, ", ");
-
-      strcat(list, msg);
-
-      cSubP = cSubP->next;
-    }
-  }
-
-  LM_T(LmtMongoSubCache, ("Statistics: refreshes: %d (%d)", *refreshes, mongoSubCache.noOfRefreshes));
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheStatisticsReset - 
-*/
-void mongoSubCacheStatisticsReset(const char* by)
-{
-  mongoSubCache.noOfRefreshes  = 0;
-  mongoSubCache.noOfInserts    = 0;
-  mongoSubCache.noOfRemoves    = 0;
-  mongoSubCache.noOfUpdates    = 0;
-
-  LM_T(LmtMongoSubCache, ("Statistics reset by %s: refreshes is now %d", by, mongoSubCache.noOfRefreshes));
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCachePresent - 
-*/
-void mongoSubCachePresent(const char* title)
-{
-  CachedSubscription* cSubP = mongoSubCache.head;
-
-  LM_T(LmtMongoSubCache, ("----------- %s ------------", title));
-
-  while (cSubP != NULL)
-  {
-    LM_T(LmtMongoSubCache, ("o %s (tenant: %s, LNT: %lu, THR: %d)", cSubP->subscriptionId, cSubP->tenant, cSubP->lastNotificationTime, cSubP->throttling));
-    cSubP = cSubP->next;
-  }
-
-  LM_T(LmtMongoSubCache, ("--------------------------------"));
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheItemRemove - 
-*/
-int mongoSubCacheItemRemove(CachedSubscription* cSubP)
-{
-  CachedSubscription* current = mongoSubCache.head;
-  CachedSubscription* prev    = NULL;
-
-  LM_T(LmtMongoSubCache, ("in mongoSubCacheItemRemove, trying to remove '%s'", cSubP->subscriptionId));
-  while (current != NULL)
-  {
-    if (current == cSubP)
-    {
-      if (cSubP == mongoSubCache.head)  { mongoSubCache.head = cSubP->next; }
-      if (cSubP == mongoSubCache.tail)  { mongoSubCache.tail = prev;        }
-      if (prev != NULL)                 { prev->next         = cSubP->next; }
-
-      LM_T(LmtMongoSubCache, ("in mongoSubCacheItemRemove, REMOVING '%s'", cSubP->subscriptionId));
-      ++mongoSubCache.noOfRemoves;
-
-      cachedSubscriptionDestroy(cSubP);
-      delete cSubP;
-      return 0;
-    }
-
-    prev    = current;
-    current = current->next;
-  }
-
-  LM_E(("Runtime Error (item to remove from sub-cache not found)"));
-  return -1;
-}
 
 
 
@@ -1193,158 +380,90 @@ int mongoSubCacheItemRemove(CachedSubscription* cSubP)
 *
 * NOTE
 *   The query for the database ONLY extracts the interesting subscriptions:
-*   - "conditions.type" << "ONCHANGE"   AND
-*   - CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true"
+*   - "conditions.type" << "ONCHANGE"
 *
-*   I.e. the subscriptions is for ONCHANGE, and it uses wildcards in entityId.
+*   I.e. the subscriptions is for ONCHANGE.
 */
-static void mongoSubCacheRefresh(std::string database)
+void mongoSubCacheRefresh(const std::string& database)
 {
-  LM_T(LmtMongoSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
+  LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                   query       = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
-  std::string               tenant      = tenantFromDb(database);
+  BSONObj                   query       = BSON("conditions.type" << "ONCHANGE");
+  std::string               db          = database;
+  std::string               tenant      = tenantFromDb(db);
   std::string               collection  = getSubscribeContextCollectionName(tenant);
   auto_ptr<DBClientCursor>  cursor;
   std::string               errorString;
 
-  if (collectionQuery(collection, query, &cursor, &errorString) != true)
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
     LM_E(("Database Error (%s)", errorString.c_str()));
+    releaseMongoConnection(connection, &cursor);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
-  // Call the treat function for each subscription
   int subNo = 0;
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj sub = cursor->next();
-    int     r;
+    BSONObj      sub;
+    std::string  err;
 
-    r = mongoSubCacheItemInsert(tenant.c_str(), sub);
+    if (!nextSafeOrError(cursor, &sub, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      continue;
+    }
+
+    int r = mongoSubCacheItemInsert(tenant.c_str(), sub);
 
     if (r == 0)
     {
       ++subNo;
     }
   }
+  releaseMongoConnection(connection, &cursor);
 
-  LM_T(LmtMongoSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
+  LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
 }
 
 
 
 /* ****************************************************************************
 *
-* mongoSubCacheRefresh - 
+* mongoSubCacheUpdate - update subscription in mongo with count and lastNotificationTime
 */
-void mongoSubCacheRefresh(void)
+void mongoSubCacheUpdate(const std::string& tenant, const std::string& subId, long long count, long long lastNotificationTime)
 {
-  std::vector<std::string> databases;
+  std::string  collection  = getSubscribeContextCollectionName(tenant);
+  BSONObj      condition;
+  BSONObj      update;
+  std::string  err;
 
-  LM_T(LmtMongoSubCache, ("Refreshing subscription cache"));
-  cacheSemTake(__FUNCTION__, "subscription cache for refresh");
-
-
-  // Empty the cache
-  mongoSubCacheDestroy();
-
-  // Get list of database
-  getOrionDatabases(databases);
-
-  // Add the 'default tenant'
-  databases.push_back(getDbPrefix());
-
-
-  // Now refresh the subCache for each and every tenant
-  for (unsigned int ix = 0; ix < databases.size(); ++ix)
+  if (count != 0)
   {
-    LM_T(LmtMongoSubCache, ("DB %d: %s", ix, databases[ix].c_str()));
-    mongoSubCacheRefresh(databases[ix]);
+    // Update count
+    condition = BSON("_id"  << OID(subId));
+    update    = BSON("$inc" << BSON(CSUB_COUNT << count));
+
+    if (collectionUpdate(collection, condition, update, false, &err) != true)
+    {
+      LM_E(("Internal Error (error updating 'count' for a subscription)"));
+    }
   }
 
-  ++mongoSubCache.noOfRefreshes;
-  LM_T(LmtMongoSubCache, ("Refreshed subscription cache [%d]", mongoSubCache.noOfRefreshes));
-
-  //
-  // FIXME P5: Remove this debugging code once the refresh works again
-  //
-#if 0
-
-  //
-  // DEBUG STARTS HERE
-  //
-  CachedSubscription* cSubP = mongoSubCache.head;
-  int                 items = 0;
-
-  while (cSubP != NULL)
+  if (lastNotificationTime != 0)
   {
-    LM_T(LmtMongoSubCache, ("%s: TEN:%s, SPath:%s, THR:%lu, EXP:%lu, LNT:%lu PN:%d, REF:%s, Es:%d, As:%d, NCs:%d",
-                            cSubP->subscriptionId,
-                            cSubP->tenant,
-                            cSubP->servicePath,
-                            cSubP->throttling,
-                            cSubP->expirationTime,
-                            cSubP->lastNotificationTime,
-                            cSubP->pendingNotifications,
-                            cSubP->reference,
-                            cSubP->entityIdInfos.size(),
-                            cSubP->attributes.size(),
-                            cSubP->notifyConditionVector.size()));
+    // Update lastNotificationTime
+    condition = BSON("_id" << OID(subId) << CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime));
+    update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
 
-    cSubP = cSubP->next;
-    ++items;
+    if (collectionUpdate(collection, condition, update, false, &err) != true)
+    {
+      LM_E(("Internal Error (error updating 'lastNotification' for a subscription)"));
+    }
   }
-
-  LM_T(LmtMongoSubCache, ("%d subs in sub.cache", items));
-
-  //
-  // DEBUG ENDS HERE
-  //
-#endif
-
-  cacheSemGive(__FUNCTION__, "subscription cache for refresh");
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheRefresherThread - 
-*/
-static void* mongoSubCacheRefresherThread(void* vP)
-{
-  extern int subCacheInterval;
-
-  while (1)
-  {
-    sleep(subCacheInterval);
-    mongoSubCacheRefresh();
-  }
-
-  return NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubCacheStart - 
-*/
-void mongoSubCacheStart(void)
-{
-  pthread_t  tid;
-  int        ret;
-
-  // Populate subscription cache from database
-  mongoSubCacheRefresh();
-
-  ret = pthread_create(&tid, NULL, mongoSubCacheRefresherThread, NULL);
-
-  if (ret != 0)
-  {
-    LM_E(("Runtime Error (error creating thread: %d)", ret));
-    return;
-  }
-  pthread_detach(tid);
 }

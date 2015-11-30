@@ -46,6 +46,12 @@ accumulatorStart
 # 13. Dump accumulator - see four notifications
 #
 
+#
+# About "subCacheRefreshs": "REGEX((0|XXX))":
+# 
+# The 0 comes from when broker is started with -noCache, as no refreshes are done
+# 
+
 echo "01. Create entity E10, attribute A1"
 echo "==================================="
 payload='{
@@ -89,7 +95,8 @@ echo
 
 echo "03. Statistics - just for fun"
 echo "============================="
-orionCurl --url /statistics --json
+valgrindSleep 1
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -115,7 +122,7 @@ echo
 
 echo "06. Statistics - to see the sub-update"
 echo "======================================"
-orionCurl --url /statistics --json
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -129,7 +136,7 @@ echo
 
 echo "08. Statistics - see 2 refresh, one notification"
 echo "================================================"
-orionCurl --url /statistics --json
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -168,7 +175,7 @@ echo
 
 echo "12. Statistics - see 2 refresh, four notifications"
 echo "=================================================="
-orionCurl --url /statistics --json
+orionCurl --url /cache/statistics --json
 echo
 echo
 
@@ -179,6 +186,16 @@ accumulatorDump
 echo
 echo
 
+
+#
+# About
+#   "refreshs": REGEX((0|1|2)),
+#
+# If started with -noCache:  0
+# Normal start:              1
+# Under valgrind:            2 (possibly, depending on timing)
+# Under valgrind:            3 (possibly, depending on timing)
+#
 
 --REGEXPECT--
 01. Create entity E10, attribute A1
@@ -214,21 +231,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "3",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "1",
-        "statisticsRequests": "1",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "1",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "ids": "REGEX(.*)",
+    "inserts": 1,
+    "items": 1,
+    "refresh": REGEX((0|1)),
+    "removes": 0,
+    "updates": 0
 }
 
 
@@ -259,22 +267,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "4",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "1",
-        "statisticsRequests": "2",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "2",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "1",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "1",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "ids": "REGEX(.*)",
+    "inserts": REGEX((2|3)),
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
 }
 
 
@@ -290,22 +288,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "4",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "1",
-        "statisticsRequests": "3",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "3",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "2",
-        "subCacheRemoves": "1",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "1",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "ids": "REGEX(.*)",
+    "inserts": REGEX((2|3)),
+    "items": 1,
+    "refresh": REGEX((0|1|2|3)),
+    "removes": 1,
+    "updates": 1
 }
 
 
@@ -344,22 +332,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "10",
-        "measuring_interval_in_secs": "REGEX(\d+)",
-        "notificationsSent": "4",
-        "statisticsRequests": "4",
-        "subCache": "REGEX(.*)",
-        "subCacheInserts": "3",
-        "subCacheItems": "1",
-        "subCacheRefreshs": "2",
-        "subCacheRemoves": "1",
-        "subCacheUpdates": "1",
-        "subscriptionUpdates": "1",
-        "subscriptions": "1",
-        "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
-    }
+    "ids": "REGEX(.*)",
+    "inserts": REGEX((2|3|4)),
+    "items": 1,
+    "refresh": REGEX((0|2|3)),
+    "removes": 1,
+    "updates": 1
 }
 
 

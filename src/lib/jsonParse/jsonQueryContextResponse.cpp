@@ -358,6 +358,7 @@ static std::string errorCodeDetails(const std::string& path, const std::string& 
 
 
 
+
 #define CELEM "/contextResponses/contextResponse/contextElement"
 /* ****************************************************************************
 *
@@ -461,6 +462,6 @@ void jsonQcrsPresent(ParseData* reqDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("QueryContextResponse:"));
+  LM_T(LmtPresent, ("QueryContextResponse:"));
   reqDataP->qcrs.res.present("  ", "jsonQcrsPresent");
 }

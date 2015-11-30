@@ -51,6 +51,14 @@ find_path(GMOCK_INCLUDE_DIR gmock/gmock.h
           PATHS /usr/includes
           PATH_SUFFIXES gmock)
 
+
+#
+# Stack protection is activated only in debug compilation.
+# However, our unit tests don't pass the compilation with "stack protection", so we turn it off using
+# remove_definitions().
+#
+remove_definitions(-fstack-check -fstack-protector)
+
 SET (SOURCES
     main_UnitTest.cpp
     testDataFromFile.cpp
@@ -242,20 +250,21 @@ SET (STATIC_LIBS
     ${GTESTMAIN_LIBRARY}
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
-    mongoBackend
     rest
-    ngsiNotify
     jsonParse
     jsonParseV2
     xmlParse
     apiTypesV2
     convenience
     serviceRoutines
+    ngsiNotify
     rest
     parse
     ngsi9
     ngsi10
     ngsi
+    cache
+    mongoBackend
     orionTypes
     common
     lm

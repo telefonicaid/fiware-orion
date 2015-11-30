@@ -251,7 +251,7 @@ std::string scarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 */
 void scarPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

@@ -41,7 +41,8 @@
 #include "mongoBackend/TriggeredSubscription.h"
 
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
 
 using std::string;
 using std::map;
@@ -60,7 +61,7 @@ using std::auto_ptr;
 */
 static bool processSubscriptions
 (
-  EntityIdVector                        triggerEntitiesV,
+  const EntityIdVector&                 triggerEntitiesV,
   map<string, TriggeredSubscription*>&  subs,
   std::string&                          err,
   const std::string&                    tenant
@@ -225,23 +226,24 @@ static bool addTriggeredSubscriptions
   auto_ptr<DBClientCursor> cursor;
   BSONObj                  query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
 
-  if (!collectionQuery(getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
   {
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    releaseMongoConnection(connection, &cursor);
     return false;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj sub;
-    try
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
     BSONElement idField = getField(sub, "_id");
@@ -272,6 +274,7 @@ static bool addTriggeredSubscriptions
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
+  releaseMongoConnection(connection, &cursor);
 
   return true;
 }

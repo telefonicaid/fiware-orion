@@ -729,6 +729,7 @@ then
   done
 fi
 
+retval=0
 if [ "${failedTests[1]}" != "" ]
 then
   echo
@@ -744,6 +745,7 @@ then
   done
 
   echo "---------------------------------------"
+  retval=1
 fi
 
 
@@ -774,4 +776,4 @@ then
   echo "Great, all valgrind tests ran without any memory leakage"
 fi
 
-exit 0
+exit $retval

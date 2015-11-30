@@ -374,9 +374,9 @@ std::string upcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void upcrsPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   parseDataP->upcrs.res.present("");
 }

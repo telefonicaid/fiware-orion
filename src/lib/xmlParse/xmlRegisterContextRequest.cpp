@@ -380,12 +380,12 @@ std::string rcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void rcrPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   parseDataP->rcr.res.contextRegistrationVector.present("");
   parseDataP->rcr.res.duration.present("");
   parseDataP->rcr.res.registrationId.present("");

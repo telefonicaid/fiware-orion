@@ -29,7 +29,6 @@ brokerStart CB
 accumulatorStart
 
 --SHELL--
-url="/v1/contextSubscriptions"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -53,14 +52,13 @@ payload='<?xml version="1.0"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/contextSubscriptions --payload "$payload"
 
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-
 echo SUB_ID: $SUB_ID > /tmp/SUB_ID
 
+
 echo "1: ++++++++++++++++++++"
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -84,13 +82,10 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 
-# Get notifications count
-mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "2: ++++++++++++++++++++"
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -114,30 +109,22 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 
-# Get notifications count
-mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "3: ++++++++++++++++++++"
-url="/v1/contextSubscriptions/${SUB_ID}"
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
   <subscriptionId>'$SUB_ID'</subscriptionId>
   <throttling>PT6S</throttling>
 </updateContextSubscriptionRequest>'
-orionCurl --url "$url" --payload "$payload" -X "PUT"
+orionCurl --url /v1/contextSubscriptions/${SUB_ID} --payload "$payload" -X "PUT"
 
-# Get notifications count
-mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "4: ++++++++++++++++++++"
-
-#Wait sleep >6s to reset the throttling interval
+# Wait >6s to reset the throttling interval
 sleep 10
-
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -161,13 +148,10 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 
-# Get notifications count
-mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "5: ++++++++++++++++++++"
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -191,13 +175,12 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+
+
 echo "6: ++++++++++++++++++++"
-
-#Wait sleep >6s to reset the throttling interval
+# Wait >6s to reset the throttling interval
 sleep 10
-
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -216,13 +199,10 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
 
-# Get notifications count
-mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "7: ++++++++++++++++++++"
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -241,14 +221,15 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+
 
 echo "8: ++++++++++++++++++++"
 echo SUB_ID: ${SUB_ID} >> /tmp/SUB_ID
 orionCurl --url "/v1/contextSubscriptions/${SUB_ID}" -X "DELETE"
 
+
 echo "9: ++++++++++++++++++++"
-url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -267,11 +248,13 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+
 
 echo "10: ++++++++++++++++++++"
-#Get accumulated data
+# Get accumulated data
 accumulatorDump
+
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -320,7 +303,6 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 1 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 809
@@ -355,7 +337,6 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 2 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 243
@@ -370,7 +351,6 @@ Date: REGEX(.*)
     <throttling>PT6S</throttling>
   </subscribeResponse>
 </updateContextSubscriptionResponse>
-{ "count" : 2 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 805
@@ -405,7 +385,6 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 3 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 805
@@ -469,7 +448,6 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 4 }
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 636

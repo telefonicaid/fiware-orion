@@ -49,7 +49,7 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
-    if (strcmp(notificationMode, "none") != 0)
+    if (!simulatedNotification)
     {
       std::string r;
 
@@ -73,8 +73,8 @@ void* startSenderThread(void* p)
     }
     else
     {
-      LM_T(LmtNotifier, ("notificationMode is 'none', skipping outgoing request"));
-      ++noOfDroppedNotifications;
+      LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
+      __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
     }
 
     /* Delete the parameters after using them */

@@ -35,7 +35,7 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 
 
 
@@ -432,18 +432,9 @@ void mongoPoolConnectionRelease(DBClientBase* connection)
 *
 * mongoPoolConnectionSemWaitingTimeGet - 
 */
-char* mongoPoolConnectionSemWaitingTimeGet(char* buf, int bufLen)
+float mongoPoolConnectionSemWaitingTimeGet(void)
 {
-  if (semStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", semWaitingTime.tv_sec, (int) semWaitingTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
-
-  return buf;
+  return semWaitingTime.tv_sec + ((float) semWaitingTime.tv_nsec) / 1E9;
 }
 
 

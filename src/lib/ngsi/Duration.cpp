@@ -148,11 +148,11 @@ void Duration::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sDuration: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sDuration: %s\n", indent.c_str(), string.c_str()));
   }
   else
   {
-    LM_F(("%sNo Duration\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo Duration\n", indent.c_str()));
   }
 }
 

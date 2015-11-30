@@ -34,7 +34,10 @@
 #include "parse/forbiddenChars.h"
 #include "ngsi/Metadata.h"
 
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/safeMongo.h"
 
+using namespace mongo;
 
 /* ****************************************************************************
 *
@@ -123,6 +126,37 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
   boolValue  = _value;
 }
 
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const BSONObj& mdB)
+{
+  name = getStringField(mdB, ENT_ATTRS_MD_NAME);
+  type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE) : "";
+  switch (getField(mdB, ENT_ATTRS_MD_VALUE).type())
+  {
+  case String:
+    valueType   = orion::ValueTypeString;
+    stringValue = getStringField(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
+  case NumberDouble:
+    valueType   = orion::ValueTypeNumber;
+    numberValue = getField(mdB, ENT_ATTRS_MD_VALUE).Number();
+    break;
+
+  case Bool:
+    valueType = orion::ValueTypeBoolean;
+    boolValue = getBoolField(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
+  default:
+    valueType = orion::ValueTypeUnknown;
+    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
+    break;
+  }
+}
 
 
 /* ****************************************************************************
@@ -191,10 +225,19 @@ std::string Metadata::check
 */
 void Metadata::present(const std::string& metadataType, int ix, const std::string& indent)
 {
-  LM_F(("%s%s Metadata %d:",   indent.c_str(), metadataType.c_str(), ix));
-  LM_F(("%s  Name:     %s", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:     %s", indent.c_str(), type.c_str()));
-  LM_F(("%s  Value:    %s", indent.c_str(), stringValue.c_str()));
+  LM_T(LmtPresent, ("%s%s Metadata %d:",   
+		    indent.c_str(), 
+		    metadataType.c_str(), 
+		    ix));
+  LM_T(LmtPresent, ("%s  Name:     %s", 
+		    indent.c_str(), 
+		    name.c_str()));
+  LM_T(LmtPresent, ("%s  Type:     %s", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%s  Value:    %s", 
+		    indent.c_str(), 
+		    stringValue.c_str()));
 }
 
 
@@ -224,7 +267,7 @@ void Metadata::fill(const struct Metadata& md)
 *
 * toStringValue -
 */
-std::string Metadata::toStringValue(void)
+std::string Metadata::toStringValue(void) const
 {
   char buffer[64];
 
@@ -247,6 +290,9 @@ std::string Metadata::toStringValue(void)
     return "<unknown type>";
     break;
   }
+
+  // Added to avoid warning when compiling with -fstack-check -fstack-protector
+  return "";
 }
 
 

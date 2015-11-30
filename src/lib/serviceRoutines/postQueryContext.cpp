@@ -27,6 +27,9 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -94,8 +97,6 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   std::string     protocol;
   int             port;
   std::string     prefix;
-  std::string     answer;
-
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -114,8 +115,10 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   //
   // 2. Render the string of the request we want to forward
   //
-  std::string  payload = qcrP->render(QueryContext, format, "");
-  char*        cleanPayload = (char*) payload.c_str();;
+  std::string  payload;
+  TIMED_RENDER(payload = qcrP->render(QueryContext, format, ""));
+
+  char* cleanPayload = (char*) payload.c_str();;
 
   if (format == XML)
   {
@@ -326,7 +329,8 @@ std::string postQueryContext
   // 01. Call mongoBackend/mongoQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
-  ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP);
+
+  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP));
 
 
   //
@@ -355,7 +359,8 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    answer = qcrsP->render(ciP, QueryContext, "");
+    TIMED_RENDER(answer = qcrsP->render(ciP, QueryContext, ""));
+
     qcrP->release();
     return answer;
   }
@@ -526,7 +531,8 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  answer = responseV.render(ciP, "", details, qcrsP->errorCode.details);
+  TIMED_RENDER(answer = responseV.render(ciP, "", details, qcrsP->errorCode.details));
+
 
   //
   // Time to cleanup.

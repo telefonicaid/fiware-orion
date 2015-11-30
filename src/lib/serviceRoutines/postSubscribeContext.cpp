@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
@@ -74,12 +77,13 @@ std::string postSubscribeContext
   {
     LM_W(("Bad Input (max *one* service-path allowed for subscriptions (%d given))", ciP->servicePathV.size()));
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
-    answer = scr.render(SubscribeContext, ciP->outFormat, "");
+
+    TIMED_RENDER(answer = scr.render(SubscribeContext, ciP->outFormat, ""));
     return answer;
   }
 
-  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV);
-  answer = scr.render(SubscribeContext, ciP->outFormat, "");
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
+  TIMED_RENDER(answer = scr.render(SubscribeContext, ciP->outFormat, ""));
 
   parseDataP->scr.res.release();
 
