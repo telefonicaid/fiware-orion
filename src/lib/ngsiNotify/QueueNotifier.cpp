@@ -29,22 +29,32 @@
 #include "ngsiNotify/QueueNotifier.h"
 
 
+
 /* ****************************************************************************
 *
-* Notifier::sendNotifyContextRequest -
+* QueueNotifier::Notifier -
+*/
+QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize), workers(&queue, numThreads)
+{
+  LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
+}
+
+/* ****************************************************************************
+*
+* QueueNotifier::start -
+*/
+int QueueNotifier::start()
+{
+  return workers.start();
+}
+
+/* ****************************************************************************
+*
+* QueueNotifier::sendNotifyContextRequest -
 */
 void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format)
 {
   ConnectionInfo ci;
-
-
-  if (pQueue == NULL)
-  {
-   QueueStatistics::incReject();
-   LM_E(("Runtime Error (notification queue is NULL)"));
-   return;
-  }
-
 
   //
   // FIXME P5: analyze how much of the code of this function is the same than in Notifier::sendNotifyContextRequest
@@ -113,7 +123,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
   clock_gettime(CLOCK_REALTIME, &params->timeStamp);
-  bool enqueued = pQueue->try_push(params);
+  bool enqueued = queue.try_push(params);
   if (!enqueued)
   {
    QueueStatistics::incReject();
