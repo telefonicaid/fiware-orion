@@ -140,14 +140,10 @@ void EntityInfo::release(void)
 */
 void EntityInfo::present(const std::string& prefix)
 {
-<<<<<<< HEAD
+  
   LM_T(LmtPresent, ("%sid:    regex describing EntityId::id (the original string is not saved)", prefix.c_str()));
   LM_T(LmtPresent, ("%stype:  %s", prefix.c_str(), entityType.c_str()));
-=======
-  LM_F(("%sid:        %s", prefix.c_str(), entityId.c_str()));
-  LM_F(("%sisPattern: %s", prefix.c_str(), FT(isPattern)));
-  LM_F(("%stype:      %s", prefix.c_str(), entityType.c_str()));
->>>>>>> develop
+
 }
 
 
