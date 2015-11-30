@@ -226,12 +226,17 @@ void releaseMongoConnection(DBClientBase* connection, std::auto_ptr<DBClientCurs
 #ifdef UNIT_TEST
   return;
 #else
+#if MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
+  // it seems that the kill() method was added in a MongoDB C++ driver version newer than the one
+  // we officially use (legacy-1.0.2). Thus, I'm leaving this block of code to be prepared to the
+  // time we have this. See issue: https://github.com/telefonicaid/fiware-orion/issues/1568
   if (cursor != NULL)
   {
     cursor->kill();
   }
+#endif // MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
   return mongoPoolConnectionRelease(connection);
-#endif
+#endif // UNIT_TEST
 }
 
 
