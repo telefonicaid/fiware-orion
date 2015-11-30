@@ -21,5 +21,4 @@
 - Deprecated: ONTIMEINTERVAL subscriptions
 - Fix: no longer adding subscriptions from all tenants in the cache if broker isn't multitenant (Issue #1555)
 - Fix: resetting temporal counters at synching the subscription cache (Issue #1562)
-- Fix: when too many subscriptions, 'subCache' in cache statistics now gets the test "too many subscriptions".
-       Before, 'subCache' was left out.
+- Fix: using the text "too many sbuscriptions" at cache statistics operations in the case of too many results
