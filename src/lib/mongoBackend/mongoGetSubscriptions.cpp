@@ -34,7 +34,7 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -129,7 +129,7 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
   //
   // Check values from subscription cache, update object from cache-values if necessary
   //
-  CachedSubscription* cSubP = mongoSubCacheItemLookup(tenant.c_str(), s->id.c_str());
+  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), s->id.c_str());
   if (cSubP)
   {
     if (cSubP->lastNotificationTime > s->notification.lastNotification)

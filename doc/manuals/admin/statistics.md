@@ -188,7 +188,7 @@ with the current number of cached items.
 
 ```
 {
-  "ids": "897123ab123, 231bbdc21221, 12321878909da",
+  "ids": "SubscriptionId1, SubscriptionId2, ... SubscriptionIdN",
   "refreshs" : 1,
   "inserts" : 1433,
   "removes" : 6,
@@ -196,6 +196,11 @@ with the current number of cached items.
   "items" : 1427  
 }
 ```
+
+Note that the "ids" field could get really really long. To avoid a too long response, the broker sets a limit of the size of the 'ids' field.
+If the length would be longer than that limit, instead of presenting the complete list of subscription-identifiers, the text
+   "too many subscriptions"
+is presented instead.
 
 ## Reseting statistics
 

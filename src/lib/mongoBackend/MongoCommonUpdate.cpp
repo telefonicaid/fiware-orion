@@ -48,7 +48,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/TriggeredSubscription.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
@@ -159,7 +159,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 * bsonAppendAttrValue -
 *
 */
-void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
+void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const ContextAttribute* caP)
 {
   switch(caP->valueType)
   {
@@ -185,7 +185,7 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
 *
 * valueBson -
 */
-static void valueBson(ContextAttribute* caP, BSONObjBuilder& bsonAttr)
+static void valueBson(const ContextAttribute* caP, BSONObjBuilder& bsonAttr)
 {
   if (caP->compoundValueP == NULL)
   {
@@ -459,7 +459,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 *
 * appendMetadata -
 */
-void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
+void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
 {
   if (mdP->type != "")
   {
@@ -671,13 +671,13 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 * If there is no custom metadata, then it returns false (true otherwise).
 *
 */
-static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute* ca)
+static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttribute* ca)
 {
   BSONArrayBuilder  mdToAdd;
 
   for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
   {
-    Metadata* md = ca->metadataVector.get(ix);
+    const Metadata* md = ca->metadataVector.get(ix);
 
     if (!isNotCustomMetadata(md->name))
     {
@@ -913,7 +913,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP)
 * name
 *
 */
-static bool legalIdUsage(ContextAttributeVector caV)
+static bool legalIdUsage(const ContextAttributeVector& caV)
 {
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
@@ -926,7 +926,7 @@ static bool legalIdUsage(ContextAttributeVector caV)
       /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
       for (unsigned int jx = 0; jx < caV.size(); ++jx)
       {
-        ContextAttribute* ca = caV.get(jx);
+        const ContextAttribute* ca = caV.get(jx);
 
         if (attrName == ca->name && attrType == ca->type && ca->getId() != "")
         {
@@ -955,22 +955,22 @@ static bool legalIdUsage(ContextAttributeVector caV)
 */
 static bool processLocation
 (
-  ContextAttributeVector  caV,
-  std::string&            locAttr,
-  double&                 coordLat,
-  double&                 coordLong,
-  std::string*            errDetail
+  const ContextAttributeVector&  caV,
+  std::string&                   locAttr,
+  double&                        coordLat,
+  double&                        coordLong,
+  std::string*                   errDetail
 )
 {
   locAttr = "";
 
   for (unsigned ix = 0; ix < caV.size(); ++ix)
   {
-    ContextAttribute* caP = caV.get(ix);
+    const ContextAttribute* caP = caV.get(ix);
 
     for (unsigned jx = 0; jx < caP->metadataVector.size(); ++jx)
     {
-      Metadata* mdP = caP->metadataVector.get(jx);
+      const Metadata* mdP = caP->metadataVector.get(jx);
 
       if (mdP->name == NGSI_MD_LOCATION)
       {
@@ -1139,9 +1139,9 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  mongoSubCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
+  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
 
-  LM_T(LmtMongoSubCache, ("%d subscriptions in cache match the update", subVec.size()));
+  LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
@@ -1151,7 +1151,7 @@ static bool addTriggeredSubscriptions_withCache
     // Outdated subscriptions are skipped
     if (cSubP->expirationTime < now)
     {
-      LM_T(LmtMongoSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
+      LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
       continue;
     }
 
@@ -1164,35 +1164,35 @@ static bool addTriggeredSubscriptions_withCache
     {
       if ((now - cSubP->lastNotificationTime) < cSubP->throttling)
       {
-        LM_T(LmtMongoSubCache, ("subscription '%s' ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                                cSubP->subscriptionId,
-                                cSubP->throttling,
-                                cSubP->lastNotificationTime,
-                                now,
-                                now - cSubP->lastNotificationTime,
-                                cSubP->throttling));
+        LM_T(LmtSubCache, ("subscription '%s' ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           cSubP->subscriptionId,
+                           cSubP->throttling,
+                           cSubP->lastNotificationTime,
+                           now,
+                           now - cSubP->lastNotificationTime,
+                           cSubP->throttling));
         continue;
       }
       else
       {
-        LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                                cSubP->subscriptionId,
-                                cSubP->throttling,
-                                cSubP->lastNotificationTime,
-                                now,
-                                now - cSubP->lastNotificationTime,
-                                cSubP->throttling));
+        LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                           cSubP->subscriptionId,
+                           cSubP->throttling,
+                           cSubP->lastNotificationTime,
+                           now,
+                           now - cSubP->lastNotificationTime,
+                           cSubP->throttling));
       }
     }
     else
     {
-      LM_T(LmtMongoSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
-                              cSubP->subscriptionId,
-                              cSubP->throttling,
-                              cSubP->lastNotificationTime,
-                              now,
-                              now - cSubP->lastNotificationTime,
-                              cSubP->throttling));
+      LM_T(LmtSubCache, ("subscription '%s' NOT ignored due to throttling II (T: %lu, LNT: %lu, NOW: %lu, NOW-LNT: %lu, T: %lu)",
+                         cSubP->subscriptionId,
+                         cSubP->throttling,
+                         cSubP->lastNotificationTime,
+                         now,
+                         now - cSubP->lastNotificationTime,
+                         cSubP->throttling));
     }
 
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
@@ -1510,7 +1510,7 @@ static bool processSubscriptions
       if (trigs->throttling > sinceLastNotification)
       {
         LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
-        LM_T(LmtMongoSubCache, ("ignored '%s' due to throttling, current time is: %l", trigs->cacheSubId.c_str(), current));
+        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", trigs->cacheSubId.c_str(), current));
         trigs->attrL.release();
         delete trigs;
 
@@ -1519,7 +1519,7 @@ static bool processSubscriptions
     }
 
     /* Send notification */
-    LM_T(LmtMongoSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
+    LM_T(LmtSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));
     if (processOnChangeConditionForUpdateContext(notifyCerP,
                                                  trigs->attrL,
                                                  mapSubId,
@@ -1533,7 +1533,7 @@ static bool processSubscriptions
       //
       // If broker running without subscription cache, put lastNotificationTime and count in DB 
       //
-      if (mongoSubCacheActive == false)
+      if (subCacheActive == false)
       {
         BSONObj query  = BSON("_id" << OID(mapSubId));
         BSONObj update = BSON("$set" <<
@@ -1551,14 +1551,14 @@ static bool processSubscriptions
       {
         cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
 
-        CachedSubscription*  cSubP = mongoSubCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
+        CachedSubscription*  cSubP = subCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
 
         if (cSubP != NULL)
         {
           cSubP->lastNotificationTime = rightNow;
           cSubP->count               += 1;
 
-          LM_T(LmtMongoSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
+          LM_T(LmtSubCache, ("set lastNotificationTime to %lu and count to %lu for '%s'", cSubP->lastNotificationTime, cSubP->count, cSubP->subscriptionId));
         }
         else
         {
@@ -2202,7 +2202,7 @@ static bool processContextAttributeVector
 static bool createEntity
 (
   EntityId*                        eP,
-  ContextAttributeVector           attrsV,
+  const ContextAttributeVector&    attrsV,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV

@@ -78,6 +78,18 @@ static Notifier*            notifier;
 static bool                 multitenant;
 
 
+
+/* ****************************************************************************
+*
+* mongoMultitenant - 
+*/
+bool mongoMultitenant(void)
+{
+  return multitenant;
+}
+
+
+
 /* ****************************************************************************
 *
 * shutdownClient -

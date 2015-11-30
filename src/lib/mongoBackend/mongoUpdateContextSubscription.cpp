@@ -34,6 +34,7 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
@@ -190,7 +191,7 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   // Update from cached value, if applicable
   //
-  CachedSubscription*  cSubP                = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  CachedSubscription*  cSubP                = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
   long long            lastNotificationTime = 0;
 
   if (cSubP != NULL)
@@ -215,7 +216,7 @@ HttpStatusCode mongoUpdateContextSubscription
 
     newSub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
     newSub.append(CSUB_COUNT, count + 1);
-    LM_T(LmtMongoSubCache, ("notificationDone => lastNotification set to %lu", lastNotificationTime));
+    LM_T(LmtSubCache, ("notificationDone => lastNotification set to %lu", lastNotificationTime));
   }
   else
   {
@@ -298,9 +299,9 @@ HttpStatusCode mongoUpdateContextSubscription
   //   3. Old subwas in cache, new sub DOES NOT enter cache
   //   4. Old sub was NOT in cache, new sub DOES NOT enter cache
   //
-  // This is resolved by two separate functions, one that removes the old one, if found (mongoSubCacheItemLookup+mongoSubCacheItemRemove), 
-  // and the other one that inserts the sub, IF it should be inserted (mongoSubCacheItemInsert).
-  // If inserted, mongoSubCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
+  // This is resolved by two separate functions, one that removes the old one, if found (subCacheItemLookup+subCacheItemRemove), 
+  // and the other one that inserts the sub, IF it should be inserted (subCacheItemInsert).
+  // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
   //
 
 
@@ -308,24 +309,24 @@ HttpStatusCode mongoUpdateContextSubscription
 
   cacheSemTake(__FUNCTION__, "Updating cached subscription");
 
-  cSubP = mongoSubCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
 
   char* subscriptionId   = (char*) requestP->subscriptionId.get().c_str();
   char* servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
-  LM_T(LmtMongoSubCache, ("update: %s", newSubObject.toString().c_str()));
+  LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
 
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(), newSubObject, subscriptionId, servicePath, lastNotificationTime, expiration);
 
   if (cSubP != NULL)
   {
-    LM_T(LmtMongoSubCache, ("Calling mongoSubCacheItemRemove"));
-    mongoSubCacheItemRemove(cSubP);
+    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+    subCacheItemRemove(cSubP);
   }
 
   if (mscInsert == 0)  // 0: Insertion was really made
   {
-    mongoSubCacheUpdateStatisticsIncrement();
+    subCacheUpdateStatisticsIncrement();
   }
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");

@@ -275,7 +275,7 @@ ContextAttribute::ContextAttribute
 *
 * ContextAttribute::getId() -
 */
-std::string ContextAttribute::getId(void)
+std::string ContextAttribute::getId(void) const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
@@ -294,7 +294,7 @@ std::string ContextAttribute::getId(void)
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation()
+std::string ContextAttribute::getLocation() const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
@@ -743,7 +743,7 @@ std::string ContextAttribute::toString(void)
 *
 * toStringValue -
 */
-std::string ContextAttribute::toStringValue(void)
+std::string ContextAttribute::toStringValue(void) const
 {
   char buffer[64];
 

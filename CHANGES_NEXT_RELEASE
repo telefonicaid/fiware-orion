@@ -20,3 +20,6 @@
 - Fix: updates including several attributes with the same name are now reported as InvalidModification (Issue #908)
 - Deprecated: ONTIMEINTERVAL subscriptions
 - Fix: avoid indirect usage of DB connections concurrently due to cursors (Issue #1558)
+- Fix: no longer adding subscriptions from all tenants in the cache if broker isn't multitenant (Issue #1555)
+- Fix: resetting temporal counters at synching the subscription cache (Issue #1562)
+- Fix: using the text "too many sbuscriptions" at cache statistics operations in the case of too many results

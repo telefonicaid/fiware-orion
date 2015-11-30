@@ -76,8 +76,8 @@ typedef struct ContextAttribute
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
-  std::string  getId();
-  std::string  getLocation();
+  std::string  getId() const;
+  std::string  getLocation() const;
 
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
@@ -88,7 +88,7 @@ typedef struct ContextAttribute
   std::string  toString(void);
 
   /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
-  std::string  toStringValue(void);
+  std::string  toStringValue(void) const;
 
   std::string  check(RequestType         requestType,
                      Format              format,

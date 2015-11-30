@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+  <entityIdList>
+  <entityId type="Room" isPattern="false">
+    <id>.*Room</id>   
+  </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+    <attribute>lightstatus</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:1028</reference>
+  <duration>P5Y</duration>
+  <restriction>
+    <attributeExpression>testRestriction</attributeExpression>
+    <scope>
+      <operationScope>
+        <scopeType>scope1</scopeType>
+        <scopeValue>sval1</scopeValue>
+      </operationScope>
+      <operationScope>
+        <scopeType>scope2</scopeType>
+        <scopeValue>sval2</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+        <condValue>lightstatus</condValue>
+      </condValueList>
+      <restriction>restriction</restriction>
+    </notifyCondition>
+  </notifyConditions>
+  <throttling>PT1S</throttling>
+</subscribeContextRequest>
