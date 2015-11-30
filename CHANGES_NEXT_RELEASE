@@ -23,3 +23,4 @@
 - Fix: no longer adding subscriptions from all tenants in the cache if broker isn't multitenant (Issue #1555)
 - Fix: resetting temporal counters at synching the subscription cache (Issue #1562)
 - Fix: using the text "too many sbuscriptions" at cache statistics operations in the case of too many results
+- Fix: crash due to subscription ID not conforming to supposed syntax in request "GET /v2/subscriptions/XXX" (Issue #1552)

@@ -22,21 +22,22 @@
 *
 * Author: Orion dev team
 */
+#include <string>
 
-#include "common/sem.h"
-#include "common/statistics.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/sem.h"
+#include "common/statistics.h"
+#include "common/idCheck.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/dbConstants.h"
 #include "cache/subCache.h"
-
-#include "mongo/client/dbclient.h"
 
 using namespace ngsiv2;
 
@@ -254,6 +255,7 @@ void mongoListSubscriptions
 }
 
 
+
 /* ****************************************************************************
 *
 * mongoGetSubscription -
@@ -267,15 +269,23 @@ void mongoGetSubscription
   const std::string&                  tenant
 )
 {
-  bool  reqSemTaken = false;
+  bool         reqSemTaken = false;
+  std::string  err;
+  OID          oid;
+  StatusCode   sc;
+
+  if (safeGetSubId(idSub, &oid, &sc) == false)
+  {
+    *oe = OrionError(sc);
+    return;
+  }
 
   reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Get Subscription"));
 
   std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
-  BSONObj                        q     = BSON("_id" << OID(idSub));
+  BSONObj                        q     = BSON("_id" << oid);
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
