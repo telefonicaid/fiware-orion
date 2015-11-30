@@ -158,7 +158,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 * bsonAppendAttrValue -
 *
 */
-void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
+void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const ContextAttribute* caP)
 {
   switch(caP->valueType)
   {
@@ -184,7 +184,7 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
 *
 * valueBson -
 */
-static void valueBson(ContextAttribute* caP, BSONObjBuilder& bsonAttr)
+static void valueBson(const ContextAttribute* caP, BSONObjBuilder& bsonAttr)
 {
   if (caP->compoundValueP == NULL)
   {
@@ -458,7 +458,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 *
 * appendMetadata -
 */
-void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
+void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
 {
   if (mdP->type != "")
   {
@@ -670,13 +670,13 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 * If there is no custom metadata, then it returns false (true otherwise).
 *
 */
-static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute* ca)
+static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttribute* ca)
 {
   BSONArrayBuilder  mdToAdd;
 
   for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
   {
-    Metadata* md = ca->metadataVector.get(ix);
+    const Metadata* md = ca->metadataVector.get(ix);
 
     if (!isNotCustomMetadata(md->name))
     {
@@ -912,7 +912,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP)
 * name
 *
 */
-static bool legalIdUsage(ContextAttributeVector caV)
+static bool legalIdUsage(const ContextAttributeVector& caV)
 {
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
@@ -925,7 +925,7 @@ static bool legalIdUsage(ContextAttributeVector caV)
       /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
       for (unsigned int jx = 0; jx < caV.size(); ++jx)
       {
-        ContextAttribute* ca = caV.get(jx);
+        const ContextAttribute* ca = caV.get(jx);
 
         if (attrName == ca->name && attrType == ca->type && ca->getId() != "")
         {
@@ -954,22 +954,22 @@ static bool legalIdUsage(ContextAttributeVector caV)
 */
 static bool processLocation
 (
-  ContextAttributeVector  caV,
-  std::string&            locAttr,
-  double&                 coordLat,
-  double&                 coordLong,
-  std::string*            errDetail
+  const ContextAttributeVector&  caV,
+  std::string&                   locAttr,
+  double&                        coordLat,
+  double&                        coordLong,
+  std::string*                   errDetail
 )
 {
   locAttr = "";
 
   for (unsigned ix = 0; ix < caV.size(); ++ix)
   {
-    ContextAttribute* caP = caV.get(ix);
+    const ContextAttribute* caP = caV.get(ix);
 
     for (unsigned jx = 0; jx < caP->metadataVector.size(); ++jx)
     {
-      Metadata* mdP = caP->metadataVector.get(jx);
+      const Metadata* mdP = caP->metadataVector.get(jx);
 
       if (mdP->name == NGSI_MD_LOCATION)
       {
@@ -2196,7 +2196,7 @@ static bool processContextAttributeVector
 static bool createEntity
 (
   EntityId*                        eP,
-  ContextAttributeVector           attrsV,
+  const ContextAttributeVector&    attrsV,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV
