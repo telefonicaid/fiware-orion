@@ -400,7 +400,7 @@ void mongoSubCacheRefresh(const std::string& database)
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
     LM_E(("Database Error (%s)", errorString.c_str()));
-    releaseMongoConnection(connection);
+    releaseMongoConnection(connection, &cursor);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
@@ -425,7 +425,7 @@ void mongoSubCacheRefresh(const std::string& database)
       ++subNo;
     }
   }
-  releaseMongoConnection(connection);
+  releaseMongoConnection(connection, &cursor);
 
   LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
 }

@@ -64,7 +64,7 @@ static std::string attributeType
   DBClientBase* connection = getMongoConnection();
   if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    releaseMongoConnection(connection);
+    releaseMongoConnection(connection, &cursor);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return "";
   }
@@ -89,7 +89,7 @@ static std::string attributeType
     ret = getStringField(attr, ENT_ATTRS_TYPE);
     break;
   }
-  releaseMongoConnection(connection);
+  releaseMongoConnection(connection, &cursor);
 
   return ret;
 }

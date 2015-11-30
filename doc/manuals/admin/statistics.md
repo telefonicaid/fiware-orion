@@ -110,7 +110,7 @@ Provides timing information, i.e. the time that CB passes executing in different
       "render": 108.162782114,
       "total": 186476.593504743,
       "xmlParse": 44.490766332
-        },
+     },
     "last": {
       "mongoBackend": 0.014752309,
       "mongoReadWait": 0.012018445,
@@ -118,7 +118,7 @@ Provides timing information, i.e. the time that CB passes executing in different
       "render": 0.000019136,
       "total": 0.015148915,
       "xmlParse": 0.000153878
-      }
+     }
   }
   ...
 }
@@ -141,7 +141,9 @@ The particular counters are as follows:
 * `render`: time passed in rendering module (pseudo self-time)
 * `mongo*Wait`: time passed waiting for MongoDB for `Read`, `Write` or `Cmd` operations. Note that if
   a given request involves several read/write/cmd calls to MongoDB, the time shown in `mongo*Wait` under
-  `last` includes the accumulation for all of them.
+  `last` includes the accumulation for all of them. In the case of mongoReadWait, only the time used
+  to get the results cursor is taken into account, but not the time to process cursors results (which
+  is time that belongs to mongoBackend counters).
 
 Times are measured from the point in time a particular thread request starts using a module uptil it finishes using it. Thus, if the
 thread is stopped for some reason (e.g. the kernel decides to give priority to another thread based on its

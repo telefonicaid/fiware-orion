@@ -1315,7 +1315,7 @@ static bool addTriggeredSubscriptions_noCache
   {
     LM_E(("Database Error (%s)", errorString.c_str()));
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    releaseMongoConnection(connection);
+    releaseMongoConnection(connection, &cursor);
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1365,7 +1365,7 @@ static bool addTriggeredSubscriptions_noCache
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
-  releaseMongoConnection(connection);
+  releaseMongoConnection(connection, &cursor);
 
   return true;
 }
@@ -2478,19 +2478,19 @@ static void updateEntity
 )
 {
   // Used to accumulate error response information
-  *attributeAlreadyExistsError = false;
-  *attributeAlreadyExistsList  = "[ ";
+  *attributeAlreadyExistsError         = false;
+  *attributeAlreadyExistsList          = "[ ";
 
   EntityId*          enP               = &ceP->entityId;
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONElement idField = getField(r, "_id");
+  BSONElement        idField           = getField(r, "_id");
 
-  std::string entityId    = getStringField(idField.embeddedObject(), ENT_ENTITY_ID);
-  std::string entityType  = getStringField(idField.embeddedObject(), ENT_ENTITY_TYPE);
-  std::string entitySPath = getStringField(idField.embeddedObject(), ENT_SERVICE_PATH);
+  std::string        entityId          = getStringField(idField.embeddedObject(), ENT_ENTITY_ID);
+  std::string        entityType        = getStringField(idField.embeddedObject(), ENT_ENTITY_TYPE);
+  std::string        entitySPath       = getStringField(idField.embeddedObject(), ENT_SERVICE_PATH);
 
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
@@ -2922,7 +2922,7 @@ void processContextElement
   DBClientBase* connection = getMongoConnection();
   if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    releaseMongoConnection(connection);
+    releaseMongoConnection(connection, &cursor);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
     return;
@@ -2963,7 +2963,7 @@ void processContextElement
     }
     results.push_back(r);
   }
-  releaseMongoConnection(connection);
+  releaseMongoConnection(connection, &cursor);
 
   LM_T(LmtServicePath, ("Docs found: %d", results.size()));
 

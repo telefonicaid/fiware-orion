@@ -123,7 +123,7 @@ extern DBClientBase* getMongoConnection(void);
 *
 * releaseMongoConnection - 
 */
-extern void releaseMongoConnection(DBClientBase* connection);
+extern void releaseMongoConnection(DBClientBase* connection, std::auto_ptr<DBClientCursor>*  cursor = NULL);
 
 /*****************************************************************************
 *
