@@ -66,7 +66,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
@@ -1240,10 +1240,10 @@ void exitFunc(void)
 
 #ifdef DEBUG
   // Take mongo req-sem ?  
-  LM_T(LmtMongoSubCache, ("try-taking req semaphore"));
+  LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();
-  LM_T(LmtMongoSubCache, ("calling mongoSubCacheDestroy"));
-  mongoSubCacheDestroy();
+  LM_T(LmtSubCache, ("calling subCacheDestroy"));
+  subCacheDestroy();
 #endif
 
   curl_context_cleanup();
@@ -1705,22 +1705,22 @@ int main(int argC, char* argV[])
 
   if (noCache == false)
   {
-    mongoSubCacheInit();
+    subCacheInit();
 
     if (subCacheInterval == 0)
     {
       // Populate subscription cache from database
-      mongoSubCacheRefresh();
+      subCacheRefresh();
     }
     else
     {
       // Populate subscription cache AND start sub-cache-refresh-thread
-      mongoSubCacheStart();
+      subCacheStart();
     }
   }
   else
   {
-    LM_T(LmtMongoSubCache, ("noCache == false"));
+    LM_T(LmtSubCache, ("noCache == false"));
   }
 
   if (https)
