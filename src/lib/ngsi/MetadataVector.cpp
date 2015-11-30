@@ -188,7 +188,11 @@ std::string MetadataVector::check
 */
 void MetadataVector::present(const std::string& metadataType, const std::string& indent)
 {
-  LM_F(("%s%lu %s Metadata%s", indent.c_str(), (uint64_t) vec.size(), metadataType.c_str(), (vec.size() == 1)? "" : "s"));
+  LM_T(LmtPresent, ("%s%lu %s Metadata%s", 
+		    indent.c_str(), 
+		    (uint64_t) vec.size(), 
+		    metadataType.c_str(), 
+		    (vec.size() == 1)? "" : "s"));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

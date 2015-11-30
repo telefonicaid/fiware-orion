@@ -247,10 +247,10 @@ std::string ucasCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void ucasPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqData->ucas.res.present("");
 }
 

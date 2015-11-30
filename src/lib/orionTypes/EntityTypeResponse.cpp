@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 #include "common/Format.h"
 #include "common/globals.h"
@@ -93,7 +94,7 @@ std::string EntityTypeResponse::check
 */
 void EntityTypeResponse::present(const std::string& indent)
 {
-  LM_F(("%EntityTypeResponse:\n", indent.c_str()));
+  LM_T(LmtPresent,("%EntityTypeResponse:\n", indent.c_str()));
   entityType.present(indent + "  ");
   statusCode.present(indent + "  ");
 }

@@ -27,6 +27,8 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -143,14 +145,19 @@ void NotifyCondition::present(const std::string& indent, int ix)
 
   if (ix == -1)
   {
-    LM_F(("%sNotify Condition:", indent2.c_str()));
+    LM_T(LmtPresent, ("%sNotify Condition:", 
+		      indent2.c_str()));
   }
   else
   {
-    LM_F(("%sNotify Condition %d:", indent2.c_str(), ix));
+    LM_T(LmtPresent, ("%sNotify Condition %d:", 
+		      indent2.c_str(), 
+		      ix));
   }
 
-  LM_F(("%stype: %s", indent2.c_str(), type.c_str()));
+  LM_T(LmtPresent, ("%stype: %s", 
+		    indent2.c_str(), 
+		    type.c_str()));
   condValueList.present(indent2);
   restriction.present(indent2);
 }

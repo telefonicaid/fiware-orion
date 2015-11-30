@@ -30,6 +30,7 @@
 #include <time.h>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -559,13 +560,17 @@ int SubscriptionCache::refresh(void)
 */
 void SubscriptionCache::present(const std::string& prefix)
 {
-  LM_F(("%sSubscription Cache with %d subscriptions", prefix.c_str(), subs.size()));
+  LM_T(LmtPresent, ("%sSubscription Cache with %d subscriptions", 
+		   prefix.c_str(), 
+		   subs.size()));
 
   for (unsigned int ix = 0; ix < subs.size(); ++ix)
   {
-    LM_F(("%s  Subscription %d:", prefix.c_str(), ix));
+    LM_T(LmtPresent, ("%s  Subscription %d:", 
+		      prefix.c_str(), 
+		      ix));
     subs[ix]->present(prefix + "    ");
-    LM_F(("%s  ------------------------------------------------", prefix.c_str()));
+    LM_T(LmtPresent, ("%s  ------------------------------------------------", prefix.c_str()));
   }
 }
 

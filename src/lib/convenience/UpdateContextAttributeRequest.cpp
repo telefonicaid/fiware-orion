@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/Format.h"
@@ -147,8 +148,12 @@ std::string UpdateContextAttributeRequest::check
 */
 void UpdateContextAttributeRequest::present(std::string indent)
 {
-  LM_F(("%stype:         %s", indent.c_str(), type.c_str()));
-  LM_F(("%scontextValue: %s", indent.c_str(), contextValue.c_str()));
+  LM_T(LmtPresent, ("%stype:         %s", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%scontextValue: %s", 
+		    indent.c_str(), 
+		    contextValue.c_str()));
   metadataVector.present("ContextMetadata", indent);
 }
 

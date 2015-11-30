@@ -309,40 +309,66 @@ void Scope::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    LM_F(("%sScope:",       indent.c_str()));
+    LM_T(LmtPresent, ("%sScope:",       indent.c_str()));
   }
   else
   {
-    LM_F(("%sScope %d:",    indent.c_str(), ix));
+    LM_T(LmtPresent, ("%sScope %d:",    
+		      indent.c_str(),
+		      ix));
   }
 
-  LM_F(("%s  Type:     '%s'", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent, ("%s  Type:     '%s'", 
+		    indent.c_str(), 
+		    type.c_str()));
   
   if (oper != "")
-    LM_F(("%s  Operator: '%s'", indent.c_str(), oper.c_str()));
+    LM_T(LmtPresent, ("%s  Operator: '%s'", 
+		      indent.c_str(), 
+		      oper.c_str()));
 
   if (areaType == orion::NoArea)
   {
-    LM_F(("%s  Value:    %s", indent.c_str(), value.c_str()));
+    LM_T(LmtPresent, ("%s  Value:    %s", 
+		      indent.c_str(), 
+		      value.c_str()));
   }
   else if (areaType == orion::CircleType)
   {
-    LM_F(("%s  FI-WARE Circle Area:", indent.c_str()));
-    LM_F(("%s    Radius:     %s", indent.c_str(), circle.radiusString().c_str()));
-    LM_F(("%s    Longitude:  %s", indent.c_str(), circle.center.longitudeString().c_str()));
-    LM_F(("%s    Latitude:   %s", indent.c_str(), circle.center.latitudeString().c_str()));
-    LM_F(("%s    Inverted:   %s", indent.c_str(), circle.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s  FI-WARE Circle Area:", indent.c_str()));
+    LM_T(LmtPresent, ("%s    Radius:     %s", 
+	  indent.c_str(), 
+	  circle.radiusString().c_str()));
+    LM_T(LmtPresent, ("%s    Longitude:  %s", 
+	  indent.c_str(), 
+	  circle.center.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Latitude:   %s", 
+	  indent.c_str(), 
+	  circle.center.latitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", 
+	  indent.c_str(), 
+	  circle.invertedString().c_str()));
   }
   else if (areaType == orion::PolygonType)
   {
-    LM_F(("%s  FI-WARE Polygon Area (%lu vertices):", indent.c_str(), polygon.vertexList.size()));
+    LM_T(LmtPresent, ("%s  FI-WARE Polygon Area (%lu vertices):", 
+		      indent.c_str(), 
+		      polygon.vertexList.size()));
 
-    LM_F(("%s    Inverted:   %s", indent.c_str(), polygon.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", 
+		      indent.c_str(), 
+		      polygon.invertedString().c_str()));
     for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
     {
-      LM_F(("%s    Vertex %d", indent.c_str(), ix));
-      LM_F(("%s      Longitude:  %s", indent.c_str(), polygon.vertexList[ix]->longitudeString().c_str()));
-      LM_F(("%s      Latitude:   %s", indent.c_str(), polygon.vertexList[ix]->latitudeString().c_str()));
+      LM_T(LmtPresent, ("%s    Vertex %d", 
+			indent.c_str(), 
+			ix));
+      LM_T(LmtPresent, ("%s      Longitude:  %s", 
+			indent.c_str(), 
+			polygon.vertexList[ix]->longitudeString().c_str()));
+      LM_T(LmtPresent, ("%s      Latitude:   %s", 
+			indent.c_str(), 
+			polygon.vertexList[ix]->latitudeString().c_str()));
     }
   }
 }

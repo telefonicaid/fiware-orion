@@ -25,6 +25,7 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/Format.h"
 #include "common/tag.h"
@@ -342,7 +343,9 @@ std::string ContextElementResponse::check
 */
 void ContextElementResponse::present(const std::string& indent, int ix)
 {
-  LM_F(("%sContextElementResponse %d:", indent.c_str(), ix));
+  LM_T(LmtPresent, ("%sContextElementResponse %d:", 
+		    indent.c_str(), 
+		    ix));
   contextElement.present(indent + "  ", ix);
   statusCode.present(indent + "  ");
 }
