@@ -60,7 +60,7 @@ bool forbiddenChars(const char* s, const char* exceptions)
     case ';':
     case '(':
     case ')':
-      LM_E(("Bad Input (character '%c')", *s));
+      // LM_W(("Bad Input (character '%c')", *s));
       return true;
     }
 
