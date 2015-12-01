@@ -357,7 +357,17 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
         --argNo;
     }
     else if ((aP = argFind(paList, argV[argNo], UNSTRICT, NULL)) != NULL)
-      valueP = &argV[argNo][strlen(aP->option)];
+    {
+      if (aP->type == PaBool)
+      {
+        snprintf(w, sizeof(w), "%s is a boolean option - cannot have a value (%s)", aP->name, &argV[argNo][strlen(aP->option)]);
+        PA_W(("Warning: '%s'", w));
+        PA_WARNING(PasNoSuchOption, w);
+        continue;
+      }
+      else
+        valueP = &argV[argNo][strlen(aP->option)];
+    }
     else if ((aP = argFind(paList, (char*) "", UNSTRICT, &param)) != NULL)
       valueP = argV[argNo];
     else
