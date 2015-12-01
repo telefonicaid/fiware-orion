@@ -1478,6 +1478,9 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | room_11       | house flat  | \s+          |
       | room_12       | afaffasf    | \D+          |
       | room_13       | hOUSEFLAT   | \u+          |
+      | room_14       | houseflat   | house(flat)  |
+      | room_15       | houseflat   | house(f*)    |
+      | room_16       | ewrwer      | .*           |
 
   @only_idPattern_wrong
   Scenario:  list any entity using NGSI v2 with only idPattern query parameter but the pattern is wrong
@@ -1531,44 +1534,6 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | idPattern | dfgdg.* |
     Then verify that receive an "OK" http code
     And verify that any entities are returned
-
-  @only_id_pattern_invalid @BUG_1523 @skip
-  Scenario Outline:  try to list all entities using NGSI v2 with only idPattern query parameter but invalid value
-    Given  a definition of headers
-      | parameter          | value                     |
-      | Fiware-Service     | test_list_only_id_pattern |
-      | Fiware-ServicePath | /test                     |
-      | Content-Type       | application/json          |
-    And initialize the accumulator context of entities
-    And create "5" entities with "2" attributes
-      | parameter        | value       |
-      | entities_type    | home        |
-      | entities_id      | room1       |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celsius     |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | random=10   |
-    And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
-    When get all entities
-      | parameter | value        |
-      | idPattern | <id_pattern> |
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                              |
-      | error       | BadRequest                         |
-      | description | invalid character in URI parameter |
-    Examples:
-      | id_pattern    |
-      | house<flat>   |
-      | house=flat    |
-      | house'flat'   |
-      | house\'flat\' |
-      | house;flat    |
-      | house(flat)   |
 
   @id_and_id_pattern
   Scenario:  try to list all entities using NGSI v2 with id and idPattern queries parameters (incompatibles)
@@ -1781,3 +1746,4 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | 20    | 1      | car       | vehicle |
       | 1     | 20     | light     | park    |
       | 5     | 3      | semaphore | street  |
+
