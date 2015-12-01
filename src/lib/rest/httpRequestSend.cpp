@@ -154,17 +154,13 @@ static char* curlVersionGet(char* buf, int bufLen)
 * The waitForResponse arguments specifies if the method has to wait for response
 * before return. If this argument is false, the return string is ""
 *
-* FIXME: I don't like too much "reusing" natural output to return "error" in the
-* case of error. I think it would be smarter to use "std::string* error" in the
-* arguments or (even better) an exception. To be solved in the future in a hardening
-* period.
-*
-* Note, we are using a hybrid approach, consisting in a static thread-local buffer of
+* NOTE
+* We are using a hybrid approach, consisting in a static thread-local buffer of a
 * small size that copes with most notifications to avoid expensive
 * calloc/free syscalls if the notification payload is not very large.
 *
 * RETURN VALUES
-*   httpRequestSendWithCurl return 0 on success and a negative number on failure:
+*   httpRequestSendWithCurl returns 0 on success and a negative number on failure:
 *     -1: Invalid port
 *     -2: Invalid IP
 *     -3: Invalid verb
@@ -457,7 +453,7 @@ int httpRequestSendWithCurl
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
     //
     LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
-    *outP = "invalid context provider response";
+    *outP = "notification failure";
   }
   else
   {
@@ -485,7 +481,7 @@ int httpRequestSendWithCurl
 * httpRequestSend - 
 *
 * RETURN VALUES
-*   httpRequestSend return 0 on success and a negative number on failure:
+*   httpRequestSend returns 0 on success and a negative number on failure:
 *     -1: Invalid port
 *     -2: Invalid IP
 *     -3: Invalid verb
@@ -494,6 +490,8 @@ int httpRequestSendWithCurl
 *     -6: Content-Type present but there is no content
 *     -7: Total outgoing message size is too big
 *     -8: Unable to initialize libcurl
+*
+*   [ error codes -1 to -7 comes from httpRequestSendWithCurl ]
 */
 int httpRequestSend
 (

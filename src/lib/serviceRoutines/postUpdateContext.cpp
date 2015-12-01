@@ -193,7 +193,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   if (r != 0)
   {
-    upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+    upcrsP->errorCode.fill(SccContextElementNotFound, "notification failure");
     LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
     return;
   }

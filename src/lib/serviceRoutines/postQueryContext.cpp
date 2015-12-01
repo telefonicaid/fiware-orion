@@ -160,7 +160,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
 
   if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+    qcrsP->errorCode.fill(SccContextElementNotFound, "notification failure");
     LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }
