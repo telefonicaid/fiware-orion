@@ -39,7 +39,7 @@
 *
 * AttributeList::fill - 
 */
-void AttributeList::fill(std::vector<std::string> aVec)
+void AttributeList::fill(const std::vector<std::string>& aVec)
 {
   for (unsigned int ix = 0; ix < aVec.size(); ++ix)
   {

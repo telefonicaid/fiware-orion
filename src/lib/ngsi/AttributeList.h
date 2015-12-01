@@ -42,7 +42,7 @@ typedef struct AttributeList
 {
   std::vector<std::string>  attributeV;
 
-  void         fill(std::vector<std::string>);
+  void         fill(const std::vector<std::string>& aVec);
   std::string  render(Format format, const std::string& indent, bool comma = false);
   void         present(const std::string& indent);
   void         release(void);

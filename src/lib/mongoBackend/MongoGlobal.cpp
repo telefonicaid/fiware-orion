@@ -1961,7 +1961,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 * collection)
 *
 */
-EntityIdVector subToEntityIdVector(BSONObj sub)
+EntityIdVector subToEntityIdVector(const BSONObj& sub)
 {
   EntityIdVector            enV;
   std::vector<BSONElement>  subEnts = getField(sub, CSUB_ENTITIES).Array();
@@ -1987,7 +1987,7 @@ EntityIdVector subToEntityIdVector(BSONObj sub)
 * collection)
 *
 */
-AttributeList subToAttributeList(BSONObj sub)
+AttributeList subToAttributeList(const BSONObj& sub)
 {
   AttributeList             attrL;
   std::vector<BSONElement>  subAttrs = getField(sub, CSUB_ATTRS).Array();
