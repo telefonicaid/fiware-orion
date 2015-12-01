@@ -34,6 +34,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/globals.h"
@@ -47,7 +48,7 @@
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "mongoBackend/MongoGlobal.h"  // MAX_SERVICE_NAME_LEN
+#include "common/limits.h"  // SERVICE_NAME_MAX_LEN
 
 
 
@@ -574,6 +575,11 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   // 4. Only alphanum and underscore allowed (just like in tenants)
   //    OR: Last component is EXACTLY '#'
   //
+  // About the constants 10 and 50, see common/limits.h:
+  //   - SERVICE_PATH_MAX_COMPONENTS
+  //   - SERVICE_PATH_MAX_LEVELS
+  //   - SERVICE_PATH_MAX_COMPONENT_LEN
+  //
   std::vector<std::string> compV;
   int                      components;
 
@@ -592,7 +598,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   components = stringSplit(servicePath, '/', compV);
 
-  if (components > 10)
+  if (components > SERVICE_PATH_MAX_LEVELS)
   {
     OrionError e(SccBadRequest, "too many components in ServicePath");
     ciP->answer = e.render(ciP, "");
@@ -601,7 +607,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   for (int ix = 0; ix < components; ++ix)
   {
-    if (strlen(compV[ix].c_str()) > 50)
+    if (strlen(compV[ix].c_str()) > SERVICE_PATH_MAX_COMPONENT_LEN)
     {
       OrionError e(SccBadRequest, "component-name too long in ServicePath");
       ciP->answer = e.render(ciP, "");
@@ -683,7 +689,7 @@ int servicePathSplit(ConnectionInfo* ciP)
     return 0;
   }
 
-  if (servicePaths > 10)
+  if (servicePaths > SERVICE_PATH_MAX_COMPONENTS)
   {
     OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
     ciP->answer = e.render(ciP, "");
@@ -1035,7 +1041,7 @@ static int connectionTreat
 
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
-    char tenant[MAX_SERVICE_NAME_LEN + 1];
+    char tenant[SERVICE_NAME_MAX_LEN + 1];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)

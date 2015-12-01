@@ -38,6 +38,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
@@ -2687,7 +2688,7 @@ static void updateEntity
   }
 
   // The servicePath of THIS object is entitySPath
-  char espath[MAX_SERVICE_NAME_LEN];
+  char espath[SERVICE_NAME_MAX_LEN];
   slashEscape(entitySPath.c_str(), espath, sizeof(espath));
 
   // servicePathString from earlier in this function
@@ -2864,7 +2865,7 @@ void processContextElement
                           servicePathV[0].c_str(),
                           action.c_str()));
 
-    char               path[MAX_SERVICE_NAME_LEN];
+    char               path[SERVICE_NAME_MAX_LEN];
     slashEscape(servicePathV[0].c_str(), path, sizeof(path));
 
     const std::string  servicePathValue  = std::string("^") + path + "$";

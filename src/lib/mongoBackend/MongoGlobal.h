@@ -49,14 +49,6 @@
 using namespace mongo;
 
 
-/*****************************************************************************
-*
-* MAX_SERVICE_NAME_LEN
-*/
-#define MAX_SERVICE_NAME_LEN 50
-
-
-
 /* ****************************************************************************
 *
 * MongoTreatFunction - callback signature for Mongo callback functions
