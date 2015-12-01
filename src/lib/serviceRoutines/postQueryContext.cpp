@@ -134,30 +134,33 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
-  std::string     out;
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
+  std::string     out;
+  int             r;
 
-  out = httpRequestSend(ip,
-                        port,
-                        protocol,
-                        verb,
-                        tenant,
-                        servicePath,
-                        ciP->httpHeaders.xauthToken,
-                        resource,
-                        mimeType,
-                        payload,
-                        false,
-                        true,
-                        mimeType);
+  r = httpRequestSend(ip,
+                      port,
+                      protocol,
+                      verb,
+                      tenant,
+                      servicePath,
+                      ciP->httpHeaders.xauthToken,
+                      resource,
+                      mimeType,
+                      payload,
+                      false,
+                      true,
+                      &out,
+                      mimeType);
 
-  if ((out == "error") || (out == ""))
+
+  if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
+    qcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
     LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }

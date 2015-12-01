@@ -159,12 +159,21 @@ static char* curlVersionGet(char* buf, int bufLen)
 * arguments or (even better) an exception. To be solved in the future in a hardening
 * period.
 *
-* Note, we are using a hybrid approach, consisting in an static thread-local buffer of
+* Note, we are using a hybrid approach, consisting in a static thread-local buffer of
 * small size that copes with most notifications to avoid expensive
 * calloc/free syscalls if the notification payload is not very large.
 *
+* RETURN VALUES
+*   httpRequestSendWithCurl return 0 on success and a negative number on failure:
+*     -1: Invalid port
+*     -2: Invalid IP
+*     -3: Invalid verb
+*     -4: Invalid resource
+*     -5: No Content-Type BUT content present
+*     -6: Content-Type present but there is no content
+*     -7: Total outgoing message size is too big
 */
-std::string httpRequestSendWithCurl
+int httpRequestSendWithCurl
 (
    CURL                   *curl,
    const std::string&     _ip,
@@ -179,6 +188,7 @@ std::string httpRequestSendWithCurl
    const std::string&     content,
    bool                   useRush,
    bool                   waitForResponse,
+   std::string*           outP,
    const std::string&     acceptFormat,
    long                   timeoutInMilliseconds
 )
@@ -213,42 +223,54 @@ std::string httpRequestSendWithCurl
   {
     LM_E(("Runtime Error (port is ZERO)"));
     LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "error";
+    return -1;
   }
 
   if (ip.empty())
   {
     LM_E(("Runtime Error (ip is empty)"));
     LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "error";
+    return -2;
   }
 
   if (verb.empty())
   {
     LM_E(("Runtime Error (verb is empty)"));
     LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "error";
+    return -3;
   }
 
   if (resource.empty())
   {
     LM_E(("Runtime Error (resource is empty)"));
     LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "error";
+    return -4;
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
     LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "error";
+    return -5;
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
     LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "error";
+    return -6;
   }
 
 
@@ -270,7 +292,9 @@ std::string httpRequestSendWithCurl
   // Also, a few HTTP headers for rush must be setup.
   //
   if ((rushPort == 0) || (rushHost == ""))
+  {
     useRush = false;
+  }
 
   if (useRush)
   {
@@ -279,8 +303,8 @@ std::string httpRequestSendWithCurl
     std::string  rushHeaderIP       = ip;
     std::string  headerRushHttp;
 
-    ip             = rushHost;
-    port           = rushPort;
+    ip    = rushHost;
+    port  = rushPort;
 
     snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
     headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;
@@ -377,7 +401,8 @@ std::string httpRequestSendWithCurl
     delete httpResponse;
 
     LM_TRANSACTION_END();
-    return "error";
+    *outP = "error";
+    return -7;
   }
 
   // Contents
@@ -432,13 +457,13 @@ std::string httpRequestSendWithCurl
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
     //
     LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
-    result = "";
+    *outP = "invalid context provider response";
   }
   else
   {
     // The Response is here
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
-    result.assign(httpResponse->memory, httpResponse->size);
+    outP->assign(httpResponse->memory, httpResponse->size);
   }
 
   // Cleanup curl environment
@@ -450,10 +475,27 @@ std::string httpRequestSendWithCurl
 
   LM_TRANSACTION_END();
 
-  return result;
+  return 0;
 }
 
-std::string httpRequestSend
+
+
+/* ****************************************************************************
+*
+* httpRequestSend - 
+*
+* RETURN VALUES
+*   httpRequestSend return 0 on success and a negative number on failure:
+*     -1: Invalid port
+*     -2: Invalid IP
+*     -3: Invalid verb
+*     -4: Invalid resource
+*     -5: No Content-Type BUT content present
+*     -6: Content-Type present but there is no content
+*     -7: Total outgoing message size is too big
+*     -8: Unable to initialize libcurl
+*/
+int httpRequestSend
 (
    const std::string&     _ip,
    unsigned short         port,
@@ -467,12 +509,13 @@ std::string httpRequestSend
    const std::string&     content,
    bool                   useRush,
    bool                   waitForResponse,
+   std::string*           outP,
    const std::string&     acceptFormat,
    long                   timeoutInMilliseconds
 )
 {
-  struct curl_context cc;
-  std::string         resp;
+  struct curl_context  cc;
+  int                  response;
 
   get_curl_context(_ip, &cc);
   if (cc.curl == NULL)
@@ -480,12 +523,27 @@ std::string httpRequestSend
     release_curl_context(&cc);
     LM_E(("Runtime Error (could not init libcurl)"));
     LM_TRANSACTION_END();
-    return "error";
+
+    *outP = "error";
+    return -8;
   }
-  resp = httpRequestSendWithCurl(cc.curl, _ip, port, protocol, verb, tenant, servicePath, xauthToken,
-                                             resource, orig_content_type, content, useRush, waitForResponse,
-                                             acceptFormat, timeoutInMilliseconds
-        );
+
+  response = httpRequestSendWithCurl(cc.curl,
+                                     _ip,
+                                     port,
+                                     protocol,
+                                     verb,
+                                     tenant,
+                                     servicePath,
+                                     xauthToken,
+                                     resource,
+                                     orig_content_type,
+                                     content,
+                                     useRush,
+                                     waitForResponse,
+                                     outP,
+                                     acceptFormat,
+                                     timeoutInMilliseconds);
   release_curl_context(&cc);
-  return resp;
+  return response;
 }

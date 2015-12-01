@@ -106,28 +106,31 @@ static void *workerFunc(void* pSyncQ)
     }
     else // we'll send the notification
     {
-      std::string r =  httpRequestSendWithCurl(curl, params->ip,
-                                       params->port,
-                                       params->protocol,
-                                       params->verb,
-                                       params->tenant,
-                                       params->servicePath,
-                                       params->xauthToken,
-                                       params->resource,
-                                       params->content_type,
-                                       params->content,
-                                       true,
-                                       NOTIFICATION_WAIT_MODE);
+      std::string  out;
+      int          r;
 
-      if ((r != "") && (r != "error"))
-      {
-        statisticsUpdate(NotifyContextSent, params->format);
-      }
+      r =  httpRequestSendWithCurl(curl,
+                                   params->ip,
+                                   params->port,
+                                   params->protocol,
+                                   params->verb,
+                                   params->tenant,
+                                   params->servicePath,
+                                   params->xauthToken,
+                                   params->resource,
+                                   params->content_type,
+                                   params->content,
+                                   true,
+                                   NOTIFICATION_WAIT_MODE,
+                                   &out);
 
+      //
       // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
       // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
-      if (r != "error" && r != "")
+      //
+      if (r == 0)
       {
+        statisticsUpdate(NotifyContextSent, params->format);
         QueueStatistics::incSentOK();
       }
       else
