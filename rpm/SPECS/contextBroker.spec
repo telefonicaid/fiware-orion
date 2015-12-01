@@ -164,6 +164,34 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Dec 01 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.0-1
+- Add: Add queue+threads for notifications (notificationMode thread:<queue size>:<num threads>) (Issue #1449)
+- Add: possibility to limit the maximum number of simultaneous connections, using the CLI option -maxConnections (Issue #1384)
+- Add: possibility to use thread pool for incoming connections, using CLI option -reqPoolSize (Issue #1384)
+- Add: Unpatterned subscriptions now also in subscription cache (Issue #1475)
+- Add: Built-in Timing/Profiling (Issue #1367)
+- Add: clearer statistics in GET /statistics and GET /cache/statistics operations
+- Add: Simulated/drop notifications mode is now orthogonal to -notificationMode (Issue #1505)
+- Add: finer-grain statistics switches: -statCounters, -statSemWait (old -mutexTimeStat), -statTiming and -statNotifQueue
+- Fix: avoid indirect usage of DB connections concurrently due to cursors (Issue #1558)
+- Fix: safer treatment of database fields lastNotification, expiration and throttling in 
+       the 'csub' collection, assuming that the field can be either int or long (it is always written as long)
+- Fix: number/bool correct rendering in NGSIv1 compound values
+- Fix: ONCHANGE notifications triggered by update context operation are filled avoiding querying entities collection (#881)
+- Fix: wrong notification values (duplicated) when triggering update context operations are too close (race condition)
+- Fix: A bug in the request reading logic that may cause unexpected Parse Errors or even SIGSEGVs
+- Fix: Semaphore releasing bug in unsubscribeContext when subscription ID is the empty string (Issue #1488)
+- Fix: Fixed an uptil now unknown bug with throttling
+- Fix: Only 1 query at csubs collection/cache is done per context element processing at updateContext (previously one query per attribute were done) (Issue #1475)
+- Fix: 'count' and 'lastNotificationTime' now maintained by subCache (and synched via DB) (Issue #1476)
+- Fix: updates including several attributes with the same name are now reported as InvalidModification (Issue #908)
+- Fix: no longer adding subscriptions from all tenants in the cache if broker isn't multitenant (Issue #1555)
+- Fix: resetting temporal counters at synching the subscription cache (Issue #1562)
+- Fix: using the text "too many sbuscriptions" at cache statistics operations in the case of too many results
+- Fix: crash due to subscription ID not conforming to supposed syntax in request "GET /v2/subscriptions/XXX" (Issue #1552)
+- Hardening: exhaustive try/catch (mainly at mongoBackend module) 
+- Deprecated: ONTIMEINTERVAL subscriptions
+
 * Mon Nov 02 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.25.0-1
 - Add: NGSIv2 operation GET /v2/subscriptions (#1126)
 - Add: NGSIv2 operation GET /v2/subscription/<id> (#1317)
