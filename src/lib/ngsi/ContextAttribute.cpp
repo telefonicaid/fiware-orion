@@ -643,8 +643,17 @@ std::string ContextAttribute::check
     return "missing attribute name";
   }
 
-  if (forbiddenChars(name.c_str()))  { return "Invalid characters in attribute name"; }
-  if (forbiddenChars(type.c_str()))  { return "Invalid characters in attribute type"; }
+  if (forbiddenChars(name.c_str()))
+  {
+    LM_W(("Bad Input (found a forbidden character in the name of an attribute"));
+    return "Invalid characters in attribute name";
+  }
+
+  if (forbiddenChars(type.c_str()))
+  {
+    LM_W(("Bad Input (found a forbidden character in the type of an attribute"));
+    return "Invalid characters in attribute type";
+  }
 
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
@@ -657,6 +666,7 @@ std::string ContextAttribute::check
   {
     if (forbiddenChars(stringValue.c_str()))
     {
+      LM_W(("Bad Input (found a forbidden character in the value of an attribute"));
       return "Invalid characters in attribute value";
     }
   }

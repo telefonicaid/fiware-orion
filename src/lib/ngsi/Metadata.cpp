@@ -198,13 +198,23 @@ std::string Metadata::check
     return "missing metadata name";
   }
 
-  if (forbiddenChars(name.c_str()))   { return "Invalid characters in metadata name";  }
-  if (forbiddenChars(type.c_str()))   { return "Invalid characters in metadata type";  }
+  if (forbiddenChars(name.c_str()))
+  {
+    LM_W(("Bad Input (found a forbidden character in the name of a Metadata"));
+    return "Invalid characters in metadata name";
+  }
+
+  if (forbiddenChars(type.c_str()))
+  {
+    LM_W(("Bad Input (found a forbidden character in the type of a Metadata"));
+    return "Invalid characters in metadata type";
+  }
 
   if (valueType == orion::ValueTypeString)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
+      LM_W(("Bad Input (found a forbidden character in the value of a Metadata"));
       return "Invalid characters in metadata value";
     }
 

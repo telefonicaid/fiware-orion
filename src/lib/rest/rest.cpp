@@ -253,6 +253,8 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
+    LM_W(("Bad Input (found a forbidden character in URI param '%s')", key.c_str()));
+
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer         = error.render(ciP, "");
   }
