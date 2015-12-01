@@ -78,6 +78,45 @@ Example:
 ./jmeter.sh -n -t orion_updates_ngsiv2.jmx -JHOST=10.10.10.1 -JTHREADS=100 -JTEST_TIME=60 -JATTRIBUTES=3
 ```
 
+**orion_soak_test_ngsiv1.jm**: script used to soak tests using NGSI v1. This script only use one host.
+Soak Testing is a type of performance test that verifies a system's stability and performance characteristics over an extended period of time (three days in this case).
+Script flow using NGSI v1:
+  - One thread that creates a ONCHANGE subscription and returns the total of subcriptions each 30 secs with a random "notifyConditions" attribute.
+  - One thread that get subcriptionIds and remove all subcriptions each 7200s (2hrs).
+  - 100 threads that send updates (APPEND) with random attributes name (between E00 and E20) and try to get values of a entity if it does exist. 
+ 
+Properties:
+```
+		* HOST                - CB host (default: localhost)
+		* PORT                - CB port (default: 1026)
+		* THREADS             - number of concurrent threads (default: 1)
+		* RAMP_UP             - the amount of time for creating the total number of threads (default: 1)
+		* TEST_TIME           - test duration time in seconds (default:30)
+		* SERVICE             - service header (default: no service is used, i.e. Fiware-Service header is omitted) 
+		* SERVICE_PATH        - service path header (default: /)	    
+		* ATTRIBUTES          - number of attributes per entity (default:1)
+		* METADATA            - if true is appended a metadata in each attribute (default: false)
+		* TIME_INSTANT        - if true is appended a "timeInstant" attribute in each entity (default: true)
+		* RANDOM_TIME_INSTANT - if this is greater than 0 is generated a string of N random characters, else it is generated a date with zulu format. (default: 0)
+		* SUBSC_REFERENCE     - host  and port to receive notifications (mock) (default: http//localhost:8090/notify)
+		* SUBSC_DURATION      - Duration of the subscriptions in seconds (default: 60)		
+```
+
+Report files (listeners):
+```
+  * tps_<date>.csv: this graph shows the number of transactions per second for each sampler (jp@gc - Transactions per Second).
+  * reports_<date>.csv: which displays values for all request made during the test and an individual row for each named request in your test(Aggregate Report).
+  * perfmon_<date>.csv: Some metric types (CPU, Memory, TCP) are show in graphic (jp@gc - Perfom Metrics Collector)
+  * errors__<date>.csv:  shows a tree of all sample responses, allowing you to view the response for any sample (only errors are stored) (View Results Tree).
+```
+
+Example:
+```
+ ./jmeter -n  -t orion_soak_test_ngsiv1.jmx -JHOST=localhost -JTEST_TIME=259200 -JTHREADS=100 -JSERVICE="soak_test" -JATTRIBUTES=5 -JSUBSC_DURATION=8000
+```
+
+
+
 **orionPerformanceTest_v1.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
 	 
         Properties:
