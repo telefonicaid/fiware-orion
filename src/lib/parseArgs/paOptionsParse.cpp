@@ -360,7 +360,11 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
     {
       if (aP->type == PaBool)
       {
-        snprintf(w, sizeof(w), "%s is a boolean option - cannot have a value (%s)", aP->name, &argV[argNo][strlen(aP->option)]);
+        if (paBoolWithValueIsUnrecognized == true)
+          snprintf(w, sizeof(w), "'%s' not recognized",  argV[argNo]);
+        else
+          snprintf(w, sizeof(w), "%s is a boolean option - cannot have a value (%s)", aP->name, &argV[argNo][strlen(aP->option)]);
+
         PA_W(("Warning: '%s'", w));
         PA_WARNING(PasNoSuchOption, w);
         continue;

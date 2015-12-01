@@ -76,6 +76,7 @@ bool       paLogToFile           = false;
 bool       paLogToScreen         = false;
 bool       paLogScreenToStderr   = false;
 bool       paLogScreenOnlyErrors = false;
+bool       paBoolWithValueIsUnrecognized = false;
 
 char*      paLogFilePath         = NULL;
 char*      paLogFileLineFormat   = NULL;
@@ -679,7 +680,7 @@ int paConfig(const char* item, const void* value, const void* value2)
       paLogToScreen  = true;
       paMsgsToStdout = true;
     }
-    else if ( value == (void*)false)
+    else if ( value == (void*) false)
     {
       paLogToScreen = false;
     }
@@ -688,6 +689,10 @@ int paConfig(const char* item, const void* value, const void* value2)
       paLogToScreen         = true;
       paLogScreenOnlyErrors = true;
     }
+  }
+  else if (strcmp(item, "bool option with value as non-recognized option") == 0)
+  {
+    paBoolWithValueIsUnrecognized = true;
   }
   else if (strcmp(item, "log to stderr") == 0)
   {

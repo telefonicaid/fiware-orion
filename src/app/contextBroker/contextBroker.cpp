@@ -1587,6 +1587,7 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
 

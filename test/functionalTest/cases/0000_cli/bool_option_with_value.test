@@ -36,7 +36,7 @@ parseArgs complains about bool argument with a value
 contextBroker -multiserviceXXX
 
 --REGEXPECT--
-option '-multiservice' is a boolean option - cannot have a value (XXX)
+'-multiserviceXXX' not recognized
 
 Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-u' (usage)]
