@@ -103,9 +103,23 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return "No Entity ID";
   }
 
-  if (forbiddenChars(id.c_str()))         { return "Invalid characters in entity id";        }
-  if (forbiddenChars(type.c_str()))       { return "Invalid characters in entity type";      }
-  if (forbiddenChars(isPattern.c_str()))  { return "Invalid characters in entity isPattern"; }
+  if (forbiddenChars(id.c_str()))
+  {
+    LM_W(("Bad Input (found a forbidden character in the id of an entity"));
+    return "Invalid characters in entity id";
+  }
+
+  if (forbiddenChars(type.c_str()))
+  {
+    LM_W(("Bad Input (found a forbidden character in the type of an entity"));
+    return "Invalid characters in entity type";
+  }
+
+  if (forbiddenChars(isPattern.c_str()))
+  {
+    LM_W(("Bad Input (found a forbidden character in the pattern of an entity"));
+    return "Invalid characters in entity isPattern";
+  }
 
   return attributeVector.check(requestType, JSON, "", "", 0);
 }

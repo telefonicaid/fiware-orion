@@ -42,6 +42,8 @@
 
 using namespace orion;
 
+
+
 /* ****************************************************************************
 *
 * compoundValueRootV -
@@ -128,7 +130,7 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
         {
           if (forbiddenChars(node->value()) == true)
           {
-            LM_E(("Found a forbidden value in '%s'", node->value()));
+            LM_W(("Bad Input (found a forbidden value in '%s')", node->value()));
             ciP->httpStatusCode = SccBadRequest;
             ciP->answer = std::string("Illegal value for XML attribute");
             return true;
@@ -141,7 +143,7 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
         {
           if (forbiddenChars(attr->value()) == true)
           {
-            LM_E(("Found a forbidden value in attribute: '%s'", node->value()));
+            LM_W(("Bad Input (found a forbidden value in attribute: '%s')", node->value()));
             ciP->httpStatusCode = SccBadRequest;
             ciP->answer = std::string("Illegal value for XML attribute");
             return true;
@@ -231,7 +233,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
     {
       if (forbiddenChars(value.c_str()) == true)
       {
-        LM_E(("Found a forbidden value in '%s'", value.c_str()));
+        LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for XML attribute");
         return;
