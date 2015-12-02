@@ -101,27 +101,27 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --json --tenant VALENCIA --servicePath /Valencia/parques
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json --servicePath /Valencia/parques
 echo
 echo
 
 echo "02. GET /v2/subscriptions for 1 servicepath"
 echo "==========================================="
-orionCurl --url /v2/subscriptions?options=count --json --tenant VALENCIA --servicePath /Valencia/parques
+orionCurl --url /v2/subscriptions?options=count --json --servicePath /Valencia/parques
 echo
 echo
 
 
 echo "03. GET /v2/subscriptions for /#"
 echo "================================"
-orionCurl --url /v2/subscriptions?options=count --json --tenant VALENCIA --servicePath /#
+orionCurl --url /v2/subscriptions?options=count --json --servicePath /#
 echo
 echo
 
 
 echo "04. GET /v2/subscriptions for inexistent servicepath"
 echo "===================================================="
-orionCurl --url /v2/subscriptions?options=count --json --tenant VALENCIA --servicePath /Sebastopol/submarinos
+orionCurl --url /v2/subscriptions?options=count --json --servicePath /Sebastopol/submarinos
 echo
 echo
 
