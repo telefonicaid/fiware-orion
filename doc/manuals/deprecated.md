@@ -15,6 +15,8 @@ not mantained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* Deprecated command line argument in Orion 0.27.0:
+  * **--silent**. Suppress all log output except errors (Please use *-logLevel ERROR* instead)
 * ONTIMEINTERVAL subscriptions are deprecated since Orion 0.26.0. ONTIMEINTERVAL subscriptions have
   several problems (introduce state in CB, thus making horizontal scaling configuration much harder,
   and makes it difficult to introduce pagination/filtering). Actually, they aren't actually needed,
@@ -30,5 +32,3 @@ A list of deprecated features and the version in which they were deprecated foll
     the broker runs in "ConfMan mode".
 * Configuration Manager role (deprecated in 0.21.0, removed in 0.25.0)
 * Associations (deprecated in 0.21.0, removed in 0.25.0).
-* Deprecated command line argument in Orion 0.27.0:
-  * **--silent**. Suppress all log output except errors (Please use *-logLevel ERROR* instead)

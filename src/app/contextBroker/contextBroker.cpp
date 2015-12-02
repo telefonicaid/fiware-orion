@@ -1637,6 +1637,16 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+
+  // Argument consistency check (--silent AND -logLevel)
+  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
+  {
+    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
+    paUsage();
+    exit(1);
+  }
+
+  // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
   {
     printf("incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG\n");
