@@ -193,6 +193,7 @@ void mongoListSubscriptions
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
+  const std::string&                   servicePath,
   int                                  limit,
   int                                  offset,
   long long*                           count
@@ -210,7 +211,16 @@ void mongoListSubscriptions
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    err;
   std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
-  Query                          q     = Query(BSON(conds << "ONCHANGE"));
+  Query                          q;
+
+  if (!servicePath.empty() && servicePath != "/#")
+  {
+    q = Query(BSON(CSUB_SERVICE_PATH << servicePath << conds << "ONCHANGE"));
+  }
+  else
+  {
+    q = Query(BSON(conds << "ONCHANGE"));
+  }
 
   q.sort(BSON("_id" << 1));
 
