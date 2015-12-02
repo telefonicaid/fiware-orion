@@ -108,17 +108,8 @@ The list of available options is the following:
 -   **-corsOrigin <domain>**. Configures CORS allowed for GET requests,
     specifing the allowed origin (use `__ALL` for `*`).
 -   **-reqMutextPolicy <all|none|write|read>**. Specifies the internal
-    mutext policy. Possible values are: "all" (which ensures that in a
-    given CB node as much as 1 request is being processed by the
-    internal logic module at the same time), "read" (which ensures that
-    in a given CB node as much as 1 read request is being processed by
-    the internal logic module at the same time, write request can
-    execute concurrently), "write" (which ensures that in a given CB
-    node as much as 1 write request is being processed by the internal
-    logic module at the same time, write request can
-    execute concurrently) and "none" (which allows all the requests
-    being executed concurrently). Default value is "all". For
-    Active-Active Orion configuration "none" is recommended.
+    mutext policy. See [performance tuning](perf_tuning.md#mutex-policy-impact-in-performance) documentation
+    for details.
 -   **-subCacheIval**. Interval in seconds between calls to subscription cache refresh. A zero
     value means "no refresh" (default value and the recommended one for mono-CB
     deployments).

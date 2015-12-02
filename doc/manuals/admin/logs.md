@@ -16,6 +16,14 @@ When starting the Orion context broker, if a previous log file exist:
 -   If **-logAppend** is not used, then the existing file is renamed,
     appending the text ".old" to its name.
 
+The `-logLevel` option allows to chose which error messages will be printed in the log:
+
+- NONE: no log at all
+- ERROR: only ERROR messages are logged
+- WARNING: WARNING and ERROR messages are logged
+- INFO: INFO, WARNING and ERROR messages are logged
+- DEBUG: DEBUG, INFO, WARNING and ERROR messages are logged
+
 When Orion runs in foreground (i.e. with the `-fg` [CLI argument](cli.md)), it also prints the same log traces
 (but in a simplified way) on the standard output.
 
@@ -61,15 +69,15 @@ The different fields in each line are as follows:
 -   **time**. A timestamp corresponding to the moment in which the log
     line was generated.
 -   **lvl (level)**. There are four level types:
-    -   INFO: This level designates informational messages that
-        highlight the progress of Orion.
-    -   WARNING: This level designates potentially harmful situations.
-        There is a minor problem that should be fixed.
     -   ERROR: This level designates error events. There is a severe
-        problem that should be fixed.
-    -   FATAL: This level designates very severe error events that will
+        problem that should be fixed. A subclass of ERROR is FATAL,
+        which designates very severe error events that will
         presumably lead the application to abort. The process can no
         longer work.
+    -   WARNING: This level designates potentially harmful situations.
+        There is a minor problem that should be fixed.
+    -   INFO: This level designates informational messages that
+        highlight the progress of Orion.
     -   DEBUG: This level designates fine-grained informational events
         that are most useful to debug an application. Only shown when
         tracelevels are in use (set with the -t command line option.

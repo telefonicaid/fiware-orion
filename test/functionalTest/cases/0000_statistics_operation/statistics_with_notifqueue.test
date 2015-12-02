@@ -25,59 +25,33 @@ statistics
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -statSemWait -statTiming
+brokerStart CB 0 IPv4 -notificationMode threadpool -statNotifQueue
 
 --SHELL--
-# curl localhost:${CB_PORT}/statistics 2> /dev/null | xmllint --format -
-echo "+++++ 1. statistics in XML"
-orionCurl --url /statistics 
-echo
-echo
-
-
-echo "+++++ 2. statistics in JSON"
+echo "+++++ 1. statistics in JSON"
 orionCurl --url /statistics --json
 echo
 echo
 
 --REGEXPECT--
-+++++ 1. statistics in XML
-HTTP/1.1 200 OK
-Content-Length: 91
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <message>XML not supported in statistics operations, use JSON</message>
-</orion>
-
-
-+++++ 2. statistics in JSON
++++++ 1. statistics in JSON
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "measuring_interval_in_secs": REGEX(1?\d),
-    "semWait": {
-        "connectionContext": REGEX(.*.A*),
-        "dbConnectionPool": REGEX(.*.A*),
-        "request": REGEX(.*.A*),
-        "subCache": REGEX(.*.A*),
-        "timeStat": REGEX(.*.A*),
-        "transaction": REGEX(.*.A*)
+    "measuring_interval_in_secs": REGEX(\d+),
+    "notifQueue": {
+        "in": 0,
+        "out": 0,
+        "reject": 0,
+        "sentError": 0,
+        "sentOk": 0,
+        "size": 0,
+        "timeInQueue": 0.0
     },
-    "timing": {
-        "accumulated": {
-            "total": REGEX(.*.A*)
-        },
-        "last": {
-            "total": REGEX(.*.A*)
-        }
-    },
-    "uptime_in_secs": REGEX(1?\d)
+    "uptime_in_secs": REGEX(\d+)
 }
 
 
