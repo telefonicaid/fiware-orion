@@ -215,7 +215,7 @@ void mongoListSubscriptions
 
   if (!servicePath.empty() && servicePath != "/#")
   {
-    q = Query(BSON("servicePath" << servicePath << conds << "ONCHANGE"));
+    q = Query(BSON(CSUB_SERVICE_PATH << servicePath << conds << "ONCHANGE"));
   }
   else
   {
