@@ -130,7 +130,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Invoke the function in mongoBackend library */
   std::vector<Subscription> subs;
-  mongoListSubscriptions(&subs, &oe, uriParams, "", 20, 0, &count);
+  mongoListSubscriptions(&subs, &oe, uriParams, "", "/#", 20, 0, &count);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
