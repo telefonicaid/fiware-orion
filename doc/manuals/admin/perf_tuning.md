@@ -4,9 +4,9 @@
 * [Database indexes](#database-indexes)
 * [Write concern](#write-concern)
 * [Notification modes and performance](#notification-modes-and-performance)
-* [HTTP server tuning](#http-server-tunning)
+* [HTTP server tuning](#http-server-tuning)
 * [Thread pool considerations](#thread-pool-considerations)
-* [Identifying bootlenecks looking at semWait statistics](#identifying-bootleneck-looking-at-semwait-statistics)
+* [Identifying bootlenecks looking at semWait statistics](#identifying-bootlenecks-looking-at-semwait-statistics)
 * [Log impact in performance](#log-impact-in-performance)
 * [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
 * [Outgoing HTTP connections timeout](#outgoing-http-connetions-timeout)
@@ -24,7 +24,7 @@ in update-intensive scenarios.
 
 [Top](#top)
 
-# Database indexes
+## Database indexes
 
 Orion Context Broker doesn't create any index in any database collection except for one exception,
 described at the end of this section) in order to let flexibility to database administrators. Take
@@ -51,12 +51,12 @@ it is based in an old Orion version, so probably outdated.
 
 [Top](#top)
 
-# Write concern
+## Write concern
 
 [Write concern](https://docs.mongodb.org/manual/core/write-concern/) is a parameter for MongoDB write
 operations. By default, Orion uses "acknowledgue" write concern that means that the Orion waits until
 MongoDB confirm it has applyed the operation in memory. You can change this behavior with the
-[`-writeConcern CLI option](cli.md). When "unacknowledgue" write concern is configured, Orion doesn't
+[`-writeConcern` CLI option](cli.md). When "unacknowledgue" write concern is configured, Orion doesn't
 wait to get confirmation, so it can execute operation involving wring much faster.
 
 Note, however, that there is a tradeoff between performance and reliability. Using "unacknowledgue" write
@@ -65,9 +65,9 @@ indication regarding if the write operation were fine or not) is higher.
 
 [Top](#top)
 
-# Notification modes and performance
+## Notification modes and performance
 
-Orion can use different notifications modes, depending on the [`-notificationMode`](cli.md) value
+Orion can use different notifications modes, depending on the [`-notificationMode`](cli.md) value.
 
 Default mode is transient. In this mode, each time a notification is sent, a new thread is created to deal
 with it. Once the notification is sent and the response is received, the thread and the connection context
@@ -98,7 +98,7 @@ on [the `notifQueue` block](statistics.md#notifqueue-block) could help you to tu
 
 [Top](#top)
 
-# HTTP server tuning
+## HTTP server tuning
 
 The REST API which Orion implements is provided by an HTTP server listening on port 1026 by default
 (this can be overridden by the [`-port` CLI parameter](cli.md)). You can tune its behavior using the
@@ -120,7 +120,7 @@ high load scenarios. The other two parameters use to work well with the default 
 
 [Top](#top)
 
-# Thread pool considerations
+## Thread pool considerations
 
 Orion can use thread pools at two different points: to process incoming HTTP requests at the API endpoint
 (managed by `-reqPoolSize`) and to process outgoing notifications (using the threadpool notification mode).
@@ -145,7 +145,7 @@ Runtime Error (error creating thread: ...)
 
 [Top](#top)
 
-# Identifying bootlenecks looking at semWait statistics
+## Identifying bootlenecks looking at semWait statistics
 
 The [semWait section](statistics.md#semwait-block) in the statistics operation output includes valuable
 information that can be used to detect potential bottlenecks.
@@ -170,15 +170,15 @@ are mainly for Orion developers, to help to identify bugs in the code. Their val
 
 [Top](#top)
 
-# Log impact in performance
+## Log impact in performance
 
-Logs can have a severe impact in performance. Thus, in high level scenarios, it is recommended to use `-logLevel`
+[Logs](logs.md) can have a severe impact in performance. Thus, in high level scenarios, it is recommended to use `-logLevel`
 ERROR or WARNING. We have found in some situations that the saving between `-logLevel WARNING` and `-logLevel INFO`
 could be around 50% in performance.
 
 [Top](#top)
 
-# Mutex policy impact in performance
+## Mutex policy impact in performance
 
 Orion allows four different policies (configurable with `-reqMutextPolicy`):
 
@@ -199,7 +199,7 @@ others at the internal logic module entry). In fact, in Active-Active Orion conf
 
 [Top](#top)
 
-# Outgoing HTTP connections timeou
+## Outgoing HTTP connections timeout
 
 It may happen that a given notification receiver or a context provider (to which a query/update has been forwarded) takes
 too long to answer the HTTP request. In some cases, the receiver is not even listening, so a long timeout (the default one
@@ -218,12 +218,12 @@ outgoing HTTP connection, overriding the default operating system timeout.
 
 [Top](#top)
 
-# Subscription cache
+## Subscription cache
 
 Orion implements a context subscriptions (NGSI10) cache in order to speed up notification triggering. In the current
 version (this may change in the future), context availability subscriptions (NGSI9) doesn't use cache.
 
-Cache synchronization period is controlled by the `-subCacheIval` (by default it is 60 seconds). Synchronization inlves two
+Cache synchronization period is controlled by the `-subCacheIval` (by default it is 60 seconds). Synchronization involves two
 different tasks:
 
 * Reading for changes in the context subscriptions collection at database and update the local cache based on it. Note that
