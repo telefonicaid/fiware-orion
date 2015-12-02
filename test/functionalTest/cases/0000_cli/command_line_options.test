@@ -33,6 +33,7 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-logDir' <log file directory>]
                       [option '-t' <trace level>]
                       [option '--silent' (silent mode)]
+                      [option '--logLevel' <log levels>]
                       [option '-logAppend' (append to log-file)]
                      
                       [option '-fg' (don't start as daemon)]

@@ -1,0 +1,1 @@
+Add: New command-line-option '--logLevel <level>', levels: NONE, ERROR, WARNING, INFO. DEBUG (Issue #1583)
