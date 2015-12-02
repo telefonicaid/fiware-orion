@@ -9,7 +9,7 @@
 * [Identifying bootlenecks looking at semWait statistics](#identifying-bootlenecks-looking-at-semwait-statistics)
 * [Log impact in performance](#log-impact-in-performance)
 * [Mutex policy impact in performance](#mutex-policy-impact-in-performance)
-* [Outgoing HTTP connections timeout](#outgoing-http-connetions-timeout)
+* [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
 
 ##  MongoDB version
@@ -113,7 +113,7 @@ following CLI parameters (see details at the corresponding document):
 * **reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning no thread pool,
   i.e. a new thread is created to manage each new incoming HTTP request and destroyed after use.
 
-Given that thread creation and destruction is a costly operation, it is recommend to use `-reqPoolSize` in
+Given that thread creation and destruction are costly operations, it is recommend to use `-reqPoolSize` in
 high load scenarios. The other two parameters use to work well with the default values.
 
 ![](requests_queue.png "requests_queue.png")
