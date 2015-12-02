@@ -68,6 +68,7 @@ char            paTerm[128];
 char            paSystem[128];
 char            paVisual[128];
 char            paLogDir[256];
+char            paLogLevel[256];
 
 
 #define T (int) true
@@ -119,6 +120,7 @@ PaiArgument paBuiltin[] =
   { "",           paVisual,        "!VISUAL",     PaStr,  PaHid,  0, PaNL, PaNL, "visual",              PAI_REST   },
   { "-t",         paTraceV,        "TRACE",       PaStr,  PaOpt,  0, PaNL, PaNL, "trace level",         PAI_REST_U },
   { "--silent",   &paSilent,       "SILENT",      PaBool, PaOpt,  F,    T,    F, "silent mode",         PAI_REST_U },
+  { "--logLevel", &paLogLevel,     "LOG_LEVEL",   PaStr,  PaOpt,  0, PaNL, PaNL, "log levels",          PAI_REST_U },
   { "-v",         &paVerbose,      "VERBOSE",     PaBool, PaOpt,  F,    T,    F, "verbose mode",        PAI_REST_U },
   { "-vv",        &paVerbose2,     "VERBOSE2",    PaBool, PaOpt,  F,    T,    F, "verbose2 mode",       PAI_REST_U },
   { "-vvv",       &paVerbose3,     "VERBOSE3",    PaBool, PaOpt,  F,    T,    F, "verbose3 mode",       PAI_REST_U },
@@ -138,6 +140,7 @@ PaiArgument paBuiltin[] =
   { "-lmll",      &paLastLines,    "LAST_LINES",  PaInt,  PaOpt, -1, PaNL, PaNL, "clear 'last lines'",  PAI_REST   },
   { "-logAppend", &paLogAppend,    "LOG_APPEND",  PaBool, PaOpt,  F,    T,    F, "append to log-file",  PAI_REST_U },
   { "-assert",    &paAssertAtExit, "EXIT_ASSERT", PaBool, PaOpt,  F,    T,    F, "assert not exit",     PAI_REST   },
+
   PAI_END_OF_ARGS
 };
 

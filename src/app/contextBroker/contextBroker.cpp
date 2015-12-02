@@ -377,6 +377,22 @@ PaArgument paArgs[] =
 
 /* ****************************************************************************
 *
+* validLogLevels - to pas to parweArgs library for validation of --logLevel 
+*/
+static const char* validLogLevels[] = 
+{
+  "NONE",
+  "ERROR",
+  "WARNING",
+  "INFO",
+  "DEBUG",
+  NULL
+};
+
+
+
+/* ****************************************************************************
+*
 * restService* - vectors of REST services for the context broker
 *
 * This vector matches an incoming REST service, using the path of the URL, to a function
@@ -1604,7 +1620,7 @@ int main(int argC, char* argV[])
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
-
+  paConfig("valid log level strings",       validLogLevels);
 
   //
   // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
