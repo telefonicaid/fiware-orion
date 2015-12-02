@@ -45,7 +45,7 @@ extern void mongoListSubscriptions
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
-  const std::string& servicePath,
+  const std::string&                   servicePath,
   int                                  limit,
   int                                  offset,
   long long*                           count
