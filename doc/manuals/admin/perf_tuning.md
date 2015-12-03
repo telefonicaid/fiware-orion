@@ -204,9 +204,9 @@ too long to answer the HTTP request. In some cases, the receiver is not even lis
 established by the operating system) has to pass before the request can be considered a failure and the sending thread unblocks.
 This may have a significant impact.
 
-In the case of notifications, it causes that the thread (either transients or in the thread pool) is blocked. 
-In transient mode, it involves a thread inside the process, counting toward the maximum per-process thread limit but doing
-no effective work.
+In the case of notifications, it causes that the thread (either transients, persistent or in the thread pool) is blocked. 
+In transient or persistent mode, it involves an idle thread inside the process, counting toward the maximum per-process thread limit but doing
+no effective work (this can be specially severe in the case of persistent mode, as it will block other notification trying to sent to the same URL).
 In the second case, it means there are workers in the pool that cannot take on new work while waiting.
 
 In the case of queries/updates forwarded to context providers, the effect is that the original client will take a long time
