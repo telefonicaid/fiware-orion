@@ -86,7 +86,12 @@ The list of available options is the following:
 -   **-logAppend**. If used, the log lines are appended to the
     contextBroker log file, instead of re-creating it when the
     broker starts.
--   **--silent**. Suppress all log output except errors.
+-   **-logLevel**. Select logging level, supported levels:
+    - NONE    (suppress ALL log output, including errors),
+    - ERROR   (show only error messages),
+    - WARNING (show error and warning messages),
+    - INFO    (show error, warning and informational messages),
+    - DEBUG   (show ALL messages - this is the default setting).
 -   **-t <trace level>**. Specifies the initial trace levels
     for logging. You can use a single value (e.g. "-t 70"), a
     range (e.g. "-t 20-80"), a comma-separated list (e.g. "-t 70,90") or

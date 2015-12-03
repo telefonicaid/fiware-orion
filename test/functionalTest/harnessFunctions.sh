@@ -312,7 +312,12 @@ function localBrokerStart()
   shift
   shift
 
-  extraParams=$*
+  if [ "$traceLevels" != "" ]
+  then
+    extraParams="-logLevel DEBUG "$*
+  else
+    extraParams=$*
+  fi
 
   IPvOption=""
   

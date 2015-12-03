@@ -72,6 +72,7 @@
 #include "parseArgs/paConfig.h"
 #include "parseArgs/paBuiltin.h"
 #include "parseArgs/paIsSet.h"
+#include "parseArgs/paUsage.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -371,6 +372,22 @@ PaArgument paArgs[] =
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
   PA_END_OF_ARGS
+};
+
+
+
+/* ****************************************************************************
+*
+* validLogLevels - to pass to parseArgs library for validation of --logLevel 
+*/
+static const char* validLogLevels[] = 
+{
+  "NONE",
+  "ERROR",
+  "WARNING",
+  "INFO",
+  "DEBUG",
+  NULL
 };
 
 
@@ -1604,6 +1621,8 @@ int main(int argC, char* argV[])
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
+  paConfig("valid log level strings",       validLogLevels);
+  paConfig("default value",                 "-logLevel", "WARNING");
 
 
   //
@@ -1617,6 +1636,23 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+
+  // Argument consistency check (--silent AND -logLevel)
+  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
+  {
+    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
+    paUsage();
+    exit(1);
+  }
+
+  // Argument consistency check (-t AND NOT -logLevel)
+  if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
+  {
+    printf("incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG\n");
+    paUsage();
+    exit(1);
+  }
 
 #ifdef DEBUG_develenv
   //
