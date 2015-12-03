@@ -1024,10 +1024,10 @@ Let's examine in detail the different elements included in the payload:
     inter-notification arrival time. So, setting throttling to 5 seconds
     as in the example above, makes a notification not to be sent
     if a previous notification was sent less than 5 seconds ago, no
-    matter how many actual changes take place in that period. This is give the 
+    matter how many actual changes take place in that period. This is to give the 
     notification receptor a means to protect itself against context producers
-    that update attribute values too frequently. In multi-CB configurationa take
-    into account that last notification measure is local to each CB node. Although
+    that update attribute values too frequently. In multi-CB configurations, take
+    into account that the last-notification measure is local to each CB node. Although
     each node periodically synchronizes with DB in order to get potencially newer
     values (more on this [here](perf_tuning.md#subscription-cache) it may happen that
     a particular node has an old value, so throttling is not 100% accurate.
