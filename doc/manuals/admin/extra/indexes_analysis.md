@@ -1,8 +1,8 @@
 # Database indexes analysis
 
-The following analyzis shows the TPS (transation per second) and storage
-consumption figures for different indexes configuration and number of
-entities in the Orion Context Broker database. We have used Orion 0.14.0
+The following analysis shows the TPS (transation per second) and storage
+consumption figures for configurations with different indexes and different 
+numbers of entities in the Orion Context Broker database. We have used Orion 0.14.0
 in this analysis. Each transaction comprises one entity (either creating
 it, querying for it or updating it).
 
@@ -10,21 +10,21 @@ Please, take into account that this information is provided only as a
 hint to guide your decision about which indexes to use in your
 particular set up, but the results in your particular environment may
 differ depending on hardware profile, the particular entities being used
-for the test, set up situation, etc. In this particular case, the
-resources of the system under test (a VMware-based VM) are: 2 vCPU (on a
+for the test, setup situation, etc. In this particular case, the
+resources of the system being tested (a VMware-based VM) are: 2 vCPU (on a
 physical host based on Intel Xeon E5620@2.40GHz) and 4GB RAM. Both Orion
-and MongoDB run in the same VM. The tool to generate load is JMeter
+and MongoDB run in the same VM. The tool to generate load is JMeter,
 using the configuration that can be found at [the following
 location](https://github.com/telefonicaid/fiware-orion/tree/develop/test/LoadTest)
 (orionPerformanceOnlyQueries\_v2.0.jmx,
 orionPerformanceOnlyAppends\_v2.0.jmx and
-orionPerformanceAppendsAndUpdates\_v2.0.jmx) and running in a separated
-VM (but in the same subnet, i.e. L2 connectivity with the system under
-test.
+orionPerformanceAppendsAndUpdates\_v2.0.jmx) and running in a separate
+VM (but in the same subnet, i.e. L2 connectivity with the system being
+tested.
 
 Test cases are entity query, entity creation and mixing creation and update.
 
-Throughput:
+Throughput (TPS):
 
 
 | Case - Indexes                                           |  10,000 entities  | 100,000 entities   | 1,000,000 entities |
@@ -65,7 +65,7 @@ Storage:
 | 1,000,000 entities - separated `_id.id` and `_id.type` | 175             | 0.088                        |
 | 1,000,000 entities - compound (`_id.id`,`_id.type}`    | 161             | 0.079                        |
 
-(\*) Althought we don't set any index, note that the MongoDB always set
+(\*) Although we don't set any index, note that the MongoDB always sets
 up an index in `_id`. Thus, some ammount of space is always allocated to
 indexes.
 
