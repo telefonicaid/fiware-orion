@@ -1319,6 +1319,9 @@ extern bool lmNoTracesToFileIfHookActive;
 extern bool lmSilent;
 
 extern __thread char   transactionId[64];
+extern __thread char   srv[50 + 1];          // FIXME: Maybe we should use limits.h ?
+extern __thread char   subsrv[51*10 +1];     // FIXME: Maybe we should use limits.h ?
+extern __thread char   from[4*4 + 1];        // Based in XXX.XXX.XXX.XXX
 
 
 /* ****************************************************************************
@@ -1775,6 +1778,9 @@ extern int lmLogLinesGet(void);
 inline void LM_TRANSACTION_RESET()
 {
   strncpy(transactionId, "N/A", sizeof(transactionId));
+  strncpy(srv,           "N/A", sizeof(srv));
+  strncpy(subsrv,        "N/A", sizeof(subsrv));
+  strncpy(from,          "N/A", sizeof(from));
 }
 
 
@@ -1786,10 +1792,73 @@ inline void LM_TRANSACTION_RESET()
 inline void LM_TRANSACTION_START(const char* keyword, const char* ip, int port, const char* path)
 {
   transactionIdSet();
+  snprintf(srv,    sizeof(srv),    "pending");
+  snprintf(subsrv, sizeof(subsrv), "pending");
+  snprintf(from,   sizeof(from),   "pending");
   LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));
 }
 
 
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_SET_SRV -
+*/
+inline void LM_TRANSACTION_SET_SRV(const std::string& _srv)
+{
+  if (_srv != "")
+  {
+    snprintf(srv, sizeof(srv), _srv.c_str());
+  }
+  else
+  {
+    snprintf(srv, sizeof(srv), "<default>");
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_SET_SUBSRV -
+*/
+inline void LM_TRANSACTION_SET_SUBSRV(const std::string& _subsrv)
+{
+  if (_subsrv != "")
+  {
+    snprintf(subsrv, sizeof(srv), _subsrv.c_str());
+  }
+  else
+  {
+    snprintf(subsrv, sizeof(srv), "<defaul>");
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_SET_FROM -
+*/
+inline void LM_TRANSACTION_SET_FROM(const std::string& _from)
+{
+  if (_from != "")
+  {
+    snprintf(from, sizeof(from), _from.c_str());
+  }
+  else
+  {
+    snprintf(from, sizeof(from), "<no ip>");
+  }
+}
+
+
+
+#if 0
+
+// This piece of code seems not be in use. Maybe it is related with ONTIMENOTIFICATION
+// notifications... let's hold in until OTI (deprecated in 0.26.0) gets definitivealy
+// removed from code
 
 /* ****************************************************************************
 *
@@ -1798,8 +1867,12 @@ inline void LM_TRANSACTION_START(const char* keyword, const char* ip, int port, 
 inline void LM_TRANSACTION_START_URL(const char* url)
 {
   transactionIdSet();
+  snprintf(srv,    sizeof(srv),    "pending");
+  snprintf(subsrv, sizeof(subsrv), "pending");
+  snprintf(from,   sizeof(from),   "N/A");      // Not actually needed, but to make it explicit
   LM_I(("Starting transaction from %s", url));
 }
+#endif
 
 
 

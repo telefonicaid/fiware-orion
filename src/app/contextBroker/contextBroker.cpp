@@ -1566,7 +1566,7 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | srv=SRV | subsrv=SUBSRV | from=FROM | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
@@ -1574,6 +1574,9 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 int main(int argC, char* argV[])
 {
   strncpy(transactionId, "N/A", sizeof(transactionId));
+  strncpy(srv,           "N/A", sizeof(srv));
+  strncpy(subsrv,        "N/A", sizeof(subsrv));
+  strncpy(from,          "N/A", sizeof(from));
 
   uint16_t       rushPort = 0;
   std::string    rushHost = "";

@@ -429,6 +429,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     // Tenant to connectionInfo
     ciP->tenant = ciP->tenantFromHttpHeader;
+    LM_TRANSACTION_SET_SRV(ciP->tenant);
 
     //
     // A tenant string must not be longer than 50 characters and may only contain

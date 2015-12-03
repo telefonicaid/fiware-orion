@@ -285,6 +285,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Origin") == 0)          headerP->origin         = value;
   else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0) headerP->xforwardedFor  = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -1041,6 +1042,16 @@ static int connectionTreat
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
     }
 
+    /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
+    if (ciP->httpHeaders.xforwardedFor == "")
+    {
+      LM_TRANSACTION_SET_FROM(ip);
+    }
+    else
+    {
+      LM_TRANSACTION_SET_FROM(ciP->httpHeaders.xforwardedFor);
+    }
+
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     char tenant[SERVICE_NAME_MAX_LEN + 1];
@@ -1124,6 +1135,7 @@ static int connectionTreat
   }
 
   ciP->servicePath = ciP->httpHeaders.servicePath;
+  LM_TRANSACTION_SET_SUBSRV(ciP->servicePath);
 
   if (servicePathSplit(ciP) != 0)
   {

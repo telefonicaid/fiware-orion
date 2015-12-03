@@ -343,6 +343,9 @@ int             inSigHandler      = 0;
 char*           progName;                   /* needed for messages (and by lmLib) */
 char            progNameV[512];             /* where to store progName            */
 __thread char   transactionId[64] = "N/A";
+__thread char   srv[50 + 1]       = "N/A";     // FIXME: Maybe we should use limits.h ?
+__thread char   subsrv[51*10 +1]  = "N/A";     // FIXME: Maybe we should use limits.h ?
+__thread char   from[4*4 + 1]     = "N/A";     // Based in XXX.XXX.XXX.XXX
 
 
 
@@ -1066,6 +1069,18 @@ static char* lmLineFix
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
     {
       STRING_ADD(transactionId, 8);
+    }
+    else if (strncmp(&format[fi], "SRV", 3) == 0)
+    {
+      STRING_ADD(srv, 3);
+    }
+    else if (strncmp(&format[fi], "SUBSRV", 6) == 0)
+    {
+      STRING_ADD(subsrv, 6);
+    }
+    else if (strncmp(&format[fi], "FROM", 4) == 0)
+    {
+      STRING_ADD(from, 4);
     }
     else if (strncmp(&format[fi], "EXEC", 4) == 0)
     {
