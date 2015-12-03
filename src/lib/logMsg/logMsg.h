@@ -981,11 +981,14 @@ do                                                                       \
 /* ****************************************************************************
 *
 * LM_T - log trace message
+*
+* FIXME: temporal change, just for Orion contextBroker, use LogLevelDebug for LM_T
+*        instead of its correct level LogLevelTrace.
 */
 #define LM_T(tLev, s)                                                         \
 do                                                                            \
 {                                                                             \
-  if (LM_MASK(LogLevelTrace) && lmOk('T', tLev) == LmsOk)                     \
+  if (LM_MASK(LogLevelDebug) && lmOk('T', tLev) == LmsOk)                     \
   {                                                                           \
     char* text;                                                               \
                                                                               \
