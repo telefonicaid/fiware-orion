@@ -1830,7 +1830,7 @@ inline void LM_TRANSACTION_SET_SUBSRV(const std::string& _subsrv)
   }
   else
   {
-    snprintf(subsrv, sizeof(srv), "<defaul>");
+    snprintf(subsrv, sizeof(srv), "<default>");
   }
 }
 
