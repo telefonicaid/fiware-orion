@@ -9,14 +9,14 @@
 
 The default log file is `/tmp/contextBroker.log`. Remember that the directory where the log file is stored (`/tmp` by default) can be changed using the `--logDir` command line option.
 
-When starting the Orion context broker, if a previous log file exist:
+When starting the Orion context broker, if a previous log file exists:
 
 -   If **-logAppend** is used, then the log is appended to the
     existing file.
 -   If **-logAppend** is not used, then the existing file is renamed,
     appending the text ".old" to its name.
 
-The `-logLevel` option allows to chose which error messages will be printed in the log:
+The `-logLevel` option allows to choose which error messages are printed in the log:
 
 - NONE: no log at all
 - ERROR: only ERROR messages are logged
@@ -88,7 +88,7 @@ The different fields in each line are as follows:
     logic ensures that every transaction id is unique, also for Orion
     instances running in different VMs (which is useful in the case you
     are aggregating logs from different sources), except if they are
-    started in the exactly same millisecond. There are two types of
+    started in the exact same millisecond. There are two types of
     transactions in Orion:
     -   The ones initiated by an external client invoking the REST API
         exposed by Orion. The first message on these transactions use
@@ -151,19 +151,19 @@ Alarm conditions
 
 | Alarm ID   | Severity   |   Detection strategy                                                                          | Stop condition                                                                                                                                                                                                                                           | Description                                                                                                  | Action
 |:---------- |:----------:|:--------------------------------------------------------------------------------------------- |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------ |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-| 1          | CRITICAL   | A FATAL trace is found                                                                        | The following INFO text trace appear: "Startup completed""                                                                                                                                                                                               | A problem has happend at Orion Context Broker startup. The FATAL 'msg' field details the particular problem. | Solving the issue that is precluding Orion Context Broker startup, e.g. if the problem was due to the listening port is being used the solution would be either changing Orion listening port or ending the process that is already using the port.
+| 1          | CRITICAL   | A FATAL trace is found                                                                        | The following INFO text trace appear: "Startup completed""                                                                                                                                                                                               | A problem has occurred at Orion Context Broker startup. The FATAL 'msg' field details the particular problem. | Solving the issue that is precluding Orion Context Broker startup, e.g. if the problem was due to the listening port is being used, the solution would be either changing Orion listening port or ending the process that is already using the port.
 | 2          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Database Error (...)"                   | The following INFO text appears in the 'msg' field: "Database Operation Successful (...)"                                                                                                                                                                | Database Error. The text within parenthesis in the 'msg' field containts the detailed information.           | Orion is unable to access MongoDB database and/or MongoDB database is not working properly. Check database connection and database status. Once repaired the database and/or its connection from Orion, the problem should disapear (Orion service restart is not needed). No specific fixing action has to be done at Orion Context Broker service.
-| 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (...)"                    | N/A                                                                                                                                                                                                                                                      | Runtime Error. The text within parenthesis in the 'msg' field containts the detailed information.            | Restart Orion Context Broker. If it persits (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
-| 4          | WARNING    | The following WARNING text appear in the 'msg' field: "Bad Input (...)"                       | A transaction comming from the same client (identified by IP and port) is processed correctly, without any "Bad Input (...)" message between the "Starting transaction from" message to the "Transaction ended" message for that particular transaction. | Bad Input. The text within parenthesis in the 'msg' field containts the detailed information.                | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific fixing action has to be done at Orion Context Broker service.
-| 5          | WARNING    | The following WARNING text appears in the 'msg' field: "Notification failure for <url> (...)" | The following INFO text appears in the 'msg' field: "Notification Successfully Sent to <url>", where <url> is the same one that triggered the alarm.                                                                                                     | Notification Failure. The text within parenthesis in the 'msg' field containts the detailed information.     | Orion is trying to send the notification to a given receiver and some problem has happended. It could be due to a problem on the network connectivy or on the receiver e.g. the receiver is down. In the second case, the owner of the receiver of the owner should be reported. No specific fixing action has to be done at Orion Context Broker service.
+| 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (...)"                    | N/A                                                                                                                                                                                                                                                      | Runtime Error. The text within parenthesis in the 'msg' field containts the detailed information.            | Restart Orion Context Broker. If it persists (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
+| 4          | WARNING    | The following WARNING text appear in the 'msg' field: "Bad Input (...)"                       | A transaction comming from the same client (identified by IP and port) is processed correctly, without any "Bad Input (...)" message between the "Starting transaction from" message to the "Transaction ended" message for that particular transaction. | Bad Input. The text within parenthesis in the 'msg' field contains the detailed information.                | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific fixing action has to be done at Orion Context Broker service.
+| 5          | WARNING    | The following WARNING text appears in the 'msg' field: "Notification failure for <url> (...)" | The following INFO text appears in the 'msg' field: "Notification Successfully Sent to <url>", where <url> is the same one that triggered the alarm.                                                                                                     | Notification Failure. The text within parenthesis in the 'msg' field contains the detailed information.     | Orion is trying to send the notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivy or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific fixing action has to be done at Orion Context Broker service.
 
 [Top](#top)
 
 ## Log rotation
 
-Logrotate is installed as RPM dependency along with contextBroker. The
-system is configure to rotate every day and whenever the log file size
-is greater than 100MB (checked very 30 minutes by default):
+Logrotate is installed as an RPM dependency along with the contextBroker.
+The system is configured to rotate once a day, or more, in case the log file size
+exceeds 100MB (checked very 30 minutes by default):
 
 -   For daily rotation: `/etc/logrotate.d/logrotate-contextBroker-daily`:
     which enables daily log rotation
