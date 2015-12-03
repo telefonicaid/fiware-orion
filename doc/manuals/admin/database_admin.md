@@ -55,7 +55,7 @@ mongorestore --host <dbhost> --db <db> dump/<db>
 
 Note that if you are using
 [multitenant/multiservice](#multiservicemultitenant-database-separation)
-you need to apply the procedures to each per-tenant/service database
+you need to apply the procedures to each per-tenant/service database.
 
 [Top](#top)
 
@@ -63,11 +63,11 @@ you need to apply the procedures to each per-tenant/service database
 
 MongoDB authorization is configured with the `-db`, `-dbuser` and `-dbpwd`
 options ([see section on command line
-options](cli.md)). There are different cases
+options](cli.md)). There are a few different cases
 to take into account:
 
--   If your MongoDB instance/cluster doesn't use authorization at all,
-    then don't use the `-dbuser` and `-dbpwd` options.
+-   If your MongoDB instance/cluster doesn't use authorization,
+    then do not use the `-dbuser` and `-dbpwd` options.
 -   If your MongoDB instance/cluster uses authorization , then:
     -   If you run Orion in single service/tenant mode (i.e.
         without `-multiservice`) then you are using only one database
@@ -79,7 +79,7 @@ to take into account:
         document](#Multiservice/multitenant_database_separation "wikilink"),
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
-        authorizing on `admin` DB ensures permisions in all them.
+        authorizing on `admin` DB ensures permissions in all of them.
      
 [Top](#top)
 
@@ -129,12 +129,12 @@ performance tuning documentation.
 
 ## Database management scripts
 
-Orion Context Broker comes along with some scripts that can be use to do
-some browsing and administrative actions in the database, installed in
+Orion Context Broker comes with a few scripts that can be used for
+browsing and administrative activities in the database, installed in
 the `/usr/share/contextBroker` directory.
 
-In order to use them, you need to install the pymongo driver (version
-2.5 or above) as a requirement to run it, typically using (run it as
+In order to use these scripts, you need to install the pymongo driver (version
+2.5 or above), typically using (run it as
 root or using the sudo command):
 
 ` pip-python install pymongo`
@@ -145,9 +145,9 @@ root or using the sudo command):
 
 NGSI specifies an expiration time for registrations and subcriptions
 (both NGSI9 and NGSI10 subscriptions). Orion Context Broker doesn't
-delete the expired documents (it just ignores them) due to the fact that
-expired registrations/subscription can be "re-activated" by an update of
-their duration.
+delete the expired documents (they are just ignored) as
+expired registrations/subscription can be "re-activated" using a subscription update request,
+modifying their duration.
 
 However, expired registrations/subscriptions consume space in the
 database, so they can be "purged" from time to time. In order to help
@@ -167,7 +167,7 @@ csubs and casubs collection, "marking" them with the following field:
 ```
 
 The garbage-collector.py program takes as arguments the collection to be
-analyzed, e.g. to analyze csubs and casubs, run:
+analyzed. E.g. to analyze csubs and casubs, run:
 
 ```
 garbage-collector.py csubs casubs
@@ -186,13 +186,13 @@ mongo <host>/<db>
 
 ### Latest updated document
 
-You can take an snapshot of the lastest updated entities and attributes
-in the database using the lastest-updates.py script. It takes up to four
+You can take an snapshot of the latest updated entities and attributes
+in the database using the latest-updates.py script. It takes up to four
 arguments:
 
 -   Either "entities" or "attributes", to set the granularity level in
     the updates.
--   The database to use (same than the -db parameter and
+-   The database to use (same as the -db parameter and
     BROKER\_DATABASE\_NAME used by the broker). Note that the mongod
     instance has to run in the same machine where the script runs.
 -   The maximum number of lines to print
@@ -201,7 +201,7 @@ arguments:
 
 Ej:
 
-    # lastest-updates.py entities orion 4
+    # latest-updates.py entities orion 4
     -- 2013-10-30 18:19:47: Room1 (Room)
     -- 2013-10-30 18:16:27: Room2 (Room)
     -- 2013-10-30 18:14:44: Room3 (Room)
