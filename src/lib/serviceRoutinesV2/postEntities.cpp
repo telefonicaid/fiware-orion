@@ -100,12 +100,12 @@ std::string postEntities
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP, true);
 
-  HttpStatusCode rcode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
-
-  std::string answer;
+  StatusCode     rstatuscode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode;
+  HttpStatusCode rhttpcode  = rstatuscode.code;
+  std::string    answer;
 
   // 03. Prepare HTTP headers
-  if (rcode == SccOk || rcode == SccNone)
+  if (rhttpcode == SccOk || rhttpcode == SccNone)
   {
     std::string location = "/v2/entities/" + eP->id;
 
@@ -113,9 +113,9 @@ std::string postEntities
     ciP->httpHeaderValue.push_back(location);
     ciP->httpStatusCode = SccCreated;
   }
-  else if (rcode == SccInvalidModification)
+  else if (rhttpcode == SccInvalidModification)
   {
-    OrionError oe(SccInvalidModification, "Entity already exists");
+    OrionError oe(rstatuscode);
     ciP->httpStatusCode = SccInvalidModification;
 
     TIMED_RENDER(answer = oe.render(ciP, ""));

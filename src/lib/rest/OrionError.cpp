@@ -153,6 +153,11 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
       ciP->httpStatusCode = SccBadRequest;
     }
 
+    if (details == "Already Exists")
+    {
+      details = "Entity already exists";
+    }
+
     reasonPhrase = errorStringForV2(reasonPhrase);
     return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
   }
