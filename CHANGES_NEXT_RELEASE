@@ -1,2 +1,3 @@
-Add: servicePath header filtering in GET /v2/subscriptions operation (Issue #1557)
-Add: New command-line-option '-logLevel <level>', levels: NONE, ERROR, WARNING, INFO, DEBUG (Issue #1583)
+- Default -subIvalCache changed to 60 seconds
+- Add: servicePath header filtering in GET /v2/subscriptions operation (Issue #1557)
+- Add: New command-line-option '-logLevel <level>', levels: NONE, ERROR, WARNING, INFO, DEBUG (Issue #1583)

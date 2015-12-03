@@ -265,7 +265,7 @@ Date: REGEX(.*)
 {
     "measuring_interval_in_secs": REGEX(\d+),
     "semWait": {
-        "curlContext": REGEX(.*.A*),
+        "connectionContext": REGEX(.*.A*),
         "dbConnectionPool": REGEX(.*.A*),
         "request": REGEX(.*.A*),
         "subCache": REGEX(.*.A*),
@@ -317,7 +317,7 @@ Date: REGEX(.*)
 {
     "measuring_interval_in_secs": REGEX(\d+),
     "semWait": {
-        "curlContext": REGEX(.*.A*),
+        "connectionContext": REGEX(.*.A*),
         "dbConnectionPool": REGEX(.*.A*),
         "request": REGEX(.*.A*),
         "subCache": REGEX(.*.A*),
@@ -369,7 +369,7 @@ Date: REGEX(.*)
 {
     "measuring_interval_in_secs": REGEX(\d+),
     "semWait": {
-        "curlContext": REGEX(.*.A*),
+        "connectionContext": REGEX(.*.A*),
         "dbConnectionPool": REGEX(.*.A*),
         "request": REGEX(.*.A*),
         "subCache": REGEX(.*.A*),

@@ -228,12 +228,12 @@ std::string renderSemWaitStats(void)
 {
   JsonHelper jh;
 
-  jh.addFloat("request",          semTimeReqGet());
-  jh.addFloat("dbConnectionPool", mongoPoolConnectionSemWaitingTimeGet());
-  jh.addFloat("transaction",      semTimeTransGet());
-  jh.addFloat("subCache",         semTimeCacheGet());
-  jh.addFloat("curlContext",      mutexTimeCCGet());
-  jh.addFloat("timeStat",         semTimeTimeStatGet());
+  jh.addFloat("request",           semTimeReqGet());
+  jh.addFloat("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
+  jh.addFloat("transaction",       semTimeTransGet());
+  jh.addFloat("subCache",          semTimeCacheGet());
+  jh.addFloat("connectionContext", mutexTimeCCGet());
+  jh.addFloat("timeStat",          semTimeTimeStatGet());
 
   return jh.str();
 }
