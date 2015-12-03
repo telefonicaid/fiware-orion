@@ -115,7 +115,8 @@ The list of available options is the following:
     mutex policy. See [performance tuning](perf_tuning.md#mutex-policy-impact-in-performance) documentation
     for details.
 -   **-subCacheIval**. Interval in seconds between calls to subscription cache refresh. A zero
-    value means "no refresh". Default value is 60 seconds, apt for mono-CB deployments.
+    value means "no refresh". Default value is 60 seconds, apt for mono-CB deployments (see more details on 
+    the subscriptions cache in [this document](perf_tuning.md#subscription-cache)).
 -   **-noCache**. Disables the context subscription cache, so subscriptions searches are
     always done in DB (not recommended but useful for debugging).
 -   **-notificationMode** *(Experimental option)*. Allows to select notification mode, either:
