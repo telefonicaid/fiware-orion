@@ -108,7 +108,7 @@ Provides timing information, i.e. the time that CB passes executing in different
       "mongoWriteWait": 259.347915990,
       "mongoCommandWait": 0.514811318,
       "render": 108.162782114,
-      "total": 186476.593504743,
+      "total": 6476.593504743,
       "xmlParse": 44.490766332
      },
     "last": {
