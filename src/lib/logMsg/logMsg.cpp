@@ -343,7 +343,6 @@ int             inSigHandler      = 0;
 char*           progName;                   /* needed for messages (and by lmLib) */
 char            progNameV[512];             /* where to store progName            */
 __thread char   transactionId[64] = "N/A";
-extern char*    progName;
 
 
 
@@ -396,6 +395,7 @@ bool  lmWrites                     = false;
 bool  lmBug                        = false;
 bool  lmBuf                        = false;
 bool  lmFix                        = false;
+int   lmLevelMask                  = 0xFFFFFFFF;  /* All "masked in" by default */
 bool  lmAssertAtExit               = false;
 LmxFp lmxFp                        = NULL;
 bool  lmNoTracesToFileIfHookActive = false;
@@ -503,6 +503,91 @@ char* lmProgName(char* pn, int levels, bool pid, const char* extra)
   printf("pName: %s\n", pName);
 
   return pName;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskSet - 
+*/
+void lmLevelMaskSet(int levelMask)
+{
+  lmLevelMask = levelMask;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskSetString - 
+*/
+void lmLevelMaskSetString(char* level)
+{
+  if (strcasecmp(level, "NONE") == 0)
+  {
+    lmLevelMask = 0;
+  }
+  else if (strcasecmp(level, "ERROR") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+  }
+  else if (strcasecmp(level, "WARNING") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+  }
+  else if (strcasecmp(level, "INFO") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+  }
+  else if (strcasecmp(level, "VERBOSE") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+  }
+  else if (strcasecmp(level, "DEBUG") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+    lmLevelMask |= LogLevelDebug;
+  }
+  else if (strcasecmp(level, "TRACE") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+    lmLevelMask |= LogLevelDebug;
+    lmLevelMask |= LogLevelTrace;
+  }
+  else if (strcasecmp(level, "ALL") == 0)
+  {
+    lmLevelMask  = 0xFFFFFFFF;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskGet - 
+*/
+int lmLevelMaskGet(void)
+{
+  return lmLevelMask;
 }
 
 
