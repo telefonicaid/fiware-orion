@@ -305,7 +305,7 @@ bool            statNotifQueue;
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
-#define STAT_NOTIF_QUEUE       "enalle thread pool notifications queue statistics"
+#define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 
 
 
@@ -1566,17 +1566,21 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | srv=SRV | subsrv=SUBSRV | from=FROM | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
 */
 int main(int argC, char* argV[])
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
-  strncpy(srv,           "N/A", sizeof(srv));
-  strncpy(subsrv,        "N/A", sizeof(subsrv));
-  strncpy(from,          "N/A", sizeof(from));
+
+  //lmTransactionReset();
+#if 1
+  strncpy(transactionId, "N/A", sizeof(transactionId));  
+  strncpy(service,       "N/A", sizeof(service));
+  strncpy(subService,    "N/A", sizeof(subService));
+  strncpy(fromIp,        "N/A", sizeof(fromIp));
+#endif
 
   uint16_t       rushPort = 0;
   std::string    rushHost = "";

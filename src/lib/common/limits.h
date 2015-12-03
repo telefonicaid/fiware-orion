@@ -37,12 +37,31 @@
 
 
 
-/* ****************************************************************************
+/* ****'************************************************************************
 *
 * Service Path definitions - 
+*
+* The formula for SERVICE_PATH_MAX_TOTAL needs a little explanation. Considering
+*
+* Fiware-ServicePath: /A/B, /C/D
+*
+* The +1 if for the '/' in each level, the +2 is the extra characters assuming that the
+* separation between tokens is ', ' (this is just an heuristic, as HTTP header could include
+* more whitespace, but probably the final value is so large that it suffices most of the
+* cases and don't mind in the case of truncated very long service path, from a logs point
+* of view).
+*
 */
 #define SERVICE_PATH_MAX_COMPONENTS       10
 #define SERVICE_PATH_MAX_LEVELS           10
 #define SERVICE_PATH_MAX_COMPONENT_LEN    50
+#define SERVICE_PATH_MAX_TOTAL            (((SERVICE_PATH_MAX_COMPONENT_LEN + 1) * SERVICE_PATH_MAX_LEVELS) + 2) * SERVICE_PATH_MAX_COMPONENTS
+
+/* ****'************************************************************************
+*
+* Others -
+*
+*/
+#define IP_LENGH_MAX  15    // Based in xxx.xxx.xxx.xxx
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_

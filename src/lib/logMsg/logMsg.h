@@ -40,6 +40,7 @@
 
 #include "common/globals.h"     /* transactionIdSet                          */
 
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
 
 
 /******************************************************************************
@@ -1322,9 +1323,9 @@ extern bool lmNoTracesToFileIfHookActive;
 extern bool lmSilent;
 
 extern __thread char   transactionId[64];
-extern __thread char   srv[50 + 1];          // FIXME: Maybe we should use limits.h ?
-extern __thread char   subsrv[51*10 +1];     // FIXME: Maybe we should use limits.h ?
-extern __thread char   from[4*4 + 1];        // Based in XXX.XXX.XXX.XXX
+extern __thread char   service[SERVICE_NAME_MAX_LEN + 1];
+extern __thread char   subService[101];                 // Using SERVICE_PATH_MAX_TOTAL will be too much
+extern __thread char   fromIp[IP_LENGH_MAX + 1];
 
 
 /* ****************************************************************************
@@ -1776,28 +1777,28 @@ extern int lmLogLinesGet(void);
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_RESET -
+* lmTransactionReset -
 */
-inline void LM_TRANSACTION_RESET()
+inline void lmTransactionReset()
 {
   strncpy(transactionId, "N/A", sizeof(transactionId));
-  strncpy(srv,           "N/A", sizeof(srv));
-  strncpy(subsrv,        "N/A", sizeof(subsrv));
-  strncpy(from,          "N/A", sizeof(from));
+  strncpy(service,       "N/A", sizeof(service));
+  strncpy(subService,    "N/A", sizeof(subService));
+  strncpy(fromIp,        "N/A", sizeof(fromIp));
 }
 
 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START -
+* lmTransactionStart -
 */
-inline void LM_TRANSACTION_START(const char* keyword, const char* ip, int port, const char* path)
+inline void lmTransactionStart(const char* keyword, const char* ip, int port, const char* path)
 {
   transactionIdSet();
-  snprintf(srv,    sizeof(srv),    "pending");
-  snprintf(subsrv, sizeof(subsrv), "pending");
-  snprintf(from,   sizeof(from),   "pending");
+  snprintf(service,    sizeof(service),    "pending");
+  snprintf(subService, sizeof(subService), "pending");
+  snprintf(fromIp,     sizeof(fromIp),     "pending");
   LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));
 }
 
@@ -1805,17 +1806,17 @@ inline void LM_TRANSACTION_START(const char* keyword, const char* ip, int port, 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_SET_SRV -
+* lmTransactionSetService -
 */
-inline void LM_TRANSACTION_SET_SRV(const std::string& _srv)
+inline void lmTransactionSetService(const char* _service)
 {
-  if (_srv != "")
+  if (strlen(_service) != 0)
   {
-    snprintf(srv, sizeof(srv), _srv.c_str());
+    snprintf(service, sizeof(service), _service);
   }
   else
   {
-    snprintf(srv, sizeof(srv), "<default>");
+    snprintf(service, sizeof(service), "<default>");
   }
 }
 
@@ -1823,17 +1824,17 @@ inline void LM_TRANSACTION_SET_SRV(const std::string& _srv)
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_SET_SUBSRV -
+* lmTransactionSetSubservice -
 */
-inline void LM_TRANSACTION_SET_SUBSRV(const std::string& _subsrv)
+inline void lmTransactionSetSubservice(const char* _subService)
 {
-  if (_subsrv != "")
+  if (strlen(_subService) != 0)
   {
-    snprintf(subsrv, sizeof(srv), _subsrv.c_str());
+    snprintf(subService, sizeof(service), _subService);
   }
   else
   {
-    snprintf(subsrv, sizeof(srv), "<default>");
+    snprintf(subService, sizeof(service), "<default>");
   }
 }
 
@@ -1841,17 +1842,17 @@ inline void LM_TRANSACTION_SET_SUBSRV(const std::string& _subsrv)
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_SET_FROM -
+* lmTransactionSetFrom -
 */
-inline void LM_TRANSACTION_SET_FROM(const std::string& _from)
+inline void lmTransactionSetFrom(const char* _fromIp)
 {
-  if (_from != "")
+  if (strlen(_fromIp) != 0)
   {
-    snprintf(from, sizeof(from), _from.c_str());
+    snprintf(fromIp, sizeof(fromIp), _fromIp);
   }
   else
   {
-    snprintf(from, sizeof(from), "<no ip>");
+    snprintf(fromIp, sizeof(fromIp), "<no ip>");
   }
 }
 
@@ -1865,14 +1866,11 @@ inline void LM_TRANSACTION_SET_FROM(const std::string& _from)
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START_URL -
+* lmTransactionStart_URL -
 */
-inline void LM_TRANSACTION_START_URL(const char* url)
+inline void lmTransactionStart_URL(const char* url)
 {
   transactionIdSet();
-  snprintf(srv,    sizeof(srv),    "pending");
-  snprintf(subsrv, sizeof(subsrv), "pending");
-  snprintf(from,   sizeof(from),   "N/A");      // Not actually needed, but to make it explicit
   LM_I(("Starting transaction from %s", url));
 }
 #endif
@@ -1881,12 +1879,12 @@ inline void LM_TRANSACTION_START_URL(const char* url)
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_END -
+* lmTransactionEnd -
 */
-inline void LM_TRANSACTION_END()
+inline void lmTransactionEnd()
 {
   LM_I(("Transaction ended"));
-  LM_TRANSACTION_RESET();
+  lmTransactionReset();
 }
 
 #endif  // SRC_LIB_LOGMSG_LOGMSG_H_

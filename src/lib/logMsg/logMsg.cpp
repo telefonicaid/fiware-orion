@@ -53,6 +53,8 @@
 #include "logMsg/time.h"
 #include "logMsg/logMsg.h"      /* Own interface                             */
 
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+
 extern "C" pid_t gettid(void);
 
 
@@ -339,13 +341,13 @@ typedef struct Line
 *
 * globals
 */
-int             inSigHandler      = 0;
-char*           progName;                   /* needed for messages (and by lmLib) */
-char            progNameV[512];             /* where to store progName            */
-__thread char   transactionId[64] = "N/A";
-__thread char   srv[50 + 1]       = "N/A";     // FIXME: Maybe we should use limits.h ?
-__thread char   subsrv[51*10 +1]  = "N/A";     // FIXME: Maybe we should use limits.h ?
-__thread char   from[4*4 + 1]     = "N/A";     // Based in XXX.XXX.XXX.XXX
+int             inSigHandler                      = 0;
+char*           progName;                         /* needed for messages (and by lmLib) */
+char            progNameV[512];                   /* where to store progName            */
+__thread char   transactionId[64]                 = "N/A";
+__thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
+__thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
+__thread char   fromIp[IP_LENGH_MAX + 1]          = "N/A";
 
 
 
@@ -1070,17 +1072,17 @@ static char* lmLineFix
     {
       STRING_ADD(transactionId, 8);
     }
-    else if (strncmp(&format[fi], "SRV", 3) == 0)
+    else if (strncmp(&format[fi], "SERVICE", 7) == 0)
     {
-      STRING_ADD(srv, 3);
+      STRING_ADD(service, 7);
     }
-    else if (strncmp(&format[fi], "SUBSRV", 6) == 0)
+    else if (strncmp(&format[fi], "SUB_SERVICE", 11) == 0)
     {
-      STRING_ADD(subsrv, 6);
+      STRING_ADD(subService, 11);
     }
-    else if (strncmp(&format[fi], "FROM", 4) == 0)
+    else if (strncmp(&format[fi], "FROM_IP", 7) == 0)
     {
-      STRING_ADD(from, 4);
+      STRING_ADD(fromIp, 7);
     }
     else if (strncmp(&format[fi], "EXEC", 4) == 0)
     {

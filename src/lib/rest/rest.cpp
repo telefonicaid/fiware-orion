@@ -480,7 +480,7 @@ static void requestCompleted
 
   *con_cls = NULL;
 
-  LM_TRANSACTION_END();  // Incoming REST request ends
+  lmTransactionEnd();  // Incoming REST request ends
 
   if (timingStatistics)
   {
@@ -1022,7 +1022,7 @@ static int connectionTreat
     //
     // Transaction starts here
     //
-    LM_TRANSACTION_START("from", ip, port, url);  // Incoming REST request starts
+    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
 
 
     //
@@ -1045,11 +1045,11 @@ static int connectionTreat
     /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
     if (ciP->httpHeaders.xforwardedFor == "")
     {
-      LM_TRANSACTION_SET_FROM(ip);
+      lmTransactionSetFrom(ip);
     }
     else
     {
-      LM_TRANSACTION_SET_FROM(ciP->httpHeaders.xforwardedFor);
+      lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
     }
 
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
@@ -1135,7 +1135,7 @@ static int connectionTreat
   }
 
   ciP->servicePath = ciP->httpHeaders.servicePath;
-  LM_TRANSACTION_SET_SUBSRV(ciP->servicePath);
+  lmTransactionSetSubservice(ciP->servicePath.c_str());
 
   if (servicePathSplit(ciP) != 0)
   {
