@@ -1574,13 +1574,7 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 int main(int argC, char* argV[])
 {
 
-  //lmTransactionReset();
-#if 1
-  strncpy(transactionId, "N/A", sizeof(transactionId));  
-  strncpy(service,       "N/A", sizeof(service));
-  strncpy(subService,    "N/A", sizeof(subService));
-  strncpy(fromIp,        "N/A", sizeof(fromIp));
-#endif
+  lmTransactionReset();
 
   uint16_t       rushPort = 0;
   std::string    rushHost = "";

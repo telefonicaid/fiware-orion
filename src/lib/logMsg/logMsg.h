@@ -1325,7 +1325,7 @@ extern bool lmSilent;
 extern __thread char   transactionId[64];
 extern __thread char   service[SERVICE_NAME_MAX_LEN + 1];
 extern __thread char   subService[101];                 // Using SERVICE_PATH_MAX_TOTAL will be too much
-extern __thread char   fromIp[IP_LENGH_MAX + 1];
+extern __thread char   fromIp[IP_LENGTH_MAX + 1];
 
 
 /* ****************************************************************************

@@ -62,6 +62,6 @@
 * Others -
 *
 */
-#define IP_LENGH_MAX  15    // Based in xxx.xxx.xxx.xxx
+#define IP_LENGTH_MAX  15    // Based in xxx.xxx.xxx.xxx
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_
