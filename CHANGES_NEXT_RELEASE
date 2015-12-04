@@ -2,3 +2,4 @@ Fix: Fixed a bug about pagination problem due to missing ErrorCode with details 
 Fix: taking into account the pagination limit before adding "potential" entities to be queried in CPrs. (Issue #945)
 Fix: Fix Conv op to std op mapping wrongly using patterns in some GET operations (Issue #1322)
 Fix: Add charset=utf-8 for notifications (Issue #1340)
+Fix: use NOSIGNAL as libcurl option to avoid crashes in that library. (Issue #1016)
