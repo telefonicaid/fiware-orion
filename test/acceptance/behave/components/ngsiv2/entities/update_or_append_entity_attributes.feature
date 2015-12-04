@@ -310,23 +310,42 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | attributes_value | 80          |
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                                                                                         |
-      | error       | BadRequest                                                                                                                                    |
-      | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
+      | parameter   | value                                                                                  |
+      | error       | BadRequest                                                                             |
+      | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
     Examples:
-      | service                         |
-      | service.sr                      |
-      | Service-sr                      |
-      | Service(sr)                     |
-      | Service=sr                      |
-      | Service<sr>                     |
-      | Service,sr                      |
-      | greater than max length allowed |
+      | service     |
+      | service.sr  |
+      | Service-sr  |
+      | Service(sr) |
+      | Service=sr  |
+      | Service<sr> |
+      | Service,sr  |
+      | service#sr  |
+      | service%sr  |
+      | service&sr  |
+
+  @service_update_append_bad_length
+  Scenario:  try to update or append attributes by entity ID using NGSI v2 with bad length service header values
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | greater than max length allowed |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    When update or append attributes by ID "room"
+      | parameter        | value       |
+      | attributes_name  | temperature |
+      | attributes_value | 80          |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                    |
+      | error       | BadRequest                                               |
+      | description | bad length - a tenant name can be max 50 characters long |
 
      # ------------------------ Service path ----------------------------------------------
 
   @service_path_update @BUG_1423 @skip
-  Scenario Outline:  update attributes by entity ID using NGSI v2 with several service header values
+  Scenario Outline:  update attributes by entity ID using NGSI v2 with several service path header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -363,7 +382,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | max length allowed and ten levels                             |
 
   @service_path_append @BUG_1423 @skip
-  Scenario Outline:  append attributes by entity ID using NGSI v2 with several service header values
+  Scenario Outline:  append attributes by entity ID using NGSI v2 with several service path header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -400,7 +419,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | max length allowed and ten levels                             |
 
   @service_path_update_without
-  Scenario:  update attributes by entity ID using NGSI v2 without service header
+  Scenario:  update attributes by entity ID using NGSI v2 without service path header
     Given  a definition of headers
       | parameter      | value                    |
       | Fiware-Service | test_update_service_path |
@@ -424,7 +443,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     And verify that an entity is updated in mongo
 
   @service_path_append_without
-  Scenario:  append attributes by entity ID using NGSI v2 without service header
+  Scenario:  append attributes by entity ID using NGSI v2 without service path header
     Given  a definition of headers
       | parameter      | value                    |
       | Fiware-Service | test_update_service_path |
@@ -448,8 +467,8 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     Then verify that receive an "Created" http code
     And verify that an entity is updated in mongo
 
-  @service_path_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
+  @service_path_update_append_error_
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with illegal service path header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -474,7 +493,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | /serv(45)    |
 
   @service_path_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with not allowed service path header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -495,7 +514,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | /service,sr  |
 
   @service_path_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with too long service path header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -516,7 +535,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | greater than max length allowed and ten levels |
 
   @service_path_update_append_error
-  Scenario:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
+  Scenario:  try to update or append attributes by entity ID using NGSI v2 with too many service path header values
     Given  a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_update_service_path             |

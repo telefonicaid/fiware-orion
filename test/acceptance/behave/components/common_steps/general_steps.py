@@ -100,6 +100,18 @@ def send_a_statistics_request(context):
     __logger__.info("..Sent a statistics request correctly")
 
 
+@step(u'send a cache statistics request')
+def send_a_cache_statistics_request(context):
+    """
+    send a cache statistics request
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Sending a statistics request...")
+    context.props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
+    context.cb = CB(protocol=context.props_cb_env["CB_PROTOCOL"], host=context.props_cb_env["CB_HOST"], port=context.props_cb_env["CB_PORT"])
+    context.resp = context.cb.get_cache_statistics_request()
+    __logger__.info("..Sent a statistics request correctly")
+
 @step(u'delete database in mongo')
 def delete_database_in_mongo(context):
     """
@@ -170,19 +182,21 @@ def verify_entry_point(context, url, value):
 @step(u'verify statistics "([^"]*)" field does exists')
 def verify_stat_fields(context, field_to_test):
     """
-    verify statistics fields in response.
-    Ex:
-             {
-                    "versionRequests" : "1",
-                    "statisticsRequests" : "1",
-                    "uptime_in_secs" : "1",
-                    "measuring_interval_in_secs" : "1",
-                    "subCacheRefreshs" : "1",
-                    "subCacheInserts" : "0",
-                    "subCacheRemoves" : "0",
-                    "subCacheUpdates" : "0",
-                    "subCacheItems" : "0"
-             }
+    verify statistics and cache statistics fields in response.
+    Ex: /statistics
+     {
+        "uptime_in_secs":2,
+        "measuring_interval_in_secs":2
+     }
+       /cache/statistics
+     {
+        "ids":"",
+        "refresh":1,
+        "inserts":0,
+        "removes":0,
+        "updates":0,
+        "items":0
+     }
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param field_to_test: field to verify if it does exists
     """
