@@ -266,7 +266,7 @@ do                                                \
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
-#define F_LEN            128
+#define F_LEN            150
 #define TF_LEN           64
 #define INFO_LEN         512
 #define TMS_LEN          20
