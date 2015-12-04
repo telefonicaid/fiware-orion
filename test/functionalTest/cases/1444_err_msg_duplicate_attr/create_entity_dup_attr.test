@@ -56,12 +56,12 @@ echo
 01. POST /v2/entities, creating first entity with id E1
 ==========================================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 88
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "duplicated attribute name and id [attr,]",
+    "description": "duplicated attribute /attr/",
     "error": "InvalidModification"
 }
 

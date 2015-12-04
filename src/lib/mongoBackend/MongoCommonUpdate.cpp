@@ -2767,7 +2767,7 @@ static bool contextElementPreconditionsCheck
       {
         ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector.get(ix));
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
-                                  "duplicated attribute name and id [" + name + "," + id + "]");
+                                  "duplicated attribute /" + name + "/");
         LM_W(("Bad Input (duplicated attribute name: name=<%s> id=<%s>)", name.c_str(), id.c_str()));
         return false; // Error already in responseP
       }
