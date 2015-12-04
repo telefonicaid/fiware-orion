@@ -285,6 +285,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Origin") == 0)          headerP->origin         = value;
   else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0) headerP->xforwardedFor  = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -479,7 +480,7 @@ static void requestCompleted
 
   *con_cls = NULL;
 
-  LM_TRANSACTION_END();  // Incoming REST request ends
+  lmTransactionEnd();  // Incoming REST request ends
 
   if (timingStatistics)
   {
@@ -1021,7 +1022,7 @@ static int connectionTreat
     //
     // Transaction starts here
     //
-    LM_TRANSACTION_START("from", ip, port, url);  // Incoming REST request starts
+    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
 
 
     //
@@ -1039,6 +1040,16 @@ static int connectionTreat
     if (!ciP->httpHeaders.servicePathReceived)
     {
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
+    }
+
+    /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
+    if (ciP->httpHeaders.xforwardedFor == "")
+    {
+      lmTransactionSetFrom(ip);
+    }
+    else
+    {
+      lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
     }
 
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
@@ -1124,6 +1135,7 @@ static int connectionTreat
   }
 
   ciP->servicePath = ciP->httpHeaders.servicePath;
+  lmTransactionSetSubservice(ciP->servicePath.c_str());
 
   if (servicePathSplit(ciP) != 0)
   {

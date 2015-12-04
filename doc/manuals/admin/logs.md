@@ -37,32 +37,24 @@ The log format is designed to be processed by tools like
 Each line in the log file is composed by several key-value fields,
 separed by the pipe character (`|`). Example:
 
-    time=2014-07-18T16:39:06.265CEST | lvl=INFO | trans=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1217]: Orion Context Broker is running
-    time=2014-07-18T16:39:06.266CEST | lvl=INFO | trans=N/A | function=mongoConnect | comp=Orion | msg=MongoGlobal.cpp[122]: Successful connection to database
-    time=2014-07-18T16:39:06.266CEST | lvl=INFO | trans=N/A | function=mongoInit | comp=Orion | msg=contextBroker.cpp[1055]: Connected to mongo at localhost:orion
-    time=2014-07-18T16:39:06.341CEST | lvl=INFO | trans=N/A | function=recoverOntimeIntervalThreads | comp=Orion | msg=MongoGlobal.cpp[421]: Database Operation Successful ({ conditions.type: "ONTIMEINTERVAL" })
-    time=2014-07-18T16:39:06.452CEST | lvl=INFO | trans=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1290]: Startup completed
+    time=2014-07-18T16:39:06.265CEST | lvl=INFO | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1217]: Orion Context Broker is running
+    time=2014-07-18T16:39:06.266CEST | lvl=INFO | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoConnect | comp=Orion | msg=MongoGlobal.cpp[122]: Successful connection to database
+    time=2014-07-18T16:39:06.266CEST | lvl=INFO | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=mongoInit | comp=Orion | msg=contextBroker.cpp[1055]: Connected to mongo at localhost:orion
+    time=2014-07-18T16:39:06.452CEST | lvl=INFO | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=main | comp=Orion | msg=contextBroker.cpp[1290]: Startup completed
     ...
-    time=2014-07-18T16:39:22.920CEST | lvl=INFO | trans=1405694346-265-00000000001 | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 0.0.0.0:48372/NGSI10/updateContext
-    time=2014-07-18T16:39:22.922CEST | lvl=INFO | trans=1405694346-265-00000000001 | function=processContextElement | comp=Orion | msg=MongoCommonUpdate.cpp[1499]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.922CEST | lvl=INFO | trans=1405694346-265-00000000001 | function=createEntity | comp=Orion | msg=MongoCommonUpdate.cpp[1318]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923CEST | lvl=INFO | trans=1405694346-265-00000000001 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923CEST | lvl=INFO | trans=1405694346-265-00000000001 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
-    time=2014-07-18T16:39:22.923CEST | lvl=INFO | trans=1405694346-265-00000000001 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:22.920CEST | lvl=INFO | trans=1405694346-265-00000000001 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.1:v1/v1/updateContext
+    time=2014-07-18T16:39:22.922CEST | lvl=INFO | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=processContextElement | comp=Orion | msg=MongoCommonUpdate.cpp[1499]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.922CEST | lvl=INFO | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=createEntity | comp=Orion | msg=MongoCommonUpdate.cpp[1318]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923CEST | lvl=INFO | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923CEST | lvl=INFO | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=addTriggeredSubscriptions | comp=Orion | msg=MongoCommonUpdate.cpp[811]: Database Operation Successful (...)
+    time=2014-07-18T16:39:22.923CEST | lvl=INFO | trans=1405694346-265-00000000001 | srv=s1 | subsrv=/A | from=10.0.0.1 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
     ...
-    time=2014-07-18T16:39:35.415CEST | lvl=INFO | trans=1405694346-265-00000000002 | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 0.0.0.0:48373/NGSI10/queryContext
-    time=2014-07-18T16:39:35.416CEST | lvl=INFO | trans=1405694346-265-00000000002 | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[877]: Database Operation Successful (...)
-    time=2014-07-18T16:39:35.416CEST | lvl=INFO | trans=1405694346-265-00000000002 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
+    time=2014-07-18T16:39:35.415CEST | lvl=INFO | trans=1405694346-265-00000000002 | srv=pending | subsrv=pending | from=pending | function=connectionTreat | comp=Orion | msg=rest.cpp[615]: Starting transaction from 10.0.0.2:48373/v1/queryContext
+    time=2014-07-18T16:39:35.416CEST | lvl=INFO | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[877]: Database Operation Successful (...)
+    time=2014-07-18T16:39:35.416CEST | lvl=INFO | trans=1405694346-265-00000000002 | srv=s1 | subsrv=/A | from=10.0.0.2 | function=connectionTreat | comp=Orion | msg=rest.cpp[745]: Transaction ended
     ...
-    time=2014-07-18T16:41:34.254CEST | lvl=INFO | trans=N/A | function=mongoGetContextSubscriptionInfo | comp=Orion | msg=mongoOntimeintervalOperations.cpp[58]: Database Operation Successful (findOne _id: 53c8c29d09b4f403b165ff61)
-    time=2014-07-18T16:41:34.255CEST | lvl=INFO | trans=N/A | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[877]: Database Operation Successful (...)
-    time=2014-07-18T16:41:34.255CEST | lvl=INFO | trans=1405694174-239-00000000015 | function=doNotification | comp=Orion | msg=onTimeIntervalThread.cpp[89]: Starting transaction to http://localhost:1028/accumulate
-    time=2014-07-18T16:41:34.255CEST | lvl=INFO | trans=1405694174-239-00000000015 | function=mongoUpdateCsubNewNotification | comp=Orion | msg=mongoOntimeintervalOperations.cpp[175]: Database Operation Successful (...)
-    time=2014-07-18T16:41:34.255CEST | lvl=INFO | trans=1405694174-239-00000000015 | function=sendHttpSocket | comp=Orion | msg=clientSocketHttp.cpp[376]: Notification Successfully Sent to 10.0.0.1:1028/accumulate
-    time=2014-07-18T16:41:34.255CEST | lvl=INFO | trans=1405694174-239-00000000015 | function=sendHttpSocket | comp=Orion | msg=clientSocketHttp.cpp[377]: Transaction ended
-    ...
-    time=2014-07-18T16:44:53.541CEST | lvl=INFO | trans=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[968]: Signal Handler (caught signal 2)
-    time=2014-07-18T16:44:53.541CEST | lvl=INFO | trans=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[974]: Orion context broker exiting due to receiving a signal
+    time=2014-07-18T16:44:53.541CEST | lvl=INFO | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[968]: Signal Handler (caught signal 2)
+    time=2014-07-18T16:44:53.541CEST | lvl=INFO | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=sigHandler | comp=Orion | msg=contextBroker.cpp[974]: Orion context broker exiting due to receiving a signal
 
 The different fields in each line are as follows:
 
@@ -102,6 +94,12 @@ The different fields in each line are as follows:
         reference element of the subscription, i.e. the URL of the
         callback to send the notification. The last message of both
         transaction types is "Transaction ended".
+-   **srv**. Service associated to the transaction, or "pending" if the
+    transaction has started but the service has not been yet obtained.
+-   **subsrv**. Subservice associated to the transaction, or "pending" if the
+    transaction has started but the subservice has not been yet obtained.
+-   **from**. Source IP of the HTTP request associated to the transaction, except
+    if the request includes `X-Forwarded-For` header (which overrides the former).
 -   **function**. The function in the source code that generated the
     log message. This information is useful for developers only.
 -   **comp (component)**. Current version always uses "Orion" in
@@ -119,26 +117,26 @@ The different fields in each line are as follows:
     using the appropriate channel (StackOverflow with the
     tag "fiware-orion").
 
-    time=2014-07-18T08:33:19.389CEST | lvl=FATAL | trans=N/A | function=restStart | comp=Orion | msg=rest.cpp[861]: Fatal Error (error starting REST interface)
+    time=2014-07-18T08:33:19.389CEST | lvl=FATAL | trans=N/A | srv=N/A | subsrv=N/A | from=N/A | function=restStart | comp=Orion | msg=rest.cpp[861]: Fatal Error (error starting REST interface)
 
 -   ERROR Runtime Error. This error may cause the Context Broker
     to fail. This type of errors should be reported to the Orion
     development team using the appropriate channel (StackOverflow with
     the tag "fiware-orion").
 
-    time=2014-07-18T08:33:19.389CEST | lvl=ERROR | trans=1405607677-567-00000000002 | function=sendHttpSocket | comp=Orion | msg=clientSocketHttp.cpp[262]: Runtime Error (HTTP request to send is too large: 2048000000 bytes)
+    time=2014-07-18T08:33:19.389CEST | lvl=ERROR | trans=1405607677-567-00000000002 | srv=... | subsrv=... | from=... | function=sendHttpSocket | comp=Orion | msg=clientSocketHttp.cpp[262]: Runtime Error (HTTP request to send is too large: 2048000000 bytes)
 
 -   ERROR Database Error. This error is due to problems with
     the database. This type of errors are associated to alarms (see
     section on alarms).
 
-    time=2014-07-21T18:38:45.897CEST | lvl=ERROR | trans=1405960644-549-00000000004 | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[886]: Database Error (...)
+    time=2014-07-21T18:38:45.897CEST | lvl=ERROR | trans=1405960644-549-00000000004 | srv=... | subsrv=... | from=... | function=entitiesQuery | comp=Orion | msg=MongoGlobal.cpp[886]: Database Error (...)
 
 -   WARNING Bad input. This error is due to problems in the API usage.
     This type of warnings are associated to alarms (see section
     on alarms).
 
-    time=2014-07-18T08:42:29.925CEST | lvl=WARNING | trans=1405665739-109-00000000001 | function=badRequest | comp=Orion | msg=badRequest.cpp[46]: Bad Input (service '/versionxxxx' not found)
+    time=2014-07-18T08:42:29.925CEST | lvl=WARNING | trans=1405665739-109-00000000001 | srv=... | subsrv=... | from=... | function=badRequest | comp=Orion | msg=badRequest.cpp[46]: Bad Input (service '/versionxxxx' not found)
 
 -   WARNING notification connection error. This type of warnings are due
     to problems connecting to notification receivers. They are
