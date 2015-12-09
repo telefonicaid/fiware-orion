@@ -164,6 +164,11 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Dec 09 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.1-1
+- Default -subIvalCache changed to 60 seconds
+- Add: servicePath header filtering in GET /v2/subscriptions operation (Issue #1557)
+- Add: New command-line-option '-logLevel <level>', levels: NONE, ERROR, WARNING, INFO, DEBUG (Issue #1583)
+
 * Tue Dec 01 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.0-1
 - Add: Add queue+threads for notifications (notificationMode thread:<queue size>:<num threads>) (Issue #1449)
 - Add: possibility to limit the maximum number of simultaneous connections, using the CLI option -maxConnections (Issue #1384)
