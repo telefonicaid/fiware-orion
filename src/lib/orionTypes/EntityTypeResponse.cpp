@@ -94,7 +94,7 @@ std::string EntityTypeResponse::check
 */
 void EntityTypeResponse::present(const std::string& indent)
 {
-  LM_T(LmtPresent,("%EntityTypeResponse:\n", indent.c_str()));
+  LM_T(LmtPresent,("%sEntityTypeResponse:\n", indent.c_str()));
   entityType.present(indent + "  ");
   statusCode.present(indent + "  ");
 }
