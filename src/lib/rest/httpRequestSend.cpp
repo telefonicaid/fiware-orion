@@ -471,7 +471,7 @@ int httpRequestSendWithCurl
 
   lmTransactionEnd();
 
-  return 0;
+  return res == CURLE_OK ? 0 : -8;
 }
 
 
