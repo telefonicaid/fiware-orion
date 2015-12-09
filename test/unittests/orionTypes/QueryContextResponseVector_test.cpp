@@ -32,21 +32,22 @@
 */
 TEST(QueryContextResponseVector, present)
 {
-  utInit();
-#if 0
-  QueryContextResponseVector qcrV;
-  QueryContextResponse       qcr;
-  ContextElementResponse     cer;
-  ContextElement             ce("E", "T", "false");
-  ContextAttribute*          ca = new ContextAttribute("A", "T", "s");
 
-  ce.contextAttributeVector.push_back(ca);
-  cer.contextElement.fill(&ce);
-  qcr.contextElementResponseVector.push_back(&cer);
+  QueryContextResponse       qcr;
+
+  utInit();
+
+  QueryContextResponseVector qcrV;
+  ContextElementResponse*    cerP = new ContextElementResponse();
+  ContextElement*            ceP  = new ContextElement("E", "T", "false");
+  ContextAttribute*          caP  = new ContextAttribute("A", "T", "s");
+
+  ceP->contextAttributeVector.push_back(caP);
+  cerP->contextElement.fill(ceP);
+  qcr.contextElementResponseVector.push_back(cerP);
   qcrV.vec.push_back(&qcr);
 
   qcrV.present();
-#endif
 
   utExit();
 }

@@ -34,8 +34,19 @@ TEST(UpdateContextRequestVector, present)
 {
   utInit();
 
-  //EntityType et("myType");
-  //et.present("");
+  UpdateContextRequestVector  ucrV;
+  UpdateContextRequest        ucr;
+
+  ContextElement ce("E", "T", "false");
+  ContextAttribute ca("A", "T", "val");
+  ce.contextAttributeVector.push_back(&ca);
+
+  ucr.contextElementVector.push_back(&ce);
+  ucr.updateActionType.set("UPDATE");
+
+  ucrV.push_back(&ucr);
+
+  ucr.present("");
 
   utExit();
 }
