@@ -125,6 +125,8 @@ static void resetStatistics(void)
 
   noOfSimulatedNotifications                      = -1;
 
+  QueueStatistics::reset();
+
   semTimeReqReset();
   semTimeTransReset();
   semTimeCacheReset();
