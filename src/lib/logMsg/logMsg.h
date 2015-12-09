@@ -1812,11 +1812,11 @@ inline void lmTransactionSetService(const char* _service)
 {
   if (strlen(_service) != 0)
   {
-    snprintf(service, sizeof(service), _service);
+    snprintf(service, sizeof(service), "%s", _service);
   }
   else
   {
-    snprintf(service, sizeof(service), "<default>");
+    snprintf(service, sizeof(service), "%s", "<default>");
   }
 }
 
@@ -1830,11 +1830,11 @@ inline void lmTransactionSetSubservice(const char* _subService)
 {
   if (strlen(_subService) != 0)
   {
-    snprintf(subService, sizeof(service), _subService);
+    snprintf(subService, sizeof(service), "%s", _subService);
   }
   else
   {
-    snprintf(subService, sizeof(service), "<default>");
+    snprintf(subService, sizeof(service), "%s", "<default>");
   }
 }
 
@@ -1848,11 +1848,11 @@ inline void lmTransactionSetFrom(const char* _fromIp)
 {
   if (strlen(_fromIp) != 0)
   {
-    snprintf(fromIp, sizeof(fromIp), _fromIp);
+    snprintf(fromIp, sizeof(fromIp), "%s", _fromIp);
   }
   else
   {
-    snprintf(fromIp, sizeof(fromIp), "<no ip>");
+    snprintf(fromIp, sizeof(fromIp), "%s", "<no ip>");
   }
 }
 
