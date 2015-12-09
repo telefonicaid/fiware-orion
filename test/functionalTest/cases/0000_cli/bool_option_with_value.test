@@ -1,4 +1,4 @@
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -19,14 +19,25 @@
 # iot_support at tid dot es
 
 --NAME--
-broker version
+parseArgs complains about bool argument with a value
 
 --SHELL-INIT--
 
 --SHELL--
-contextBroker -u
+#
+# -multiservice is a valid BOOLEAN parameter for the broker.
+# As the parseArgs library allows for space or no space between the name of an option
+# and its value (-x1 == -x 1), -multiserviceXXX is the bool option -multiservice WITH a
+# value of XXX, which is an error, as bool options have no values.
+# This error should be printed on stdout, like:
+#
+# -multiservice: bool option - no value allowed
+#
+contextBroker -multiserviceXXX
 
 --REGEXPECT--
+'-multiserviceXXX' not recognized
+
 Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-u' (usage)]
                       [option '--version' (show version)]

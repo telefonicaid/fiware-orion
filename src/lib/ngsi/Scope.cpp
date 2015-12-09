@@ -176,6 +176,7 @@ std::string Scope::check
   //
   if (forbiddenChars(type.c_str()))
   {
+    LM_W(("Bad Input (found a forbidden character in the type of a scope"));
     return "illegal chars in scope type";
   }
 
@@ -183,6 +184,7 @@ std::string Scope::check
   {
     if (forbiddenChars(value.c_str()))
     {
+      LM_W(("Bad Input (found a forbidden character in the value of a scope"));
       return "illegal chars in scope";
     }
   }

@@ -88,6 +88,7 @@ extern bool       paLogToFile;
 extern bool       paLogToScreen;
 extern bool       paLogScreenToStderr;
 extern bool       paLogScreenOnlyErrors;
+extern bool       paBoolWithValueIsUnrecognized;
 
 extern char*      paLogFilePath;
 extern char*      paLogFileLineFormat;

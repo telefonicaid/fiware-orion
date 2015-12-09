@@ -303,8 +303,8 @@ HttpStatusCode mongoEntityTypes
 */
 HttpStatusCode mongoAttributesForEntityType
 (
-  std::string                           entityType,
-  EntityTypeResponse*         responseP,
+  const std::string&                    entityType,
+  EntityTypeResponse*                   responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams

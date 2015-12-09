@@ -51,7 +51,8 @@ void* startSenderThread(void* p)
 
     if (!simulatedNotification)
     {
-      std::string r;
+      std::string  out;
+      int          r;
 
       r = httpRequestSend(params->ip,
                           params->port,
@@ -64,9 +65,10 @@ void* startSenderThread(void* p)
                           params->content_type,
                           params->content,
                           true,
-                          NOTIFICATION_WAIT_MODE);
+                          NOTIFICATION_WAIT_MODE,
+                          &out);
 
-      if ((r != "") && (r != "error"))
+      if (r == 0)
       {
         statisticsUpdate(NotifyContextSent, params->format);
       }

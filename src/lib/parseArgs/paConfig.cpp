@@ -76,6 +76,7 @@ bool       paLogToFile           = false;
 bool       paLogToScreen         = false;
 bool       paLogScreenToStderr   = false;
 bool       paLogScreenOnlyErrors = false;
+bool       paBoolWithValueIsUnrecognized = false;
 
 char*      paLogFilePath         = NULL;
 char*      paLogFileLineFormat   = NULL;
@@ -118,11 +119,11 @@ bool       paBuf                 = false;
 bool       paDoubt               = false;
 
 bool       paSilent              = false;
-
 bool       paMsgsToStdout        = true;
 bool       paMsgsToStderr        = false;
 char       paPid[16];
 bool       paNoTracesToFileIfHookActive = false;
+char**     paValidLogLevels             = NULL;
 
 
 
@@ -454,6 +455,29 @@ static void paConfigInit(void)
 
 /* ****************************************************************************
 *
+* validLogLevelCheck - 
+*/
+static bool validLogLevelCheck(char** paValidLogLevels, char* value)
+{
+  int ix = 0;
+
+  while (paValidLogLevels[ix] != NULL)
+  {
+    if (strcasecmp(value, paValidLogLevels[ix]) == 0)
+    {
+      return true;
+    }
+
+    ++ix;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * paConfig - 
 */
 int paConfig(const char* item, const void* value, const void* value2)
@@ -550,13 +574,19 @@ int paConfig(const char* item, const void* value, const void* value2)
   else if (strcmp(item, "prefix") == 0)
   {
     if (paPrefix != NULL)
+    {
       free(paPrefix);
+    }
+
     paPrefix = strdup((char*) val);
   }
   else if (strcmp(item, "builtin prefix") == 0)
   {
     if (paBuiltinPrefix != NULL)
+    {
       free(paBuiltinPrefix);
+    }
+
     paBuiltinPrefix = strdup((char*) val);
   }
   else if (strcmp(item, "prog name") == 0)
@@ -658,7 +688,37 @@ int paConfig(const char* item, const void* value, const void* value2)
   }
   else if (strcmp(item, "silent mode") == 0)
   {
-    paSilent = (bool) val;
+    strncpy(paLogLevel, "ERROR", sizeof(paLogLevel));
+  }
+  else if (strcmp(item, "valid log level strings") == 0)
+  {
+    paValidLogLevels = (char**) val;
+  }
+  else if (strcmp(item, "log level string") == 0)
+  {
+    bool ok = true;
+
+    if (paValidLogLevels != NULL)
+    {
+      ok = validLogLevelCheck(paValidLogLevels, (char*) val);
+    }
+
+    if (ok == true)
+    {
+      lmLevelMaskSetString((char*) val);
+    }
+    else
+    {
+      char w[256];
+
+      snprintf(w, sizeof(w), "invalid log level string: %s", (char*) val);
+      PA_WARNING(PasBadValue, w);
+      return -1;
+    }
+  }
+  else if (strcmp(item, "log level mask") == 0)
+  {
+    lmLevelMaskSet((int) val);
   }
   else if (strcmp(item, "version") == 0)
   {
@@ -679,7 +739,7 @@ int paConfig(const char* item, const void* value, const void* value2)
       paLogToScreen  = true;
       paMsgsToStdout = true;
     }
-    else if ( value == (void*)false)
+    else if ( value == (void*) false)
     {
       paLogToScreen = false;
     }
@@ -688,6 +748,10 @@ int paConfig(const char* item, const void* value, const void* value2)
       paLogToScreen         = true;
       paLogScreenOnlyErrors = true;
     }
+  }
+  else if (strcmp(item, "bool option with value as non-recognized option") == 0)
+  {
+    paBoolWithValueIsUnrecognized = true;
   }
   else if (strcmp(item, "log to stderr") == 0)
   {
@@ -880,6 +944,7 @@ int paConfigActions(bool preTreat)
   {
     LM_ENTRY();
     lmTraceSet(paTraceV);
+
     if (paNoClear == true)
     {
       lmDontClear();
@@ -889,6 +954,33 @@ int paConfigActions(bool preTreat)
     {
       /* logMsg must be changed to not change -1 values */
       lmClearAt(paClearAt, paKeepLines, paLastLines);
+    }
+
+    if (paSilent)
+    {
+      strncpy(paLogLevel, "ERROR", sizeof(paLogLevel));
+    }
+
+    if (paLogLevel[0] != 0)
+    {
+      bool ok = true;
+
+      if (paValidLogLevels != NULL)
+      {
+        ok = validLogLevelCheck(paValidLogLevels, paLogLevel);
+      }
+      
+      if (ok == true)
+      {
+        lmLevelMaskSetString(paLogLevel);
+      }
+      else
+      {
+        char w[256];
+
+        snprintf(w, sizeof(w), "invalid log level string: %s", (char*) paLogLevel);
+        PA_WARNING(PasBadValue, w);
+      }
     }
 
     LM_T(LmtPaConfigAction, ("setting trace levels to '%s'", paTraceV));

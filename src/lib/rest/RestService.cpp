@@ -30,6 +30,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/string.h"
@@ -42,15 +43,6 @@
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
 #include "mongoBackend/mongoSubCache.h"
-
-
-
-/* ****************************************************************************
-*
-* Tenant name max length
-*/
-#define MAX_TENANT_NAME_LEN            50
-#define MAX_TENANT_NAME_LEN_STRING    "50"
 
 
 
@@ -144,10 +136,10 @@ static std::string tenantCheck(const std::string& tenant)
 {
   char*        name    = (char*) tenant.c_str();
 
-  if (strlen(name) > MAX_TENANT_NAME_LEN)
+  if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
-    LM_W(("Bad Input (a tenant name can be max %d characters long. Length: %d)", MAX_TENANT_NAME_LEN, strlen(name)));
-    return "bad length - a tenant name can be max " MAX_TENANT_NAME_LEN_STRING " characters long";
+    LM_W(("Bad Input (a tenant name can be max %d characters long. Length: %d)", SERVICE_NAME_MAX_LEN, strlen(name)));
+    return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }
 
   while (*name != 0)

@@ -49,14 +49,6 @@
 using namespace mongo;
 
 
-/*****************************************************************************
-*
-* MAX_SERVICE_NAME_LEN
-*/
-#define MAX_SERVICE_NAME_LEN 50
-
-
-
 /* ****************************************************************************
 *
 * MongoTreatFunction - callback signature for Mongo callback functions
@@ -312,7 +304,7 @@ extern bool registrationsQuery
 * collection)
 *
 */
-extern EntityIdVector subToEntityIdVector(BSONObj sub);
+extern EntityIdVector subToEntityIdVector(const BSONObj& sub);
 
 /* ****************************************************************************
 *
@@ -322,7 +314,7 @@ extern EntityIdVector subToEntityIdVector(BSONObj sub);
 * collection)
 *
 */
-extern AttributeList subToAttributeList(BSONObj attrL);
+extern AttributeList subToAttributeList(const BSONObj& attrL);
 
 /* ****************************************************************************
 *

@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_COMMON_LIMITS_H_
+#define SRC_LIB_COMMON_LIMITS_H_
+
 /*
 *
-* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -22,49 +25,24 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "parse/forbiddenChars.h"
 
 
 
 /* ****************************************************************************
 *
-* forbiddenChars - 
+* Service/Tenant definitions - 
 */
-bool forbiddenChars(const char* s, const char* exceptions)
-{
-  if (s == (void*) 0)
-  {
-    return false;
-  }
+#define SERVICE_NAME_MAX_LEN            50
+#define SERVICE_NAME_MAX_LEN_STRING    "50"
 
-  while (*s != 0)
-  {
-    if ((exceptions != NULL) && (strchr(exceptions, *s) != NULL))
-    {
-      ++s;
-      continue;
-    }
 
-    switch (*s)
-    {
-    case '<':
-    case '>':
-    case '"':
-    case '\'':
-    case '=':
-    case ';':
-    case '(':
-    case ')':
-      return true;
-    }
 
-    ++s;
-  }
+/* ****************************************************************************
+*
+* Service Path definitions - 
+*/
+#define SERVICE_PATH_MAX_COMPONENTS       10
+#define SERVICE_PATH_MAX_LEVELS           10
+#define SERVICE_PATH_MAX_COMPONENT_LEN    50
 
-  return false;
-}
+#endif  // SRC_LIB_COMMON_LIMITS_H_
