@@ -256,7 +256,7 @@ std::string renderNotifQueueStats(void)
   jh.addNumber("sentOk",         QueueStatistics::getSentOK());     // FIXME P7: this needs to be generalized for all notificationModes
   jh.addNumber("sentError",      QueueStatistics::getSentError());  // FIXME P7: this needs to be generalized for all notificationModes
   jh.addFloat ("timeInQueue",    timeInQ);
-  jh.addFloat ("avgTimeInQueue", (timeInQ/out));
+  jh.addFloat ("avgTimeInQueue", out==0 ? 0 : (timeInQ/out));
   jh.addNumber("size",           QueueStatistics::getQSize());
 
   return jh.str();
