@@ -168,6 +168,7 @@ static char* curlVersionGet(char* buf, int bufLen)
 *     -5: No Content-Type BUT content present
 *     -6: Content-Type present but there is no content
 *     -7: Total outgoing message size is too big
+*     -9: Error making HTTP request
 */
 int httpRequestSendWithCurl
 (
@@ -490,6 +491,7 @@ int httpRequestSendWithCurl
 *     -6: Content-Type present but there is no content
 *     -7: Total outgoing message size is too big
 *     -8: Unable to initialize libcurl
+*     -9: Error making HTTP request
 *
 *   [ error codes -1 to -7 comes from httpRequestSendWithCurl ]
 */
