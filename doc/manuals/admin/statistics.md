@@ -159,6 +159,7 @@ it is only shown if `-notificationMode` is set to threadpool.
 {
   ...
   "notifQueue" : {
+    "avgTimeInQueue": 0.000077437,
     "in" : 579619,
     "out" : 579619,
     "reject" : 0,
@@ -173,6 +174,7 @@ it is only shown if `-notificationMode` is set to threadpool.
 
 The particular counters are as follows:
 
+* `avgTimeInQueue`: average time that each notification waits in the queue (equal to `timeInQueue` divided by `out`)
 * `in`: number of notifications that get into the queue
 * `out`: numbers of notifications that get out of the queue
 * `reject`: number of notifications that get rejected, due to queue full. In other words, notifications that are not even
