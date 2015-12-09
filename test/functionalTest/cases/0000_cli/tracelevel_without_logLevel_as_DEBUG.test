@@ -19,26 +19,16 @@
 # iot_support at tid dot es
 
 --NAME--
-parseArgs complains about bool argument with a value
+tracelevel without logLevel as DEBUG
 
 --SHELL-INIT--
 
 --SHELL--
-#
-# -multiservice is a valid BOOLEAN parameter for the broker.
-# As the parseArgs library allows for space or no space between the name of an option
-# and its value (-x1 == -x 1), -multiserviceXXX is the bool option -multiservice WITH a
-# value of XXX, which is an error, as bool options have no values.
-# This error should be printed on stdout, like:
-#
-# -multiservice: bool option - no value allowed
-#
-contextBroker -multiserviceXXX
+contextBroker -t 0-255
 
 --REGEXPECT--
-'-multiserviceXXX' not recognized
-
-Usage: contextBroker  [option '-U' (extended usage)]
+incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG
+Usage:                [option '-U' (extended usage)]
                       [option '-u' (usage)]
                       [option '--version' (show version)]
                       [option '-logDir' <log file directory>]

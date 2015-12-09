@@ -212,13 +212,13 @@ int httpRequestSendWithCurl
     timeoutInMilliseconds = defaultTimeout;
   }
 
-  LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
+  lmTransactionStart("to", ip.c_str(), port, resource.c_str());
 
   // Preconditions check
   if (port == 0)
   {
     LM_E(("Runtime Error (port is ZERO)"));
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
 
     *outP = "error";
     return -1;
@@ -227,7 +227,7 @@ int httpRequestSendWithCurl
   if (ip.empty())
   {
     LM_E(("Runtime Error (ip is empty)"));
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
 
     *outP = "error";
     return -2;
@@ -236,7 +236,7 @@ int httpRequestSendWithCurl
   if (verb.empty())
   {
     LM_E(("Runtime Error (verb is empty)"));
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
 
     *outP = "error";
     return -3;
@@ -245,7 +245,7 @@ int httpRequestSendWithCurl
   if (resource.empty())
   {
     LM_E(("Runtime Error (resource is empty)"));
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
 
     *outP = "error";
     return -4;
@@ -254,7 +254,7 @@ int httpRequestSendWithCurl
   if ((content_type.empty()) && (!content.empty()))
   {
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
 
     *outP = "error";
     return -5;
@@ -263,7 +263,7 @@ int httpRequestSendWithCurl
   if ((!content_type.empty()) && (content.empty()))
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
 
     *outP = "error";
     return -6;
@@ -396,7 +396,7 @@ int httpRequestSendWithCurl
     free(httpResponse->memory);
     delete httpResponse;
 
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
     *outP = "error";
     return -7;
   }
@@ -469,7 +469,7 @@ int httpRequestSendWithCurl
   free(httpResponse->memory);
   delete httpResponse;
 
-  LM_TRANSACTION_END();
+  lmTransactionEnd();
 
   return 0;
 }
@@ -520,7 +520,7 @@ int httpRequestSend
   {
     release_curl_context(&cc);
     LM_E(("Runtime Error (could not init libcurl)"));
-    LM_TRANSACTION_END();
+    lmTransactionEnd();
 
     *outP = "error";
     return -8;
