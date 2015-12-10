@@ -40,7 +40,7 @@ TEST(EntityTypeVectorResponse, present)
   etVRes.entityTypeVector.vec.push_back(&et);
   etVRes.statusCode.fill(SccOk);
 
-  et.present("");
+  etVRes.present("");
 
   utExit();
 }

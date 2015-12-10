@@ -46,7 +46,7 @@ TEST(UpdateContextRequestVector, present)
 
   ucrV.push_back(&ucr);
 
-  ucr.present("");
+  ucrV.present("");
 
   utExit();
 }
