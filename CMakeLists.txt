@@ -94,6 +94,8 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
         MESSAGE("cmake: Coverage compilation")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
         set (CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
+        # FIXME: explain this remove_definitions()
+        remove_definitions(-DLM_ON)
     endif (COVERAGE)
 
     if (UNIT_TEST)
