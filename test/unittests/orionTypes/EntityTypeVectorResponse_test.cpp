@@ -44,3 +44,36 @@ TEST(EntityTypeVectorResponse, present)
 
   utExit();
 }
+
+
+/* ****************************************************************************
+*
+* check
+*/
+TEST(EntityTypeVectorResponse, check)
+{
+  ConnectionInfo ci;
+
+  utInit();
+
+  ci.outFormat = JSON;
+
+  EntityType et1("myType");
+  EntityType et2("");
+
+  // EntityTypeVectorResponse with a EntityType (in the vector) that will not fail
+  EntityTypeVectorResponse etRV1;
+  etRV1.entityTypeVector.push_back((&et1));
+
+  // EntityTypeVectorResponse with a EntityType (in the vector) that will fail
+  EntityTypeVectorResponse etRV2;
+  etRV2.entityTypeVector.push_back((&et2));
+
+  EXPECT_EQ("OK", etRV1.check(&ci, "", ""));
+
+  EXPECT_NE("OK", etRV1.check(&ci, "", "foo"));
+
+  EXPECT_NE("OK", etRV2.check(&ci, "", ""));
+
+  utExit();
+}

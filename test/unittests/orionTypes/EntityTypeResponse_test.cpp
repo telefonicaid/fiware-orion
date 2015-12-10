@@ -42,3 +42,28 @@ TEST(EntityTypeResponse, present)
 
   utExit();
 }
+
+
+/* ****************************************************************************
+*
+* check
+*/
+TEST(EntityTypeResponse, check)
+{
+  ConnectionInfo ci;
+
+  utInit();
+
+  ci.outFormat = JSON;
+  EntityTypeResponse etR1;
+  EntityTypeResponse etR2;
+
+  etR1.entityType.type = "myType";
+  etR2.entityType.type = "";
+
+  EXPECT_EQ("OK", etR1.check(&ci, "", ""));
+  EXPECT_NE("OK", etR2.check(&ci, "", ""));
+  EXPECT_NE("OK", etR1.check(&ci, "", "foo"));
+
+  utExit();
+}

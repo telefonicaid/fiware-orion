@@ -42,3 +42,35 @@ TEST(EntityTypeVector, present)
 
   utExit();
 }
+
+/* ****************************************************************************
+*
+* check
+*/
+TEST(EntityTypeVector, check)
+{
+  ConnectionInfo ci;
+
+  utInit();
+
+  ci.outFormat = JSON;
+
+  EntityType et1("myType");
+  EntityType et2("");
+
+  // EntityTypeVector with a EntityType that will not fail
+  EntityTypeVector etV1;
+  etV1.push_back(&et1);
+
+  // EntityTypeVector with a EntityType that will fail
+  EntityTypeVector etV2;
+  etV2.push_back(&et2);
+
+  EXPECT_EQ("OK", etV1.check(&ci, "", ""));
+
+  EXPECT_EQ("foo", etV1.check(&ci, "", "foo"));
+
+  EXPECT_EQ("Empty Type", etV2.check(&ci, "", ""));
+
+  utExit();
+}
