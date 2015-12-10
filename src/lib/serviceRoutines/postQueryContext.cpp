@@ -30,6 +30,8 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
+#include "logMsg/traceLevels.h"
+
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -142,6 +144,8 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   std::string     out;
   int             r;
 
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
+
   r = httpRequestSend(ip,
                       port,
                       protocol,
@@ -157,13 +161,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
                       &out,
                       mimeType);
 
-
   if (r != 0)
   {
     qcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding query");
     LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
 
 
   //

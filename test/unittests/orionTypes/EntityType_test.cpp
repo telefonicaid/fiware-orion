@@ -46,7 +46,7 @@ TEST(EntityType, present)
 *
 * check
 */
-TEST(EntityId, check)
+TEST(EntityType, check)
 {
   ConnectionInfo ci;
 
