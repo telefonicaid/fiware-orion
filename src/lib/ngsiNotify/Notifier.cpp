@@ -27,13 +27,16 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/string.h"
 #include "common/statistics.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi10/NotifyContextRequest.h"
 
-#include "onTimeIntervalThread.h"
-#include "senderThread.h"
 #include "rest/httpRequestSend.h"
+#include "ngsiNotify/onTimeIntervalThread.h"
+#include "ngsiNotify/senderThread.h"
+
 
 
 /* ****************************************************************************
@@ -105,7 +108,9 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
-      LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + url + "'";
+      alarmMgr.badInput(clientIp, details);
+
       return;
     }
 
@@ -184,7 +189,9 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
-      LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
+      std::string details = std::string("sending NotifyContextAvailabilityRequest: malformed URL: '") + url + "'";
+      alarmMgr.badInput(clientIp, details);
+
       return;
     }
 

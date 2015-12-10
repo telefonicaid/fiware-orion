@@ -196,6 +196,7 @@
 
 #include "contextBroker/version.h"
 #include "common/string.h"
+#include "alarmMgr/alarmMgr.h"
 
 using namespace orion;
 
@@ -258,7 +259,8 @@ bool            statCounters;
 bool            statSemWait;
 bool            statTiming;
 bool            statNotifQueue;
-
+int             notifErrLogInterval;
+int             badInputLogInterval;
 
 
 /* ****************************************************************************
@@ -269,7 +271,7 @@ bool            statNotifQueue;
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
 
-#define FG_DESC               "don't start as daemon"
+#define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
 #define PORT_DESC              "port to receive new connections"
 #define PIDPATH_DESC           "pid file path"
@@ -301,12 +303,12 @@ bool            statNotifQueue;
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
-
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
 #define STAT_NOTIF_QUEUE       "enalle thread pool notifications queue statistics"
-
+#define NOTIF_ERR_LOG_INTERVAL "interval to issue warning log about notification errors - in number of errors"
+#define BAD_INPUT_LOG_INTERVAL "interval to issue warning log about bad input - in number of errors"
 
 
 
@@ -370,6 +372,9 @@ PaArgument paArgs[] =
   { "-statSemWait",    &statSemWait,    "STAT_SEM_WAIT",    PaBool, PaOpt, false, false, true, STAT_SEM_WAIT     },
   { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
+
+  { "-notifErrLogInterval",   &notifErrLogInterval,   "",           PaInt,    PaOpt, 100,            0,     PaNL, NOTIF_ERR_LOG_INTERVAL },
+  { "-badInputLogInterval",   &badInputLogInterval,   "",           PaInt,    PaOpt, 100,            0,     PaNL, BAD_INPUT_LOG_INTERVAL },
 
   PA_END_OF_ARGS
 };
@@ -1637,6 +1642,22 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+#if 0
+  printf("argC: %d\n", argC);
+  printf("lmLevelMask: 0x%x\n", lmLevelMask);
+  printf("LogLevelTrace: 0x%x\n", LogLevelTrace);
+  LM_E(("Error"));
+  LM_W(("Warning"));
+  LM_M(("Message"));
+  LM_I(("Info"));
+  LM_T(0, ("Trace level 0"));
+  LM_M(("argC: %d", argC));
+
+  for (int ix = 0; ix < argC; ++ix)
+    LM_M(("argV[%d]: '%s'", ix, argV[ix]));
+
+  exit(99);
+#endif
 
   // Argument consistency check (--silent AND -logLevel)
   if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
@@ -1686,6 +1707,9 @@ int main(int argC, char* argV[])
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+
+  alarmMgr.notificationErrorLogIntervalSet(notifErrLogInterval);
+  alarmMgr.badInputLogIntervalSet(badInputLogInterval);
 
   LM_I(("Orion Context Broker is running"));
 

@@ -31,6 +31,7 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
@@ -312,7 +313,7 @@ void UpdateContextRequest::fill
     }
     else if (mP->stringValue != metaID)
     {
-      LM_W(("Bad Input (metaID differs in URI and payload"));
+      alarmMgr.badInput(clientIp, "metaID differs in URI and payload");
     }
   }
 

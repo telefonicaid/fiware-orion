@@ -33,6 +33,7 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "common/statistics.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "cache/subCache.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -69,10 +70,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+    alarmMgr.dbError(details);
     return -1;
   }
-
+  alarmMgr.dbErrorReset();
 
   //
   // 03. Create CachedSubscription
@@ -399,7 +401,7 @@ void mongoSubCacheRefresh(const std::string& database)
   DBClientBase* connection = getMongoConnection();
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
-    LM_E(("Database Error (%s)", errorString.c_str()));
+    alarmMgr.dbError(errorString);
     releaseMongoConnection(connection, &cursor);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;

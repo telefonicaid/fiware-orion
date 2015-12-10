@@ -40,6 +40,9 @@
 
 #include "common/Format.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
+
+
 
 /* ****************************************************************************
 *
@@ -69,7 +72,8 @@ HttpStatusCode mongoUpdateContextSubscription
     reqSemGive(__FUNCTION__, "ngsi10 update subscription request (safeGetSubId fail)", reqSemTaken);
     if (responseP->subscribeError.errorCode.code == SccContextElementNotFound)
     {
-      LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+      alarmMgr.badInput(clientIp, details);
     }
     else // SccReceiverInternalError
     {

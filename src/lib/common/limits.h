@@ -45,4 +45,13 @@
 #define SERVICE_PATH_MAX_LEVELS           10
 #define SERVICE_PATH_MAX_COMPONENT_LEN    50
 
+
+
+/* ****************************************************************************
+*
+* Alarm Manager definitions - 
+*/
+#define ALARM_MGR_NOTIFICATION_ERROR_LOG_INTERVAL     50
+#define ALARM_MGR_BAD_INPUT_LOG_INTERVAL              50
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_

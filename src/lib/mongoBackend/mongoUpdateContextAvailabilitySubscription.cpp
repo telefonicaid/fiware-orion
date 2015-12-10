@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -38,6 +39,8 @@
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
+
+
 
 /* ****************************************************************************
 *
@@ -66,7 +69,8 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
     if (responseP->errorCode.code == SccContextElementNotFound)
     {
-      LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'"; 
+      alarmMgr.badInput(clientIp, details);
     }
     else // SccReceiverInternalError
     {

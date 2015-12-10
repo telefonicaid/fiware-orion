@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "ngsi/ParseData.h"
@@ -75,7 +76,12 @@ std::string postSubscribeContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    LM_W(("Bad Input (max *one* service-path allowed for subscriptions (%d given))", ciP->servicePathV.size()));
+    char  noOfV[16];
+    snprintf(noOfV, sizeof(noOfV), "%lu", ciP->servicePathV.size());
+    std::string details = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
+
+    alarmMgr.badInput(clientIp, details);
+
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
     TIMED_RENDER(answer = scr.render(SubscribeContext, ciP->outFormat, ""));

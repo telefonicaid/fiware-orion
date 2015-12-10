@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/wsStrip.h"
 #include "common/string.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "parse/CompoundValueNode.h"
@@ -130,7 +131,9 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
         {
           if (forbiddenChars(node->value()) == true)
           {
-            LM_W(("Bad Input (found a forbidden value in '%s')", node->value()));
+            std::string details = std::string("found a forbidden value in '") + node->value() + "'";
+            alarmMgr.badInput(clientIp, details);
+
             ciP->httpStatusCode = SccBadRequest;
             ciP->answer = std::string("Illegal value for XML attribute");
             return true;
@@ -143,7 +146,9 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
         {
           if (forbiddenChars(attr->value()) == true)
           {
-            LM_W(("Bad Input (found a forbidden value in attribute: '%s')", node->value()));
+            std::string details = std::string("found a forbidden value in attribute: '") + node->value() + "'";
+            alarmMgr.badInput(clientIp, details);
+
             ciP->httpStatusCode = SccBadRequest;
             ciP->answer = std::string("Illegal value for XML attribute");
             return true;
@@ -153,7 +158,10 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
 
       if ((r = parseVector[ix].treat(node, parseDataP)) != 0)
       {
-        LM_W(("Bad Input (xml parse error %d)", r));
+        char rV[16];
+        snprintf(rV, sizeof(rV), "%d", r);
+        std::string details = std::string("xml parse error ") + rV;
+        alarmMgr.badInput(clientIp, details);
       }
 
       return true;  // Node has been treated
@@ -193,10 +201,9 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
     {
       ciP->httpStatusCode = SccBadRequest;
 
-      ciP->answer = std::string("Bad value for XML attribute /type/ for /") +
-        node->name() + "/: " + xmlAttribute;
+      ciP->answer = std::string("Bad value for XML attribute /type/ for /") + node->name() + "/: " + xmlAttribute;
 
-      LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+      alarmMgr.badInput(clientIp, ciP->answer);
 
       return;
     }
@@ -224,7 +231,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
       {
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Bad value for XML attribute /type/ for /") + name + "/: " + xmlAttribute;
-        LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+        alarmMgr.badInput(clientIp, ciP->answer);
 
         return;
       }
@@ -233,7 +240,9 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
     {
       if (forbiddenChars(value.c_str()) == true)
       {
-        LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
+        std::string details = std::string("found a forbidden value in '") + value + "'";
+        alarmMgr.badInput(clientIp, details);
+
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for XML attribute");
         return;
@@ -324,7 +333,7 @@ void xmlParse
       ciP->answer = std::string("Unknown XML field: ") + name.c_str();
     }
 
-    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+    alarmMgr.badInput(clientIp, ciP->answer);
 
     if (errorMsgP)
     {
@@ -391,7 +400,9 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
     }
     else
     {
-      LM_W(("Bad Input (unsupported attribute '%s' for EntityId)", attr->name()));
+      std::string details = std::string("unsupported attribute '") + attr->name() + "' for EntityId";
+      alarmMgr.badInput(clientIp, details);
+
       return "unsupported attribute for EntityId";
     }
   }

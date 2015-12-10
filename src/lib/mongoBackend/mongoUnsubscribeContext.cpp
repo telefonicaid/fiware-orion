@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -60,7 +61,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     {
         reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
         responseP->statusCode.fill(SccContextElementNotFound);
-        LM_W(("Bad Input (no subscriptionId)"));
+        alarmMgr.badInput(clientIp, "no subscriptionId");
         return SccOk;
     }
 
@@ -73,7 +74,9 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (safeGetSubId fail)", reqSemTaken);
       if (responseP->statusCode.code == SccContextElementNotFound)
       {
-        LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+        // FIXME: Doubt - invalid OID format?  Or, just a subscription that was not found?
+        std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+        alarmMgr.badInput(clientIp, details);
       }
       else // SccReceiverInternalError
       {

@@ -29,6 +29,7 @@
 
 #include "common/sem.h"
 #include "common/statistics.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -388,9 +389,11 @@ HttpStatusCode mongoAttributesForEntityType
     //
     if (idField.eoo() == true)
     {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
+      std::string details = std::string("error retrieving _id field in doc: '") + resultsArray[ix].embeddedObject().toString() + "'";
+      alarmMgr.dbError(details);
       continue;
     }
+    alarmMgr.dbErrorReset();
 
     /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
      * This could be unefficient, specially if the number of attributes is large */

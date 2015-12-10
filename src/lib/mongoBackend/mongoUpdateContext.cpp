@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
@@ -39,6 +40,8 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi/NotifyCondition.h"
 #include "rest/HttpStatusCode.h"
+
+
 
 /* ****************************************************************************
 *
@@ -63,8 +66,12 @@ HttpStatusCode mongoUpdateContext
     /* Check that the service path vector has only one element, returning error otherwise */
     if (servicePathV.size() > 1)
     {
-        LM_W(("Bad Input (service path length %d is greater than the one in update)", servicePathV.size()));
-        responseP->errorCode.fill(SccBadRequest, "service path length greater than one in update");
+      char lenV[16];
+      snprintf(lenV, sizeof(lenV), "%lu", servicePathV.size());
+
+      std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
+      alarmMgr.badInput(clientIp, details);
+      responseP->errorCode.fill(SccBadRequest, "service path length greater than one in update");
     }
     else
     {

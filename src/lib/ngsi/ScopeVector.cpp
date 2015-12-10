@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ScopeVector.h"
 
 
@@ -80,7 +81,10 @@ std::string ScopeVector::check
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
     {
-      LM_W(("Bad Input (error in scope %d: %s)", ix, res.c_str()));
+      char ixV[16];
+      snprintf(ixV, sizeof(ixV), "%d", ix);
+      std::string details = std::string("error in scope ") + ixV + ": " + res;
+      alarmMgr.badInput(clientIp, details);
       return res;
     }
   }

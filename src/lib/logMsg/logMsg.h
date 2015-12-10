@@ -985,7 +985,7 @@ do                                                                       \
 #define LM_T(tLev, s)                                                         \
 do                                                                            \
 {                                                                             \
-  if (LM_MASK(LogLevelTrace) && lmOk('T', tLev) == LmsOk)                     \
+  if (LM_MASK(LogLevelDebug) && lmOk('T', tLev) == LmsOk)                     \
   {                                                                           \
     char* text;                                                               \
                                                                               \

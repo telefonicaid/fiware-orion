@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 
@@ -153,7 +154,9 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
     }
   }
 
-  LM_W(("Bad Input (no request found for RequestType '%s', method '%s')", requestType(request), method.c_str()));
+  std::string details = std::string("no request found for RequestType '") + requestType(request) + "'', method '" + method + "'";
+  alarmMgr.badInput(clientIp, details);
+
   return NULL;
 }
 
@@ -203,7 +206,11 @@ std::string jsonTreat
                         std::string("Sorry, no request treating object found for RequestType /") +
                         requestType(request) + "/");
 
-    LM_W(("Bad Input (no request treating object found for RequestType %d (%s))", request, requestType(request)));
+
+    char reqTypeV[16];
+    snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
+    std::string details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
+    alarmMgr.badInput(clientIp, details);
     return errorReply;
   }
 
@@ -222,7 +229,6 @@ std::string jsonTreat
   }
   catch (const std::exception &e)
   {
-    LM_W(("Bad Input (JSON Parse Error)"));
     std::string errorReply  = restErrorReplyGet(ciP,
                                                 ciP->outFormat,
                                                 "",
@@ -230,12 +236,12 @@ std::string jsonTreat
                                                 SccBadRequest,
                                                 std::string("JSON Parse Error"));
 
-    LM_W(("Bad Input (JSON Parse Error: %s)", e.what()));
+    std::string details = std::string("JSON Parse Error: ") + e.what();
+    alarmMgr.badInput(clientIp, details);
     return errorReply;
   }
   catch (...)
   {
-    LM_W(("Bad Input (JSON Parse Error II)"));
     std::string errorReply  = restErrorReplyGet(ciP,
                                                 ciP->outFormat,
                                                 "",
@@ -243,13 +249,15 @@ std::string jsonTreat
                                                 SccBadRequest,
                                                 std::string("JSON Generic Error"));
 
-    LM_W(("Bad Input (JSON parse generic error)"));
+    alarmMgr.badInput(clientIp, "JSON parse generic error");
     return errorReply;
   }
 
   if (res != "OK")
   {
-    LM_W(("Bad Input (JSON parse error: %s)", res.c_str()));
+    std::string details = std::string("JSON parse error: ") + res;
+    alarmMgr.badInput(clientIp, details);
+
     ciP->httpStatusCode = SccBadRequest;
 
     std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
@@ -269,7 +277,8 @@ std::string jsonTreat
   res = reqP->check(parseDataP, ciP);
   if (res != "OK")
   {
-    LM_W(("Bad Input (%s: %s)", reqP->keyword.c_str(), res.c_str()));
+    std::string details = reqP->keyword + ": " + res;
+    alarmMgr.badInput(clientIp, details);
   }
 
   return res;

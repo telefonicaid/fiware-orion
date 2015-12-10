@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ALARMMGR_ALARMMANAGER_H_
+#define SRC_LIB_ALARMMGR_ALARMMANAGER_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,38 +26,35 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "alarmMgr/alarmMgr.h"
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
-#include "serviceRoutines/badVerbAllFive.h"
+#include <map>
 
 
 
 /* ****************************************************************************
 *
-* badVerbAllFive - 
+* AlarmManager - 
 */
-std::string badVerbAllFive
-(
-  ConnectionInfo*            ciP,
-  int                        components,
-  std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
-)
+class AlarmManager
 {
-  std::string details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
+private:
+  bool                        dbOk;
+  std::map<std::string, int>  notificationV;
+  std::map<std::string, int>  badInputV;
+  int                         notificationErrorLogInterval;
+  int                         badInputLogInterval;
 
-  ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE, PATCH");
-  ciP->httpStatusCode = SccBadVerb;
+public:
+  AlarmManager();
+  AlarmManager(int _notificationErrorLogInterval, int _badInputLogInterval);
 
-  alarmMgr.badInput(clientIp, details);
+  void notificationErrorLogIntervalSet(int _notificationErrorLogInterval);
+  void badInputLogIntervalSet(int _badInputLogInterval);
+  bool dbError(const std::string& details);
+  bool dbErrorReset(void);
+  bool notificationError(const std::string& url, const std::string& details);
+  bool notificationErrorReset(const std::string& url);
+  bool badInput(const std::string& ip, const std::string& details);
+  bool badInputReset(const std::string& ip);
+};
 
-  return "";
-}
+#endif  // SRC_LIB_ALARMMGR_ALARMMANAGER_H_

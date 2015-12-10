@@ -34,6 +34,7 @@
 #include "common/defaultValues.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "serviceRoutines/postRegisterContext.h"
 #include "mongoBackend/mongoRegisterContext.h"
@@ -67,7 +68,7 @@ std::string postRegisterContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    LM_W(("Bad Input (more than one service path for a registration)"));
+    alarmMgr.badInput(clientIp, "more than one service path for a registration");
     rcr.errorCode.fill(SccBadRequest, "more than one service path for notification");
 
     TIMED_RENDER(answer = rcr.render(RegisterContext, ciP->outFormat, ""));

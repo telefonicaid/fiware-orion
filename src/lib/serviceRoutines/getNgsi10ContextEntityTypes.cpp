@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -92,7 +93,7 @@ std::string getNgsi10ContextEntityTypes
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
 
@@ -102,7 +103,7 @@ std::string getNgsi10ContextEntityTypes
   else if ((typeNameFromUriParam != typeName) && (typeNameFromUriParam != ""))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
     TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
 
