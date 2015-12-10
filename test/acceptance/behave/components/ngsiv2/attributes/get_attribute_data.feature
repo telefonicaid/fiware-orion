@@ -151,18 +151,34 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
     When get an attribute "temperature_0" by ID "room_0"
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                                                                                         |
-      | error       | BadRequest                                                                                                                                    |
-      | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
+      | parameter   | value                                                                                  |
+      | error       | BadRequest                                                                             |
+      | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
     Examples:
-      | service                         |
-      | service.sr                      |
-      | Service-sr                      |
-      | Service(sr)                     |
-      | Service=sr                      |
-      | Service<sr>                     |
-      | Service,sr                      |
-      | greater than max length allowed |
+      | service     |
+      | service.sr  |
+      | Service-sr  |
+      | Service(sr) |
+      | Service=sr  |
+      | Service<sr> |
+      | Service,sr  |
+      | service#sr  |
+      | service%sr  |
+      | service&sr  |
+
+  @service_bad_length
+  Scenario:  try to get an attribute by entity ID using NGSI v2 with bad length several services
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | greater than max length allowed |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    When get an attribute "temperature_0" by ID "room_0"
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                    |
+      | error       | BadRequest                                               |
+      | description | bad length - a tenant name can be max 50 characters long |
 
     # ------------------------ Service path ----------------------------------------------
 

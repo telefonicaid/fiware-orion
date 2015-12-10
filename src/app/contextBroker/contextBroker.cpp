@@ -306,7 +306,7 @@ int             badInputLogInterval;
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
-#define STAT_NOTIF_QUEUE       "enalle thread pool notifications queue statistics"
+#define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 #define NOTIF_ERR_LOG_INTERVAL "interval to issue warning log about notification errors - in number of errors"
 #define BAD_INPUT_LOG_INTERVAL "interval to issue warning log about bad input - in number of errors"
 
@@ -1571,14 +1571,15 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
 */
 int main(int argC, char* argV[])
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+
+  lmTransactionReset();
 
   uint16_t       rushPort = 0;
   std::string    rushHost = "";

@@ -1,9 +1,6 @@
-#ifndef SRC_APP_CONTEXTBROKER_VERSION_H_
-#define SRC_APP_CONTEXTBROKER_VERSION_H_
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,11 +20,45 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan
 */
 
+#include "orionTypes/EntityType.h"
+#include "unittest.h"
+
+/* ****************************************************************************
+*
+* present - no output expected, just exercising the code
+*/
+TEST(EntityType, present)
+{
+  utInit();
+
+  EntityType et("myType");
+
+  et.present("");
+
+  utExit();
+}
 
 
-#define ORION_VERSION "0.26.1-next"
+/* ****************************************************************************
+*
+* check
+*/
+TEST(EntityId, check)
+{
+  ConnectionInfo ci;
 
-#endif  // SRC_APP_CONTEXTBROKER_VERSION_H_
+  utInit();
+
+  ci.outFormat = JSON;
+  EntityType et1("myType");
+  EntityType et2("");
+
+  EXPECT_EQ("OK", et1.check(&ci, "", ""));
+  EXPECT_EQ("Empty Type", et2.check(&ci, "", ""));
+  EXPECT_EQ("foo", et1.check(&ci, "", "foo"));
+
+  utExit();
+}

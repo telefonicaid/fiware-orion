@@ -1,9 +1,6 @@
-#ifndef SRC_APP_CONTEXTBROKER_VERSION_H_
-#define SRC_APP_CONTEXTBROKER_VERSION_H_
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,11 +20,34 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan
 */
 
+#include "orionTypes/QueryContextResponseVector.h"
+#include "unittest.h"
 
+/* ****************************************************************************
+*
+* present - no output expected, just exercising the code
+*/
+TEST(QueryContextResponseVector, present)
+{
 
-#define ORION_VERSION "0.26.1-next"
+  QueryContextResponse       qcr;
 
-#endif  // SRC_APP_CONTEXTBROKER_VERSION_H_
+  utInit();
+
+  QueryContextResponseVector qcrV;
+  ContextElementResponse*    cerP = new ContextElementResponse();
+  ContextElement*            ceP  = new ContextElement("E", "T", "false");
+  ContextAttribute*          caP  = new ContextAttribute("A", "T", "s");
+
+  ceP->contextAttributeVector.push_back(caP);
+  cerP->contextElement.fill(ceP);
+  qcr.contextElementResponseVector.push_back(cerP);
+  qcrV.vec.push_back(&qcr);
+
+  qcrV.present();
+
+  utExit();
+}

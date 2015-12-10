@@ -34,17 +34,17 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
-     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-     Setup: update contextBroker config file
-     Setup: start ContextBroker
-     Check: verify contextBroker is installed successfully
-     Check: verify mongo is installed successfully
+  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+  Setup: update contextBroker config file
+  Setup: start ContextBroker
+  Check: verify contextBroker is installed successfully
+  Check: verify mongo is installed successfully
 
   Actions After each Scenario:
-     Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
-     Setup: stop ContextBroker
+  Setup: stop ContextBroker
 
   @happy_path
   Scenario:  get an entity by ID using NGSI v2
@@ -161,18 +161,36 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | attrs     | temperature_0 |
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                                                                                         |
-      | error       | BadRequest                                                                                                                                    |
-      | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
+      | parameter   | value                                                                                  |
+      | error       | BadRequest                                                                             |
+      | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
     Examples:
-      | service                         |
-      | service.sr                      |
-      | Service-sr                      |
-      | Service(sr)                     |
-      | Service=sr                      |
-      | Service<sr>                     |
-      | Service,sr                      |
-      | greater than max length allowed |
+      | service     |
+      | service.sr  |
+      | Service-sr  |
+      | Service(sr) |
+      | Service=sr  |
+      | Service<sr> |
+      | Service,sr  |
+      | service#sr  |
+      | service%sr  |
+      | service&sr  |
+
+  @service_bad_length
+  Scenario:  try to get an entity by ID using NGSI v2 with bad length services headers
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | greater than max length allowed |
+      | Fiware-ServicePath | /test                           |
+    When get an entity by ID "room_0"
+      | parameter | value         |
+      | attrs     | temperature_0 |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                    |
+      | error       | BadRequest                                               |
+      | description | bad length - a tenant name can be max 50 characters long |
+
 
    # ------------------------ Service path ----------------------------------------------
 
@@ -600,7 +618,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
 
   @compound_with_metadata_without_meta_type @BUG_1106 @skip
   Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with metadatas but without
-                    metadata type (compound, vector, boolean, etc)
+  metadata type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_id_with_attribute_type |

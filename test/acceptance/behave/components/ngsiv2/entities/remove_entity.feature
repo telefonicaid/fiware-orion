@@ -134,18 +134,36 @@ Feature: delete an entity request using NGSI v2 API. "DELETE" - /v2/entities/
     When delete entities with id "room"
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                                                                                                                         |
-      | error       | BadRequest                                                                                                                                    |
-      | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
+      | parameter   | value                                                                                  |
+      | error       | BadRequest                                                                             |
+      | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
     Examples:
-      | service                         |
-      | service.sr                      |
-      | Service-sr                      |
-      | Service(sr)                     |
-      | Service=sr                      |
-      | Service<sr>                     |
-      | Service,sr                      |
-      | greater than max length allowed |
+      | service     |
+      | service.sr  |
+      | Service-sr  |
+      | Service(sr) |
+      | Service=sr  |
+      | Service<sr> |
+      | Service,sr  |
+      | service#sr  |
+      | service%sr  |
+      | service&sr  |
+
+  @service_delete_bad_length
+  Scenario: Try to delete entities by ID using NGSI v2 with bad length service header values
+    Given a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | greater than max length allowed |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    When delete entities with id "room"
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                                    |
+      | error       | BadRequest                                               |
+      | description | bad length - a tenant name can be max 50 characters long |
+
+
 
   # ------------------------ Service path ----------------------------------------------
 

@@ -1,9 +1,6 @@
-#ifndef SRC_APP_CONTEXTBROKER_VERSION_H_
-#define SRC_APP_CONTEXTBROKER_VERSION_H_
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,11 +20,33 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan
 */
 
+#include "orionTypes/UpdateContextRequestVector.h"
+#include "unittest.h"
 
+/* ****************************************************************************
+*
+* present - no output expected, just exercising the code
+*/
+TEST(UpdateContextRequestVector, present)
+{
+  utInit();
 
-#define ORION_VERSION "0.26.1-next"
+  UpdateContextRequestVector  ucrV;
+  UpdateContextRequest        ucr;
 
-#endif  // SRC_APP_CONTEXTBROKER_VERSION_H_
+  ContextElement ce("E", "T", "false");
+  ContextAttribute ca("A", "T", "val");
+  ce.contextAttributeVector.push_back(&ca);
+
+  ucr.contextElementVector.push_back(&ce);
+  ucr.updateActionType.set("UPDATE");
+
+  ucrV.push_back(&ucr);
+
+  ucrV.present("");
+
+  utExit();
+}

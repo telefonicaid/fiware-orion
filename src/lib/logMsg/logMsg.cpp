@@ -53,6 +53,8 @@
 #include "logMsg/time.h"
 #include "logMsg/logMsg.h"      /* Own interface                             */
 
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+
 extern "C" pid_t gettid(void);
 
 
@@ -264,7 +266,7 @@ do                                                \
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
-#define F_LEN            128
+#define F_LEN            150
 #define TF_LEN           64
 #define INFO_LEN         512
 #define TMS_LEN          20
@@ -339,10 +341,13 @@ typedef struct Line
 *
 * globals
 */
-int             inSigHandler      = 0;
-char*           progName;                   /* needed for messages (and by lmLib) */
-char            progNameV[512];             /* where to store progName            */
-__thread char   transactionId[64] = "N/A";
+int             inSigHandler                      = 0;
+char*           progName;                         /* needed for messages (and by lmLib) */
+char            progNameV[512];                   /* where to store progName            */
+__thread char   transactionId[64]                 = "N/A";
+__thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
+__thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
+__thread char   fromIp[IP_LENGTH_MAX + 1]          = "N/A";
 
 
 
@@ -1066,6 +1071,18 @@ static char* lmLineFix
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
     {
       STRING_ADD(transactionId, 8);
+    }
+    else if (strncmp(&format[fi], "SERVICE", 7) == 0)
+    {
+      STRING_ADD(service, 7);
+    }
+    else if (strncmp(&format[fi], "SUB_SERVICE", 11) == 0)
+    {
+      STRING_ADD(subService, 11);
+    }
+    else if (strncmp(&format[fi], "FROM_IP", 7) == 0)
+    {
+      STRING_ADD(fromIp, 7);
     }
     else if (strncmp(&format[fi], "EXEC", 4) == 0)
     {

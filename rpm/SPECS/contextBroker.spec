@@ -164,6 +164,11 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Dec 09 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.1-1
+- Default -subIvalCache changed to 60 seconds
+- Add: servicePath header filtering in GET /v2/subscriptions operation (Issue #1557)
+- Add: New command-line-option '-logLevel <level>', levels: NONE, ERROR, WARNING, INFO, DEBUG (Issue #1583)
+
 * Tue Dec 01 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.0-1
 - Add: Add queue+threads for notifications (notificationMode thread:<queue size>:<num threads>) (Issue #1449)
 - Add: possibility to limit the maximum number of simultaneous connections, using the CLI option -maxConnections (Issue #1384)
@@ -361,30 +366,30 @@ fi
 - Fix:  Service-Path is taken into account in 'GET /v1/contextTypes' and 'GET /v1/contextTypes/{entityType}' operations (Issue #676)
 
 * Fri Nov 28 2014 Fermin Galan <fermin@tid.es> 0.17.0-1 (FIWARE-4.1.2-1)
-Add: New convop: "POST /v1/contextEntities" (Issue #613).
-     Note also that AppendContextElementRequest has been added an EntityId field.
-Add: Convenience operations that respond with AppendContextElementResponse now get the
-     EntityId info included in the response.
-Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
-     The old name will be supported as well. (Issue #633)
-Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
-Add: "/" is used as implicit service path for entities. (Issue #646)
-Add: Queries without Fiware-ServicePath are resolved on "/#" implicitly (i.e. all the paths). (Issue #646)
-Fix: Attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
-Fix: Changed max-length of tenant names from 20 characters to 50.
-     Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)
-Fix: No longer responding with 'Service not found: $URL'. (Issue #619)
-Fix: Requests with payload containing forbidden characters are now rejected. (Issue #619)
-Fix: Fixed a bug that made the broker crash on problems with EntityId during XML-parse (in very rare situations).
-Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one is still supported to ensure backward compatibility. (Issue #627)
-Fix: Fixed a leak for each forwarding of messages to Context Providers.
-Fix: Changed max-length of service path elements from 10 characteres to 50. (Issue #649)
-Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
-Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
-Fix: Using 443 as default port for "https" notifications. (Issue #639)
-Fix: Fixed RPM package so PID file is stored in /var/run/contextBroker instead of /var/log/contextBroker. (Issue #612)
-Fix: Payload no longer accepts 'operator' as part of a Scope. (Issue #618)
-Fix: Made compound attribute values for for convenience operations (Issue #660)
+- Add: New convop: "POST /v1/contextEntities" (Issue #613).
+       Note also that AppendContextElementRequest has been added an EntityId field.
+- Add: Convenience operations that respond with AppendContextElementResponse now get the
+       EntityId info included in the response.
+- Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
+       The old name will be supported as well. (Issue #633)
+- Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
+- Add: "/" is used as implicit service path for entities. (Issue #646)
+- Add: Queries without Fiware-ServicePath are resolved on "/#" implicitly (i.e. all the paths). (Issue #646)
+- Fix: Attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
+- Fix: Changed max-length of tenant names from 20 characters to 50.
+       Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)
+- Fix: No longer responding with 'Service not found: $URL'. (Issue #619)
+- Fix: Requests with payload containing forbidden characters are now rejected. (Issue #619)
+- Fix: Fixed a bug that made the broker crash on problems with EntityId during XML-parse (in very rare situations).
+- Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one is still supported to ensure backward compatibility. (Issue #627)
+- Fix: Fixed a leak for each forwarding of messages to Context Providers.
+- Fix: Changed max-length of service path elements from 10 characteres to 50. (Issue #649)
+- Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
+- Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
+- Fix: Using 443 as default port for "https" notifications. (Issue #639)
+- Fix: Fixed RPM package so PID file is stored in /var/run/contextBroker instead of /var/log/contextBroker. (Issue #612)
+- Fix: Payload no longer accepts 'operator' as part of a Scope. (Issue #618)
+- Fix: Made compound attribute values for for convenience operations (Issue #660)
 
 * Mon Nov 03 2014 Fermin Galan <fermin@tid.es> 0.16.0-1 (FIWARE-4.1.1-1)
 - Add: Adding alternative (preferred) URLs: '/ngsi10' => '/v1' AND '/ngsi9' => '/v1/registry' (Issue #559)

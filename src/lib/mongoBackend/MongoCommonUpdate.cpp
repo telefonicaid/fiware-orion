@@ -2770,10 +2770,11 @@ static bool contextElementPreconditionsCheck
       if ((name == ceP->contextAttributeVector.get(jx)->name) && (id == ceP->contextAttributeVector.get(jx)->getId()))
       {
         ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector.get(ix));
-        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
-                                  "duplicated attribute name and id [" + name + "," + id + "]");
         std::string details = std::string("duplicated attribute name: name=<") + name + "> id=<" + id + ">";
         alarmMgr.badInput(clientIp, details);
+
+        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
+                                  "duplicated attribute /" + name + "/");
         return false; // Error already in responseP
       }
     }
