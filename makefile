@@ -304,7 +304,7 @@ coverage: install_coverage
 	lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
-	BUILD_COVERAGE/test/unittests/unitTest --gtest_output=xml:BUILD_COVERAGE/unit_test.xml
+	BUILD_COVERAGE/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_COVERAGE/unit_test.xml
 	if [ -z "${CONTEXTBROKER_TESTENV_SOURCED}" ]; then \
 	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
 	    exit 1; \
@@ -337,7 +337,7 @@ coverage_unit_test: build_unit_test
 	lcov --capture --initial --directory BUILD_UNITTEST -b BUILD_UNITTEST --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
-	BUILD_UNITTEST/test/unittests/unitTest --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
+	BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
 	# Generate test report
 	echo "Generating coverage report"
 	lcov --directory BUILD_UNITTEST --capture -b BUILD_UNITTEST --output-file coverage/broker.test.info 
