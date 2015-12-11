@@ -28,7 +28,9 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/tag.h"
+#include "common/limits.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
 #include "orionTypes/EntityType.h"
@@ -160,7 +162,7 @@ void EntityType::release(void)
 std::string EntityType::toJson(ConnectionInfo* ciP)
 {
   std::string  out = "{";
-  char         countV[16];
+  char         countV[STRING_SIZE_FOR_INT];
 
   snprintf(countV, sizeof(countV), "%lld", count);
 

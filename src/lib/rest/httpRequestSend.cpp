@@ -37,10 +37,12 @@
 #include <iostream>
 #include <sstream>
 
-#include "common/string.h"
-#include "common/sem.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/string.h"
+#include "common/sem.h"
+#include "common/limits.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/rest.h"
@@ -190,7 +192,7 @@ int httpRequestSendWithCurl
    long                   timeoutInMilliseconds
 )
 {
-  char                       portAsString[16];
+  char                       portAsString[STRING_SIZE_FOR_INT];
   static unsigned long long  callNo             = 0;
   std::string                result;
   std::string                ip                 = _ip;
@@ -295,7 +297,7 @@ int httpRequestSendWithCurl
 
   if (useRush)
   {
-    char         rushHeaderPortAsString[16];
+    char         rushHeaderPortAsString[STRING_SIZE_FOR_INT];
     uint16_t     rushHeaderPort     = port;
     std::string  rushHeaderIP       = ip;
     std::string  headerRushHttp;

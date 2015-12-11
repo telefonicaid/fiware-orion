@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
@@ -66,7 +67,7 @@ HttpStatusCode mongoUpdateContext
     /* Check that the service path vector has only one element, returning error otherwise */
     if (servicePathV.size() > 1)
     {
-      char lenV[16];
+      char lenV[STRING_SIZE_FOR_INT];
       snprintf(lenV, sizeof(lenV), "%lu", servicePathV.size());
 
       std::string details = std::string("service path length ") + lenV + " is greater than the one in update";

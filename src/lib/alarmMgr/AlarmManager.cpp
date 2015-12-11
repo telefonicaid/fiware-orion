@@ -37,9 +37,9 @@
 * AlarmManager::AlarmManager - 
 */
 AlarmManager::AlarmManager():
-dbOk(true),
-notificationErrorLogInterval(0),
-badInputLogInterval(0)
+  dbOk(true),
+  notificationErrorLogSampling(0),
+  badInputLogSampling(0)
 {
 }
 
@@ -49,10 +49,10 @@ badInputLogInterval(0)
 *
 * AlarmManager::AlarmManager - 
 */
-AlarmManager::AlarmManager(int _notificationErrorLogInterval, int _badInputLogInterval):
-dbOk(true),
-notificationErrorLogInterval(_notificationErrorLogInterval),
-badInputLogInterval(_badInputLogInterval)
+AlarmManager::AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling):
+  dbOk(true),
+  notificationErrorLogSampling(_notificationErrorLogSampling),
+  badInputLogSampling(_badInputLogSampling)
 {
 }  
 
@@ -60,22 +60,22 @@ badInputLogInterval(_badInputLogInterval)
 
 /* ****************************************************************************
 *
-* AlarmManager::notificationErrorLogIntervalSet - 
+* AlarmManager::notificationErrorLogSamplingSet - 
 */
-void AlarmManager::notificationErrorLogIntervalSet(int _notificationErrorLogInterval)
+void AlarmManager::notificationErrorLogSamplingSet(int _notificationErrorLogSampling)
 {
-  notificationErrorLogInterval = _notificationErrorLogInterval;
+  notificationErrorLogSampling = _notificationErrorLogSampling;
 }
 
 
 
 /* ****************************************************************************
 *
-* AlarmManager::badInputLogIntervalSet - 
+* AlarmManager::badInputLogSamplingSet - 
 */
-void AlarmManager::badInputLogIntervalSet(int _badInputLogInterval)
+void AlarmManager::badInputLogSamplingSet(int _badInputLogSampling)
 {
-  badInputLogInterval = _badInputLogInterval;
+  badInputLogSampling = _badInputLogSampling;
 }
 
 
@@ -84,7 +84,7 @@ void AlarmManager::badInputLogIntervalSet(int _badInputLogInterval)
 *
 * AlarmManager::dbError - 
 *
-* Returns false if no action is taken/necessary, otherwise, true is returned.
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
 */
 bool AlarmManager::dbError(const std::string& details)
 {
@@ -93,7 +93,7 @@ bool AlarmManager::dbError(const std::string& details)
     return false;
   }
 
-  LM_E(("DB in an erroneous state (%s)", details.c_str()));
+  LM_E(("Raising alarm DatabaseError %s", details.c_str()));
   dbOk = false;
   return true;
 }
@@ -104,7 +104,7 @@ bool AlarmManager::dbError(const std::string& details)
 *
 * AlarmManager::dbErrorReset - 
 *
-* Returns false if no action is taken/necessary, otherwise, true is returned.
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
 */
 bool AlarmManager::dbErrorReset(void)
 {
@@ -114,7 +114,7 @@ bool AlarmManager::dbErrorReset(void)
   }
 
   ++dbErrors;
-  LM_E(("Releasing Database alarms"));
+  LM_E(("Releasing alarm DatabaseError"));
   dbOk = true;
   return true;
 }
@@ -125,7 +125,7 @@ bool AlarmManager::dbErrorReset(void)
 *
 * AlarmManager::notificationError - 
 *
-* Returns false if no action is taken/necessary, otherwise, true is returned.
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
 *
 * NOTE
 * The number of notificationErrors per url is maintained in the map.
@@ -142,19 +142,17 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
   if (iter != notificationV.end())  // Already exists - add to the 'url-specific' counter
   {
     iter->second += 1;
-  }
-  else
-  {
-    notificationV[url] = 1;
+
+    if ((notificationErrorLogSampling != 0) && ((notificationErrors % notificationErrorLogSampling) == 1))
+    {
+      LM_W(("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
+    }
+
+    return false;
   }
 
-  if (notificationErrorLogInterval != 0)
-  {
-    if ((notificationErrors % notificationErrorLogInterval) == 1)
-    {
-      LM_W(("Notification Error [%d] for %s: %s", notificationErrors, url.c_str(), details.c_str()));
-    }
-  }
+  LM_W(("Raising alarm NotificationError %s: %s", url.c_str(), details.c_str()));
+  notificationV[url] = 1;
 
   return true;
 }
@@ -165,15 +163,17 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
 *
 * AlarmManager::notificationErrorReset - 
 *
-* Returns false if no action is taken/necessary, otherwise, true is returned.
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
 */
 bool AlarmManager::notificationErrorReset(const std::string& url)
 {
   if (notificationV.find(url) == notificationV.end())  // Doesn't exist
+  {
     return false;
+  }
   
   notificationV.erase(url);
-  LM_W(("Releasing Notification Error alarm for %s", url.c_str()));
+  LM_W(("Releasing alarm NotificationError %s", url.c_str()));
 
   return true;
 }
@@ -184,7 +184,7 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 *
 * AlarmManager::badInput - 
 *
-* Returns false if no action is taken/necessary, otherwise, true is returned.
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
 *
 * NOTE
 * The number of badInputs per IP is maintained in the map.
@@ -201,19 +201,17 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
   if (iter != badInputV.end())  // Already exists - add to the 'ip-specific' counter
   {
     iter->second += 1;
-  }
-  else
-  {
-    badInputV[ip] = 1;
+
+    if ((badInputLogSampling != 0) && ((badInputs % badInputLogSampling) == 1))
+    {
+      LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
+    }
+
+    return false;
   }
 
-  if (badInputLogInterval != 0)
-  {
-    if ((badInputs % badInputLogInterval) == 1)
-    {
-      LM_W(("Bad Input [%d] for %s: %s", badInputs, ip.c_str(), details.c_str()));
-    }
-  }
+  LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
+  badInputV[ip] = 1;
 
   return true;
 }
@@ -224,7 +222,7 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 *
 * AlarmManager::badInputReset - 
 *
-* Returns false if no action is taken/necessary, otherwise, true is returned.
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
 */
 bool AlarmManager::badInputReset(const std::string& ip)
 {
@@ -234,7 +232,7 @@ bool AlarmManager::badInputReset(const std::string& ip)
   }
 
   badInputV.erase(ip);
-  LM_W(("Releasing Bad Input alarm for %s", ip.c_str()));
+  LM_W(("Releasing alarm BadInput %s", ip.c_str()));
 
   return true;
 }

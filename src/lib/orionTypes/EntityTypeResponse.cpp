@@ -32,6 +32,7 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
@@ -123,7 +124,7 @@ void EntityTypeResponse::release(void)
 std::string EntityTypeResponse::toJson(ConnectionInfo* ciP)
 {
   std::string  out = "{";
-  char         countV[16];
+  char         countV[STRING_SIZE_FOR_INT];
 
   snprintf(countV, sizeof(countV), "%lld", entityType.count);
 

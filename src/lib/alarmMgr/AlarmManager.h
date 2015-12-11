@@ -43,15 +43,15 @@ private:
   bool                        dbOk;
   std::map<std::string, int>  notificationV;
   std::map<std::string, int>  badInputV;
-  int                         notificationErrorLogInterval;
-  int                         badInputLogInterval;
+  int                         notificationErrorLogSampling;
+  int                         badInputLogSampling;
 
 public:
   AlarmManager();
-  AlarmManager(int _notificationErrorLogInterval, int _badInputLogInterval);
+  AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling);
 
-  void notificationErrorLogIntervalSet(int _notificationErrorLogInterval);
-  void badInputLogIntervalSet(int _badInputLogInterval);
+  void notificationErrorLogSamplingSet(int _notificationErrorLogSampling);
+  void badInputLogSamplingSet(int _badInputLogSampling);
   bool dbError(const std::string& details);
   bool dbErrorReset(void);
   bool notificationError(const std::string& url, const std::string& details);

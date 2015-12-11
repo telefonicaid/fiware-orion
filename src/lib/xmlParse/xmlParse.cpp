@@ -31,7 +31,9 @@
 #include "common/globals.h"
 #include "common/wsStrip.h"
 #include "common/string.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "parse/CompoundValueNode.h"
@@ -158,7 +160,7 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
 
       if ((r = parseVector[ix].treat(node, parseDataP)) != 0)
       {
-        char rV[16];
+        char rV[STRING_SIZE_FOR_INT];
         snprintf(rV, sizeof(rV), "%d", r);
         std::string details = std::string("xml parse error ") + rV;
         alarmMgr.badInput(clientIp, details);

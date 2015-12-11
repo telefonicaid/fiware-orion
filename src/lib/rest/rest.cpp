@@ -99,7 +99,7 @@ static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
-__thread char                    clientIp[16];  // 16: xxx.xxx.xxx.xxx\0
+__thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;

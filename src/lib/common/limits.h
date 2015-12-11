@@ -36,8 +36,7 @@
 #define SERVICE_NAME_MAX_LEN_STRING    "50"
 
 
-
-/* ****'************************************************************************
+/* ****************************************************************************
 *
 * Service Path definitions - 
 *
@@ -57,12 +56,15 @@
 #define SERVICE_PATH_MAX_COMPONENT_LEN    50
 #define SERVICE_PATH_MAX_TOTAL            (((SERVICE_PATH_MAX_COMPONENT_LEN + 1) * SERVICE_PATH_MAX_LEVELS) + 2) * SERVICE_PATH_MAX_COMPONENTS
 
-/* ****'************************************************************************
+
+
+/* ****************************************************************************
 *
 * Others -
 *
 */
-#define IP_LENGTH_MAX  15    // Based in xxx.xxx.xxx.xxx
+#define IP_LENGTH_MAX        15    // Based on xxx.xxx.xxx.xxx
+#define STRING_SIZE_FOR_INT  16    // Room enough for an integer
 
 
 
@@ -70,7 +72,7 @@
 *
 * Alarm Manager definitions - 
 */
-#define ALARM_MGR_NOTIFICATION_ERROR_LOG_INTERVAL     50
-#define ALARM_MGR_BAD_INPUT_LOG_INTERVAL              50
+#define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     50
+#define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              50
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_

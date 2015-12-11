@@ -259,8 +259,7 @@ bool            statCounters;
 bool            statSemWait;
 bool            statTiming;
 bool            statNotifQueue;
-int             notifErrLogInterval;
-int             badInputLogInterval;
+
 
 
 /* ****************************************************************************
@@ -307,8 +306,6 @@ int             badInputLogInterval;
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
-#define NOTIF_ERR_LOG_INTERVAL "interval to issue warning log about notification errors - in number of errors"
-#define BAD_INPUT_LOG_INTERVAL "interval to issue warning log about bad input - in number of errors"
 
 
 
@@ -373,9 +370,6 @@ PaArgument paArgs[] =
   { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
-  { "-notifErrLogInterval",   &notifErrLogInterval,   "",           PaInt,    PaOpt, 100,            0,     PaNL, NOTIF_ERR_LOG_INTERVAL },
-  { "-badInputLogInterval",   &badInputLogInterval,   "",           PaInt,    PaOpt, 100,            0,     PaNL, BAD_INPUT_LOG_INTERVAL },
-
   PA_END_OF_ARGS
 };
 
@@ -417,6 +411,7 @@ static const char* validLogLevels[] =
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
+
 
 
 //
@@ -1695,8 +1690,8 @@ int main(int argC, char* argV[])
   //
   // Initializing alarm manager
   //
-  alarmMgr.notificationErrorLogIntervalSet(notifErrLogInterval);
-  alarmMgr.badInputLogIntervalSet(badInputLogInterval);
+  alarmMgr.notificationErrorLogSamplingSet(ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING);
+  alarmMgr.badInputLogSamplingSet(ALARM_MGR_BAD_INPUT_LOG_SAMPLING);
 
   LM_I(("Orion Context Broker is running"));
 

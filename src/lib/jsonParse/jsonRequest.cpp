@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
@@ -207,10 +208,12 @@ std::string jsonTreat
                         requestType(request) + "/");
 
 
-    char reqTypeV[16];
+    char reqTypeV[STRING_SIZE_FOR_INT];
+
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
     std::string details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
     alarmMgr.badInput(clientIp, details);
+
     return errorReply;
   }
 

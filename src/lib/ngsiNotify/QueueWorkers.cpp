@@ -29,6 +29,7 @@
 
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi10/NotifyContextRequest.h"
@@ -136,7 +137,7 @@ static void *workerFunc(void* pSyncQ)
       // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
       // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
       //
-      char portV[16];
+      char portV[STRING_SIZE_FOR_INT];
       snprintf(portV, sizeof(portV), "%d", params->port);
       std::string url = params->ip + ":" + portV + params->resource;
 

@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
@@ -298,7 +299,7 @@ std::string xmlTreat
         std::string("Sorry, no request treating object found for RequestType /") +
         requestType(request) + "/, method /" + ciP->method + "/");
 
-    char rtV[16];
+    char rtV[STRING_SIZE_FOR_INT];
     snprintf(rtV, sizeof(rtV), "%d", request);
     std::string details = std::string("no request treating object found for RequestType ") + rtV + " (" + requestType(request) + "), method " + ciP->method;
     alarmMgr.badInput(clientIp, details);

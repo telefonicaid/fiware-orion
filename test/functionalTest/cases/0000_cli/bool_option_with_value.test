@@ -80,7 +80,5 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-statSemWait' (enable semaphore waiting time statistics)]
                       [option '-statTiming' (enable request-time-measuring statistics)]
                       [option '-statNotifQueue' (enable thread pool notifications queue statistics)]
-                      [option '-notifErrLogInterval' <interval to issue warning log about notification errors - in number of errors>]
-                      [option '-badInputLogInterval' <interval to issue warning log about bad input - in number of errors>]
 
 --TEARDOWN--

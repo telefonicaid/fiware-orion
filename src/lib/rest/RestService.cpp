@@ -34,6 +34,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/string.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
@@ -140,8 +141,9 @@ static std::string tenantCheck(const std::string& tenant)
 
   if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
-    char numV1[16];
-    char numV2[16];
+    char numV1[STRING_SIZE_FOR_INT];
+    char numV2[STRING_SIZE_FOR_INT];
+
     snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
     snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
 
@@ -495,12 +497,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     //
     if (ciP->httpStatusCode == SccOk)
     {
-      // LM_W(("Stopping Bad Input - %s %s", ciP->method.c_str(), ciP->url.c_str()));
       alarmMgr.badInputReset(clientIp);
     }
-//    else
-//      LM_W(("NOT Stopping Bad Input - %s %s", ciP->method.c_str(), ciP->url.c_str()));
-
 
     filterRelease(&parseData, serviceV[ix].request);
 

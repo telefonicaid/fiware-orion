@@ -25,7 +25,7 @@ Bad Input for Alarm Manager
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4 -badInputLogInterval 3
+brokerStart CB 0-255 IPv4
 
 --SHELL--
 
@@ -84,7 +84,7 @@ echo
 
 echo "07. grep in log-file"
 echo "===================="
-grep "Bad Input" /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
+egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
 echo
 echo
 
@@ -159,9 +159,9 @@ Date: REGEX(.*)
 
 07. grep in log-file
 ====================
- Bad Input [1] for 0.0.0.0: service '/v2/noService' not found
- Bad Input [4] for 0.0.0.0: bad verb for url '/v2/entities', method 'GETT'
- Releasing Bad Input alarm for 0.0.0.0
+ Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
+ Releasing alarm BadInput 0.0.0.0
+ Raising alarm BadInput 0.0.0.0: cannot find default service path for: (PROUST /v2/entities) - BAD VERB?
 
 
 --TEARDOWN--

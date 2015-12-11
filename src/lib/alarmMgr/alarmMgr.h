@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "common/limits.h"
 #include "alarmMgr/AlarmManager.h"
 
 
@@ -38,7 +39,7 @@
 * A 'global' variable was chosen instead of passing the IP from function
 * to function.
 */
-extern __thread char clientIp[16];  // 16: xxx.xxx.xxx.xxx\0
+extern __thread char clientIp[IP_LENGTH_MAX + 1];
 
 
 

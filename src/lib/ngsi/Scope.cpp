@@ -31,6 +31,7 @@
 #include "common/tag.h"
 #include "common/Format.h"
 #include "common/string.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Scope.h"
@@ -247,10 +248,12 @@ std::string Scope::check
     {
       if (polygon.vertexList.size() < 3)
       {
-        char noOfV[16];
+        char noOfV[STRING_SIZE_FOR_INT];
+
         snprintf(noOfV, sizeof(noOfV), "%lu", polygon.vertexList.size());
         std::string details = std::string("too few vertices for a polygon (") + noOfV + " is less than three)";
         alarmMgr.badInput(clientIp, details);
+
         return "too few vertices for a polygon";
       }
       else if (polygon.invertedString() != "")

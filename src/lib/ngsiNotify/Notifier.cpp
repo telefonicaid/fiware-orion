@@ -27,6 +27,7 @@
 
 #include "common/string.h"
 #include "common/statistics.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi10/NotifyContextRequest.h"
@@ -131,7 +132,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
                         true,
                         NOTIFICATION_WAIT_MODE);
 
-    char portV[16];
+    char portV[STRING_SIZE_FOR_INT];
     snprintf(portV, sizeof(portV), "%d", port);
     std::string url = host + ":" + portV + params->resource;
 

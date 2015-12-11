@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/mongoSubscribeContext.h"
@@ -76,7 +77,7 @@ std::string postSubscribeContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    char  noOfV[16];
+    char  noOfV[STRING_SIZE_FOR_INT];
     snprintf(noOfV, sizeof(noOfV), "%lu", ciP->servicePathV.size());
     std::string details = std::string("max *one* service-path allowed for subscriptions (") + noOfV + " given";
 

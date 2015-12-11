@@ -24,7 +24,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
-#include "common/statistics.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
@@ -38,7 +38,7 @@
 void* startSenderThread(void* p)
 {
     SenderThreadParams* params = (SenderThreadParams*) p;
-    char                portV[16];
+    char                portV[STRING_SIZE_FOR_INT];
     std::string         url;
 
     snprintf(portV, sizeof(portV), "%d", params->port);
