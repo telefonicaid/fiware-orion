@@ -72,7 +72,7 @@
 *
 * Alarm Manager definitions - 
 */
-#define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     50
-#define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              50
+#define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     1
+#define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              1
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_

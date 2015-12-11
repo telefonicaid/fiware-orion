@@ -93,7 +93,7 @@ bool AlarmManager::dbError(const std::string& details)
     return false;
   }
 
-  LM_E(("Raising alarm DatabaseError %s", details.c_str()));
+  LM_E(("Raising alarm DatabaseError: %s", details.c_str()));
   dbOk = false;
   return true;
 }
