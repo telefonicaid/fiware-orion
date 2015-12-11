@@ -138,3 +138,5 @@ The list of available options is the following:
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
 -   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
     generation. See [statistics documentation](statistics.md).
+-   **-notifErrLogInterval**. Interval to issue warning log about notification errors - in number of errors.
+-   **-badInputLogInterval**. Interval to issue warning log about bad input - in number of errors.

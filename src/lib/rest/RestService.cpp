@@ -486,13 +486,22 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
-    //
-    // If we have gotten this far, it is safe to assume the Input is OK.
-    // So, the 'Bad Input' alarm is cleared for this client.
-    //
-    alarmMgr.badInputReset(clientIp);
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+
+    //
+    // If we have gotten this far, and the status is 200, the Input is OK.
+    // So, the 'Bad Input' alarm is cleared for this client.
+    //
+    if (ciP->httpStatusCode == SccOk)
+    {
+      // LM_W(("Stopping Bad Input - %s %s", ciP->method.c_str(), ciP->url.c_str()));
+      alarmMgr.badInputReset(clientIp);
+    }
+//    else
+//      LM_W(("NOT Stopping Bad Input - %s %s", ciP->method.c_str(), ciP->url.c_str()));
+
+
     filterRelease(&parseData, serviceV[ix].request);
 
     if (reqP != NULL)

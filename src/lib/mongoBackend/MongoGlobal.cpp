@@ -898,7 +898,6 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
     areaQuery = BSON("$geoWithin" << geoWithin);
   }
 
-  alarmMgr.badInputReset(clientIp);
   return true;
 }
 
@@ -1266,7 +1265,6 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 
     if (pushBackFilter)
     {
-      alarmMgr.badInputReset(clientIp);
       filters.push_back(f);
     }
   }

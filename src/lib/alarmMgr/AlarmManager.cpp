@@ -113,6 +113,7 @@ bool AlarmManager::dbErrorReset(void)
     return false;
   }
 
+  ++dbErrors;
   LM_E(("DB is ok again"));
   dbOk = true;
   return true;
@@ -125,28 +126,35 @@ bool AlarmManager::dbErrorReset(void)
 * AlarmManager::notificationError - 
 *
 * Returns false if no action is taken/necessary, otherwise, true is returned.
+*
+* NOTE
+* The number of notificationErrors per url is maintained in the map.
+* Right now that info is not used, but might be in the future.
+* To do so, we'd need another counter as well, to not forget the accumulated 
+* number each time the notificationErrors are reset.
 */
 bool AlarmManager::notificationError(const std::string& url, const std::string& details)
 {
   std::map<std::string, int>::iterator iter = notificationV.find(url);
 
-  if (iter != notificationV.end())  // Already exists
+  ++notificationErrors;
+
+  if (iter != notificationV.end())  // Already exists - add to the counter
   {
-    if (notificationErrorLogInterval != 0)
-    {
-      iter->second += 1;
-
-      if ((iter->second % notificationErrorLogInterval) == 0)
-      {
-        LM_W(("Notification Errors for %s (%d times): %s", url.c_str(), iter->second, details.c_str()));
-      }
-    }
-
-    return false;
+    iter->second += 1;
+  }
+  else
+  {
+    notificationV[url] = 1;
   }
 
-  notificationV[url] = 1;
-  LM_W(("Notification Error for %s: %s", url.c_str(), details.c_str()));
+  if (notificationErrorLogInterval != 0)
+  {
+    if ((notificationErrors % notificationErrorLogInterval) == 1)
+    {
+      LM_W(("Notification Errors for %s (%d times): %s", url.c_str(), iter->second, details.c_str()));
+    }
+  }
 
   return true;
 }
@@ -177,28 +185,35 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 * AlarmManager::badInput - 
 *
 * Returns false if no action is taken/necessary, otherwise, true is returned.
+*
+* NOTE
+* The number of badInputs per IP is maintained in the map.
+* Right now that info is not used, but might be in the future.
+* To do so, we'd need another counter as well, to not forget the accumulated 
+* number each time the badInputs are reset.
 */
 bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 {
   std::map<std::string, int>::iterator iter = badInputV.find(ip);
 
+  ++badInputs;
+
   if (iter != badInputV.end())  // Already exists
   {
-    if (badInputLogInterval != 0)
-    {
-      iter->second += 1;
-
-      if ((iter->second % badInputLogInterval) == 0)
-      {
-        LM_W(("Bad Input for %s (%d times); %s", ip.c_str(), iter->second, details.c_str()));
-      }
-    }
-
-    return false;
+    iter->second += 1;
+  }
+  else
+  {
+    badInputV[ip] = 1;
   }
 
-  badInputV[ip] = 1;
-  LM_W(("Bad Input for %s (%s)", ip.c_str(), details.c_str()));
+  if (badInputLogInterval != 0)
+  {
+    if ((badInputs % badInputLogInterval) == 1)
+    {
+      LM_W(("Bad Input [%d] for %s: %s", badInputs, ip.c_str(), details.c_str()));
+    }
+  }
 
   return true;
 }

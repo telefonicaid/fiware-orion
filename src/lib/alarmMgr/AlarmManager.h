@@ -37,6 +37,9 @@
 class AlarmManager
 {
 private:
+  long long                   badInputs;
+  long long                   notificationErrors;
+  long long                   dbErrors;
   bool                        dbOk;
   std::map<std::string, int>  notificationV;
   std::map<std::string, int>  badInputV;
