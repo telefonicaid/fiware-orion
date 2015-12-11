@@ -1643,23 +1643,6 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-#if 0
-  printf("argC: %d\n", argC);
-  printf("lmLevelMask: 0x%x\n", lmLevelMask);
-  printf("LogLevelTrace: 0x%x\n", LogLevelTrace);
-  LM_E(("Error"));
-  LM_W(("Warning"));
-  LM_M(("Message"));
-  LM_I(("Info"));
-  LM_T(0, ("Trace level 0"));
-  LM_M(("argC: %d", argC));
-
-  for (int ix = 0; ix < argC; ++ix)
-    LM_M(("argV[%d]: '%s'", ix, argV[ix]));
-
-  exit(99);
-#endif
-
   // Argument consistency check (--silent AND -logLevel)
   if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
   {
@@ -1709,6 +1692,9 @@ int main(int argC, char* argV[])
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
 
+  //
+  // Initializing alarm manager
+  //
   alarmMgr.notificationErrorLogIntervalSet(notifErrLogInterval);
   alarmMgr.badInputLogIntervalSet(badInputLogInterval);
 

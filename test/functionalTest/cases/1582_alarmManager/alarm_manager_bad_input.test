@@ -161,7 +161,7 @@ Date: REGEX(.*)
 ====================
  Bad Input [1] for 0.0.0.0: service '/v2/noService' not found
  Bad Input [4] for 0.0.0.0: bad verb for url '/v2/entities', method 'GETT'
- Bad Input stopped for 0.0.0.0
+ Releasing Bad Input alarm for 0.0.0.0
 
 
 --TEARDOWN--

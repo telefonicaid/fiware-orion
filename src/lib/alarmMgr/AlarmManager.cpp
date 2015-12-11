@@ -114,7 +114,7 @@ bool AlarmManager::dbErrorReset(void)
   }
 
   ++dbErrors;
-  LM_E(("DB is ok again"));
+  LM_E(("Releasing Database alarms"));
   dbOk = true;
   return true;
 }
@@ -139,7 +139,7 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
 
   ++notificationErrors;
 
-  if (iter != notificationV.end())  // Already exists - add to the counter
+  if (iter != notificationV.end())  // Already exists - add to the 'url-specific' counter
   {
     iter->second += 1;
   }
@@ -152,7 +152,7 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
   {
     if ((notificationErrors % notificationErrorLogInterval) == 1)
     {
-      LM_W(("Notification Errors for %s (%d times): %s", url.c_str(), iter->second, details.c_str()));
+      LM_W(("Notification Error [%d] for %s: %s", notificationErrors, url.c_str(), details.c_str()));
     }
   }
 
@@ -173,7 +173,7 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
     return false;
   
   notificationV.erase(url);
-  LM_W(("Notification OK for %s", url.c_str()));
+  LM_W(("Releasing Notification Error alarm for %s", url.c_str()));
 
   return true;
 }
@@ -198,7 +198,7 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 
   ++badInputs;
 
-  if (iter != badInputV.end())  // Already exists
+  if (iter != badInputV.end())  // Already exists - add to the 'ip-specific' counter
   {
     iter->second += 1;
   }
@@ -234,7 +234,7 @@ bool AlarmManager::badInputReset(const std::string& ip)
   }
 
   badInputV.erase(ip);
-  LM_W(("Bad Input stopped for %s", ip.c_str()));
+  LM_W(("Releasing Bad Input alarm for %s", ip.c_str()));
 
   return true;
 }
