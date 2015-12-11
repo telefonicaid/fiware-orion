@@ -204,6 +204,10 @@ SET (SOURCES
     orionTypes/QueryContextResponseVector_test.cpp
     orionTypes/UpdateContextRequestVector_test.cpp
 
+    apiTypesV2/Entities_test.cpp
+    apiTypesV2/Entity_test.cpp  
+    apiTypesV2/EntityVector_test.cpp
+
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp

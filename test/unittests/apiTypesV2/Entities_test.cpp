@@ -23,24 +23,30 @@
 * Author: Fermin Galan
 */
 
-#include "orionTypes/EntityTypeVectorResponse.h"
+#include "apiTypesV2/Entities.h"
 #include "unittest.h"
 
 /* ****************************************************************************
 *
 * present - no output expected, just exercising the code
 */
-TEST(EntityTypeVectorResponse, present)
+TEST(Entities, present)
 {
   utInit();
 
-  EntityType               et("myType");
-  EntityTypeVectorResponse etVRes;
+  Entity* enP    = new Entity();
+  enP->id        = "E";
+  enP->type      = "T";
+  enP->isPattern = "false";
 
-  etVRes.entityTypeVector.vec.push_back(&et);
-  etVRes.statusCode.fill(SccOk);
+  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
+  enP->attributeVector.push_back(caP);
 
-  etVRes.present("");
+  Entities ens;
+  ens.vec.push_back(enP);
+  ens.errorCode.fill("FooError", "Lorem ipsum");
+
+  ens.present("");
 
   utExit();
 }
@@ -50,30 +56,32 @@ TEST(EntityTypeVectorResponse, present)
 *
 * check
 */
-TEST(EntityTypeVectorResponse, check)
+TEST(Entities, check)
 {
   ConnectionInfo ci;
 
   utInit();
 
-  ci.outFormat = JSON;
+  Entity* enP;
 
-  EntityType et1("myType");
-  EntityType et2("");
+  // Entities with ok Entity inside
+  enP            = new Entity();
+  enP->id        = "E";
+  enP->type      = "T";
+  enP->isPattern = "false";
+  Entities ens1;
+  ens1.vec.push_back(enP);
 
-  // EntityTypeVectorResponse with a EntityType (in the vector) that will not fail
-  EntityTypeVectorResponse etRV1;
-  etRV1.entityTypeVector.push_back((&et1));
+  // Entities with nok Entity inside
+  enP            = new Entity();
+  enP->id        = "";
+  enP->type      = "T";
+  enP->isPattern = "false";
+  Entities ens2;
+  ens2.vec.push_back(enP);
 
-  // EntityTypeVectorResponse with a EntityType (in the vector) that will fail
-  EntityTypeVectorResponse etRV2;
-  etRV2.entityTypeVector.push_back((&et2));
-
-  EXPECT_EQ("OK", etRV1.check(&ci, "", ""));
-
-  EXPECT_NE("OK", etRV1.check(&ci, "", "foo"));
-
-  EXPECT_NE("OK", etRV2.check(&ci, "", ""));
+  EXPECT_EQ("OK", ens1.check(&ci, EntitiesRequest));
+  EXPECT_EQ("No Entity ID", ens2.check(&ci, EntitiesRequest));
 
   utExit();
 }

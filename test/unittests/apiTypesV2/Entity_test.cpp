@@ -23,24 +23,26 @@
 * Author: Fermin Galan
 */
 
-#include "orionTypes/EntityTypeVectorResponse.h"
+#include "apiTypesV2/Entity.h"
 #include "unittest.h"
 
 /* ****************************************************************************
 *
 * present - no output expected, just exercising the code
 */
-TEST(EntityTypeVectorResponse, present)
+TEST(Entity, present)
 {
   utInit();
 
-  EntityType               et("myType");
-  EntityTypeVectorResponse etVRes;
+  Entity* enP    = new Entity();
+  enP->id        = "E";
+  enP->type      = "T";
+  enP->isPattern = "false";
 
-  etVRes.entityTypeVector.vec.push_back(&et);
-  etVRes.statusCode.fill(SccOk);
+  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
+  enP->attributeVector.push_back(caP);
 
-  etVRes.present("");
+  enP->present("");
 
   utExit();
 }
@@ -50,30 +52,35 @@ TEST(EntityTypeVectorResponse, present)
 *
 * check
 */
-TEST(EntityTypeVectorResponse, check)
+TEST(Entity, check)
 {
   ConnectionInfo ci;
 
   utInit();
 
-  ci.outFormat = JSON;
+  Entity* enP    = new Entity();
+  enP->id        = "E";
+  enP->type      = "T";
+  enP->isPattern = "false";
 
-  EntityType et1("myType");
-  EntityType et2("");
+  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
+  enP->attributeVector.push_back(caP);
 
-  // EntityTypeVectorResponse with a EntityType (in the vector) that will not fail
-  EntityTypeVectorResponse etRV1;
-  etRV1.entityTypeVector.push_back((&et1));
+  EXPECT_EQ("OK", enP->check(&ci, EntitiesRequest));
 
-  // EntityTypeVectorResponse with a EntityType (in the vector) that will fail
-  EntityTypeVectorResponse etRV2;
-  etRV2.entityTypeVector.push_back((&et2));
+  enP->id = "";
+  EXPECT_EQ("No Entity ID", enP->check(&ci, EntitiesRequest));
 
-  EXPECT_EQ("OK", etRV1.check(&ci, "", ""));
+  enP->id = "E<1>";
+  EXPECT_EQ("Invalid characters in entity id", enP->check(&ci, EntitiesRequest));
+  enP->id = "E";
 
-  EXPECT_NE("OK", etRV1.check(&ci, "", "foo"));
+  enP->type = "T<1>";
+  EXPECT_EQ("Invalid characters in entity type", enP->check(&ci, EntitiesRequest));
+  enP->type = "T";
 
-  EXPECT_NE("OK", etRV2.check(&ci, "", ""));
+  enP->isPattern = "<false>";
+  EXPECT_EQ("Invalid characters in entity isPattern", enP->check(&ci, EntitiesRequest));
 
   utExit();
 }

@@ -23,24 +23,29 @@
 * Author: Fermin Galan
 */
 
-#include "orionTypes/EntityTypeVectorResponse.h"
+#include "apiTypesV2/EntityVector.h"
 #include "unittest.h"
 
 /* ****************************************************************************
 *
 * present - no output expected, just exercising the code
 */
-TEST(EntityTypeVectorResponse, present)
+TEST(EntityVector, present)
 {
   utInit();
 
-  EntityType               et("myType");
-  EntityTypeVectorResponse etVRes;
+  Entity* enP    = new Entity();
+  enP->id        = "E";
+  enP->type      = "T";
+  enP->isPattern = "false";
 
-  etVRes.entityTypeVector.vec.push_back(&et);
-  etVRes.statusCode.fill(SccOk);
+  ContextAttribute* caP = new ContextAttribute("A", "T", "val");
+  enP->attributeVector.push_back(caP);
 
-  etVRes.present("");
+  EntityVector eV;
+  eV.push_back(enP);
+
+  eV.present("");
 
   utExit();
 }
@@ -50,30 +55,32 @@ TEST(EntityTypeVectorResponse, present)
 *
 * check
 */
-TEST(EntityTypeVectorResponse, check)
+TEST(EntityVector, check)
 {
   ConnectionInfo ci;
 
   utInit();
 
-  ci.outFormat = JSON;
+  Entity* enP;
 
-  EntityType et1("myType");
-  EntityType et2("");
+  // EntityVector with ok Entity inside
+  enP            = new Entity();
+  enP->id        = "E";
+  enP->type      = "T";
+  enP->isPattern = "false";
+  EntityVector enV1;
+  enV1.push_back(enP);
 
-  // EntityTypeVectorResponse with a EntityType (in the vector) that will not fail
-  EntityTypeVectorResponse etRV1;
-  etRV1.entityTypeVector.push_back((&et1));
+  // EntityVector with nok Entity inside
+  enP            = new Entity();
+  enP->id        = "";
+  enP->type      = "T";
+  enP->isPattern = "false";
+  EntityVector enV2;
+  enV2.push_back(enP);
 
-  // EntityTypeVectorResponse with a EntityType (in the vector) that will fail
-  EntityTypeVectorResponse etRV2;
-  etRV2.entityTypeVector.push_back((&et2));
-
-  EXPECT_EQ("OK", etRV1.check(&ci, "", ""));
-
-  EXPECT_NE("OK", etRV1.check(&ci, "", "foo"));
-
-  EXPECT_NE("OK", etRV2.check(&ci, "", ""));
+  EXPECT_EQ("OK", enV1.check(&ci, EntitiesRequest));
+  EXPECT_EQ("No Entity ID", enV2.check(&ci, EntitiesRequest));
 
   utExit();
 }
