@@ -3,3 +3,4 @@
 - Fix: more descriptive error messages for CPr update/query forward fail
 - Add: reset for notification counters in threadpool mode
 - Fix: avoid -g compiler flag in release build
+- Add: proper alarm management, including activation/deactivation in logs (Issue #1582)

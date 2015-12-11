@@ -29,6 +29,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
@@ -84,7 +85,7 @@ std::string deleteAttributeValueInstanceWithTypeAndId
   // 02. Check validity of URI params
   if ((entityTypeFromUriParam != "") && (entityTypeFromUriParam != entityTypeFromPath))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 

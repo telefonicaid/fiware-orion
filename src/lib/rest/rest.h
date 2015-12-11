@@ -55,7 +55,7 @@ typedef enum IpVersion
 
 /* ****************************************************************************
 *
-* ipVersionUsed - 
+* Global vars - 
 */
 extern IpVersion       ipVersionUsed;  
 extern std::string     rushHost;

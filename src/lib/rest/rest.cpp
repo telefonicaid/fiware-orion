@@ -42,6 +42,8 @@
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -97,6 +99,7 @@ static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
+__thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
@@ -251,9 +254,10 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
   if (containsForbiddenChars == true)
   {
+    std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
-    LM_W(("Bad Input (found a forbidden character in URI param '%s')", key.c_str()));
+    alarmMgr.badInput(clientIp, details);
 
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer         = error.render(ciP, "");
@@ -441,8 +445,7 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
     }
   }
 
-
-  LM_W(("Bad Input (no valid 'Accept-format' found)"));
+  alarmMgr.badInput(clientIp, "no valid 'Accept-format' found");
   return NOFORMAT;
 }
 
@@ -679,7 +682,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   {
     OrionError e(SccBadRequest, "empty service path");
     ciP->answer = e.render(ciP, "");
-    LM_W(("Bad Input (empty service path)"));
+    alarmMgr.badInput(clientIp, "empty service path");
     return -1;
   }
 #endif
@@ -888,7 +891,9 @@ std::string defaultServicePath(const char* url, const char* method)
   if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
   if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
 
-  LM_W(("Bad Input (cannot find default service path for: (%s, %s))", method, url));
+  std::string details = std::string("cannot find default service path for: (") + method + " " + url + ") - BAD VERB?";
+  alarmMgr.badInput(clientIp, details);
+
   return DEFAULT_SERVICE_PATH;
 }
 
@@ -971,6 +976,7 @@ static int connectionTreat
                addr->sa_data[3] & 0xFF,
                addr->sa_data[4] & 0xFF,
                addr->sa_data[5] & 0xFF);
+      snprintf(clientIp, sizeof(clientIp), "%s", ip);
     }
     else
     {
@@ -1130,7 +1136,7 @@ static int connectionTreat
   
   if (urlCheck(ciP, ciP->url) == false)
   {
-    LM_W(("Bad Input (error in URI path)"));
+    alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
   }
 
@@ -1139,18 +1145,18 @@ static int connectionTreat
 
   if (servicePathSplit(ciP) != 0)
   {
-    LM_W(("Bad Input (error in ServicePath http-header)"));
+    alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
   }
 
   if (contentTypeCheck(ciP) != 0)
   {
-    LM_W(("Bad Input (invalid mime-type in Content-Type http-header)"));
+    alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
   }
   else if (outFormatCheck(ciP) != 0)
   {
-    LM_W(("Bad Input (invalid mime-type in Accept http-header)"));
+    alarmMgr.badInput(clientIp, "invalid mime-type in Accept http-header");
     restReply(ciP, ciP->answer);
   }
   else
@@ -1160,7 +1166,7 @@ static int connectionTreat
 
   if (ciP->httpStatusCode != SccOk)
   {
-    LM_W(("Bad Input (error in URI parameters)"));
+    alarmMgr.badInput(clientIp, "error in URI parameters");
     restReply(ciP, ciP->answer);
     return MHD_YES;
   }

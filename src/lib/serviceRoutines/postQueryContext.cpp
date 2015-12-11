@@ -29,6 +29,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "logMsg/traceLevels.h"
 
@@ -105,10 +106,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   //
   if (parseUrl(qcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", qcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
+      
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }

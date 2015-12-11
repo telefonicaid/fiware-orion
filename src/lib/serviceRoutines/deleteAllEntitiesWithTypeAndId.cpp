@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
@@ -92,7 +93,7 @@ std::string deleteAllEntitiesWithTypeAndId
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
 
@@ -102,7 +103,7 @@ std::string deleteAllEntitiesWithTypeAndId
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 

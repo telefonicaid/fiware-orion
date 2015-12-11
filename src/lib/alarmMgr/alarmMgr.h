@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ALARMMGR_ALARMMGR_H_
+#define SRC_LIB_ALARMMGR_ALARMMGR_H_
+
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -22,39 +25,28 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "alarmMgr/alarmMgr.h"
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
-#include "serviceRoutines/badVerbAllFour.h"
+#include "common/limits.h"
+#include "alarmMgr/AlarmManager.h"
 
 
 
 /* ****************************************************************************
 *
-* badVerbAllFour - 
+* clientIp - the IP address of the current peer sending the request
+*
+* This information is needed for all "badInput" reports for the alarm manager
+* It is a thread-variable, only valid while the request is active.
+* A 'global' variable was chosen instead of passing the IP from function
+* to function.
 */
-std::string badVerbAllFour
-(
-  ConnectionInfo*            ciP,
-  int                        components,
-  std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
-)
-{
-  std::string details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
+extern __thread char clientIp[IP_LENGTH_MAX + 1];
 
-  ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE");
-  ciP->httpStatusCode = SccBadVerb;
 
-  alarmMgr.badInput(clientIp, details);
 
-  return "";
-}
+/* ****************************************************************************
+*
+* alarmMgr - 
+*/
+extern AlarmManager alarmMgr;
+
+#endif  // SRC_LIB_ALARMMGR_ALARMMGR_H_

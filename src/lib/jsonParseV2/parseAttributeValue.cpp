@@ -24,6 +24,7 @@
 */
 #include "rapidjson/document.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -50,7 +51,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    LM_W(("Bad Input (JSON parse error)"));
+    alarmMgr.badInput(clientIp, "JSON parse error");
     oe.fill(SccBadRequest, "Errors found in incoming JSON buffer");
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
@@ -59,7 +60,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject())
   {
-    LM_E(("Bad Input (JSON Parse Error)"));
+    alarmMgr.badInput(clientIp, "JSON parse error");
     oe.fill(SccBadRequest, "Error parsing incoming JSON buffer");
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
@@ -68,7 +69,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.HasMember("value"))
   {
-    LM_W(("Bad Input (No attribute value specified"));
+    alarmMgr.badInput(clientIp, "No attribute value specified");
     oe.fill(SccBadRequest, "no attribute value specified");
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
@@ -82,7 +83,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
     if (name != "value")
     {
-      LM_W(("Bad Input (unexpected JSON field - accepting only 'value'"));
+      alarmMgr.badInput(clientIp, "unexpected JSON field - accepting only 'value'");
       oe.fill(SccBadRequest, "unexpected JSON field - accepting only /value/");
       ciP->httpStatusCode = SccBadRequest;;
       return oe.render(ciP, "");
@@ -111,23 +112,23 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
     }
     else if (type == "Array")
     {
-      caP->valueType    = orion::ValueTypeVector;
+      caP->valueType = orion::ValueTypeVector;
 
       std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
       if (r != "OK")
       {
-        LM_W(("Bad Input (json error in ContextAttributeObject::Vector"));
+        alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Vector");
         return "json error in ContextAttributeObject::Vector";
       }
     }
     else if (type == "Object")
     {
-      caP->valueType    = orion::ValueTypeObject;
+      caP->valueType = orion::ValueTypeObject;
 
       std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
       if (r != "OK")
       {
-        LM_W(("Bad Input (json error in ContextAttributeObject::Object"));
+        alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Object");
         return "json error in ContextAttributeObject::Object";
       }
     }

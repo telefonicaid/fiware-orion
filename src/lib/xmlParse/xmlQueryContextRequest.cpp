@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "orionTypes/areas.h"
 #include "ngsi/Request.h"
 #include "ngsi/ContextAttribute.h"
@@ -77,7 +78,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     reqDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }

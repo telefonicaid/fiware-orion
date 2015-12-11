@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi/ContextAttribute.h"
@@ -645,13 +646,13 @@ std::string ContextAttribute::check
 
   if (forbiddenChars(name.c_str()))
   {
-    LM_W(("Bad Input (found a forbidden character in the name of an attribute"));
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
     return "Invalid characters in attribute name";
   }
 
   if (forbiddenChars(type.c_str()))
   {
-    LM_W(("Bad Input (found a forbidden character in the type of an attribute"));
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
   }
 
@@ -666,7 +667,7 @@ std::string ContextAttribute::check
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      LM_W(("Bad Input (found a forbidden character in the value of an attribute"));
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
       return "Invalid characters in attribute value";
     }
   }

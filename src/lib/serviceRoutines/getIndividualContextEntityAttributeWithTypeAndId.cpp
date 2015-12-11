@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/ParseData.h"
@@ -102,12 +103,12 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
   }
   else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
   }
   else
   {

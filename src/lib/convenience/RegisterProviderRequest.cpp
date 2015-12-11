@@ -32,6 +32,8 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "convenience/RegisterProviderRequest.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/MetadataVector.h"
@@ -112,7 +114,8 @@ std::string RegisterProviderRequest::check
     return "OK";
   }
 
-  LM_W(("Bad Input (RegisterProviderRequest Error: %s)", res.c_str()));
+  std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
+  alarmMgr.badInput(clientIp, details);
 
   return response.render(DiscoverContextAvailability, format, indent);
 }

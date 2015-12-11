@@ -30,6 +30,8 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "orionTypes/OrionValueType.h"
 #include "rest/ConnectionInfo.h"
 #include "parse/CompoundValueNode.h"
@@ -577,7 +579,7 @@ void CompoundValueNode::check(void)
         rootP->error =
           std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
 
-        LM_W(("Bad Input (%s)", rootP->error.c_str()));
+        alarmMgr.badInput(clientIp, rootP->error);
         return;
       }
     }
@@ -596,7 +598,7 @@ void CompoundValueNode::check(void)
         if (childV[ix]->name == childV[ix2]->name)
         {
           rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
-          LM_W(("Bad Input (%s)", rootP->error.c_str()));
+          alarmMgr.badInput(clientIp, rootP->error);
 
           return;
         }
