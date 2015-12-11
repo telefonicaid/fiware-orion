@@ -196,7 +196,6 @@
 
 #include "contextBroker/version.h"
 #include "common/string.h"
-#include "alarmMgr/alarmMgr.h"
 
 using namespace orion;
 
@@ -1686,13 +1685,6 @@ int main(int argC, char* argV[])
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
-
-  //
-  // Initializing alarm manager
-  //
-  alarmMgr.notificationErrorLogSamplingSet(ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING);
-  alarmMgr.badInputLogSamplingSet(ALARM_MGR_BAD_INPUT_LOG_SAMPLING);
-
   LM_I(("Orion Context Broker is running"));
 
   if (fg == false)
