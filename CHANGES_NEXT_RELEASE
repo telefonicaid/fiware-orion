@@ -2,4 +2,4 @@
 - Fix: wrong accumulation in counter sentOK
 - Fix: more descriptive error messages for CPr update/query forward fail
 - Add: reset for notification counters in threadpool mode
-
+- Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)

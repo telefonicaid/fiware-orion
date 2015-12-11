@@ -146,6 +146,13 @@ TEST(commonGlobals, parse8601)
    secs = parse8601("P3Y1M1DT1H1M11S");
    EXPECT_EQ(threeYearsOneMonthOneDayOneHourOneMinuteAndElevenSeconds, secs) << "parse error for 'P3Y1M1DT1H1M11S'";
 
+   secs = parse8601("P0YT12.005S");
+   EXPECT_EQ(12, secs) << "parse error for 'P0YT12.005S'";
+
+   secs = parse8601("P0YT12.51S");
+   EXPECT_EQ(13, secs) << "round error for 'P0YT12.51S'";
+
+
    //
    // Errors
    //

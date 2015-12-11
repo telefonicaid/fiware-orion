@@ -301,7 +301,7 @@ int64_t parse8601(const std::string& s)
 
   while (*duration != 0)
   {
-    if (isdigit(*duration))
+    if (isdigit(*duration) || (*duration == '.') || (*duration == ','))
     {
       ++duration;
       digitsPending = true;
@@ -316,8 +316,8 @@ int64_t parse8601(const std::string& s)
 
       if ((value == 0) && (*start != '0'))
       {
+        LM_W(("Bad Input (parse error for duration '%s')", s.c_str()));
         free(toFree);
-        LM_W(("Bad Input (parse error for duration '%s')", start));
         return -1;
       }
 
@@ -337,14 +337,33 @@ int64_t parse8601(const std::string& s)
              ((*duration == 'H') || (*duration == 'M') || (*duration == 'S')))
     {
       char what = *duration;
+      int  value;
 
       *duration = 0;
-      int value = atoi(start);
+
+      if (what == 'S')  // We support floats for the seconds
+      {
+        float secs    = atof(start);
+        int   intPart = (int) secs;
+        float rest    = secs - intPart;
+
+        if (rest >= 0.5)
+        {
+          ++intPart;
+        }
+
+        value = intPart;
+      }
+      else
+      {
+        value = atoi(start);
+      }
 
       accumulated += toSeconds(value, what, dayPart);
       digitsPending = false;
       ++duration;
       start = duration;
+      LM_M(("duration left: '%s'", duration));
     }
     else
     {
@@ -357,6 +376,7 @@ int64_t parse8601(const std::string& s)
 
   if (digitsPending == true)
   {
+    LM_E(("digitsPending: '%s'", duration));
     return -1;
   }
 
