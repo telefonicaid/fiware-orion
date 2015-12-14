@@ -21,12 +21,3 @@
  iot_support at tid dot es
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
-
-import os
-
-"""
-Make sure the logs path exists and create it otherwise.
-"""
-
-if not os.path.exists("logs"):
-    os.makedirs("logs")

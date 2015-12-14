@@ -51,6 +51,14 @@ find_path(GMOCK_INCLUDE_DIR gmock/gmock.h
           PATHS /usr/includes
           PATH_SUFFIXES gmock)
 
+
+#
+# Stack protection is activated only in debug compilation.
+# However, our unit tests don't pass the compilation with "stack protection", so we turn it off using
+# remove_definitions().
+#
+remove_definitions(-fstack-check -fstack-protector)
+
 SET (SOURCES
     main_UnitTest.cpp
     testDataFromFile.cpp
@@ -155,9 +163,6 @@ SET (SOURCES
     ngsi/ContextAttribute_test.cpp
     ngsi/ContextElement_test.cpp
     ngsi/NotifyCondition_test.cpp
-    ngsi/AttributeAssociation_test.cpp
-    ngsi/Association_test.cpp
-    ngsi/AttributeAssociationList_test.cpp
     ngsi/AttributeDomainName_test.cpp
     ngsi/AttributeList_test.cpp
     ngsi/ConditionValueList_test.cpp
@@ -191,7 +196,18 @@ SET (SOURCES
     ngsi/Throttling_test.cpp
     ngsi/UpdateActionType_test.cpp
 
-    mongoBackend/mongoConfManOperations_test.cpp
+    orionTypes/EntityType_test.cpp
+    orionTypes/EntityTypeResponse_test.cpp
+    orionTypes/EntityTypeVector_test.cpp
+    orionTypes/EntityTypeVectorResponse_test.cpp
+    orionTypes/QueryContextRequestVector_test.cpp
+    orionTypes/QueryContextResponseVector_test.cpp
+    orionTypes/UpdateContextRequestVector_test.cpp
+
+    apiTypesV2/Entities_test.cpp
+    apiTypesV2/Entity_test.cpp  
+    apiTypesV2/EntityVector_test.cpp
+
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
@@ -216,6 +232,7 @@ SET (SOURCES
     mongoBackend/mongoContextProvidersUpdate_test.cpp
     mongoBackend/mongoQueryTypes_test.cpp
     mongoBackend/mongoQueryContextFilterExistEntity_test.cpp
+    mongoBackend/mongoGetSubscriptions_test.cpp
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp
@@ -223,7 +240,6 @@ SET (SOURCES
     jsonParse/jsonRequest_test.cpp
 
     xmlParse/xmlAppendContextElementRequest_test.cpp
-    xmlParse/xmlRegisterContextRequest_test.cpp
     xmlParse/xmlRegisterContextResponse_test.cpp
     xmlParse/xmlRequest_test.cpp
     xmlParse/xmlUpdateContextElementRequest_test.cpp
@@ -234,8 +250,6 @@ SET (SOURCES
     rest/restReply_test.cpp
     rest/RestService_test.cpp
     rest/rest_test.cpp
-
-    cache/SubscriptionCache_test.cpp
 )
 
 SET (HEADERS
@@ -248,23 +262,24 @@ SET (STATIC_LIBS
     ${GTESTMAIN_LIBRARY}
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
-    mongoBackend
-    cache
     rest
-    ngsiNotify
     jsonParse
     jsonParseV2
     xmlParse
     apiTypesV2
     convenience
     serviceRoutines
+    ngsiNotify
     rest
     parse
     ngsi9
     ngsi10
     ngsi
+    cache
+    mongoBackend
     orionTypes
     common
+    alarmMgr
     lm
     pa
     pthread
@@ -311,7 +326,7 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS")
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS"))
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
@@ -326,6 +341,11 @@ ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
   MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient
 -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
+ELSEIF(${DISTRO} MATCHES "Debian_8.2")
+  # It seems that Debian 8.2 doesn't like -mt libraries for unit tests... not sure about other Debian versions
+  MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex)
+ELSE()
 ELSEIF(${DISTRO} MATCHES "Debian_.*")
   MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)

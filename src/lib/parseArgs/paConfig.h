@@ -39,7 +39,7 @@
 #endif
 
 #ifndef DEFAULT_COPYRIGHT
-    #define DEFAULT_COPYRIGHT "Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U\n" \
+    #define DEFAULT_COPYRIGHT "Copyright 2013-2015 Telefonica Investigacion y Desarrollo, S.A.U\n" \
                               "Orion Context Broker is free software: you can redistribute it and/or\n" \
                               "modify it under the terms of the GNU Affero General Public License as\n" \
                               "published by the Free Software Foundation, either version 3 of the\n" \
@@ -88,6 +88,7 @@ extern bool       paLogToFile;
 extern bool       paLogToScreen;
 extern bool       paLogScreenToStderr;
 extern bool       paLogScreenOnlyErrors;
+extern bool       paBoolWithValueIsUnrecognized;
 
 extern char*      paLogFilePath;
 extern char*      paLogFileLineFormat;

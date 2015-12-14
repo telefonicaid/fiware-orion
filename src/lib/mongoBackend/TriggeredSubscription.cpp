@@ -27,27 +27,33 @@
 #include <sstream>
 #include "mongoBackend/TriggeredSubscription.h"
 
+
+
 /* ****************************************************************************
 *
 * TriggeredSubscription::TriggeredSubscription -
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  long long          _throttling,
-  long long          _lastNotification,
-  Format             _format,
-  const std::string& _reference,
-  AttributeList      _attrL,
-  Subscription*      _cacheSubReference
-)
+  long long            _throttling,
+  long long            _lastNotification,
+  Format               _format,
+  const std::string&   _reference,
+  const AttributeList& _attrL,
+  const std::string&   _cacheSubId,
+  const char*          _tenant
+):
+  throttling        (_throttling),
+  lastNotification  (_lastNotification),
+  format            (_format),
+  reference         (_reference),
+  attrL             (_attrL),
+  cacheSubId        (_cacheSubId),
+  tenant            ((_tenant == NULL)? "" : _tenant)
 {
-  throttling        = _throttling;
-  lastNotification  = _lastNotification;
-  format            = _format;
-  reference         = _reference;
-  attrL             = _attrL;
-  cacheSubReference = _cacheSubReference;
+
 }
+
 
 
 /* ****************************************************************************
@@ -58,18 +64,21 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  Format             _format,
-  const std::string& _reference,
-  AttributeList      _attrL
-)
+  Format                _format,
+  const std::string&   _reference,
+  const AttributeList& _attrL
+):
+  throttling        (-1),
+  lastNotification  (-1),
+  format            (_format),
+  reference         (_reference),
+  attrL             (_attrL),
+  cacheSubId        (""),
+  tenant            ("")
 {
-  throttling        = -1;
-  lastNotification  = -1;
-  format            = _format;
-  reference         = _reference;
-  attrL             = _attrL;
-  cacheSubReference = NULL;
+
 }
+
 
 
 /* ****************************************************************************

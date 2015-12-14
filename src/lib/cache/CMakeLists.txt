@@ -21,16 +21,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    SubscriptionCache.cpp
-    Subscription.cpp
-    EntityInfo.cpp
     subCache.cpp
 )
 
 SET (HEADERS
-    SubscriptionCache.h
-    Subscription.h
-    EntityInfo.h
     subCache.h
 )
 
@@ -39,6 +33,7 @@ SET (HEADERS
 # Include directories
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
+
 
 # Library declaration
 # -----------------------------------------------------------------

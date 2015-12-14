@@ -1,0 +1,86 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+CREATE Entity V2 Exceed Mongo Key Limit
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Trying to create a entity with a type > 1024
+# 02. Making sure no entity was created in part 01
+#
+
+echo "01. POST /v2/entities (Room1)"
+echo "============================="
+payload='{
+  "id": "Room1",
+  "type": "TZQIpnz4YX7NgOo2DCSJ6llpviu6mG2Xc2H7MqPaJy9fGRtUcjg1UmguN39pwSKkFJpIJJ1n4RGwjJBkk5iGDl7OY1RW5dZRKQ6hKCSSufXZqm02ECdoqQWnjR6WZ5PGJMRpSmnrVbdZMKfXkJ04WiCUekxiLxgHM6ToydSt8XZ2yDdYcXpXBSVOx66bIi8CoImJAqLYc39apAF77hI1Y1RPksM1S8z9d5sVp0IxhnFN27Al72XXQDqwSTW7YUZyJJeXzM9OI4lQY0CnZLignlNqxiW8Hr4SfZrqWhailwIZ9Q6FyWfjhcSrWK2RF89kVkGIt9DuO7yaGQ5ONCessB2f8rab0CVvVC6WGafUtvDJs8raCQfEzMnLZ2PW6jDMFH1RXPAoxRN78Ho1QLgJB4YVqUWjgB4ZMQCWFQbaG0fSMAImLyzwqjSAoIbobooQzKjaL6aZzIYV1HlVsZSzrnlz68cHD62ZQxIjxsTjPjk2jlXAPCWi23KO4XOB3x9NrzYN2Eh0aN4VDCHfnFQWj4LkqoF2LbZLYonLLrty9yLRqUD1Sq4dpHO52HTWI6dh9LZI0oT4spnPHNmlnsifjatn3e6hmH6gFiXiyXKdndptaHUVaI8GwDr6zeQH0GYlfw4Ho46iaECauPbpgD9YONA0kAl8BFZpL83yz3pJyhRNK4vCWHS676PBEGr8GXBkwTScge5f2pACnvfNmHbrPtm1FHuZ6ZRH318hBt7p98XSF757lz3ML2ixoecLBORRTBgHto95feclNIyrbRgZ9LiOfQrifoagfhGh04eLN6dPCt3mXDmirYR6kU2xUGOmGug4QM1OKUyWUK8vPCqfG4iu4Klt9Pv2s1ttPHmloeEvZ580b7AODyxQqWhHbVJ0OmAJ02h14ONdkvGKDBBzcmh5cFiTDMZDRMFU88NnTQJkFoEBjtz6OYkRdR2U1ctpPXyYkFP0xednTNl6cC9oRz7vXiOXFDozYFPV3lZqeenIsPlQhFpqim11DxTdEbqM",
+  "temp": "29"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. GET /v2/entities/Room1"
+echo "=========================="
+orionCurl --url /v2/entities/Room1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities (Room1)
+=============================
+HTTP/1.1 400 Bad Request
+Content-Length: 86
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Too long entity id/type/servicePath combination",
+    "error": "BadRequest"
+}
+
+
+02. GET /v2/entities/Room1
+==========================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

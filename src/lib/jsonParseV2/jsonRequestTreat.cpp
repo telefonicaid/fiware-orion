@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "common/clockFunctions.h"
+#include "common/statistics.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -42,7 +44,14 @@
 */
 std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP)
 {
-  std::string answer;
+  std::string      answer;
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
 
   switch (requestType)
   {
@@ -61,7 +70,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     }
     break;
 
-  case EntityRequest:  // POST /v2/entities/<eid>
+  case EntityRequest:  // POST|PUT /v2/entities/<eid>
     releaseP->entity = &parseDataP->ent.res;
     answer = parseEntity(ciP, &parseDataP->ent.res, true);
     if (answer != "OK")
@@ -79,7 +88,6 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   case EntityAttributeRequest:
     releaseP->attribute = &parseDataP->attr.attribute;
     answer = parseContextAttribute(ciP, &parseDataP->attr.attribute);
-    parseDataP->attr.attribute.present("Parsed Attribute: ", 0);
     if (answer != "OK")
     {
       return answer;
@@ -100,5 +108,12 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
   }
   
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &threadLastTimeStat.jsonV2ParseTime);
+  }
+
   return answer;
 }

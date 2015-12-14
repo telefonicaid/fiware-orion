@@ -25,9 +25,12 @@
 #include <string>
 #include <vector>
 
-#include "common/globals.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
 #include "ngsi/ContextAttribute.h"
@@ -159,7 +162,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   if (value == "")
   {
-    LM_W(("Bad Input (empty attribute expression)"));
+    alarmMgr.badInput(clientIp, "empty attribute expression");
     return "Empty attribute expression";
   }
 
@@ -264,12 +267,12 @@ std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 */
 void jsonDcarPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   reqDataP->dcar.res.present("");
 }
 

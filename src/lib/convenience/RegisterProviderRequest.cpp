@@ -32,6 +32,8 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "convenience/RegisterProviderRequest.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/MetadataVector.h"
@@ -112,7 +114,8 @@ std::string RegisterProviderRequest::check
     return "OK";
   }
 
-  LM_W(("Bad Input (RegisterProviderRequest Error: %s)", res.c_str()));
+  std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
+  alarmMgr.badInput(clientIp, details);
 
   return response.render(DiscoverContextAvailability, format, indent);
 }
@@ -125,12 +128,12 @@ std::string RegisterProviderRequest::check
 */
 void RegisterProviderRequest::present(std::string indent)
 {
-  LM_F(("%sRegisterProviderRequest:\n", indent.c_str()));
+  LM_T(LmtPresent, ("%sRegisterProviderRequest:\n", indent.c_str()));
   metadataVector.present("Registration", indent + "  ");
   duration.present(indent + "  ");
   providingApplication.present(indent + "  ");
   registrationId.present(indent + "  ");
-  LM_F(("\n"));
+  LM_T(LmtPresent, ("\n"));
 }
 
 

@@ -80,7 +80,7 @@ std::string ContextRegistrationResponseVector::render(Format format, const std::
 */
 void ContextRegistrationResponseVector::present(const std::string& indent)
 {
-  LM_F(("%lu ContextRegistrationResponses", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu ContextRegistrationResponses", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

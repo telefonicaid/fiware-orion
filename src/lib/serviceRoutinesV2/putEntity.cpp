@@ -25,12 +25,16 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
+#include "rest/OrionError.h"
 
 
 
@@ -60,7 +64,8 @@ std::string putEntity
   ParseData*                 parseDataP
 )
 {
-  Entity*  eP = &parseDataP->ent.res;
+  std::string answer = "";
+  Entity*     eP     = &parseDataP->ent.res;
 
   eP->id = compV[2];
 
@@ -87,10 +92,21 @@ std::string putEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
+  else if (ciP->httpStatusCode == SccConflict)
+  {
+    OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
 
+    TIMED_RENDER(answer = orionError.render(ciP, ""));
+  }
+  else if (ciP->httpStatusCode == SccContextElementNotFound)
+  {
+    OrionError orionError(SccContextElementNotFound, "No context element found");
+
+    TIMED_RENDER(answer = orionError.render(ciP, ""));
+  }
 
   // 05. Cleanup and return result
   eP->release();
 
-  return "";
+  return answer;
 }

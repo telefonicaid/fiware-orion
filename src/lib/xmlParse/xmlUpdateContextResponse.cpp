@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "orionTypes/areas.h"
 #include "ngsi/Request.h"
 #include "ngsi/ContextAttribute.h"
@@ -88,7 +89,8 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
+
     parseDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }
@@ -106,6 +108,7 @@ static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute"));
   parseDataP->upcrs.attributeP = new ContextAttribute();
+  parseDataP->upcrs.attributeP->valueType = orion::ValueTypeNone;
   parseDataP->upcrs.cerP->contextElement.contextAttributeVector.push_back(parseDataP->upcrs.attributeP);
   return 0;
 }
@@ -148,6 +151,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   parseDataP->lastContextAttribute = parseDataP->upcrs.attributeP;
   parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
   parseDataP->upcrs.attributeP->stringValue = node->value();
+  parseDataP->upcrs.attributeP->valueType = orion::ValueTypeString;
   return 0;
 }
 
@@ -372,9 +376,9 @@ std::string upcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void upcrsPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   parseDataP->upcrs.res.present("");
 }

@@ -44,6 +44,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 
@@ -55,6 +59,7 @@
 #include "jsonParse/jsonParse.h"
 
 using boost::property_tree::ptree;
+using namespace orion;
 
 
 
@@ -85,11 +90,10 @@ static const char* compoundRootV[] =
 */
 static bool isCompoundPath(const char* path)
 {
-  unsigned int len;
 
   for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
   {
-    len = strlen(compoundRootV[ix]);
+    size_t len = strlen(compoundRootV[ix]);
 
     if (strlen(path) < len)
     {
@@ -161,7 +165,9 @@ static bool treat
     {
       if (forbiddenChars(value.c_str()) == true)
       {
-        LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
+        std::string details = std::string("found a forbidden value in '") + value + "'";
+          
+        alarmMgr.badInput(clientIp, details);
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return false;
@@ -262,7 +268,7 @@ void eatCompound
   if (containerP == NULL)
   {
     LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
-    containerP = new CompoundValueNode(orion::ValueTypeObject);
+    containerP = new CompoundValueNode(ValueTypeObject);
     ciP->compoundValueRoot = containerP;
   }
   else
@@ -271,7 +277,9 @@ void eatCompound
     {
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
-        LM_W(("Bad Input (found a forbidden value in compound '%s')", nodeValue.c_str()));
+        std::string details = std::string("found a forbidden value in compound '") + nodeValue + "'";
+        alarmMgr.badInput(clientIp, details);
+
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return;
@@ -291,17 +299,17 @@ void eatCompound
     else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
-      containerP = containerP->add(orion::ValueTypeObject, nodeName, "");
+      containerP = containerP->add(ValueTypeObject, nodeName, "");
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
       LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
-      containerP->valueType = orion::ValueTypeVector;
-      containerP = containerP->add(orion::ValueTypeObject, "item", "");
+      containerP->valueType = ValueTypeVector;
+      containerP = containerP->add(ValueTypeObject, "item", "");
     }
     else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
     {
-      containerP->valueType = orion::ValueTypeVector;
+      containerP->valueType = ValueTypeVector;
       LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
       containerP->add(orion::ValueTypeString, "item", nodeValue);
       LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'",
@@ -367,7 +375,6 @@ static std::string jsonParse
   int                         noOfChildren = subtree.size();
   if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
   {
-    std::string s;
 
     LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
     eatCompound(ciP, NULL, v, "");
@@ -386,9 +393,10 @@ static std::string jsonParse
     if (ciP->answer == "")
     {
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
+      alarmMgr.badInput(clientIp, ciP->answer);
     }
 
-    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+    alarmMgr.badInput(clientIp, ciP->answer);
     return ciP->answer;
   }
 
@@ -403,13 +411,16 @@ static std::string jsonParse
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);
     if (out != "OK")
     {
-      LM_W(("Bad Input (JSON parse error: '%s')", out.c_str()));
+      std::string details = std::string("JSON parse error: '") + out + "'";
+      alarmMgr.badInput(clientIp, details);
       return out;
     }
   }
 
   return "OK";
 }
+
+
 
 /* ****************************************************************************
 *
@@ -428,6 +439,13 @@ std::string jsonParse
   ptree              tree;
   ptree              subtree;
   std::string        path;
+  struct timespec    start;
+  struct timespec    end;
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
 
   ss << content;
   read_json(ss, subtree);
@@ -440,9 +458,16 @@ std::string jsonParse
     std::string res = jsonParse(ciP, v, path, parseVector, parseDataP);
     if (res != "OK")
     {
-      LM_W(("Bad Input (JSON Parse error: '%s')", res.c_str()));
+      std::string details = std::string("JSON parse error: '") + res + "'";
+      alarmMgr.badInput(clientIp, details);
       return res;
     }
+  }
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &threadLastTimeStat.jsonV1ParseTime);
   }
 
   return "OK";

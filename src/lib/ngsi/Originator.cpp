@@ -93,11 +93,13 @@ void Originator::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sOriginator: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sOriginator: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo Originator", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo Originator", indent.c_str()));
   }
 }
 

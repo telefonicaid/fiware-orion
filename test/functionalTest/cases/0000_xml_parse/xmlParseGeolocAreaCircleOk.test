@@ -180,7 +180,7 @@ curl localhost:${CB_PORT}/v1/queryContext -s -S --header "Content-Type: applicat
 echo '4: +++++++++++++++++++++++++++++++++++++'
 curl localhost:${CB_PORT}/v1/subscribeContext -s -S --header "Content-Type: application/xml" -d "$scr"
 echo '5: +++++++++++++++++++++++++++++++++++++'
-grep 'Got a circleRadius' /tmp/contextBroker.log | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+grep 'Got a circleRadius' /tmp/contextBroker.log | awk -F\| '{ print $9 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
 echo '6: +++++++++++++++++++++++++++++++++++++'
 
 --REGEXPECT--

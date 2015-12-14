@@ -450,8 +450,24 @@ int paParse
     strncpy(paCommandLine, argV[1], sizeof(paCommandLine));
     for (ix = 2; ix < argC; ix++)
     {
-      strncat(paCommandLine, " ",      sizeof(paCommandLine) - 1);
-      strncat(paCommandLine, argV[ix], sizeof(paCommandLine) - 1);
+      if (sizeof(paCommandLine) - strlen(paCommandLine) > 1)
+      {
+        strncat(paCommandLine, " ", sizeof(paCommandLine) - strlen(paCommandLine) - 1);
+      }
+      else
+      {
+        break;
+      }
+
+      if (sizeof(paCommandLine) - strlen(paCommandLine) > 1)
+      {
+        strncat(paCommandLine, argV[ix], sizeof(paCommandLine) - strlen(paCommandLine) - 1);
+      }
+      else
+      {
+        break;
+      }
+
     }
   }
 

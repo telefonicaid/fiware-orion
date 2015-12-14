@@ -126,11 +126,13 @@ void ProvidingApplication::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sProvidingApplication: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sProvidingApplication: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo ProvidingApplication\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo ProvidingApplication\n", indent.c_str()));
   }
 }
 

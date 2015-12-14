@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
@@ -35,6 +36,8 @@
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
+
+
 
 /* ****************************************************************************
 *
@@ -167,7 +170,7 @@ void addContextProviderAttribute
 * matchEntityInCrr -
 *
 */
-bool matchEntityInCrr(ContextRegistration& cr, EntityId* enP)
+bool matchEntityInCrr(ContextRegistration& cr, const EntityId* enP)
 {
   for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix)
   {
@@ -197,7 +200,7 @@ bool matchEntityInCrr(ContextRegistration& cr, EntityId* enP)
 * processGenericEntities() function)
 *
 */
-void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached, EntityId* enP = NULL)
+void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached, const EntityId* enP = NULL)
 {
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
@@ -244,11 +247,11 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 * limit has been reached with local entities.
 *
 */
-void processGenericEntities(EntityIdVector& enV, ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached)
+void processGenericEntities(const EntityIdVector& enV, ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached)
 {
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    EntityId* enP = enV.get(ix);
+    const EntityId* enP = enV.get(ix);
     if (enP->type == "" || isTrue(enP->isPattern))
     {
       addContextProviders(cerV, crrV, limitReached, enP);
@@ -288,7 +291,7 @@ HttpStatusCode mongoQueryContext
     /* FIXME: restriction not supported for the moment */
     if (!requestP->restriction.attributeExpression.isEmpty())
     {
-      LM_W(("Bad Input (restriction found, but restrictions are not supported by mongo backend)"));
+      alarmMgr.badInput(clientIp, "restriction found, but restrictions are not supported by mongo backend");
     }
 
     std::string err;
@@ -310,12 +313,12 @@ HttpStatusCode mongoQueryContext
                        limit,
                        &limitReached,
                        countP);
-    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
 
     if (!ok)
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         rawCerV.release();
+        reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
         return SccOk;
     }
 
@@ -334,7 +337,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -353,7 +356,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -372,7 +375,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -392,7 +395,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -437,5 +440,7 @@ HttpStatusCode mongoQueryContext
     }
 
     rawCerV.release();
+    
+    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
     return SccOk;
 }

@@ -4,32 +4,39 @@ Folder for acceptance tests of context broker NGSI v2.In this framework we are u
 
 ## How to Run the Acceptance Tests
 
-### Prerequisites:
+#### Prerequisites:
 
-- Python 2.6 or newer
-- pip installed (http://docs.python-guide.org/en/latest/starting/install/linux/)
-- virtualenv installed (pip install virtualenv) (optional).
+- Python 2.7.x (One way would be SCL - The Software Collections Repository)
+- pip installed 1.4.1 or higher (http://docs.python-guide.org/en/latest/starting/install/linux/)
+- virtualenv installed 1.10.1 or higher (pip install virtualenv) (optional).
+
 Note: We recommend the use of virtualenv, because is an isolated working copy of Python which allows you to work on a specific project without worry of affecting other projects.
 
-##### Environment preparation:
+
+#### Requirements to fabric (http://www.fabfile.org/)
+Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
+Some requirements are neccesary verify before to install `Fabric` library, mainly to pycripto library (Fabric dependency). 
+This libraries will be install into `requirements.txt`
+```
+     yum install gcc python-devel
+```
+   
+
+#### Environment preparation:
 
 - If you are going to use a virtual environment (optional):
-  * Create a virtual environment somewhere, e.g. in ~/venv (virtualenv ~/venv) (optional)
-  * Activate the virtual environment (source ~/venv/bin/activate) (optional)
-  * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
+  * Create a virtual environment somewhere, `virtualenv venv_name` (optional)
+  * Activate the virtual environment `source venv_name/bin/activate` (optional)
+  * Remember to unset the virtual environment when you're done testing, if it has been previously activated `deactivate` (optional)
 - You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
   * Install the requirements for the acceptance tests in the virtual environment
+  * You should add `--upgrade` (if you have a previous installed version of this library)
 ```
-     pip install -r requirements.txt --allow-all-external
+     pip install [--upgrade] -r requirements.txt --allow-all-external
 ```
 
-#### Requirements to fabric (http://www.fabfile.org/)
-```
-     yum install gcc python-devel
-```
-   Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
 
 #### Folders/Files Structure
 
@@ -50,6 +57,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     configuration.json:                  initial configuration, before of execution
     environment.py                       (generic environment) may define code to run before and after certain events during your testing
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
+    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see properties.json.base)
     README.md:                           this file, a brief explication about this framework to test
     requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
 
@@ -59,25 +67,53 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
        (not in the “steps” directory). We recommend use a generic environment.py and import it in the environment.py 
        file in the same directory that contains the “steps” directory.
 ```
-### Tests execution:
+
+
+### Executing Tests:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
-- You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
-- You should add "--upgrade" (if you have a previous installed version of this library)
-- We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to referenced by `properties.json` files.
-  The settings folder path could be changed in the `configuration.json`.
-  This file initially will overwrite properties.json in each feature.
+- We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
+    - we can use several configurations, create a file (with ssh commands) to each configuration (this file can to have whatever name and extension), 
+      each configuration file is used in the initial configuration (see `BackgroundFeature` in *.feature). This option is valid with `UPDATE_PROPERTIES_JSON` equal to `true`
+      each file will be composed of lines with ssh commands, that will be executed.
+         Example of configuration file into `PATH_TO_SETTING_FOLDER`:
+         ```
+            # replace values in configuration.json
+            sed -i "s/\"CB_RUNNING_MODE\".*/\"CB_RUNNING_MODE\": \"RPM\"/" configuration.json
+            
+            # copy properties.json.base to properties.json
+            cp -R properties.json.base properties.json
+            
+            # replace values in properties.py
+            sed -i "s/\"CB_HOST\".*/\"CB_HOST\":\"localhost\",/" properties.json
+            sed -i "s/\"CB_VERSION\".*/\"CB_VERSION\":\"0.24.0\",/" properties.json
+            sed -i "s/\"CB_VERIFY_VERSION\".*/\"CB_VERIFY_VERSION\":\"true\",/" properties.json
+            sed -i "s/\"CB_FABRIC_USER\".*/\"CB_FABRIC_USER\":\"username\",/" properties.json
+            sed -i "s/\"CB_FABRIC_PASS\".*/\"CB_FABRIC_PASS\":\"password\",/" properties.json
+            sed -i "s/\"MONGO_HOST\".*/\"MONGO_HOST\":\"mongo_host\",/" properties.json
+            sed -i "s/\"MONGO_VERSION\".*/\"MONGO_VERSION\":\"2.6.10\",/" properties.json
+            sed -i "s/\"MONGO_VERIFY_VERSION\".*/\"MONGO_VERIFY_VERSION\":\"true\",/" properties.json
+         ```
+    - Other option is `UPDATE_PROPERTIES_JSON` equal to `false` but in this case `properties.json` will be create manually from `properties.json.base` in root path (used in Jenkins)     
+  The settings folder path could be changed in `PATH_TO_SETTING_FOLDER` in the `configuration.json` file. 
 - modify in `configuration.json`:
-       * JENKINS: determine whether you are in jenkins or not.
        * PATH_TO_SETTING_FOLDER: folder where are the different configurations
-- `properties.json` will be update automatically from settings folder (see configuration.json)
+       * UPDATE_PROPERTIES_JSON: determine whether you are create/update `properties.json` automatically or manually (used to jenkins).
+           - true: read external file (the file is mandatory) in `PATH_TO_SETTING_FOLDER` (with ssh commands) and execute these automatically (used to create `properties.json`) 
+           - false: it does nothing and the creation of `properties.json` will be by user in jenkins console.
+       * CB_RUNNING_MODE: is used to determine how is compiled ContextBroker.
+           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.org/en/develop/admin/build_source/index.html`.        
+           - RPM: CB is installed as RPM, so service tooling will be used to start and stop
+           - CLI: plain CB command line interface will be used to start contextBroker, the contextBroker binary (compiled in DEBUG mode) 
+             must be available in the system PATH.   
+- `properties.json` (MANDATORY) will be create/update in `root path` automatically from settings folder (see `configuration.json`) or manually.
 - Run behave (see available params with the -h option).
 ```
     Some examples:
-       behave .../example.feature                      -- run only one feature
-       behave .../example.feature -t test              -- run scenarios tagged with "test" in a feature
-       behave .../example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
-       behave .../example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
+       behave component/<path>/example.feature                      -- run only one feature
+       behave component/<path>/example.feature -t test              -- run scenarios tagged with "test" in a feature
+       behave component/<path>/example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
+       behave component/<path>/example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
 ```
 
 ### Properties.json
@@ -86,17 +122,21 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 - context_broker_env
     * CB_PROTOCOL: web protocol used (http by default)
     * CB_HOST: context broker host (localhost by default)
-    * CB_PORT: sth port (8666 by default)
+    * CB_PORT: sth port (1026 by default)
     * CB_VERSION: context broker version (x.y.z by default)
     * CB_VERIFY_VERSION: determine whether the version is verified or not (True or False).
     * CB_FABRIC_USER: user used to connect by Fabric
     * CB_FABRIC_PASS: password used to connect by Fabric, if use password, cert_file must be None.
     * CB_FABRIC_CERT: cert_file used to connect by Fabric, if use cert file, password must be None.
     * CB_FABRIC_RETRY: Number of times Fabric will attempt to connect when connecting to a new server
+    * CB_FABRIC_SUDO: determine whether with superuser privileges or not (True | False)
     * CB_LOG_FILE: log file used by context broker
+    * CB_PID_FILE: where to store the pid for context broker
     * CB_LOG_OWNER: owner and group log used by context broker
     * CB_LOG_MOD: mod file used by context broker
     * CB_EXTRA_OPS:  Use the following variable if you need extra ops
+    * CB_RETRIES: number of retries for verification of starting the context broker
+    * CB_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
  Properties used by mongo verifications
 - mongo_env
@@ -108,13 +148,16 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     * MONGO_VERIFY_VERSION: determine whether the version is verified or not (True or False).
     * MONGO_DATABASE: mongo database (sth by default).
     * MONGO_RETRIES: number of retries for data verification.
-    * MONGO_DELAY_TO_RETRY: time to delay in each retry.
+    * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
 
-### BackgroundFeature
+### Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
 
-In certain cases, could be useful define a background by feature instead of `Background` that is by scenario.
-Recommend append `BackgroundFeature` in Feature description and define the steps with `Setup:` or `Check:` prefix.
+In certain cases, could be useful to define actions before or/and after of the feature or/and each scenario. This help to read all pre or post actions into the feature. 
+
+Recommend append labels defined (`Actions Before the Feature`, `Actions Before each Scenario`, `Actions After each Scenario`,`Actions After the Feature`)
+into de feature description, these labels are Optional. And define steps with `Setup:` or `Check:` prefix (must be `:` in the step prefix). See `environment.py` in root path.
+
 Example:
 ```
 Feature: feature name...
@@ -122,43 +165,99 @@ Feature: feature name...
   I would like to execute once several steps in the feature
   So ....
 
-  BackgroundFeature:
-    Setup: update config file
-    Setup: restart service
-    Check: verify if the service is installed successfully
+   Actions Before the Feature:
+      Setup: update config file
+      Setup: start service
+      Check: verify if the service is installed successfully
+  
+   Actions Before each Scenario:
+      Setup: reinit the configuration
+  
+   Actions After each Scenario:
+      Setup: delete database
+
+   Actions After the Feature:
+       Setup: stop service
 ```
+
+
+### Summary of Features and Scenarios
+
+Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
+To activate/deactivate this summary, modify `SHOW_SUMMARY` variable (boolean).
+
+Example:
+```
+                    SUMMARY:
+-------------------------------------------------
+  - components/ngsiv2/attributes/get_attribute_data.feature >> passed: 141, failed: 0, skipped: 77 and total: 218 with duration: 27.799 seconds.
+  - components/ngsiv2/attributes/update_attribute_data.feature >> passed: 260, failed: 0, skipped: 347 and total: 607 with duration: 53.619 seconds.
+  - components/ngsiv2/entities/create_entity.feature >> passed: 444, failed: 0, skipped: 136 and total: 580 with duration: 50.480 seconds.
+  - components/ngsiv2/entities/list_entities.feature >> passed: 123, failed: 0, skipped: 77 and total: 200 with duration: 28.104 seconds.
+  - components/ngsiv2/entities/remove_entity.feature >> passed: 55, failed: 0, skipped: 10 and total: 65 with duration: 6.725 seconds.
+  - components/ngsiv2/entities/replace_all_entity_attributes.feature >> passed: 245, failed: 0, skipped: 315 and total: 560 with duration: 46.318 seconds.
+  - components/ngsiv2/entities/retrieve_entity.feature >> passed: 132, failed: 0, skipped: 77 and total: 209 with duration: 22.966 seconds.
+  - components/ngsiv2/entities/update_existing_entity_attributes.feature >> passed: 298, failed: 0, skipped: 356 and total: 654 with duration: 51.908 seconds.
+  - components/ngsiv2/entities/update_or_append_entity_attributes.feature >> passed: 384, failed: 0, skipped: 382 and total: 766 with duration: 64.614 seconds.
+  - components/ngsiv2/api_entry_point/retrieve_api_resource.feature >> passed: 20, failed: 0, skipped: 0 and total: 20 with duration: 0.127 seconds.
+-------------------------------------------------
+10 features passed, 0 failed, 0 skipped
+2102 scenarios passed, 0 failed, 1777 skipped
+11072 steps passed, 0 failed, 9618 skipped, 0 undefined
+Took 5m52.659s
+```
+
+
+### Logs
+
+The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
+
 
 ### Tests Suites Coverage (features):
 
-  - entities
-    * general_operations - 16 testcases
-    * create_entities - 535 testcases
-    * list_all_entities - 200 testcases
-    * list_an_entity_by_id - 209 testcases
-    * list_an_attribute_by_id - 198 testcases
-    * update_append_attribute_by_id - 729 testcases
-    * update_only_by_id (pending)
-    * replace_attributes_by_id (pending)
-    * remove_entity (pending)
+|       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
+|:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
+|**api_entry_point**                                                                                                                                       |
+|  retrieve_api_resource                      |     20       | GET     | /version   /statistics    /v2                        | No        | No             |
+|                                                                                                                                                          |
+|**entities folder**                                                                                                                                       |
+| create_entity                               |    580       | POST    | /v2/entities/                                        | Yes       | No             |    
+| list_entities                               |    334       | GET     | /v2/entities/                                        | No        | Yes            |
+|                                                                                                                                                          |
+| update_or_append_entity_attributes          |    766       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| retrieve_entity                             |    209       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| replace_all_entity_attributes               |    560       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | No             |  
+| update_existing_entity_attributes           |    654       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | No             |
+| remove_entity                               |     65       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
+|                                                                                                                                                          |
+|**attributes folder**                                                                                                                                     |
+| get_attribute_data                          |    218       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |   
+| update_attribute_data                       |    607       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | No             |
+| remove_a_single_attribute                   |     95       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
+|                                                                                                                                                          |
+|**attributes_value folder**                                                                                                                               |
+| get_attribute_value                         |  (pending)   | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
+| update_attribute_value                      |    234       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
+|                                                                                                                                                          |
+|**alarms folder**                            |  (pending)   |                                                                                             |
 
-  -  alarms (pending)
-
-
+  
 ### Hints:
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
   - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
       The number after "=" is the number of chars
         ex: | attr_name | random=10 |
-  - If entities number is "1", the entity id is without consecutive, ex: `entity_id=room`
-    Else entities number is major than "1" the entities number are prefix plus consecutive, ex:
+  - If entities number is "1", the entity id has not suffix, ex: `entity_id=room`
+    Else entities number is major than "1" the entities id are value plus a suffix (consecutive), ex:
         `entity_id=room_0, entity_id=room_1, ..., entity_id=room_N`
-  - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
-    Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
+  - If attribute number is "1", the attribute name has not suffix, ex: `attributes_name=temperature`
+    Else attributes number is major than "1" the attributes name are value plus a suffix (consecutive), ex:
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
-  - If would like a wrong query parameter name, use `qp_` prefix       
-        
-
+  - If would like a wrong query parameter name, use `qp_` prefix   
+  - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
+  - It is possible to use the same value of the previous request in another request using this string `the same value of the previous request`.
+     
 
 ### Tags
 

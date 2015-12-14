@@ -83,16 +83,9 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - patternNoType
 * - mixPatternAndNotPattern
 *
-* Test with associations
-*
-* - sourceAssociations
-* - sourceAssociationsFails
-* - targetAssoications
-*
 * Simulating fails in MongoDB connection:
 *
 * - mongoDbQueryFail
-* - mongoDBQueryAssociationFail
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
@@ -202,22 +195,10 @@ static void prepareDatabase(void) {
               "contextRegistration" << BSON_ARRAY(cr5)
               );
 
-  /* This association relates E1.A4 (in cr2) -> E2.A1 (in cr1) */
-  BSONObj assoc = BSON(
-              "_id" << "assoc1" <<
-              "srcEnt" << BSON("id" << "E1" << "type" << "T1") <<
-              "tgtEnt" << BSON("id" << "E2" << "type" << "T2") <<
-              "attrs" << BSON_ARRAY(
-                  BSON("src" << "A4" << "tgt" << "A1")
-                  )
-              );
-
   connection->insert(REGISTRATIONS_COLL, reg1);
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-
-  connection->insert(ASSOCIATIONS_COLL, assoc);
 
 }
 
@@ -473,8 +454,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -578,8 +557,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -629,8 +606,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -680,8 +655,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -759,8 +732,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -797,8 +768,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExisting)
 
   ASSERT_EQ(0,res.responseVector.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -848,8 +817,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -886,8 +853,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingDetails)
 
   ASSERT_EQ(0,res.responseVector.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -942,8 +907,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -999,8 +962,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1077,12 +1038,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
-
 }
 
 
@@ -1142,11 +1099,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1223,11 +1177,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1304,11 +1255,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1348,11 +1296,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 
@@ -1395,11 +1340,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1498,11 +1440,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1573,11 +1512,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1667,11 +1603,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1775,11 +1708,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1864,11 +1794,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -1923,11 +1850,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -2000,11 +1924,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -2096,11 +2017,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -2140,11 +2058,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -2251,11 +2166,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
 /* ****************************************************************************
@@ -2360,216 +2272,10 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
-
 }
 
-/* ****************************************************************************
-*
-* sourceAssociations -
-*
-*/
-TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
-{
-  HttpStatusCode                       ms;
-  DiscoverContextAvailabilityRequest   req;
-  DiscoverContextAvailabilityResponse  res;
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* This associations relates E1.A4 (in cr2) -> E2.A1 (in cr1) */
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E2", "T2");
-  req.entityIdVector.push_back(&en);
-  req.attributeList.push_back("A1");
-  Scope sc(SCOPE_TYPE_ASSOC, "SOURCES");
-  req.restriction.scopeVector.push_back(&sc);
-
-  /* Prepare mock */
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(2,res.responseVector.size());
-  /* Context registration element #1 */
-  ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-  ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
-  EXPECT_EQ("A4", RES_CNTX_REG_ATTR(0, 0)->name);
-  EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(0, 0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
-  EXPECT_EQ(0, RES_CNTX_REG(0).registrationMetadataVector.size());
-  EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
-
-  /* Context registration element #2 */
-  ASSERT_EQ(0, RES_CNTX_REG(1).entityIdVector.size());
-  ASSERT_EQ(0, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
-  ASSERT_EQ(1, RES_CNTX_REG(1).registrationMetadataVector.size());
-  EXPECT_EQ("assoc1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->name);
-  EXPECT_EQ("Association", RES_CNTX_REG(1).registrationMetadataVector.get(0)->type);
-  EXPECT_EQ("E1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.source.id);
-  EXPECT_EQ("T1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.source.type);
-  EXPECT_EQ("E2", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.target.id);
-  EXPECT_EQ("T2", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.target.type);
-  ASSERT_EQ(1, RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.size());
-  EXPECT_EQ("A4", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->source);
-  EXPECT_EQ("A1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->target);
-  EXPECT_EQ("http://www.fi-ware.eu/NGSI/association", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-  /* Delete mock */
-  delete timerMock;
-
-}
-
-/* ****************************************************************************
-*
-* sourceAssociationsFails -
-*
-*/
-TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociationsFails)
-{
-  HttpStatusCode                       ms;
-  DiscoverContextAvailabilityRequest   req;
-  DiscoverContextAvailabilityResponse  res;
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E2", "T3");
-  req.entityIdVector.push_back(&en);
-  req.attributeList.push_back("A1");
-  Scope sc(SCOPE_TYPE_ASSOC, "SOURCES");
-  req.restriction.scopeVector.push_back(&sc);
-
-  /* Prepare mock */
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(404, res.errorCode.code);
-  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("Could not query association with combination of entity/attribute", res.errorCode.details);
-
-  ASSERT_EQ(0, res.responseVector.size());
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-  /* Delete mock */
-  delete timerMock;
-
-}
-
-/* ****************************************************************************
-*
-* targetAssociations -
-*
-*/
-TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
-{
-    HttpStatusCode                       ms;
-    DiscoverContextAvailabilityRequest   req;
-    DiscoverContextAvailabilityResponse  res;
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A4");
-    Scope sc(SCOPE_TYPE_ASSOC, "TARGETS");
-    req.restriction.scopeVector.push_back(&sc);
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccNone, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(2,res.responseVector.size());
-    /* Context registration element #1 */
-    ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
-    EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
-    EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
-    EXPECT_EQ(0, RES_CNTX_REG(0).registrationMetadataVector.size());
-    EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
-
-    /* Context registration element #2 */
-    ASSERT_EQ(0, RES_CNTX_REG(1).entityIdVector.size());
-    ASSERT_EQ(0, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
-    ASSERT_EQ(1, RES_CNTX_REG(1).registrationMetadataVector.size());
-    EXPECT_EQ("assoc1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->name);
-    EXPECT_EQ("Association", RES_CNTX_REG(1).registrationMetadataVector.get(0)->type);
-    EXPECT_EQ("E1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.source.id);
-    EXPECT_EQ("T1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.source.type);
-    EXPECT_EQ("E2", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.target.id);
-    EXPECT_EQ("T2", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.entityAssociation.target.type);
-    ASSERT_EQ(1, RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.size());
-    EXPECT_EQ("A4", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->source);
-    EXPECT_EQ("A1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->target);
-    EXPECT_EQ("http://www.fi-ware.eu/NGSI/association", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-    /* Delete mock */
-    delete timerMock;
-
-}
 
 /* ****************************************************************************
 *
@@ -2596,7 +2302,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     setTimer(timerMock);
 
     /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+    DBClientBase* connectionDb = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E3", "T3");
@@ -2611,63 +2318,19 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
 
-    EXPECT_EQ("collection: utest.registrations "
+    EXPECT_EQ("Database Error (collection: utest.registrations "
               "- query(): { query: { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
               "{ contextRegistration.entities.id: { $in: [] } } ], "
               "expiration: { $gt: 1360232700 }"
               ", servicePath: { $in: [ /^/.*/, null ] } }"
-              ", orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
+              ", orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
     /* Release mock */
     delete connectionMock;
     delete timerMock;
-
-}
-
-/* ****************************************************************************
-*
-* mongoDBQueryAssociationFail -
-*
-*/
-TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
-{ 
-
-    HttpStatusCode                       ms;
-    DiscoverContextAvailabilityRequest   req;
-    DiscoverContextAvailabilityResponse  res;
-
-    /* Prepare mock */
-    const DBException e = DBException("boom!!", 33);
-    DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, _query("utest.associations",_,_,_,_,_,_))
-            .WillByDefault(Throw(e));
-
-    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
-    setMongoConnectionForUnitTest(connectionMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A4");
-    Scope sc(SCOPE_TYPE_ASSOC, "TARGETS");
-    req.restriction.scopeVector.push_back(&sc);
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("Database error: collection: utest.associations - query(): { query: { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } }, orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
-    EXPECT_EQ(0,res.responseVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-    /* Release mock */
-    delete connectionMock;
 
 }

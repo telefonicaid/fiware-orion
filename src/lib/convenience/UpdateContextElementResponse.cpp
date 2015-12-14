@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponse.h"
@@ -212,7 +213,7 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
 */
 void UpdateContextElementResponse::present(const std::string& indent)
 {
-  LM_F(("%sUpdateContextElementResponse:", indent.c_str()));
+  LM_T(LmtPresent,("%sUpdateContextElementResponse:", indent.c_str()));
   contextAttributeResponseVector.present(indent + "  ");
   errorCode.present(indent + "  ");
 }

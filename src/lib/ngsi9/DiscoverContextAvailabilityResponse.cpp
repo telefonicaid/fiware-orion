@@ -101,15 +101,6 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
       out += errorCode.render(format, indent + "  ");
   }
 
-#if 0
-  // I needed to adjust rednder function for details=on to work. Ken, please review that this code can be safely removed, after the
-  // above re-factoring
-  if (errorCode.code == SccNone)
-     out += responseVector.render(format, indent + "  ", false);
-  else
-     out += errorCode.render(format, indent + "  ", false);
-#endif
-
   out += endTag(indent, tag, format);
 
   return out;

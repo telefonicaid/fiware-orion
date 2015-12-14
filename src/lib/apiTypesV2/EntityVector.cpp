@@ -31,6 +31,8 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "apiTypesV2/EntityVector.h"
 
@@ -79,7 +81,7 @@ std::string EntityVector::check
 
     if ((res = vec[ix]->check(ciP, requestType)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of Entity)"));
+      alarmMgr.badInput(clientIp, "invalid vector of Entity");
       return res;
     }
   }
@@ -95,7 +97,7 @@ std::string EntityVector::check
 */
 void EntityVector::present(const std::string& indent)
 {
-  LM_F(("%lu Entities:\n", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu Entities:\n", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

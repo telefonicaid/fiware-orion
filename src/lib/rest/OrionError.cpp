@@ -127,7 +127,10 @@ std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
   {
     return "TooManyResults";
   }
- 
+  else if (_reasonPhrase == "No context element found")
+  {
+    return "NotFound";
+  }
 
   return _reasonPhrase;
 }
@@ -148,6 +151,11 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
     if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
     {
       ciP->httpStatusCode = SccBadRequest;
+    }
+
+    if (details == "Already Exists")
+    {
+      details = "Entity already exists";
     }
 
     reasonPhrase = errorStringForV2(reasonPhrase);

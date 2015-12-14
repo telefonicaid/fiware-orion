@@ -99,10 +99,10 @@ std::string jsonUcarCheck(ParseData* parseData, ConnectionInfo* ciP)
 */
 void jsonUcarPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
 
   parseDataP->ucar.res.subscriptionId.present("");
 }

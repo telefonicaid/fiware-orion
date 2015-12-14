@@ -41,7 +41,9 @@
 */
 static sem_t           reqSem;
 static sem_t           transSem;
-static SemRequestType  reqPolicy;
+static sem_t           cacheSem;
+static sem_t           timeStatSem;
+static SemOpType  reqPolicy;
 
 
 
@@ -49,8 +51,10 @@ static SemRequestType  reqPolicy;
 *
 * Time measuring variables - 
 */
-static struct timespec accReqSemTime   = { 0, 0 };
-static struct timespec accTransSemTime = { 0, 0 };
+static struct timespec accReqSemTime      = { 0, 0 };
+static struct timespec accTransSemTime    = { 0, 0 };
+static struct timespec accCacheSemTime    = { 0, 0 };
+static struct timespec accTimeStatSemTime = { 0, 0 };
 
 
 
@@ -66,7 +70,7 @@ static struct timespec accTransSemTime = { 0, 0 };
 *  -1 on failure
 *
 */
-int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
+int semInit(SemOpType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
 {
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
@@ -80,11 +84,36 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
     return -1;
   }
 
+  if (sem_init(&cacheSem, shared, takenInitially) == -1)
+  {
+    LM_E(("Runtime Error (error initializing 'cache' semaphore: %s)", strerror(errno)));
+    return -1;
+  }
+
+  if (sem_init(&timeStatSem, shared, takenInitially) == -1)
+  {
+    LM_E(("Runtime Error (error initializing 'timeStat' semaphore: %s)", strerror(errno)));
+    return -1;
+  }
+
   reqPolicy = _reqPolicy;
 
   // Measure accumulated semaphore waiting time?
-  semTimeStatistics = semTimeStat;
+  semWaitStatistics = semTimeStat;
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* reqSemTryToTake - try to take take semaphore
+*/
+int reqSemTryToTake(void)
+{
+  int r = sem_trywait(&reqSem);
+
+  return r;
 }
 
 
@@ -93,7 +122,7 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
 *
 * reqSemTake -
 */
-int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken)
+int reqSemTake(const char* who, const char* what, SemOpType reqType, bool* taken)
 {
   int r;
 
@@ -121,14 +150,14 @@ int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* 
   struct timespec endTime;
   struct timespec diffTime;
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &startTime);
   }
 
   r = sem_wait(&reqSem);
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &endTime);
 
@@ -148,16 +177,9 @@ int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* 
 *
 * semTimeReqGet - get accumulated req semaphore waiting time
 */
-void semTimeReqGet(char* buf, int bufLen)
+float semTimeReqGet(void)
 {
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accReqSemTime.tv_sec, (int) accReqSemTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accReqSemTime.tv_sec + ((float) accReqSemTime.tv_nsec) / 1E9;
 }
 
 
@@ -166,16 +188,31 @@ void semTimeReqGet(char* buf, int bufLen)
 *
 * semTimeTransGet - get accumulated trans semaphore waiting time
 */
-void semTimeTransGet(char* buf, int bufLen)
+float semTimeTransGet(void)
 {
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accTransSemTime.tv_sec, (int) accTransSemTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accTransSemTime.tv_sec + ((float) accTransSemTime.tv_nsec) / 1E9;
+}
+
+
+
+/* ****************************************************************************
+*
+* semTimeCacheGet - get accumulated cache semaphore waiting time
+*/
+float semTimeCacheGet(void)
+{
+  return accCacheSemTime.tv_sec + ((float) accCacheSemTime.tv_nsec)/ 1E9;
+}
+
+
+
+/* ****************************************************************************
+*
+* semTimeTimeStatGet - get accumulated trans semaphore waiting time
+*/
+float semTimeTimeStatGet(void)
+{
+  return accTimeStatSemTime.tv_sec + ((float) accTimeStatSemTime.tv_nsec) / 1E9;
 }
 
 
@@ -206,6 +243,30 @@ void semTimeTransReset(void)
 
 /* ****************************************************************************
 *
+* semTimeCacheReset - 
+*/
+void semTimeCacheReset(void)
+{
+  accCacheSemTime.tv_sec  = 0;
+  accCacheSemTime.tv_nsec = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* semTimeTimeStatReset - 
+*/
+void semTimeTimeStatReset(void)
+{
+  accTimeStatSemTime.tv_sec  = 0;
+  accTimeStatSemTime.tv_nsec = 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * transSemTake -
 */
 int transSemTake(const char* who, const char* what)
@@ -218,14 +279,14 @@ int transSemTake(const char* who, const char* what)
   struct timespec endTime;
   struct timespec diffTime;
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &startTime);
   }
 
   r = sem_wait(&transSem);
 
-  if (semTimeStatistics)
+  if (semWaitStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &endTime);
 
@@ -234,6 +295,42 @@ int transSemTake(const char* who, const char* what)
   }
 
   LM_T(LmtTransSem, ("%s has the 'trans' semaphore", who));
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
+* cacheSemTake -
+*/
+int cacheSemTake(const char* who, const char* what)
+{
+  int r;
+
+  LM_T(LmtCacheSem, ("%s taking the 'cache' semaphore for '%s'", who, what));
+
+  struct timespec startTime;
+  struct timespec endTime;
+  struct timespec diffTime;
+
+  if (semWaitStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &startTime);
+  }
+
+  r = sem_wait(&cacheSem);
+
+  if (semWaitStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &endTime);
+
+    clock_difftime(&endTime, &startTime, &diffTime);
+    clock_addtime(&accCacheSemTime, &diffTime);
+  }
+
+  LM_T(LmtCacheSem, ("%s has the 'cache' semaphore", who));
 
   return r;
 }
@@ -284,9 +381,86 @@ int transSemGive(const char* who, const char* what)
 }
 
 
+
 /* ****************************************************************************
- *  curl context
- */
+*
+* cacheSemGive -
+*/
+int cacheSemGive(const char* who, const char* what)
+{
+  if (what != NULL)
+  {
+    LM_T(LmtCacheSem, ("%s gives the 'cache' semaphore for '%s'", who, what));
+  }
+  else
+  {
+    LM_T(LmtCacheSem, ("%s gives the 'cache' semaphore", who));
+  }
+
+  return sem_post(&cacheSem);
+}
+
+
+
+/* ****************************************************************************
+*
+* timeStatSemTake -
+*/
+int timeStatSemTake(const char* who, const char* what)
+{
+  int r;
+
+  LM_T(LmtTimeStatSem, ("%s taking the 'timeStat' semaphore for '%s'", who, what));
+
+  struct timespec startTime;
+  struct timespec endTime;
+  struct timespec diffTime;
+
+  if (semWaitStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &startTime);
+  }
+
+  r = sem_wait(&timeStatSem);
+
+  if (semWaitStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &endTime);
+
+    clock_difftime(&endTime, &startTime, &diffTime);
+    clock_addtime(&accTimeStatSemTime, &diffTime);
+  }
+
+  LM_T(LmtTimeStatSem, ("%s has the 'timeStat' semaphore", who));
+
+  return r;
+}
+
+
+
+/* ****************************************************************************
+*
+* timeStatSemGive -
+*/
+int timeStatSemGive(const char* who, const char* what)
+{
+  if (what != NULL)
+  {
+    LM_T(LmtTimeStatSem, ("%s gives the 'timeStat' semaphore for '%s'", who, what));
+  }
+  else
+  {
+    LM_T(LmtTimeStatSem, ("%s gives the 'timeStat' semaphore", who));
+  }
+
+  return sem_post(&timeStatSem);
+}
+
+
+
+/* ****************************************************************************
+*  curl context
+*/
 
 
 static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -308,7 +482,6 @@ void curl_context_cleanup(void)
     curl_easy_cleanup(it->second.curl);
     it->second.curl = NULL;
     release_curl_context(&it->second, true);
-    contexts.erase(it);
   }
 
   contexts.clear();
@@ -319,9 +492,9 @@ void curl_context_cleanup(void)
 
 /* ****************************************************************************
 *
-* get_curl_context - 
+* get_curl_context_reuse -
 */
-int get_curl_context(const std::string& key, struct curl_context* pcc)
+static int get_curl_context_reuse(const std::string& key, struct curl_context* pcc)
 {
   pcc->curl   = NULL;
   pcc->pmutex = NULL;
@@ -387,7 +560,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
     struct timespec  endTime;
     struct timespec  diffTime;
 
-    if (semTimeStatistics)
+    if (semWaitStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &startTime);
     }
@@ -399,7 +572,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       return s;
     }
 
-    if (semTimeStatistics)
+    if (semWaitStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &endTime);
       clock_difftime(&endTime, &startTime, &diffTime);
@@ -424,13 +597,50 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
   return 0;
 }
 
+/* ****************************************************************************
+*
+* get_curl_context_new -
+*/
+static int get_curl_context_new(const std::string& key, struct curl_context* pcc)
+{
+  pcc->curl   = NULL;
+  pcc->pmutex = NULL;
+
+  pcc->curl = curl_easy_init();
+
+  if (pcc->curl == NULL)
+  {
+    LM_E(("Runtime Error (curl_easy_init)"));
+    return -1;
+  }
+
+  return 0;
+}
+
+/* ****************************************************************************
+*
+* get_curl_context -
+*/
+int get_curl_context(const std::string& key, struct curl_context* pcc)
+{
+
+  if (strcmp(notificationMode, "persistent") == 0)
+  {
+    LM_T(LmtCurlContext, ("using persistent curl_contexts"));
+    return get_curl_context_reuse(key, pcc);
+  }
+
+  return get_curl_context_new(key, pcc);
+}
+
+
 
 
 /* ****************************************************************************
 *
-* release_curl_context - 
+* release_curl_context_reuse -
 */
-int release_curl_context(struct curl_context *pcc, bool final)
+static int release_curl_context_reuse(struct curl_context *pcc, bool final)
 {
   // Reset context if not an empty context
   if (pcc->curl != NULL)
@@ -457,11 +667,38 @@ int release_curl_context(struct curl_context *pcc, bool final)
     pcc->pmutex = NULL; // It will remain in global map
   }
 
+  return 0;
+}
+
+/* ****************************************************************************
+*
+* release_curl_context_new -
+*/
+static int release_curl_context_new(struct curl_context *pcc, bool final)
+{
+  // Clean-up context if not an empty context
+  if (pcc->curl != NULL)
+  {
+    curl_easy_cleanup(pcc->curl);
+    pcc->curl = NULL;
+  }
 
   return 0;
 }
 
+/* ****************************************************************************
+*
+* release_curl_context -
+*/
+int release_curl_context(struct curl_context *pcc, bool final)
+{
+  if (strcmp(notificationMode, "persistent") == 0)
+  {
+    return release_curl_context_reuse(pcc, final);
+  }
 
+  return release_curl_context_new(pcc, final);
+}
 
 /* ****************************************************************************
 *
@@ -473,20 +710,12 @@ void mutexTimeCCReset(void)
   accCCMutexTime.tv_nsec = 0;
 }
 
-
-
 /* ****************************************************************************
 *
 * mutexTimeCCGet - get accumulated curl contexts mutex waiting time
 */
-void mutexTimeCCGet(char* buf, int bufLen)
+float mutexTimeCCGet(void)
 {
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accCCMutexTime.tv_sec, (int) accCCMutexTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
+  return accCCMutexTime.tv_sec + ((float) accCCMutexTime.tv_nsec) / 1E9;
 }
+

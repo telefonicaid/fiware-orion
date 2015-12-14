@@ -87,14 +87,18 @@ function dMsg()
 }
 
 
-
+# ------------------------------------------------------------------------------
+#
+# dbInit - 
+#
 # ------------------------------------------------------------------------------
 #
 # dbInit - 
 #
 function dbInit()
 {
-  role=$1
+  role=$1  
+  tenant=$2
   
   host="${CB_DATABASE_HOST}"
   if [ "$host" == "" ]
@@ -108,35 +112,42 @@ function dbInit()
     port="27017"
   fi
   
-  db=$host:$port/$1
-
   dMsg initializing database;
 
   if [ "$role" == "CB" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DATABASE_NAME} --quiet
-  elif [ "$role" == "CM" ]
-  then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CM_DATABASE_NAME} --quiet
+    baseDbName=${CB_DB_NAME}
   elif [ "$role" == "CP1" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DATABASE_NAME} --quiet
+    baseDbName=${CP1_DB_NAME}
   elif [ "$role" == "CP2" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP2_DATABASE_NAME} --quiet
+    baseDbName=${CP2_DB_NAME}
   elif [ "$role" == "CP3" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP3_DATABASE_NAME} --quiet
+    baseDbName=${CP3_DB_NAME}
   elif [ "$role" == "CP4" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP4_DATABASE_NAME} --quiet
+    baseDbName=${CP4_DB_NAME}
   elif [ "$role" == "CP5" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP5_DATABASE_NAME} --quiet
+    baseDbName=${CP5_DB_NAME}
   else
-    echo 'db.dropDatabase()' | mongo $db --quiet
+    baseDbName=$1
   fi
+
+  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
+  if [ $# == 2 ]
+  then 
+    db=$baseDbName-$tenant
+  else
+    db=$baseDbName
+  fi
+
+  dMsg "database to drop: <$db>" 
+  echo 'db.dropDatabase()' | mongo $host:$port/$db --quiet
 }
+
 
 
 # ------------------------------------------------------------------------------
@@ -145,17 +156,12 @@ function dbInit()
 #
 function dbDrop()
 {
-  db=$1
-
   if [ "$CB_DB_DROP" != "No" ]
   then
-    if [ "$db" != "" ]
-    then
-      dbInit $db
-    fi
+    # FIXME: Not sure if $@ should be better...
+    dbInit $*
   fi
 }
-
 
 
 # -----------------------------------------------------------------------------
@@ -306,7 +312,12 @@ function localBrokerStart()
   shift
   shift
 
-  extraParams=$*
+  if [ "$traceLevels" != "" ]
+  then
+    extraParams="-logLevel DEBUG "$*
+  else
+    extraParams=$*
+  fi
 
   IPvOption=""
   
@@ -335,37 +346,32 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
-  elif [ "$role" == "CM" ]
-  then
-    mkdir -p $CM_LOG_DIR
-    port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CM_PORT  -pidpath $CM_PID_FILE -dbhost $dbHost:$dbPort  -db $CM_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CM_LOG_DIR -fwdPort $CB_PORT -ngsi9 $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
     port=$CP1_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
   elif [ "$role" == "CP2" ]
   then
     mkdir -p $CP2_LOG_DIR
     port=$CP2_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
   elif [ "$role" == "CP3" ]
   then
     mkdir -p $CP3_LOG_DIR
     port=$CP3_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
   elif [ "$role" == "CP4" ]
   then
     mkdir -p $CP4_LOG_DIR
     port=$CP4_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
   elif [ "$role" == "CP5" ]
   then
     mkdir -p $CP5_LOG_DIR
     port=$CP5_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
 
@@ -422,9 +428,6 @@ function localBrokerStop
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
-  elif [ "$role" == "CM" ]
-  then
-    port=$CM_PORT
   elif [ "$role" == "CP1" ]
   then
     port=$CP1_PORT
@@ -523,10 +526,6 @@ function brokerStop
     port=$CB_PORT
     vMsg pidFile: $pidFile
     vMsg port: $port
-  elif [ "$role" == "CM" ]
-  then
-    pidFile=$CM_PID_FILE
-    port=$CM_PORT
   elif [ "$role" == "CP1" ]
   then
     pidFile=$CP1_PID_FILE
@@ -719,6 +718,24 @@ function accumulator2Dump()
   fi
 }
 
+
+# ------------------------------------------------------------------------------
+#
+# accumulator3Dump
+#
+function accumulator3Dump()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER3_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER3_PORT}/dump -s -S 2> /dev/null
+  fi
+}
+
+
 # ------------------------------------------------------------------------------
 #
 # accumulatorCount
@@ -735,6 +752,7 @@ function accumulatorCount()
   fi
 }
 
+
 # ------------------------------------------------------------------------------
 #
 # accumulator2Count
@@ -748,6 +766,23 @@ function accumulator2Count()
     curl -g [::1]:${LISTENER2_PORT}/number -s -S 2> /dev/null
   else
     curl localhost:${LISTENER2_PORT}/number -s -S 2> /dev/null
+  fi
+}
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulator3Count
+#
+function accumulator3Count()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER3_PORT}/number -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER3_PORT}/number -s -S 2> /dev/null
   fi
 }
 
@@ -1227,15 +1262,16 @@ export -f brokerStart
 export -f localBrokerStop
 export -f localBrokerStart
 export -f brokerStop
-export -f localBrokerStop
 export -f proxyCoapStart
 export -f proxyCoapStop
 export -f accumulatorStart
 export -f accumulatorStop
 export -f accumulatorDump
 export -f accumulator2Dump
+export -f accumulator3Dump
 export -f accumulatorCount
 export -f accumulator2Count
+export -f accumulator3Count
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd

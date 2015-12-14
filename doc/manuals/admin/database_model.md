@@ -197,7 +197,7 @@ Example document:
                }
            ],
            "attrs": [
-               {`\
+               {
                    "name": "A1",
                    "type": "TA1",
                    "isDomain": "false"
@@ -234,7 +234,8 @@ Fields:
     parameter included in the subscribeContext operation (basically, sum
     "now" and duration) and will be recalculated when an
     updateContextSubscription is received (see [programmers
-    guide](../user/duration.md)).
+    guide](../user/duration.md)). For permanent subscriptions (allowed in NGSIv2)
+    it is set to -1.
 -   **lastNotification**: the time when last notification was sent. This
     is updated each time a notification is sent, to avoid
     violating throttling.
@@ -243,9 +244,7 @@ Fields:
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type** and **isPattern**.
 -   **attrs**: an array of attribute names (strings) (optional).
--   **conditions**: a list of conditions that trigger notifications. The
-    two different cases currently supported are shown in the example
-    below (we think they're quite straightforward)
+-   **conditions**: a list of conditions that trigger notifications.
 -   **count**: the number of notifications sent associated to
     the subscription.
 -   **format**: the format to use to send notification, either "XML" or "JSON".
@@ -272,10 +271,6 @@ Example document:
         "A2"
    ],
    "conditions": [
-       {
-           "type": "ONTIMEINTERVAL",
-           "value": 60
-       },
        {
            "type": "ONCHANGE",
            "value": [

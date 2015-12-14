@@ -172,11 +172,11 @@ void ContextElement::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    LM_F(("%sContext Element:", indent.c_str()));
+    LM_T(LmtPresent, ("%sContext Element:", indent.c_str()));
   }
   else
   {
-    LM_F(("%sContext Element %d:", indent.c_str(), ix));
+    LM_T(LmtPresent, ("%sContext Element %d:", indent.c_str(), ix));
   }
 
   entityId.present(indent + "  ", -1);
@@ -185,8 +185,13 @@ void ContextElement::present(const std::string& indent, int ix)
   domainMetadataVector.present("Domain", indent + "  ");
   for (unsigned int ix = 0; ix < providingApplicationList.size(); ++ix)
   {
-    LM_F(("%s  PA: %s (%s)", indent.c_str(), providingApplicationList[ix].get().c_str(), formatToString(providingApplicationList[ix].getFormat())));
-    LM_F(("%s  providingApplication: %s", indent.c_str(), providingApplicationList[ix].c_str()));
+    LM_T(LmtPresent, ("%s  PA: %s (%s)", 
+		      indent.c_str(), 
+		      providingApplicationList[ix].get().c_str(), 
+		      formatToString(providingApplicationList[ix].getFormat())));
+    LM_T(LmtPresent, ("%s  providingApplication: %s", 
+		      indent.c_str(), 
+		      providingApplicationList[ix].c_str()));
   }
 }
 

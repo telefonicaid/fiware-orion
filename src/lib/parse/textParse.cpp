@@ -74,7 +74,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   // 3. Null ?
   else if ((strlen(ciP->payload) == 4) && ((strcmp(ciP->payload, "null") == 0) || (strcmp(ciP->payload, "Null") == 0) || (strcmp(ciP->payload, "NULL") == 0)))
   {
-    caP->valueType   = orion::ValueTypeNull;
+    caP->valueType   = orion::ValueTypeNone;
   }
 
   //

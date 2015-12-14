@@ -28,6 +28,11 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "rest/restReply.h"
@@ -185,7 +190,9 @@ static XmlRequest* xmlRequestGet(RequestType request, std::string method)
     }
   }
 
-  LM_W(("Bad Input (no request found for RequestType '%s', method '%s')", requestType(request), method.c_str()));
+  std::string details = std::string("no request found for RequestType '") + requestType(request) + "', method '" + method + "'";
+  alarmMgr.badInput(clientIp, details);
+
   return NULL;
 }
 
@@ -206,8 +213,11 @@ std::string xmlTreat
   std::string*     errorMsgP
 )
 {
-  xml_document<>  doc;
-  char*           xmlPayload = (char*) content;
+  xml_document<>   doc;
+  char*            xmlPayload = (char*) content;
+  struct timespec  start;
+  struct timespec  end;
+
 
   //
   // If the payload is empty, the XML parsing library does an assert
@@ -223,12 +233,19 @@ std::string xmlTreat
 
   try
   {
+    if (timingStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &start);
+    }
+
     doc.parse<0>(xmlPayload);
   }
   catch (parse_error& e)
   {
+    std::string details    = std::string("'") + content + "', '" + e.what() + "'";
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
-    LM_W(("Bad Input ('%s', '%s')", content, e.what()));
+
+    alarmMgr.badInput(clientIp, details);
 
     if (errorMsgP)
     {
@@ -237,10 +254,12 @@ std::string xmlTreat
 
     return errorReply;
   }
+  // in this case the try/catch block is not using a 'catch (const std::exception &e)' clause, as we are not using
+  // e.what(), so it wouldn't be useful
   catch (...)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
-    LM_W(("Bad Input (%s)", content));
+    alarmMgr.badInput(clientIp, content);
 
     if (errorMsgP)
     {
@@ -258,7 +277,8 @@ std::string xmlTreat
   if (father == NULL)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
+
     if (errorMsgP)
     {
       *errorMsgP = std::string("XML parse error: invalid XML input");
@@ -279,13 +299,10 @@ std::string xmlTreat
         std::string("Sorry, no request treating object found for RequestType /") +
         requestType(request) + "/, method /" + ciP->method + "/");
 
-    LM_W(("Bad Input (no request treating object found for RequestType %d (%s), method %s)",
-          request,
-          requestType(request),
-          ciP->method.c_str()));
-
-    LM_W(("Bad Input (no request treating object found for RequestType %d (%s), method %s)",
-          request, requestType(request), ciP->method.c_str()));
+    char rtV[STRING_SIZE_FOR_INT];
+    snprintf(rtV, sizeof(rtV), "%d", request);
+    std::string details = std::string("no request treating object found for RequestType ") + rtV + " (" + requestType(request) + "), method " + ciP->method;
+    alarmMgr.badInput(clientIp, details);
 
     if (errorMsgP)
     {
@@ -332,7 +349,8 @@ std::string xmlTreat
                                       std::string("Expected /") + payloadWord +
                                         "/ payload, got /" + payloadStart + "/");
 
-      LM_W(("Bad Input (invalid  payload: wanted: '%s', got '%s')", payloadWord.c_str(), payloadStart));
+      std::string details = std::string("invalid payload: wanted: ") + "'" + payloadWord + "', got '" + payloadStart + "'";
+      alarmMgr.badInput(clientIp, details);
 
       if (errorMsgP)
       {
@@ -351,28 +369,31 @@ std::string xmlTreat
 
   reqP->init(parseDataP);
   ciP->httpStatusCode = SccOk;
+
   xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP, errorMsgP);
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &threadLastTimeStat.xmlParseTime);
+  }
+
   if (ciP->httpStatusCode != SccOk)
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
 
     return restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, ciP->answer);
   }
 
   LM_T(LmtParseCheck, ("Calling check for XML parsed tree (%s)", ciP->payloadWord));
   std::string check = reqP->check(parseDataP, ciP);
-  if (check != "OK")
-  {
-    LM_W(("Bad Input (%s: %s)", reqP->keyword.c_str(), check.c_str()));
-
-    if (errorMsgP)
-    {
-      *errorMsgP = std::string("Bad Input: ") + check;
-    }
-  }
 
   if (check != "OK")
   {
+    std::string details = reqP->keyword + ": " + check;
+
+    alarmMgr.badInput(clientIp, details);
+
     if (errorMsgP)
     {
       *errorMsgP = std::string("Bad Input: ") + check;

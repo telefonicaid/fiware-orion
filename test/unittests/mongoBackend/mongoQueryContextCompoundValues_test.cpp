@@ -47,16 +47,16 @@
 * - CompoundValue1PlusSimpleValue
 * - CompoundValue2PlusSimpleValue
 *
-* Compound 1 is based in: [ 22, {x: [x1, x2], y: 3}, [z1, z2] ]
-* Compound 2 is based in: { x: {x1: a, x2: b}, y: [ y1, y2 ] }
+* Compound 1 is based on: [ 22, {x: [x1, x2], y: 3}, [z1, z2] ]
+* Compound 2 is based on: { x: {x1: a, x2: b}, y: [ y1, y2 ] }
 *
 * - CompoundValue1Native
 * - CompoundValue2Native
 * - CompoundValue1PlusSimpleValueNative
 * - CompoundValue2PlusSimpleValueNative
 *
-* Compound 1 is based in: [ 22, {x: [x1, x2], y: 3}, [z1, false] ]
-* Compound 2 is based in: { x: {x1: a, x2: true}, y: [ y1, y2 ] }
+* Compound 1 is based on: [ 22, {x: [x1, x2], y: 3}, [z1, false] ]
+* Compound 2 is based on: { x: {x1: a, x2: true}, y: [ y1, y2 ] }
 *
 */
 

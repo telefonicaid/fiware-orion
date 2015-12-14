@@ -27,6 +27,12 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
+#include "logMsg/traceLevels.h"
+
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -94,18 +100,20 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   std::string     protocol;
   int             port;
   std::string     prefix;
-  std::string     answer;
-
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
   if (parseUrl(qcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", qcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
+      
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
@@ -114,8 +122,10 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   //
   // 2. Render the string of the request we want to forward
   //
-  std::string  payload = qcrP->render(QueryContext, format, "");
-  char*        cleanPayload = (char*) payload.c_str();;
+  std::string  payload;
+  TIMED_RENDER(payload = qcrP->render(QueryContext, format, ""));
+
+  char* cleanPayload = (char*) payload.c_str();;
 
   if (format == XML)
   {
@@ -131,33 +141,39 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
-  std::string     out;
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
+  std::string     out;
+  int             r;
 
-  out = httpRequestSend(ip,
-                        port,
-                        protocol,
-                        verb,
-                        tenant,
-                        servicePath,
-                        ciP->httpHeaders.xauthToken,
-                        resource,
-                        mimeType,
-                        payload,
-                        false,
-                        true,
-                        mimeType);
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
 
-  if ((out == "error") || (out == ""))
+  r = httpRequestSend(ip,
+                      port,
+                      protocol,
+                      verb,
+                      tenant,
+                      servicePath,
+                      ciP->httpHeaders.xauthToken,
+                      resource,
+                      mimeType,
+                      payload,
+                      false,
+                      true,
+                      &out,
+                      mimeType);
+
+  if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
-    LM_E(("Runtime Error (error forwarding 'Query' to providing application)"));
+    qcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding query");
+    LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
 
 
   //
@@ -326,7 +342,8 @@ std::string postQueryContext
   // 01. Call mongoBackend/mongoQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
-  ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP);
+
+  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP));
 
 
   //
@@ -355,7 +372,8 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    answer = qcrsP->render(ciP, QueryContext, "");
+    TIMED_RENDER(answer = qcrsP->render(ciP, QueryContext, ""));
+
     qcrP->release();
     return answer;
   }
@@ -526,7 +544,8 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  answer = responseV.render(ciP, "", details, qcrsP->errorCode.details);
+  TIMED_RENDER(answer = responseV.render(ciP, "", details, qcrsP->errorCode.details));
+
 
   //
   // Time to cleanup.

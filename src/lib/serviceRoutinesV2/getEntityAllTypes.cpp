@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntityAllTypes.h"
@@ -53,8 +56,8 @@ std::string getEntityAllTypes
   EntityTypeVectorResponse  response;
   std::string               answer;
 
-  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-  answer = response.toJson(ciP);
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam));
+  TIMED_RENDER(answer = response.toJson(ciP));
 
   if (ciP->uriParamOptions["count"])
   {

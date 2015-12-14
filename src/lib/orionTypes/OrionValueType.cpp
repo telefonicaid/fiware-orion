@@ -43,7 +43,7 @@ const char* valueTypeName(const orion::ValueType _type)
   case ValueTypeBoolean:      return "Boolean";
   case ValueTypeObject:       return "Object";
   case ValueTypeVector:       return "Vector";
-  case ValueTypeNull:         return "Null";
+  case ValueTypeNone:         return "None";
   case ValueTypeUnknown:      return "Unknown";
   }
 

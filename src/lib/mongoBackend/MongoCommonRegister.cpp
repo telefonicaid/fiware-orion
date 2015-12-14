@@ -35,117 +35,19 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
+#include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
+
 using std::string;
 using std::map;
 using std::auto_ptr;
-
-
-/*****************************************************************************
-*
-* processAssociations -
-*
-* FIXME: first version of associations doesn't support association update
-*/
-static bool processAssociations(MetadataVector mdV, std::string* err, std::string tenant)
-{
-  DBClientBase* connection = NULL;
-
-  for (unsigned int ix = 0; ix < mdV.size(); ++ix)
-  {
-    Metadata* md = mdV.get(ix);
-
-    if (md->type != "Association")
-    {
-      continue;
-    }
-
-    LM_T(LmtMongo, ("Processing association metadata"));
-
-    std::string name      = md->name;
-    std::string srcEnId   = md->association.entityAssociation.source.id;
-    std::string srcEnType = md->association.entityAssociation.source.type;
-    std::string tgtEnId   = md->association.entityAssociation.target.id;
-    std::string tgtEnType = md->association.entityAssociation.target.type;
-
-    BSONObj srcEn;
-    if (srcEnType == "")
-    {
-      srcEn = BSON(ASSOC_ENT_ID << srcEnId);
-    }
-    else
-    {
-      srcEn = BSON(ASSOC_ENT_ID << srcEnId << ASSOC_ENT_TYPE << srcEnType);
-    }
-
-    BSONObj tgtEn;
-    if (tgtEnType == "")
-    {
-      tgtEn = BSON(ASSOC_ENT_ID << tgtEnId);
-    }
-    else
-    {
-      tgtEn = BSON(ASSOC_ENT_ID << tgtEnId << ASSOC_ENT_TYPE << tgtEnType);
-    }
-
-    BSONArrayBuilder attrs;
-    for (unsigned int jx = 0; jx < md->association.attributeAssociationList.size(); ++jx)
-    {
-      std::string srcAtt = md->association.attributeAssociationList.get(jx)->source;
-      std::string tgtAtt = md->association.attributeAssociationList.get(jx)->target;
-      attrs.append(BSON(ASSOC_ATTRS_SOURCE << srcAtt << ASSOC_ATTRS_TARGET << tgtAtt));
-    }
-
-    BSONObj doc = BSON("_id" << name <<
-                       ASSOC_SOURCE_ENT << srcEn <<
-                       ASSOC_TARGET_ENT << tgtEn <<
-                       ASSOC_ATTRS << attrs.arr());
-
-    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'",
-                    getAssociationsCollectionName(tenant).c_str(),
-                    doc.toString().c_str()));
-
-    try
-    {
-      connection = getMongoConnection();
-      connection->insert(getAssociationsCollectionName(tenant).c_str(), doc);
-      releaseMongoConnection(connection);
-
-      LM_I(("Database Operation Successful (%s)", doc.toString().c_str()));
-    }
-    catch (const DBException &e)
-    {
-      releaseMongoConnection(connection);
-
-      *err = e.what();
-      LM_E(("Database Error ('insert \"%s\" in %s', '%s')",
-            doc.toString().c_str(),
-            getAssociationsCollectionName(tenant).c_str(),
-            e.what()));
-
-      return false;
-    }
-    catch (...)
-    {
-      releaseMongoConnection(connection);
-
-      *err = "Generic Exception from mongo";
-
-      LM_E(("Database Error ('insert \"%s\" in %s', '%s')",
-            doc.toString().c_str(),
-            getAssociationsCollectionName(tenant).c_str(),
-            "generic error"));
-
-      return false;
-    }
-  }
-
-  return true;
-}
 
 
 /* ****************************************************************************
@@ -160,7 +62,7 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
 */
 static bool processSubscriptions
 (
-  EntityIdVector                        triggerEntitiesV,
+  const EntityIdVector&                 triggerEntitiesV,
   map<string, TriggeredSubscription*>&  subs,
   std::string&                          err,
   const std::string&                    tenant
@@ -210,7 +112,6 @@ static bool addTriggeredSubscriptions
   std::string                           tenant
 )
 {
-  DBClientBase* connection = NULL;
 
   BSONArrayBuilder          entitiesNoPatternA;
   std::vector<std::string>  idJsV;
@@ -323,59 +224,30 @@ static bool addTriggeredSubscriptions
   queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.appendCode("$where", function);
 
-  BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
-
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
-                  query.toString().c_str()));
-
   auto_ptr<DBClientCursor> cursor;
-  try
+  BSONObj                  query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
+
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
   {
-    connection = getMongoConnection();
-    cursor = connection->query(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query);
-
-    /*
-     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-     * exception ourselves
-     */
-    if (cursor.get() == NULL)
-    {
-      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-    }
-
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-
-    err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
-      " - query(): " + query.toString() +
-      " - exception: " + e.what();
-    LM_E(("Database Error (%s)", err.c_str()));
-
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    releaseMongoConnection(connection, &cursor);
     return false;
   }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
-      " - query(): " + query.toString() +
-      " - exception: " + "generic";
-    LM_E(("Database Error (%s)", err.c_str()));
-    return false;
-  }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj     sub     = cursor->next();
-    BSONElement idField = sub.getField("_id");
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrError(cursor, &sub, &err))
+    {
+      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      continue;
+    }
+    BSONElement idField = getField(sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -385,9 +257,11 @@ static bool addTriggeredSubscriptions
     //
     if (idField.eoo() == true)
     {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+      std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+      alarmMgr.dbError(details);
       continue;
     }
+    alarmMgr.dbErrorReset();
 
     std::string subIdStr = idField.OID().toString();
 
@@ -396,13 +270,14 @@ static bool addTriggeredSubscriptions
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML,
-        STR_FIELD(sub, CASUB_REFERENCE),
+        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringField(sub, CASUB_FORMAT)) : XML,
+        getStringField(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
+  releaseMongoConnection(connection, &cursor);
 
   return true;
 }
@@ -432,7 +307,7 @@ HttpStatusCode processRegisterContext
   const std::string&        format
 )
 {
-  DBClientBase* connection = NULL;
+  std::string err;
 
   /* If expiration is not present, then use a default one */
   if (requestP->duration.isEmpty())
@@ -521,11 +396,6 @@ HttpStatusCode processRegisterContext
                     requestP->contextRegistrationVector.get(ix)->providingApplication.c_str()));
 
     std::string err;
-    if (!processAssociations(cr->registrationMetadataVector, &err, tenant))
-    {
-      responseP->errorCode.fill(SccReceiverInternalError);
-      return SccOk;
-    }
 
     if (!addTriggeredSubscriptions(*cr, subsToNotify, err, tenant))
     {
@@ -535,59 +405,20 @@ HttpStatusCode processRegisterContext
   }
   reg.append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 
-  BSONObj regDoc = reg.obj();
-
-  LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'",
-                  getRegistrationsCollectionName(tenant).c_str(),
-                  regDoc.toString().c_str()));
-
-  try
+  /* Note we are using upsert = "true". This means that if the document doesn't previously
+   * exist in the collection, it is created. Thus, this way both uses of registerContext are OK
+   * (either new registration or updating an existing one) */
+  if (!collectionUpdate(getRegistrationsCollectionName(tenant), BSON("_id" << oid), reg.obj(), true, &err))
   {
-    connection = getMongoConnection();
-
-    //
-    // Note the fourth parameter is set to "true". This means "upsert", so if the document doesn't previously
-    // exist in the collection, it is created. Thus, this way is ok with both uses of
-    // registerContext (either new registration or updating an existing one)
-    //
-    connection->update(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << oid), regDoc, true);
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (_id: %s)", oid.toString().c_str()));
-  }
-  catch (const DBException& e)
-  {
-    releaseMongoConnection(connection);
-
-    responseP->errorCode.fill(SccReceiverInternalError,
-                              std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
-                              " - upsert update(): " + regDoc.toString() +
-                              " - exception: " + e.what());
-
-    LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+    responseP->errorCode.fill(SccReceiverInternalError, err);
     releaseTriggeredSubscriptions(subsToNotify);
     return SccOk;
   }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    responseP->errorCode.fill(SccReceiverInternalError,
-                              std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
-                              " - upsert update(): " + regDoc.toString() +
-                              " - exception: " + "generic");
-
-    LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
-    releaseTriggeredSubscriptions(subsToNotify);
-    return SccOk;
-  }
-
 
   //
   // Send notifications for each one of the subscriptions accumulated by
   // previous addTriggeredSubscriptions() invocations
   //
-  std::string err;
   processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant);
 
   // Fill the response element

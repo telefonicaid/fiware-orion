@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/idCheck.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -57,7 +58,9 @@ std::string idCheck(const std::string& s)
     }
     else
     {
-      LM_W(("Bad Input (invalid char '%c' in ID string)", *cP));
+      std::string details = std::string("invalid char '") + *cP + "' in ID string";
+      alarmMgr.badInput(clientIp, details);
+
       return "invalid char in ID string";
     }
 

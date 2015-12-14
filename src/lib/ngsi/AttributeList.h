@@ -42,16 +42,16 @@ typedef struct AttributeList
 {
   std::vector<std::string>  attributeV;
 
-  void         fill(std::vector<std::string>);
+  void         fill(const std::vector<std::string>& aVec);
   std::string  render(Format format, const std::string& indent, bool comma = false);
   void         present(const std::string& indent);
   void         release(void);
   bool         lookup(const std::string& attributeName);
   void         push_back(const std::string& attributeName);
   void         push_back_if_absent(const std::string& attributeName);
-  unsigned int size(void);
-  std::string  get(int ix);
-  void         clone(AttributeList& aList);
+  unsigned int size(void) const;
+  std::string  get(int ix) const;
+  void         clone(const AttributeList& aList);
 
   std::string  check(RequestType         requestType,
                      Format              format,
@@ -59,7 +59,7 @@ typedef struct AttributeList
                      const std::string&  predetectedError,
                      int                 counter);
 
-  std::string  operator[](unsigned int ix)
+  std::string  operator[](unsigned int ix) const
   {
     if (ix < attributeV.size())
     {

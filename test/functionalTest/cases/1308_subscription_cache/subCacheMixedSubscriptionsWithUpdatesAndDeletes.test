@@ -1,0 +1,517 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Cache Mixed wildcard and not and removes and updates
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 38,101
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create subscription S1 - without pattern
+# 02. Check statistics, see ONE entry in subCache
+# 03. Update S1
+# 04. Check statistics, see ONE entry in subCache
+# 05. Create subscription S2 - with pattern 's0.*' 
+# 06. Check statistics, see TWO entries in subCache
+# 07. Create subscription S3 - without pattern
+# 08. Check statistics, see THREE subCacheItems in subCache
+# 09. Update S3
+# 10. Check statistics, see THREE subCacheItems in subCache
+# 11. Remove S1
+# 12. Check statistics, see TWO subCacheItems in subCache
+# 13. Update S2
+# 14. Check statistics, see TWO subCacheItem in subCache
+# 15. Remove S2
+# 16. Check statistics, see ONE entry in subCache
+#
+
+
+echo "01. Create subscription S1 - without pattern"
+echo "============================================"
+payload='{
+  "entities": [
+    {
+      "isPattern": "false",
+      "id": "S1"
+    }
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "throttling": "PT2S",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB1=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+echo
+echo
+
+
+echo "02. Check statistics, see ONE entry in subCache"
+echo "==============================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "03. Update S1"
+echo "============="
+payload='{
+  "subscriptionId": "'$SUB1'",
+  "duration": "P5Y",
+  "throttling": "PT10S"
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Check statistics, see ONE entry in subCache"
+echo "==============================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "05. Create subscription S2 - with pattern 's0.*'"
+echo "================================================"
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": "s0.*"
+    }
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "PT5S",
+  "throttling": "PT2S",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB2=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+echo
+echo
+
+
+echo "06. Check statistics, see TWO entries in subCache"
+echo "================================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "07. Create subscription S3 - without pattern"
+echo "============================================"
+payload='{
+  "entities": [
+    {
+      "isPattern": "false",
+      "id": "S3"
+    }
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "throttling": "PT2S",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB3=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+echo
+echo
+
+
+echo "08. Check statistics, see THREE subCacheItems in subCache"
+echo "========================================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "09. Update S3"
+echo "============="
+payload='{
+  "subscriptionId": "'$SUB3'",
+  "duration": "P5Y",
+  "throttling": "PT10S"
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Check statistics, see THREE subCacheItems in subCache"
+echo "========================================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "11. Remove S1"
+echo "============="
+payload='{
+  "subscriptionId": "'$SUB1'"
+}'
+orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "12. Check statistics, see TWO subCacheItems in subCache"
+echo "======================================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "13. Update S2"
+echo "============="
+payload='{
+  "subscriptionId": "'$SUB2'",
+  "duration": "P5Y",
+  "throttling": "PT10S"
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+echo
+echo
+
+
+echo "14. Check statistics, see TWO subCacheItems in subCache"
+echo "======================================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "15. Remove S2"
+echo "============="
+payload='{
+  "subscriptionId": "'$SUB2'"
+}'
+orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "16. Check statistics, see ONE entry in subCache"
+echo "==============================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+#
+# About
+#   "refresh": REGEX((0|1|2)),
+#
+# If started with -noCache:  0
+# Normal start:              1
+# Under valgrind:            2 (possibly, depending on timing)
+#
+
+
+--REGEXPECT--
+01. Create subscription S1 - without pattern
+============================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT2S"
+    }
+}
+
+
+02. Check statistics, see ONE entry in subCache
+===============================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": 1,
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 0,
+    "updates": 0
+}
+
+
+03. Update S1
+=============
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT10S"
+    }
+}
+
+
+04. Check statistics, see ONE entry in subCache
+===============================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": 2,
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
+}
+
+
+05. Create subscription S2 - with pattern 's0.*'
+================================================
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT5S",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT2S"
+    }
+}
+
+
+06. Check statistics, see TWO entries in subCache
+=================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f, ]{50})",
+    "inserts": 3,
+    "items": 2,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
+}
+
+
+07. Create subscription S3 - without pattern
+============================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT2S"
+    }
+}
+
+
+08. Check statistics, see THREE subCacheItems in subCache
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f, ]{76})",
+    "inserts": REGEX((4|7)),
+    "items": 3,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
+}
+
+
+09. Update S3
+=============
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT10S"
+    }
+}
+
+
+10. Check statistics, see THREE subCacheItems in subCache
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f, ]{76})",
+    "inserts": REGEX((5|8)),
+    "items": 3,
+    "refresh": REGEX((0|1|2)),
+    "removes": 2,
+    "updates": 2
+}
+
+
+11. Remove S1
+=============
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+12. Check statistics, see TWO subCacheItems in subCache
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f, ]{50})",
+    "inserts": REGEX((5|8)),
+    "items": 2,
+    "refresh": REGEX((0|1|2)),
+    "removes": 3,
+    "updates": 2
+}
+
+
+13. Update S2
+=============
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT10S"
+    }
+}
+
+
+14. Check statistics, see TWO subCacheItems in subCache
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f, ]{50})",
+    "inserts": REGEX((6|9)),
+    "items": 2,
+    "refresh": REGEX((0|1|2)),
+    "removes": 4,
+    "updates": 3
+}
+
+
+15. Remove S2
+=============
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+16. Check statistics, see ONE entry in subCache
+===============================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": REGEX((6|9)),
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 5,
+    "updates": 3
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

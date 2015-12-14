@@ -22,17 +22,20 @@
 *
 * Author: Fermin Galan
 */
-
-#include "Notifier.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/string.h"
-#include "ngsi10/NotifyContextRequest.h"
 
-#include "onTimeIntervalThread.h"
-#include "senderThread.h"
+#include "common/string.h"
+#include "common/statistics.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
+
+#include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
+#include "ngsiNotify/onTimeIntervalThread.h"
+#include "ngsiNotify/senderThread.h"
+#include "ngsiNotify/Notifier.h"
+
 
 
 /* ****************************************************************************
@@ -104,7 +107,9 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
-      LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + url + "'";
+      alarmMgr.badInput(clientIp, details);
+
       return;
     }
 
@@ -112,18 +117,37 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    httpRequestSend(host,
-                    port,
-                    protocol,
-                    "POST",
-                    tenant,
-                    spathList,
-                    xauthToken,
-                    uriPath,
-                    content_type,
-                    payload,
-                    true,
-                    NOTIFICATION_WAIT_MODE);
+    int r;
+
+    r = httpRequestSend(host,
+                        port,
+                        protocol,
+                        "POST",
+                        tenant,
+                        spathList,
+                        xauthToken,
+                        uriPath,
+                        content_type,
+                        payload,
+                        true,
+                        NOTIFICATION_WAIT_MODE);
+
+    char portV[STRING_SIZE_FOR_INT];
+    snprintf(portV, sizeof(portV), "%d", port);
+    std::string url = host + ":" + portV + params->resource;
+
+    if (r == 0)
+    {
+      statisticsUpdate(NotifyContextSent, format);
+      QueueStatistics::incSentOK();
+      alarmMgr.notificationErrorReset(url);
+    }
+    else
+    {
+      QueueStatistics::incSentError();
+      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");
+    }
+
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -140,6 +164,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->resource      = uriPath;
     params->content_type  = content_type;
     params->content       = payload;
+    params->format        = format;
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
@@ -161,8 +186,8 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
 * they could be refactored in the future to have a common part using a parent
 * class for both types of notifications and using it as first argument
 */
-void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, Format format) {
-
+void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, Format format)
+{
     /* Render NotifyContextAvailabilityRequest */
     std::string payload = ncar->render(NotifyContextAvailability, format, "");
 
@@ -174,16 +199,30 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
-      LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
+      std::string details = std::string("sending NotifyContextAvailabilityRequest: malformed URL: '") + url + "'";
+      alarmMgr.badInput(clientIp, details);
+
       return;
     }
 
     /* Set Content-Type depending on the format */
     std::string content_type = (format == XML ? "application/xml" : "application/json");
 
-    /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
+    /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
 #ifdef SEND_BLOCKING
-    httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+
+    if (r == 0)
+    {
+      statisticsUpdate(NotifyContextSent, format);
+      QueueStatistics::incSentOK();
+      alarmMgr.notificationErrorReset(url);
+    }
+    else
+    {
+      QueueStatistics::incSentError();
+      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");      
+    }
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -208,6 +247,8 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     pthread_detach(tid);
 #endif
 }
+
+
 
 /* ****************************************************************************
 *

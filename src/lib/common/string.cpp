@@ -28,10 +28,12 @@
 #include <string>
 #include <vector>
 
-#include "common/string.h"
-#include "common/wsStrip.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/string.h"
+#include "common/wsStrip.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -95,7 +97,6 @@ bool isIPv6(const std::string& in)
 {
   size_t      pos;
   std::string partip;
-  std::string resu;
   std::string staux = in;
   int         cont  = 0;
 
@@ -104,7 +105,6 @@ bool isIPv6(const std::string& in)
   {
     cont++;
     partip = staux.substr(0, pos+1);
-    resu  += partip;
 
     if (checkGroupIPv6(partip) == false)
     {
@@ -414,8 +414,10 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
   if (err.length() > 0)
   {
+    std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     latitude = oldLatitude;
-    LM_W(("Bad Input (bad latitude value in coordinate string '%s')", initial));
     ret = false;
   }
   else
@@ -424,44 +426,33 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
     if (err.length() > 0)
     {
+      std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
+      alarmMgr.badInput(clientIp, details);
+
       /* Rollback latitude */
       latitude = oldLatitude;
       longitude = oldLongitude;
-      LM_W(("Bad Input (bad longitude value in coordinate string '%s')", initial));
       ret = false;
     }
   }
 
   if ((latitude > 90) || (latitude < -90))
   {
-    LM_W(("Bad Input (bad value for latitude '%s')", initial));
+    std::string details = std::string("bad value for latitude '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     ret = false;
   }
   else if ((longitude > 180) || (longitude < -180))
   {
-    LM_W(("Bad Input (bad value for longitude '%s')", initial));
+    std::string details = std::string("bad value for longitude '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     ret = false;
   }
 
   free(initial);
   return ret;
-}
-
-
-
-/* ****************************************************************************
-*
-* coords2string - 
-*/
-void coords2string(std::string* s, double latitude, double longitude, int decimals)
-{
-  char buf[256];
-  char format[32];
-
-  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
-  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
-
-  *s = buf;
 }
 
 
@@ -662,7 +653,7 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
   {
     if (strncmp(&from[fromIx], oldString, oldLen) == 0)
     {
-      snprintf(to, toLen, "%s", newString);
+      strncat(to, newString, toLen - strlen(to));
       toIx   += newLen;
       fromIx += oldLen;
     }
@@ -709,7 +700,9 @@ std::string servicePathCheck(const char* servicePath)
       ;
     else
     {
-      LM_W(("Bad Input (Bad Character '%c' in Service-Path)", *servicePath));
+      std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
+      alarmMgr.badInput(clientIp, details);
+
       return "Bad Character in Service-Path";
     }
 
@@ -717,4 +710,67 @@ std::string servicePathCheck(const char* servicePath)
   }
 
   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* str2double - convert string to double, and return false if no valid double is found
+*
+* From the manual page of strtod:
+*   double strtod(const char *nptr, char **endptr);
+*
+*   If endptr is not NULL, a pointer to the character after the last character
+*   used in the conversion is stored in the location referenced by endptr.
+*
+*   If no conversion is performed, zero is returned and the value of nptr is stored 
+*   in the location referenced by endptr.
+*
+* Now, this is just perfect. It is just what we need to assure that a string is
+* in fact 'expressing' a double.
+* All we need to do is to check that endptr only contains whitespace (or nothing at all)
+* after the call to 'strtod'. And also, that a covervsion has actually been performed.
+* If so, the string sent to isDouble is indeed a valid 'double'.
+*
+* More from the man page:
+*   If the correct value would cause overflow, plus or minus HUGE_VAL (HUGE_VALF, HUGE_VALL)
+*   is returned (according to the sign of the value), and ERANGE is stored in errno.
+*   If the correct value would cause underflow, zero is returned and ERANGE is stored in errno.
+*
+* So, we will need to check errno for ERANGE also.
+*
+* This in turn will make a 'HUGE_VAL double' 12e999999 (is that enough? :-)) be treated as an error.
+* It IS a double, but this function will say it is not, as it actually is not a valid double for
+* this computer as the computer cannot represent it as the C builtin type 'double' ... OK!
+*/
+bool str2double(char* s, double* dP)
+{
+  char*   rest = s;
+  double  d;
+
+  d = strtod(s, &rest);
+
+  if ((rest == s) || (errno == ERANGE))
+  {
+    return false;
+  }
+
+  // If all WS after the last char used in the conversion, then all is OK
+  while (isspace(*rest))
+  {
+    ++rest;
+  }
+
+  if (*rest != 0)
+  {
+    return false;
+  }
+
+  if (dP != NULL)
+  {
+    *dP = d;
+  }
+
+  return true;
 }

@@ -25,7 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -117,9 +119,23 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return "No Entity ID";
   }
 
-  if (forbiddenChars(id.c_str()))         { return "Invalid characters in entity id";        }
-  if (forbiddenChars(type.c_str()))       { return "Invalid characters in entity type";      }
-  if (forbiddenChars(isPattern.c_str()))  { return "Invalid characters in entity isPattern"; }
+  if (forbiddenChars(id.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
+    return "Invalid characters in entity id";
+  }
+
+  if (forbiddenChars(type.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
+    return "Invalid characters in entity type";
+  }
+
+  if (forbiddenChars(isPattern.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the pattern of an entity");
+    return "Invalid characters in entity isPattern";
+  }
 
   return attributeVector.check(requestType, JSON, "", "", 0);
 }
@@ -132,9 +148,15 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 */
 void Entity::present(const std::string& indent)
 {
-  LM_F(("%sid:        %s", indent.c_str(), id.c_str()));
-  LM_F(("%stype:      %s", indent.c_str(), type.c_str()));
-  LM_F(("%sisPattern: %s", indent.c_str(), isPattern.c_str()));
+  LM_T(LmtPresent, ("%sid:        %s", 
+		    indent.c_str(), 
+		    id.c_str()));
+  LM_T(LmtPresent, ("%stype:      %s", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%sisPattern: %s", 
+		    indent.c_str(), 
+		    isPattern.c_str()));
 
   attributeVector.present(indent + "  ");
 }

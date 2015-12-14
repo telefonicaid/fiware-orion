@@ -52,8 +52,9 @@ typedef struct EntityIdVector
   void         present(const std::string& indent);
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);
-  unsigned int size(void);
+  unsigned int size(void) const;
   EntityId*    get(int ix);
+  const EntityId* get(int ix) const;
   EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
   void         release();
 
@@ -66,7 +67,15 @@ typedef struct EntityIdVector
 
     return NULL;
   }
+  const EntityId* operator[](unsigned int ix) const
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
 
+    return NULL;
+  }
   std::string  check(RequestType         requestType,
                      Format              format,
                      const std::string&  indent,

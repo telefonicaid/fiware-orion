@@ -25,13 +25,16 @@
 #include <string>
 #include <vector>
 
-#include "serviceRoutinesV2/getEntityAttribute.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 
+#include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/getEntityAttribute.h"
 
 
 
@@ -51,54 +54,77 @@ std::string getEntityAttributeValue
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP
-)
+  )
 {
-  std::string            answer;
-  std::string            entityId = compV[2];
-  std::string            attrName = compV[4];
-  QueryContextResponse*  qcrsP    = &parseDataP->qcrs.res;
+  std::string  answer;
+  Attribute    attribute;
+  bool         text = (ciP->uriParam["options"] == "text" || ciP->outFormat == TEXT);
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", attrName);
+  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
 
+  attribute.fill(&parseDataP->qcrs.res, compV[4]);
+
   // Render entity attribute response
-  if (qcrsP->contextElementResponseVector.size() > 1)
+  if (attribute.errorCode.error == "TooManyResults")
   {
     ErrorCode ec("TooManyResults", "There is more than one entity with that id - please refine your query");
 
     ciP->httpStatusCode = SccConflict;
-    answer = ec.toJson(true);
+
+    TIMED_RENDER(answer = ec.toJson(true));
   }
-  else if (qcrsP->contextElementResponseVector.size() == 0)
+  else if (attribute.errorCode.error == "NotFound")
   {
     ErrorCode ec("NotFound", "The requested entity has not been found. Check type and id");
     ciP->httpStatusCode = SccContextElementNotFound;
-    answer = ec.toJson(true);
-  }
-  else if (qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size() > 1)
-  {
-    ErrorCode ec("TooManyResults", "There is more than one attribute with that name. Pleasee refine your query");
 
-    ciP->httpStatusCode = SccConflict;
-    answer = ec.toJson(true);
-  }
-  else if (qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size() == 0)
-  {
-    ErrorCode ec("NotFound", "The requested attribute has not been found. Check its name");
-    ciP->httpStatusCode = SccContextElementNotFound;
-    answer = ec.toJson(true);
+    TIMED_RENDER(answer = ec.toJson(true));
   }
   else
   {
-    answer = qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->toJsonAsValue(ciP);
+    // the same of the wrapped operation
+    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+
+    // Remove unwanted fields from attribute before rendering
+    attribute.pcontextAttribute->type = "";
+    attribute.pcontextAttribute->metadataVector.release();
+
+    if (!text)
+    {
+      // Do not use attribute name, change to 'value'
+      attribute.pcontextAttribute->name = "value";
+
+      TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+    }
+    else
+    {
+      if (attribute.pcontextAttribute->compoundValueP != NULL)
+      {
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, ""));
+        if (attribute.pcontextAttribute->compoundValueP->isObject())
+        {
+          answer = "{" + answer + "}";
+        }
+        else if (attribute.pcontextAttribute->compoundValueP->isVector())
+        {
+          answer = "[" + answer + "]";
+        }
+      }
+      else
+      {
+        TIMED_RENDER(answer = attribute.pcontextAttribute->toStringValue());
+      }
+
+      ciP->outFormat = TEXT;
+    }
   }
 
   // Cleanup and return result
   parseDataP->qcr.res.release();
-  parseDataP->qcrs.res.release();
 
   return answer;
 }

@@ -298,8 +298,6 @@ TEST(mongoQueryTypes, queryAllType)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -417,9 +415,6 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
     EXPECT_EQ("", ca->stringValue);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -539,9 +534,6 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -615,9 +607,6 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -670,9 +659,6 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
     EXPECT_EQ("", ca->stringValue);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -753,9 +739,6 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -788,9 +771,6 @@ TEST(mongoQueryTypes, queryAllPaginationNonExisting)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(0, res.entityTypeVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -850,10 +830,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
     EXPECT_EQ("pos_T", ca->type);
     EXPECT_EQ("", ca->stringValue);
     EXPECT_EQ(NULL, ca->compoundValueP);
-    EXPECT_EQ(0, ca->metadataVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
+    EXPECT_EQ(0, ca->metadataVector.size());    
 
     utExit();
 }
@@ -888,9 +865,6 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
 
     ASSERT_EQ(0, res.entityTypeVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -913,6 +887,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   utInit();
 
   /* Set MongoDB connection */
+  DBClientBase* connectionDb = getMongoConnection();
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
@@ -922,14 +897,16 @@ TEST(mongoQueryTypes, queryAllDbException)
   EXPECT_EQ(SccOk, ms); 
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-  EXPECT_EQ("database: utest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
-            "exception: boom!!", res.statusCode.details);
+  EXPECT_EQ("Database Error (collection: utest "
+            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
+            "- exception: boom!!)", res.statusCode.details);
   EXPECT_EQ(0,res.entityTypeVector.size());
 
+  /* Restore real DB connection */
+  setMongoConnectionForUnitTest(connectionDb);
+
   /* Release mock */
-  delete connectionMock;
-  setMongoConnectionForUnitTest(NULL);
+  delete connectionMock;  
 
   utExit();
 
@@ -954,6 +931,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   utInit();
 
   /* Set MongoDB connection */
+  DBClientBase* connectionDb = getMongoConnection();
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
@@ -964,14 +942,17 @@ TEST(mongoQueryTypes, queryAllGenericException)
 
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-  EXPECT_EQ("database: utest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
-            "exception: generic", res.statusCode.details);
+  EXPECT_EQ("Database Error (collection: utest "
+            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } "
+            "- exception: std::exception)", res.statusCode.details);
   EXPECT_EQ(0,res.entityTypeVector.size());
+
+  /* Restore real DB connection */
+  setMongoConnectionForUnitTest(connectionDb);
 
   /* Release mock */
   delete connectionMock;
-  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 
 }
@@ -1038,9 +1019,6 @@ TEST(mongoQueryTypes, queryGivenTypeBasic)
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->stringValue);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1110,9 +1088,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -1181,9 +1156,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationAll)
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -1222,9 +1194,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlyFirst)
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->stringValue);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1266,9 +1235,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlySecond)
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->stringValue);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1325,9 +1291,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationRange)
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(2)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -1360,9 +1323,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExisting)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1412,9 +1372,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(1)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(1)->metadataVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -1448,9 +1405,6 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
 
     ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -1459,7 +1413,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
 * queryGivenTypeDbException -
 *
 */
-TEST(mongoQueryTypes, queryGiveyTypeDbException)
+TEST(mongoQueryTypes, queryGivenTypeDbException)
 {
   HttpStatusCode               ms;
   EntityTypeResponse res;
@@ -1473,6 +1427,7 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
   utInit();
 
   /* Set MongoDB connection */
+  DBClientBase* connectionDb = getMongoConnection();
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
@@ -1483,14 +1438,16 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
 
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-  EXPECT_EQ("database: utest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } - "
-            "exception: boom!!", res.statusCode.details);
+  EXPECT_EQ("Database Error (collection: utest "
+            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
+            "- exception: boom!!)", res.statusCode.details);
   EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
 
+  /* Restore real DB connection */
+  setMongoConnectionForUnitTest(connectionDb);
+
   /* Release mock */
-  delete connectionMock;
-  setMongoConnectionForUnitTest(NULL);
+  delete connectionMock;  
 
   utExit();
 }
@@ -1514,6 +1471,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   utInit();
 
   /* Set MongoDB connection */
+  DBClientBase* connectionDb = getMongoConnection();
   setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
@@ -1524,14 +1482,16 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
 
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-  EXPECT_EQ("database: utest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } - "
-            "exception: generic", res.statusCode.details);
+  EXPECT_EQ("Database Error (collection: utest "
+            "- runCommand(): { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } "
+            "- exception: std::exception)", res.statusCode.details);
   EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
 
+  /* Restore real DB connection */
+  setMongoConnectionForUnitTest(connectionDb);
+
   /* Release mock */
-  delete connectionMock;
-  setMongoConnectionForUnitTest(NULL);
+  delete connectionMock; 
 
   utExit();
 }

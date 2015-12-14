@@ -86,7 +86,7 @@ void RegistrationId::set(const std::string& value)
 *
 * RegistrationId::get -
 */
-std::string RegistrationId::get(void)
+std::string RegistrationId::get(void) const
 {
   return string;
 }
@@ -101,11 +101,13 @@ void RegistrationId::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sRegistrationId: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sRegistrationId: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo RegistrationId\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo RegistrationId\n", indent.c_str()));
   }
 }
 

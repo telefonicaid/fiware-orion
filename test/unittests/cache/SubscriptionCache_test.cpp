@@ -35,6 +35,7 @@
 
 #include "unittest.h"
 
+using namespace orion;
 
 extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 
@@ -57,7 +58,7 @@ TEST(cache, SubscriptionCache)
   EntityInfo*               ei2 = new EntityInfo();
   NotifyCondition*          ncP = new NotifyCondition();
   
-  subscriptionCacheInit("unittest");
+  subscriptionCacheInit("utest");
 
   attributeV.push_back("attr1");
   attributeV.push_back("attr2");
@@ -77,51 +78,50 @@ TEST(cache, SubscriptionCache)
   ncP->condValueList.push_back("attr3");
   nv.push_back(ncP);
 
-  subP = new Subscription("unittest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
+  subP = new Subscription("utest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
 
   subCache->insert(subP);
 
-  subP = subCache->lookupById("unittest", "/spath", "012345678901234567890123");
+  subP = subCache->lookupById("utest", "/spath", "012345678901234567890123");
   EXPECT_TRUE(subP != NULL);
   EXPECT_EQ("012345678901234567890123", subP->subscriptionId);
 
   std::vector<Subscription*> subV;
-  subCache->lookup("unittest", "/spath", "E10", "", "attr1", &subV);
+  subCache->lookup("utest", "/spath", "E10", "", "attr1", &subV);
   ASSERT_EQ(1, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   subV.clear();
 
-  subCache->lookup("unittest", "/spath", "E20", "", "attr1", &subV);
+  subCache->lookup("utest", "/spath", "E20", "", "attr1", &subV);
   ASSERT_EQ(1, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   subV.clear();
 
-  subCache->lookup("unittest", "/spath", "E30", "", "attr1", &subV);
+  subCache->lookup("utest", "/spath", "E30", "", "attr1", &subV);
   EXPECT_EQ(0, subV.size());
   subV.clear();
 
-  subCache->lookup("unittest", "/spath", "E30", "", "attr4", &subV);
+  subCache->lookup("utest", "/spath", "E30", "", "attr4", &subV);
   EXPECT_EQ(0, subV.size());
   subV.clear();
 
-  subCache->lookup("unittest", "/spath", "E10", "at1", "attr3", &subV);
+  subCache->lookup("utest", "/spath", "E10", "at1", "attr3", &subV);
   ASSERT_EQ(1, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   subV.clear();
 
-  subCache->lookup("unittest", "/spath", "E10", "at3", "attr4", &subV);
+  subCache->lookup("utest", "/spath", "E10", "at3", "attr4", &subV);
   ASSERT_EQ(0, subV.size());
   subV.clear();
 
-  subP = new Subscription("unittest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
+  subP = new Subscription("utest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
   subCache->insert(subP);
 
-  subCache->lookup("unittest", "/spath", "E10", "", "attr3", &subV);
+  subCache->lookup("utest", "/spath", "E10", "", "attr3", &subV);
   ASSERT_EQ(2, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   EXPECT_EQ("012345678901234567890124", subV[1]->subscriptionId);
   subV.clear();
 
-  utExit();
-  setMongoConnectionForUnitTest(NULL);
+  utExit();  
 }

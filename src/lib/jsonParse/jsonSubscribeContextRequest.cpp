@@ -29,6 +29,8 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "orionTypes/areas.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -150,7 +152,8 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   if ((s = parseDataP->scr.res.duration.check(SubscribeContext, JSON, "", "", 0)) != "OK")
   {
-    LM_W(("Bad Input (error parsing duration '%s': %s)", parseDataP->scr.res.duration.get().c_str(), s.c_str()));
+    std::string details = std::string("error parsing duration '") + parseDataP->scr.res.duration.get() + "': " + s;
+    alarmMgr.badInput(clientIp, details);
     return s;
   }
 
@@ -313,7 +316,8 @@ static std::string circleInverted(const std::string& path, const std::string& va
 
   if (!isTrue(value) && !isFalse(value))
   {
-    LM_W(("Bad Input (invalid string for circle/inverted: '%s')", value.c_str()));
+    std::string details = std::string("invalid string for circle/inverted: '") + value + "'";
+    alarmMgr.badInput(clientIp, details);
     parseDataP->errorString = "bad string for circle/inverted: /" + value + "/";
     return parseDataP->errorString;
   }
@@ -572,7 +576,7 @@ void jsonScrPresent(ParseData* parseDataP)
 {
   printf("jsonScrPresent\n");
 
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

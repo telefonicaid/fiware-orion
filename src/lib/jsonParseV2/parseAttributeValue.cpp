@@ -24,6 +24,7 @@
 */
 #include "rapidjson/document.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -47,7 +48,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    LM_W(("Bad Input (JSON parse error)"));
+    alarmMgr.badInput(clientIp, "JSON parse error");
     oe.fill(SccBadRequest, "Errors found in incoming JSON buffer");
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
@@ -56,9 +57,10 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject() && !document.IsArray())
   {
-    LM_E(("Bad Input (Nor JSON Object nor JSON Array for attribute::value)"));
-    oe.fill(SccBadRequest, "Nor JSON Object nor JSON Array for attribute::value");
+    alarmMgr.badInput(clientIp, "JSON parse error");
+    oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value");
     ciP->httpStatusCode = SccBadRequest;;
+
     return oe.render(ciP, "");
   }
 

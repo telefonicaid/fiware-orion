@@ -56,6 +56,7 @@ typedef enum RequestType
   NotifyContext,
   UpdateContext,
   RtUpdateContextResponse,
+  NotifyContextSent,
 
   ContextEntitiesByEntityId = 21,
   ContextEntityAttributes,
@@ -117,6 +118,8 @@ typedef enum RequestType
   DeleteEntity,
   EntityTypeRequest,
   EntityAllTypesRequest,
+  SubscriptionsRequest,
+  IndividualSubscriptionRequest,
 
   InvalidRequest = 100
 } RequestType;

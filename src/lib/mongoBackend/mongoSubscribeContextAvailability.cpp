@@ -32,6 +32,8 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
+#include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/dbConstants.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "rest/uriParamNames.h"
@@ -52,7 +54,6 @@ HttpStatusCode mongoSubscribeContextAvailability
   const std::string&                     tenant
 )
 {
-    DBClientBase*  connection = NULL;
     bool           reqSemTaken;
 
     LM_T(LmtMongo, ("Subscribe Context Availability Request, notifyFormat: %s", formatToString(notifyFormat)));
@@ -104,42 +105,12 @@ HttpStatusCode mongoSubscribeContextAvailability
     sub.append(CASUB_FORMAT, formatToString(notifyFormat));
 
     /* Insert document in database */
-    BSONObj subDoc = sub.obj();
-    try
+    std::string err;
+    if (!collectionInsert(getSubscribeContextAvailabilityCollectionName(tenant), sub.obj(), &err))
     {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc.toString().c_str()));
-
-        connection = getMongoConnection();
-        connection->insert(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc);
-        releaseMongoConnection(connection);
-
-        LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
-    }
-    catch (const DBException &e)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)", reqSemTaken);
-
-        responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
-                                  " - insert(): " + subDoc.toString() +
-                                  " - exception: " + e.what());
-        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
-
-        return SccOk;
-    }
-    catch (...)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)", reqSemTaken);
-
-        responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
-                                  " - insert(): " + subDoc.toString() +
-                                  " - exception: " + "generic");
-        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
-
-        return SccOk;
+      reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)", reqSemTaken);
+      responseP->errorCode.fill(SccReceiverInternalError, err);
+      return SccOk;
     }
 
     /* Send notifications for matching context registrations */

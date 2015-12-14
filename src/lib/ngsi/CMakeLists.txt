@@ -21,9 +21,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    Association.cpp
-    AttributeAssociation.cpp
-    AttributeAssociationList.cpp
     AttributeDomainName.cpp
     AttributeExpression.cpp
     AttributeList.cpp
@@ -41,7 +38,6 @@ SET (SOURCES
     ContextRegistrationResponse.cpp
     ContextRegistrationResponseVector.cpp
     Duration.cpp
-    EntityAssociation.cpp
     EntityId.cpp
     EntityIdVector.cpp
     Metadata.cpp
@@ -66,9 +62,6 @@ SET (SOURCES
 )
 
 SET (HEADERS
-    Association.h
-    AttributeAssociation.h
-    AttributeAssociationList.h
     AttributeDomainName.h
     AttributeExpression.h
     AttributeList.h
@@ -85,7 +78,6 @@ SET (HEADERS
     ContextRegistrationResponse.h
     ContextRegistrationResponseVector.h
     Duration.h
-    EntityAssociation.h
     EntityId.h
     EntityIdVector.h
     Metadata.h
