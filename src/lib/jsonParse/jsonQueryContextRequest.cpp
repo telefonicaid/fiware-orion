@@ -29,15 +29,15 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "orionTypes/areas.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
-
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "parse/nullTreat.h"
-
 #include "rest/ConnectionInfo.h"
 
 using namespace orion;
@@ -123,8 +123,8 @@ static std::string attribute(const std::string& path, const std::string& value, 
 
   if (value == "")
   {
+    alarmMgr.badInput(clientIp, "empty attribute name");
     reqDataP->errorString = "Empty attribute name";
-    LM_W(("Bad Input (empty attribute name)"));
   }
 
   reqDataP->qcr.res.attributeList.push_back(value);
@@ -170,8 +170,8 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   if (value == "")
   {
+    alarmMgr.badInput(clientIp, "empty attribute expression");
     reqDataP->errorString = "Empty attribute expression";
-    LM_W(("Bad Input (empty attribute expression"));
   }
 
   return "OK";

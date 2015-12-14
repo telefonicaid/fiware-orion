@@ -34,6 +34,9 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/string.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "rest/ConnectionInfo.h"
@@ -91,7 +94,7 @@ std::string payloadParse
   {
     if (compV[0] == "v2")
     {
-      LM_W(("Bad Input (payload mime-type is not JSON)"));
+      alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
       return "Bad inFormat";
     }
 
@@ -111,7 +114,7 @@ std::string payloadParse
   }
   else
   {
-    LM_W(("Bad Input (payload mime-type is neither JSON nor XML)"));
+    alarmMgr.badInput(clientIp, "payload mime-type is neither JSON nor XML");
     return "Bad inFormat";
   }
 
@@ -138,7 +141,15 @@ static std::string tenantCheck(const std::string& tenant)
 
   if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
-    LM_W(("Bad Input (a tenant name can be max %d characters long. Length: %d)", SERVICE_NAME_MAX_LEN, strlen(name)));
+    char numV1[STRING_SIZE_FOR_INT];
+    char numV2[STRING_SIZE_FOR_INT];
+
+    snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
+    snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
+
+    std::string details = std::string("a tenant name can be max ") + numV1 + " characters long. Length: " + numV2;
+    alarmMgr.badInput(clientIp, details);
+
     return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }
 
@@ -146,7 +157,9 @@ static std::string tenantCheck(const std::string& tenant)
   {
     if ((!isalnum(*name)) && (*name != '_'))
     {
-      LM_W(("Bad Input (bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: %c)", *name));
+      std::string details = std::string("bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: ") + *name;
+
+      alarmMgr.badInput(clientIp, details);
       return "bad character in tenant name - only underscore and alphanumeric characters are allowed";
     }
 
@@ -343,7 +356,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.render(ciP, "");
 
-    LM_W(("Bad Input (The Orion Context Broker is a REST service, not a 'web page')"));
+    alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
     restReply(ciP, response);
 
     return std::string("Empty URL");
@@ -442,7 +455,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       std::string  response = error.render(ciP, "");
 
-      LM_W(("Bad Input (%s)", error.details.c_str()));
+      alarmMgr.badInput(clientIp, result);
 
       if (ciP->apiVersion != "v1")
       {
@@ -475,7 +488,18 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
+
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+
+    //
+    // If we have gotten this far, and the status is 200, the Input is OK.
+    // So, the 'Bad Input' alarm is cleared for this client.
+    //
+    if (ciP->httpStatusCode == SccOk)
+    {
+      alarmMgr.badInputReset(clientIp);
+    }
+
     filterRelease(&parseData, serviceV[ix].request);
 
     if (reqP != NULL)
@@ -504,7 +528,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
-  LM_W(("Bad Input (service '%s' not recognized)", ciP->url.c_str()));
+  std::string details = std::string("service '") + ciP->url + "' not recognized";
+  alarmMgr.badInput(clientIp, details);
+
   ciP->httpStatusCode = SccBadRequest;
   std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
   restReply(ciP, answer);

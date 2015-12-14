@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 #include "serviceRoutines/versionTreat.h"     // For orionInit()
 #include "mongoBackend/MongoGlobal.h"         // For orionInit()
 #include "ngsiNotify/onTimeIntervalThread.h"  // For orionInit()
@@ -254,7 +255,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
 
   if (result == -1)
   {
-    LM_W(("Bad Input (ERROR in duration string)"));
+    alarmMgr.badInput(clientIp, "ERROR in duration string");
   }
 
   return result;
@@ -316,7 +317,9 @@ int64_t parse8601(const std::string& s)
 
       if ((value == 0) && (*start != '0'))
       {
-        LM_W(("Bad Input (parse error for duration '%s')", s.c_str()));
+        std::string details = std::string("parse error for duration '") + start + "'";
+        alarmMgr.badInput(clientIp, details);
+
         free(toFree);
         return -1;
       }

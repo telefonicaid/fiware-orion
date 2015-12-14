@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -22,39 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "alarmMgr/alarmMgr.h"
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
-#include "serviceRoutines/badVerbAllFour.h"
+#include "common/limits.h"
+#include "alarmMgr/AlarmManager.h"
 
 
 
 /* ****************************************************************************
 *
-* badVerbAllFour - 
+* alarmMgr - 
 */
-std::string badVerbAllFour
-(
-  ConnectionInfo*            ciP,
-  int                        components,
-  std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
-)
-{
-  std::string details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
-
-  ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE");
-  ciP->httpStatusCode = SccBadVerb;
-
-  alarmMgr.badInput(clientIp, details);
-
-  return "";
-}
+AlarmManager alarmMgr(ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING, ALARM_MGR_BAD_INPUT_LOG_SAMPLING);

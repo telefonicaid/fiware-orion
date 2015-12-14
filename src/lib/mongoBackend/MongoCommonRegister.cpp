@@ -35,6 +35,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -256,9 +257,11 @@ static bool addTriggeredSubscriptions
     //
     if (idField.eoo() == true)
     {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+      std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+      alarmMgr.dbError(details);
       continue;
     }
+    alarmMgr.dbErrorReset();
 
     std::string subIdStr = idField.OID().toString();
 

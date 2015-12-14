@@ -269,7 +269,7 @@ bool            statNotifQueue;
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
 
-#define FG_DESC               "don't start as daemon"
+#define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
 #define PORT_DESC              "port to receive new connections"
 #define PIDPATH_DESC           "pid file path"
@@ -301,12 +301,10 @@ bool            statNotifQueue;
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
-
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
-
 
 
 
@@ -412,6 +410,7 @@ static const char* validLogLevels[] =
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
+
 
 
 //
@@ -1638,7 +1637,6 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-
   // Argument consistency check (--silent AND -logLevel)
   if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
   {
@@ -1687,7 +1685,6 @@ int main(int argC, char* argV[])
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
-
   LM_I(("Orion Context Broker is running"));
 
   if (fg == false)

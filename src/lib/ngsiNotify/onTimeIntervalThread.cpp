@@ -38,13 +38,16 @@
 #include "ngsiNotify/ContextSubscriptionInfo.h"
 #include "ngsiNotify/Notifier.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
+#include "alarmMgr/alarmMgr.h"
+
+
 
 /* ****************************************************************************
 *
 * doNotification -
 */
-static void doNotification(OnIntervalThreadParams* params, const std::string& tenant) {
-
+static void doNotification(OnIntervalThreadParams* params, const std::string& tenant)
+{
     std::string err;
 
     /* Get document from database. Note that although we can include some parameters in
@@ -59,9 +62,10 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
       //           If it didn't we would have a leak right here, as mongoGetContextSubscriptionInfo
       //           allocates entities and pushes them to 'csi', which is lost leaving this function.
       //
-      LM_E(("Database Error (error invoking mongoGetContextSubscriptionInfo"));
+      alarmMgr.dbError("error invoking mongoGetContextSubscriptionInfo");
       return;
     }
+    alarmMgr.dbErrorReset();
 
     int current = getCurrentTime();
 
@@ -79,9 +83,10 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
             {
               csi.release();
               ncr.contextElementResponseVector.release();
-              LM_E(("Database Error (error invoking mongoGetContextElementResponses"));
+              alarmMgr.dbError("error invoking mongoGetContextElementResponses");
               return;
             }
+            alarmMgr.dbErrorReset();
 
             if (ncr.contextElementResponseVector.size() > 0)
             {

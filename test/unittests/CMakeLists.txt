@@ -279,6 +279,7 @@ SET (STATIC_LIBS
     mongoBackend
     orionTypes
     common
+    alarmMgr
     lm
     pa
     pthread

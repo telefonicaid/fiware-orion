@@ -28,6 +28,7 @@
 
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
+#include "alarmMgr/alarmMgr.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseMetadata.h"
@@ -57,7 +58,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     {
       if (type != "String")
       {
-        LM_E(("Bad Input (ContextAttributeObject::type must be a String"));
+        alarmMgr.badInput(clientIp, "ContextAttributeObject::type must be a String");
         return "invalid JSON type for attribute type";
       }
 
@@ -92,7 +93,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
         if (r != "OK")
         {
-          LM_W(("Bad Input (json error in ContextAttributeObject::Vector"));
+          alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Vector");
           return "json error in ContextAttributeObject::Vector";
         }
       }
@@ -103,7 +104,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
         if (r != "OK")
         {
-          LM_W(("Bad Input (json error in ContextAttributeObject::Object"));
+          alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Object");
           return "json error in ContextAttributeObject::Object";
         }
       }
@@ -119,7 +120,8 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 
       if (r != "OK")
       {
-        LM_W(("Bad Input (error parsing Metadata): %s", r.c_str()));
+        std::string details = std::string("error parsing Metadata: ") + r;
+        alarmMgr.badInput(clientIp, details);
         return r;
       }
     }
@@ -171,7 +173,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
     if (r != "OK")
     {
-      LM_W(("Bad Input (json error in ContextAttribute::Vector"));
+      alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
       ciP->httpStatusCode = SccBadRequest;
       return "json error in ContextAttribute::Vector";
     }
@@ -190,7 +192,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
       r = parseContextAttributeObject(iter->value, caP);
       if (r != "OK")
       {
-        LM_W(("Bad Input (JSON parse error in ContextAttribute::Object"));
+        alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object");
         ciP->httpStatusCode = SccBadRequest;
         return r;
       }
@@ -203,14 +205,14 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
   else
   {
-    LM_W(("Bad Input (bad type for ContextAttribute)"));
+    alarmMgr.badInput(clientIp, "bad type for ContextAttribute");
     ciP->httpStatusCode = SccBadRequest;
     return "invalid JSON type for ContextAttribute";
   }
 
   if (caP->name == "")
   {
-    LM_W(("Bad Input (no 'name' for ContextAttribute"));
+    alarmMgr.badInput(clientIp, "no 'name' for ContextAttribute");
     ciP->httpStatusCode = SccBadRequest;
     return "no 'name' for ContextAttribute";
   }
@@ -234,7 +236,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
 
-    LM_W(("Bad Input (JSON parse error)"));
+    alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
   }
@@ -244,7 +246,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
 
-    LM_E(("Bad Input (JSON Parse Error)"));
+    alarmMgr.badInput(clientIp, "JSON Parse Error");
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
   }

@@ -2,4 +2,6 @@
 - Fix: wrong accumulation in counter sentOK
 - Fix: more descriptive error messages for CPr update/query forward fail
 - Add: reset for notification counters in threadpool mode
+- Fix: avoid -g compiler flag in release build
+- Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
 - Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
