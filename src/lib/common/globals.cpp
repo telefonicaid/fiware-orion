@@ -366,7 +366,6 @@ int64_t parse8601(const std::string& s)
       digitsPending = false;
       ++duration;
       start = duration;
-      LM_M(("duration left: '%s'", duration));
     }
     else
     {
@@ -379,7 +378,6 @@ int64_t parse8601(const std::string& s)
 
   if (digitsPending == true)
   {
-    LM_E(("digitsPending: '%s'", duration));
     return -1;
   }
 
