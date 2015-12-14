@@ -24,6 +24,7 @@
 */
 #include <time.h>
 #include <stdint.h>
+#include <math.h>
 
 #include <string>
 
@@ -346,26 +347,8 @@ int64_t parse8601(const std::string& s)
 
       if (what == 'S')  // We support floats for the seconds, but only to round to an integer
       {
-        //
-        // To round e.g. 4.51 to 5, we split 4.51 in its integer part and its decimal part:
-        //   secs    = 4.51
-        //   intPart = 4
-        //   rest    = 0.51
-        //
-        // After this simple operation is done, we just need to add ONE to 'intPart' if
-        // 'rest' >= 0.5 ('greater than' or just 'greater'?)
-        // and if 'rest' < 0.5, it is just thrown away.
-        //
-        float secs    = atof(start);
-        int   intPart = (int) secs;
-        float rest    = secs - intPart;
-
-        if (rest >= 0.5)
-        {
-          ++intPart;
-        }
-
-        value = intPart;
+        float secs  = atof(start);
+        value       = (int) round(secs);
       }
       else
       {
