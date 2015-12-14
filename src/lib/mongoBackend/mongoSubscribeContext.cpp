@@ -68,13 +68,20 @@ HttpStatusCode mongoSubscribeContext
     // Calculate expiration (using the current time and the duration field in the request).
     // If expiration is not present, use a default value
     //
-    if (requestP->duration.isEmpty())
+    long long expiration = -1;
+    if (requestP->expires > 0)
     {
-      requestP->duration.set(DEFAULT_DURATION);
+      expiration = requestP->expires;
     }
+    else
+    {
+      if (requestP->duration.isEmpty())
+      {
+        requestP->duration.set(DEFAULT_DURATION);
+      }
 
-    long long expiration = getCurrentTime() + requestP->duration.parse();
-
+      expiration = getCurrentTime() + requestP->duration.parse();
+    }
     LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
 
     /* Create the mongoDB subscription document */

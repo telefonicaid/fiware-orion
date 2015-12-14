@@ -46,6 +46,11 @@ typedef struct NotifyCondition
   std::string               type;            // Mandatory
   ConditionValueList        condValueList;   // Optional
   RestrictionString         restriction;     // Optional
+  struct {
+    std::string               q;
+    std::string               geometry;
+    std::string               coords;
+   }                        expression;
 
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);

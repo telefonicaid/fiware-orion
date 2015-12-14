@@ -34,6 +34,7 @@
 #include "jsonParseV2/parseEntity.h"
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseAttributeValue.h"
+#include "jsonParseV2/parseSubscription.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 
 
@@ -97,6 +98,15 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
   case EntityAttributeValueRequest:
     releaseP->attribute = &parseDataP->av.attribute;
     answer = parseAttributeValue(ciP, &parseDataP->av.attribute);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    break;
+
+  case SubscriptionsRequest:
+    //releaseP->XXX= &parseDataP->scr;
+    answer = parseSubscription(ciP, parseDataP);
     if (answer != "OK")
     {
       return answer;
