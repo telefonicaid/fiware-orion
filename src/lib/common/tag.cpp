@@ -168,7 +168,7 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
      * JSON specification is a bit obscure about the need of escaping / (what they call 'solidus'). The
      * picture at JSON specification (http://www.json.org/) seems suggesting so, but after a careful reading of
      * https://tools.ietf.org/html/rfc4627#section-2.5, we can conclude it is not mandatory. Online checkers
-     * such http://jsonlint.com confirm this. Looking in some online discussions
+     * such as http://jsonlint.com confirm this. Looking in some online discussions
      * (http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/ and
      * https://groups.google.com/forum/#!topic/opensocial-and-gadgets-spec/FkLsC-2blbo) it seems that
      * escaping / may have sense in some situations related with JavaScript code, which is not the case of Orion.
