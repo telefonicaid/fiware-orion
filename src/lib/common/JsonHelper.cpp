@@ -48,12 +48,20 @@ std::string toJsonString(const std::string& input)
      * but as long as we support NGSIv1, it is better to have the check (e.g. a newline could be 
      * used in an attribute value using XML). Even removing NGSIv1, we have to ensure that the 
      * input parser (rapidjson) doesn't inject not supported JSON characters in the DB (this needs to be
-     * investigated in the rapidjson documentation) */
+     * investigated in the rapidjson documentation)
+     *
+     * JSON specification is a bit obscure about the need of escaping / (what they call 'solidus'). The
+     * picture at JSON specification (http://www.json.org/) seems suggesting so, but after a careful reading of
+     * https://tools.ietf.org/html/rfc4627#section-2.5, we can conclude it is not mandatory. Online checkers
+     * such http://jsonlint.com confirm this. Looking in some online discussions
+     * (http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/ and
+     * https://groups.google.com/forum/#!topic/opensocial-and-gadgets-spec/FkLsC-2blbo) it seems that
+     * escaping / may have sense in some situations related with JavaScript code, which is not the case of Orion.
+     */
     switch (char ch = *iter)
     {
     case '\\': ss << "\\\\"; break;
-    case '"': ss << "\\\""; break;
-    case '/': ss << "\\/"; break;
+    case '"': ss << "\\\""; break;    
     case '\b': ss << "\\b"; break;
     case '\f': ss << "\\f"; break;
     case '\n': ss << "\\n"; break;

@@ -1,0 +1,2 @@
+- Fix: avoid rendering invalid JSON characters in response payloads (Issue #1172)
+- Fix: avoid escaping / in callback field in GET /v2/subscriptions and GET /v2/subscriptions/<subId> operations

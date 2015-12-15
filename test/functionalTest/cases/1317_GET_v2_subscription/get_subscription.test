@@ -154,7 +154,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 446
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -202,7 +202,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 380
 Content-Type: application/json
 Date: REGEX(.*)
 
