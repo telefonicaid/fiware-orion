@@ -1,3 +1,5 @@
+- Fix: avoid rendering invalid JSON characters in response payloads (Issue #1172)
+- Fix: avoid escaping / in callback field in GET /v2/subscriptions and GET /v2/subscriptions/<subId> operations
 - Add: srv=, subsrv= and from= fields to log (Issue #1593)
 - Fix: wrong accumulation in counter sentOK
 - Fix: more descriptive error messages for CPr update/query forward fail
