@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Restriction.h"
 
@@ -58,7 +59,7 @@ std::string Restriction::check
 
   if ((scopeVector.size() == 0) && (attributeExpression.isEmpty()))
   {
-    LM_W(("Bad Input (empty restriction)"));
+    alarmMgr.badInput(clientIp, "empty restriction");
     return "empty restriction";
   }
 
@@ -66,7 +67,7 @@ std::string Restriction::check
       ((res = attributeExpression.check(requestType, format, indent, predetectedError,  counter)) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
 
     return res;
   }

@@ -128,14 +128,14 @@ Date: REGEX(.*)
 02. Update entity using the same attribute name twice
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 157
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "422",
-        "details": "duplicated attribute name and id [temperature,]",
+        "details": "duplicated attribute /temperature/",
         "reasonPhrase": "Invalid Modification"
     }
 }

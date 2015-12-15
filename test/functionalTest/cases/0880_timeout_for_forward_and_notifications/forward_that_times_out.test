@@ -155,14 +155,14 @@ Date: REGEX(.*)
 02. Update/UPDATE E1/T1/A1 on CB (provoking forward to accumulator)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 137
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "404",
-        "details": "invalid context provider response",
+        "details": "error forwarding update",
         "reasonPhrase": "No context element found"
     }
 }
@@ -180,14 +180,14 @@ Date: REGEX(.*)
 05. Query E1/T1/A1 on CB (provoking forward to accumulator)
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 136
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "404",
-        "details": "invalid context provider response",
+        "details": "error forwarding query",
         "reasonPhrase": "No context element found"
     }
 }

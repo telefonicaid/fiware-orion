@@ -33,6 +33,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "jsonParse/jsonRequest.h"
 #include "mongoBackend/mongoUpdateContext.h"
@@ -130,10 +131,14 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   if (parseUrl(upcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", upcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
+
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     upcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
@@ -176,6 +181,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string     out;
   int             r;
 
+  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
+
   r = httpRequestSend(ip,
                       port,
                       protocol,
@@ -193,10 +200,12 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   if (r != 0)
   {
-    upcrsP->errorCode.fill(SccContextElementNotFound, "notification failure");
+    upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext response payload: %s", out.c_str()));
 
 
   //
@@ -482,7 +491,7 @@ std::string postUpdateContext
   if (ciP->servicePathV.size() > 1)
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
-    LM_W(("Bad Input (more than one service path for an update request)"));
+    alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 

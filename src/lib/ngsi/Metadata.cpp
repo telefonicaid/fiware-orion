@@ -30,6 +30,8 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi/Metadata.h"
@@ -38,6 +40,8 @@
 #include "mongoBackend/safeMongo.h"
 
 using namespace mongo;
+
+
 
 /* ****************************************************************************
 *
@@ -195,18 +199,19 @@ std::string Metadata::check
 {
   if (name == "")
   {
+    alarmMgr.badInput(clientIp, "missing metadata name");
     return "missing metadata name";
   }
 
   if (forbiddenChars(name.c_str()))
   {
-    LM_W(("Bad Input (found a forbidden character in the name of a Metadata"));
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
   }
 
   if (forbiddenChars(type.c_str()))
   {
-    LM_W(("Bad Input (found a forbidden character in the type of a Metadata"));
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
     return "Invalid characters in metadata type";
   }
 
@@ -214,12 +219,13 @@ std::string Metadata::check
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      LM_W(("Bad Input (found a forbidden character in the value of a Metadata"));
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata");
       return "Invalid characters in metadata value";
     }
 
     if (stringValue == "")
     {
+      alarmMgr.badInput(clientIp, "missing metadata value");
       return "missing metadata value";
     }
   }

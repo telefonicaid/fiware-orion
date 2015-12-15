@@ -28,10 +28,12 @@
 #include <string>
 #include <vector>
 
-#include "common/string.h"
-#include "common/wsStrip.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/string.h"
+#include "common/wsStrip.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -412,8 +414,10 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
   if (err.length() > 0)
   {
+    std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     latitude = oldLatitude;
-    LM_W(("Bad Input (bad latitude value in coordinate string '%s')", initial));
     ret = false;
   }
   else
@@ -422,22 +426,28 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
     if (err.length() > 0)
     {
+      std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
+      alarmMgr.badInput(clientIp, details);
+
       /* Rollback latitude */
       latitude = oldLatitude;
       longitude = oldLongitude;
-      LM_W(("Bad Input (bad longitude value in coordinate string '%s')", initial));
       ret = false;
     }
   }
 
   if ((latitude > 90) || (latitude < -90))
   {
-    LM_W(("Bad Input (bad value for latitude '%s')", initial));
+    std::string details = std::string("bad value for latitude '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     ret = false;
   }
   else if ((longitude > 180) || (longitude < -180))
   {
-    LM_W(("Bad Input (bad value for longitude '%s')", initial));
+    std::string details = std::string("bad value for longitude '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     ret = false;
   }
 
@@ -690,7 +700,9 @@ std::string servicePathCheck(const char* servicePath)
       ;
     else
     {
-      LM_W(("Bad Input (Bad Character '%c' in Service-Path)", *servicePath));
+      std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
+      alarmMgr.badInput(clientIp, details);
+
       return "Bad Character in Service-Path";
     }
 

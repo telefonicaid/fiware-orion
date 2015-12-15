@@ -22,20 +22,30 @@
 *
 * Author: Orion dev team
 */
-
-#include "QueueWorkers.h"
-
 #include <pthread.h>
+
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi10/NotifyContextRequest.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/QueueStatistics.h"
+#include "ngsiNotify/QueueWorkers.h"
 
-static void *workerFunc(void* pSyncQ); /* prototype */
+
+
+/* ****************************************************************************
+*
+* workerFunc - prototype
+*/
+static void* workerFunc(void* pSyncQ);
+
+
 
 /* ****************************************************************************
 *
@@ -86,7 +96,6 @@ static void *workerFunc(void* pSyncQ)
     estimatedQSize = queue->size();
     QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
 
-
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
     LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
@@ -128,16 +137,21 @@ static void *workerFunc(void* pSyncQ)
       // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
       // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
       //
+      char portV[STRING_SIZE_FOR_INT];
+      snprintf(portV, sizeof(portV), "%d", params->port);
+      std::string url = params->ip + ":" + portV + params->resource;
+
       if (r == 0)
       {
         statisticsUpdate(NotifyContextSent, params->format);
         QueueStatistics::incSentOK();
+        alarmMgr.notificationErrorReset(url);
       }
       else
       {
         QueueStatistics::incSentError();
+        alarmMgr.notificationError(url, "notification failure for queue worker");
       }
-
     }
 
     // Free params memory

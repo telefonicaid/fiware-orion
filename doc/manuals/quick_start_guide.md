@@ -6,7 +6,8 @@ First of all, you need an account in FIWARE Lab, so register for one in [the fol
 
     # wget --no-check-certificate https://raw.githubusercontent.com/fgalan/oauth2-example-orion-client/master/token_script.sh
     # bash token_script.sh
-    Username: your_email@example.comPassword:
+    Username: your_email@example.com
+    Password:
     Token: <this is the token you need>
 
 Let's assume that the authentication token you got is in the AUTH_TOKEN shell variable. Now, let's start querying some real-time information from the city sensors of Santander (in particular, a sound level meter):

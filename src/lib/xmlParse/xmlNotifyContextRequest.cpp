@@ -28,6 +28,8 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "xmlParse/XmlNode.h"
@@ -153,7 +155,7 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     parseDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }

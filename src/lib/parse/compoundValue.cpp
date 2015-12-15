@@ -26,13 +26,16 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/ParseData.h"
 #include "parse/CompoundValueNode.h"
 #include "parse/compoundValue.h"
 #include "rest/ConnectionInfo.h"
+
 
 
 namespace orion
@@ -151,7 +154,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   {
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = std::string("compound value error: ") + status;
-    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+    alarmMgr.badInput(clientIp, ciP->answer);
   }
 
   //

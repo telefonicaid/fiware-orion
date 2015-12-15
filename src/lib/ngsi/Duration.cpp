@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Duration.h"
 
@@ -74,7 +75,7 @@ std::string Duration::check
   if (parse() == -1)
   {
     valid = false;
-    LM_W(("Bad Input (syntax error in duration string)"));
+    alarmMgr.badInput(clientIp, "syntax error in duration string");
 
     return "syntax error in duration string";
   }

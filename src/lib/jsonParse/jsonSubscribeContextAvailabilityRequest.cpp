@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
 #include "ngsi/EntityId.h"
@@ -152,7 +153,9 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   if ((s = reqDataP->scar.res.duration.check(SubscribeContextAvailability, JSON, "", "", 0)) != "OK")
   {
-    LM_W(("Bad Input (error parsing duration '%s': %s)", reqDataP->scar.res.duration.get().c_str(), s.c_str()));
+    std::string details = std::string("error parsing duration '") + reqDataP->scar.res.duration.get() + "': " + s;
+    alarmMgr.badInput(clientIp, details);
+
     return s;
   }
 

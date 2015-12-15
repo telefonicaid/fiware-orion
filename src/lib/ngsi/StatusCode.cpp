@@ -34,6 +34,7 @@
 #include "common/string.h"
 #include "common/tag.h"
 #include "common/Format.h"
+#include "common/limits.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -143,7 +144,7 @@ std::string StatusCode::toJson(bool isLastElement)
     free(s);
   }
 
-  char codeV[16];
+  char codeV[STRING_SIZE_FOR_INT];
 
   snprintf(codeV, sizeof(codeV), "%d", code);
 

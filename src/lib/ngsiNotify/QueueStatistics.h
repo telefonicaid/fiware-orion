@@ -117,6 +117,13 @@ public:
   */
   static size_t getQSize();
 
+  /* ****************************************************************************
+  *
+  * reset() -
+  */
+  static void reset();
+
+
 private:
    QueueStatistics();
    static volatile int noOfNotificationsQueueIn;
