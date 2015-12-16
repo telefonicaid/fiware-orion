@@ -28,7 +28,8 @@ impact in performance:
 * Check that ulimit settings in your system are ok. MongoDB provides [the following recomendations](https://docs.mongodb.org/manual/reference/ulimit)
   As described in that document, in RHEL/CentOS you have to create a /etc/security/limits.d/99-mongodb-nproc.conf file,
   in order to set soft/hard process limit to at least 32000 (check details in the cited document).
-* [Disable Transparent Huge Pages (THP)](https://docs.mongodb.org/manual/tutorial/transparent-huge-pages/)
+* You should also disable Transparent Huge Pages (HTP) to increment the performance as explain 
+  in [this document](https://docs.mongodb.org/manual/tutorial/transparent-huge-pages/).
 
 [Top](#top)
 
