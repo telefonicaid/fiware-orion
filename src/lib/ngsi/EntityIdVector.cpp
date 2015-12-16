@@ -186,16 +186,27 @@ bool EntityIdVector::push_back_if_absent(EntityId* item)
 
 /* ****************************************************************************
 *
-* EntityIdVector::get -
+* EntityIdVector::operator -
 */
-EntityId* EntityIdVector::get(int ix)
+ 
+EntityId* EntityIdVector::operator[] (unsigned int ix)
 {
-  return vec[ix];
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
 }
 
-const EntityId* EntityIdVector::get(int ix) const
+const EntityId* EntityIdVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+
+    return NULL;
 }
 
 

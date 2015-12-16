@@ -106,7 +106,7 @@ HttpStatusCode mongoSubscribeContext
     BSONArrayBuilder entities;
     for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
     {
-        EntityId* en = requestP->entityIdVector.get(ix);
+        EntityId* en = requestP->entityIdVector.operator[](ix);
 
         if (en->type == "")
         {
@@ -125,7 +125,7 @@ HttpStatusCode mongoSubscribeContext
     /* Build attributes array */
     BSONArrayBuilder attrs;
     for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList.get(ix));
+        attrs.append(requestP->attributeList.operator[](ix));
     }
     sub.append(CSUB_ATTRS, attrs.arr());
 

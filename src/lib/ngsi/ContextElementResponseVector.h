@@ -50,20 +50,11 @@ typedef struct ContextElementResponseVector
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);
-  ContextElementResponse*  get(unsigned int ix);
   ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);
   void                     release();
   void                     fill(ContextElementResponseVector& cerV);
-
-  ContextElementResponse*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-  }
+  ContextElementResponse*  operator[] (unsigned int ix);
+  
 
   std::string              check(RequestType         requestType,
                                  Format              format,

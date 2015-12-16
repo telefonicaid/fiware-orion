@@ -116,13 +116,19 @@ void ContextElementVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextElementVector::get -
+* ContextElementVector::operator -
 */
-ContextElement* ContextElementVector::get(int ix)
+ContextElement* ContextElementVector::operator[](unsigned int ix)
 {
-  return vec[ix];
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+    else
+    {
+      return NULL;
+    }
 }
-
 
 
 /* ****************************************************************************

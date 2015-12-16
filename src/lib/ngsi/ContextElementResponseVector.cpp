@@ -131,10 +131,12 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::get -
+* ContextElementResponseVector::operator -
 */
-ContextElementResponse* ContextElementResponseVector::get(unsigned int ix)
+
+ContextElementResponse*  ContextElementResponseVector::operator[] (unsigned int ix)
 {
+  
   if (ix < vec.size())
   {
     return vec[ix];
@@ -144,14 +146,15 @@ ContextElementResponse* ContextElementResponseVector::get(unsigned int ix)
 }
 
 
-
 /* ****************************************************************************
 *
 * ContextElementResponseVector::size -
 */
 unsigned int ContextElementResponseVector::size(void)
 {
+    
   return vec.size();
+
 }
 
 

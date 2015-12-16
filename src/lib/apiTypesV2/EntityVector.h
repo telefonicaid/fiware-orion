@@ -45,19 +45,10 @@ typedef struct EntityVector
   void          present(const std::string& indent);
   void          push_back(Entity* item);
   unsigned int  size(void);
-  Entity*       get(int ix);
   Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);
   void          release();
-
-  Entity*       operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-  }
+  Entity*  operator[](unsigned int ix);
+  
 } EntityVector;
 
 #endif  // SRC_LIB_NGSI_ENTITYVECTOR_H_

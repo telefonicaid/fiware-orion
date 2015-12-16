@@ -118,11 +118,16 @@ void EntityVector::push_back(Entity* item)
 
 /* ****************************************************************************
 *
-* EntityVector::get -
+* EntityVector::operator -
 */
-Entity* EntityVector::get(int ix)
+Entity*  EntityVector::operator[] (unsigned int ix)
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+      return vec[ix];
+    }
+
+   return NULL;
 }
 
 

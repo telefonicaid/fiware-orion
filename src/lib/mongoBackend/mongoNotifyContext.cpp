@@ -55,7 +55,7 @@ HttpStatusCode mongoNotifyContext
     {
         // We use 'ucr' to conform to processContextElement signature but we are not doing anything with that
         UpdateContextResponse  ucr;
-        ContextElement*        ceP = &requestP->contextElementResponseVector.get(ix)->contextElement;
+        ContextElement*        ceP = &requestP->contextElementResponseVector.operator[] (ix)->contextElement;
         // FIXME P10: we pass an empty uriParams in order to fulfill the processContextElement signature().
         std::map<std::string, std::string> uriParams;
 

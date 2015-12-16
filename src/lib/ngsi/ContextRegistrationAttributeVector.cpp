@@ -115,11 +115,25 @@ void ContextRegistrationAttributeVector::push_back(ContextRegistrationAttribute*
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::get -
+* ContextRegistrationAttributeVector::operator -
 */
-ContextRegistrationAttribute* ContextRegistrationAttributeVector::get(int ix)
+ContextRegistrationAttribute* ContextRegistrationAttributeVector::operator[] (unsigned int ix)
+{    
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;  
+}
+ContextRegistrationAttribute* ContextRegistrationAttributeVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;  
 }
 
 

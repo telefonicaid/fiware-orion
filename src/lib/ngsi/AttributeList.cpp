@@ -39,6 +39,7 @@
 *
 * AttributeList::fill - 
 */
+
 void AttributeList::fill(std::vector<std::string> aVec)
 {
   for (unsigned int ix = 0; ix < aVec.size(); ++ix)
@@ -186,14 +187,12 @@ unsigned int AttributeList::size(void) const
 
 /* ****************************************************************************
 *
-* AttributeList::get - 
+* AttributeList::operator - 
 */
-std::string AttributeList::get(int ix) const
+std::string AttributeList::operator[] (unsigned int ix) const 
 {
   return attributeV[ix];
 }
-
-
 
 /* ****************************************************************************
 *

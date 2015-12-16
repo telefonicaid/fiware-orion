@@ -120,11 +120,16 @@ void NotifyConditionVector::push_back(NotifyCondition* item)
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::get -
+* NotifyConditionVector::operator -
 */
-NotifyCondition* NotifyConditionVector::get(int ix)
+NotifyCondition* NotifyConditionVector::operator[] (unsigned int ix)  
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+
+   return NULL;
 }
 
 

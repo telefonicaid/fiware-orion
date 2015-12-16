@@ -44,7 +44,6 @@ typedef struct ContextRegistrationAttributeVector
   void                             present(const std::string& indent);
   void                             push_back(ContextRegistrationAttribute* item);
   unsigned int                     size(void);
-  ContextRegistrationAttribute*    get(int ix);
   void                             release();
 
   std::string                      check(RequestType         requestType,
@@ -53,15 +52,9 @@ typedef struct ContextRegistrationAttributeVector
                                          const std::string&  predetectedError,
                                          int                 counter);
 
-  ContextRegistrationAttribute*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  ContextRegistrationAttribute*  operator[](unsigned int ix);
+  ContextRegistrationAttribute*  operator[](unsigned int ix) const;
 
-    return NULL;
-  }
 } ContextRegistrationAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTEVECTOR_H_
