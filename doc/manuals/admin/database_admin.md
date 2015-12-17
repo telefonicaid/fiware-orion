@@ -74,9 +74,9 @@ to take into account:
         (the one specified by the -db option) and the authorization is
         done with `-dbuser` and `-dbpwd` in that database.
     -   If you run Orion in multi service/tenant mode (i.e.
-        with + -multiservice`) then the authorization is done at `admin`
+        with `-multiservice`) then the authorization is done at `admin`
         database using `-dbuser` and `-dbpwd`. As described [later in this
-        document](#Multiservice/multitenant_database_separation "wikilink"),
+        document](#multiservicemultitenant-database-separation),
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
         authorizing on `admin` DB ensures permissions in all of them.

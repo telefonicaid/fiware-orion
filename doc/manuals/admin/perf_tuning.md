@@ -22,7 +22,7 @@ to use WireTiger storage engine) implements per-document lock. Thus, the lock sy
 From a performance point of view, it is recommended to use MongoDB 3.0 with WireTiger, especially
 in update-intensive scenarios.
 
-In addition, take into account the following information from official MongoDB documentation, as it may have
+In addition, take into account the following information from the official MongoDB documentation, as it may have
 impact in performance:
 
 * Check that ulimit settings in your system are ok. MongoDB provides [the following recomendations](https://docs.mongodb.org/manual/reference/ulimit)
