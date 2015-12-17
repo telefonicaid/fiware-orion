@@ -49,7 +49,6 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
   // valueTypeNone will be overridden inside the 'for' block in case the attribute has an actual value
   caP->valueType = orion::ValueTypeNone;
 
-  LM_W(("KZ: parsing ContextAttribute object"));
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -143,8 +142,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   std::string name   = iter->name.GetString();
   std::string type   = jsonParseTypeNames[iter->value.GetType()];
   
-  LM_W(("KZ: parsing ContextAttribute"));
-
   caP->name = name;
 
   if (type == "String")

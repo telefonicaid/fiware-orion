@@ -122,8 +122,6 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     return eP->render(ciP, EntitiesRequest);
   }
 
-  LM_W(("KZ: document is NOT empty: '%s'", ciP->payload));
-
   int membersFound = 0;
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {

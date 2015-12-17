@@ -101,7 +101,6 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      LM_W(("KZ: calling Attribute:render"));
       TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeValueRequest, false));
     }
     else

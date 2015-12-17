@@ -34,7 +34,7 @@ brokerStart CB 0
 # 02. POST /v2/entities (Room1-Room)
 # 03. GET /v2/entities/Room1
 # 04. GET /v2/entities/Room1?options=keyValues
-# 05. GET /v2/entities/Room1?options=values (postponed)
+# 05. GET /v2/entities/Room1?options=values (postponed)  FIXME: Implement!
 #
 
 echo "01. POST /v2/entities (Room1-Room)"

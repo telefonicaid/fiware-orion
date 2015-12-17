@@ -2773,7 +2773,6 @@ static bool contextElementPreconditionsCheck
         std::string details = std::string("duplicated attribute name: name=<") + name + "> id=<" + id + ">";
         alarmMgr.badInput(clientIp, details);
 
-        LM_W(("KZ: duplicated attribute"));
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute /" + name + "/");
         return false; // Error already in responseP
@@ -2802,7 +2801,6 @@ static bool contextElementPreconditionsCheck
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
-        LM_W(("KZ: empty attribute not allowed in APPEND or UPDATE"));
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
                                   std::string("action: ") + action +
                                   " - entity: [" + enP->toString(true) + "]" +
@@ -2916,7 +2914,6 @@ void processContextElement
 
     if (entitiesNumber > 0 && checkEntityExistance && action == "APPEND_STRICT")
     {
-        LM_W(("KZ: Already Exists"));
         buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
         return;
     }

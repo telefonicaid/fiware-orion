@@ -46,12 +46,10 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 
     if (requestType == EntityAttributeValueRequest)
     {
-      LM_W(("KZ: Calling ContextAttribute::toJsonAsValue"));
       out = pcontextAttribute->toJsonAsValue(ciP);
     }
     else
     {
-      LM_W(("KZ: Calling ContextAttribute::toJson, renderMode '%s'", renderMode.c_str()));
       out = "{";
       out += pcontextAttribute->toJson(true, false, renderMode, requestType);  // param 1 'true' as it is the last and only element
       out += "}";

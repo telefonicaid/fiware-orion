@@ -65,8 +65,6 @@ std::string putEntityAttribute
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
 
-  LM_W(("KZ: In putEntityAttribute"));
-
   // 01. Fill in UpdateContextRequest from URL and payload
   parseDataP->attr.attribute.name = attributeName;
 
