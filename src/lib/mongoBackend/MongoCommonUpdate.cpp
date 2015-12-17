@@ -2753,7 +2753,8 @@ static bool contextElementPreconditionsCheck
 (
   ContextElement*         ceP,
   UpdateContextResponse*  responseP,
-  const std::string&      action
+  const std::string&      action,
+  const std::string&      apiVersion
 )
 {
 
@@ -2788,10 +2789,11 @@ static bool contextElementPreconditionsCheck
   }
 
   /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
-  if ((strcasecmp(action.c_str(), "update") == 0) ||
+  /* Only wanted for API version v1                                                                      */
+  if (((strcasecmp(action.c_str(), "update") == 0) ||
       (strcasecmp(action.c_str(), "append") == 0) ||
       (strcasecmp(action.c_str(), "append_strict") == 0) ||
-      (strcasecmp(action.c_str(), "replace") == 0))
+       (strcasecmp(action.c_str(), "replace") == 0)) && (apiVersion == "v1"))
   {
 
     // FIXME: Careful, in V2, this check is not wanted ...
@@ -2841,7 +2843,7 @@ void processContextElement
 )
 {
   /* Check preconditions */
-  if (!contextElementPreconditionsCheck(ceP, responseP, action))
+  if (!contextElementPreconditionsCheck(ceP, responseP, action, apiVersion))
   {
     return; // Error already in responseP
   }
