@@ -114,6 +114,11 @@ This libraries will be install into `requirements.txt`
        behave component/<path>/example.feature -t test              -- run scenarios tagged with "test" in a feature
        behave component/<path>/example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
        behave component/<path>/example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
+       
+    It is possible to execute only one row in a Scenario Outline (Examples), first is necessary to define a placeholder in the tag into the feature file, example:      
+       @test.row<row.id> (http://pythonhosted.org/behave/new_and_noteworthy_v1.2.5.html#tags-may-contain-placeholders)
+    After:
+       behave component/<path>/example.feature -t @test.row1.10       -- run only the row 10 with this tag     
 ```
 
 ### Properties.json
@@ -218,26 +223,26 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
 |**api_entry_point**                                                                                                                                       |
-|  retrieve_api_resource                      |     20       | GET     | /version   /statistics    /v2                        | No        | No             |
+|  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
-| create_entity                               |    580       | POST    | /v2/entities/                                        | Yes       | No             |    
-| list_entities                               |    334       | GET     | /v2/entities/                                        | No        | Yes            |
+| list_entities                               |    497       | GET     | /v2/entities/                                        | No        | Yes            |
+| create_entity                               |    583       | POST    | /v2/entities/                                        | Yes       | No             |    
 |                                                                                                                                                          |
-| update_or_append_entity_attributes          |    766       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
-| retrieve_entity                             |    209       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
-| replace_all_entity_attributes               |    560       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | No             |  
-| update_existing_entity_attributes           |    654       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | No             |
-| remove_entity                               |     65       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
+| retrieve_entity                             |    212       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| update_or_append_entity_attributes          |    768       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| update_existing_entity_attributes           |    657       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | No             |
+| replace_all_entity_attributes               |    563       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | No             |  
+| remove_entity                               |     68       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
 |                                                                                                                                                          |
 |**attributes folder**                                                                                                                                     |
-| get_attribute_data                          |    218       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |   
-| update_attribute_data                       |    607       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | No             |
-| remove_a_single_attribute                   |     95       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
+| get_attribute_data                          |    221       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |   
+| update_attribute_data                       |    610       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | No             |
+| remove_a_single_attribute                   |     98       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
 |                                                                                                                                                          |
 |**attributes_value folder**                                                                                                                               |
 | get_attribute_value                         |  (pending)   | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
-| update_attribute_value                      |    234       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
+| update_attribute_value                      |    237       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
 |                                                                                                                                                          |
 |**alarms folder**                            |  (pending)   |                                                                                             |
 
