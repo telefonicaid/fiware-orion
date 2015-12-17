@@ -2793,7 +2793,9 @@ static bool contextElementPreconditionsCheck
       (strcasecmp(action.c_str(), "append_strict") == 0) ||
       (strcasecmp(action.c_str(), "replace") == 0))
   {
-#if 0
+
+    // FIXME: Careful, in V2, this check is not wanted ...
+
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
@@ -2810,7 +2812,7 @@ static bool contextElementPreconditionsCheck
         return false; // Error already in responseP
       }
     }
-#endif
+
   }
 
   return true;
