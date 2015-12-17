@@ -42,7 +42,8 @@ extern std::string postUpdateContext
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
+  ParseData*                 parseDataP,
+  bool                       checkEntityExistance = false
 );
 
 #endif  // SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXT_H_

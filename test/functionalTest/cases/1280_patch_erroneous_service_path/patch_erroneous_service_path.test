@@ -1,0 +1,125 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Patch Erroneous Service Patch 
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. PATCH /v2/ent=ities/E1 (invalid URI)
+# 02. PATCH /v2/entities/E1 (incorrect service path)
+# 03. PATCH /v2/entities/E1 (service path without /) 
+# 04. PATCH /v2/entities/E1 (unrecognized content type)
+
+
+echo "01. PATCH /v2/ent=ities/E1 (invalid URI)"
+echo "========================================"
+payload='{ "A1": 1 }'
+orionCurl --url /v2/ent=ities/E1 --payload "$payload" --json -X PATCH 
+echo
+echo
+
+echo "02. PATCH /v2/entities/E1 (incorrect service path)"
+echo "=================================================="
+payload='{ "A1": 1 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --servicePath "/service.sr" --json -X PATCH 
+echo
+echo
+
+
+echo "03. PATCH /v2/entities/E1 (service path without /)"
+echo "=================================================="
+payload='{ "A1": 1 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --servicePath "miservice" --json -X PATCH
+echo
+echo
+
+
+echo "04. PATCH /v2/entities/E1 (unrecognized content type)"
+echo "====================================================="
+payload='<?xml version="1.0" encoding="UTF-8"?>'
+orionCurl --url /v2/entities/E1 --payload "${payload}" --in "text/plain" --out "application/json" -X PATCH
+echo
+echo
+
+
+--REGEXPECT--
+01. PATCH /v2/ent=ities/E1 (invalid URI)
+========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid character in URI",
+    "error": "BadRequest"
+}
+
+
+02. PATCH /v2/entities/E1 (incorrect service path)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "a component of ServicePath contains an illegal character",
+    "error": "BadRequest"
+}
+
+
+03. PATCH /v2/entities/E1 (service path without /)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Only /absolute/ Service Paths allowed [a service path must begin with /]",
+    "error": "BadRequest"
+}
+
+
+04. PATCH /v2/entities/E1 (unrecognized content type)
+=====================================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 87
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "not supported content type: text/plain",
+    "error": "UnsupportedMediaType"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -26,36 +26,237 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
+#include <regex.h>
+
+#include "mongo/client/dbclient.h"
+
+#include "ngsi/NotifyConditionVector.h"
+#include "ngsi10/SubscribeContextRequest.h"
+
+using namespace mongo;
 
 
-namespace orion
+
+/* ****************************************************************************
+*
+* EntityInfo - 
+*
+* The struct fields:
+* -------------------------------------------------------------------------------
+* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
+* o entityType           string containing the type of the EntityId
+*
+*/
+struct EntityInfo
 {
+  bool          isPattern;
+  regex_t       entityIdPattern;
+  std::string   entityId;
+  std::string   entityType;
+  bool          entityIdPatternToBeFreed;
 
-class SubscriptionCache;
+  EntityInfo() {}
+  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern);
+  ~EntityInfo() { release(); }
 
-
-/* ****************************************************************************
-*
-* subCache - 
-*/
-extern SubscriptionCache* subCache;
-
-
-
-/* ****************************************************************************
-*
-* subscriptionCacheInit - 
-*/
-extern void subscriptionCacheInit(std::string tenant);
+  bool          match(const std::string& idPattern, const std::string& type);
+  void          release(void);
+  void          present(const std::string& prefix);
+};
 
 
 
 /* ****************************************************************************
 *
-* subCacheMutexWaitingTimeGet - 
+* CachedSubscription - 
 */
-extern void subCacheMutexWaitingTimeGet(char* buf, int bufLen);
+struct CachedSubscription
+{
+  std::vector<EntityInfo*>    entityIdInfos;
+  std::vector<std::string>    attributes;
+  NotifyConditionVector       notifyConditionVector;
+  char*                       tenant;
+  char*                       servicePath;
+  char*                       subscriptionId;
+  int64_t                     throttling;
+  int64_t                     expirationTime;
+  int64_t                     lastNotificationTime;
+  int64_t                     count;
+  Format                      notifyFormat;
+  char*                       reference;
+  struct CachedSubscription*  next;
+};
 
-}  // namespace orion
+
+
+/* ****************************************************************************
+*
+* subCacheActive - 
+*/
+extern bool subCacheActive;
+
+
+
+/* ****************************************************************************
+*
+* subCacheInit - 
+*/
+extern void subCacheInit(void);
+
+
+
+/* ****************************************************************************
+*
+* subCacheStart - 
+*/
+extern void subCacheStart(void);
+
+
+
+/* ****************************************************************************
+*
+* subCacheDestroy - 
+*/
+extern void subCacheDestroy(void);
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemDestroy - 
+*/
+extern void subCacheItemDestroy(CachedSubscription* cSubP);
+
+
+
+/* ****************************************************************************
+*
+* subCacheItems - 
+*/
+extern int subCacheItems(void);
+
+
+
+/* ****************************************************************************
+*
+* subCachePresent - 
+*/
+extern void subCachePresent(const char* title);
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemInsert - 
+*/
+extern void subCacheItemInsert
+(
+  const char*               tenant,
+  const char*               servicePath,
+  SubscribeContextRequest*  scrP,
+  const char*               subscriptionId,
+  int64_t                   expiration,
+  int64_t                   throttling,
+  Format                    notifyFormat,
+  bool                      notificationDone,
+  int64_t                   lastNotificationTime
+);
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemInsert - 
+*/
+extern void subCacheItemInsert(CachedSubscription* cSubP);
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemLookup - 
+*/
+extern CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscriptionId);
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemRemove - 
+*/
+extern int subCacheItemRemove(CachedSubscription* cSubP);
+
+
+
+/* ****************************************************************************
+*
+* subCacheRefresh - 
+*/
+extern void subCacheRefresh(void);
+
+
+
+/* ****************************************************************************
+*
+* subCacheSync - 
+*/
+extern void subCacheSync(void);
+
+
+
+/* ****************************************************************************
+*
+* subCacheMatch - 
+*/
+extern void subCacheMatch
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const char*                        entityId,
+  const char*                        entityType,
+  const char*                        attr,
+  std::vector<CachedSubscription*>*  subVecP
+);
+
+
+
+/* ****************************************************************************
+*
+* subCacheMatch - 
+*/
+extern void subCacheMatch
+(
+  const char*                        tenant,
+  const char*                        servicePath,
+  const char*                        entityId,
+  const char*                        entityType,
+  const std::vector<std::string>&    attrV,
+  std::vector<CachedSubscription*>*  subVecP
+);
+
+
+
+/* ****************************************************************************
+*
+* subCacheStatisticsGet - 
+*/
+extern void subCacheStatisticsGet(int* refreshes, int* inserts, int* removes, int* updates, int* items, char* list, int listSize);
+
+
+
+/* ****************************************************************************
+*
+* subCacheUpdateStatisticsIncrement - 
+*/
+extern void subCacheUpdateStatisticsIncrement(void);
+
+
+
+/* ****************************************************************************
+*
+* subCacheStatisticsReset - 
+*/
+extern void subCacheStatisticsReset(const char* by);
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

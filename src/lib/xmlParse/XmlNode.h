@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "rapidxml.hpp"
+#include "boost/property_tree/detail/rapidxml.hpp"
 #include "ngsi/ParseData.h"
 
 

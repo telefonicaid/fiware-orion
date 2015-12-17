@@ -27,6 +27,10 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -87,9 +91,11 @@ std::string postAttributeValueInstanceWithTypeAndId
   // 02. Check validity of URI params VS URI path components
   if ((entityTypeFromUriParam != "") && (entityTypeFromUriParam != entityType))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+
     response.fill(SccBadRequest, "non-matching entity::types in URL");
-    answer = response.render(ciP->outFormat, "", false, false);
+
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
     parseDataP->upcar.res.release();
     return answer;
@@ -104,7 +110,9 @@ std::string postAttributeValueInstanceWithTypeAndId
     std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
     
     response.fill(SccBadRequest, details);
-    answer = response.render(ciP->outFormat, "", false, false);
+
+    TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
+
     parseDataP->upcar.res.release();
 
     return answer;
@@ -124,7 +132,7 @@ std::string postAttributeValueInstanceWithTypeAndId
 
 
   // 07. Render result
-  answer = response.render(ciP->outFormat, "", false, false);
+  TIMED_RENDER(answer = response.render(ciP->outFormat, "", false, false));
 
 
   // 08. Cleanup and return result

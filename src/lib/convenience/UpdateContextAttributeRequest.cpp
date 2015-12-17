@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/Format.h"
@@ -45,6 +46,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
   metadataVector.tagSet("metadata");
   compoundValueP = NULL;
+  valueType = orion::ValueTypeNone;
 }
 
 
@@ -119,10 +121,6 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((contextValue == "") && (compoundValueP == NULL))
-  {
-    response.fill(SccBadRequest, "empty context value");
-  }
   else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
   {
     response.fill(SccBadRequest, res);
@@ -150,8 +148,12 @@ std::string UpdateContextAttributeRequest::check
 */
 void UpdateContextAttributeRequest::present(std::string indent)
 {
-  LM_F(("%stype:         %s", indent.c_str(), type.c_str()));
-  LM_F(("%scontextValue: %s", indent.c_str(), contextValue.c_str()));
+  LM_T(LmtPresent, ("%stype:         %s", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%scontextValue: %s", 
+		    indent.c_str(), 
+		    contextValue.c_str()));
   metadataVector.present("ContextMetadata", indent);
 }
 

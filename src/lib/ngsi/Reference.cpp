@@ -101,11 +101,13 @@ void Reference::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sReference: %s", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sReference: %s", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo Reference", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo Reference", indent.c_str()));
   }
 }
 

@@ -39,7 +39,6 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsiNotify/Notifier.h"
-#include "cache/SubscriptionCache.h"
 
 #include "unittest.h"
 
@@ -60,13 +59,15 @@ PaArgument paArgs[] =
 *
 * global variables
 */
-bool  harakiri          = true;
-int   logFd             = -1;
-int   fwdPort           = -1;
-char  fwdHost[64];
-unsigned cprForwardLimit = 1000;
-
-
+bool          harakiri              = true;
+int           logFd                 = -1;
+int           fwdPort               = -1;
+int           subCacheInterval      = 10;
+unsigned int  cprForwardLimit       = 1000;
+bool          noCache               = false;
+char          fwdHost[64];
+char          notificationMode[64];
+bool          simulatedNotification;
 
 
 /* ****************************************************************************
@@ -108,7 +109,7 @@ int main(int argC, char** argV)
     paParse(paArgs, 1, argV, 1, false);
 
   LM_M(("Init tests"));
-  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false);
+  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false);
   setupDatabase();
 
   LM_M(("Run all tests"));

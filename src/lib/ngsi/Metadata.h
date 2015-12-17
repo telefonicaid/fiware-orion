@@ -31,7 +31,8 @@
 #include "common/Format.h"
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
-#include "ngsi/Association.h"
+
+#include "mongo/client/dbclient.h"
 
 
 
@@ -52,16 +53,11 @@
 *
 * Metadata -
 *
-* FIXME
-*   The Association field should be added not in this class but in a class that inherits
-*   from Metadata.
-*    Once we start the next refactoring ...
 */
 typedef struct Metadata
 {
   std::string  name;         // Mandatory
-  std::string  type;         // Optional  
-  Association  association;  // Optional (used if type == 'Association')
+  std::string  type;         // Optional
 
   // Mandatory
   orion::ValueType   valueType;    // Type of value: taken from JSON parse
@@ -76,13 +72,14 @@ typedef struct Metadata
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
   Metadata(const std::string& _name, const std::string& _type, double _value);
   Metadata(const std::string& _name, const std::string& _type, bool _value);
+  Metadata(const mongo::BSONObj& mdB);
 
   std::string  render(Format format, const std::string& indent, bool comma = false);
   std::string  toJson(bool isLastElement);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
-  std::string  toStringValue(void);
+  std::string  toStringValue(void) const;
 
   std::string  check(RequestType         requestType,
                      Format              format,

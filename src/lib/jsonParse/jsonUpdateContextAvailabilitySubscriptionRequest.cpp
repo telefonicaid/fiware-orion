@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi/EntityId.h"
@@ -98,7 +99,9 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
   if (!isTrue(value) && !isFalse(value))
   {
-    LM_W(("Bad Input (invalid isPattern value: '%s')", value.c_str()));
+    std::string details = std::string("invalid isPattern value: '") + value + "'";
+    alarmMgr.badInput(clientIp, details);
+
     reqDataP->errorString = "invalid isPattern value for entity: /" + value + "/";
     return "invalid isPattern value for entity: /" + value + "/";
   }
@@ -304,7 +307,7 @@ std::string jsonUcasCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUcasPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

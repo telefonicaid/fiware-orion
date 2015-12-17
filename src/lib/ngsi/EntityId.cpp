@@ -96,8 +96,7 @@ std::string EntityId::render
   Format              format,
   const std::string&  indent,
   bool                comma,
-  bool                isInVector,
-  const std::string&  assocTag
+  bool                isInVector
 )
 {
   std::string  out              = "";
@@ -112,8 +111,7 @@ std::string EntityId::render
     out += indent + "</" + tag + ">\n";
   }
   else
-  {
-    bool        isAssoc = !assocTag.empty();
+  {    
     std::string indent2 = indent;
 
     if (isInVector)
@@ -121,7 +119,7 @@ std::string EntityId::render
        indent2 += "  ";
     }
 
-    out += (isInVector? indent + (isAssoc? "\"" + assocTag + "\" : ": "") + "{\n": "");
+    out += (isInVector? indent + "{\n" : "");
     out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
     out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
     out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
@@ -215,16 +213,24 @@ void EntityId::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    LM_F(("%sEntity Id:",       indent.c_str()));
+    LM_T(LmtPresent, ("%sEntity Id:",       indent.c_str()));
   }
   else
   {
-    LM_F(("%sEntity Id %d:",       indent.c_str(), ix));
+    LM_T(LmtPresent, ("%sEntity Id %d:",       
+		      indent.c_str(), 
+		      ix));
   }
 
-  LM_F(("%s  Id:         '%s'", indent.c_str(), id.c_str()));
-  LM_F(("%s  Type:       '%s'", indent.c_str(), type.c_str()));
-  LM_F(("%s  isPattern:  '%s'", indent.c_str(), isPattern.c_str()));
+  LM_T(LmtPresent, ("%s  Id:         '%s'", 
+		    indent.c_str(), 
+		    id.c_str()));
+  LM_T(LmtPresent, ("%s  Type:       '%s'", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%s  isPattern:  '%s'", 
+		    indent.c_str(), 
+		    isPattern.c_str()));
 }
 
 

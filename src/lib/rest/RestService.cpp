@@ -30,9 +30,13 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/string.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "parse/textParse.h"
@@ -42,15 +46,7 @@
 #include "rest/restReply.h"
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
-
-
-
-/* ****************************************************************************
-*
-* Tenant name max length
-*/
-#define MAX_TENANT_NAME_LEN            50
-#define MAX_TENANT_NAME_LEN_STRING    "50"
+#include "mongoBackend/mongoSubCache.h"
 
 
 
@@ -101,7 +97,7 @@ std::string payloadParse
   {
     if (compV[0] == "v2")
     {
-      LM_W(("Bad Input (payload mime-type is not JSON)"));
+      alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
       return "Bad inFormat";
     }
 
@@ -125,7 +121,7 @@ std::string payloadParse
   }
   else
   {
-    LM_W(("Bad Input (payload mime-type is neither JSON nor XML)"));
+    alarmMgr.badInput(clientIp, "payload mime-type is neither JSON nor XML");
     return "Bad inFormat";
   }
 
@@ -150,17 +146,27 @@ static std::string tenantCheck(const std::string& tenant)
 {
   char*        name    = (char*) tenant.c_str();
 
-  if (strlen(name) > MAX_TENANT_NAME_LEN)
+  if (strlen(name) > SERVICE_NAME_MAX_LEN)
   {
-    LM_W(("Bad Input (a tenant name can be max %d characters long. Length: %d)", MAX_TENANT_NAME_LEN, strlen(name)));
-    return "bad length - a tenant name can be max " MAX_TENANT_NAME_LEN_STRING " characters long";
+    char numV1[STRING_SIZE_FOR_INT];
+    char numV2[STRING_SIZE_FOR_INT];
+
+    snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
+    snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
+
+    std::string details = std::string("a tenant name can be max ") + numV1 + " characters long. Length: " + numV2;
+    alarmMgr.badInput(clientIp, details);
+
+    return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }
 
   while (*name != 0)
   {
     if ((!isalnum(*name)) && (*name != '_'))
     {
-      LM_W(("Bad Input (bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: %c)", *name));
+      std::string details = std::string("bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: ") + *name;
+
+      alarmMgr.badInput(clientIp, details);
       return "bad character in tenant name - only underscore and alphanumeric characters are allowed";
     }
 
@@ -357,7 +363,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.render(ciP, "");
 
-    LM_W(("Bad Input (The Orion Context Broker is a REST service, not a 'web page')"));
+    alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
     restReply(ciP, response);
 
     return std::string("Empty URL");
@@ -406,6 +412,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
+      LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
@@ -434,10 +441,15 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+    if (ciP->payloadSize == 0)
+    {
+      ciP->inFormat = NOFORMAT;
+    }
     statisticsUpdate(serviceV[ix].request, ciP->inFormat);
 
     // Tenant to connectionInfo
     ciP->tenant = ciP->tenantFromHttpHeader;
+    lmTransactionSetService(ciP->tenant.c_str());
 
     //
     // A tenant string must not be longer than 50 characters and may only contain
@@ -446,13 +458,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError  error(SccBadRequest,
-                        "tenant name not accepted - a tenant string must not be longer than " MAX_TENANT_NAME_LEN_STRING " characters"
-                        " and may only contain underscores and alphanumeric characters");
+      OrionError  error(SccBadRequest, result);
 
       std::string  response = error.render(ciP, "");
 
-      LM_W(("Bad Input (%s)", error.details.c_str()));
+      alarmMgr.badInput(clientIp, result);
 
       if (ciP->apiVersion != "v1")
       {
@@ -485,7 +495,18 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
+
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+
+    //
+    // If we have gotten this far, and the status is 200, the Input is OK.
+    // So, the 'Bad Input' alarm is cleared for this client.
+    //
+    if (ciP->httpStatusCode == SccOk)
+    {
+      alarmMgr.badInputReset(clientIp);
+    }
+
     filterRelease(&parseData, serviceV[ix].request);
 
     if (reqP != NULL)
@@ -514,7 +535,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     return response;
   }
 
-  LM_W(("Bad Input (service '%s' not recognized)", ciP->url.c_str()));
+  std::string details = std::string("service '") + ciP->url + "' not recognized";
+  alarmMgr.badInput(clientIp, details);
+
   ciP->httpStatusCode = SccBadRequest;
   std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
   restReply(ciP, answer);

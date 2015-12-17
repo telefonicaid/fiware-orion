@@ -25,7 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 #include "common/string.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -60,7 +63,6 @@ std::string getEntity
 {
   using namespace std;
 
-
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
   // optional parameter for attributes
@@ -86,7 +88,8 @@ std::string getEntity
 
   entity.fill(&parseDataP->qcrs.res);
 
-  string answer = entity.render(ciP, EntityResponse);
+  std::string answer;
+  TIMED_RENDER(answer = entity.render(ciP, EntityResponse));
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

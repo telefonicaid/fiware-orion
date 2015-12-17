@@ -22,15 +22,21 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
-import behave
-from behave import step
 
-from iotqautils.fabric_utils import FabricSupport
-from iotqautils.mongo_utils import Mongo
-from iotqautils.CB_v2_utils import CB
-from iotqautils.helpers_utils import *
+from components.common_steps.general_steps import *
+from iotqatools.fabric_utils import FabricSupport
+from iotqatools.mongo_utils import Mongo
+from iotqatools.cb_v2_utils import CB
+from iotqatools.helpers_utils import *
 
 from tools.properties_config import Properties  # methods in properties class
+
+# constants
+CONTEXT_BROKER_ENV = u'context_broker_env'
+MONGO_ENV = u'mongo_env'
+properties_class = Properties()
+props_cb = properties_class.read_properties()[CONTEXT_BROKER_ENV]       # context broker properties dict
+props_mongo = properties_class.read_properties()[MONGO_ENV]             # mongo properties dict
 
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
@@ -40,72 +46,111 @@ __logger__ = logging.getLogger("steps")
 def update_properties_file(context, properties_file, sudo_run):
     """
     update properties.py file from setting folder or jenkins console
-    :param context:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param properties_file: file to get data to update properties.py
     """
-    global properties_class
-    __logger__.info(" >> config file used: '%s'", properties_file)
-    properties_class = Properties()
+    __logger__.debug("Updating properties.json file...")
     properties_class.update_properties_json_file(properties_file, sudo_run)
-    __logger__.info(" >> properties.json is updated")
+    __logger__.debug("...Updated properties.json file")
 
 
-@step(u'update contextBroker config file and restart service')
+@step(u'update contextBroker config file')
 def update_context_broker_config_file_and_restart_service(context):
     """
-    updating /etc/sysconfig/contextBroker file an restarting service
-    :param context:
+    updating /etc/sysconfig/contextBroker file
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
-    global properties_class, props_cb, props_mongo
-    __logger__.debug(" >> updating /etc/sysconfig/contextBroker file")
-    props = properties_class.read_properties()  # properties dict
-    props_cb = props["context_broker_env"]  # context broker properties dict
-    props_mongo = props["mongo_env"]  # mongo properties dict
-    __logger__.debug("properties dict: %s " % str(props))
-    my_fab = FabricSupport(host=props_cb["CB_HOST"], user=props_cb["CB_FABRIC_USER"],
+    __logger__.debug(" Context Broker parameters:")
+    for param in props_cb:
+        __logger__.debug("   %s: %s" % (param, props_cb[param]))
+    __logger__.debug(" Mongo parameters:")
+    for param in props_mongo:
+        __logger__.debug("   %s: %s" % (param, props_mongo[param]))
+    context.my_fab = FabricSupport(host=props_cb["CB_HOST"], user=props_cb["CB_FABRIC_USER"],
                            password=props_cb["CB_FABRIC_PASS"], cert_file=props_cb["CB_FABRIC_CERT"],
                            retry=props_cb["CB_FABRIC_RETRY"], hide=True, sudo=props_cb["CB_FABRIC_SUDO"])
-    properties_class.update_context_broker_file(my_fab)
-    __logger__.info(" >> updated /etc/sysconfig/contextBroker file")
-    __logger__.debug(" >> restarting contextBroker service")
-    my_fab.run("service contextBroker restart")
-    __logger__.info(" >> restarted contextBroker service")
+    context.configuration = properties_class.read_configuration_json()
+    __logger__.debug("CB_RUNNING_MODE: %s" % context.configuration["CB_RUNNING_MODE"])
+    if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
+        __logger__.debug("Updating /etc/sysconfig/contextBroker file...")
+        properties_class.update_context_broker_file(context.my_fab)
+        __logger__.info("...Updated /etc/sysconfig/contextBroker file")
+
+
+@step(u'start ContextBroker')
+def start_context_broker(context):
+    """
+    start ContextBroker
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
+        __logger__.debug("Starting contextBroker service...")
+        context.my_fab.run("service contextBroker restart")
+        __logger__.info("...Started contextBroker service")
+    else:
+        __logger__.debug("Starting contextBroker per command line interface...")
+        props_cb["CB_EXTRA_OPS"] = props_cb["CB_EXTRA_OPS"].replace('"', "")
+        # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
+        __logger__.debug("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
+            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
+             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        resp = context.my_fab.run("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
+            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
+             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        __logger__.debug("output: %s" % repr(resp))
+        __logger__.info("...Started contextBroker command line interface")
+
+
+@step(u'stop ContextBroker')
+def stop_Context_broker(context):
+    """
+    stop ContextBroker
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
+        __logger__.debug("Stopping contextBroker service...")
+        context.my_fab.run("service contextBroker stop")
+        __logger__.info("...Stopped contextBroker service")
+    else:
+        __logger__.debug("Stopping contextBroker per harakiri...")
+        cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
+        cb.harakiri()
+        __logger__.info("...Stopped contextBroker per harakiri")
 
 
 @step(u'verify contextBroker is installed successfully')
 def verify_context_broker_is_installed_successfully(context):
     """
-    verify contextBroker is installed successfully
-    :param context:
+    verify contextBroker is started successfully
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
-    global props_cb
-    __logger__.debug(" >> verify if contextBroker is installed successfully")
-    __logger__.debug("Sending a version request...")
-
+    __logger__.debug("Verifying if contextBroker is started successfully...")
     cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
-    resp = cb.get_version_request()
+    c = 0
+    while (not cb.is_cb_started()) and (int(props_cb["CB_RETRIES"]) > c):
+        time.sleep(int(props_cb["CB_DELAY_TO_RETRY"]))
+        c += 1
+        __logger__.debug("WARN - Retry in verification if context broker is started. No: (%s)" % str(c))
+    assert (props_cb["CB_RETRIES"]) > c, "ERROR - context Broker is not started after of %s verification retries" % str(c)
     if props_cb["CB_VERIFY_VERSION"].lower() == "true":
-        resp_dict = convert_str_to_dict(str(resp.text), "JSON")
-        assert resp_dict["orion"]["version"].find(
-            props_cb["CB_VERSION"]) >= 0, " ERROR in context broker version  value, \n " \
-                                          " expected: %s \n" \
-                                          " installed: %s" % (props_cb["CB_VERSION"], resp_dict["orion"]["version"])
-        __logger__.debug("-- version %s is correct in base request v2" % props_cb["CB_VERSION"])
-    __logger__.info(" >> verified that contextBroker is installed successfully")
+        context.execute_steps(u'Given send a version request')
+        context.execute_steps(u'Given verify if version is the expected')
+    else:
+        __logger__.info("Current version is not verified...")
+    __logger__.info("...Verified that contextBroker is started successfully")
 
 
 @step(u'verify mongo is installed successfully')
 def verify_mongo_is_installed_successfully(context):
     """
     verify contextBroker is installed successfully
-    :param context:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
-    global props_mongo
-    __logger__.debug(" >> verify if mongo is installed successfully")
-    m = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
-              password=props_mongo["MONGO_PASS"], version=props_mongo["MONGO_VERSION"],
-              verify_version=props_mongo["MONGO_VERIFY_VERSION"])
-    m.connect()
-    m.eval_version()
-    m.disconnect()
-    __logger__.info(" >> verified that mongo is installed successfully")
+    __logger__.debug("Verifying if mongo is installed successfully...")
+    mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
+                  password=props_mongo["MONGO_PASS"], version=props_mongo["MONGO_VERSION"],
+                  verify_version=props_mongo["MONGO_VERIFY_VERSION"])
+    mongo.connect()
+    mongo.eval_version()
+    mongo.disconnect()
+    __logger__.info("...Verified that mongo is installed successfully")

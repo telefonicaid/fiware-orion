@@ -33,6 +33,7 @@
 #include "orionTypes/EntityTypeResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
 
 
 /* Some string tokens used for aggregation commands */
@@ -62,8 +63,8 @@ extern HttpStatusCode mongoEntityTypes
 */
 extern HttpStatusCode mongoAttributesForEntityType
 (
-  std::string                           entityType,
-  EntityTypeResponse*         responseP,
+  const std::string&                    entityType,
+  EntityTypeResponse*                   responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams

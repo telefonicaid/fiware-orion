@@ -26,13 +26,18 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
+
 
 
 /* ****************************************************************************
@@ -77,11 +82,13 @@ std::string EntityTypeVectorResponse::check
   }
   else if ((res = entityTypeVector.check(ciP, indent, predetectedError)) != "OK")
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
   return render(ciP, "");
 }
@@ -94,7 +101,9 @@ std::string EntityTypeVectorResponse::check
 */
 void EntityTypeVectorResponse::present(const std::string& indent)
 {
-  LM_F(("%s%d items in EntityTypeVectorResponse:\n", indent.c_str(), entityTypeVector.size()));
+  LM_T(LmtPresent,("%s%d items in EntityTypeVectorResponse:\n", 
+		  indent.c_str(), 
+		  entityTypeVector.size()));
 
   entityTypeVector.present(indent + "  ");
   statusCode.present(indent + "  ");

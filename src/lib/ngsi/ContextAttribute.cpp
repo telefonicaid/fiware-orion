@@ -28,8 +28,11 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/string.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/ErrorCode.h"
@@ -37,10 +40,9 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 
-// FIXME P5: we have the same macro in parseArg library. That is not efficient: the macro (along
-// with probably more stuff) should be isolated in a separate library, invoked but all the other
-// libraries which need it)
-#define FT(x) (x == true)? "true" : "false"
+using namespace orion;
+
+
 
 /* ****************************************************************************
 *
@@ -78,6 +80,16 @@ ContextAttribute::ContextAttribute()
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute - 
+*
+* Note that this constructor moves the compoundValue of the source CA to the
+* CA being constructed (the compoundValueP attribute in the source CA is set to NULL).
+* Another option (closer to copy semantics) would be cloning (using the clone() method in
+* CompoundValueNode class) but by the moment this is not needed by this constructor as
+* all their usage cases suffice with this "move compoundValue instead of cloning" approach.
+*
+* Note however that the treatement of metadata is different: in that case, the metadata
+* in "cloned" from source CA to the CA being constructed.
+*
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
@@ -274,7 +286,7 @@ ContextAttribute::ContextAttribute
 *
 * ContextAttribute::getId() -
 */
-std::string ContextAttribute::getId(void)
+std::string ContextAttribute::getId(void) const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
@@ -293,7 +305,7 @@ std::string ContextAttribute::getId(void)
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation()
+std::string ContextAttribute::getLocation() const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
@@ -478,7 +490,7 @@ std::string ContextAttribute::render
       case ValueTypeNumber:
         char num[32];
         snprintf(num, sizeof(num), "%f", numberValue);
-        effectiveValue      = std::string(num);
+        effectiveValue      = num;
         valueIsNumberOrBool = true;
         break;
 
@@ -487,6 +499,7 @@ std::string ContextAttribute::render
       }
 
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        "value",
                         (request != RtUpdateContextResponse)? effectiveValue : "",
                         ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
 
@@ -527,7 +540,7 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode)
+std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode, RequestType requestType)
 {
   std::string  out;
 
@@ -567,7 +580,10 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
   }
   else  // Render mode: normalized 
   {
-    out = JSON_STR(name) + ":{";
+    if (requestType != EntityAttributeResponse)
+    {
+      out = JSON_STR(name) + ":{";
+    }
 
     //
     // type
@@ -617,7 +633,10 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     //
     out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
 
-    out += "}";
+    if (requestType != EntityAttributeResponse)
+    {
+      out += "}";
+    }
   }
 
   if (!isLastElement)
@@ -722,8 +741,17 @@ std::string ContextAttribute::check
     return "missing attribute name";
   }
 
-  if (forbiddenChars(name.c_str()))  { return "Invalid characters in attribute name"; }
-  if (forbiddenChars(type.c_str()))  { return "Invalid characters in attribute type"; }
+  if (forbiddenChars(name.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
+    return "Invalid characters in attribute name";
+  }
+
+  if (forbiddenChars(type.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
+    return "Invalid characters in attribute type";
+  }
 
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
@@ -736,7 +764,7 @@ std::string ContextAttribute::check
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      LM_W(("Bad Input (Invalid characters in attribute value: '%s')", stringValue.c_str()));
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
       return "Invalid characters in attribute value";
     }
   }
@@ -752,27 +780,45 @@ std::string ContextAttribute::check
 */
 void ContextAttribute::present(const std::string& indent, int ix)
 {
-  LM_F(("%sAttribute %d:",    indent.c_str(), ix));
-  LM_F(("%s  Name:      %s", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:      %s", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent, ("%sAttribute %d:",    
+		    indent.c_str(), 
+		    ix));
+  LM_T(LmtPresent, ("%s  Name:      %s", 
+		    indent.c_str(), 
+		    name.c_str()));
+  LM_T(LmtPresent, ("%s  Type:      %s", 
+		    indent.c_str(), 
+		    type.c_str()));
 
   if (compoundValueP == NULL)
   {
     if (valueType == orion::ValueTypeString)
     {
-      LM_F(("%s  String Value:      %s", indent.c_str(), stringValue.c_str()));
+      LM_T(LmtPresent, ("%s  String Value:      %s", 
+			indent.c_str(), 
+			stringValue.c_str()));
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      LM_F(("%s  Number Value:      %f", indent.c_str(), numberValue));
+      LM_T(LmtPresent, ("%s  Number Value:      %f", 
+			indent.c_str(), 
+			numberValue));
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      LM_F(("%s  Boolean Value:      %s", indent.c_str(), (boolValue == false)? "false" : "true"));
+      LM_T(LmtPresent, ("%s  Boolean Value:      %s", 
+			indent.c_str(), 
+			(boolValue == false)? "false" : "true"));
+    }
+    else if (valueType == orion::ValueTypeNone)
+    {
+      LM_T(LmtPresent, ("%s  No Value", indent.c_str()));
     }
     else
     {
-      LM_F(("%s  Unknown value type (%d)", indent.c_str(), valueType));
+      LM_T(LmtPresent, ("%s  Unknown value type (%d)", 
+			indent.c_str(), 
+			valueType));
     }
   }
   else
@@ -780,8 +826,16 @@ void ContextAttribute::present(const std::string& indent, int ix)
     compoundValueP->show(indent + "  ");
   }
 
-  LM_F(("%s  PA:       %s (%s)", indent.c_str(), providingApplication.get().c_str(), formatToString(providingApplication.getFormat())));
-  LM_F(("%s  found:    %s", indent.c_str(), FT(found)));
+  LM_T(LmtPresent, ("%s  PA:       %s (%s)", 
+		    indent.c_str(), 
+		    providingApplication.get().c_str(), 
+		    formatToString(providingApplication.getFormat())));
+  LM_T(LmtPresent, ("%s  found:    %s", 
+		    indent.c_str(), 
+		    FT(found)));
+  LM_T(LmtPresent, ("%s  skip:     %s", 
+		    indent.c_str(), 
+		    FT(skip)));
 
   metadataVector.present("Attribute", indent + "  ");
 }
@@ -818,7 +872,7 @@ std::string ContextAttribute::toString(void)
 *
 * toStringValue -
 */
-std::string ContextAttribute::toStringValue(void)
+std::string ContextAttribute::toStringValue(void) const
 {
   char buffer[64];
 
@@ -841,6 +895,9 @@ std::string ContextAttribute::toStringValue(void)
     return "<unknown type>";
     break;
   }
+
+  // Added to avoid warning when compiling with -fstack-check -fstack-protector 
+  return "";
 }
 
 

@@ -91,9 +91,12 @@ broker_start()
 {
     printf "%-50s" "Starting ${NAME}..."
     if [[ -x ${EXECUTABLE} ]]; then
-        su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} &> /dev/null "
-        sleep 2 # wait some time to leave contextbroker start
-        PID=$(cat ${BROKER_PID_FILE})
+        # preserving existing error log (if it already exists)
+        BROKER_OUTPUT_LOG=${BROKER_LOG_DIR}/${NAME}-service.out
+        su $BROKER_USER -c "mv ${BROKER_OUTPUT_LOG} ${BROKER_OUTPUT_LOG}.old 2> /dev/null"
+        su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} &> ${BROKER_OUTPUT_LOG}"
+        sleep 2 # wait some time to let the contextbroker start
+        PID=$(cat ${BROKER_PID_FILE} 2> /dev/null)
         if [[ -z "${PID}" ]]; then
             printf "%s" "pidfile not found"
             printf "%s\n" "$(failure)" 

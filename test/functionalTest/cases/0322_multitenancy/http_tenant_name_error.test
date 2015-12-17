@@ -25,8 +25,8 @@ Erroneous tenant URL names
 
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DATABASE_NAME}-01234567890123456789012345678901234567890123456789
-dbInit ${CB_DATABASE_NAME}-ngsi10
+dbInit ${CB_DB_NAME} 01234567890123456789012345678901234567890123456789
+dbInit ${CB_DB_NAME} ngsi10
 
 brokerStart CB 0 IPV4 -multiservice
 
@@ -127,7 +127,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 167
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -135,13 +135,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters</details>
+  <details>bad length - a tenant name can be max 50 characters long</details>
 </orionError>
 
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 197
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -149,7 +149,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters</details>
+  <details>bad character in tenant name - only underscore and alphanumeric characters are allowed</details>
 </orionError>
 
 
@@ -171,5 +171,5 @@ Date: REGEX(.*)
 brokerStop CB
 
 dbDrop CB
-dbDrop ${CB_DATABASE_NAME}-01234567890123456789012345678901234567890123456789
-dbDrop ${CB_DATABASE_NAME}-ngsi10
+dbDrop ${CB_DB_NAME} 01234567890123456789012345678901234567890123456789
+dbDrop ${CB_DB_NAME} ngsi10

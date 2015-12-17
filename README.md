@@ -1,5 +1,8 @@
 #<a name="top"></a>Orion Context Broker
 
+[![license badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
+[![Documentation Status](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion.readthedocs.org/en/latest/?badge=latest)
+
 * [Introduction](#introduction)
 * [GEi overall description](#gei-overall-description)
 * [Build and Install](#build-and-install)
@@ -23,7 +26,7 @@ This project is part of [FIWARE](http://www.fiware.org). Check also the [FIWARE 
 Any feedback on this documentation is highly welcome, including bugs, typos
 or things you think should be included but aren't. You can use [github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to provide feedback.
 
-You can find the User & Programmer's Manual and the Administration Guide on [readthedocs.org](https://fiware-orion.readthedocs.org)
+You can find the User & Programmer's Manual and the Installation & Administration Manual on [readthedocs.org](https://fiware-orion.readthedocs.org)
 
 For documentation previous to Orion 0.23.0 please check the manuals at FIWARE public wiki:
 
@@ -135,7 +138,6 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * [Advanced Programming](doc/manuals/user/README.md)
 * [Installation and administration](doc/manuals/admin/README.md)
 * Container-based deployment
-  * [Vagrant](doc/manuals/vagrant.md)
   * [Docker](docker/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
 * [Deprecated features](doc/manuals/deprecated.md)

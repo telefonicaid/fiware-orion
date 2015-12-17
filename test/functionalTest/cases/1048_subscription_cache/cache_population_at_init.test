@@ -158,18 +158,23 @@ echo
 echo
 
 
-echo "05. Statistics in XML"
-echo "====================="
-orionCurl --url /statistics
-echo
-echo
-
-
-echo "06. Statistics in JSON"
+echo "05. Statistics in JSON"
 echo "======================"
-orionCurl --url /statistics --json
+orionCurl --url /cache/statistics --json
 echo
 echo
+
+
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1))"
+# When the broker is started with -noCache, there are no refreshes performed
+#
+#
+# About:
+#  "REGEX((3|0))" and similar.  (sudden jump from 3 to 0)
+# This is to make the functest work when the broker is started with -noCache - no cache inserts etc are made ... 0
+#
 
 
 --REGEXPECT--
@@ -182,8 +187,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -198,8 +203,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -214,8 +219,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "PT1S"
     }
 }
@@ -227,41 +232,20 @@ Broker Stopped
 Broker Restarted
 
 
-05. Statistics in XML
-=====================
-HTTP/1.1 200 OK
-Content-Length: 269
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <xmlRequests>REGEX((1|2))</xmlRequests>
-  <versionRequests>REGEX((0|1))</versionRequests>
-  <statisticsRequests>1</statisticsRequests>
-  <subCacheEntries>3</subCacheEntries>
-  <uptime_in_secs>REGEX(\d)</uptime_in_secs>
-  <measuring_interval_in_secs>REGEX(\d)</measuring_interval_in_secs>
-</orion>
-
-
-06. Statistics in JSON
+05. Statistics in JSON
 ======================
 HTTP/1.1 200 OK
-Content-Length: 230
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "jsonRequests": "1",
-        "measuring_interval_in_secs": "REGEX(\d)",
-        "statisticsRequests": "2",
-        "subCacheEntries": "3",
-        "uptime_in_secs": "REGEX(\d)",
-        "versionRequests": "REGEX((0|1))",
-        "xmlRequests": "REGEX((1|2))"
-    }
+    "ids": "REGEX([0-9a-f, ]{76})",
+    "inserts": REGEX((3|0)),
+    "items": REGEX((3|0)),
+    "refresh": REGEX((0|1)),
+    "removes": 0,
+    "updates": 0
 }
 
 

@@ -45,9 +45,14 @@ echo
 01. Modify non-existing entity E1
 =================================
 HTTP/1.1 404 Not Found
-Content-Length: 0
+Content-Length: 61
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "description": "No context element found",
+    "error": "NotFound"
+}
 
 
 --TEARDOWN--

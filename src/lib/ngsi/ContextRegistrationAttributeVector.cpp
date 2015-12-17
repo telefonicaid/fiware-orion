@@ -27,6 +27,8 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextRegistrationAttributeVector.h"
@@ -90,7 +92,7 @@ std::string ContextRegistrationAttributeVector::check
 */
 void ContextRegistrationAttributeVector::present(const std::string& indent)
 {
-  LM_F(("%lu ContextRegistrationAttributes", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu ContextRegistrationAttributes", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

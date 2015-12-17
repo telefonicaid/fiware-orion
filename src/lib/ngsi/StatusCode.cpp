@@ -28,11 +28,13 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
 #include "common/Format.h"
+#include "common/limits.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -142,7 +144,7 @@ std::string StatusCode::toJson(bool isLastElement)
     free(s);
   }
 
-  char codeV[16];
+  char codeV[STRING_SIZE_FOR_INT];
 
   snprintf(codeV, sizeof(codeV), "%d", code);
 
@@ -265,10 +267,18 @@ std::string StatusCode::check
 */
 void StatusCode::present(const std::string& indent)
 {
-  LM_F(("%s%s:", indent.c_str(), tag.c_str()));
-  LM_F(("%s  Code:            %d",   indent.c_str(), code));
-  LM_F(("%s  ReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str()));
-  LM_F(("%s  Detail:          '%s'", indent.c_str(), details.c_str()));
+  LM_T(LmtPresent, ("%s%s:", 
+		    indent.c_str(), 
+		    tag.c_str()));
+  LM_T(LmtPresent, ("%s  Code:            %d",   
+		    indent.c_str(), 
+		    code));
+  LM_T(LmtPresent, ("%s  ReasonPhrase:    '%s'", 
+		    indent.c_str(), 
+		    reasonPhrase.c_str()));
+  LM_T(LmtPresent, ("%s  Detail:          '%s'", 
+		    indent.c_str(), 
+		    details.c_str()));
 }
 
 

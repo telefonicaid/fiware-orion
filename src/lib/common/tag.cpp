@@ -279,9 +279,6 @@ std::string endTag
 *
 * valueTag -  
 *
-* NOTE
-* The value of the tag is not HTML-escaped if the value is an Association.
-* In the case of Associations, the specific values must be HTML-escaped instead.
 */
 std::string valueTag
 (
@@ -290,10 +287,11 @@ std::string valueTag
   const std::string&  unescapedValue,
   Format              format,
   bool                showComma,
-  bool                isAssociation,
-  bool                isVectorElement
+  bool                isVectorElement,
+  bool                valueIsNumberOrBool
 )
 {
+
   char* value;
 
   if (unescapedValue == "")
@@ -304,15 +302,7 @@ std::string valueTag
   }
   else
   {
-    if (isAssociation == false)
-    {
-      value = htmlEscape(unescapedValue.c_str());
-    }
-    else
-    {
-      // unnecessary malloc, but this way I can always free => easier to read
-      value = strdup(unescapedValue.c_str());
-    }
+    value = htmlEscape(unescapedValue.c_str());
   }
 
   if (value == NULL)
@@ -328,51 +318,32 @@ std::string valueTag
     return out;
   }
 
+  std::string effectiveValue = valueIsNumberOrBool ? value : std::string("\"") + value + "\"";
+  free(value);
+
   if (showComma == true)
   {
-    if (isAssociation == true)
+    if (isVectorElement == true)
     {
-      std::string out = indent + "\"" + tagName + "\" : " + value + ",\n";
-
-      free(value);
-      return out;
-    }
-    else if (isVectorElement == true)
-    {
-      std::string out = indent + "\"" + value + "\",\n";
-
-      free(value);
+      std::string out = indent + effectiveValue + ",\n";
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\",\n";
-
-      free(value);
+      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + ",\n";
       return out;
     }
   }
   else
   {
-    if (isAssociation == true)
+    if (isVectorElement == true)
     {
-      std::string out = indent + "\"" + tagName + "\" : " + value + "\n";
-
-      free(value);
-      return out;
-    }
-    else if (isVectorElement == true)
-    {
-      std::string out = indent + "\"" + value + "\"\n";
-
-      free(value);
+      std::string out = indent + effectiveValue + "\n";
       return out;
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\"\n";
-
-      free(value);
+      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + "\n";
       return out;
     }
   }
@@ -389,8 +360,7 @@ std::string valueTag
   const std::string&  tagName,
   int                 value,
   Format              format,
-  bool                showComma,
-  bool                isAssociation
+  bool                showComma
 )
 {
   char val[32];
@@ -424,7 +394,6 @@ std::string valueTag
   const std::string&  value,
   Format              format,
   bool                showComma,
-  bool                isAssociation,
   bool                valueIsNumberOrBool
 )
 {

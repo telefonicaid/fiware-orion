@@ -28,6 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/orionReply.h"
@@ -96,7 +99,8 @@ std::string logTraceTreat
   else
   {
     OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + ciP->method + " " + path);
-    out = error.render(ciP, "");
+
+    TIMED_RENDER(out = error.render(ciP, ""));
   }
 
   return out;

@@ -24,7 +24,7 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 import subprocess
 
-from iotqautils.helpers_utils import *
+from iotqatools.helpers_utils import *
 
 __logger__ = logging.getLogger("utils")
 
@@ -39,6 +39,13 @@ class Properties:
         constructor
         """
 
+    def read_configuration_json(self):
+        """
+        return properties from configuration.josn file
+        :return: dict
+        """
+        return read_file_to_json("configuration.json")
+
     def update_properties_json_file(self, file_name, sudo_run="true"):
         """
          update properties. json from script file in setting folders
@@ -49,9 +56,10 @@ class Properties:
             sudo_run = "sudo"
         else:
             sudo_run = ""
-        configuration = read_file_to_json("configuration.json")
+        configuration = self.read_configuration_json()
         __logger__.info("configuration.json: %s" % str(configuration))
-        if configuration["JENKINS"].lower() == "false":
+        if configuration["UPDATE_PROPERTIES_JSON"].lower() == "true":
+            __logger__.info(" >> config file used: '%s'", file_name)
             with open("%s/%s" % (configuration["PATH_TO_SETTINGS_FOLDER"], file_name)) as config_file:
                 for line in config_file.readlines():
                     __logger__.info("-- properties.json lines: %s %s" % (sudo_run, str(line)))
@@ -59,7 +67,10 @@ class Properties:
                                          stderr=subprocess.STDOUT)
                     stdout = p.stdout.readlines()
                     assert stdout == [], "ERROR - modifying config files from %s/%s in setting folder. \n " \
-                                         "        %s" % (configuration.PATH_TO_SETTING_FOLDER, file_name, stdout)
+                                         "        %s" % (configuration["PATH_TO_SETTINGS_FOLDER"], file_name, stdout)
+            __logger__.info(" >> properties.json is created or updated")
+        else:
+            __logger__.info("properties.json is not updated")
 
     def read_properties(self):
         """
@@ -74,9 +85,9 @@ class Properties:
         updating /etc/sysconfig/contextBroker
         note: if values have "/" chars are replaced by "\/". Ex: BROKER_LOG_DIR variable
         """
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_USER", "BROKER_USER", self.config["context_broker_env"]["CB_LOG_OWNER"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_PORT", "BROKER_PORT", self.config["context_broker_env"]["CB_PORT"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_LOG_DIR", "BROKER_LOG_DIR", self.config["context_broker_env"]["CB_LOG_FILE"].replace("/", "\/")), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_DATABASE_HOST", "BROKER_DATABASE_HOST", self.config["mongo_env"]["MONGO_HOST"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_DATABASE_NAME", "BROKER_DATABASE_NAME", self.config["mongo_env"]["MONGO_DATABASE"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_EXTRA_OPS", "BROKER_EXTRA_OPS", self.config["context_broker_env"]["CB_EXTRA_OPS"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_USER", "BROKER_USER", self.config["context_broker_env"]["CB_LOG_OWNER"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_PORT", "BROKER_PORT", self.config["context_broker_env"]["CB_PORT"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_LOG_DIR", "BROKER_LOG_DIR", self.config["context_broker_env"]["CB_LOG_FILE"].replace("/", "\/")), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_DATABASE_HOST", "BROKER_DATABASE_HOST", self.config["mongo_env"]["MONGO_HOST"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_DATABASE_NAME", "BROKER_DATABASE_NAME", self.config["mongo_env"]["MONGO_DATABASE"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_EXTRA_OPS", "BROKER_EXTRA_OPS", self.config["context_broker_env"]["CB_EXTRA_OPS"]), sudo=True)

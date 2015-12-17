@@ -24,6 +24,7 @@
 */
 #include <string>
 
+#include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ContextAttribute.h"
@@ -74,7 +75,7 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
   // 3. Null ?
   else if ((strlen(ciP->payload) == 4) && ((strcmp(ciP->payload, "null") == 0) || (strcmp(ciP->payload, "Null") == 0) || (strcmp(ciP->payload, "NULL") == 0)))
   {
-    caP->valueType   = orion::ValueTypeNull;
+    caP->valueType   = orion::ValueTypeNone;
   }
 
   //
@@ -128,12 +129,16 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   default:
-    answer = "Request Treat function not implemented";
+    OrionError error(SccUnsupportedMediaType, "not supported content type: text/plain");
+
+    answer = error.render(ciP, "");
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+
+    alarmMgr.badInput(clientIp, "not supported content type: text/plain");
     break;
   }
   
   return answer;
 }
-
 
 

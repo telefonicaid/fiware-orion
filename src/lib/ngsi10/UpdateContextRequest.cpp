@@ -31,6 +31,7 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
@@ -58,7 +59,7 @@ UpdateContextRequest::UpdateContextRequest()
 *
 * UpdateContextRequest::UpdateContextRequest - 
 */
-UpdateContextRequest::UpdateContextRequest(const std::string _contextProvider, EntityId* eP)
+UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, EntityId* eP)
 {
   contextProvider = _contextProvider;
   contextElementVector.push_back(new ContextElement(eP));
@@ -288,6 +289,7 @@ void UpdateContextRequest::fill
   else
   {
     caP = new ContextAttribute(attributeName, ucarP->type, ucarP->contextValue);
+    caP->valueType = ucarP->valueType;
   }
 
   caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
@@ -311,7 +313,7 @@ void UpdateContextRequest::fill
     }
     else if (mP->stringValue != metaID)
     {
-      LM_W(("Bad Input (metaID differs in URI and payload"));
+      alarmMgr.badInput(clientIp, "metaID differs in URI and payload");
     }
   }
 

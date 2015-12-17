@@ -63,7 +63,6 @@ std::string parseContextAttributeCompoundValue
   orion::CompoundValueNode*          parent
 )  
 {
-  std::string  type   = jsonParseTypeNames[node->GetType()];
 
   if (node->IsObject())
   {
@@ -193,7 +192,6 @@ std::string parseContextAttributeCompoundValue
 )
 {
   std::string type   = jsonParseTypeNames[node->value.GetType()];
-  std::string name   = node->name.GetString();
 
   if (caP->compoundValueP == NULL)
   {

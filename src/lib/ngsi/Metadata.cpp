@@ -30,9 +30,16 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi/Metadata.h"
+
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/safeMongo.h"
+
+using namespace mongo;
 
 
 
@@ -129,6 +136,37 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
   typeGiven    = false;
 }
 
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const BSONObj& mdB)
+{
+  name = getStringField(mdB, ENT_ATTRS_MD_NAME);
+  type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE) : "";
+  switch (getField(mdB, ENT_ATTRS_MD_VALUE).type())
+  {
+  case String:
+    valueType   = orion::ValueTypeString;
+    stringValue = getStringField(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
+  case NumberDouble:
+    valueType   = orion::ValueTypeNumber;
+    numberValue = getField(mdB, ENT_ATTRS_MD_VALUE).Number();
+    break;
+
+  case Bool:
+    valueType = orion::ValueTypeBoolean;
+    boolValue = getBoolField(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
+  default:
+    valueType = orion::ValueTypeUnknown;
+    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
+    break;
+  }
+}
 
 
 /* ****************************************************************************
@@ -144,13 +182,7 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
   out += startTag(indent, tag, tag, format, false, false);
   out += valueTag(indent + "  ", "name", name, format, true);
   out += valueTag(indent + "  ", "type", type, format, true);
-
-  if (type == "Association")
-  {
-    xValue = std::string("\n") + association.render(format, indent + "  ", false);
-  }
-
-  out += valueTag(indent + "  ", "value", xValue, format, false, (type == "Association"));
+  out += valueTag(indent + "  ", "value", xValue, format, false);
   out += endTag(indent, tag, format, comma);
 
   return out;
@@ -173,29 +205,35 @@ std::string Metadata::check
 {
   if (name == "")
   {
+    alarmMgr.badInput(clientIp, "missing metadata name");
     return "missing metadata name";
   }
 
-  if (forbiddenChars(name.c_str()))   { return "Invalid characters in metadata name";  }
-  if (forbiddenChars(type.c_str()))   { return "Invalid characters in metadata type";  }
+  if (forbiddenChars(name.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
+    return "Invalid characters in metadata name";
+  }
+
+  if (forbiddenChars(type.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
+    return "Invalid characters in metadata type";
+  }
 
   if (valueType == orion::ValueTypeString)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata");
       return "Invalid characters in metadata value";
     }
 
-    if ((stringValue == "") && (type != "Association"))
+    if (stringValue == "")
     {
+      alarmMgr.badInput(clientIp, "missing metadata value");
       return "missing metadata value";
     }
-  }
-
-
-  if (type == "Association")
-  {
-     return association.check(requestType, format, indent, predetectedError, counter);
   }
 
   return "OK";
@@ -209,10 +247,19 @@ std::string Metadata::check
 */
 void Metadata::present(const std::string& metadataType, int ix, const std::string& indent)
 {
-  LM_F(("%s%s Metadata %d:",   indent.c_str(), metadataType.c_str(), ix));
-  LM_F(("%s  Name:     %s", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:     %s", indent.c_str(), type.c_str()));
-  LM_F(("%s  Value:    %s", indent.c_str(), stringValue.c_str()));
+  LM_T(LmtPresent, ("%s%s Metadata %d:",   
+		    indent.c_str(), 
+		    metadataType.c_str(), 
+		    ix));
+  LM_T(LmtPresent, ("%s  Name:     %s", 
+		    indent.c_str(), 
+		    name.c_str()));
+  LM_T(LmtPresent, ("%s  Type:     %s", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%s  Value:    %s", 
+		    indent.c_str(), 
+		    stringValue.c_str()));
 }
 
 
@@ -223,7 +270,6 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
 */
 void Metadata::release(void)
 {
-  association.release();
 }
 
 
@@ -237,14 +283,13 @@ void Metadata::fill(const struct Metadata& md)
   name         = md.name;
   type         = md.type;
   stringValue  = md.stringValue;
-  association  = md.association;
 }
 
 /* ****************************************************************************
 *
 * toStringValue -
 */
-std::string Metadata::toStringValue(void)
+std::string Metadata::toStringValue(void) const
 {
   char buffer[64];
 
@@ -267,6 +312,9 @@ std::string Metadata::toStringValue(void)
     return "<unknown type>";
     break;
   }
+
+  // Added to avoid warning when compiling with -fstack-check -fstack-protector
+  return "";
 }
 
 

@@ -396,6 +396,6 @@ void jsonNcarPresent(ParseData* parseDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   parseDataP->ncar.res.present("");
 }

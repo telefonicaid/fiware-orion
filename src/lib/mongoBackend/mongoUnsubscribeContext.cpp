@@ -28,12 +28,15 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
+#include "mongoBackend/safeMongo.h"
+#include "cache/subCache.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
-#include "cache/subCache.h"
 
 
 
@@ -43,9 +46,8 @@
 */
 HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, const std::string& tenant)
 {
-    bool           reqSemTaken;
-    BSONObj        sub;
-    DBClientBase*  connection = NULL;
+    bool         reqSemTaken;
+    std::string  err;
 
     reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
 
@@ -57,123 +59,78 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
 
     if (responseP->subscriptionId.get() == "")
     {
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
         responseP->statusCode.fill(SccContextElementNotFound);
-        LM_W(("Bad Input (no subscriptionId)"));
+        alarmMgr.badInput(clientIp, "no subscriptionId");
         return SccOk;
     }
-
-    LM_T(LmtMongo, ("findOne() in '%s' collection _id '%s'}", getSubscribeContextCollectionName(tenant).c_str(),
-                    requestP->subscriptionId.get().c_str()));
 
     /* Look for document */
-    connection = getMongoConnection();
-    try
+    BSONObj sub;
+    OID     id;
+
+    if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
     {
-        OID id = OID(requestP->subscriptionId.get());
-        sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << id));
-        releaseMongoConnection(connection);
-        LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
+      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (safeGetSubId fail)", reqSemTaken);
+      if (responseP->statusCode.code == SccContextElementNotFound)
+      {
+        // FIXME: Doubt - invalid OID format?  Or, just a subscription that was not found?
+        std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+        alarmMgr.badInput(clientIp, details);
+      }
+      else // SccReceiverInternalError
+      {
+        LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
+      }
+      return SccOk;
     }
-    catch (const AssertionException &e)
+
+    if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
     {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo assertion exception)", reqSemTaken);
-
-        //
-        // This happens when OID format is wrong
-        // FIXME: this checking should be done at parsing stage, without progressing to
-        // mongoBackend. By the moment we can live this here, but we should remove in the future
-        // (old issue #95)
-        //
-        responseP->statusCode.fill(SccContextElementNotFound);
-        LM_W(("Bad Input (invalid OID format)"));
-        return SccOk;
-    }
-    catch (const DBException &e)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
-
-        responseP->statusCode.fill(SccReceiverInternalError,
-                                   std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                   " - findOne() _id: " + requestP->subscriptionId.get() +
-                                   " - exception: " + e.what());
-        LM_E(("Database Error (%s)", responseP->statusCode.details.c_str()));
-
-        return SccOk;
-    }
-    catch (...)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo generic exception)", reqSemTaken);
-
-        responseP->statusCode.fill(SccReceiverInternalError,
-                                   std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                   " - findOne() _id: " + requestP->subscriptionId.get() +
-                                   " - exception: " + "generic");
-        LM_E(("Database Error (%s)", responseP->statusCode.details.c_str()));
-
-        return SccOk;
+      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+      responseP->statusCode.fill(SccReceiverInternalError, err);
+      return SccOk;
     }
 
     if (sub.isEmpty())
     {
        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
-
        responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
        return SccOk;
     }
 
     /* Remove document in MongoDB */
-    // FIXME: I will prefer to do the find and remove in a single operation. Is the some similar
-    // to findAndModify for this?
-    LM_T(LmtMongo, ("remove() in '%s' collection _id '%s'}", getSubscribeContextCollectionName(tenant).c_str(),
-                    requestP->subscriptionId.get().c_str()));
-
-    connection = getMongoConnection();    
-    try
+    // FIXME: I would prefer to do the find and remove in a single operation. Is there something similar
+    // to findAndModify for this?    
+    if (!collectionRemove(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), &err))
     {
-        connection->remove(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())));
-        releaseMongoConnection(connection);
-        
-        LM_I(("Database Operation Successful (remove _id: %s)", requestP->subscriptionId.get().c_str()));
-    }
-    catch (const DBException &e)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
-
-        responseP->statusCode.fill(SccReceiverInternalError,
-                                   std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                   " - remove() _id: " + requestP->subscriptionId.get().c_str() +
-                                   " - exception: " + e.what());
-        LM_E(("Database Error (%s)", responseP->statusCode.details.c_str()));
-        return SccOk;
-    }
-    catch (...)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo generic exception)", reqSemTaken);
-
-        responseP->statusCode.fill(SccReceiverInternalError,
-                                   std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                   " - remove() _id: " + requestP->subscriptionId.get().c_str() +
-                                   " - exception: " + "generic");
-
-        LM_E(("Database Error (%s)", responseP->statusCode.details.c_str()));
-        return SccOk;
+      reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+      responseP->statusCode.fill(SccReceiverInternalError, err);
+      return SccOk;
     }
 
     /* Destroy any previous ONTIMEINTERVAL thread */
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
-    responseP->statusCode.fill(SccOk);
+
+    //
+    // Removing subscription from mongo subscription cache
+    //
+    LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", requestP->subscriptionId.get().c_str(), tenant.c_str()));
+
+    cacheSemTake(__FUNCTION__, "Removing subscription from cache");
+
+    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
+    if (cSubP != NULL)
+    {
+      subCacheItemRemove(cSubP);
+    }
+
+    cacheSemGive(__FUNCTION__, "Removing subscription from cache");
+
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
 
-    //
-    // Removing subscription from cache
-    //
-    subCache->remove(tenant, "", requestP->subscriptionId.get());
-
+    responseP->statusCode.fill(SccOk);
     return SccOk;
 }

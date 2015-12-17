@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "xmlParse/XmlNode.h"
@@ -81,12 +82,12 @@ std::string ncarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void ncarPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   parseDataP->ncar.res.present("");
 }
 
@@ -160,7 +161,7 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     parseDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }

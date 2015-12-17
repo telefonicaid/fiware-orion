@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
@@ -47,9 +48,11 @@ std::string badNgsi9Request
   ParseData*                 parseDataP
 )
 {
+  std::string details = std::string("service '") + ciP->url + "' not found";
   std::string answer;
 
-  LM_W(("Bad Input (service '%s' not found)", ciP->url.c_str()));
+  alarmMgr.badInput(clientIp, details);
+
   answer = restErrorReplyGet(ciP,
                              ciP->outFormat,
                              "",

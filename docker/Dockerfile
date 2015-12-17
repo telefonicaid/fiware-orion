@@ -3,7 +3,6 @@ FROM centos:centos6.6
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
 ENV ORION_USER orion
-ENV GIT_REV_ORION_PROXYCOAP 749e22376664dd3adae17492090e58882d3b28a7
 ENV GIT_REV_ORION develop
 ENV CLEAN_DEV_TOOLS 1
 
@@ -18,8 +17,6 @@ RUN \
       boost-devel \
       bzip2 \
       cmake \
-      clang \
-      CUnit-devel \
       epel-release \
       libcurl-devel \
       libmicrohttpd-devel \
@@ -49,14 +46,6 @@ RUN \
     make install && \
     ldconfig && \
     cd /opt && \
-    # Install proxyCoap
-    git clone https://github.com/staropram/cantcoap && \
-    cd cantcoap && \
-    git checkout ${GIT_REV_ORION_PROXYCOAP} && \
-    make && \
-    cp cantcoap.h dbg.h nethelper.h /usr/local/include && \
-    cp libcantcoap.a /usr/local/lib && \
-    cd /opt && \
     # Install orion from source
     git clone https://github.com/telefonicaid/fiware-orion && \
     cd fiware-orion && \
@@ -65,7 +54,6 @@ RUN \
     make install && \
     # reduce size of installed binaries
     strip /usr/bin/contextBroker && \
-    strip /usr/bin/proxyCoap && \
     # create needed log and run paths
     mkdir -p /var/log/contextBroker && \
     mkdir -p /var/run/contextBroker && \
@@ -90,11 +78,6 @@ RUN \
            /usr/local/lib/libgmock* \
            /usr/local/lib/libgtest* \
            /usr/local/share/aclocal/gtest* \
-           /opt/cantcoap \
-           /usr/local/include/cantcoap.h \
-           /usr/local/include/dbg.h \
-           /usr/local/include/nethelper.h \
-           /usr/local/lib/libcantcoap.a \
            /opt/fiware-orion \
            && \
     yum -y erase git perl rsync \
@@ -118,5 +101,5 @@ RUN \
     build-locale-archive
 
 WORKDIR /
-ENTRYPOINT ["/usr/bin/contextBroker","-fg"]
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice"]
 EXPOSE 1026

@@ -134,7 +134,7 @@ Content-Length: 274
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "contextElements" : [

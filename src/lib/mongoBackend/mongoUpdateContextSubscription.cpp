@@ -28,16 +28,21 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
-#include "cache/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
+#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
 #include "common/Format.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
+
+
 
 /* ****************************************************************************
 *
@@ -52,70 +57,43 @@ HttpStatusCode mongoUpdateContextSubscription
   const std::string&                  xauthToken,
   const std::vector<std::string>&     servicePathV
 )
-{
-  DBClientBase* connection = NULL;
+{ 
   bool          reqSemTaken;
 
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request", SemWriteOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Update Context Subscription, notifyFormat: '%s'", formatToString(notifyFormat)));
-
-
   /* Look for document */
-  BSONObj  sub;
-  try
-  {
-      OID id = OID(requestP->subscriptionId.get());
+  BSONObj     sub;
+  std::string err;
+  OID         id;
 
-      connection = getMongoConnection();
-      sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << id));
-      releaseMongoConnection(connection);
-      LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
-  }
-  catch (const AssertionException &e)
+  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->subscribeError.errorCode)))
   {
-      /* This happens when OID format is wrong */
-      // FIXME P4: this checking should be done at the parsing stage, without progressing to
-      // mongoBackend. For the moment we can leave this here, but we should remove it in the future
-      // (old issue #95)
-      //
-      releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)", reqSemTaken);
-
-      responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-      LM_W(("Bad Input (invalid OID format)"));
-      return SccOk;
-  }
-  catch (const DBException &e)
-  {
-      releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)", reqSemTaken);
-
-      responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                               std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                               " - findOne() _id: " + requestP->subscriptionId.get() +
-                                               " - exception: " + e.what());
-      LM_E(("Database Error (%s)", responseP->subscribeError.errorCode.details.c_str()));
-      return SccOk;
-  }
-  catch (...)
-  {
-      releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)", reqSemTaken);
-
-      responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                               std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                               " - findOne() _id: " + requestP->subscriptionId.get() +
-                                               " - exception: " + "generic");
-      LM_E(("Database Error (%s)", responseP->subscribeError.errorCode.details.c_str()));
-      return SccOk;
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (safeGetSubId fail)", reqSemTaken);
+    if (responseP->subscribeError.errorCode.code == SccContextElementNotFound)
+    {
+      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+      alarmMgr.badInput(clientIp, details);
+    }
+    else // SccReceiverInternalError
+    {
+      LM_E(("Runtime Error (exception getting OID: %s)", responseP->subscribeError.errorCode.details.c_str()));
+    }
+    return SccOk;
   }
 
+  if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << id), &sub, &err))
+  {
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)", reqSemTaken);
+    responseP->subscribeError.errorCode.fill(SccReceiverInternalError, err);
+    return SccOk;
+  }
 
-  if (sub.isEmpty()) {
-      responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)", reqSemTaken);
-      return SccOk;
+  if (sub.isEmpty())
+  {
+    responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)", reqSemTaken);
+    return SccOk;
   }
 
   /* We start with an empty BSONObjBuilder and process requestP for all the fields that can
@@ -130,42 +108,57 @@ HttpStatusCode mongoUpdateContextSubscription
   BSONObjBuilder newSub;
 
   /* Entities, attribute list and reference are not updatable, so they are appended directly */
-  newSub.appendArray(CSUB_ENTITIES, sub.getField(CSUB_ENTITIES).Obj());
-  newSub.appendArray(CSUB_ATTRS, sub.getField(CSUB_ATTRS).Obj());
-  newSub.append(CSUB_REFERENCE, STR_FIELD(sub, CSUB_REFERENCE));
+  newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
+  newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
+  newSub.append(CSUB_REFERENCE, getStringField(sub, CSUB_REFERENCE));
 
   /* Duration update */
-  if (requestP->duration.isEmpty()) {      
-      newSub.append(CSUB_EXPIRATION, sub.getField(CSUB_EXPIRATION).numberLong());
+  long long expiration = getCurrentTime() + requestP->duration.parse();
+  if (requestP->duration.isEmpty())
+  {
+    //
+    // No duration in incoming request => "inherit" expirationDate from 'old' subscription
+    //
+    long long expirationTime = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION) : -1;
+
+    newSub.append(CSUB_EXPIRATION, expirationTime);
   }
-  else {
-      long long expiration = getCurrentTime() + requestP->duration.parse();
-      newSub.append(CSUB_EXPIRATION, expiration);
-      LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
+  else
+  {
+    newSub.append(CSUB_EXPIRATION, expiration);
+    LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
   /* Restriction update */
   // FIXME: Restrictions not implemented yet
 
   /* Throttling update */
-  if (!requestP->throttling.isEmpty()) {
-      /* Throttling equal to 0 removes throttling */
-      long long throttling = requestP->throttling.parse();
-      if (throttling != 0) {
-          newSub.append(CSUB_THROTTLING, throttling);
-      }
+  if (!requestP->throttling.isEmpty())
+  {
+    /* Throttling equal to 0 removes throttling */
+    long long throttling = requestP->throttling.parse();
+
+    if (throttling != 0)
+    {
+      newSub.append(CSUB_THROTTLING, throttling);
+    }
   }
-  else {
-      /* The hasField check is needed due to Throttling could not be present in the original doc */
-      if (sub.hasField(CSUB_THROTTLING)) {
-          newSub.append(CSUB_THROTTLING, sub.getField(CSUB_THROTTLING).numberLong());
-      }
+  else
+  {
+    //
+    // The hasField check is needed as Throttling might not be present in the original doc
+    // FIXME P1: However, we could include Throttling in the new doc anyway ...
+    //
+    if (sub.hasField(CSUB_THROTTLING))
+    {
+      newSub.append(CSUB_THROTTLING, getIntOrLongFieldAsLong(sub, CSUB_THROTTLING));
+    }
   }
 
   /* Notify conditions */
   bool notificationDone = false;
   if (requestP->notifyConditionVector.size() == 0) {
-    newSub.appendArray(CSUB_CONDITIONS, sub.getField(CSUB_CONDITIONS).embeddedObject());
+    newSub.appendArray(CSUB_CONDITIONS, getField(sub, CSUB_CONDITIONS).embeddedObject());
   }
   else {
       /* Destroy any previous ONTIMEINTERVAL thread */
@@ -181,7 +174,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 enV,
                                                 attrL,
                                                 requestP->subscriptionId.get(),
-                                                C_STR_FIELD(sub, CSUB_REFERENCE),
+                                                getStringField(sub, CSUB_REFERENCE).c_str(),
                                                 &notificationDone,
                                                 notifyFormat,
                                                 tenant,
@@ -195,67 +188,86 @@ HttpStatusCode mongoUpdateContextSubscription
        attrL.release();
   }
 
-  int count = sub.hasField(CSUB_COUNT) ? sub.getIntField(CSUB_COUNT) : 0;
+
+  
+  int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
+
+  //
+  // Update from cached value, if applicable
+  //
+  CachedSubscription*  cSubP                = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+  long long            lastNotificationTime = 0;
+
+  if (cSubP != NULL)
+  {
+    count                += cSubP->count;
+    lastNotificationTime  = cSubP->lastNotificationTime;
+  }
 
   /* Last notification */
-  if (notificationDone) {
-      newSub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
-      newSub.append(CSUB_COUNT, count + 1);
+  if (notificationDone)
+  {
+    lastNotificationTime = getCurrentTime();
+
+    //
+    // Update sub-cache
+    //
+    if (cSubP != NULL)
+    {
+      cSubP->count                 += 1; // 'count' to be reset later if DB operation OK
+      cSubP->lastNotificationTime  = lastNotificationTime;
+    }
+
+    newSub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
+    newSub.append(CSUB_COUNT, count + 1);
+    LM_T(LmtSubCache, ("notificationDone => lastNotification set to %lu", lastNotificationTime));
   }
-  else {
-      /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
-      if (sub.hasField(CSUB_LASTNOTIFICATION)) {
-          newSub.append(CSUB_LASTNOTIFICATION, sub.getIntField(CSUB_LASTNOTIFICATION));
+  else
+  {
+    //
+    // FIXME P1: if CSUB_LASTNOTIFICATION is not in the original doc, it will also not be in the new doc.
+    //           Is this necessary?
+    //           The implementation would get a lot simpler if we ALWAYS add CSUB_LASTNOTIFICATION and CSUB_COUNT
+    //           to 'newSub'
+    //
+
+    /* The hasField checks are needed as lastNotification/count might not be present in the original doc */
+    if (sub.hasField(CSUB_LASTNOTIFICATION))
+    {
+      long long lastNotification = getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION);
+
+      //
+      // Compare with 'lastNotificationTime', that might come from the sub-cache.
+      // If the cached value of lastNotificationTime is higher, then use it.
+      //
+      if (lastNotificationTime > lastNotification)
+      {
+        lastNotification = lastNotificationTime;
       }
-      if (sub.hasField(CSUB_COUNT)) {
-          newSub.append(CSUB_COUNT, count);
-      }
+      newSub.append(CSUB_LASTNOTIFICATION, lastNotification);
+    }
+
+    if (sub.hasField(CSUB_COUNT))
+    {
+      newSub.append(CSUB_COUNT, count);
+    }
   }
 
   /* Adding format to use in notifications */
   newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
 
   /* Update document in MongoDB */
-  BSONObj update = newSub.obj();
-  try
+  BSONObj  newSubObject = newSub.obj();
+  if (!collectionUpdate(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), newSubObject, false, &err))
   {
-      LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextCollectionName(tenant).c_str(),
-                         requestP->subscriptionId.get().c_str(),
-                         update.toString().c_str()));
-
-      connection = getMongoConnection();
-      connection->update(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
-      releaseMongoConnection(connection);
-
-      LM_I(("Database Operation Successful (update _id: %s, %s)", requestP->subscriptionId.get().c_str(), update.toString().c_str()));
+    reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)", reqSemTaken);
+    responseP->subscribeError.errorCode.fill(SccReceiverInternalError, err);
+    return SccOk;
   }
-  catch (const DBException &e)
+
+  if (cSubP != NULL)
   {
-      releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)", reqSemTaken);
-
-      responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                               std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                               " - update() _id: " + requestP->subscriptionId.get().c_str() +
-                                               " - update() doc: " + update.toString() +
-                                               " - exception: " + e.what());
-
-      LM_E(("Database Error (%s)", responseP->subscribeError.errorCode.details.c_str()));
-      return SccOk;
-  }
-  catch (...)
-  {
-      releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)", reqSemTaken);
-
-      responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                               std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
-                                               " - update() _id: " + requestP->subscriptionId.get().c_str() +
-                                               " - update() doc: " + update.toString() +
-                                               " - exception: " + "generic");
-
-      LM_E(("Database Error (%s)", responseP->subscribeError.errorCode.details.c_str()));
-      return SccOk;
+    cSubP->count = 0; // New 'count' has been sent to DB - must be reset here
   }
 
   // Duration and throttling are optional parameters, they are only added in the case they were used for update
@@ -270,34 +282,59 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
-  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
 
   //
   // Modification of the subscription cache
   //
-  // The subscription before this updatye is stored in 'sub'.
-  // The updated subscription is stored in 'newSub'
+  // The subscription "before this update" is looked up in cache and referenced by 'cSubP'.
+  // The "updated subscription information" is in 'newSubObject' (mongo BSON object format).
   // 
   // All we need to do now for the cache is to:
-  //   1. Remove 'sub' from sub-cache (if present)
-  //   2. Create 'newSub' in sub-cache (if applicable)
+  //   1. Remove 'cSubP' from sub-cache (if present)
+  //   2. Create 'newSubObject' in sub-cache (if applicable)
+  //
+  // The subscription is already updated in mongo.
+  //
+  //
+  // There are four different scenarios here:
+  //   1. Old sub was in cache, new sub enters cache
+  //   2. Old sub was NOT in cache, new sub enters cache
+  //   3. Old subwas in cache, new sub DOES NOT enter cache
+  //   4. Old sub was NOT in cache, new sub DOES NOT enter cache
+  //
+  // This is resolved by two separate functions, one that removes the old one, if found (subCacheItemLookup+subCacheItemRemove), 
+  // and the other one that inserts the sub, IF it should be inserted (subCacheItemInsert).
+  // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
   //
 
+
   // 0. Lookup matching subscription in subscription-cache
-  std::string servicePath;
 
-  servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
-  Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
+  cacheSemTake(__FUNCTION__, "Updating cached subscription");
 
-  // 1. Remove 'sub' from sub-cache (if present)
-  if (subP)
+  cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
+  char* subscriptionId   = (char*) requestP->subscriptionId.get().c_str();
+  char* servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
+
+  LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
+
+  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(), newSubObject, subscriptionId, servicePath, lastNotificationTime, expiration);
+
+  if (cSubP != NULL)
   {
-    subCache->remove(subP);
+    LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+    subCacheItemRemove(cSubP);
   }
 
-  // 2. Create 'newSub' in sub-cache (if applicable)
-  subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
+  if (mscInsert == 0)  // 0: Insertion was really made
+  {
+    subCacheUpdateStatisticsIncrement();
+  }
+
+  cacheSemGive(__FUNCTION__, "Updating cached subscription");
+  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
   return SccOk;
 }

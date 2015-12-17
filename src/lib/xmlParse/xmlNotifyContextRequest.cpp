@@ -28,6 +28,8 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "xmlParse/XmlNode.h"
@@ -80,12 +82,12 @@ std::string ncrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 */
 void ncrPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   parseDataP->ncr.res.subscriptionId.present("");
 }
 
@@ -153,7 +155,7 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     parseDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }
@@ -200,6 +202,7 @@ static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtParse, ("Creating an attribute"));
 
   parseDataP->ncr.attributeP = new ContextAttribute();
+  parseDataP->ncr.attributeP->valueType = orion::ValueTypeNone;
   parseDataP->ncr.cerP->contextElement.contextAttributeVector.push_back(parseDataP->ncr.attributeP);
 
   return 0;
@@ -246,6 +249,7 @@ static int contextAttributeContextValue(xml_node<>* node, ParseData* parseDataP)
   parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
 
   parseDataP->ncr.attributeP->stringValue = node->value();
+  parseDataP->ncr.attributeP->valueType = orion::ValueTypeString;
 
   return 0;
 }

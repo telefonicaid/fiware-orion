@@ -69,7 +69,7 @@ static void prepareDatabase(void) {
 
   DBClientBase* connection = getMongoConnection();
 
-  connection->createIndex("unittest.entities", BSON("location.coords" << "2dsphere" ));
+  connection->createIndex("utest.entities", BSON("location.coords" << "2dsphere" ));
 
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
                      "attrNames" << BSON_ARRAY("pos" << "foo") <<
@@ -250,8 +250,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -366,9 +364,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -441,9 +436,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -540,9 +532,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -638,9 +627,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     utExit();
 }
 
@@ -713,9 +699,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -791,9 +774,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -889,9 +869,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }

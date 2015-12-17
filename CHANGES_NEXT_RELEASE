@@ -1,10 +1,7 @@
-Fix:  Detail message for HTTP Content-Lenght required error (Issue #1203)
-Fix:  Changed the description text for parse errors in v2 json requests (Issue #1200)
-Fix:  Remove leftover whitespaces in error messages (Issue #1199) 
-Fix:  Avoid updating several matching entities associated to the same ID, returning TooManyResults error in that case (Issue #1198)
-Fix:  URI params 'geometry' and 'coords' for GET /v2/entities (Issue #1177)
-Fix:  Permitting attribute values to be empty in API v2 (Issue #1187 and #1188)
-Fix:  Clearer error on NGSIv2 entity attribute update, without value in payload (Issue #1164)
-Fix:  Changed  error code from 472 (Invalid Parameter) to 422 (Invalid Moficiation) in NGSIv1 in the case of missing attribute value (Issue #1164)
-Add:  Using 'count' option when getting entities (Issue #1041)
-Fix:  Improved JSON representation for APIv2 (Issue #1259)
+- Add: srv=, subsrv= and from= fields to log (Issue #1593)
+- Fix: wrong accumulation in counter sentOK
+- Fix: more descriptive error messages for CPr update/query forward fail
+- Add: reset for notification counters in threadpool mode
+- Fix: avoid -g compiler flag in release build
+- Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
+- Fix: improved JSON representation for APIv2 (Issue #1259)

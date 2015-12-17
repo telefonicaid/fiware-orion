@@ -228,6 +228,9 @@ echo
 echo
 
 
+# Avoid throttling (1 second) for the subscription
+sleep 2
+
 echo "11. Update E1/T1/A1"
 echo "==================="
 payload='{
@@ -468,7 +471,7 @@ Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -577,7 +580,7 @@ Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -686,7 +689,7 @@ Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -723,7 +726,7 @@ Content-Length: 574
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",

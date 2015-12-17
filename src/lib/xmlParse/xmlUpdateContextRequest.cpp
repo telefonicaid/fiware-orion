@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/EntityId.h"
@@ -92,7 +93,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     reqDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }
@@ -110,6 +111,7 @@ static int contextAttribute(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Creating an attribute"));
   reqData->upcr.attributeP = new ContextAttribute();
+  reqData->upcr.attributeP->valueType = orion::ValueTypeNone;
   reqData->upcr.ceP->contextAttributeVector.push_back(reqData->upcr.attributeP);
   return 0;
 }
@@ -156,7 +158,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
   parseDataP->upcr.attributeP->stringValue = node->value();
-  parseDataP->upcr.attributeP->valueType   = ValueTypeString;
+  parseDataP->upcr.attributeP->valueType   = orion::ValueTypeString;
 
   if (parseDataP->upcr.attributeP->stringValue == " ")
   {

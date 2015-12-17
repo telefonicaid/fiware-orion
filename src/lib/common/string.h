@@ -26,9 +26,11 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <sstream>
 #include <vector>
 
-
+// the same macro in parseArg library
+#define FT(x) (x == true)? "true" : "false"
 
 /* ****************************************************************************
 *
@@ -96,20 +98,6 @@ extern bool string2coords(const std::string& s, double& latitude, double& longit
 
 /* ****************************************************************************
 *
-* coords2string - 
-*/
-extern void coords2string
-(
-  std::string*  s,
-  double        latitude,
-  double        longitude,
-  int           decimals = 6
-);
-
-
-
-/* ****************************************************************************
-*
 * versionParse -
 */
 bool versionParse
@@ -158,5 +146,28 @@ extern void strReplace
 * servicePathCheck - 
 */
 extern std::string servicePathCheck(const char* servicePath);
+
+
+
+/* ****************************************************************************
+*
+* str2double - is the string a correct float (double)?
+*/
+extern bool str2double(char* s, double* dP = NULL);
+
+
+
+/* ****************************************************************************
+*
+* toString -
+*/
+template <typename T> std::string toString(T t)
+{
+  std::ostringstream ss;
+
+  ss << t;
+
+  return ss.str();
+}
 
 #endif  // SRC_LIB_COMMON_STRING_H_

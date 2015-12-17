@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "apiTypesV2/Entities.h"
 
@@ -92,7 +93,9 @@ std::string Entities::check(ConnectionInfo* ciP, RequestType requestType)
 */
 void Entities::present(const std::string& indent)
 {
-  LM_F(("%s%d Entities:", indent.c_str(), vec.size()));
+  LM_T(LmtPresent, ("%s%d Entities:", 
+		    indent.c_str(), 
+		    vec.size()));
   vec.present(indent + "  ");
 }
 

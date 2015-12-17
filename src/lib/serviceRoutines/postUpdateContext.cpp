@@ -27,9 +27,15 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
+#include "jsonParse/jsonRequest.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -38,7 +44,6 @@
 #include "rest/httpRequestSend.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "xmlParse/xmlRequest.h"
-#include "jsonParse/jsonRequest.h"
 
 
 
@@ -116,22 +121,24 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 */
 static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP, Format format)
 {
-  std::string     ip;
-  std::string     protocol;
-  int             port;
-  std::string     prefix;
-  std::string     answer;
-
+  std::string      ip;
+  std::string      protocol;
+  int              port;
+  std::string      prefix;
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
   if (parseUrl(upcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", upcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
+
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     upcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
@@ -145,7 +152,9 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   char*        cleanPayload;
 
   ciP->outFormat  = format;
-  payload         = upcrP->render(ciP, UpdateContext, "");
+
+  TIMED_RENDER(payload = upcrP->render(ciP, UpdateContext, ""));
+
   ciP->outFormat  = outFormat;
   cleanPayload    = (char*) payload.c_str();
 
@@ -164,33 +173,39 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
-  std::string     out;
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/updateContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
+  std::string     out;
+  int             r;
 
-  out = httpRequestSend(ip,
-                        port,
-                        protocol,
-                        verb,
-                        tenant,
-                        servicePath,
-                        ciP->httpHeaders.xauthToken,
-                        resource,
-                        mimeType,
-                        cleanPayload,
-                        false,
-                        true,
-                        mimeType);
+  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
-  if ((out == "error") || (out == ""))
+  r = httpRequestSend(ip,
+                      port,
+                      protocol,
+                      verb,
+                      tenant,
+                      servicePath,
+                      ciP->httpHeaders.xauthToken,
+                      resource,
+                      mimeType,
+                      cleanPayload,
+                      false,
+                      true,
+                      &out,
+                      mimeType);
+
+  if (r != 0)
   {
-    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext response payload: %s", out.c_str()));
 
 
   //
@@ -457,12 +472,14 @@ std::string postUpdateContext
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
+  ParseData*                 parseDataP,
+  bool                       checkEntityExistance
 )
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
+
 
   //
   // 01. Check service-path consistency
@@ -474,8 +491,10 @@ std::string postUpdateContext
   if (ciP->servicePathV.size() > 1)
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
-    LM_W(("Bad Input (more than one service path for an update request)"));
-    answer = upcrsP->render(ciP, UpdateContext, "");
+    alarmMgr.badInput(clientIp, "more than one service path for an update request");
+
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+
     return answer;
   }
   else if (ciP->servicePathV.size() == 0)
@@ -487,7 +506,9 @@ std::string postUpdateContext
   if (res != "OK")
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
-    answer = upcrsP->render(ciP, UpdateContext, "");
+
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+
     return answer;
   }
 
@@ -497,7 +518,10 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion);
+  
+  HttpStatusCode httpStatusCode;
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance));
+
   if (ciP->httpStatusCode != SccCreated)
   {
     ciP->httpStatusCode = httpStatusCode;
@@ -515,7 +539,8 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    answer = upcrsP->render(ciP, UpdateContext, "");
+    TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
+
     upcrP->release();
     return answer;
   }
@@ -540,8 +565,11 @@ std::string postUpdateContext
       }
       else
       {
-        ceP->contextAttributeVector[aIx]->stringValue = aP->stringValue; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-        ceP->contextAttributeVector[aIx]->type  = aP->type;
+        ceP->contextAttributeVector[aIx]->stringValue    = aP->stringValue;
+        ceP->contextAttributeVector[aIx]->numberValue    = aP->numberValue;
+        ceP->contextAttributeVector[aIx]->boolValue      = aP->boolValue;
+        ceP->contextAttributeVector[aIx]->valueType      = aP->valueType;
+        ceP->contextAttributeVector[aIx]->compoundValueP = aP->compoundValueP == NULL ? NULL : aP->compoundValueP->clone();
       }
     }
   }
@@ -673,7 +701,7 @@ std::string postUpdateContext
     response.merge(&upcrs);
   }
 
-  answer = response.render(ciP, UpdateContext, "");
+  TIMED_RENDER(answer = response.render(ciP, UpdateContext, ""));
 
   //
   // Cleanup

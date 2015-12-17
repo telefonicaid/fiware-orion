@@ -27,6 +27,10 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
@@ -97,12 +101,12 @@ std::string getAttributeValueInstanceWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     response.statusCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
   }  
   else if ((entityTypeFromParam != "") && (entityTypeFromParam != entityTypeFromPath))
   {
     response.statusCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
   }
   else
   {
@@ -118,8 +122,8 @@ std::string getAttributeValueInstanceWithTypeAndId
     response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
+  TIMED_RENDER(answer = response.render(ciP, AttributeValueInstance, ""));
 
-  answer = response.render(ciP, AttributeValueInstance, "");
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
   response.release();

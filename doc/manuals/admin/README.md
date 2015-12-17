@@ -1,7 +1,7 @@
 
 # Administration Guide
 
-Orion Context Broker: Administration Guide. 
+Orion Context Broker: Installation & Administration Manual. 
 
 ## Table of Contents
 
@@ -14,6 +14,8 @@ Orion Context Broker: Administration Guide.
 * [Watchdog](watchdog.md)
 * [Rush relayer](rush.md)
 * [Management REST inferface](management_api.md)
+* [Statistics](statistics.md)
+* [Performance Tuning](perf_tuning.md)
 * [Data model](database_model.md)
 * [Sanity check procedures](sanity_check.md)
 * [Diagnosis procedures](diagnosis.md)

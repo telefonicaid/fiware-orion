@@ -43,9 +43,10 @@ struct ConnectionInfo;
 typedef struct UpdateContextAttributeRequest
 {
   std::string                type;                // Optional
-  std::string                contextValue;        // Mandatory
+  std::string                contextValue;        // Mandatory  
   MetadataVector             metadataVector;      // Optional
 
+  orion::ValueType           valueType;           // Type of value: either string or none
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
 

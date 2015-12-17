@@ -105,7 +105,6 @@ TEST(commonTag, valueTag)
    std::string      xml                     = "  <TAG>tag</TAG>\n";
    std::string      jsonComma               = "  \"TAG\" : \"tag\",\n";
    std::string      jsonNoComma             = "  \"TAG\" : \"tag\"\n";
-   std::string      jsonCommaAndAssociation = "  \"TAG\" : tag,\n";
    std::string      integerJsonNoComma      = "  \"TAG\" : \"8\"\n";
    std::string      stringJsonComma         = "  \"TAG\" : \"8\",\n";
    std::string      stringJsonNoComma       = "  \"TAG\" : \"8\"\n";
@@ -119,9 +118,6 @@ TEST(commonTag, valueTag)
 
    out = valueTag(indent, tag, value, JSON);
    EXPECT_EQ(jsonNoComma, out);   
-
-   out = valueTag(indent, tag, value, JSON, true, true);
-   EXPECT_EQ(jsonCommaAndAssociation, out);
 
    out = valueTag(indent, tag, 8, JSON, false);
    EXPECT_EQ(integerJsonNoComma, out);

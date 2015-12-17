@@ -1,4 +1,5 @@
 {
     "PATH_TO_SETTINGS_FOLDER":"settings",
-    "JENKINS": "false"
+    "UPDATE_PROPERTIES_JSON": "false",
+    "CB_RUNNING_MODE": "CLI"
 }

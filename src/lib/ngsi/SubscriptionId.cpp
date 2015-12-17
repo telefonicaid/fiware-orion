@@ -108,7 +108,7 @@ void SubscriptionId::set(const std::string& value)
 *
 * SubscriptionId::get -
 */
-std::string SubscriptionId::get(void)
+std::string SubscriptionId::get(void) const
 {
   return string;
 }
@@ -123,11 +123,13 @@ void SubscriptionId::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sSubscriptionId: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sSubscriptionId: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo SubscriptionId\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo SubscriptionId\n", indent.c_str()));
   }
 }
 

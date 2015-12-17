@@ -31,6 +31,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/EntityId.h"
@@ -77,7 +78,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     reqDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }
@@ -222,12 +223,12 @@ std::string dcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 */
 void dcarPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqDataP->dcar.res.present("");
 }
 

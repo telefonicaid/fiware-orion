@@ -26,8 +26,11 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/tag.h"
+#include "common/limits.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
 #include "orionTypes/EntityType.h"
@@ -38,9 +41,9 @@
 *
 * EntityType::EntityType -
 */
-EntityType::EntityType()
+EntityType::EntityType(): count(0)
 {
-  type = "";
+
 }
 
 
@@ -49,9 +52,9 @@ EntityType::EntityType()
 *
 * EntityType::EntityType -
 */
-EntityType::EntityType(std::string  _type)
+EntityType::EntityType(std::string _type): type(_type), count(0)
 {
-  type = _type;
+
 }
 
 
@@ -135,7 +138,7 @@ std::string EntityType::check
 */
 void EntityType::present(const std::string& indent)
 {
-  LM_F(("%stype:   %s", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent,("%stype:   %s", indent.c_str(), type.c_str()));
   contextAttributeVector.present(indent);
 }
 
@@ -159,7 +162,7 @@ void EntityType::release(void)
 std::string EntityType::toJson(ConnectionInfo* ciP)
 {
   std::string  out = "{";
-  char         countV[16];
+  char         countV[STRING_SIZE_FOR_INT];
 
   snprintf(countV, sizeof(countV), "%lld", count);
 

@@ -280,6 +280,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
@@ -287,10 +288,14 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
 
     /* Check results */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("boom!!", err);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- findOne(): { _id: ObjectId('51307b66f481db11bf860001') } "
+              "- exception: boom!!)", err);
 
-    /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */
     delete connectionMock;
 }
 
@@ -508,6 +513,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
@@ -515,13 +521,15 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
 
     /* Check results */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("collection: utest.entities - "
+    EXPECT_EQ("Database Error (collection: utest.entities - "
               "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T\" }, { _id.id: \"E2\", _id.type: \"T\" } ], _id.servicePath: { $in: [ /^/.*/, null ] }, "
               "attrNames: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
-              "exception: boom!!", err);    
+              "exception: boom!!)", err);
 
-    /* Release mock */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */
     delete connectionMock;
 }
 
@@ -631,7 +639,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object)
      * Note that we preserve the "actual" connection for future database checking */
     prepareDatabase();
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
@@ -639,22 +647,26 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
 
     /* Check results */
     EXPECT_EQ(SccReceiverInternalError, ms);
-    EXPECT_EQ("boom!!", err);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ $set: { lastNotification: 1360232700 }, $inc: { count: 1 } }> "
+              "- exception: boom!!)", err);
 
     /* Check that database is as expected (untouched) */   
 
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
 
-    BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    BSONObj sub2 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
+    BSONObj sub1 = connectionDb->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
+    BSONObj sub2 = connectionDb->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(20000000, sub1.getIntField("lastNotification"));
     EXPECT_EQ(20, sub1.getIntField("count"));
     EXPECT_EQ(30000000, sub2.getIntField("lastNotification"));
     EXPECT_EQ(30, sub2.getIntField("count"));
 
-    /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */    
     delete timerMock;
     delete connectionMock;
 }

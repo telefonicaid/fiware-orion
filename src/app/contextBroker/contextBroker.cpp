@@ -65,10 +65,14 @@
 #include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
+#include "cache/subCache.h"
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
 #include "parseArgs/paBuiltin.h"
+#include "parseArgs/paIsSet.h"
+#include "parseArgs/paUsage.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -84,10 +88,14 @@
 #include "common/globals.h"
 #include "common/Timer.h"
 #include "common/compileInfo.h"
+#include "common/SyncQOverflow.h"
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
+#include "ngsiNotify/QueueNotifier.h"
+#include "ngsiNotify/QueueWorkers.h"
+#include "ngsiNotify/senderThread.h"
 #include "serviceRoutines/logTraceTreat.h"
 #include "serviceRoutines/getEntityTypes.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
@@ -183,11 +191,13 @@
 #include "serviceRoutinesV2/getEntityType.h"
 #include "serviceRoutinesV2/getEntityAllTypes.h"
 #include "serviceRoutinesV2/patchEntity.h"
+#include "serviceRoutinesV2/getAllSubscriptions.h"
+#include "serviceRoutinesV2/getSubscription.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
+
+using namespace orion;
 
 
 
@@ -196,6 +206,14 @@
 * DB_NAME_MAX_LEN - max length of database name
 */
 #define DB_NAME_MAX_LEN  10
+
+
+
+/* ****************************************************************************
+*
+* Global vars
+*/
+static bool isFatherProcess = false;
 
 
 
@@ -212,9 +230,6 @@ char            dbName[64];
 char            user[64];
 char            pwd[64];
 char            pidPath[256];
-char            fwdHost[64];
-int             fwdPort;
-bool            ngsi9Only;
 bool            harakiri;
 bool            useOnlyIPv4;
 bool            useOnlyIPv6;
@@ -228,10 +243,21 @@ long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
-bool            mutexTimeStat;
 int             writeConcern;
-unsigned        cprForwardLimit;
+unsigned int    cprForwardLimit;
 int             subCacheInterval;
+char            notificationMode[64];
+int             notificationQueueSize;
+int             notificationThreadNum;
+bool            noCache;
+unsigned int    connectionMemory;
+unsigned int    maxConnections;
+unsigned int    reqPoolSize;
+bool            simulatedNotification;
+bool            statCounters;
+bool            statSemWait;
+bool            statTiming;
+bool            statNotifQueue;
 
 
 
@@ -243,42 +269,59 @@ int             subCacheInterval;
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
 
-#define FG_DESC             "don't start as daemon"
-#define LOCALIP_DESC        "IP to receive new connections"
-#define PORT_DESC           "port to receive new connections"
-#define PIDPATH_DESC        "pid file path"
-#define DBHOST_DESC         "database host"
-#define RPLSET_DESC         "replica set"
-#define DBUSER_DESC         "database user"
-#define DBPASSWORD_DESC     "database password"
-#define DB_DESC             "database name"
-#define DB_TMO_DESC         "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
-#define FWDHOST_DESC        "host for forwarding NGSI9 regs"
-#define FWDPORT_DESC        "port for forwarding NGSI9 regs"
-#define NGSI9_DESC          "run as Configuration Manager"
-#define USEIPV4_DESC        "use ip v4 only"
-#define USEIPV6_DESC        "use ip v6 only"
-#define HARAKIRI_DESC       "commits harakiri on request"
-#define HTTPS_DESC          "use the https 'protocol'"
-#define HTTPSKEYFILE_DESC   "private server key file (for https)"
-#define HTTPSCERTFILE_DESC  "certificate key file (for https)"
-#define RUSH_DESC           "rush host (IP:port)"
-#define MULTISERVICE_DESC   "service multi tenancy mode"
-#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
-#define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
-#define DBPS_DESC           "database connection pool size"
-#define MAX_L               900000
-#define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
-#define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
-#define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
+#define FG_DESC                "don't start as daemon"
+#define LOCALIP_DESC           "IP to receive new connections"
+#define PORT_DESC              "port to receive new connections"
+#define PIDPATH_DESC           "pid file path"
+#define DBHOST_DESC            "database host"
+#define RPLSET_DESC            "replica set"
+#define DBUSER_DESC            "database user"
+#define DBPASSWORD_DESC        "database password"
+#define DB_DESC                "database name"
+#define DB_TMO_DESC            "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
+#define USEIPV4_DESC           "use ip v4 only"
+#define USEIPV6_DESC           "use ip v6 only"
+#define HARAKIRI_DESC          "commits harakiri on request"
+#define HTTPS_DESC             "use the https 'protocol'"
+#define HTTPSKEYFILE_DESC      "private server key file (for https)"
+#define HTTPSCERTFILE_DESC     "certificate key file (for https)"
+#define RUSH_DESC              "rush host (IP:port)"
+#define MULTISERVICE_DESC      "service multi tenancy mode"
+#define ALLOWED_ORIGIN_DESC    "CORS allowed origin. use '__ALL' for any"
+#define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
+#define DBPS_DESC              "database connection pool size"
+#define MAX_L                  900000
+#define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
+#define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
-#define SUB_CACHE_IVAL_DESC "interval in seconds between calls to Subscription Cache refresh"
+#define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
+#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
+#define NO_CACHE               "disable subscription cache for lookups"
+#define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
+#define MAX_CONN_DESC          "maximum number of simultaneous connections"
+#define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+#define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
+#define STAT_COUNTERS          "enable request/notification counters statistics"
+#define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
+#define STAT_TIMING            "enable request-time-measuring statistics"
+#define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 
 
 
 /* ****************************************************************************
 *
-* Parse arguments
+* paArgs - option vector for the Parse CLI arguments library
+*
+* NOTE
+*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
+*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
+*
+*   MHD_OPTION_CONNECTION_LIMIT
+*     Maximum number of concurrent connections to accept.
+*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
+*     select minus four for stdin, stdout, stderr and the server socket). In other words,
+*    the default is as large as possible.
+*
 */
 PaArgument paArgs[] =
 {
@@ -295,9 +338,6 @@ PaArgument paArgs[] =
   { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
   { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
 
-  { "-fwdHost",       fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
-  { "-fwdPort",       &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
-  { "-ngsi9",         &ngsi9Only,    "CONFMAN",        PaBool,   PaOpt, false,      false,  true,  NGSI9_DESC         },
   { "-ipv4",          &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
   { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
   { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
@@ -310,16 +350,42 @@ PaArgument paArgs[] =
   { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
+  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },  
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
-  { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
-  { "-cprForwardLimit", &cprForwardLimit, "CPR_FORWARD_LIMIT", PaUInt, PaOpt, 1000, 0, UINT_MAX, CPR_FORWARD_LIMIT_DESC},
-  { "-subCacheIval",  &subCacheInterval, "SUBCACHE_IVAL", PaInt, PaOpt, 10,         0,     3600,  SUB_CACHE_IVAL_DESC },
+  { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
+  { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
+  { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
 
+  { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
+  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },
+
+  { "-statCounters",   &statCounters,   "STAT_COUNTERS",    PaBool, PaOpt, false, false, true, STAT_COUNTERS     },
+  { "-statSemWait",    &statSemWait,    "STAT_SEM_WAIT",    PaBool, PaOpt, false, false, true, STAT_SEM_WAIT     },
+  { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
+  { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
   PA_END_OF_ARGS
+};
+
+
+
+/* ****************************************************************************
+*
+* validLogLevels - to pass to parseArgs library for validation of --logLevel 
+*/
+static const char* validLogLevels[] = 
+{
+  "NONE",
+  "ERROR",
+  "WARNING",
+  "INFO",
+  "DEBUG",
+  NULL
 };
 
 
@@ -344,6 +410,7 @@ PaArgument paArgs[] =
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
+
 
 
 //
@@ -376,6 +443,13 @@ PaArgument paArgs[] =
 #define ETT_COMPS_V2            2, { "v2", "types" }
 #define ETT_COMPS_WORD          ""
 
+#define SSR                     SubscriptionsRequest
+#define SSR_COMPS_V2            2, { "v2", "subscriptions" }
+#define SSR_COMPS_WORD          ""
+
+#define ISR                     IndividualSubscriptionRequest
+#define ISR_COMPS_V2            3, { "v2", "subscriptions", "*" }
+#define ISR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -595,9 +669,11 @@ PaArgument paArgs[] =
 #define LOG2T_COMPS_V1     4, { "v1", "admin", "log", "traceLevel"       }
 #define LOG2TL_COMPS_V1    5, { "v1", "admin", "log", "traceLevel", "*"  }
 
-#define STAT               StatisticsRequest
-#define STAT_COMPS_V0      1, { "statistics"                             }
-#define STAT_COMPS_V1      3, { "v1", "admin", "statistics"              }
+#define STAT                 StatisticsRequest
+#define STAT_COMPS_V0        1, { "statistics"                             }
+#define STAT_COMPS_V1        3, { "v1", "admin", "statistics"              }
+#define STAT_CACHE_COMPS_V0  2, { "cache", "statistics"                    }
+#define STAT_CACHE_COMPS_V1  4, { "v1", "admin", "cache", "statistics"     }
 
 
 
@@ -650,7 +726,13 @@ PaArgument paArgs[] =
   { "*",      ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          getEntityAllTypes        }, \
-  { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }
+  { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
+  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
+  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetOnly           }
 
 
 
@@ -688,7 +770,7 @@ PaArgument paArgs[] =
 
 
 #define STANDARD_REQUESTS_V0                                                                             \
-  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
   { "*",      UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -704,7 +786,7 @@ PaArgument paArgs[] =
 
 
 #define STANDARD_REQUESTS_V1                                                                               \
-  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
   { "*",      UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -950,6 +1032,16 @@ PaArgument paArgs[] =
   { "DELETE", STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
   { "*",      STAT, STAT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }
 
+#define STAT_CACHE_REQUESTS_V0                                                       \
+  { "GET",    STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
+  { "DELETE", STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
+  { "*",      STAT, STAT_CACHE_COMPS_V0,    "",  badVerbGetDeleteOnly             }
+
+#define STAT_CACHE_REQUESTS_V1                                                       \
+  { "GET",    STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
+  { "DELETE", STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
+  { "*",      STAT, STAT_CACHE_COMPS_V1,    "",  badVerbGetDeleteOnly             }
+
 #define VERSION_REQUESTS                                                             \
   { "GET",    VERS, VERS_COMPS,    "",  versionTreat                              }, \
   { "*",      VERS, VERS_COMPS,    "",  badVerbGetOnly                            }
@@ -983,6 +1075,8 @@ PaArgument paArgs[] =
 *
 * This is the default service vector, that is used if the broker is started without the -ngsi9 option
 */
+
+
 RestService restServiceV[] =
 {
   API_V2,
@@ -1000,37 +1094,8 @@ RestService restServiceV[] =
   LOG_REQUESTS_V1,
   STAT_REQUESTS_V0,
   STAT_REQUESTS_V1,
-  VERSION_REQUESTS,
-
-#ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
-#endif
-
-  INVALID_REQUESTS,
-  END_REQUEST
-};
-
-
-
-/* ****************************************************************************
-*
-* restServiceNgsi9 - services for CONF MAN
-*
-* This service vector (configuration) is used if the broker is started as
-* CONFIGURATION MANAGER (using the -ngsi9 option) and without using the
-* -multiservice option.
-*/
-RestService restServiceNgsi9[] =
-{
-  REGISTRY_STANDARD_REQUESTS_V0,   // FIXME P10:  NCAR is added here, is that OK?
-  REGISTRY_STANDARD_REQUESTS_V1,
-  REGISTRY_CONVENIENCE_OPERATIONS_V0,
-  REGISTRY_CONVENIENCE_OPERATIONS_V1,
-  LOG_REQUESTS_V0,
-  LOG_REQUESTS_V1,
-  STAT_REQUESTS_V0,
-  STAT_REQUESTS_V1,
+  STAT_CACHE_REQUESTS_V0,
+  STAT_CACHE_REQUESTS_V1,
   VERSION_REQUESTS,
 
 #ifdef DEBUG
@@ -1102,6 +1167,7 @@ void daemonize(void)
   // Exiting father process
   if (pid > 0)
   {
+    isFatherProcess = true;
     exit(0);
   }
 
@@ -1182,12 +1248,19 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
-  if (subCache != NULL)
+  if (isFatherProcess)
   {
-    subCache->release();
-    delete subCache;
-    subCache = NULL;
+    isFatherProcess = false;
+    return;
   }
+
+#ifdef DEBUG
+  // Take mongo req-sem ?  
+  LM_T(LmtSubCache, ("try-taking req semaphore"));
+  reqSemTryToTake();
+  LM_T(LmtSubCache, ("calling subCacheDestroy"));
+  subCacheDestroy();
+#endif
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1220,35 +1293,43 @@ const char* description =
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multitenant)
+static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
-  /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
 
-  /* Create the subscription cache object */
-  subscriptionCacheInit(dbName);
+  Notifier* pNotifier = NULL;
 
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
+  /* If we use a queue for notifications, start worker threads */
+  if (strcmp(notificationMode, "threadpool") == 0)
   {
-    recoverOntimeIntervalThreads("");
-
-    if (multitenant)
+    QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
+    int rc = pQNotifier->start();
+    if (rc != 0)
     {
-      /* We get tenant database names and recover ontime interval threads on each one */
-      std::vector<std::string> orionDbs;
-      getOrionDatabases(orionDbs);
-      for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
-      {
-        std::string orionDb = orionDbs[ix];
-        std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-        recoverOntimeIntervalThreads(tenant);
-      }
+      LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
     }
+    pNotifier = pQNotifier;
   }
   else
   {
-    LM_I(("Running in NGSI9 only mode"));
+    pNotifier = new Notifier();
+  }
+
+  /* Set notifier object (singleton) */
+  setNotifier(pNotifier);
+
+  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
+  recoverOntimeIntervalThreads("");
+  if (multitenant)
+  {
+    /* We get tenant database names and recover ontime interval threads on each one */
+    std::vector<std::string> orionDbs;
+    getOrionDatabases(orionDbs);
+    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
+    {
+      std::string orionDb = orionDbs[ix];
+      std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+      recoverOntimeIntervalThreads(tenant);
+    }
   }
 
   httpRequestInit(httpTimeout);
@@ -1293,8 +1374,7 @@ static void mongoInit
   setEntitiesCollectionName(COL_ENTITIES);
   setRegistrationsCollectionName(COL_REGISTRATIONS);
   setSubscribeContextCollectionName(COL_CSUBS);
-  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
-  setAssociationsCollectionName(COL_ASSOCIATIONS);
+  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);  
 
   //
   // Note that index creation operation is idempotent.
@@ -1408,7 +1488,7 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 *
 * policyGet - 
 */
-static SemRequestType policyGet(std::string mutexPolicy)
+static SemOpType policyGet(std::string mutexPolicy)
 {
   if (mutexPolicy == "read")
   {
@@ -1433,16 +1513,67 @@ static SemRequestType policyGet(std::string mutexPolicy)
   return SemReadWriteOp;
 }
 
+/* ****************************************************************************
+*
+* notificationModeParse -
+*/
+static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
+{
+  char* mode;
+  char* first_colon;
+  int   flds_num;
 
+  errno = 0;
+  // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
+  // cppcheck-suppress invalidscanf
+  flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
+  if (errno != 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
+  }
+  if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
+  {
+    if (*pQueueSize <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid queue size (%d)", *pQueueSize));
+    }
+    if (*pNumThreads <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid number of threads (%d)",*pNumThreads));
+    }
+  }
+  else if (flds_num == 1 && strcmp(mode, "threadpool") == 0)
+  {
+    *pQueueSize = DEFAULT_NOTIF_QS;
+    *pNumThreads = DEFAULT_NOTIF_TN;
+  }
+  else if (!(
+             flds_num == 1 &&
+             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0)
+             ))
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
+  }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+  // get rid of params, if any, in notifModeArg
+  first_colon = strchr(notifModeArg, ':');
+  if (first_colon != NULL)
+  {
+    *first_colon = '\0';
+  }
+
+  free(mode);
+}
+
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
 */
 int main(int argC, char* argV[])
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+
+  lmTransactionReset();
 
   uint16_t       rushPort = 0;
   std::string    rushHost = "";
@@ -1473,25 +1604,54 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
+
+  std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
 
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
-  paConfig("man version",                   (void*) ORION_VERSION);
-  paConfig("log to screen",                 (void*) true);
+  paConfig("man version",                   (void*) versionString.c_str());
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
-  paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+  paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
-  paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
+  paConfig("valid log level strings",       validLogLevels);
+  paConfig("default value",                 "-logLevel", "WARNING");
+
+
+  //
+  // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
+  //
+  if (paIsSet(argC, argV, "-fg"))
+  {
+    paConfig("log to screen",                 (void*) true);
+    paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+  }
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  // Argument consistency check (--silent AND -logLevel)
+  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
+  {
+    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
+    paUsage();
+    exit(1);
+  }
+
+  // Argument consistency check (-t AND NOT -logLevel)
+  if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
+  {
+    printf("incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG\n");
+    paUsage();
+    exit(1);
+  }
 
 #ifdef DEBUG_develenv
   //
@@ -1505,8 +1665,6 @@ int main(int argC, char* argV[])
   {
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
-
-  LM_I(("Orion Context Broker is running"));
 
   if (useOnlyIPv6 && useOnlyIPv4)
   {
@@ -1525,6 +1683,10 @@ int main(int argC, char* argV[])
     }
   }
 
+  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
+  LM_I(("Orion Context Broker is running"));
+
   if (fg == false)
   {
     daemonize();
@@ -1542,7 +1704,7 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  RestService* rsP       = (ngsi9Only == true)? restServiceNgsi9 : restServiceV;
+  RestService* rsP       = restServiceV;
   IpVersion    ipVersion = IPDUAL;
 
   if (useOnlyIPv4)
@@ -1554,17 +1716,42 @@ int main(int argC, char* argV[])
     ipVersion = IPV6;
   }
 
+
+  //
+  //  Where everything begins
+  //
+
   pidFile();
-  SemRequestType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
-  contextBrokerInit(ngsi9Only, dbName, mtenant);
+  SemOpType policy = policyGet(reqMutexPolicy);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 
   if (rush[0] != 0)
   {
     rushParse(rush, &rushHost, &rushPort);
     LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
+  }
+
+  if (noCache == false)
+  {
+    subCacheInit();
+
+    if (subCacheInterval == 0)
+    {
+      // Populate subscription cache from database
+      subCacheRefresh();
+    }
+    else
+    {
+      // Populate subscription cache AND start sub-cache-refresh-thread
+      subCacheStart();
+    }
+  }
+  else
+  {
+    LM_T(LmtSubCache, ("noCache == false"));
   }
 
   if (https)
@@ -1584,28 +1771,24 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));
+  if (simulatedNotification)
+  {
+    LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
+  }
 
   while (1)
   {
-    if (subCacheInterval != 0)
-    {
-      sleep(subCacheInterval);
-      orion::subCache->refresh();
-    }
-    else
-    {
-      sleep(60);
-    }
+    sleep(60);
   }
 }

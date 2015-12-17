@@ -126,7 +126,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->upcr.attributeP = new ContextAttribute("", "", "");
-
+  reqDataP->upcr.attributeP->valueType = orion::ValueTypeNone;
   reqDataP->upcr.ceP->contextAttributeVector.push_back(reqDataP->upcr.attributeP);
 
   return "OK";
@@ -172,6 +172,7 @@ static std::string attributeValue(const std::string& path, const std::string& va
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute to: %p", parseDataP->lastContextAttribute));
 
   parseDataP->upcr.attributeP->stringValue = value;
+  parseDataP->upcr.attributeP->valueType = orion::ValueTypeString;
   LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->stringValue.c_str()));
 
   return "OK";
@@ -396,10 +397,10 @@ std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUpcrPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
 
   reqDataP->upcr.res.contextElementVector.present("");
   reqDataP->upcr.res.updateActionType.present("");

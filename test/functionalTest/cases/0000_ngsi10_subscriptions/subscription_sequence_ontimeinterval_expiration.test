@@ -68,10 +68,10 @@ valgrindSleep 2
 
 
 # Subscribe for 5 seconds (7 if VALGRIND)
-sleepTime=PT5S
+duration=PT5S
 if [ "$VALGRIND" == 1 ]
 then
-  sleepTime=PT7S
+  duration=PT6S
 fi
 
 
@@ -89,7 +89,7 @@ payload='<?xml version="1.0"?>
     <attribute>temperature</attribute>
   </attributeList>
   <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
-  <duration>'${sleepTime}'</duration>
+  <duration>'${duration}'</duration>
   <notifyConditions>
     <notifyCondition>
       <type>ONTIMEINTERVAL</type>
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 <subscribeContextResponse>
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>REGEX((PT5S|PT7S))</duration>
+    <duration>REGEX((PT5S|PT6S))</duration>
   </subscribeResponse>
 </subscribeContextResponse>
 

@@ -96,11 +96,15 @@ Date: REGEX(.*)
 
 03. POST /v2/entities to create E1/A2="", using json object
 ===========================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 69
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "description": "Entity already exists",
+    "error": "InvalidModification"
+}
 
 
 04. GET /v2/entities/E1 to see A2==""

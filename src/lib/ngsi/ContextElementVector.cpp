@@ -87,7 +87,7 @@ std::string ContextElementVector::render
 */
 void ContextElementVector::present(const std::string& indent)
 {
-  LM_F(("%lu ContextElements", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu ContextElements", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

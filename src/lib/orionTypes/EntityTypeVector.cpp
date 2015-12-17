@@ -114,7 +114,7 @@ std::string EntityTypeVector::check
 */
 void EntityTypeVector::present(const std::string& indent)
 {
-  LM_F(("%lu items in entityTypeVector", (uint64_t) vec.size()));
+  LM_T(LmtPresent,("%lu items in entityTypeVector", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

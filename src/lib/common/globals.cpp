@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 #include "serviceRoutines/versionTreat.h"     // For orionInit()
 #include "mongoBackend/MongoGlobal.h"         // For orionInit()
 #include "ngsiNotify/onTimeIntervalThread.h"  // For orionInit()
@@ -42,13 +43,15 @@
 *
 * Globals
 */
-static Timer*          timer             = NULL;
-int                    startTime         = -1;
-int                    statisticsTime    = -1;
-OrionExitFunction      orionExitFunction = NULL;
+static Timer*          timer                = NULL;
+int                    startTime            = -1;
+int                    statisticsTime       = -1;
+OrionExitFunction      orionExitFunction    = NULL;
 static struct timeval  logStartTime;
-bool                   semTimeStatistics = false;
-
+bool                   countersStatistics   = false;
+bool                   semWaitStatistics    = false;
+bool                   timingStatistics     = false;
+bool                   notifQueueStatistics = false;
 
 
 /* ****************************************************************************
@@ -91,7 +94,16 @@ void transactionIdSet(void)
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy, bool semTimeStat)
+void orionInit
+(
+  OrionExitFunction  exitFunction,
+  const char*        version,
+  SemOpType          reqPolicy,
+  bool               _countersStatistics,
+  bool               _semWaitStatistics,
+  bool               _timingStatistics,
+  bool               _notifQueueStatistics
+)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -100,7 +112,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestTy
   orionExitFunction = exitFunction;
 
   // Initialize the semaphore used by mongoBackend
-  semInit(reqPolicy, semTimeStat);
+  semInit(reqPolicy, _semWaitStatistics);
 
   // Set timer object (singleton)
   setTimer(new Timer());
@@ -115,6 +127,11 @@ void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestTy
   // Set start time and statisticsTime used by REST interface
   startTime      = logStartTime.tv_sec;
   statisticsTime = startTime;
+
+  // Set other flags related with statistics
+  countersStatistics   = _countersStatistics;
+  timingStatistics     = _timingStatistics;
+  notifQueueStatistics = _notifQueueStatistics;
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
 }
@@ -238,7 +255,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
 
   if (result == -1)
   {
-    LM_W(("Bad Input (ERROR in duration string)"));
+    alarmMgr.badInput(clientIp, "ERROR in duration string");
   }
 
   return result;
@@ -300,8 +317,10 @@ int64_t parse8601(const std::string& s)
 
       if ((value == 0) && (*start != '0'))
       {
+        std::string details = std::string("parse error for duration '") + start + "'";
+        alarmMgr.badInput(clientIp, details);
+
         free(toFree);
-        LM_W(("Bad Input (parse error for duration '%s')", start));
         return -1;
       }
 

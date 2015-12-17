@@ -39,7 +39,7 @@
 *
 * AttributeList::fill - 
 */
-void AttributeList::fill(std::vector<std::string> aVec)
+void AttributeList::fill(const std::vector<std::string>& aVec)
 {
   for (unsigned int ix = 0; ix < aVec.size(); ++ix)
   {
@@ -65,7 +65,9 @@ std::string AttributeList::render(Format format, const std::string& indent, bool
   out += startTag(indent, xmlTag, jsonTag, format, true, true, false);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, false, true);
+  {
+    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, true);
+  }
 
   out += endTag(indent, xmlTag, format, comma, true);
 
@@ -104,11 +106,13 @@ std::string AttributeList::check
 */
 void AttributeList::present(const std::string& indent)
 {
-  LM_F(("%sAttribute List",    indent.c_str()));
+  LM_T(LmtPresent, ("%sAttribute List",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    LM_F(("%s  %s", indent.c_str(), attributeV[ix].c_str()));
+    LM_T(LmtPresent, ("%s  %s", 
+		      indent.c_str(), 
+		      attributeV[ix].c_str()));
   }
 }
 
@@ -173,7 +177,7 @@ void AttributeList::push_back_if_absent(const std::string& attributeName)
 *
 * AttributeList::size - 
 */
-unsigned int AttributeList::size(void)
+unsigned int AttributeList::size(void) const
 {
   return attributeV.size();
 }
@@ -184,7 +188,7 @@ unsigned int AttributeList::size(void)
 *
 * AttributeList::get - 
 */
-std::string AttributeList::get(int ix)
+std::string AttributeList::get(int ix) const
 {
   return attributeV[ix];
 }
@@ -195,7 +199,7 @@ std::string AttributeList::get(int ix)
 *
 * AttributeList::clone - 
 */
-void AttributeList::clone(AttributeList& aList)
+void AttributeList::clone(const AttributeList& aList)
 {
   for (unsigned int ix = 0; ix < aList.size(); ++ix)
   {

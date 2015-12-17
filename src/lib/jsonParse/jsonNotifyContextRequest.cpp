@@ -148,6 +148,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->ncr.attributeP = new ContextAttribute();
+  parseDataP->ncr.attributeP->valueType = orion::ValueTypeNone;
   parseDataP->ncr.cerP->contextElement.contextAttributeVector.push_back(parseDataP->ncr.attributeP);
   return "OK";
 }
@@ -189,6 +190,7 @@ static std::string attributeValue(const std::string& path, const std::string& va
   LM_T(LmtParse, ("Got an attribute value: '%s'", value.c_str()));
   parseDataP->lastContextAttribute = parseDataP->ncr.attributeP;
   parseDataP->ncr.attributeP->stringValue = value;
+  parseDataP->ncr.attributeP->valueType = orion::ValueTypeString;
   return "OK";
 }
 
@@ -433,6 +435,6 @@ void jsonNcrPresent(ParseData* parseDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   parseDataP->ncr.res.present("");
 }

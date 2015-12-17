@@ -11,9 +11,12 @@
         "CB_FABRIC_RETRY": "3",
         "CB_FABRIC_SUDO": "false",
         "CB_LOG_FILE": "/var/log/contextBroker",
+        "CB_PID_FILE": "/var/run/contextBroker/contextBroker.pid",
         "CB_LOG_OWNER": "orion",
         "CB_LOG_MOD": "777",
-        "CB_EXTRA_OPS": "\"-multiservice\""
+        "CB_EXTRA_OPS": "\"-multiservice -t 0-255\"",
+        "CB_RETRIES": "30",
+        "CB_DELAY_TO_RETRY" : "1"
     },
 
    "mongo_env": {

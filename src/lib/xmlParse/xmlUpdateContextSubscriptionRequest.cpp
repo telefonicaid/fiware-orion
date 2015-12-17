@@ -101,7 +101,7 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  if (reqData->ucsr.scopeP->type == FIWARE_LOCATION || reqData->ucsr.scopeP->type == FIWARE_LOCATION)
+  if (reqData->ucsr.scopeP->type == FIWARE_LOCATION || reqData->ucsr.scopeP->type == FIWARE_LOCATION_DEPRECATED)
   {
     //
     // If the scope type is FIWARE_LOCATION (or its deprecated variant), then the value of this scope is stored in 'circle' or 'polygon'.
@@ -402,10 +402,10 @@ std::string ucsrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void ucsrPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqData->ucsr.res.present("");
 }
 

@@ -1,0 +1,464 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+All Tests Empty Payload
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities (without payload) 
+# 02. POST /v2/entities (empty payload) 
+# 03. POST /v2/entities to create E1/A1=0
+# 04. PUT /v2/entities/E1 (without payload)
+# 05. PUT /v2/entities/E1 (empty payload)
+# 06. PATCH /v2/entities/E1 (without payload)
+# 07. PATCH /v2/entities/E1 (empty payload)
+# 08. POST /v2/entities/E1 (without payload) 
+# 09. POST /v2/entities/E1 (empty payload) 
+# 10. PUT /v2/entities/E1/attrs (without payload)
+# 11. PUT /v2/entities/E1/attrs (empty payload)
+# 12. PATCH /v2/entities/E1/attrs (without payload)
+# 13. PATCH /v2/entities/E1/attrs (empty payload)
+#
+# 14. POST /v2/entities/E1/attrs (without payload) 
+# 15. POST /v2/entities/E1/attrs (empty payload) 
+# 16. PUT /v2/entities/E1/attrs/A1 (without payload)
+# 17. PUT /v2/entities/E1/attrs/A1 (empty payload)
+# 18. PATCH /v2/entities/E1/attrs/A1 (without payload)
+# 19. PATCH /v2/entities/E1/attrs/A1 (empty payload)
+
+
+echo "01. POST /v2/entities (without payload)"
+echo "======================================="
+payload=''
+orionCurl --url /v2/entities --payload "$payload" --json -X POST
+echo
+echo
+
+
+echo "02. POST /v2/entities (empty payload)"
+echo "====================================="
+payload='{}'
+orionCurl --url /v2/entities --payload "$payload" --json  -X POST
+echo
+echo
+
+
+echo "03. POST /v2/entities to create E1/A1=0"
+echo "======================================="
+payload='{ "id": "E1", "type": "T1", "A1": 0 }'
+orionCurl --url /v2/entities --payload "$payload" --json -X POST
+echo
+echo
+
+
+echo "04. PUT /v2/entities/E1 (without payload)"
+echo "========================================="
+payload=''
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT 
+echo
+echo
+
+
+echo "05. PUT /v2/entities/E1 (empty payload)"
+echo "======================================="
+payload='{}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT 
+echo
+echo
+
+
+echo "06. PATCH /v2/entities/E1 (without payload)"
+echo "==========================================="
+payload=''
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH 
+echo
+echo
+
+
+echo "07. PATCH /v2/entities/E1 (empty payload)"
+echo "==========================================="
+payload='{}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH 
+echo
+echo
+
+
+echo "08. POST /v2/entities/E1 (without payload)"
+echo "=========================================="
+payload=''
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X POST
+echo
+echo
+
+
+echo "09. POST /v2/entities/E1 (empty payload)"
+echo "========================================"
+payload='{}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json  -X POST
+echo
+echo
+
+
+echo "10. PUT /v2/entities/E1/attrs (without payload)"
+echo "==============================================="
+payload=''
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT 
+echo
+echo
+
+
+echo "11. PUT /v2/entities/E1/attrs (empty payload)"
+echo "============================================="
+payload='{}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT 
+echo
+echo
+
+
+echo "12. PATCH /v2/entities/E1/attrs (without payload)"
+echo "================================================="
+payload=''
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH 
+echo
+echo
+
+
+echo "13. PATCH /v2/entities/E1/attrs (empty payload)"
+echo "==============================================="
+payload='{}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH 
+echo
+echo
+
+
+echo "14. POST /v2/entities/E1/attrs (without payload)"
+echo "================================================"
+payload=''
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X POST
+echo
+echo
+
+
+echo "15. POST /v2/entities/E1/attrs (empty payload)"
+echo "=============================================="
+payload='{}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json  -X POST
+echo
+echo
+
+
+echo "16. PUT /v2/entities/E1/attrs/A1 (without payload)"
+echo "=================================================="
+payload=''
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT 
+echo
+echo
+
+
+echo "17. PUT /v2/entities/E1/attrs/A1 (empty payload)"
+echo "================================================"
+payload='{}'
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT 
+echo
+echo
+
+echo "17b. GET /v2/entities/E1/attrs/A1"
+echo "================================="
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo "18. PATCH /v2/entities/E1/attrs/A1 (without payload)"
+echo "===================================================="
+payload=''
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PATCH 
+echo
+echo
+
+
+echo "19. PATCH /v2/entities/E1/attrs/A1 (empty payload)"
+echo "=================================================="
+payload='{}'
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PATCH 
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities (without payload)
+=======================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+02. POST /v2/entities (empty payload)
+=====================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "no entity id specified",
+    "error": "BadRequest"
+}
+
+
+03. POST /v2/entities to create E1/A1=0
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+04. PUT /v2/entities/E1 (without payload)
+=========================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+05. PUT /v2/entities/E1 (empty payload)
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 52
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty payload",
+    "error": "BadRequest"
+}
+
+
+06. PATCH /v2/entities/E1 (without payload)
+===========================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+07. PATCH /v2/entities/E1 (empty payload)
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 52
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty payload",
+    "error": "BadRequest"
+}
+
+
+08. POST /v2/entities/E1 (without payload)
+==========================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+09. POST /v2/entities/E1 (empty payload)
+========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 52
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty payload",
+    "error": "BadRequest"
+}
+
+
+10. PUT /v2/entities/E1/attrs (without payload)
+===============================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+11. PUT /v2/entities/E1/attrs (empty payload)
+=============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+12. PATCH /v2/entities/E1/attrs (without payload)
+=================================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+13. PATCH /v2/entities/E1/attrs (empty payload)
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+14. POST /v2/entities/E1/attrs (without payload)
+================================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+15. POST /v2/entities/E1/attrs (empty payload)
+==============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+16. PUT /v2/entities/E1/attrs/A1 (without payload)
+==================================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+17. PUT /v2/entities/E1/attrs/A1 (empty payload)
+================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+17b. GET /v2/entities/E1/attrs/A1
+=================================
+HTTP/1.1 200 OK
+Content-Length: 40
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": null
+}
+
+
+18. PATCH /v2/entities/E1/attrs/A1 (without payload)
+====================================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+19. PATCH /v2/entities/E1/attrs/A1 (empty payload)
+==================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

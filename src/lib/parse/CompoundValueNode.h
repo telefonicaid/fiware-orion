@@ -119,6 +119,7 @@ class CompoundValueNode
     int                 _level = -1
   );
 
+
   CompoundValueNode
   (
     CompoundValueNode*  _container,
@@ -129,6 +130,7 @@ class CompoundValueNode
     orion::ValueType    _type,
     int                 _level = -1
   );
+
 
   CompoundValueNode
   (
@@ -173,7 +175,6 @@ class CompoundValueNode
   bool                isString(void);
 
   const char*         cname(void);
-  const char*         cvalue(void);
   const char*         cpath(void);
 };
 

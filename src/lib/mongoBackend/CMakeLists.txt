@@ -34,16 +34,22 @@ SET (SOURCES
     mongoSubscribeContext.cpp
     mongoUnsubscribeContext.cpp
     mongoUpdateContextSubscription.cpp
-    mongoOntimeintervalOperations.cpp
-    mongoConfManOperations.cpp
+    mongoOntimeintervalOperations.cpp    
     mongoNotifyContext.cpp
     mongoNotifyContextAvailability.cpp
     mongoQueryTypes.cpp
     TriggeredSubscription.cpp
     mongoConnectionPool.cpp
+    mongoGetSubscriptions.cpp
+    connectionOperations.cpp
+    mongoSubCache.cpp
+    safeMongo.cpp
+    dbFieldEncoding.cpp
+    compoundResponses.cpp
 )
 
 SET (HEADERS
+    dbConstants.h
     MongoGlobal.h
     MongoCommonUpdate.h
     MongoCommonRegister.h
@@ -57,13 +63,18 @@ SET (HEADERS
     mongoSubscribeContext.h
     mongoUnsubscribeContext.h
     mongoUpdateContextSubscription.h
-    mongoOntimeintervalOperations.h
-    mongoConfManOperations.h
+    mongoOntimeintervalOperations.h    
     mongoNotifyContext.h
     mongoNotifyContextAvailability.h
     mongoQueryTypes.h
     TriggeredSubscription.h
     mongoConnectionPool.h
+    mongoGetSubscriptions.h
+    connectionOperations.h
+    mongoSubCache.h
+    safeMongo.h
+    dbFieldEncoding.h
+    compoundResponses.h
 )
 
 

@@ -31,6 +31,9 @@
 #include "common/sem.h"
 
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
 
 using namespace mongo;
@@ -39,43 +42,24 @@ using namespace mongo;
 *
 * mongoGetContextSubscriptionInfo -
 */
-HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, ContextSubscriptionInfo* csiP, std::string* err, const std::string& tenant)
+HttpStatusCode mongoGetContextSubscriptionInfo
+(
+  const std::string&       subId,
+  ContextSubscriptionInfo* csiP,
+  std::string*             err,
+  const std::string&       tenant
+)
 {
-    DBClientBase* connection  = NULL;
     bool          reqSemTaken = false;
 
     reqSemTake(__FUNCTION__, "get info on subscriptions", SemReadOp, &reqSemTaken);
 
     LM_T(LmtMongo, ("Get Subscription Info operation"));
-
-    /* Search for the document */
-    LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(tenant).c_str(), subId.c_str()));
     BSONObj sub;
-    try
+    if (!collectionFindOne(getSubscribeContextCollectionName(tenant), BSON("_id" << OID(subId)), &sub, err))
     {
-        connection = getMongoConnection();
-        sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
-        releaseMongoConnection(connection);
-
-        LM_I(("Database Operation Successful (findOne _id: %s)", subId.c_str()));
-    }
-    catch (const DBException &e)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)", reqSemTaken);
-
-        *err = e.what();
-        LM_E(("Database Error ('findOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), e.what()));
-        return SccOk;
-    }
-    catch (...)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)", reqSemTaken);
-
-        *err = "Database error: received generic exception";
-        LM_E(("Database Error ('indOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), "generic exception"));
-        return SccOk;
+      reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)", reqSemTaken);
+      return SccOk;
     }
 
     LM_T(LmtMongo, ("retrieved subscription: %s", sub.toString().c_str()));
@@ -87,36 +71,31 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
     }
 
     /* Build the ContextSubcriptionInfo object */
-    std::vector<BSONElement> entities = sub.getField(CSUB_ENTITIES).Array();
+    std::vector<BSONElement> entities = getField(sub, CSUB_ENTITIES).Array();
     for (unsigned int ix = 0; ix < entities.size(); ++ix) {
         BSONObj entity = entities[ix].embeddedObject();
         EntityId* enP = new EntityId;
-        enP->id = STR_FIELD(entity, CSUB_ENTITY_ID);
-        enP->type = STR_FIELD(entity, CSUB_ENTITY_TYPE);
-        enP->isPattern = STR_FIELD(entity, CSUB_ENTITY_ISPATTERN);
+        enP->id = getStringField(entity, CSUB_ENTITY_ID);
+        enP->type = entity.hasField(CSUB_ENTITY_TYPE) ? getStringField(entity, CSUB_ENTITY_TYPE) : "";
+        enP->isPattern = getStringField(entity, CSUB_ENTITY_ISPATTERN);
         csiP->entityIdVector.push_back(enP);
 
     }
-    std::vector<BSONElement> attrs = sub.getField(CSUB_ATTRS).Array();
-    for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
-        csiP->attributeList.push_back(attrs[ix].String());
+
+    std::vector<BSONElement> attrs = getField(sub, CSUB_ATTRS).Array();
+    for (unsigned int ix = 0; ix < attrs.size(); ++ix)
+    {
+      csiP->attributeList.push_back(attrs[ix].String());
     }
 
-    BSONElement be = sub.getField(CSUB_EXPIRATION);
-    csiP->expiration = be.numberLong();
+    csiP->url              = getStringField(sub, CSUB_REFERENCE);
+    csiP->expiration       = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : -1;
+    csiP->lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
+    csiP->throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
 
-    csiP->url = STR_FIELD(sub, CSUB_REFERENCE);
-    if (sub.hasElement(CSUB_LASTNOTIFICATION)) {
-        csiP->lastNotification = sub.getIntField(CSUB_LASTNOTIFICATION);
-    }
-    else {
-        csiP->lastNotification = -1;
-    }
-
-    csiP->throttling = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-    std::string fmt = STR_FIELD(sub, CSUB_FORMAT);
+    std::string fmt = getStringField(sub, CSUB_FORMAT);
     csiP->format = sub.hasField(CSUB_FORMAT)? stringToFormat(fmt) : XML;
 
     reqSemGive(__FUNCTION__, "get info on subscriptions", reqSemTaken);
@@ -163,7 +142,6 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
 */
 HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::string* err, const std::string& tenant)
 {
-    DBClientBase*  connection  = NULL;
     bool           reqSemTaken = false;
 
     reqSemTake(__FUNCTION__, "update subscription notifications", SemWriteOp, &reqSemTaken);
@@ -172,41 +150,13 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
 
     /* Update the document */
     BSONObj query  = BSON("_id" << OID(subId));
-    BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
-
-    LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(tenant).c_str(),
-                    query.toString().c_str(),
-                    update.toString().c_str()));
-
-    try
+    BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << (long long) getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
+    if (!collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err))
     {
-        connection = getMongoConnection();
-        connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
-        releaseMongoConnection(connection);
-
-        LM_I(("Database Operation Successful (update: %s, query %s)", update.toString().c_str(), query.toString().c_str()));
-    }
-    catch (const DBException &e)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)", reqSemTaken);
-
-        *err = e.what();
-        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
-
-        return SccReceiverInternalError;
-    }
-    catch (...)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)", reqSemTaken);
-
-        *err = "Generic Exception";
-        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
-
-        return SccReceiverInternalError;
+      reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)", reqSemTaken);
+      return SccReceiverInternalError;
     }
 
     reqSemGive(__FUNCTION__, "update subscription notifications", reqSemTaken);
-    return SccOk;
+    return SccOk;    
 }

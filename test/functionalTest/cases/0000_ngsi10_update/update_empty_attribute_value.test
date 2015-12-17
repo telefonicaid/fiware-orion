@@ -1,0 +1,138 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Accept header fail
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1: Empty context attribute value for JSON"
+url=/v1/updateContext
+payload='{
+    "contextElements":
+    [
+        {
+            "type":"ZBarFilter",
+            "isPattern":false,
+            "id":"ZBarHandlerkla860agfdg4s5s2g7n4iiucrm",
+            "attributes":
+               [
+                  {
+                     "name":"CodeFoundEvent",
+                     "type":"CodeFoundEvent",
+                     "value":""
+                  }
+               ]
+        }
+    ],
+    "updateAction":"APPEND"
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+echo
+echo
+echo "2: Empty context attribute value for XML"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="T" isPattern="false">
+        <id>EObject</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>nnn</name>
+          <type>ttt</type>
+          <contextValue></contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
+--REGEXPECT--
+1: Empty context attribute value for JSON
+HTTP/1.1 200 OK
+Content-Length: 446
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "CodeFoundEvent",
+                        "type": "CodeFoundEvent",
+                        "value": ""
+                    }
+                ],
+                "id": "ZBarHandlerkla860agfdg4s5s2g7n4iiucrm",
+                "isPattern": "false",
+                "type": "ZBarFilter"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+2: Empty context attribute value for XML
+HTTP/1.1 200 OK
+Content-Length: 623
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T" isPattern="false">
+          <id>EObject</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>nnn</name>
+            <type>ttt</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

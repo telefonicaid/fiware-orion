@@ -31,8 +31,13 @@
 #include "common/tag.h"
 #include "common/Format.h"
 #include "common/string.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Scope.h"
 #include "parse/forbiddenChars.h"
+
+using namespace orion;
 
 
 
@@ -176,6 +181,7 @@ std::string Scope::check
   //
   if (forbiddenChars(type.c_str()))
   {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a scope");
     return "illegal chars in scope type";
   }
 
@@ -183,6 +189,7 @@ std::string Scope::check
   {
     if (forbiddenChars(value.c_str()))
     {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a scope");
       return "illegal chars in scope";
     }
   }
@@ -193,44 +200,47 @@ std::string Scope::check
     {
       if (circle.radiusString() == "0")
       {
-        LM_W(("Bad Input (radius zero for a circle area)"));
+        alarmMgr.badInput(clientIp, "radius zero for a circle area");
         return "Radius zero for a circle area";
       }
       else if (circle.radiusString() == "")
       {
-        LM_W(("Bad Input (missing radius for circle area)"));
+        alarmMgr.badInput(clientIp, "missing radius for circle area");
         return "Missing radius for circle area";
       }
       else if (circle.invertedString() != "")
       {
         if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
         {
-          LM_W(("Bad Input (bad value for circle/inverted: '%s')", circle.invertedString().c_str()));
+          std::string details = std::string("bad value for circle/inverted: '") + circle.invertedString() + "'"; 
+          alarmMgr.badInput(clientIp, details);
           return "bad value for circle/inverted: /" + circle.invertedString() + "/";
         }
       }
       else if (circle.center.latitudeString() == "")
       {
-        LM_W(("Bad Input (missing latitude for circle center)"));
+        alarmMgr.badInput(clientIp, "missing latitude for circle center");
         return "Missing latitude for circle center";
       }
       else if (circle.center.longitudeString() == "")
       {
-        LM_W(("Bad Input (missing longitude for circle center)"));
+        alarmMgr.badInput(clientIp, "missing longitude for circle center");
         return "Missing longitude for circle center";
       }
 
       float latitude = atof(circle.center.latitudeString().c_str());
       if ((latitude > 90) || (latitude < -90))
       {
-        LM_W(("Bad Input (invalid value for latitude (%s))", circle.center.latitudeString().c_str()));
+        std::string details = std::string("invalid value for latitude (") + circle.center.latitudeString() + ")";
+        alarmMgr.badInput(clientIp, details);
         return "invalid value for latitude";
       }
 
       float longitude = atof(circle.center.longitudeString().c_str());
       if ((longitude > 180) || (longitude < -180))
       {
-        LM_W(("Bad Input (invalid value for longitude: '%s')", circle.center.longitudeString().c_str()));
+        std::string details = std::string("invalid value for longitude: '") + circle.center.longitudeString() + "'";
+        alarmMgr.badInput(clientIp, details);
         return "invalid value for longitude";
       }
     }
@@ -238,14 +248,20 @@ std::string Scope::check
     {
       if (polygon.vertexList.size() < 3)
       {
-        LM_W(("Bad Input (too few vertices for a polygon (%d is less than three))", polygon.vertexList.size()));
+        char noOfV[STRING_SIZE_FOR_INT];
+
+        snprintf(noOfV, sizeof(noOfV), "%lu", polygon.vertexList.size());
+        std::string details = std::string("too few vertices for a polygon (") + noOfV + " is less than three)";
+        alarmMgr.badInput(clientIp, details);
+
         return "too few vertices for a polygon";
       }
       else if (polygon.invertedString() != "")
       {
         if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
         {
-          LM_W(("Bad Input (bad value for polygon/inverted: '%s')", polygon.invertedString().c_str()));
+          std::string details = std::string("bad value for polygon/inverted: '") + polygon.invertedString() + "'";
+          alarmMgr.badInput(clientIp, details);
           return "bad value for polygon/inverted: /" + polygon.invertedString() + "/";
         }
       }
@@ -254,27 +270,29 @@ std::string Scope::check
       {
         if (polygon.vertexList[ix]->latitudeString() == "")
         {
-          LM_W(("Bad Input (missing latitude value for polygon vertex)"));
+          alarmMgr.badInput(clientIp, "missing latitude value for polygon vertex");
           return std::string("missing latitude value for polygon vertex");
         }
 
         if (polygon.vertexList[ix]->longitudeString() == "")
         {
-          LM_W(("Bad Input (missing longitude value for polygon vertex)"));
+          alarmMgr.badInput(clientIp, "missing longitude value for polygon vertex");
           return std::string("missing longitude value for polygon vertex");
         }
 
         float latitude = atof(polygon.vertexList[ix]->latitudeString().c_str());
         if ((latitude > 90) || (latitude < -90))
         {
-          LM_W(("Bad Input (invalid value for latitude: '%s')", polygon.vertexList[ix]->latitudeString().c_str()));
+          std::string details = std::string("invalid value for latitude: '") + polygon.vertexList[ix]->latitudeString() + "'";
+          alarmMgr.badInput(clientIp, details);
           return "invalid value for latitude";
         }
 
         float longitude = atof(polygon.vertexList[ix]->longitudeString().c_str());
         if ((longitude > 180) || (longitude < -180))
         {
-          LM_W(("Bad Input (invalid value for longitude: '%s')", polygon.vertexList[ix]->longitudeString().c_str()));
+          std::string details = std::string("invalid value for longitude: '") + polygon.vertexList[ix]->longitudeString() + "'";
+          alarmMgr.badInput(clientIp, details);
           return "invalid value for longitude";
         }
       }
@@ -285,13 +303,13 @@ std::string Scope::check
   {
     if (type == "")
     {
-      LM_W(("Bad Input (empty type in restriction scope)"));
+      alarmMgr.badInput(clientIp, "empty type in restriction scope");
       return "Empty type in restriction scope";
     }
 
     if (value == "")
     {
-      LM_W(("Bad Input (empty value in restriction scope)"));
+      alarmMgr.badInput(clientIp, "empty value in restriction scope");
       return "Empty value in restriction scope";
     }
   }
@@ -309,40 +327,66 @@ void Scope::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    LM_F(("%sScope:",       indent.c_str()));
+    LM_T(LmtPresent, ("%sScope:",       indent.c_str()));
   }
   else
   {
-    LM_F(("%sScope %d:",    indent.c_str(), ix));
+    LM_T(LmtPresent, ("%sScope %d:",    
+		      indent.c_str(),
+		      ix));
   }
 
-  LM_F(("%s  Type:     '%s'", indent.c_str(), type.c_str()));
+  LM_T(LmtPresent, ("%s  Type:     '%s'", 
+		    indent.c_str(), 
+		    type.c_str()));
   
   if (oper != "")
-    LM_F(("%s  Operator: '%s'", indent.c_str(), oper.c_str()));
+    LM_T(LmtPresent, ("%s  Operator: '%s'", 
+		      indent.c_str(), 
+		      oper.c_str()));
 
   if (areaType == orion::NoArea)
   {
-    LM_F(("%s  Value:    %s", indent.c_str(), value.c_str()));
+    LM_T(LmtPresent, ("%s  Value:    %s", 
+		      indent.c_str(), 
+		      value.c_str()));
   }
   else if (areaType == orion::CircleType)
   {
-    LM_F(("%s  FI-WARE Circle Area:", indent.c_str()));
-    LM_F(("%s    Radius:     %s", indent.c_str(), circle.radiusString().c_str()));
-    LM_F(("%s    Longitude:  %s", indent.c_str(), circle.center.longitudeString().c_str()));
-    LM_F(("%s    Latitude:   %s", indent.c_str(), circle.center.latitudeString().c_str()));
-    LM_F(("%s    Inverted:   %s", indent.c_str(), circle.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s  FI-WARE Circle Area:", indent.c_str()));
+    LM_T(LmtPresent, ("%s    Radius:     %s", 
+	  indent.c_str(), 
+	  circle.radiusString().c_str()));
+    LM_T(LmtPresent, ("%s    Longitude:  %s", 
+	  indent.c_str(), 
+	  circle.center.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Latitude:   %s", 
+	  indent.c_str(), 
+	  circle.center.latitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", 
+	  indent.c_str(), 
+	  circle.invertedString().c_str()));
   }
   else if (areaType == orion::PolygonType)
   {
-    LM_F(("%s  FI-WARE Polygon Area (%lu vertices):", indent.c_str(), polygon.vertexList.size()));
+    LM_T(LmtPresent, ("%s  FI-WARE Polygon Area (%lu vertices):", 
+		      indent.c_str(), 
+		      polygon.vertexList.size()));
 
-    LM_F(("%s    Inverted:   %s", indent.c_str(), polygon.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", 
+		      indent.c_str(), 
+		      polygon.invertedString().c_str()));
     for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
     {
-      LM_F(("%s    Vertex %d", indent.c_str(), ix));
-      LM_F(("%s      Longitude:  %s", indent.c_str(), polygon.vertexList[ix]->longitudeString().c_str()));
-      LM_F(("%s      Latitude:   %s", indent.c_str(), polygon.vertexList[ix]->latitudeString().c_str()));
+      LM_T(LmtPresent, ("%s    Vertex %d", 
+			indent.c_str(), 
+			ix));
+      LM_T(LmtPresent, ("%s      Longitude:  %s", 
+			indent.c_str(), 
+			polygon.vertexList[ix]->longitudeString().c_str()));
+      LM_T(LmtPresent, ("%s      Latitude:   %s", 
+			indent.c_str(), 
+			polygon.vertexList[ix]->latitudeString().c_str()));
     }
   }
 }

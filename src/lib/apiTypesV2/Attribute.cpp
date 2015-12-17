@@ -30,19 +30,31 @@
 #include "ngsi10/QueryContextResponse.h"
 
 
+
 /* ****************************************************************************
 *
 * Attribute::render -
 */
 std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
+  bool         keyValues  = ciP->uriParamOptions["keyValues"];
+  std::string  renderMode = (keyValues == true)? "keyValues" : "normalized";
+
   if (pcontextAttribute)
   {
     std::string out;
 
-    out = "{";
-    out += pcontextAttribute->toJson(true, false, "normalized");  // param 1 'true' as it is the last and only element
-    out += "}";
+    if (requestType == EntityAttributeValueRequest)
+    {
+      out = pcontextAttribute->toJsonAsValue(ciP);
+    }
+    else
+    {
+      out = "{";
+      out += pcontextAttribute->toJson(true, false, renderMode, requestType);  // param 1 'true' as it is the last and only element
+      out += "}";
+    }
+
 
     if (comma)
     {
@@ -51,6 +63,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 
     return out;
   }
+
   return errorCode.toJson(true);
 }
 
