@@ -78,6 +78,8 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
     renderMode = "values";
   }
 
+  LM_W(("KZ: renderMode: '%s'", renderMode.c_str()));
+
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out = "{";

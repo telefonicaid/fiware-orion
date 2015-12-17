@@ -35,6 +35,7 @@ brokerStart CB
 # 03. GET /v2/entities/E1/a_bool/value
 # 04. GET /v2/entities/E1/a_compound/value
 # 05. GET /v2/entities/E1/a_number/value
+# 06. GET /v2/entities/E1/attrs/a_vector/value
 #
 
 echo "01. POST /v2/entities"
@@ -85,7 +86,7 @@ echo
 echo
 
 
-echo "05. GET /v2/entities/E1/attrs/a_vector/value"
+echo "06. GET /v2/entities/E1/attrs/a_vector/value"
 echo "============================================"
 orionCurl --url /v2/entities/E1/attrs/a_vector/value --out json
 echo
@@ -146,7 +147,7 @@ Date: REGEX(.*)
 }
 
 
-05. GET /v2/entities/E1/attrs/a_vector/value
+06. GET /v2/entities/E1/attrs/a_vector/value
 ============================================
 HTTP/1.1 200 OK
 Content-Length: 37

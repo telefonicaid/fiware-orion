@@ -82,9 +82,11 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
   {
     if (!isValidOption(vec[ix]))
     {
+      LM_W(("KZ: Invalid option '%s'", vec[ix].c_str()));
       return -1;
     }
 
+    LM_W(("KZ: Got option '%s'", vec[ix].c_str()));
     ciP->uriParamOptions[vec[ix]] = true;
   }
 

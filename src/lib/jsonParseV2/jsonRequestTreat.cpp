@@ -104,7 +104,9 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   default:
-    answer = "Request Treat function not implemented";
+    OrionError error(SccNotImplemented, "Request Treat function not implemented");
+    answer = error.render(ciP, "");
+    ciP->httpStatusCode = SccNotImplemented;
     break;
   }
   

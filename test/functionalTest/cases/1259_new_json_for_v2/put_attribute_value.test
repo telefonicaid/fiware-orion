@@ -322,18 +322,16 @@ Date: REGEX(.*)
 04. Check that A1 == "that JSON object"
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 65
+Content-Length: 58
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": {
-            "a": "1",
-            "b": 2.0
-        }
+    "metadata": {},
+    "type": null,
+    "value": {
+        "a": "1",
+        "b": 2.0
     }
 }
 
@@ -349,20 +347,18 @@ Date: REGEX(.*)
 06. Check that A1 == "that JSON array"
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 56
+Content-Length: 49
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": [
-            "a",
-            "b",
-            "c"
-        ]
-    }
+    "metadata": {},
+    "type": null,
+    "value": [
+        "a",
+        "b",
+        "c"
+    ]
 }
 
 
@@ -377,16 +373,14 @@ Date: REGEX(.*)
 08. Check that A1 == "STRING"
 =============================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 44
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": "STRING"
-    }
+    "metadata": {},
+    "type": null,
+    "value": "STRING"
 }
 
 
@@ -401,16 +395,14 @@ Date: REGEX(.*)
 10. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": true
-    }
+    "metadata": {},
+    "type": null,
+    "value": true
 }
 
 
@@ -425,16 +417,14 @@ Date: REGEX(.*)
 12. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": true
-    }
+    "metadata": {},
+    "type": null,
+    "value": true
 }
 
 
@@ -449,16 +439,14 @@ Date: REGEX(.*)
 14. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": true
-    }
+    "metadata": {},
+    "type": null,
+    "value": true
 }
 
 
@@ -473,16 +461,14 @@ Date: REGEX(.*)
 16. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 48
+Content-Length: 41
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": false
-    }
+    "metadata": {},
+    "type": null,
+    "value": false
 }
 
 
@@ -497,16 +483,14 @@ Date: REGEX(.*)
 18. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 48
+Content-Length: 41
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": false
-    }
+    "metadata": {},
+    "type": null,
+    "value": false
 }
 
 
@@ -521,16 +505,14 @@ Date: REGEX(.*)
 20. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 48
+Content-Length: 41
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": false
-    }
+    "metadata": {},
+    "type": null,
+    "value": false
 }
 
 
@@ -545,16 +527,14 @@ Date: REGEX(.*)
 22. Check that A1 == 123
 ========================
 HTTP/1.1 200 OK
-Content-Length: 53
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": 123.0
-    }
+    "metadata": {},
+    "type": null,
+    "value": 123.0
 }
 
 
@@ -569,16 +549,14 @@ Date: REGEX(.*)
 24. Check that A1 == 3.14
 =========================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 44
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": 3.14
-    }
+    "metadata": {},
+    "type": null,
+    "value": 3.14
 }
 
 
@@ -598,16 +576,14 @@ Date: REGEX(.*)
 26. Check that A1 == 3.14 still
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 44
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": 3.14
-    }
+    "metadata": {},
+    "type": null,
+    "value": 3.14
 }
 
 
@@ -622,16 +598,14 @@ Date: REGEX(.*)
 28. Check that A1 == -12.1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 53
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": -12.1
-    }
+    "metadata": {},
+    "type": null,
+    "value": -12.1
 }
 
 
@@ -646,16 +620,14 @@ Date: REGEX(.*)
 30. Check that A1 == 3.2e2
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 53
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": 320.0
-    }
+    "metadata": {},
+    "type": null,
+    "value": 320.0
 }
 
 

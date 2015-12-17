@@ -1019,6 +1019,7 @@ static int connectionTreat
 
     LM_T(LmtRequest, (""));
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
+    LM_W(("KZ: Serving request %s %s", method, url));
 
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;

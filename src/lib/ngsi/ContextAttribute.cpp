@@ -540,7 +540,7 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode)
+std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode, RequestType requestType)
 {
   std::string  out;
 
@@ -580,7 +580,10 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
   }
   else  // Render mode: normalized 
   {
-    out = JSON_STR(name) + ":{";
+    if (requestType != EntityAttributeResponse)
+    {
+      out = JSON_STR(name) + ":{";
+    }
 
     //
     // type
@@ -630,7 +633,10 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     //
     out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
 
-    out += "}";
+    if (requestType != EntityAttributeResponse)
+    {
+      out += "}";
+    }
   }
 
   if (!isLastElement)

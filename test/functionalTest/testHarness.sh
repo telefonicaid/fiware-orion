@@ -24,7 +24,7 @@
 
 date
 testStartTime=$(date +%s.%2N)
-MAX_TRIES=3
+MAX_TRIES=${CB_MAX_TRIES:-3}
 
 
 
@@ -596,7 +596,7 @@ function partExecute()
         echo -n "(ERROR 9 - .out and .regexpect differ) "
       fi
 
-      if [ "$CB_DIFF_TOOL" != "" ]
+      if [ "$CB_DIFF_TOOL" != "" ] && [ $__tryNo == $MAX_TRIES ]
       then
         endDate=$(date)
         if [ $blockDiff == 'yes' ]

@@ -47,6 +47,9 @@
 * Payload In:  None
 * Payload Out: Entity Attribute
 *
+* URI parameters:
+*   - options=keyValues,text
+* 
 */
 std::string getEntityAttributeValue
 (
@@ -54,11 +57,11 @@ std::string getEntityAttributeValue
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP
-  )
+)
 {
   std::string  answer;
   Attribute    attribute;
-  bool         text = (ciP->uriParam["options"] == "text" || ciP->outFormat == TEXT);
+  bool         text       = (ciP->uriParamOptions["options"] == true || ciP->outFormat == TEXT);
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
@@ -98,13 +101,15 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+      LM_W(("KZ: calling Attribute:render"));
+      TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeValueRequest, false));
     }
     else
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
         TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, ""));
+
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {
           answer = "{" + answer + "}";

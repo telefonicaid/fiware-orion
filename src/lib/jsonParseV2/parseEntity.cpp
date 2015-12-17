@@ -61,7 +61,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
     eP->errorCode.fill("ParseError", "Errors found in incoming JSON buffer");
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return eP->render(ciP, EntitiesRequest);
   }
 
@@ -116,17 +116,21 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
     alarmMgr.badInput(clientIp, "Empty payload");
-    eP->errorCode.fill("ParseError", "empty payload");
+    eP->errorCode.fill("BadRequest", "empty payload");
     ciP->httpStatusCode = SccBadRequest;
 
     return eP->render(ciP, EntitiesRequest);
   }
 
+  LM_W(("KZ: document is NOT empty: '%s'", ciP->payload));
 
+  int membersFound = 0;
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
+
+    ++membersFound;
 
     if (name == "id")
     {
@@ -184,13 +188,20 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     }
   }
 
+  if (membersFound == 0)
+  {
+    eP->errorCode.fill("BadRequest", "empty payload");
+    ciP->httpStatusCode = SccBadRequest;
+    return eP->render(ciP, EntitiesRequest);
+  }
+
   if (eidInURL == false)
   {
     if (eP->id == "")
     {
       alarmMgr.badInput(clientIp, "empty entity id");
       eP->errorCode.fill("BadRequest", "empty entity id");
-      ciP->httpStatusCode = SccBadRequest;;
+      ciP->httpStatusCode = SccBadRequest;
 
       return eP->render(ciP, EntitiesRequest);
     }

@@ -37,6 +37,7 @@ struct ConnectionInfo;
 */
 typedef enum RequestType
 {
+  NoRequest,
   RegisterContext = 1,
   DiscoverContextAvailability,
   SubscribeContextAvailability,

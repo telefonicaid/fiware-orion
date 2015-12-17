@@ -38,7 +38,11 @@ brokerStart CB
 
 echo "01. POST /v2/entities to create E1/A1=0"
 echo "======================================="
-payload='{ "id": "E1", "type": "T1", "A1": 0 }'
+payload='{
+  "id":   "E1",
+  "type": "T1",
+  "A1":   0
+}'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
@@ -78,16 +82,14 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1/attrs/A1
 ================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 44
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": 0.0
-    }
+    "metadata": {},
+    "type": null,
+    "value": 0.0
 }
 
 
@@ -107,15 +109,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": {
-        "metadata": {},
-        "type": null,
-        "value": ""
-    }
+    "metadata": {},
+    "type": null,
+    "value": null
 }
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-
