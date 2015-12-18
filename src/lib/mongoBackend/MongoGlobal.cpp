@@ -2418,7 +2418,7 @@ void cprLookupByAttribute
 
   for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
-    ContextRegistrationResponse* crr = crrV[crrIx](crrIx);
+    ContextRegistrationResponse* crr = crrV[crrIx];
 
     /* Is there a matching entity in the CRR? */
     for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
