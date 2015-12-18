@@ -11,7 +11,7 @@ Installing and setting up the environment from (almost :) the scratch
     to [SCL](https://www.softwarecollections.org).
   * Python pip 1.4.1 or higher
   * virtualenv 1.10.1 or higher
-  * Requeriments for the fabric Python module (installed in a next step), typically installed using: `yum install gcc python-devel`.
+  * Requeriments for the fabric Python module (installed in a next step), typically installed using: `yum install gcc python-devel`. [Fabric](http://www.fabfile.org) is a library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
 * Creating a virtual env (e.g. named orion_bh). Actually this step is optional (if you know what a virtual env is, then you would know which 
   steps to skip in order to avoid using it ;)
 
@@ -85,7 +85,7 @@ pip install --upgrade -r requirements.txt --allow-all-external
 (not inside the steps/ directory itself). We recommend use a generic environment.py and import it in the environment.py 
 file in the same directory that contains the “steps” directory.
 
-### Executing Tests:
+## Executing Tests:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
 - We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
@@ -137,7 +137,7 @@ file in the same directory that contains the “steps” directory.
        behave component/<path>/example.feature -t @test.row1.10       -- run only the row 10 with this tag     
 ```
 
-### Properties.json
+## Properties.json
 
  Properties used by Context Broker tests
 - context_broker_env
@@ -172,7 +172,7 @@ file in the same directory that contains the “steps” directory.
     * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
 
-### Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
+## Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
 
 In certain cases, could be useful to define actions before or/and after of the feature or/and each scenario. This help to read all pre or post actions into the feature. 
 
@@ -202,7 +202,7 @@ Feature: feature name...
 ```
 
 
-### Summary of Features and Scenarios
+## Summary of Features and Scenarios
 
 Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
 To activate/deactivate this summary, modify `SHOW_SUMMARY` variable (boolean).
@@ -229,12 +229,12 @@ Took 5m52.659s
 ```
 
 
-### Logs
+## Logs
 
 The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
 
-### Tests Suites Coverage (features):
+## Tests Suites Coverage (features):
 
 |       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
@@ -263,7 +263,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |**alarms folder**                            |  (pending)   |                                                                                             |
 
   
-### Hints:
+## Hints:
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
   - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
@@ -280,7 +280,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - It is possible to use the same value of the previous request in another request using this string `the same value of the previous request`.
      
 
-### Tags
+## Tags
 
 You can to use multiples tags in each scenario, possibles tags used:
 
