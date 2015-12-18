@@ -189,20 +189,8 @@ bool EntityIdVector::push_back_if_absent(EntityId* item)
 
 /* ****************************************************************************
 *
-* EntityIdVector::operator -
+* EntityIdVector::operator[] -
 */
- #if 0
-EntityId* EntityIdVector::operator[] (unsigned int ix)
-{
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-}
-#endif
-
 EntityId* EntityIdVector::operator[] (unsigned int ix) const
 {
    if (ix < vec.size())

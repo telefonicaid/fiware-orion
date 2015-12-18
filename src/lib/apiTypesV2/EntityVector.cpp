@@ -120,7 +120,7 @@ void EntityVector::push_back(Entity* item)
 
 /* ****************************************************************************
 *
-* EntityVector::operator -
+* EntityVector::operator[] -
 */
 Entity*  EntityVector::operator[] (unsigned int ix) const
 {

@@ -109,7 +109,7 @@ void ContextRegistrationVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::operator -
+* ContextRegistrationVector::operator[] -
 */
 ContextRegistration* ContextRegistrationVector::operator[](unsigned int ix) const
 {

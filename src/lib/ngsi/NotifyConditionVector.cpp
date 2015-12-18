@@ -120,7 +120,7 @@ void NotifyConditionVector::push_back(NotifyCondition* item)
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::operator -
+* NotifyConditionVector::operator[] -
 */
 NotifyCondition* NotifyConditionVector::operator[] (unsigned int ix) const
 {

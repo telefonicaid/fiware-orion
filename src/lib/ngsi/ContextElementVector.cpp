@@ -116,7 +116,7 @@ void ContextElementVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextElementVector::operator -
+* ContextElementVector::operator[] -
 */
 ContextElement* ContextElementVector::operator[](unsigned int ix) const
 {

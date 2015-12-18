@@ -215,7 +215,7 @@ void MetadataVector::push_back(Metadata* item)
 
 /* ****************************************************************************
 *
-* MetadataVector::operator -
+* MetadataVector::operator[] -
 */
 Metadata* MetadataVector::operator[] (unsigned int ix) const
 {

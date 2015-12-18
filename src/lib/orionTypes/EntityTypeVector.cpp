@@ -137,7 +137,7 @@ void EntityTypeVector::push_back(EntityType* item)
 
 /* ****************************************************************************
 *
-* EntityTypeVector::operator -
+* EntityTypeVector::operator[] -
 */
 EntityType* EntityTypeVector::operator[] (unsigned int ix) const
 {

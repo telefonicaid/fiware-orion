@@ -56,7 +56,6 @@ typedef struct EntityIdVector
   EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
   void         release();
 
-  //EntityId*    operator[](unsigned int ix);
   EntityId* operator[](unsigned int ix) const;
 
   std::string  check(RequestType         requestType,

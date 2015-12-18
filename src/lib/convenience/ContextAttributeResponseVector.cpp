@@ -119,7 +119,7 @@ void ContextAttributeResponseVector::push_back(ContextAttributeResponse* item)
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::operator - 
+* ContextAttributeResponseVector::operator[] -
 */
 ContextAttributeResponse* ContextAttributeResponseVector::operator[](unsigned int ix) const
 {
