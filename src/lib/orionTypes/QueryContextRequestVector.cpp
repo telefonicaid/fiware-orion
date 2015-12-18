@@ -79,6 +79,19 @@ unsigned int QueryContextRequestVector::size(void)
 }
 
 
+/* ****************************************************************************
+*
+* QueryContextRequestVector::operator[] -
+*/
+QueryContextRequest*  QueryContextRequestVector::operator[](unsigned int ix)
+{
+   if (ix < vec.size())
+   {
+      return vec[ix];
+   }
+   return NULL;
+}
+
 
 /* ****************************************************************************
 *
