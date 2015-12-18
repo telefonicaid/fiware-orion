@@ -4,7 +4,9 @@ Folder for acceptance tests of Orion Context Broker NGSIv2, implemented using [B
 
 ## Quick way
 
-Installing and setting up the environment from (almost :) the scratch
+Installing and setting up the environment from (almost :) the scratch in your local machine (running tests on Orion
+running in an external machine is advanced stuff, look to BB_FABRIC_USER, CB_FABRIC_PASS or CB_FABRIC_CERT and CB_FABRIC_SUDO
+parameters).
 
 * Ensure you have the following requirements in your system:
   * Python 2.7. If you need to keep different version of Python interpreter at the same time, you could have a look
