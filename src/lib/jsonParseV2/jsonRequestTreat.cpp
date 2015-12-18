@@ -105,7 +105,6 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   case SubscriptionsRequest:
-    //releaseP->XXX= &parseDataP->scr;
     answer = parseSubscription(ciP, parseDataP);
     if (answer != "OK")
     {

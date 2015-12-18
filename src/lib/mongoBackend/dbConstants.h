@@ -80,6 +80,7 @@
 #define CSUB_CONDITIONS_Q       "q"
 #define CSUB_CONDITIONS_GEO     "geometry"
 #define CSUB_CONDITIONS_COORDS  "coords"
+#define CSUB_CONDITIONS_GEOREL  "georel"
 
 #define CSUB_THROTTLING         "throttling"
 #define CSUB_ENTITIES           "entities"

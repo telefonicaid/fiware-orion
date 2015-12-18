@@ -151,7 +151,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?limit=1&options=count
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 460
 Content-Type: application/json
 X-Total-Count: 2
 Date: REGEX(.*)
@@ -179,6 +179,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },
@@ -202,7 +203,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions?limit=1&offset=1&options=count
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 396
 Content-Type: application/json
 X-Total-Count: 2
 Date: REGEX(.*)
@@ -227,6 +228,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },

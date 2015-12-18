@@ -84,7 +84,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 360
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -107,6 +107,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "",
                 "geometry": "",
+                "georel": "",
                 "q": "temperature>40"
             }
         },

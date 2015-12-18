@@ -21,7 +21,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 
 #include <algorithm>
@@ -73,7 +73,6 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     LM_E(("Bad Input (JSON Parse Error)"));
     OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
 
-
     return oe.render(ciP, "");
   }
 
@@ -87,7 +86,6 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     LM_W(("Bad Input (Empty payload)"));
     OrionError oe(SccBadRequest, "empty payload");
 
-
     return oe.render(ciP, "");
   }
 
@@ -95,7 +93,6 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
   {
     LM_W(("Bad Input (No subject specified"));
     OrionError oe(SccBadRequest, "no subject for subscription specified");
-
 
     return oe.render(ciP, "");
   }
@@ -105,7 +102,6 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     LM_W(("Bad Input (No notification specified"));
     OrionError oe(SccBadRequest, "no notitifcation for subscription specified");
 
-
     return oe.render(ciP, "");
   }
 
@@ -114,30 +110,29 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     LM_W(("Bad Input (No expires specified"));
     OrionError oe(SccBadRequest, "no expiration for subscription specified");
 
-
     return oe.render(ciP, "");
   }
 
   const Value& expires = document["expires"];
+
   if (!expires.IsString())
   {
     LM_W(("Bad Input (Expires is not an string"));
     OrionError oe(SccBadRequest, "expires is not an string");
 
-
     return oe.render(ciP, "");
   }
+
   int64_t eT= parse8601Time(expires.GetString());
+
   if (eT == -1)
   {
     LM_W(("Bad Input (Expires has an invalid format"));
     OrionError oe(SccBadRequest, "expires has a invalid format");
 
-
     return oe.render(ciP, "");
   }
   parseDataP->scr.res.expires = eT;
-
 
   const Value& notification = document["notification"];
   r = parseNotification(ciP, &parseDataP->scr.res, notification);
@@ -154,6 +149,14 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
   return "OK";
 }
 
+
+
+/* ****************************************************************************
+*
+* parseSubject -
+*
+*/
+
 static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject)
 {
 
@@ -166,7 +169,6 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
   {
     LM_W(("Bad Input (No subject entities specified"));
     OrionError oe(SccBadRequest, "no subject entities specified");
-
 
     return oe.render(ciP, "");
   }
@@ -196,13 +198,20 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
   return "";
 }
 
+
+
+/* ****************************************************************************
+*
+* parseEntitiesVector -
+*
+*/
+
 static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities)
 {
   if (!entities.IsArray())
   {
     LM_W(("Bad Input (subject entities is not an array"));
     OrionError oe(SccBadRequest, "subject entities is not an array");
-
 
     return oe.render(ciP, "");
   }
@@ -212,7 +221,6 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
     {
       LM_W(("Bad Input (subject entities element is not an object"));
       OrionError oe(SccBadRequest, "subject entities element is not an object");
-
 
       return oe.render(ciP, "");
     }
@@ -293,6 +301,14 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
 }
 
+
+
+/* ****************************************************************************
+*
+* parseNotification -
+*
+*/
+
 static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification)
 {
   // Callback
@@ -304,7 +320,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
       LM_W(("Bad Input (callback is not an string"));
       OrionError oe(SccBadRequest, "callback is not an string");
 
-
       return oe.render(ciP, "");
     }
     scrP->reference.string = callback.GetString();
@@ -313,7 +328,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
   {
     LM_W(("Bad Input (callback is missing"));
     OrionError oe(SccBadRequest, "callback is missing");
-
 
     return oe.render(ciP, "");
   }
@@ -324,12 +338,12 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     LM_W(("Bad Input (No notification attributes specified"));
     OrionError oe(SccBadRequest, "no notification attributes specified");
 
-
     return oe.render(ciP, "");
   }
   else
   {
     std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attributes"]);
+
     if (r != "") {
       return r;
     }
@@ -344,13 +358,20 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
       LM_W(("Bad Input (Throttling is not a int"));
       OrionError oe(SccBadRequest, "throttling is not an int");
 
-
       return oe.render(ciP, "");
     }
     scrP->throttling.seconds = throttling.GetInt64();
   }
   return "";
 }
+
+
+
+/* ****************************************************************************
+*
+* parseNotifyConditionVector -
+*
+*/
 
 static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditionVector* ncvP, const Value& condition)
 {
@@ -360,13 +381,14 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditi
     LM_W(("Bad Input (No condition attributes specified"));
     OrionError oe(SccBadRequest, "no condition attributes specified");
 
-
     return oe.render(ciP, "");
   }
   NotifyCondition* nc = new NotifyCondition();
   nc->type = ON_CHANGE_CONDITION;
   ncvP->push_back(nc);
+
   std::string r = parseAttributeList(ciP, &nc->condValueList.vec, condition["attributes"]);
+
   if (r != "") {
     return r;
   }
@@ -386,10 +408,22 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditi
     {
       nc->expression.coords = expression["coords"].GetString();
     }
+    if (expression.HasMember("georel"))
+    {
+      nc->expression.georel = expression["georel"].GetString();
+    }
   }
 
   return "";
 }
+
+
+
+/* ****************************************************************************
+*
+* parseAttributeList -
+*
+*/
 
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
 {
@@ -400,7 +434,6 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     LM_W(("Bad Input (attributes is not an array"));
     OrionError oe(SccBadRequest, "attributes is not an array");
 
-
     return oe.render(ciP, "");
   }
   for (Value::ConstValueIterator iter = attributes.Begin(); iter != attributes.End(); ++iter)
@@ -409,7 +442,6 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     {
       LM_W(("Bad Input (attributes element is not an string"));
       OrionError oe(SccBadRequest, "attributes element is not an string");
-
 
       return oe.render(ciP, "");
     }
