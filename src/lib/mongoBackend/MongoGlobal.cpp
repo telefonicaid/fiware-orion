@@ -1557,7 +1557,7 @@ bool entitiesQuery
 
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
-        EntityId* eP = cerV[jx]->contextElement.entityId;
+        EntityId* eP = &cerV->operator[](jx)->contextElement.entityId;
 
         if ((eP->id == enV[ix]->id) && (eP->type == enV[ix]->type))
         {
@@ -2423,7 +2423,7 @@ void cprLookupByAttribute
     /* Is there a matching entity in the CRR? */
     for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
     {
-      EntityId* regEn = crr->contextRegistration.entityIdVector[enIx]();
+      EntityId* regEn = crr->contextRegistration.entityIdVector[enIx];
 
       if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {

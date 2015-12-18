@@ -201,7 +201,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 {
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
-    ContextRegistration cr = crrV[ix])->contextRegistration;
+    ContextRegistration cr = crrV[ix]->contextRegistration;
 
     /* In the case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP)) {
