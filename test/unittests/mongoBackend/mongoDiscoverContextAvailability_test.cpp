@@ -386,73 +386,73 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   ASSERT_EQ(5,res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
   /* Context registration element #2 */
   ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-  EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-  EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector[0]->id);
+  EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
   EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
   /* Context registration element #3 */
   ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-  EXPECT_EQ("E3", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-  EXPECT_EQ("T3", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E3", RES_CNTX_REG(2).entityIdVector[0]->id);
+  EXPECT_EQ("T3", RES_CNTX_REG(2).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
   EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
   /* Context registration element #4 */
   ASSERT_EQ(1, RES_CNTX_REG(3).entityIdVector.size());
-  EXPECT_EQ("E4", RES_CNTX_REG(3).entityIdVector.get(0)->id);
-  EXPECT_EQ("T4", RES_CNTX_REG(3).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E4", RES_CNTX_REG(3).entityIdVector[0]->id);
+  EXPECT_EQ("T4", RES_CNTX_REG(3).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(3).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(3, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
   EXPECT_EQ("http://cr4.com", RES_CNTX_REG(3).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[3]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[3]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[3]->errorCode.details.size());
 
   /* Context registration element #5 */
   ASSERT_EQ(1, RES_CNTX_REG(4).entityIdVector.size());
-  EXPECT_EQ("E5", RES_CNTX_REG(4).entityIdVector.get(0)->id);
-  EXPECT_EQ("T5", RES_CNTX_REG(4).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(4).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E5", RES_CNTX_REG(4).entityIdVector[0]->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(4).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(4).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(4).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(4, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(4, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(4, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(4).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(4)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[4]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[4]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[4]->errorCode.details.size());
 
   utExit();
 }
@@ -489,73 +489,73 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   ASSERT_EQ(5,res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
   /* Context registration element #2 */
   ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-  EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-  EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector[0]->id);
+  EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
   EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
   /* Context registration element #3 */
   ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-  EXPECT_EQ("E3", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-  EXPECT_EQ("T3", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E3", RES_CNTX_REG(2).entityIdVector[0]->id);
+  EXPECT_EQ("T3", RES_CNTX_REG(2).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
   EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
   /* Context registration element #4 */
   ASSERT_EQ(1, RES_CNTX_REG(3).entityIdVector.size());
-  EXPECT_EQ("E4", RES_CNTX_REG(3).entityIdVector.get(0)->id);
-  EXPECT_EQ("T4", RES_CNTX_REG(3).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E4", RES_CNTX_REG(3).entityIdVector[0]->id);
+  EXPECT_EQ("T4", RES_CNTX_REG(3).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(3).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(3, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
   EXPECT_EQ("http://cr4.com", RES_CNTX_REG(3).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[3]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[3]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[3]->errorCode.details.size());
 
   /* Context registration element #5 */
   ASSERT_EQ(1, RES_CNTX_REG(4).entityIdVector.size());
-  EXPECT_EQ("E5", RES_CNTX_REG(4).entityIdVector.get(0)->id);
-  EXPECT_EQ("T5", RES_CNTX_REG(4).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(4).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E5", RES_CNTX_REG(4).entityIdVector[0]->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(4).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(4).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(4).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(4, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(4, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(4, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(4).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(4)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[4]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[4]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[4]->errorCode.details.size());
 
   utExit();
 }
@@ -594,17 +594,17 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   ASSERT_EQ(1,res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
   utExit();
 }
@@ -643,17 +643,17 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   ASSERT_EQ(1,res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[0]->id);
+  EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
   utExit();
 }
@@ -692,45 +692,45 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   ASSERT_EQ(3,res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T3", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[0]->id);
+  EXPECT_EQ("T3", RES_CNTX_REG(0).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr3.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
   /* Context registration element #2 */
   ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-  EXPECT_EQ("E4", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-  EXPECT_EQ("T4", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E4", RES_CNTX_REG(1).entityIdVector[0]->id);
+  EXPECT_EQ("T4", RES_CNTX_REG(1).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
   EXPECT_EQ("http://cr4.com", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
   /* Context registration element #3 */
   ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-  EXPECT_EQ("E5", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-  EXPECT_EQ("T5", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E5", RES_CNTX_REG(2).entityIdVector[0]->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(2).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(2).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
   utExit();
 }
@@ -805,17 +805,17 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   ASSERT_EQ(1,res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E5", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T5", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E5", RES_CNTX_REG(0).entityIdVector[0]->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(0).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
   ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
   utExit();
 }
@@ -889,9 +889,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   ASSERT_EQ(1,res.responseVector.size());
   /* Context registration element #1 */
   ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-  EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-  EXPECT_EQ("T3", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[0]->id);
+  EXPECT_EQ("T3", RES_CNTX_REG(0).entityIdVector[0]->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
   ASSERT_EQ(3, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
   EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -903,9 +903,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+  EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
   utExit();
 }
@@ -950,17 +950,17 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     ASSERT_EQ(1,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A4", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1012,31 +1012,31 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     ASSERT_EQ(2,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1084,9 +1084,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     ASSERT_EQ(1,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T3", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T3", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -1095,9 +1095,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(0, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 1)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1143,9 +1143,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     ASSERT_EQ(2,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(3, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -1157,14 +1157,14 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
@@ -1173,9 +1173,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1221,9 +1221,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     ASSERT_EQ(2,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(3, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -1235,14 +1235,14 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(1, 0)->type);
@@ -1251,9 +1251,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1387,12 +1387,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     ASSERT_EQ(3,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(1)->id);
-    EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector.get(1)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(1)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[1]->id);
+    EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector[1]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[1]->isPattern);
     ASSERT_EQ(3, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -1404,14 +1404,14 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
@@ -1420,14 +1420,14 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
     /* Context registration element #3 */
     ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-    EXPECT_EQ("T2", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector[0]->id);
+    EXPECT_EQ("T2", RES_CNTX_REG(2).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(2, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(2, 0)->type);
@@ -1436,9 +1436,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(2, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1487,30 +1487,30 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     ASSERT_EQ(2,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A3", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A4", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1562,46 +1562,46 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     ASSERT_EQ(3,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(1)->id);
-    EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector.get(1)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(1)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[1]->id);
+    EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector[1]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[1]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A3", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A4", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
     /* Context registration element #3 */
     ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-    EXPECT_EQ("T2", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector[0]->id);
+    EXPECT_EQ("T2", RES_CNTX_REG(2).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A3", RES_CNTX_REG_ATTR(2, 0)->name);
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1654,59 +1654,59 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     ASSERT_EQ(4,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T1", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Context registration element #3 */
     ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-    EXPECT_EQ("T1bis", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(2).entityIdVector[0]->id);
+    EXPECT_EQ("T1bis", RES_CNTX_REG(2).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(2, 0)->name);
     EXPECT_EQ("TA1bis", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr4.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
     /* Context registration element #4 */
     ASSERT_EQ(1, RES_CNTX_REG(3).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(3).entityIdVector.get(0)->id);
-    EXPECT_EQ(0, RES_CNTX_REG(3).entityIdVector.get(0)->type.size());
-    EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(3).entityIdVector[0]->id);
+    EXPECT_EQ(0, RES_CNTX_REG(3).entityIdVector[0]->type.size());
+    EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(3).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(3, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
     EXPECT_EQ("http://cr5.com", RES_CNTX_REG(3).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[3]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[3]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[3]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1756,12 +1756,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector.get(1)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(1)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(1)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
+    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[1]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[1]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[1]->isPattern);
     ASSERT_EQ(3, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -1773,15 +1773,15 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.reasonPhrase.c_str());
-    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.details.c_str());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_STREQ("", res.responseVector[0]->errorCode.reasonPhrase.c_str());
+    EXPECT_STREQ("", res.responseVector[0]->errorCode.details.c_str());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(1, 0)->type);
@@ -1790,9 +1790,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1838,17 +1838,17 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     ASSERT_EQ(1,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A4", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1895,34 +1895,34 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     ASSERT_EQ(2,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(1)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(1)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(1)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[1]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[1]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[1]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -1971,12 +1971,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     ASSERT_EQ(3,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(1)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(1)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(1)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[1]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[1]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[1]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -1985,37 +1985,37 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(0, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 1)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Context registration element #3 */
     ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(2).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(2, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -2109,62 +2109,62 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     ASSERT_EQ(4,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector.get(1)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(1)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(1)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
+    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[1]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[1]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[1]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Context registration element #3 */
     ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-    EXPECT_EQ("Tbis", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector[0]->id);
+    EXPECT_EQ("Tbis", RES_CNTX_REG(2).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(2, 0)->name);
     EXPECT_EQ("TA2bis", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr4.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
     /* Context registration element #4 */
     ASSERT_EQ(1, RES_CNTX_REG(3).entityIdVector.size());
-    EXPECT_EQ("E3", RES_CNTX_REG(3).entityIdVector.get(0)->id);
-    EXPECT_EQ(0, RES_CNTX_REG(3).entityIdVector.get(0)->type.size());
-    EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E3", RES_CNTX_REG(3).entityIdVector[0]->id);
+    EXPECT_EQ(0, RES_CNTX_REG(3).entityIdVector[0]->type.size());
+    EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector[0]->isPattern);
     ASSERT_EQ(1, RES_CNTX_REG(3).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(3, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(3, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(3, 0)->isDomain);
     EXPECT_EQ("http://cr5.com", RES_CNTX_REG(3).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[3]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[3]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[3]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;
@@ -2214,15 +2214,15 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     ASSERT_EQ(3,res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(3, RES_CNTX_REG(0).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(1)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(1)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(1)->isPattern);
-    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector.get(2)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector.get(2)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(2)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[0]->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector[1]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[1]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[1]->isPattern);
+    EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector[2]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(0).entityIdVector[2]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector[2]->isPattern);
     ASSERT_EQ(3, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
@@ -2234,15 +2234,15 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[0]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[0]->errorCode.details.size());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
-    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E1", RES_CNTX_REG(1).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(1).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
@@ -2251,15 +2251,15 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[1]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[1]->errorCode.details.size());
 
     /* Context registration element #3 */
     ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
-    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector.get(0)->id);
-    EXPECT_EQ("T", RES_CNTX_REG(2).entityIdVector.get(0)->type);
-    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+    EXPECT_EQ("E2", RES_CNTX_REG(2).entityIdVector[0]->id);
+    EXPECT_EQ("T", RES_CNTX_REG(2).entityIdVector[0]->type);
+    EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector[0]->isPattern);
     ASSERT_EQ(2, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
     EXPECT_EQ("A2", RES_CNTX_REG_ATTR(2, 0)->name);
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(2, 0)->type);
@@ -2268,9 +2268,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(2, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+    EXPECT_EQ(SccNone, res.responseVector[2]->errorCode.code);
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.responseVector[2]->errorCode.details.size());
 
     /* Delete mock */
     delete timerMock;

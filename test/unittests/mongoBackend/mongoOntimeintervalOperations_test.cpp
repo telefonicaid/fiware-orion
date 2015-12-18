@@ -215,16 +215,16 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_ok)
     /* Check results */
     EXPECT_EQ(SccOk, ms);
     ASSERT_EQ(2, csi.entityIdVector.size());
-    EXPECT_EQ("E1", csi.entityIdVector.get(0)->id);
-    EXPECT_EQ("T", csi.entityIdVector.get(0)->type);
-    EXPECT_EQ("false", csi.entityIdVector.get(0)->isPattern);
-    EXPECT_EQ("E2", csi.entityIdVector.get(1)->id);
-    EXPECT_EQ("T", csi.entityIdVector.get(1)->type);
-    EXPECT_EQ("false", csi.entityIdVector.get(1)->isPattern);
+    EXPECT_EQ("E1", csi.entityIdVector[0]->id);
+    EXPECT_EQ("T", csi.entityIdVector[0]->type);
+    EXPECT_EQ("false", csi.entityIdVector[0]->isPattern);
+    EXPECT_EQ("E2", csi.entityIdVector[1]->id);
+    EXPECT_EQ("T", csi.entityIdVector[1]->type);
+    EXPECT_EQ("false", csi.entityIdVector[1]->isPattern);
     ASSERT_EQ(3, csi.attributeList.size());
-    EXPECT_EQ("A1", csi.attributeList.get(0));
-    EXPECT_EQ("A3", csi.attributeList.get(1));
-    EXPECT_EQ("A4", csi.attributeList.get(2));
+    EXPECT_EQ("A1", csi.attributeList[0]);
+    EXPECT_EQ("A3", csi.attributeList[1]);
+    EXPECT_EQ("A4", csi.attributeList[2]);
     EXPECT_EQ(10000000, csi.expiration);
     EXPECT_EQ(20000000, csi.lastNotification);
     EXPECT_EQ("http://notify1.me", csi.url);
@@ -330,8 +330,8 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_ok)
     /* Check results */
     EXPECT_EQ(SccOk, ms);
     ASSERT_EQ(2, cerV.size());
-    ContextElementResponse cer0 = *cerV.get(0);
-    ContextElementResponse cer1 = *cerV.get(1);
+    ContextElementResponse cer0 = *cerV[0];
+    ContextElementResponse cer1 = *cerV[1];
     ContextAttribute ca0, ca1, ca2, ca3;
 
     /* Context Element Response #1 */
@@ -342,9 +342,9 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_ok)
     EXPECT_EQ("T", cer0.contextElement.entityId.type);
     EXPECT_EQ("false", cer0.contextElement.entityId.isPattern);
     ASSERT_EQ(3, cer0.contextElement.contextAttributeVector.size());
-    ca0 = *cer0.contextElement.contextAttributeVector.get(0);
-    ca1 = *cer0.contextElement.contextAttributeVector.get(1);
-    ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
+    ca0 = *cer0.contextElement.contextAttributeVector[0];
+    ca1 = *cer0.contextElement.contextAttributeVector[1];
+    ca2 = *cer0.contextElement.contextAttributeVector[2];
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("X", ca0.stringValue);
@@ -363,8 +363,8 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_ok)
     EXPECT_EQ("T", cer1.contextElement.entityId.type);
     EXPECT_EQ("false", cer1.contextElement.entityId.isPattern);
     ASSERT_EQ(2, cer1.contextElement.contextAttributeVector.size());
-    ca0 = *cer1.contextElement.contextAttributeVector.get(0);
-    ca1 = *cer1.contextElement.contextAttributeVector.get(1);
+    ca0 = *cer1.contextElement.contextAttributeVector[0];
+    ca1 = *cer1.contextElement.contextAttributeVector[1];
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("S", ca0.stringValue);
@@ -404,8 +404,8 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_pattern)
     /* Check results */
     EXPECT_EQ(SccOk, ms);
     ASSERT_EQ(2, cerV.size());
-    ContextElementResponse cer0 = *cerV.get(0);
-    ContextElementResponse cer1 = *cerV.get(1);
+    ContextElementResponse cer0 = *cerV[0];
+    ContextElementResponse cer1 = *cerV[1];
     ContextAttribute ca0, ca1, ca2, ca3;
 
     /* Context Element Response #1 */
@@ -416,9 +416,9 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_pattern)
     EXPECT_EQ("T", cer0.contextElement.entityId.type);
     EXPECT_EQ("false", cer0.contextElement.entityId.isPattern);
     ASSERT_EQ(3, cer0.contextElement.contextAttributeVector.size());
-    ca0 = *cer0.contextElement.contextAttributeVector.get(0);
-    ca1 = *cer0.contextElement.contextAttributeVector.get(1);
-    ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
+    ca0 = *cer0.contextElement.contextAttributeVector[0];
+    ca1 = *cer0.contextElement.contextAttributeVector[1];
+    ca2 = *cer0.contextElement.contextAttributeVector[2];
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("X", ca0.stringValue);
@@ -437,8 +437,8 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_pattern)
     EXPECT_EQ("T", cer1.contextElement.entityId.type);
     EXPECT_EQ("false", cer1.contextElement.entityId.isPattern);
     ASSERT_EQ(2, cer1.contextElement.contextAttributeVector.size());
-    ca0 = *cer1.contextElement.contextAttributeVector.get(0);
-    ca1 = *cer1.contextElement.contextAttributeVector.get(1);
+    ca0 = *cer1.contextElement.contextAttributeVector[0];
+    ca1 = *cer1.contextElement.contextAttributeVector[1];
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("S", ca0.stringValue);
