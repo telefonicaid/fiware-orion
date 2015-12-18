@@ -184,15 +184,6 @@ unsigned int AttributeList::size(void) const
 
 
 
-/* ****************************************************************************
-*
-* AttributeList::get - 
-*/
-std::string AttributeList::get(int ix) const
-{
-  return attributeV[ix];
-}
-
 
 
 /* ****************************************************************************

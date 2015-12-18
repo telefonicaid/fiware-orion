@@ -113,7 +113,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
   {
     LM_T(LmtClone, ("Copying metadata %d", mIx));
-    Metadata* mP = new Metadata(caP->metadataVector.get(mIx));
+    Metadata* mP = new Metadata(caP->metadataVector[mIx]);
     metadataVector.push_back(mP);
   }
 }
@@ -280,9 +280,9 @@ std::string ContextAttribute::getId(void) const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
-    if (metadataVector.get(ix)->name == NGSI_MD_ID)
+    if (metadataVector[ix]->name == NGSI_MD_ID)
     {
-      return metadataVector.get(ix)->stringValue;
+      return metadataVector[ix]->stringValue;
     }
   }
 
@@ -299,9 +299,9 @@ std::string ContextAttribute::getLocation() const
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
-    if (metadataVector.get(ix)->name == NGSI_MD_LOCATION)
+    if (metadataVector[ix]->name == NGSI_MD_LOCATION)
     {
-      return metadataVector.get(ix)->stringValue;
+      return metadataVector[ix]->stringValue;
     }
   }
 

@@ -44,8 +44,6 @@ typedef struct ScopeVector
   void         present(const std::string& indent);
   void         push_back(Scope* item);
   unsigned int size(void) const;
-  Scope*       get(int ix);
-  const Scope* get(int ix) const;
   void         release();
 
   std::string  check(RequestType         requestType,
@@ -53,12 +51,10 @@ typedef struct ScopeVector
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+  Scope* operator[](unsigned int ix) const;
 
-  Scope* operator[](unsigned int ix)
-  {
-    return (ix < vec.size())? vec[ix] : NULL;
-  }
 
+  
 } ScopeVector;
 
 #endif  // SRC_LIB_NGSI_SCOPEVECTOR_H_

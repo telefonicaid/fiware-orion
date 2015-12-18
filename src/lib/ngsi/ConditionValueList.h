@@ -47,7 +47,6 @@ typedef struct ConditionValueList
   void         release(void);
   void         push_back(const std::string& attributeName);
   unsigned int size(void);
-  std::string  get(int ix);
   void         fill(ConditionValueList& cvlP);
 
   std::string  check(RequestType         requestType,
@@ -56,15 +55,9 @@ typedef struct ConditionValueList
                      const std::string&  predetectedError,
                      int                 counter);
 
-  std::string operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  std::string operator[] (unsigned int ix) const;
 
-    return "";
-  }
+
 } ConditionValueList;
 
 #endif  // SRC_LIB_NGSI_CONDITIONVALUELIST_H_

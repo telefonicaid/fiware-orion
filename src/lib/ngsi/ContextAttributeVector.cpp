@@ -301,26 +301,6 @@ void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
   }
 }
 
-
-/* ****************************************************************************
-*
-* ContextAttributeVector::get - 
-*/
-ContextAttribute* ContextAttributeVector::get(unsigned int ix)
-{
-  if (ix < vec.size())
-    return vec[ix];
-  return NULL;
-}
-
-const ContextAttribute* ContextAttributeVector::get(unsigned int ix) const
-{
-  if (ix < vec.size())
-    return vec[ix];
-  return NULL;
-}
-
-
 /* ****************************************************************************
 *
 * ContextAttributeVector::size - 
@@ -328,6 +308,20 @@ const ContextAttribute* ContextAttributeVector::get(unsigned int ix) const
 unsigned int ContextAttributeVector::size(void) const
 {
   return vec.size();
+}
+
+
+/* ****************************************************************************
+*
+* ContextAttributeVector::operator[] -
+*/
+ContextAttribute*  ContextAttributeVector::operator[](unsigned int ix) const
+{
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+  return NULL;
 }
 
 
@@ -360,7 +354,7 @@ void ContextAttributeVector::fill(ContextAttributeVector* cavP)
 
   for (unsigned int ix = 0; ix < cavP->size(); ++ix)
   {
-    ContextAttribute* from = cavP->get(ix);
+    ContextAttribute* from = (*cavP)[ix];
     ContextAttribute* caP = new ContextAttribute(from);
 
     push_back(caP);

@@ -46,20 +46,12 @@ class EntityTypeVector
   void          present(const std::string& indent);
   void          push_back(EntityType* item);
   unsigned int  size(void);
-  EntityType*   get(unsigned int ix);
   void          release(void);
   std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);  
 
-  EntityType*   operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  EntityType*   operator[] (unsigned int ix) const;
 
-    return NULL;
-  }
 };
 
 #endif  // SRC_LIB_UTILITY_ENTITYTYPEVECTOR_H_

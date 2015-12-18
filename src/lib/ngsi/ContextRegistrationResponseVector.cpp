@@ -109,13 +109,17 @@ void ContextRegistrationResponseVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::get -
+* ContextRegistrationResponseVector::operator[] -
 */
-ContextRegistrationResponse* ContextRegistrationResponseVector::get(int ix)
+ContextRegistrationResponse*  ContextRegistrationResponseVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+    return NULL;
 }
-
+  
 
 
 /* ****************************************************************************
