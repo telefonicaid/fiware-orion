@@ -29,6 +29,9 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
+#include "logMsg/traceLevels.h"
 
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
@@ -103,10 +106,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   //
   if (parseUrl(qcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", qcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
+      
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
@@ -134,33 +141,39 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
-  std::string     out;
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
+  std::string     out;
+  int             r;
 
-  out = httpRequestSend(ip,
-                        port,
-                        protocol,
-                        verb,
-                        tenant,
-                        servicePath,
-                        ciP->httpHeaders.xauthToken,
-                        resource,
-                        mimeType,
-                        payload,
-                        false,
-                        true,
-                        mimeType);
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
 
-  if ((out == "error") || (out == ""))
+  r = httpRequestSend(ip,
+                      port,
+                      protocol,
+                      verb,
+                      tenant,
+                      servicePath,
+                      ciP->httpHeaders.xauthToken,
+                      resource,
+                      mimeType,
+                      payload,
+                      false,
+                      true,
+                      &out,
+                      mimeType);
+
+  if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
+    qcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding query");
     LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
 
 
   //

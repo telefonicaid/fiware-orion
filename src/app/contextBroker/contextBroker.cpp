@@ -72,6 +72,7 @@
 #include "parseArgs/paConfig.h"
 #include "parseArgs/paBuiltin.h"
 #include "parseArgs/paIsSet.h"
+#include "parseArgs/paUsage.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -268,7 +269,7 @@ bool            statNotifQueue;
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
 
-#define FG_DESC               "don't start as daemon"
+#define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
 #define PORT_DESC              "port to receive new connections"
 #define PIDPATH_DESC           "pid file path"
@@ -300,12 +301,10 @@ bool            statNotifQueue;
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
-
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
-#define STAT_NOTIF_QUEUE       "enalle thread pool notifications queue statistics"
-
+#define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 
 
 
@@ -356,7 +355,7 @@ PaArgument paArgs[] =
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 0,              0,     3600,     SUB_CACHE_IVAL_DESC    },
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
   { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
   { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
@@ -371,6 +370,22 @@ PaArgument paArgs[] =
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
   PA_END_OF_ARGS
+};
+
+
+
+/* ****************************************************************************
+*
+* validLogLevels - to pass to parseArgs library for validation of --logLevel 
+*/
+static const char* validLogLevels[] = 
+{
+  "NONE",
+  "ERROR",
+  "WARNING",
+  "INFO",
+  "DEBUG",
+  NULL
 };
 
 
@@ -395,6 +410,7 @@ PaArgument paArgs[] =
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
+
 
 
 //
@@ -1549,14 +1565,15 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
 */
 int main(int argC, char* argV[])
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+
+  lmTransactionReset();
 
   uint16_t       rushPort = 0;
   std::string    rushHost = "";
@@ -1604,6 +1621,8 @@ int main(int argC, char* argV[])
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
+  paConfig("valid log level strings",       validLogLevels);
+  paConfig("default value",                 "-logLevel", "WARNING");
 
 
   //
@@ -1617,6 +1636,22 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  // Argument consistency check (--silent AND -logLevel)
+  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
+  {
+    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
+    paUsage();
+    exit(1);
+  }
+
+  // Argument consistency check (-t AND NOT -logLevel)
+  if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
+  {
+    printf("incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG\n");
+    paUsage();
+    exit(1);
+  }
 
 #ifdef DEBUG_develenv
   //
@@ -1650,7 +1685,6 @@ int main(int argC, char* argV[])
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
   LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
-
   LM_I(("Orion Context Broker is running"));
 
   if (fg == false)

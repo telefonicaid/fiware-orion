@@ -22,10 +22,13 @@
 *
 * Author: Orion dev team
 */
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/string.h"
-#include "ngsiNotify/QueueStatistics.h"
+#include "alarmMgr/alarmMgr.h"
 
+#include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueNotifier.h"
 
 
@@ -39,6 +42,8 @@ QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize)
   LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
 }
 
+
+
 /* ****************************************************************************
 *
 * QueueNotifier::start -
@@ -47,6 +52,8 @@ int QueueNotifier::start()
 {
   return workers.start();
 }
+
+
 
 /* ****************************************************************************
 *
@@ -78,6 +85,8 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
     spathList += eP->servicePath;
     atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
   }
+
+  //
   // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
   // request not having that header. However, this causes as side-effect that a
   // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
@@ -85,6 +94,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
   // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
   // this FIXME will be removed (and all the test harness adjusted, if needed)
+  //
   if (!atLeastOneNotDefault)
   {
     spathList = "";
@@ -101,7 +111,9 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
 
   if (!parseUrl(url, host, port, uriPath, protocol))
   {
-    LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+    std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + url + "'";
+    alarmMgr.badInput(clientIp, details);
+
     return;
   }
 
@@ -123,13 +135,17 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
   clock_gettime(CLOCK_REALTIME, &params->timeStamp);
+
   bool enqueued = queue.try_push(params);
   if (!enqueued)
   {
    QueueStatistics::incReject();
+
    LM_E(("Runtime Error (notification queue is full)"));
    delete params;
+
    return;
   }
+
   QueueStatistics::incIn();
 }

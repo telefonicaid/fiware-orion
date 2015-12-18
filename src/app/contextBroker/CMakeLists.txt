@@ -45,6 +45,7 @@ SET (STATIC_LIBS
     parse
     orionTypes
     common
+    alarmMgr
     lm
     pa
     curl

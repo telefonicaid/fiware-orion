@@ -1,12 +1,12 @@
 ## Statistics
 
-**Warning**: This section of the manual is yet work in progress, so maybe the current Orion implementation
-is not fully aligned with it. In addition, take into account that statistics API is by the moment
+**Warning**: This section of the manual is yet work in progress, so the current Orion implementation
+may not be fully aligned with it. In addition, take into account that statistics API is by the moment
 in beta status, so changes in the name of the different counters or the JSON structure could take
 place in the future.
 
-Orion Context Broker provides a set of statistics (mainly aimed at testing and debugging) through the
-`GET /statistics` and `GET /cache/statistics` operations. These operations only support JSON encoding.
+Orion Context Broker provides a set of statistics (mainly for testing and debugging) through the
+`GET /statistics` and `GET /cache/statistics` operations. These operations support JSON encoding only.
 
 For now, statistics accuracy is not 100% guaranteed under high load conditions. Atomic
 counters are not used in all places, so race conditions on requests running at the same time could
@@ -28,10 +28,10 @@ The statistics JSON is composed of four conditional blocks and two unconditional
 }
 ```
 
-Conditional blocks are enabled using `-statXXX` flags at command line (in the future, maybe
-we will develop the possibility to activate/deactivate them using the [management API](management_api.md).
+Conditional blocks are enabled using `-statXXX` flags at command line (in the future, we may
+implement the possibility to activate/deactivate them using the [management API](management_api.md).
 This is due to two reasons. First, to avoid too verbose statistics output for users that are not interested
-in want some parts. Second, measuring some of the information might involve a performance penalty
+in some parts. Second, measuring some of the information might involve a performance penalty
 (in general, to measure time always needs additional system calls) so explicit activation is desirable.
 
 * "counters" (enabled with the `-statCounters`)
@@ -75,7 +75,7 @@ If a particular request type has not been received, its corresponding counter is
 ### SemWait block
 
 The SemWait block provides accumulates waiting time for the main internal semaphores. It can be useful to detect bottlenecks, e.g.
-if your DB is too slow or your DB pool is undersized, then `dbConnectionPool` time would be anormally high
+if your DB is too slow or your DB pool is undersized, then `dbConnectionPool` time would be abnormally high
 (see section on [performance tunning](perf_tuning.md) for more details).
 
 ```
@@ -86,7 +86,7 @@ if your DB is too slow or your DB pool is undersized, then `dbConnectionPool` ti
     "dbConnectionPool" : 2.917002794,
     "transaction" : 0.567478849,
     "subCache" : 0.784979145,
-    "curlContext" : 0.000000000,
+    "connectionContext" : 0.000000000,
     "timeStat" : 0.124000605
   },
   ...
@@ -108,7 +108,7 @@ Provides timing information, i.e. the time that CB passes executing in different
       "mongoWriteWait": 259.347915990,
       "mongoCommandWait": 0.514811318,
       "render": 108.162782114,
-      "total": 186476.593504743,
+      "total": 6476.593504743,
       "xmlParse": 44.490766332
      },
     "last": {
@@ -126,9 +126,9 @@ Provides timing information, i.e. the time that CB passes executing in different
 
 The block includes two main sections:
 
-* `last`: times corresponding to the last request processed. If that request didn't use a particular module
+* `last`: times corresponding to the last request processed. If the last request didn't use a particular module
   (e.g. a GET request doesn't use parsing), then that counter is 0 and it is not shown.
-* `accumulated`: accumulated time corresponding to all requests.
+* `accumulated`: accumulated time corresponding to all requests since the broker was started.
 
 The particular counters are as follows:
 
@@ -145,8 +145,8 @@ The particular counters are as follows:
   to get the results cursor is taken into account, but not the time to process cursors results (which
   is time that belongs to mongoBackend counters).
 
-Times are measured from the point in time a particular thread request starts using a module uptil it finishes using it. Thus, if the
-thread is stopped for some reason (e.g. the kernel decides to give priority to another thread based on its
+Times are measured from the point in time in which a particular thread request starts using a module until it finishes using it.
+Thus, if the thread is stopped for some reason (e.g. the kernel decides to give priority to another thread based on its
 scheculing policy) the time that the thread was sleeping, waiting to execute again is included in the measurement and thus, the measurement is not accurate. That is why we say *pseudo* selt/end-to-end time. However,
 under low load conditions this situation is not expected to have a significant impact.
 
@@ -159,6 +159,7 @@ it is only shown if `-notificationMode` is set to threadpool.
 {
   ...
   "notifQueue" : {
+    "avgTimeInQueue": 0.000077437,
     "in" : 579619,
     "out" : 579619,
     "reject" : 0,
@@ -173,6 +174,7 @@ it is only shown if `-notificationMode` is set to threadpool.
 
 The particular counters are as follows:
 
+* `avgTimeInQueue`: average time that each notification waits in the queue (equal to `timeInQueue` divided by `out`)
 * `in`: number of notifications that get into the queue
 * `out`: numbers of notifications that get out of the queue
 * `reject`: number of notifications that get rejected, due to queue full. In other words, notifications that are not even
@@ -200,13 +202,13 @@ with the current number of cached items.
 ```
 
 Note that the "ids" field could get really really long. To avoid a too long response, the broker sets a limit of the size of the 'ids' field.
-If the length would be longer than that limit, instead of presenting the complete list of subscription-identifiers, the text
+If the length is longer than that limit, instead of presenting the complete list of subscription-identifiers, the text
    "too many subscriptions"
 is presented instead.
 
 ## Reseting statistics
 
-To reset the statistics counters (note that fields that come from the state of the system are not reset, e.g. subs cache items or notification queue size) just invoke the DELETE operation on the statistics URL:
+To reset the statistics counters (note that the fields that come from the state of the system are not reset, e.g. subs cache items or notification queue size) just invoke the DELETE operation on the statistics URL:
 
 * DELETE /statistics
 * DELETE /cache/statistics

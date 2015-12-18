@@ -46,6 +46,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
@@ -164,7 +165,9 @@ static bool treat
     {
       if (forbiddenChars(value.c_str()) == true)
       {
-        LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
+        std::string details = std::string("found a forbidden value in '") + value + "'";
+          
+        alarmMgr.badInput(clientIp, details);
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return false;
@@ -274,7 +277,9 @@ void eatCompound
     {
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
-        LM_W(("Bad Input (found a forbidden value in compound '%s')", nodeValue.c_str()));
+        std::string details = std::string("found a forbidden value in compound '") + nodeValue + "'";
+        alarmMgr.badInput(clientIp, details);
+
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return;
@@ -388,9 +393,10 @@ static std::string jsonParse
     if (ciP->answer == "")
     {
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
+      alarmMgr.badInput(clientIp, ciP->answer);
     }
 
-    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+    alarmMgr.badInput(clientIp, ciP->answer);
     return ciP->answer;
   }
 
@@ -405,13 +411,16 @@ static std::string jsonParse
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);
     if (out != "OK")
     {
-      LM_W(("Bad Input (JSON parse error: '%s')", out.c_str()));
+      std::string details = std::string("JSON parse error: '") + out + "'";
+      alarmMgr.badInput(clientIp, details);
       return out;
     }
   }
 
   return "OK";
 }
+
+
 
 /* ****************************************************************************
 *
@@ -449,7 +458,8 @@ std::string jsonParse
     std::string res = jsonParse(ciP, v, path, parseVector, parseDataP);
     if (res != "OK")
     {
-      LM_W(("Bad Input (JSON Parse error: '%s')", res.c_str()));
+      std::string details = std::string("JSON parse error: '") + res + "'";
+      alarmMgr.badInput(clientIp, details);
       return res;
     }
   }

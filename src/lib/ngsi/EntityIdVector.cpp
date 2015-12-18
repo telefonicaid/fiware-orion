@@ -31,8 +31,11 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Request.h"
+
 
 
 /* ****************************************************************************
@@ -81,7 +84,7 @@ std::string EntityIdVector::check
   {
     if (vec.size() == 0)
     {
-      LM_W(("Bad Input (mandatory entity list missing)"));
+      alarmMgr.badInput(clientIp, "mandatory entity list missing");
       return "No entities";
     }
   }
@@ -92,7 +95,7 @@ std::string EntityIdVector::check
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of EntityIds)"));
+      alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;
     }
   }

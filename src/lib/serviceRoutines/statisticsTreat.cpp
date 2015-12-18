@@ -125,6 +125,8 @@ static void resetStatistics(void)
 
   noOfSimulatedNotifications                      = -1;
 
+  QueueStatistics::reset();
+
   semTimeReqReset();
   semTimeTransReset();
   semTimeCacheReset();
@@ -228,12 +230,12 @@ std::string renderSemWaitStats(void)
 {
   JsonHelper jh;
 
-  jh.addFloat("request",          semTimeReqGet());
-  jh.addFloat("dbConnectionPool", mongoPoolConnectionSemWaitingTimeGet());
-  jh.addFloat("transaction",      semTimeTransGet());
-  jh.addFloat("subCache",         semTimeCacheGet());
-  jh.addFloat("curlContext",      mutexTimeCCGet());
-  jh.addFloat("timeStat",         semTimeTimeStatGet());
+  jh.addFloat("request",           semTimeReqGet());
+  jh.addFloat("dbConnectionPool",  mongoPoolConnectionSemWaitingTimeGet());
+  jh.addFloat("transaction",       semTimeTransGet());
+  jh.addFloat("subCache",          semTimeCacheGet());
+  jh.addFloat("connectionContext", mutexTimeCCGet());
+  jh.addFloat("timeStat",          semTimeTimeStatGet());
 
   return jh.str();
 }
@@ -245,14 +247,17 @@ std::string renderSemWaitStats(void)
 std::string renderNotifQueueStats(void)
 {
   JsonHelper jh;
+  float      timeInQ = QueueStatistics::getTimeInQ();
+  int        out     = QueueStatistics::getOut();
 
-  jh.addNumber("in",          QueueStatistics::getIn());
-  jh.addNumber("out",         QueueStatistics::getOut());
-  jh.addNumber("reject",      QueueStatistics::getReject());
-  jh.addNumber("sentOk",      QueueStatistics::getSentOK());     // FIXME P7: this needs to be generalized for all notificationModes
-  jh.addNumber("sentError",   QueueStatistics::getSentError());  // FIXME P7: this needs to be generalized for all notificationModes
-  jh.addFloat ("timeInQueue", QueueStatistics::getTimeInQ());
-  jh.addNumber("size",        QueueStatistics::getQSize());
+  jh.addNumber("in",             QueueStatistics::getIn());
+  jh.addNumber("out",            out);
+  jh.addNumber("reject",         QueueStatistics::getReject());
+  jh.addNumber("sentOk",         QueueStatistics::getSentOK());     // FIXME P7: this needs to be generalized for all notificationModes
+  jh.addNumber("sentError",      QueueStatistics::getSentError());  // FIXME P7: this needs to be generalized for all notificationModes
+  jh.addFloat ("timeInQueue",    timeInQ);
+  jh.addFloat ("avgTimeInQueue", out==0 ? 0 : (timeInQ/out));
+  jh.addNumber("size",           QueueStatistics::getQSize());
 
   return jh.str();
 }

@@ -29,12 +29,6 @@
 #include <vector>
 #include <set>
 
-#include "mongoBackend/MongoCommonUpdate.h"
-#include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeMongo.h"
-#include "mongoBackend/dbConstants.h"
-#include "mongoBackend/dbFieldEncoding.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -43,9 +37,15 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/statistics.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
 
+#include "mongoBackend/MongoCommonUpdate.h"
+#include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -62,10 +62,13 @@ using namespace orion;
 using namespace mongo;
 
 
+
 /* ****************************************************************************
+*
 * Forward declarations
 */
 static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);
+
 
 
 /* ****************************************************************************
@@ -1314,7 +1317,7 @@ static bool addTriggeredSubscriptions_noCache
   DBClientBase* connection = getMongoConnection();
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
-    LM_E(("Database Error (%s)", errorString.c_str()));
+    alarmMgr.dbError(errorString);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     releaseMongoConnection(connection, &cursor);
     return false;
@@ -1341,7 +1344,8 @@ static bool addTriggeredSubscriptions_noCache
     //
     if (idField.eoo() == true)
     {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+      std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+      alarmMgr.dbError(details);
       continue;
     }
 
@@ -1842,7 +1846,7 @@ static bool updateContextAttributeItem
                           " - offending attribute: " + targetAttr->toString() +
                           " - location nature of an attribute has to be defined at creation time, with APPEND");
 
-    LM_W(("Bad Input (location nature of an attribute has to be defined at creation time, with APPEND)"));
+    alarmMgr.badInput(clientIp, "location nature of an attribute has to be defined at creation time, with APPEND");
     return false;
   }
 
@@ -1856,7 +1860,7 @@ static bool updateContextAttributeItem
                             " - offending attribute: " + targetAttr->toString() +
                             " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
 
-      LM_W(("Bad Input (error parsing location attribute)"));
+      alarmMgr.badInput(clientIp, "error parsing location attribute");
       return false;
     }
   }
@@ -1904,7 +1908,7 @@ static bool appendContextAttributeItem
               " - attempt to define a location attribute [" + targetAttr->name + "]" +
               " when another one has been previously defined [" + locAttr + "]");
 
-        LM_W(("Bad Input (attempt to define a second location attribute)"));
+        alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
         return false;
       }
 
@@ -1917,7 +1921,7 @@ static bool appendContextAttributeItem
               " - offending attribute: " + targetAttr->toString() +
               " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
 
-        LM_W(("Bad Input (only WGS84 is supported for location)"));
+        alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
         return false;
       }
 
@@ -1928,7 +1932,7 @@ static bool appendContextAttributeItem
                               " - entity: [" + eP->toString() + "]" +
                               " - offending attribute: " + targetAttr->toString() +
                               " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
-        LM_W(("Bad Input (error parsing location attribute)"));
+        alarmMgr.badInput(clientIp, "error parsing location attribute");
         return false;
       }
 
@@ -1945,7 +1949,7 @@ static bool appendContextAttributeItem
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->toString() +
                           " - attribute can not be appended");
-    LM_W(("Bad Input (attribute can not be appended)"));
+    alarmMgr.badInput(clientIp, "attribute can not be appended");
     return false;
   }
 
@@ -1985,7 +1989,7 @@ static bool deleteContextAttributeItem
                             " - offending attribute: " + targetAttr->toString() +
                             " - location attribute has to be defined at creation time, with APPEND");
 
-      LM_W(("Bad Input (location attribute has to be defined at creation time)"));
+      alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
       return false;
     }
 
@@ -2008,7 +2012,7 @@ static bool deleteContextAttributeItem
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->toString() +
                           " - attribute not found");
-    LM_W(("Bad Input (attribute to be deleted is not found)"));
+    alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
     ca->found = false;
 
     return false;
@@ -2407,7 +2411,7 @@ void searchContextProviders
       // Unlike errors in DB at entitiesQuery(), DB failure at registrationsQuery()
       // is not considered "critical"
       //
-      LM_E(("Database Error (%s)", err.c_str()));
+      alarmMgr.dbError(err);
     }
     crrV.release();
   }
@@ -2429,7 +2433,7 @@ void searchContextProviders
       // Unlike errors in DB at entitiesQuery(), DB failure at registrationsQuery()
       // is not considered "critical"
       //
-      LM_E(("Database Error (%s)", err.c_str()));
+      alarmMgr.dbError(err);
     }
     crrV.release();
   }
@@ -2553,7 +2557,7 @@ static void updateEntity
     {
       if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
       {
-        LM_W(("Bad Input (attribute already exists)"));
+        alarmMgr.badInput(clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
 
         //
@@ -2766,9 +2770,10 @@ static bool contextElementPreconditionsCheck
       if ((name == ceP->contextAttributeVector[jx]->name) && (id == ceP->contextAttributeVector[jx]->getId()))
       {
         ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector[ix]);
+        std::string details = std::string("duplicated attribute name: name=<") + name + "> id=<" + id + ">";
+        alarmMgr.badInput(clientIp, details);
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
-                                  "duplicated attribute name and id [" + name + "," + id + "]");
-        LM_W(("Bad Input (duplicated attribute name: name=<%s> id=<%s>)", name.c_str(), id.c_str()));
+                                  "duplicated attribute /" + name + "/");
         return false; // Error already in responseP
       }
     }
@@ -2799,7 +2804,7 @@ static bool contextElementPreconditionsCheck
                                   " - entity: [" + enP->toString(true) + "]" +
                                   " - offending attribute: " + aP->name +
                                   " - empty attribute not allowed in APPEND or UPDATE");
-        LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
+        alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
         return false; // Error already in responseP
       }
     }
@@ -2959,7 +2964,8 @@ void processContextElement
     //
     if (idField.eoo() == true)
     {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", r.toString().c_str()));
+      std::string details = std::string("error retrieving _id field in doc: '") + r.toString() + "'";
+      alarmMgr.dbError(details);
       continue;
     }
     results.push_back(r);

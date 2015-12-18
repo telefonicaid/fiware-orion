@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
@@ -35,6 +36,8 @@
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
+
+
 
 /* ****************************************************************************
 *
@@ -288,7 +291,7 @@ HttpStatusCode mongoQueryContext
     /* FIXME: restriction not supported for the moment */
     if (!requestP->restriction.attributeExpression.isEmpty())
     {
-      LM_W(("Bad Input (restriction found, but restrictions are not supported by mongo backend)"));
+      alarmMgr.badInput(clientIp, "restriction found, but restrictions are not supported by mongo backend");
     }
 
     std::string err;
@@ -334,7 +337,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -353,7 +356,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -372,7 +375,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -392,7 +395,7 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        LM_E(("Database Error (%s)", err.c_str()));
+        alarmMgr.dbError(err);
       }
       crrV.release();
     }

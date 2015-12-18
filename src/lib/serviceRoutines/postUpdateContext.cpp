@@ -33,6 +33,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "jsonParse/jsonRequest.h"
 #include "mongoBackend/mongoUpdateContext.h"
@@ -130,10 +131,14 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //
   if (parseUrl(upcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", upcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
+
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     upcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
@@ -168,33 +173,39 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
-  std::string     out;
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/updateContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
+  std::string     out;
+  int             r;
 
-  out = httpRequestSend(ip,
-                        port,
-                        protocol,
-                        verb,
-                        tenant,
-                        servicePath,
-                        ciP->httpHeaders.xauthToken,
-                        resource,
-                        mimeType,
-                        cleanPayload,
-                        false,
-                        true,
-                        mimeType);
+  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
 
-  if ((out == "error") || (out == ""))
+  r = httpRequestSend(ip,
+                      port,
+                      protocol,
+                      verb,
+                      tenant,
+                      servicePath,
+                      ciP->httpHeaders.xauthToken,
+                      resource,
+                      mimeType,
+                      cleanPayload,
+                      false,
+                      true,
+                      &out,
+                      mimeType);
+
+  if (r != 0)
   {
-    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
     LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext response payload: %s", out.c_str()));
 
 
   //
@@ -480,7 +491,7 @@ std::string postUpdateContext
   if (ciP->servicePathV.size() > 1)
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
-    LM_W(("Bad Input (more than one service path for an update request)"));
+    alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 

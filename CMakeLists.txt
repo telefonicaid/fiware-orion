@@ -59,7 +59,7 @@ add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types
 #set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
-set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -g -Werror -fno-var-tracking-assignments")
+set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
 
 #
 # Platform checks
@@ -89,10 +89,13 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
     # remove_definitions().
     #
     add_definitions(-fstack-check -fstack-protector)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     if (COVERAGE)
         MESSAGE("cmake: Coverage compilation")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+        # LM_T macros introduce condition branchs which are not never traversed. Removing LM_T macros doesn't have 
+        # any impact in line coverage but removes "noise" in condition coverage, thus making coverage reports more useful
+        remove_definitions(-DLM_ON)
+        # Removing LM_T macros make that some variables get unused, thus -Wno-unused-variable have to be used
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -fprofile-arcs -ftest-coverage")
         set (CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
     endif (COVERAGE)
 
@@ -103,7 +106,6 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 else (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
     MESSAGE("cmake: RELEASE compilation")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
     if (STRICT)
         MESSAGE("cmake: Strict compilation")
@@ -186,6 +188,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/cache)
+  ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")

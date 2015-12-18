@@ -22,10 +22,12 @@
 */
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/statistics.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
-#include "common/statistics.h"
 
 
 
@@ -36,6 +38,11 @@
 void* startSenderThread(void* p)
 {
     SenderThreadParams* params = (SenderThreadParams*) p;
+    char                portV[STRING_SIZE_FOR_INT];
+    std::string         url;
+
+    snprintf(portV, sizeof(portV), "%d", params->port);
+    url = params->ip + ":" + portV + params->resource;
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
@@ -51,7 +58,8 @@ void* startSenderThread(void* p)
 
     if (!simulatedNotification)
     {
-      std::string r;
+      std::string  out;
+      int          r;
 
       r = httpRequestSend(params->ip,
                           params->port,
@@ -64,17 +72,20 @@ void* startSenderThread(void* p)
                           params->content_type,
                           params->content,
                           true,
-                          NOTIFICATION_WAIT_MODE);
+                          NOTIFICATION_WAIT_MODE,
+                          &out);
 
-      if ((r != "") && (r != "error"))
+      if (r == 0)
       {
         statisticsUpdate(NotifyContextSent, params->format);
+        alarmMgr.notificationErrorReset(url);
       }
     }
     else
     {
       LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
       __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
+      alarmMgr.notificationError(url, "notification failure for sender-thread");
     }
 
     /* Delete the parameters after using them */

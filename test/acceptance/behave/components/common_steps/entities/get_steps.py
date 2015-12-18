@@ -88,10 +88,11 @@ def accumulate_entities_to_list(context):
     accumulate context of entities for use with the returned lists
     :param context:It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
-    entity = None
+    entity = {}
     entity = context.cb.get_entity_context()
     context.entities_accumulate.append(copy.deepcopy(entity))
     __logger__.debug("accumulate after: %s" % str(context.entities_accumulate))
+
 
 # ------------------------------------- validations ----------------------------------------------
 

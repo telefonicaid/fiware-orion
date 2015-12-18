@@ -7,7 +7,7 @@ site_dir: html
 markdown_extensions: [toc,fenced_code]
 use_directory_urls: false
 theme: readthedocs
-extra_css: ["http://fiware.org/style/monokai_sublime.css"]
+extra_css: ["https://fiware.org/style/fiware_readthedocs.css"]
 pages:
   - Home: index.md
   - 'Getting Started': 'quick_start_guide.md'

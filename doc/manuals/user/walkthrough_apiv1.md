@@ -153,7 +153,7 @@ command:
 # ./accumulator-server.py 1028 /accumulate ::1 on
 ```
 
-The accumulator-server.py is also part of the contextBroker-test package (see in the administrator manual [how to install](../../../README.md#optional-packages "wikilink")). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
+The accumulator-server.py is also part of the contextBroker-test package (see [optional packages section in how to install](../admin/install.md#optional-packages)). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
 
 [Top](#top)
 
@@ -1024,9 +1024,13 @@ Let's examine in detail the different elements included in the payload:
     inter-notification arrival time. So, setting throttling to 5 seconds
     as in the example above, makes a notification not to be sent
     if a previous notification was sent less than 5 seconds ago, no
-    matter how many actual changes take place in that period. This is give the 
-   notification receptor a means to protect itself against context producers 
-   that update attribute values too frequently.
+    matter how many actual changes take place in that period. This is to give the 
+    notification receptor a means to protect itself against context producers
+    that update attribute values too frequently. In multi-CB configurations, take
+    into account that the last-notification measure is local to each CB node. Although
+    each node periodically synchronizes with DB in order to get potencially newer
+    values (more on this [here](perf_tuning.md#subscription-cache) it may happen that
+    a particular node has an old value, so throttling is not 100% accurate.
 
 The response corresponding to that request contains a subscription ID (a
 24 hexadecimal number used for updating and cancelling the subscription

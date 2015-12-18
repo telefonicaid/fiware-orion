@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
@@ -130,7 +131,7 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
            ((res = attributeList.check(QueryContext,  ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
            ((res = restriction.check(QueryContext,    ciP->outFormat, indent, predetectedError, restrictions)) != "OK"))
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
   }
   else

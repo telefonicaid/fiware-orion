@@ -165,3 +165,20 @@ size_t QueueStatistics::getQSize()
 
   return  queueSize;
 }
+
+/* ****************************************************************************
+*
+* reset() -
+*/
+void QueueStatistics::reset()
+{
+  __sync_fetch_and_and(&noOfNotificationsQueueIn, 0);
+  __sync_fetch_and_and(&noOfNotificationsQueueOut, 0);
+  __sync_fetch_and_and(&noOfNotificationsQueueReject, 0);
+  __sync_fetch_and_and(&noOfNotificationsQueueSentOK, 0);
+  __sync_fetch_and_and(&noOfNotificationsQueueSentError, 0);
+
+  boost::mutex::scoped_lock lock(mtxTimeInQ);
+  timeInQ.tv_sec = 0;
+  timeInQ.tv_nsec = 0;
+}

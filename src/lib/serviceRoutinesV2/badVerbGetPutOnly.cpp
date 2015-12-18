@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
@@ -51,7 +52,8 @@ std::string badVerbGetPutOnly
   ciP->httpHeaderValue.push_back("GET, PUT");
   ciP->httpStatusCode = SccBadVerb;
 
-  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
+  std::string details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
+  alarmMgr.badInput(clientIp, details);
 
   return "";
 }

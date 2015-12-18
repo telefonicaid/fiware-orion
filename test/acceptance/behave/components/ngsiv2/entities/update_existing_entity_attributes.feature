@@ -262,18 +262,37 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | attributes_value | 80          |
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                                                                                         |
-      | error       | BadRequest                                                                                                                                    |
-      | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
+      | parameter   | value                                                                                  |
+      | error       | BadRequest                                                                             |
+      | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
     Examples:
-      | service                         |
-      | service.sr                      |
-      | Service-sr                      |
-      | Service(sr)                     |
-      | Service=sr                      |
-      | Service<sr>                     |
-      | Service,sr                      |
-      | greater than max length allowed |
+      | service     |
+      | service.sr  |
+      | Service-sr  |
+      | Service(sr) |
+      | Service=sr  |
+      | Service<sr> |
+      | Service,sr  |
+      | service#sr  |
+      | service%sr  |
+      | service&sr  |
+
+  @service_update_bad_length
+  Scenario:  try to update attributes by entity ID using NGSI v2 with bad length service header values
+    Given  a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | greater than max length allowed |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    When update an attribute by ID "room" if it exists
+      | parameter        | value       |
+      | attributes_name  | temperature |
+      | attributes_value | 80          |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                    |
+      | error       | BadRequest                                               |
+      | description | bad length - a tenant name can be max 50 characters long |
 
   # ------------------------ Service path ----------------------------------------------
 

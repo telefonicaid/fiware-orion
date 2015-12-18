@@ -196,6 +196,18 @@ SET (SOURCES
     ngsi/Throttling_test.cpp
     ngsi/UpdateActionType_test.cpp
 
+    orionTypes/EntityType_test.cpp
+    orionTypes/EntityTypeResponse_test.cpp
+    orionTypes/EntityTypeVector_test.cpp
+    orionTypes/EntityTypeVectorResponse_test.cpp
+    orionTypes/QueryContextRequestVector_test.cpp
+    orionTypes/QueryContextResponseVector_test.cpp
+    orionTypes/UpdateContextRequestVector_test.cpp
+
+    apiTypesV2/Entities_test.cpp
+    apiTypesV2/Entity_test.cpp  
+    apiTypesV2/EntityVector_test.cpp
+
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
@@ -267,6 +279,7 @@ SET (STATIC_LIBS
     mongoBackend
     orionTypes
     common
+    alarmMgr
     lm
     pa
     pthread

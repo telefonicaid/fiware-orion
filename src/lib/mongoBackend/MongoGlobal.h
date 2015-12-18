@@ -304,7 +304,7 @@ extern bool registrationsQuery
 * collection)
 *
 */
-extern EntityIdVector subToEntityIdVector(BSONObj sub);
+extern EntityIdVector subToEntityIdVector(const BSONObj& sub);
 
 /* ****************************************************************************
 *
@@ -314,7 +314,7 @@ extern EntityIdVector subToEntityIdVector(BSONObj sub);
 * collection)
 *
 */
-extern AttributeList subToAttributeList(BSONObj attrL);
+extern AttributeList subToAttributeList(const BSONObj& attrL);
 
 /* ****************************************************************************
 *

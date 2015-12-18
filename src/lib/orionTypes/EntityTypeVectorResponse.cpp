@@ -28,12 +28,16 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
+
 
 
 /* ****************************************************************************
@@ -78,11 +82,13 @@ std::string EntityTypeVectorResponse::check
   }
   else if ((res = entityTypeVector.check(ciP, indent, predetectedError)) != "OK")
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
   return render(ciP, "");
 }

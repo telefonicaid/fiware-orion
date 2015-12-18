@@ -39,6 +39,9 @@
 #include "common/globals.h"
 #include "common/sem.h"
 #include "common/string.h"
+#include "common/wsStrip.h"
+#include "common/statistics.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
 
@@ -58,12 +61,9 @@
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 
-#include "common/wsStrip.h"
-
-#include "common/statistics.h"
-
 using namespace mongo;
 using std::auto_ptr;
+
 
 
 /* ****************************************************************************
@@ -546,9 +546,11 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   // Paranoia check:  _id exists?
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+    alarmMgr.dbError(details);
     return;
   }
+  alarmMgr.dbErrorReset();
 
   std::string  subId   = idField.OID().toString();
 
@@ -556,9 +558,11 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   BSONElement conditionsField = getField(sub, CSUB_CONDITIONS);
   if (conditionsField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving 'conditions' field) for subscription '%s'", subId.c_str()));
+    std::string details = std::string("error retrieving 'conditions' field for subscription '") + subId + "'";
+    alarmMgr.dbError(details);
     return;
   }
+  alarmMgr.dbErrorReset();
 
   std::vector<BSONElement> condV = getField(sub, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < condV.size(); ++ix)
@@ -599,7 +603,8 @@ static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+    alarmMgr.dbError(details);
     return;
   }
 
@@ -640,7 +645,8 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     idMatch = false;
     if (regcomp(&regex, en2->id.c_str(), 0) != 0)
     {
-      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
+      std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
+      alarmMgr.badInput(clientIp, details);
     }
     else
     {
@@ -827,9 +833,10 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 {
   if (!mongoLocationCapable())
   {
-    LM_W(("Bad Input (location scope was found but your MongoDB version doesn't support it."
-          " Please upgrade MongoDB server to 2.4 or newer)"));
+    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+      "Please upgrade MongoDB server to 2.4 or newer)";
 
+    alarmMgr.badInput(clientIp, details);
     return false;
   }
 
@@ -876,7 +883,7 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
   }
   else
   {
-    LM_W(("Bad Input (unknown area type)"));
+    alarmMgr.badInput(clientIp, "unknown area type");
     return false;
   }
 
@@ -1251,8 +1258,9 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
     }
     else
     {
-       LM_W(("Bad Input (unknown query operator: %s", op));
-       pushBackFilter = false;
+      std::string details = std::string("unknown query operator: ") + op;
+      alarmMgr.badInput(clientIp, details);
+      pushBackFilter = false;
     }
 
     if (pushBackFilter)
@@ -1268,7 +1276,6 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 /* *****************************************************************************
 *
 * addFilterScopes -
-*
 */
 static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
 {
@@ -1285,14 +1292,17 @@ static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
     }
     else
     {
-      LM_W(("Bad Input (unknown value for %s filter: '%s'", SCOPE_FILTER_EXISTENCE, scoP->value.c_str()));
+      std::string details = std::string("unknown value for '") + SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
+      alarmMgr.badInput(clientIp, details);
     }
   }
   else
   {
-    LM_W(("Bad Input (unknown filter type '%s'", scoP->type.c_str()));
+    std::string details = std::string("unknown filter type '") + scoP->type + "'";
+    alarmMgr.badInput(clientIp, details);
   }
 }
+
 
 
 /* ****************************************************************************
@@ -1389,7 +1399,7 @@ bool entitiesQuery
       geoScopes++;
       if (geoScopes > 1)
       {
-        LM_W(("Bad Input (current version supports only one area scope, extra geoScope is ignored"));
+        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
       }
       else
       {
@@ -1409,7 +1419,8 @@ bool entitiesQuery
     }
     else
     {
-      LM_W(("Bad Input (unknown scope type '%s', ignoring)", sco->type.c_str()));
+      std::string details = std::string("unknown scope type '") + sco->type + "', ignoring";
+      alarmMgr.badInput(clientIp, details);
     }
   }
 
@@ -1457,7 +1468,7 @@ bool entitiesQuery
       const char* invalidPolygon      = "Exterior shell of polygon is invalid";
       const char* defaultErrorString  = "Error at querying MongoDB";
 
-      LM_W(("Database Error (%s)", exErr.c_str()));
+      alarmMgr.dbError(exErr);
 
       if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
       {
@@ -1502,6 +1513,8 @@ bool entitiesQuery
       releaseMongoConnection(connection, &cursor);
       return false;
     }
+
+    alarmMgr.dbErrorReset();
 
     // Build CER from BSON retrieved from DB
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -1961,7 +1974,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 * collection)
 *
 */
-EntityIdVector subToEntityIdVector(BSONObj sub)
+EntityIdVector subToEntityIdVector(const BSONObj& sub)
 {
   EntityIdVector            enV;
   std::vector<BSONElement>  subEnts = getField(sub, CSUB_ENTITIES).Array();
@@ -1987,7 +2000,7 @@ EntityIdVector subToEntityIdVector(BSONObj sub)
 * collection)
 *
 */
-AttributeList subToAttributeList(BSONObj sub)
+AttributeList subToAttributeList(const BSONObj& sub)
 {
   AttributeList             attrL;
   std::vector<BSONElement>  subAttrs = getField(sub, CSUB_ATTRS).Array();

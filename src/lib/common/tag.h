@@ -52,6 +52,14 @@
 */
 extern char* htmlEscape(const char* s);
 
+/* ****************************************************************************
+*
+* jsonInvalidCharsTransformation -
+*
+* FIXME P5: this is a quick fix for #1172. A better fix should be developed.
+*/
+extern std::string jsonInvalidCharsTransformation(const std::string& input);
+
 
 
 /* ****************************************************************************
