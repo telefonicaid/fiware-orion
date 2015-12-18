@@ -204,7 +204,7 @@ TEST(ContextAttributeResponseVector, getAndSize)
   carV.push_back(&car);
   ASSERT_EQ(1, carV.size());
 
-  ContextAttributeResponse* carP = carV.get(0);
+  ContextAttributeResponse* carP = carV[0];
   EXPECT_TRUE(carP != NULL);
 }
 
