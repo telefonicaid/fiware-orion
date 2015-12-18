@@ -185,14 +185,7 @@ unsigned int AttributeList::size(void) const
 
 
 
-/* ****************************************************************************
-*
-* AttributeList::operator - 
-*/
-std::string AttributeList::operator[] (unsigned int ix) const 
-{
-  return attributeV[ix];
-}
+
 
 /* ****************************************************************************
 *

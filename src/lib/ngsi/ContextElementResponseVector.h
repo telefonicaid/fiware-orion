@@ -53,7 +53,15 @@ typedef struct ContextElementResponseVector
   ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);
   void                     release();
   void                     fill(ContextElementResponseVector& cerV);
-  ContextElementResponse*  operator[] (unsigned int ix);
+  ContextElementResponse*  operator[] (unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+  return NULL;
+  }
   
 
   std::string              check(RequestType         requestType,

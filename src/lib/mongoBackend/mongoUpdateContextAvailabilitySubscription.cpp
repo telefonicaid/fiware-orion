@@ -103,7 +103,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Entities (mandatory) */
   BSONArrayBuilder entities;
   for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix) {
-      EntityId* en = requestP->entityIdVector.operator[](ix);
+      EntityId* en = requestP->entityIdVector[ix];
       if (en->type == "") {
           entities.append(BSON(CASUB_ENTITY_ID << en->id <<
                                CASUB_ENTITY_ISPATTERN << en->isPattern));
@@ -120,7 +120,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Attributes (always taken into account) */
   BSONArrayBuilder attrs;
   for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-      attrs.append(requestP->attributeList.operator[](ix));
+      attrs.append(requestP->attributeList[ix]);
   }
   newSub.append(CASUB_ATTRS, attrs.arr());
 

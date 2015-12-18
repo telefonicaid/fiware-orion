@@ -124,10 +124,7 @@ ContextElement* ContextElementVector::operator[](unsigned int ix)
     {
       return vec[ix];
     }
-    else
-    {
-      return NULL;
-    }
+    return NULL;
 }
 
 

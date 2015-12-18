@@ -57,7 +57,6 @@ typedef struct EntityIdVector
   void         release();
 
   EntityId*    operator[](unsigned int ix);
-
   const EntityId* operator[](unsigned int ix) const;
 
   std::string  check(RequestType         requestType,

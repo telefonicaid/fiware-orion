@@ -58,7 +58,7 @@ HttpStatusCode mongoNotifyContextAvailability
     /* Process each ContextRegistrationElement to create a "fake" RegisterContextRequest */
     RegisterContextRequest rcr;
     for (unsigned int ix= 0; ix < requestP->contextRegistrationResponseVector.size(); ++ix) {
-        ContextRegistration* crP = &requestP->contextRegistrationResponseVector.operator[](ix)->contextRegistration;
+        ContextRegistration* crP = &requestP->contextRegistrationResponseVector[ix]->contextRegistration;
         rcr.contextRegistrationVector.push_back(crP);
     }
 

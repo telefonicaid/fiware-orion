@@ -125,8 +125,7 @@ Entity*  EntityVector::operator[] (unsigned int ix)
    if (ix < vec.size())
    {
       return vec[ix];
-    }
-
+   }
    return NULL;
 }
 

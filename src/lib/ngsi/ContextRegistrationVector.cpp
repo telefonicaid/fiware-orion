@@ -117,7 +117,6 @@ ContextRegistration* ContextRegistrationVector::operator[](unsigned int ix)
    {
      return vec[ix];
    }
-
    return NULL;
 }
 

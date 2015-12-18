@@ -137,17 +137,15 @@ void EntityTypeVector::push_back(EntityType* item)
 
 /* ****************************************************************************
 *
-* EntityTypeVector::get -
+* EntityTypeVector::operator -
 */
 EntityType* EntityTypeVector::operator[] (unsigned int ix)
 {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 

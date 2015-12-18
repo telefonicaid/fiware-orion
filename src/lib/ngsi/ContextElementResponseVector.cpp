@@ -127,25 +127,6 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
   vec.push_back(item);
 }
 
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::operator -
-*/
-
-ContextElementResponse*  ContextElementResponseVector::operator[] (unsigned int ix)
-{
-  
-  if (ix < vec.size())
-  {
-    return vec[ix];
-  }
-
-  return NULL;
-}
-
-
 /* ****************************************************************************
 *
 * ContextElementResponseVector::size -

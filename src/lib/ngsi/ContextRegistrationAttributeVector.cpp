@@ -123,7 +123,6 @@ ContextRegistrationAttribute* ContextRegistrationAttributeVector::operator[] (un
     {
       return vec[ix];
     }
-
     return NULL;  
 }
 ContextRegistrationAttribute* ContextRegistrationAttributeVector::operator[] (unsigned int ix) const
@@ -132,7 +131,6 @@ ContextRegistrationAttribute* ContextRegistrationAttributeVector::operator[] (un
     {
       return vec[ix];
     }
-
     return NULL;  
 }
 

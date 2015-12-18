@@ -205,8 +205,7 @@ const EntityId* EntityIdVector::operator[] (unsigned int ix) const
    {
      return vec[ix];
    }
-
-    return NULL;
+   return NULL;
 }
 
 

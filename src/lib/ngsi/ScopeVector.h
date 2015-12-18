@@ -44,7 +44,6 @@ typedef struct ScopeVector
   void         present(const std::string& indent);
   void         push_back(Scope* item);
   unsigned int size(void) const;
-
   void         release();
 
   std::string  check(RequestType         requestType,
@@ -52,7 +51,6 @@ typedef struct ScopeVector
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
-
   Scope* operator[](unsigned int ix); 
   const Scope* operator[](unsigned int ix) const;
 

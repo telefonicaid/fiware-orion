@@ -56,7 +56,7 @@
 *   - !exist=entity::type
 *   - attributesFormat=object?
 *
-* 0. Take care of URI par/home/raconte/fiware-orion/src/lib/serviceRoutines/getAttributeValueInstance.cppams
+* 0. Take care of URI params
 * 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
 * 2. Call standard operation
 * 3. Fill in ContextAttributeResponse from QueryContextResponse
@@ -123,13 +123,13 @@ std::string getAttributeValueInstance
     // mongoQueryContext() (although breaking the design principle about mongo*() functions follow the NGSI
     // standard). To think about ...
     //
-    //for (int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
-   // {
-      //if (cerP->contextElement.vec[i])->getId() == metaIdValue)
-      //{
-        //response.contextAttributeVector.push_back(cerP->contextElement.vec[i]);
-      //}
-   // }
+    for (unsigned int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
+    {
+      if (cerP->contextElement.contextAttributeVector[i]->getId() == metaIdValue)
+      {
+        response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector[i]);
+      }
+    }
 
     if (cerP->contextElement.contextAttributeVector.size() > 0 && response.contextAttributeVector.size() == 0)
     {

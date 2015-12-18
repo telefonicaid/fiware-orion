@@ -119,17 +119,16 @@ void ContextAttributeResponseVector::push_back(ContextAttributeResponse* item)
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::get - 
+* ContextAttributeResponseVector::operator - 
 */
 ContextAttributeResponse* ContextAttributeResponseVector::operator[](unsigned int ix)
+{
+  if (ix < vec.size())
   {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
+    return vec[ix];
   }
+  return NULL;
+}
 
 
 /* ****************************************************************************

@@ -140,7 +140,6 @@ const Scope* ScopeVector::operator[](unsigned int ix) const
    {
      return vec[ix];
    }
-
    return NULL;
 }
 

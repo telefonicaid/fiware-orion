@@ -51,7 +51,6 @@ typedef struct ContextRegistrationAttributeVector
                                          const std::string&  indent,
                                          const std::string&  predetectedError,
                                          int                 counter);
-
   ContextRegistrationAttribute*  operator[](unsigned int ix);
   ContextRegistrationAttribute*  operator[](unsigned int ix) const;
 

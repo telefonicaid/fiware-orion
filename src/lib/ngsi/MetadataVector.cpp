@@ -223,7 +223,6 @@ Metadata* MetadataVector::operator[] (unsigned int ix)
    {
      return vec[ix];
    }
-
    return NULL;
 }
 
@@ -233,7 +232,6 @@ const Metadata* MetadataVector::operator[] (unsigned int ix) const
    {
      return vec[ix];
    }
-
    return NULL;
 }
 

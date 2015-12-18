@@ -301,33 +301,6 @@ void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
   }
 }
 
-
-/* ****************************************************************************
-*
-* ContextAttributeVector::operator - 
-*/
-
-ContextAttribute* ContextAttributeVector::operator[] (unsigned int ix)
-{    
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;  
-}
-
-ContextAttribute* ContextAttributeVector::operator[] (unsigned int ix) const
-{
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;  
-}
-
-
 /* ****************************************************************************
 *
 * ContextAttributeVector::size - 

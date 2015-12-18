@@ -264,7 +264,7 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 {
   for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
   {
-    Metadata* md = caP->metadataVector.operator[](ix);
+    Metadata* md = caP->metadataVector[ix];
 
     /* Note that, unlike entity types or attribute types, for attribute metadata we don't consider empty type
      * as a wildcard in order to keep it simpler */
@@ -572,7 +572,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* First add the metadata elements coming in the request */
   for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
   {
-    Metadata* mdP = caP->metadataVector.operator[](ix);
+    Metadata* mdP = caP->metadataVector[ix];
 
     /* Skip not custom metadata */
     if (isNotCustomMetadata(mdP->name))
@@ -678,7 +678,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttr
 
   for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
   {
-    const Metadata* md = ca->metadataVector.operator[](ix);
+    const Metadata* md = ca->metadataVector[ix];
 
     if (!isNotCustomMetadata(md->name))
     {
@@ -918,16 +918,16 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
 {
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    std::string  attrName  = caV.operator[](ix)->name;
-    std::string  attrType  = caV.operator[](ix)->type;
-    std::string  attrId    = caV.operator[](ix)->getId();
+    std::string  attrName  = caV[ix]->name;
+    std::string  attrType  = caV[ix]->type;
+    std::string  attrId    = caV[ix]->getId();
 
     if (attrId == "")
     {
       /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
       for (unsigned int jx = 0; jx < caV.size(); ++jx)
       {
-        const ContextAttribute* ca = caV.operator[](jx);
+        const ContextAttribute* ca = caV[jx];
 
         if (attrName == ca->name && attrType == ca->type && ca->getId() != "")
         {
@@ -967,11 +967,11 @@ static bool processLocation
 
   for (unsigned ix = 0; ix < caV.size(); ++ix)
   {
-    const ContextAttribute* caP = caV.operator[](ix);
+    const ContextAttribute* caP = caV[ix];
 
     for (unsigned jx = 0; jx < caP->metadataVector.size(); ++jx)
     {
-      const Metadata* mdP = caP->metadataVector.operator[](jx);
+      const Metadata* mdP = caP->metadataVector[jx];
 
       if (mdP->name == NGSI_MD_LOCATION)
       {
@@ -1427,7 +1427,7 @@ static bool processOnChangeConditionForUpdateContext
   /* Fill NotifyContextRequest with cerP, filtering by attrL */
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.operator[](ix);
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
     if (attrL.size() == 0)
     {
@@ -1440,7 +1440,7 @@ static bool processOnChangeConditionForUpdateContext
       {
         /* 'skip' field is used to mark deleted attributes that must not be included in the
          * notification (see deleteAttrInNotifyCer function for details) */
-        if (caP->name == attrL.operator[](jx) && !caP->skip)
+        if (caP->name == attrL[jx] && !caP->skip)
         {
           cer.contextElement.contextAttributeVector.push_back(caP);
         }
@@ -1641,7 +1641,7 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
   /* Custom (just "mirroring" in the response) */
   for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix)
   {
-    Metadata* mdReq = caReq->metadataVector.operator[](ix);
+    Metadata* mdReq = caReq->metadataVector[ix];
 
     if (!isNotCustomMetadata(mdReq->name))
     {
@@ -1691,7 +1691,7 @@ static void updateAttrInNotifyCer
   /* Try to find the attribute in the notification CER */
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.operator[](ix);
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
 
     if (caP->name == targetAttr->name)
     {
@@ -1717,12 +1717,12 @@ static void updateAttrInNotifyCer
       /* Metadata */
       for (unsigned int jx = 0; jx < targetAttr->metadataVector.size(); jx++)
       {
-        Metadata* targetMdP = targetAttr->metadataVector.operator[](jx);
+        Metadata* targetMdP = targetAttr->metadataVector[jx];
         /* Search for matching medatat in the CER attribute */
         bool matchMd = false;
         for (unsigned int kx = 0; kx < caP->metadataVector.size(); kx++)
         {
-          Metadata* mdP = caP->metadataVector.operator[](kx);
+          Metadata* mdP = caP->metadataVector[kx];
           if (mdP->name == targetMdP->name)
           {
             mdP->valueType   = targetMdP->valueType;
@@ -1770,7 +1770,7 @@ static void deleteAttrInNotifyCer
 {  
   for (unsigned int ix = 0; ix < notifyCerP->contextElement.contextAttributeVector.size(); ix++)
   {
-    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector.operator[](ix);
+    ContextAttribute* caP = notifyCerP->contextElement.contextAttributeVector[ix];
     if (caP->name == targetAttr->name)
     {
       caP->skip = true;
@@ -2053,7 +2053,7 @@ static bool processContextAttributeVector
 
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
-    ContextAttribute*  targetAttr = ceP->contextAttributeVector.operator[](ix);
+    ContextAttribute*  targetAttr = ceP->contextAttributeVector[ix];
 
     if (targetAttr->skip == true)
     {
@@ -2241,16 +2241,16 @@ static bool createEntity
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    std::string     attrId = attrsV.operator[](ix)->getId();
+    std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
-    bsonAttr.appendElements(BSON(ENT_ATTRS_TYPE << attrsV.operator[](ix)->type <<
+    bsonAttr.appendElements(BSON(ENT_ATTRS_TYPE << attrsV[ix]->type <<
                                  ENT_ATTRS_CREATION_DATE << now <<
                                  ENT_ATTRS_MODIFICATION_DATE << now));
 
-    valueBson(attrsV.operator[](ix), bsonAttr);
+    valueBson(attrsV[ix], bsonAttr);
 
-    std::string effectiveName = dbDotEncode(attrsV.operator[](ix)->name);
+    std::string effectiveName = dbDotEncode(attrsV[ix]->name);
     if (attrId.length() != 0)
     {
       effectiveName += "__" + attrId;
@@ -2258,18 +2258,18 @@ static bool createEntity
 
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),
-                    attrsV.operator[](ix)->type.c_str(),
-                    attrsV.operator[](ix)->toStringValue().c_str()));
+                    attrsV[ix]->type.c_str(),
+                    attrsV[ix]->toStringValue().c_str()));
 
     /* Custom metadata */
     BSONObj mdV;
-    if (contextAttributeCustomMetadataToBson(mdV, attrsV.operator[](ix)))
+    if (contextAttributeCustomMetadataToBson(mdV, attrsV[ix]))
     {
       bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
     }
 
     attrsToAdd.append(effectiveName, bsonAttr.obj());
-    attrNamesToAdd.append(attrsV.operator[](ix)->name);
+    attrNamesToAdd.append(attrsV[ix]->name);
   }
 
   BSONObj bsonId;
@@ -2388,7 +2388,7 @@ void searchContextProviders
   enV.push_back(&en);
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
-    attrL.push_back(caV.operator[](ix)->name);
+    attrL.push_back(caV[ix]->name);
   }
 
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
@@ -2759,13 +2759,13 @@ static bool contextElementPreconditionsCheck
   /* Checking there aren't duplicate attributes */
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
-    std::string name = ceP->contextAttributeVector.operator[](ix)->name;
-    std::string id   = ceP->contextAttributeVector.operator[](ix)->getId();
+    std::string name = ceP->contextAttributeVector[ix]->name;
+    std::string id   = ceP->contextAttributeVector[ix]->getId();
     for (unsigned int jx = ix + 1; jx < ceP->contextAttributeVector.size(); ++jx)
     {
-      if ((name == ceP->contextAttributeVector.operator[](jx)->name) && (id == ceP->contextAttributeVector.operator[](jx)->getId()))
+      if ((name == ceP->contextAttributeVector[jx]->name) && (id == ceP->contextAttributeVector[jx]->getId()))
       {
-        ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector.operator[](ix));
+        ContextAttribute* ca = new ContextAttribute(ceP->contextAttributeVector[ix]);
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
                                   "duplicated attribute name and id [" + name + "," + id + "]");
         LM_W(("Bad Input (duplicated attribute name: name=<%s> id=<%s>)", name.c_str(), id.c_str()));
@@ -3002,7 +3002,7 @@ void processContextElement
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
-      ContextAttribute*  caP  = ceP->contextAttributeVector.operator[](ix);
+      ContextAttribute*  caP  = ceP->contextAttributeVector[ix];
       ContextAttribute*  ca   = new ContextAttribute(caP->name, caP->type, "", foundValue);
 
       setResponseMetadata(caP, ca);
@@ -3047,7 +3047,7 @@ void processContextElement
         std::vector<std::string> attrNames;
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
         {
-          attrNames.push_back(ceP->contextAttributeVector.operator[](ix)->name);
+          attrNames.push_back(ceP->contextAttributeVector[ix]->name);
         }
         if (!addTriggeredSubscriptions(enP->id,
                                        enP->type,

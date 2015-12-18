@@ -56,8 +56,6 @@ void QueryContextResponseVector::push_back(QueryContextResponse* item)
   vec.push_back(item);
 }
 
-
-
 /* ****************************************************************************
 *
 * QueryContextResponseVector::release -

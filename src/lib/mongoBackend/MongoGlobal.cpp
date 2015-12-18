@@ -691,7 +691,7 @@ bool includedAttribute(const ContextRegistrationAttribute& attr, const Attribute
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV.operator[](ix) == attr.name)
+    if (attrsV[ix] == attr.name)
     {
       return true;
     }
@@ -1344,7 +1344,7 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    fillQueryEntity(orEnt, enV.operator[](ix));
+    fillQueryEntity(orEnt, enV[ix]);
   }
 
   /* The result of orEnt is appended to the final query */
@@ -1358,7 +1358,7 @@ bool entitiesQuery
   BSONArrayBuilder attrs;
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
-    std::string attrName = attrL.operator[](ix);
+    std::string attrName = attrL[ix];
 
     attrs.append(attrName);
     LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
@@ -1377,7 +1377,7 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
-    const Scope* sco = res.scopeVector.operator[](ix);
+    const Scope* sco = res.scopeVector[ix];
 
     if (sco->type.find(SCOPE_FILTER) == 0)
     {
@@ -1512,11 +1512,11 @@ bool entitiesQuery
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
     {
       bool         found     = false;
-      std::string  attrName  = attrL.operator[](ix);
+      std::string  attrName  = attrL[ix];
 
       for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
       {
-        if (attrName == cer->contextElement.contextAttributeVector.operator[](jx)->name)
+        if (attrName == cer->contextElement.contextAttributeVector[jx]->name)
         {
           found = true;
           break;
@@ -1551,15 +1551,15 @@ bool entitiesQuery
    * used before pruning in the CPr calculation logic */
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    if (enV.operator[](ix)->isPattern != "true")
+    if (enV[ix]->isPattern != "true")
     {
       bool needToAdd = true;
 
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
-        EntityId* eP = &cerV->operator[](jx)->contextElement.entityId;
+        EntityId* eP = cerV[jx]->contextElement.entityId;
 
-        if ((eP->id == enV.operator[](ix)->id) && (eP->type == enV.operator[](ix)->type))
+        if ((eP->id == enV[ix]->id) && (eP->type == enV[ix]->type))
         {
           needToAdd = false;
           break;  /* jx */
@@ -1570,8 +1570,8 @@ bool entitiesQuery
       {
         ContextElementResponse* cerP = new ContextElementResponse();
 
-        cerP->contextElement.entityId.id = enV.operator[](ix)->id;
-        cerP->contextElement.entityId.type = enV.operator[](ix)->type;
+        cerP->contextElement.entityId.id = enV[ix]->id;
+        cerP->contextElement.entityId.type = enV[ix]->type;
         cerP->contextElement.entityId.isPattern = "false";
 
         //
@@ -1583,7 +1583,7 @@ bool entitiesQuery
 
         for (unsigned int jx = 0; jx < attrL.size(); ++jx)
         {
-          ContextAttribute* caP = new ContextAttribute(attrL.operator[](jx), "", "", false);
+          ContextAttribute* caP = new ContextAttribute(attrL[jx], "", "", false);
 
           cerP->contextElement.contextAttributeVector.push_back(caP);
         }
@@ -1610,7 +1610,7 @@ void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementR
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
-    ContextElementResponse* cerP = oldCerV.operator[](ix);
+    ContextElementResponse* cerP = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
     /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
@@ -1800,7 +1800,7 @@ bool registrationsQuery
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    const EntityId* en = enV.operator[](ix);
+    const EntityId* en = enV[ix];
 
     if (isTrue(en->isPattern))
     {
@@ -1836,7 +1836,7 @@ bool registrationsQuery
 
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
-    std::string attrName = attrL.operator[](ix);
+    std::string attrName = attrL[ix];
 
     attrs.append(attrName);
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
@@ -1941,7 +1941,7 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 
       for (unsigned int kx = 0; kx < caV.size(); ++kx)
       {
-        if (caV.operator[](kx)->name == condValues->operator[](cvlx))
+        if (caV[kx]->name == condValues->operator[](cvlx))
         {
           return true;
         }
@@ -2135,7 +2135,7 @@ BSONArray processConditionVector
     {
       Duration interval;
 
-      interval.set(nc->condValueList.operator[](0));
+      interval.set(nc->condValueList[0]);
       interval.parse();
 
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_TIMEINTERVAL_CONDITION <<
@@ -2150,7 +2150,7 @@ BSONArray processConditionVector
 
       for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
       {
-        condValues.append(nc->condValueList.operator[](jx));
+        condValues.append(nc->condValueList[jx]);
       }
 
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
@@ -2340,7 +2340,7 @@ void fillContextProviders(ContextElementResponse* cer, ContextRegistrationRespon
 {
   for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
   {
-    ContextAttribute* ca = cer->contextElement.contextAttributeVector.operator[](ix);
+    ContextAttribute* ca = cer->contextElement.contextAttributeVector[ix];
 
     if (ca->found)
     {
@@ -2418,12 +2418,12 @@ void cprLookupByAttribute
 
   for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
-    ContextRegistrationResponse* crr = crrV.operator[](crrIx);
+    ContextRegistrationResponse* crr = crrV[crrIx](crrIx);
 
     /* Is there a matching entity in the CRR? */
     for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
     {
-      EntityId* regEn = crr->contextRegistration.entityIdVector.operator[](enIx);
+      EntityId* regEn = crr->contextRegistration.entityIdVector[enIx]();
 
       if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {
@@ -2443,7 +2443,7 @@ void cprLookupByAttribute
       /* Is there a matching entity or the absence of attributes? */
       for (unsigned attrIx = 0; attrIx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++attrIx)
       {
-        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.operator[](attrIx)->name;
+        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector[attrIx]->name;
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result keep searching in CRR vector, so we return */
