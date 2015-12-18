@@ -1,44 +1,66 @@
 # Context Broker Acceptance Tests
 
-Folder for acceptance tests of context broker NGSI v2.In this framework we are using Behave-python (http://pythonhosted.org/behave).
+Folder for acceptance tests of Orion Context Broker NGSIv2, implemented using [Behave-python](http://pythonhosted.org/behave).
 
-## How to Run the Acceptance Tests
+## Quick way
 
-#### Prerequisites:
+Installing and setting up the environment from (almost :) the scratch in your local machine (running tests on Orion
+running in an external machine is advanced stuff, look to BB_FABRIC_USER, CB_FABRIC_PASS or CB_FABRIC_CERT and CB_FABRIC_SUDO
+parameters).
 
-- Python 2.7.x (One way would be SCL - The Software Collections Repository)
-- pip installed 1.4.1 or higher (http://docs.python-guide.org/en/latest/starting/install/linux/)
-- virtualenv installed 1.10.1 or higher (pip install virtualenv) (optional).
+* Ensure you have the following requirements in your system:
+  * Python 2.7. If you need to keep different version of Python interpreter at the same time, you could have a look
+    to [SCL](https://www.softwarecollections.org).
+  * Python pip 1.4.1 or higher
+  * virtualenv 1.10.1 or higher
+  * Requeriments for the fabric Python module (installed in a next step), typically installed using: `yum install gcc python-devel`. [Fabric](http://www.fabfile.org) is a library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
+* Creating a virtual env (e.g. named orion_bh). Actually this step is optional (if you know what a virtual env is, then you would know which 
+  steps to skip in order to avoid using it ;)
 
-Note: We recommend the use of virtualenv, because is an isolated working copy of Python which allows you to work on a specific project without worry of affecting other projects.
-
-
-#### Requirements to fabric (http://www.fabfile.org/)
-Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
-Some requirements are neccesary verify before to install `Fabric` library, mainly to pycripto library (Fabric dependency). 
-This libraries will be install into `requirements.txt`
 ```
-     yum install gcc python-devel
-```
-   
-
-#### Environment preparation:
-
-- If you are going to use a virtual environment (optional):
-  * Create a virtual environment somewhere, `virtualenv venv_name` (optional)
-  * Activate the virtual environment `source venv_name/bin/activate` (optional)
-  * Remember to unset the virtual environment when you're done testing, if it has been previously activated `deactivate` (optional)
-- You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
-- Both if you are using a virtual environment or not:
-  * Change to the test/acceptance/behave folder of the project.
-  * Install the requirements for the acceptance tests in the virtual environment
-  * You should add `--upgrade` (if you have a previous installed version of this library)
-```
-     pip install [--upgrade] -r requirements.txt --allow-all-external
+virtualenv orion_bh
 ```
 
+* Activate virtual env (you can later run `deactivate` to exit out of the virtual env)
 
-#### Folders/Files Structure
+```
+source orion_bh/bin/activate
+```
+
+* Install requirements. Assuming that you are at the test/acceptance/behave directory, run:
+
+```
+pip install -r requirements.txt --allow-all-external
+```
+
+* Set properties.json
+
+```
+cp properties.json.base properties.json
+vi properties.json
+# Ensure that CB_LOG_FILE and CB_PID_FILE are ok in your environment
+# Ensure that CB_EXTRA_OPS
+```
+
+* Check that test run ok. Note that you need a contextBroker built in DEBUG mode in your system PATH, e.g:
+
+```
+behave components/ngsiv2/api_entry_point/retrieve_api_resource.feature
+```
+
+* You are done!
+
+*Note*: you may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine.
+
+## Upgrading
+
+Use the same pip command done for installation, but adding `--upgrade` to the command line, i.e:
+
+```
+pip install --upgrade -r requirements.txt --allow-all-external
+```
+
+## Folders/Files Structure
 
     components/:                         folder with several sub-folders with features and steps
         --> common_steps/:               folder with common steps used in several features
@@ -61,15 +83,11 @@ This libraries will be install into `requirements.txt`
     README.md:                           this file, a brief explication about this framework to test
     requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
 
-   Note:
-```
-       The “environment.py” file (optional), if present, must be in the same directory that contains the “steps” directory 
-       (not in the “steps” directory). We recommend use a generic environment.py and import it in the environment.py 
-       file in the same directory that contains the “steps” directory.
-```
+*Note*: The `environment.py` file (optional), if present, must be in the same directory that contains the steps/ directory 
+(not inside the steps/ directory itself). We recommend use a generic environment.py and import it in the environment.py 
+file in the same directory that contains the “steps” directory.
 
-
-### Executing Tests:
+## Executing Tests:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
 - We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
@@ -121,7 +139,7 @@ This libraries will be install into `requirements.txt`
        behave component/<path>/example.feature -t @test.row1.10       -- run only the row 10 with this tag     
 ```
 
-### Properties.json
+## Properties.json
 
  Properties used by Context Broker tests
 - context_broker_env
@@ -156,7 +174,7 @@ This libraries will be install into `requirements.txt`
     * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
 
-### Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
+## Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
 
 In certain cases, could be useful to define actions before or/and after of the feature or/and each scenario. This help to read all pre or post actions into the feature. 
 
@@ -186,7 +204,7 @@ Feature: feature name...
 ```
 
 
-### Summary of Features and Scenarios
+## Summary of Features and Scenarios
 
 Finally, after each execution is displayed a summary (Optional) with all features executed and its scenarios status. See `environment.py` in root path.
 To activate/deactivate this summary, modify `SHOW_SUMMARY` variable (boolean).
@@ -213,12 +231,12 @@ Took 5m52.659s
 ```
 
 
-### Logs
+## Logs
 
 The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
 
-### Tests Suites Coverage (features):
+## Tests Suites Coverage (features):
 
 |       FEATURE/REFERENCE                     |  TEST CASES  | METHOD  |            URL                                       |  PAYLOAD  | QUERIES PARAMS |
 |:--------------------------------------------|:------------:|--------:|:-----------------------------------------------------|:---------:|:--------------:|      
@@ -247,7 +265,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |**alarms folder**                            |  (pending)   |                                                                                             |
 
   
-### Hints:
+## Hints:
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
   - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
@@ -264,7 +282,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - It is possible to use the same value of the previous request in another request using this string `the same value of the previous request`.
      
 
-### Tags
+## Tags
 
 You can to use multiples tags in each scenario, possibles tags used:
 
