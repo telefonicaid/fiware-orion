@@ -48,13 +48,15 @@ behave components/ngsiv2/api_entry_point/retrieve_api_resource.feature
 
 * You are done!
 
-Note: you may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine.
+*Note*: you may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine.
 
 ## Upgrading
 
 Use the same pip command done for installation, but adding `--upgrade` to the command line, i.e:
 
+```
 pip install --upgrade -r requirements.txt --allow-all-external
+```
 
 ## Folders/Files Structure
 
