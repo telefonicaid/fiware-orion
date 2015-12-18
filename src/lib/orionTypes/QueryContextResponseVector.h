@@ -47,15 +47,8 @@ typedef struct QueryContextResponseVector
   std::string            render(ConnectionInfo* ciP, const std::string& indent, bool details, const std::string& detailsString);
   void                   populate(QueryContextResponse* responseP);
 
-  QueryContextResponse*  operator[](unsigned int ix);
-  /*{
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  QueryContextResponse*  operator[](unsigned int ix) const;
 
-    return NULL;
-  }*/
 } QueryContextResponseVector;
 
 #endif  // SRC_LIB_ORIONTYPES_QUERYCONTEXTRESPONSEVECTOR_H_

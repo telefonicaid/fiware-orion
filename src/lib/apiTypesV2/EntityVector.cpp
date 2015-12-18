@@ -120,7 +120,7 @@ void EntityVector::push_back(Entity* item)
 *
 * EntityVector::operator -
 */
-Entity*  EntityVector::operator[] (unsigned int ix)
+Entity*  EntityVector::operator[] (unsigned int ix) const
 {
    if (ix < vec.size())
    {

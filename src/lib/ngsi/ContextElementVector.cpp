@@ -118,7 +118,7 @@ void ContextElementVector::release(void)
 *
 * ContextElementVector::operator -
 */
-ContextElement* ContextElementVector::operator[](unsigned int ix)
+ContextElement* ContextElementVector::operator[](unsigned int ix) const
 {
     if (ix < vec.size())
     {

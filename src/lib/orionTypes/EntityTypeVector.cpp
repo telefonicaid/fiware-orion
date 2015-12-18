@@ -139,7 +139,7 @@ void EntityTypeVector::push_back(EntityType* item)
 *
 * EntityTypeVector::operator -
 */
-EntityType* EntityTypeVector::operator[] (unsigned int ix)
+EntityType* EntityTypeVector::operator[] (unsigned int ix) const
 {
    if (ix < vec.size())
    {

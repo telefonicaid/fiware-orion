@@ -83,7 +83,7 @@ unsigned int QueryContextRequestVector::size(void)
 *
 * QueryContextRequestVector::operator[] -
 */
-QueryContextRequest*  QueryContextRequestVector::operator[](unsigned int ix)
+QueryContextRequest*  QueryContextRequestVector::operator[](unsigned int ix) const
 {
    if (ix < vec.size())
    {

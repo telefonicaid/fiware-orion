@@ -53,7 +53,7 @@ typedef struct ContextAttributeResponseVector
                                    int              counter);
   void                       fill(ContextAttributeVector* cavP, const StatusCode& statusCode);
 
-  ContextAttributeResponse*  operator[](unsigned int ix);
+  ContextAttributeResponse*  operator[](unsigned int ix) const;
 
 } ContextAttributeResponseVector;
 

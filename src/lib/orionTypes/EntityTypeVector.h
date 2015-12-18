@@ -50,7 +50,7 @@ class EntityTypeVector
   std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);  
 
-  EntityType*   operator[] (unsigned int ix);
+  EntityType*   operator[] (unsigned int ix) const;
 
 };
 

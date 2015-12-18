@@ -49,7 +49,7 @@ unsigned int QueryContextResponseVector::size(void)
 *
 * QueryContextResponseVector::operator[] -
 */
-QueryContextResponse*  QueryContextResponseVector::operator[](unsigned int ix)
+QueryContextResponse*  QueryContextResponseVector::operator[](unsigned int ix) const
 {
    if (ix < vec.size())
    {

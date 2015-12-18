@@ -217,16 +217,7 @@ void MetadataVector::push_back(Metadata* item)
 *
 * MetadataVector::operator -
 */
-Metadata* MetadataVector::operator[] (unsigned int ix) 
-{
-   if (ix < vec.size())
-   {
-     return vec[ix];
-   }
-   return NULL;
-}
-
-const Metadata* MetadataVector::operator[] (unsigned int ix) const 
+Metadata* MetadataVector::operator[] (unsigned int ix) const
 {
    if (ix < vec.size())
    {
@@ -275,7 +266,7 @@ void MetadataVector::fill(MetadataVector* mvP)
 {
   for (unsigned int ix = 0; ix < mvP->size(); ++ix)
   {
-    Metadata* mP = new Metadata(mvP->operator[](ix));
+    Metadata* mP = new Metadata((*mvP)[ix]);
 
     push_back(mP);
   }

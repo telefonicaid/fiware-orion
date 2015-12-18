@@ -46,7 +46,7 @@ typedef struct ContextRegistrationResponseVector
   void                          present(const std::string& indent);
   void                          release(void);
 
-  ContextRegistrationResponse*  operator[](unsigned int ix);
+  ContextRegistrationResponse*  operator[](unsigned int ix) const;
 
 
   std::string                   check(RequestType         requestType,

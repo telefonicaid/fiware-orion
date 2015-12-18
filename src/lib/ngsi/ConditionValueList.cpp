@@ -136,15 +136,15 @@ unsigned int ConditionValueList::size(void)
 *
 * ConditionValueList::operator
 */
-//std::string ConditionValueList::operator[] (unsigned int ix)
-//{
-  //  if (ix < vec.size())
-    //{
-      //return vec[ix];
-   // }
+std::string ConditionValueList::operator[] (unsigned int ix) const
+{
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
 
-    //return "";
-//}
+  return "";
+}
 
 
 

@@ -111,7 +111,7 @@ void ContextRegistrationResponseVector::release(void)
 *
 * ContextRegistrationResponseVector::operator -
 */
-ContextRegistrationResponse*  ContextRegistrationResponseVector::operator[] (unsigned int ix)
+ContextRegistrationResponse*  ContextRegistrationResponseVector::operator[] (unsigned int ix) const
 {
     if (ix < vec.size())
     {

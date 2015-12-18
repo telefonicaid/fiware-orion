@@ -111,7 +111,7 @@ void ContextRegistrationVector::release(void)
 *
 * ContextRegistrationVector::operator -
 */
-ContextRegistration* ContextRegistrationVector::operator[](unsigned int ix)
+ContextRegistration* ContextRegistrationVector::operator[](unsigned int ix) const
 {
    if (ix < vec.size())
    {

@@ -1557,9 +1557,9 @@ bool entitiesQuery
 
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
-        EntityId* eP = &cerV->operator[](jx)->contextElement.entityId;
+        EntityId eP = (*cerV)[jx]->contextElement.entityId;
 
-        if ((eP->id == enV[ix]->id) && (eP->type == enV[ix]->type))
+        if ((eP.id == enV[ix]->id) && (eP.type == enV[ix]->type))
         {
           needToAdd = false;
           break;  /* jx */
@@ -1937,11 +1937,11 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
   {
     for (unsigned int aclx = 0; aclx < cerV->size(); ++aclx)
     {
-      ContextAttributeVector caV = cerV->operator[](aclx)->contextElement.contextAttributeVector;
+      ContextAttributeVector caV = (*cerV)[aclx]->contextElement.contextAttributeVector;
 
       for (unsigned int kx = 0; kx < caV.size(); ++kx)
       {
-        if (caV[kx]->name == condValues->operator[](cvlx))
+        if (caV[kx]->name == (*condValues)[cvlx])
         {
           return true;
         }
@@ -2129,7 +2129,7 @@ BSONArray processConditionVector
 
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
-    NotifyCondition* nc = ncvP->operator[](ix);
+    NotifyCondition* nc = (*ncvP)[ix];
 
     if (nc->type == ON_TIMEINTERVAL_CONDITION)
     {

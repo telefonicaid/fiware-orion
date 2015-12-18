@@ -47,7 +47,7 @@ typedef struct EntityVector
   unsigned int  size(void);
   Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);
   void          release();
-  Entity*  operator[](unsigned int ix);
+  Entity*  operator[](unsigned int ix) const;
   
 } EntityVector;
 

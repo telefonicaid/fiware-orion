@@ -51,8 +51,8 @@ typedef struct ScopeVector
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
-  Scope* operator[](unsigned int ix); 
-  const Scope* operator[](unsigned int ix) const;
+  //Scope* operator[](unsigned int ix);
+  Scope* operator[](unsigned int ix) const;
 
 
   

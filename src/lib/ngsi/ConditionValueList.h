@@ -55,15 +55,8 @@ typedef struct ConditionValueList
                      const std::string&  predetectedError,
                      int                 counter);
 
-  std::string operator[] (unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+  std::string operator[] (unsigned int ix) const;
 
-    return "";
-  }
 
 } ConditionValueList;
 

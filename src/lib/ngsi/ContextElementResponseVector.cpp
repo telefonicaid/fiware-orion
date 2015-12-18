@@ -139,6 +139,19 @@ unsigned int ContextElementResponseVector::size(void)
 }
 
 
+/* ****************************************************************************
+*
+* ContextElementResponseVector::operator[] -
+*/
+ContextElementResponse*  ContextElementResponseVector::operator[] (unsigned int ix) const
+{
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+  return NULL;
+}
+
 
 /* ****************************************************************************
 *

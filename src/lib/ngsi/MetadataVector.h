@@ -61,8 +61,7 @@ typedef struct MetadataVector
   void            fill(MetadataVector* mV);
  
   
-  Metadata*    operator[](unsigned int ix);
-  const Metadata* operator[](unsigned int ix) const;
+  Metadata* operator[](unsigned int ix) const;
 
   
 } MetadataVector;

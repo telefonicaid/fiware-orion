@@ -52,7 +52,7 @@ typedef struct ContextRegistrationVector
                               const std::string&  predetectedError,
                               int                 counter);
 
-  ContextRegistration*  operator[](unsigned int ix);
+  ContextRegistration*  operator[](unsigned int ix) const;
 
 } ContextRegistrationVector;
 

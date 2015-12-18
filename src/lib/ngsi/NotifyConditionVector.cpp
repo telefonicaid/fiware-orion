@@ -122,7 +122,7 @@ void NotifyConditionVector::push_back(NotifyCondition* item)
 *
 * NotifyConditionVector::operator -
 */
-NotifyCondition* NotifyConditionVector::operator[] (unsigned int ix)  
+NotifyCondition* NotifyConditionVector::operator[] (unsigned int ix) const
 {
    if (ix < vec.size())
    {

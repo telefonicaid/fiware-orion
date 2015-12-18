@@ -130,11 +130,11 @@ void ScopeVector::push_back(Scope* item)
 *
 * ScopeVector::operator -
 */
-Scope* ScopeVector::operator[](unsigned int ix) 
+/*Scope* ScopeVector::operator[](unsigned int ix)
 {
   return (ix < vec.size())? vec[ix] : NULL;
-}
-const Scope* ScopeVector::operator[](unsigned int ix) const
+}*/
+Scope* ScopeVector::operator[](unsigned int ix) const
 {
    if (ix < vec.size())
    {

@@ -50,24 +50,8 @@ typedef struct ContextAttributeVector
   unsigned int             size(void) const;
   void                     release(void);
   void                     fill(struct ContextAttributeVector* cavP);
-
-  ContextAttribute*  operator[](unsigned int ix)
-  {    
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-    return NULL;  
-  }
   
-  ContextAttribute*  operator[](unsigned int ix) const
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-    return NULL;  
-  }
+  ContextAttribute*  operator[](unsigned int ix) const;
 
 
   std::string        check(RequestType          requestType,

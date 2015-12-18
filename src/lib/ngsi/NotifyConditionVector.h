@@ -53,7 +53,7 @@ typedef struct NotifyConditionVector
                           const std::string&  predetectedError,
                           int                 counter);
 
-  NotifyCondition* operator[] (unsigned int ix);
+  NotifyCondition* operator[] (unsigned int ix) const;
 
 } NotifyConditionVector;
 
