@@ -82,6 +82,7 @@ pip install --upgrade -r requirements.txt --allow-all-external
     properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see properties.json.base)
     README.md:                           this file, a brief explication about this framework to test
     requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
+    behave_all.py                        execute all features in a given directory and its subdirectories
 
 *Note*: The `environment.py` file (optional), if present, must be in the same directory that contains the steps/ directory 
 (not inside the steps/ directory itself). We recommend use a generic environment.py and import it in the environment.py 
@@ -138,6 +139,26 @@ file in the same directory that contains the “steps” directory.
     After:
        behave component/<path>/example.feature -t @test.row1.10       -- run only the row 10 with this tag     
 ```
+
+
+## Scripts
+
+ - **behave_all.sh**:  This script execute all .feature files in a given directory and its subdirectories.       
+      usage:                                                                                   
+         ./python behave_all.sh [-u] [-only] [-path==directory_path] [-tags==tags_list] [-skip==folders] 
+                                                                                               
+      parameters:                                                                              
+         -u: show the usage [optional].                                                       
+         -path: find .feature files in the directory and subdirectory (default: .) [optional]. 
+         -tags: use tags defined (default: nothing) [optional].                                
+         -skip: list of directories skipped, separated by comma (default: steps) [optional].  
+         -only: The features are not executed only returns the command line. [optional].
+                                                                                               
+      example:                                                                                 
+          ./python behave_all.py -path==components/ngsi -tag==-t @skip -skip==types,entities -only       
+                                                                                               
+     Note: If the folder has not a file with .feature extension, this folder is skipped automatically.                                   
+
 
 ## Properties.json
 
@@ -261,6 +282,26 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |**attributes_value folder**                                                                                                                               |
 | get_attribute_value                         |  (pending)   | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
 | update_attribute_value                      |    237       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
+|                                                                                                                                                          |
+|**types folder**                                                                                                                                          |
+| retrieve_entity_types                       |  (pending)   | GET     | /v2/types/                                           | No        | Yes            |   
+| retrieve_an_entity_type                     |  (pending)   | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
+|                                                                                                                                                          |
+|**subscriptions folder**                                                                                                                                  |
+| retrieve_subscriptions                      |  (pending)   | GET     | /v2/subscriptions                                    | No        | Yes            |   
+| create_a_new_subscription                   |  (pending)   | POST    | /v2/subscriptions                                    | Yes       | No             |   
+|                                                                                                                                                          |
+| retrieve_subscription                       |  (pending)   | GET     | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
+| update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   
+| delete_subscription                         |  (pending)   | DELETE  | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
+|                                                                                                                                                          |
+|**registration folder**                                                                                                                                   |
+| retrieve_registrations                      |  (pending)   | GET     | /v2/registrations                                    | No        | Yes            |   
+| create_a_new_context_provider_registration  |  (pending)   | POST    | /v2/registrations                                    | Yes       | No             |   
+|                                                                                                                                                          |
+| retrieve_context_provider_registration      |  (pending)   | GET     | /v2/registrations/`<registration_id>`                | No        | No             |   
+| update_context_provider_registration        |  (pending)   | PATCH   | /v2/registrations/`<registration_id>`                | Yes       | No             |   
+| delete_context_provider_registration        |  (pending)   | DELETE  | /v2/registrations/`<registration_id>`                | No        | No             |   
 |                                                                                                                                                          |
 |**alarms folder**                            |  (pending)   |                                                                                             |
 
