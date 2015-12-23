@@ -771,7 +771,8 @@ class NGSI:
     def verify_entity_types(self, queries_parameters, accumulate_entities_context, resp):
         """
         verify entity types  -- /v2/types
-        :param entities_context:
+        :param queries_parameters: queries parameters used in the request
+        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
         :param resp: http response
         """
         types = {}
