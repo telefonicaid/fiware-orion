@@ -263,13 +263,13 @@ class NGSI:
                     posf = value[posi:].find("'")
                     comma = value[posi:posf+posi].find(",")
                     if comma >= 0:
-                        comma = posi+comma
+                        comma += posi
                         value = "%s%s%s" % (value[:comma], text_to_comma_replace, value[comma+1:])
                 posi = posi+posf + len(text_to_comma_replace) + 1
         l = value.split(",")
         for e in l:
             e = e.replace("'", "")  # remove the simpl quote
-            e = e.replace(text_to_comma_replace, ",") # replace temporal text to comma
+            e = e.replace(text_to_comma_replace, ",")  # replace temporal text to comma
             final_list.append(e)
         return final_list
 
@@ -313,7 +313,7 @@ class NGSI:
                 assert len(value) == 2, " ERROR - It is necessary attribute and value (in that order)"
                 if value[0].find(self.__remove_quote(entity_context["attributes_name"])) >= 0:
                     items = []
-                    if value[1].find("..") >= 0: # value is a range, specified as a minimum and maximum separated by ..
+                    if value[1].find("..") >= 0:  # value is a range, specified as a minimum and maximum separated by ..
                         items.append("range")
                         min_max = value[1].split("..")
                         items.append(min_max)
@@ -396,7 +396,7 @@ class NGSI:
         elements = {}
         group = []
         for entities_group in accumulate_entities_context:
-            total = total + int(entities_group["entities_number"])
+            total += int(entities_group["entities_number"])
             ids.append(self.__remove_quote(entities_group["entities_id"]))
             types.append(self.__remove_quote(entities_group["entities_type"]))
 
@@ -468,7 +468,7 @@ class NGSI:
                     if tp is not None and items_list[i]["type"].find(tp) >= 0:
                         type_exists = True
                         break
-                assert type_exists, 'ERROR - type field does not exist' % items_list[i]["type"]
+                assert type_exists, 'ERROR - type field with value "%s" does not exist' % items_list[i]["type"]
                 sub_elements["entities_type"] = items_list[i]["type"]
 
             # verify attributes names
@@ -734,6 +734,20 @@ class NGSI:
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type and ' \
                     'without metadatas' % (str(attribute), field_type)
 
+    def verify_an_attribute_value_by_id(self, entities_context, resp):
+        """
+        verify an attribute value by ID
+        :param entities_context:
+        :param resp:
+        ex:
+            {
+                value: "017-06-17T07:21:24.238Z"
+            }
+        """
+        resp_json = convert_str_to_dict(resp.content, JSON)
+        assert "value" in resp_json, 'ERROR - value key dos not exist in response: \n %s' %  resp.content
+        assert resp_json["value"] == entities_context["attributes_value"], "ERROR - the value %s is not the expected: %s" % (resp_json["value"], entities_context["attributes_value"])
+
     def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers):
         """
         verify if the attribute has been deleted
@@ -751,6 +765,89 @@ class NGSI:
             assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
             entity = curs_list[i]  # manages N entities
             assert entities_contexts["attributes_name"] not in entity["attrNames"], " ERROR - the attribute: %s exists in the entity No: %s" % \
-                                                                                (entities_contexts["attributes_name"], str(i+1))
+                                                                                    (entities_contexts["attributes_name"], str(i+1))
         mongo_driver.disconnect()
+
+    def verify_entity_types(self, queries_parameters, accumulate_entities_context, resp):
+        """
+        verify entity types  -- /v2/types
+        :param entities_context:
+        :param resp: http response
+        """
+        types = {}
+        total = 0
+        limit = 20
+        offset = 0
+        count_total = 0
+
+        for entities_group in accumulate_entities_context:
+            temp = self.__remove_quote(entities_group["entities_type"])
+            if temp not in types:  # avoid types duplicated
+                types[temp] = int(entities_group["entities_number"])
+                total += 1
+            else:
+                types[temp] += int(entities_group["entities_number"])  # entities counter
+
+        if "limit" in queries_parameters:
+            limit = int(queries_parameters["limit"])
+        if "offset" in queries_parameters:
+            offset = int(queries_parameters["offset"])
+        if "options" in queries_parameters:
+            if queries_parameters["options"] == "count":
+                count = int(resp.headers["x-total-count"])
+
+            if queries_parameters["options"] == "values":
+                pass  # not implemented and not tested yet (pending)
+
+        # determinate number of items and position in response
+        if offset >= total:
+            items = 0
+            position = 0
+        elif limit+offset > total:
+            items = total-offset
+            position = offset
+        else:
+            items = limit
+            position = offset
+
+        #  info in log
+        __logger__.debug("total:  %s" % str(total))
+        __logger__.debug("limit:  %s" % str(limit))
+        __logger__.debug("offset: %s" % str(offset))
+        __logger__.debug("items:  %s" % str(items))
+        __logger__.debug("pos:    %s" % str(position))
+        __logger__.debug("types:  %s" % str(types))
+
+        # verify entities number
+        items_dict = convert_str_to_dict(resp.content, JSON)
+        items_list = items_dict.keys()  # list of keys
+        assert items == len(items_list), " ERROR - the entities group total: %d is not the expected:%d" % (len(items_list), items)
+        for item in items_list:
+            attr_exists = False
+            type_resp = item
+            if item == EMPTY:
+                type_resp = None
+
+            assert type_resp in types, " ERROR - wrong entity type: %s" % item  # verify that the entities was created
+            count_total += int(items_dict[item]["count"])
+            """
+            assert types[type_resp] == int(items_dict[item]["count"]), \
+                " ERROR - the entities counter %s does not match with the expected: %s" % \
+                (items_dict[item]["count"], types[type_resp])
+            """
+            attr_list = items_dict[item]["attrs"].keys()       # list of attributes in each entities group
+            for attr in attr_list:
+                for entities_group in accumulate_entities_context:
+                    if (entities_group["entities_type"] == type_resp) and (attr.find(entities_group["attributes_name"]) >= 0):
+                      #  if entities_group["attributes_type"] == items_dict[item]["attrs"][attr]["type"]:
+                         attr_exists = True
+                         break
+            assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, items_dict[item]["attrs"][attr]["type"])
+
+        # options=count query parameter
+        if "options" in queries_parameters:
+            if queries_parameters["options"] == "count":
+                count = int(resp.headers["x-total-count"])
+                assert count == count_total, " ERROR - the x-total-count header: %d does not match with the expected total: %d" \
+                                             % (count, count_total)
 
