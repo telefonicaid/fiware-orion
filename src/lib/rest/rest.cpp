@@ -92,7 +92,6 @@ static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
-unsigned short                   rushPort              = 0;
 char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
@@ -1382,11 +1381,7 @@ void restInit
   const char*         _bindAddress,
   unsigned short      _port,
   bool                _multitenant,
-  unsigned int        _connectionMemory,
-  unsigned int        _maxConnections,
-  unsigned int        _mhdThreadPoolSize,
   const std::string&  _rushHost,
-  unsigned short      _rushPort,
   const char*         _allowedOrigin,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
@@ -1403,11 +1398,11 @@ void restInit
   serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
   acceptTextXml    = _acceptTextXml;
   multitenant      = _multitenant;
-  connMemory       = _connectionMemory;
-  maxConns         = _maxConnections;
-  threadPoolSize   = _mhdThreadPoolSize;
+  connMemory       = CONNECTION_MEM;
+  maxConns         = MAX_CONNECTIONS;
+  threadPoolSize   = MHD_THREAD_POOLSIZE;
   rushHost         = _rushHost;
-  rushPort         = _rushPort;
+  rushPort         = RUSH_PORT;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

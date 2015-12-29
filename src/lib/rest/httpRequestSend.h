@@ -32,8 +32,8 @@
 
 #define URI_BUF          (256)
 #define TAM_BUF          (8 * 1024)            // 8 KB  (for HTTP responses and pre-payload bytes in request, which will be very small)
-#define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
-#define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
+//#define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
+//#define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
 
 
 

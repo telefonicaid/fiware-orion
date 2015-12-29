@@ -75,4 +75,32 @@
 #define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     1
 #define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              1
 
+/* ****************************************************************************
+*
+* Message definitions - 
+*/
+#define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
+#define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
+
+/* ****************************************************************************
+*
+* Pagination definitions - 
+*/
+#define MAX_PAGINATION_LIMIT            "1000"
+
+/* ****************************************************************************
+*
+* MAX_LEN_IP - 
+*/
+#define MAX_LEN_IP  64
+
+/* ****************************************************************************
+*
+* CONSTANTS REST - 
+*/
+#define   CONNECTION_MEM  	64
+#define   MAX_CONNECTIONS   	128
+#define   MHD_THREAD_POOLSIZE   128
+#define   RUSH_PORT             0
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_
