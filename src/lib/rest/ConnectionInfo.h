@@ -51,90 +51,12 @@ struct ParseData;
 class ConnectionInfo
 {
 public:
-  ConnectionInfo():
-    connection             (NULL),
-    verb                   (NOVERB),
-    inFormat               (XML),
-    outFormat              (XML),
-    tenant                 (""),
-    servicePath            (""),
-    payload                (NULL),
-    payloadSize            (0),
-    callNo                 (1),
-    parseDataP             (NULL),
-    port                   (0),
-    ip                     (""),
-    apiVersion             ("v1"),
-    inCompoundValue        (false),
-    compoundValueP         (NULL),
-    compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk)
-  {
-    memset(payloadWord, 0, sizeof(payloadWord));
-  }
+  ConnectionInfo(const std::string &_api = "v1", Format _format = XML, bool _ws = false);
+  ConnectionInfo(Format _outFormat);
+  ConnectionInfo(const std::string &_url, const std::string &_method, const std::string &_version, MHD_Connection* _connection = NULL);
+  ~ConnectionInfo();
 
-  ConnectionInfo(Format _outFormat):
-    connection             (NULL),
-    verb                   (NOVERB),
-    inFormat               (XML),
-    outFormat              (_outFormat),
-    tenant                 (""),
-    servicePath            (""),
-    payload                (NULL),
-    payloadSize            (0),
-    callNo                 (1),
-    parseDataP             (NULL),
-    port                   (0),
-    ip                     (""),
-    apiVersion             ("v1"),
-    inCompoundValue        (false),
-    compoundValueP         (NULL),
-    compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk)
-  {
-    memset(payloadWord, 0, sizeof(payloadWord));
-  }
-
-  ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
-    connection             (_connection),
-    verb                   (NOVERB),
-    inFormat               (XML),
-    outFormat              (XML),
-    url                    (_url),
-    method                 (_method),
-    version                (_version),
-    tenant                 (""),
-    servicePath            (""),
-    payload                (NULL),
-    payloadSize            (0),
-    callNo                 (1),
-    parseDataP             (NULL),
-    port                   (0),
-    ip                     (""),
-    apiVersion             ("v1"),
-    inCompoundValue        (false),
-    compoundValueP         (NULL),
-    compoundValueRoot      (NULL),
-    httpStatusCode         (SccOk)
-  {
-
-    memset(payloadWord, 0, sizeof(payloadWord));
-
-    if      (_method == "POST")    verb = POST;
-    else if (_method == "PUT")     verb = PUT;
-    else if (_method == "GET")     verb = GET;
-    else if (_method == "DELETE")  verb = DELETE;
-    else if (_method == "PATCH")   verb = PATCH;
-    else                           verb = NOVERB;
-  }
-
-  ~ConnectionInfo()
-  {
-    if (compoundValueRoot != NULL)
-      delete compoundValueRoot;
-
-    servicePathV.clear();
-  }
+  void modify(const std::string &_url, const std::string &_verb, const std::string &_payload);
 
   MHD_Connection*            connection;
   Verb                       verb;
