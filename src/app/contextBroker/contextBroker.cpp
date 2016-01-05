@@ -194,6 +194,8 @@
 #include "serviceRoutinesV2/getAllSubscriptions.h"
 #include "serviceRoutinesV2/getSubscription.h"
 
+#include "orion_websocket/ws.h"
+
 #include "contextBroker/version.h"
 #include "common/string.h"
 
@@ -1780,6 +1782,9 @@ int main(int argC, char* argV[])
   {
     restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
+
+  orion_websocket *ws = orion_websocket_new(restServiceV);
+  orion_websocket_start(ws);
 
   LM_I(("Startup completed"));
   if (simulatedNotification)
