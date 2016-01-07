@@ -49,6 +49,10 @@ using namespace rapidjson;
 *
 * In the case of /v2/entities/<eid>, the entityId of 'Entity* eP' is set in
 * the service routine postEntity.
+*
+* Also, if the URI param 'options' includes the value 'keyValues', then the
+* parse changes to accept 'unknown fields' as attributes inside entity or
+* metadata inside attributes.
 * 
 */
 std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
