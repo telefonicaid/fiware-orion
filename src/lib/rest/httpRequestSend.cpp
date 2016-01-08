@@ -49,26 +49,6 @@
 #include "serviceRoutines/versionTreat.h"
 
 
-
-
-/* ****************************************************************************
-*
-* HTTP header maximum lengths
-*/
-#define CURL_VERSION_MAX_LENGTH             128
-#define HTTP_HEADER_USER_AGENT_MAX_LENGTH   256
-#define HTTP_HEADER_HOST_MAX_LENGTH         256
-
-
-
-/* ****************************************************************************
-*
-* Default timeout - 5000 milliseconds
-*/
-#define DEFAULT_TIMEOUT     5000
-
-
-
 /* ****************************************************************************
 *
 * defaultTimeout - 
@@ -303,7 +283,7 @@ int httpRequestSendWithCurl
     std::string  headerRushHttp;
 
     ip    = rushHost;
-    port  = rushPort;
+    port  = RUSH_PORT;
 
     snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
     headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;

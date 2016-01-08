@@ -84,6 +84,47 @@
 
 /* ****************************************************************************
 *
+* PAYLOAD_MAX_SIZE - 
+*/
+#define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
+
+
+
+/* ****************************************************************************
+*
+* IP - 
+*/
+#define  LOCAL_IP_V6  "::"
+#define  LOCAL_IP_V4  "0.0.0.0"
+
+
+/* ****************************************************************************
+*
+* STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
+*/
+#define STATIC_BUFFER_SIZE (32 * 1024)
+
+
+
+/* ****************************************************************************
+*
+* HTTP header maximum lengths
+*/
+#define CURL_VERSION_MAX_LENGTH             128
+#define HTTP_HEADER_USER_AGENT_MAX_LENGTH   256
+#define HTTP_HEADER_HOST_MAX_LENGTH         256
+
+
+
+/* ****************************************************************************
+*
+* Default timeout - 5000 milliseconds
+*/
+#define DEFAULT_TIMEOUT     5000
+
+
+/* ****************************************************************************
+*
 * Pagination definitions - 
 */
 #define MAX_PAGINATION_LIMIT            "1000"
@@ -102,5 +143,18 @@
 #define   MAX_CONNECTIONS   	128
 #define   MHD_THREAD_POOLSIZE   128
 #define   RUSH_PORT             0
+
+/* ****************************************************************************
+*
+* Values for URI parameters
+*/
+#define DEFAULT_PAGINATION_LIMIT        "20"
+#define DEFAULT_PAGINATION_LIMIT_INT    20
+
+/* ****************************************************************************
+*
+* DB_NAME_MAX_LEN - max length of database name
+*/
+#define DB_NAME_MAX_LEN  10
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_

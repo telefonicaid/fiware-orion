@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "rest/RestService.h"
+#include "common/limits.h"
 
 
 
@@ -52,7 +53,6 @@ typedef enum IpVersion
 */
 extern IpVersion       ipVersionUsed;  
 extern std::string     rushHost;
-extern unsigned short  rushPort;
 extern bool            multitenant;
 extern char            restAllowedOrigin[64];
 
