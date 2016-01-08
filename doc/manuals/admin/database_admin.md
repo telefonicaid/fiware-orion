@@ -97,12 +97,7 @@ the behaviour is different and the following databases are used (let
     database would be `orion-tenantA`.
 
 Per-service/tenant databases are created "on the fly" as the first
-request involving tenant data is processed by Orion. Note that there is
-a limitation in MongoDB current versions of 24,000 namespaces (each
-collection or index in a database consumes a namespace). Orion currently
-uses 5 collections per database, thus taking into account each
-collection involves also at least the `_id` index, that will end in a
-2,400 services/tenants limit (less if you have more indexes in place).
+request involving tenant data is processed by Orion.
 
 Finally, in the case of per-service/tenant databases, all collections
 and administrative procedures (backup, restore, etc.) are associated to
