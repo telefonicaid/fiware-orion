@@ -22,6 +22,11 @@ ubuntu_distro=$(grep DISTRIB_DESCRIPTION= /etc/lsb-release 2>/dev/null | cut -d\
 debian_distro=$(cat /etc/debian_version 2> /dev/null)
 suse_distro=$(cat /etc/SuSE-release 2> /dev/null | grep SUSE | cut -d ' ' -f 1-2 | sed 's/ /_/g')
 centos_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $3}')
+# In some cases (e.g. CentOS 7.x) we have found that the /etc/redhat-release content use the following pattern:
+# CentOS Linux release 7.2.1511 (Core) 
+# Instead the one in previous versions:
+# CentOS release 6.6 (Final)
+# The check in the next line ensure that the distro version is correctly detected in any case.
 if [ $centos_distro == "release" ]; then
 	centos_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $4}')
 fi
