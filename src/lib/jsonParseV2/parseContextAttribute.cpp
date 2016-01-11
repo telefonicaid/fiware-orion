@@ -121,53 +121,10 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         return r;
       }
     }
-    else if (keyValues == false) // ERROR
+    else // ERROR
     {
       LM_W(("Bad Input (unrecognized property for ContextAttribute - '%s')", name.c_str()));
       return "unrecognized property for context attribute";
-    }
-    else  // Anything captured here is a metadata, and options=keyValues has been set
-    {
-      Metadata* mdP = new Metadata();
-
-      mdP->name = name;
-
-      if (type == "String")
-      {
-        mdP->valueType   = orion::ValueTypeString;
-        mdP->stringValue = iter->value.GetString();
-      }
-      else if (type == "Number")
-      {
-        mdP->valueType   = orion::ValueTypeNumber;
-        mdP->numberValue = iter->value.GetDouble();
-      }
-      else if (type == "True")
-      {
-        mdP->valueType   = orion::ValueTypeBoolean;
-        mdP->boolValue   = true;
-      }
-      else if (type == "False")
-      {
-        mdP->valueType   = orion::ValueTypeBoolean;
-        mdP->boolValue   = false;
-      }
-      else if (type == "Null")
-      {
-        mdP->valueType   = orion::ValueTypeNone;
-      }
-      else if ((type == "Array") || (type == "Object"))
-      {
-        alarmMgr.badInput(clientIp, "Compound values not supported for metadata");
-        return "json error in metadata value";
-      }
-      else
-      {
-        alarmMgr.badInput(clientIp, "Invalid value for metadata");
-        return "json error in metadata value";
-      }
-
-      caP->metadataVector.push_back(mdP);
     }
   }
 

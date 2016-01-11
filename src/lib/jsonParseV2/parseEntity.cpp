@@ -51,8 +51,7 @@ using namespace rapidjson;
 * the service routine postEntity.
 *
 * Also, if the URI param 'options' includes the value 'keyValues', then the
-* parse changes to accept 'unknown fields' as attributes inside entity or
-* metadata inside attributes.
+* parse changes to accept 'unknown fields' as attributes inside entities.
 * 
 */
 std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)

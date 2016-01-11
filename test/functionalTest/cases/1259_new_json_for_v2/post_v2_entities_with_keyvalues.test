@@ -88,7 +88,7 @@ brokerStart CB 0-255
 # In keyValues mode, there are no metadata for attributes. If you need that, use the "normalized" method.
 # 
 #
-# An example just for Curiosity ...
+# An example just for curiosity ...
 #
 # {
 #   "id": "",
@@ -127,9 +127,11 @@ payload='{
   "a1": {
     "value": "25",
     "type": "AT1",
-    "meta1": 24,
-    "meta2": false,
-    "meta3": "string"
+    "metadata": {
+      "meta1": 24,
+      "meta2": false,
+      "meta3": "string"
+    }
   }
 }'
 orionCurl --url /v2/entities?options=keyValues  --payload "$payload" --json
