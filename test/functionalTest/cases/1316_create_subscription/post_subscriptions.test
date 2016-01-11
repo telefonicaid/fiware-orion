@@ -47,7 +47,10 @@ payload='
         "condition": {
             "attributes": [ "temperature" ],
             "expression": {
-               "q": "temperature>40"
+               "q": "temperature>40",
+               "geometry": "_geometry_",
+               "coords": "_coords_",
+               "georel": "_georel_"
             }
          }
     },
@@ -84,7 +87,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 360
+Content-Length: 386
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -105,9 +108,9 @@ Date: REGEX(.*)
                 "temperature"
             ],
             "expression": {
-                "coords": "",
-                "geometry": "",
-                "georel": "",
+                "coords": "_coords_",
+                "geometry": "_geometry_",
+                "georel": "_georel_",
                 "q": "temperature>40"
             }
         },
