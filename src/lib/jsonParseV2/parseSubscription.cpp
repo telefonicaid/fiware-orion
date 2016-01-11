@@ -160,8 +160,6 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject)
 {
 
-  //parseDataP->scr.res.entityIdVector = NULL;
-  //parseDataP->scr.res.notifyConditionVector = NULL;
   std::string r;
 
   // Entities
