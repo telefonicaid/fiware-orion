@@ -89,7 +89,6 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 #include "common/SyncQOverflow.h"
-#include "common/limits.h"
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
@@ -199,6 +198,15 @@
 #include "common/string.h"
 
 using namespace orion;
+
+
+
+/* ****************************************************************************
+*
+* DB_NAME_MAX_LEN - max length of database name
+*/
+#define DB_NAME_MAX_LEN  10
+
 
 
 /* ****************************************************************************
@@ -1763,14 +1771,14 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, allowedOrigin);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));

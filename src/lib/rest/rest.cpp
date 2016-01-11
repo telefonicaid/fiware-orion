@@ -52,6 +52,8 @@
 #include "rest/uriParamNames.h"
 #include "common/limits.h"  // SERVICE_NAME_MAX_LEN
 
+
+
 /* ****************************************************************************
 *
 * Globals
@@ -65,6 +67,7 @@ static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
+unsigned short                   rushPort              = RUSH_PORT;
 char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
@@ -72,8 +75,9 @@ static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
 __thread char                    clientIp[IP_LENGTH_MAX + 1];
-
-
+static unsigned int              connMemory;
+static unsigned int              maxConns;
+static unsigned int              threadPoolSize;
 
 
 /* ****************************************************************************
@@ -1210,7 +1214,7 @@ static int connectionTreat
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   bool      mhdStartError  = true;
-  size_t    memoryLimit    = CONNECTION_MEM * 1024; // CONNECTION_MEM is expressed in kilobytes
+  size_t    memoryLimit    = CONNECTION_MEM * 1024; // Connection memory is expressed in kilobytes
   MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)
@@ -1218,7 +1222,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     LM_X(1, ("Fatal Error (please call restInit before starting the REST service)"));
   }
 
-  if (MHD_THREAD_POOLSIZE != 0)
+  if (threadPoolSize != 0)
   {
     serverMode = MHD_USE_SELECT_INTERNALLY;
   }
@@ -1246,8 +1250,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                    MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                   MHD_OPTION_CONNECTION_LIMIT,         MAX_CONNECTIONS,
-                                   MHD_OPTION_THREAD_POOL_SIZE,         MHD_THREAD_POOLSIZE,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1262,8 +1266,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    NULL,
                                    connectionTreat,                     NULL,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                   MHD_OPTION_CONNECTION_LIMIT,         MAX_CONNECTIONS,
-                                   MHD_OPTION_THREAD_POOL_SIZE,         MHD_THREAD_POOLSIZE,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1298,8 +1302,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                       MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                      MHD_OPTION_CONNECTION_LIMIT,         MAX_CONNECTIONS,
-                                      MHD_OPTION_THREAD_POOL_SIZE,         MHD_THREAD_POOLSIZE,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1313,8 +1317,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       NULL,
                                       connectionTreat,                     NULL,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
-                                      MHD_OPTION_CONNECTION_LIMIT,         MAX_CONNECTIONS,
-                                      MHD_OPTION_THREAD_POOL_SIZE,         MHD_THREAD_POOLSIZE,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1352,7 +1356,11 @@ void restInit
   const char*         _bindAddress,
   unsigned short      _port,
   bool                _multitenant,
+  unsigned int        _connectionMemory,
+  unsigned int        _maxConnections,
+  unsigned int        _mhdThreadPoolSize,
   const std::string&  _rushHost,
+  unsigned short      _rushPort,
   const char*         _allowedOrigin,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
@@ -1369,7 +1377,10 @@ void restInit
   serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
   acceptTextXml    = _acceptTextXml;
   multitenant      = _multitenant;
+  connMemory       = _connectionMemory;
+  maxConns         = _maxConnections;
   rushHost         = _rushHost;
+  rushPort         = _rushPort;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

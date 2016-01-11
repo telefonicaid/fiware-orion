@@ -29,10 +29,20 @@
 #include <vector>
 
 #include "rest/RestService.h"
-#include "common/limits.h"
 
 
 
+/* ****************************************************************************
+*
+* MAX_LEN_IP - 
+*/
+#define MAX_LEN_IP  64
+
+/* ****************************************************************************
+*
+* CONSTANTS RESTINIT - 
+*/ 
+#define   RUSH_PORT 0
 
 /* ****************************************************************************
 *
@@ -53,6 +63,7 @@ typedef enum IpVersion
 */
 extern IpVersion       ipVersionUsed;  
 extern std::string     rushHost;
+extern unsigned short  rushPort;
 extern bool            multitenant;
 extern char            restAllowedOrigin[64];
 
@@ -74,10 +85,14 @@ extern void restInit
 (
    RestService*        _restServiceV,
    IpVersion           _ipVersion,
-   const char*         _bindAddress,
+   const char*         _bindAddress, 
    unsigned short      _port,
    bool                _multitenant       = false,
+   unsigned int        _connectionMemory  = CONNECTION_MEM,
+   unsigned int        _maxConnections    = MAX_CONNECTIONS,
+   unsigned int        _mhdThreadPoolSize = MHD_THREAD_POOLSIZE,
    const std::string&  _rushHost          = "",
+   unsigned short      _rushPort          = RUSH_PORT,
    const char*         _allowedOrigin     = NULL,
    const char*         _httpsKey          = NULL,
    const char*         _httpsCert         = NULL,

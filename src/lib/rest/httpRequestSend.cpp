@@ -270,7 +270,7 @@ int httpRequestSendWithCurl
   // now sent to rush instead of to its final destination.
   // Also, a few HTTP headers for rush must be setup.
   //
-  if ((RUSH_PORT==0) || (rushHost == ""))
+  if ((rushPort==0) || (rushHost == ""))
   {
     useRush = false;
   }
@@ -283,7 +283,7 @@ int httpRequestSendWithCurl
     std::string  headerRushHttp;
 
     ip    = rushHost;
-    port  = RUSH_PORT;
+    port  = rushPort;
 
     snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
     headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;
