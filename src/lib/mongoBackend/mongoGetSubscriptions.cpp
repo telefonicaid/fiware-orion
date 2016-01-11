@@ -112,10 +112,6 @@ static void setSubject(Subscription* s, const BSONObj& r)
     }
   }
 
-  // Note that current DB model is based on NGSIv1 and doesn't consider expressions. Thus
-  // subject.condition.expression cannot be filled. The implemetion will be enhanced once
-  // the DB model gets defined
-  // TBD
 }
 
 
