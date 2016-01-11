@@ -24,6 +24,7 @@
 * Author: Orion dev team
 */
 
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
@@ -48,9 +49,15 @@ extern std::string postSubscriptions
   SubscribeContextResponse  scr;
   std::string               answer;
 
+
+
   if (ciP->servicePathV.size() > 1)
   {
-    LM_W(("Bad Input (max *one* service-path allowed for subscriptions (%d given))", ciP->servicePathV.size()));
+    const size_t MSG_SIZE        = 96; // strlen(msg) + enough for digits
+    char         errMsg[MSG_SIZE];
+
+    snprintf(errMsg, MSG_SIZE, "Bad Input (max *one* service-path allowed for subscriptions (%zd given))", ciP->servicePathV.size());
+    alarmMgr.badInput(clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
     TIMED_RENDER(answer = scr.render(SubscribeContext, ciP->outFormat, ""));
