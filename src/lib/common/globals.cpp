@@ -384,7 +384,8 @@ int64_t parse8601(const std::string& s)
 * This is common code for Duration and Throttling (at least)
 *
 */
-int64_t parse8601Time(const std::string& s) {
+int64_t parse8601Time(const std::string& s)
+{
   struct tm   tm = {0};
   const char* p;
 

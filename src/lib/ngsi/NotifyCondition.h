@@ -46,12 +46,13 @@ typedef struct NotifyCondition
   std::string               type;            // Mandatory
   ConditionValueList        condValueList;   // Optional
   RestrictionString         restriction;     // Optional
+
   struct {
     std::string               q;
     std::string               geometry;
     std::string               coords;
     std::string               georel;
-   }                        expression;
+   }                        expression;      // Only used by NGSIv2 subscription
 
   NotifyCondition();
   NotifyCondition(NotifyCondition* ncP);
