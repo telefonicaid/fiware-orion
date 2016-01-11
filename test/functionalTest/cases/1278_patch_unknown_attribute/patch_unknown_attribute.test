@@ -31,8 +31,9 @@ brokerStart CB
 
 #
 # 01. POST /v2/entities to create E1/T1/A1=0
-# 02. PATCH /v2/entities/E1 (A2 unknown)
-
+# 02. PATCH /v2/entities/E1 (to create attr A2)
+# 03. GET /v2/entities/E1
+#
 
 echo "01. POST /v2/entities to create E1/T1/A1=0"
 echo "=========================================="
@@ -42,12 +43,20 @@ echo
 echo
 
 
-echo "02. PATCH /v2/entities/E1 (A2 unknown)"
-echo "======================================"
+echo "02. PATCH /v2/entities/E1 (to create attr A2)"
+echo "============================================="
 payload='{ "A2": 1 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH 
 echo
 echo
+
+
+echo "03. GET /v2/entities/E1"
+echo "======================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
 
 --REGEXPECT--
 01. POST /v2/entities to create E1/T1/A1=0
@@ -59,16 +68,34 @@ Date: REGEX(.*)
 
 
 
-02. PATCH /v2/entities/E1 (A2 unknown)
-======================================
-HTTP/1.1 404 Not Found
-Content-Length: 61
+02. PATCH /v2/entities/E1 (to create attr A2)
+=============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities/E1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "No context element found",
-    "error": "NotFound"
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": 0.0
+    },
+    "A2": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "id": "E1",
+    "type": "T1"
 }
 
 

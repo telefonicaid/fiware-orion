@@ -70,11 +70,11 @@ std::string patchEntity
   eP->id = compV[2];
 
   // 01. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(eP, "UPDATE");
+  parseDataP->upcr.res.fill(eP, "APPEND");
   
 
-  // 02. Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP);
+  // 02. Call standard op postUpdateContext, with checkEntityExistance set to TRUE
+  postUpdateContext(ciP, components, compV, parseDataP, true);
 
   // 03. Check output from mongoBackend - any errors?
   if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
