@@ -38,7 +38,7 @@ brokerStart CB
 echo "01. Create E1/attr1"
 echo "==================="
 payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url /v2/entities/E1?options=append --payload "$payload" --json
 echo
 echo
 
@@ -46,7 +46,7 @@ echo
 echo "02. Create E1/attr1 again - should fail"
 echo "======================================="
 payload='{ "attr1": 2 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url /v2/entities/E1?options=append --payload "$payload" --json
 echo
 echo
 
