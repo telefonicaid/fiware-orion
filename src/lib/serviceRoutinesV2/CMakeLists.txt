@@ -39,6 +39,7 @@ badVerbGetPutOnly.cpp
 getAllSubscriptions.cpp
 getSubscription.cpp
 postSubscriptions.cpp
+deleteSubscription.cpp
 )
 
 SET (HEADERS
@@ -60,6 +61,7 @@ badVerbGetPutOnly.h
 getAllSubscriptions.h
 getSubscription.h
 postSubscriptions.h
+deleteSubscription.h
 )
 
 

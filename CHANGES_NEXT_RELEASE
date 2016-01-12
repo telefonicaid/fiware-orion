@@ -9,3 +9,4 @@
 - Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
 - Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
 - Add: POST /v2/subscriptions operation (without expression evaluation yet) (Issue #1316)
+- Add: DELETE /v2/subscriptions operation (Issue #1654)
