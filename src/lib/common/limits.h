@@ -108,9 +108,9 @@
 *
 * CONSTANTS RESTINIT - 
 */ 
-#define   CONNECTION_MEM  	64   
-#define   MAX_CONNECTIONS   	128   
-#define   MHD_THREAD_POOLSIZE   128 
+#define   DEFAULT_CONNECTION_MEM  	64   
+#define   DEFAULT_MAX_CONNECTIONS   	128   
+#define   DEFAULT_MHD_THREAD_POOLSIZE   128 
 
 
 /* ****************************************************************************

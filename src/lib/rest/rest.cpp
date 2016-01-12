@@ -67,7 +67,7 @@ static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
-unsigned short                   rushPort              = RUSH_PORT;
+unsigned short                   rushPort              = NO_PORT;
 char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;

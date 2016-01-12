@@ -270,7 +270,7 @@ int httpRequestSendWithCurl
   // now sent to rush instead of to its final destination.
   // Also, a few HTTP headers for rush must be setup.
   //
-  if ((rushPort==0) || (rushHost == ""))
+  if ((rushPort == 0) || (rushHost == ""))
   {
     useRush = false;
   }

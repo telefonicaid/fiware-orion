@@ -42,7 +42,7 @@
 *
 * CONSTANTS RESTINIT - 
 */ 
-#define   RUSH_PORT 0
+#define   NO_PORT 0
 
 /* ****************************************************************************
 *
@@ -92,7 +92,7 @@ extern void restInit
    unsigned int        _maxConnections    = MAX_CONNECTIONS,
    unsigned int        _mhdThreadPoolSize = MHD_THREAD_POOLSIZE,
    const std::string&  _rushHost          = "",
-   unsigned short      _rushPort          = RUSH_PORT,
+   unsigned short      _rushPort          = NO_PORT,
    const char*         _allowedOrigin     = NULL,
    const char*         _httpsKey          = NULL,
    const char*         _httpsCert         = NULL,
