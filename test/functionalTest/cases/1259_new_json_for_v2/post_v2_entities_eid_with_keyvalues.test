@@ -39,8 +39,10 @@ brokerStart CB 0-255
 # 07. GET /v2/entities/E1?options=keyValues
 # 08. POST /v2/entities/E1?options=keyValues, adding A4 to E1
 # 09. GET /v2/entities/E1?options=keyValues
-# 10. POST /v2/entities, creating one more E1, different type
-# 11. GET /v2/entities/E1?options=keyValues
+# 10. PATCH /v2/entities/E1, setting A4 to 10
+# 11. GET /v2/entities/E1, to see A4 == 10
+# 12. POST /v2/entities, creating one more E1, different type
+# 13. GET /v2/entities/E1?options=keyValues
 #
 
 echo "01. POST /v2/entities, creating E1"
@@ -122,7 +124,24 @@ echo
 echo
 
 
-echo "10. POST /v2/entities, creating one more E1, different type"
+echo "10. PATCH /v2/entities/E1, setting A4 to 10"
+echo "==========================================="
+payload='{
+  "A4": 10
+}'
+orionCurl --url /v2/entities/E1  --payload "$payload" -X PATCH --json
+echo
+echo
+
+
+echo "11. GET /v2/entities/E1, to see A4 == 10"
+echo "========================================"
+orionCurl --url '/v2/entities/E1?options=keyValues' --json
+echo
+echo
+
+
+echo "12. POST /v2/entities, creating one more E1, different type"
 echo "==========================================================="
 payload='{
   "id": "E1",
@@ -133,7 +152,7 @@ echo
 echo
 
 
-echo "11. GET /v2/entities/E1?options=keyValues"
+echo "13. GET /v2/entities/E1?options=keyValues"
 echo "========================================="
 orionCurl --url '/v2/entities/E1?options=keyValues' --json
 echo
@@ -247,7 +266,30 @@ Date: REGEX(.*)
 }
 
 
-10. POST /v2/entities, creating one more E1, different type
+10. PATCH /v2/entities/E1, setting A4 to 10
+===========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+11. GET /v2/entities/E1, to see A4 == 10
+========================================
+HTTP/1.1 200 OK
+Content-Length: 52
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A3": 3.0,
+    "A4": 10.0,
+    "id": "E1",
+    "type": "T1"
+}
+
+
+12. POST /v2/entities, creating one more E1, different type
 ===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -256,7 +298,7 @@ Date: REGEX(.*)
 
 
 
-11. GET /v2/entities/E1?options=keyValues
+13. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 409 Conflict
 Content-Length: 105
