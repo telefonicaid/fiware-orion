@@ -27,7 +27,8 @@ centos_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $3}')
 # Instead the one in previous versions:
 # CentOS release 6.6 (Final)
 # The check in the next line ensure that the distro version is correctly detected in any case.
-if [ $centos_distro == "release" ]; then
+if [ "$centos_distro" = "release" ]
+then
 	centos_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $4}')
 fi
 fedora_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $1}')
@@ -41,7 +42,7 @@ then
 elif [ "$suse_distro" != "" ]
 then
   distro=$suse_distro 
-elif [ "$fedora_distro" == "Fedora" ]
+elif [ "$fedora_distro" = "Fedora" ]
 then
   distro=${fedora_distro}_${centos_distro}
 elif [ "$centos_distro" != "" ]

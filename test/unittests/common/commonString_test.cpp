@@ -58,13 +58,15 @@ TEST(commonString, stringSplit)
 TEST(commonString, parseUrl)
 {
    bool         r;
-   std::string  url1 = "";
-   std::string  url2 = "http:/Bad";
-   std::string  url3 = "http:/XXX";
-   std::string  url4 = "http://";
-   std::string  url5 = "http://XXX:12:34";
-   std::string  url6 = "http://XXX:1234/path";
-   std::string  url7 = "http://XXX/path";
+   std::string  url1   = "";
+   std::string  url2   = "http:/Bad";
+   std::string  url3   = "http:/XXX";
+   std::string  url4   = "http://";
+   std::string  url5   = "http://XXX:12:34";
+   std::string  url51  = "http://http://XXX:1234/path";              // Per bug #1652
+   std::string  url52  = "http://XXXX:/path";                        // Per bug #1652
+   std::string  url6   = "http://XXX:1234/path";
+   std::string  url7   = "http://XXX/path";
    std::string  urlv61 = "http://20:12345:20:80";
    std::string  urlv62 = "http://20:20:20:20:20:20:20:20:20:20";
    std::string  urlv63 = "http://2001:DB8:2de::e13:80/path";
@@ -84,6 +86,10 @@ TEST(commonString, parseUrl)
    r = parseUrl(url4, host, port, path, protocol);
    EXPECT_FALSE(r);
    r = parseUrl(url5, host, port, path, protocol);
+   EXPECT_FALSE(r);
+   r = parseUrl(url51, host, port, path, protocol);
+   EXPECT_FALSE(r);
+   r = parseUrl(url52, host, port, path, protocol);
    EXPECT_FALSE(r);
 
    r = parseUrl(url6, host, port, path, protocol);
