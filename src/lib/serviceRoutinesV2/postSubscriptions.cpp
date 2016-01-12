@@ -53,10 +53,10 @@ extern std::string postSubscriptions
 
   if (ciP->servicePathV.size() > 1)
   {
-    const size_t MSG_SIZE        = 96; // strlen(msg) + enough for digits
+    const size_t MSG_SIZE        = 96; // strlen(msg) + enough room for digits
     char         errMsg[MSG_SIZE];
 
-    snprintf(errMsg, MSG_SIZE, "Bad Input (max *one* service-path allowed for subscriptions (%zd given))", ciP->servicePathV.size());
+    snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%zd given)", ciP->servicePathV.size());
     alarmMgr.badInput(clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 

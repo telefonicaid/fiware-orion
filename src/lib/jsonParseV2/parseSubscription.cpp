@@ -62,7 +62,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp,"Bad Input (JSON parse error)");
+    alarmMgr.badInput(clientIp, "JSON parse error");
     OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
 
     return oe.render(ciP, "");
@@ -70,7 +70,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 
   if (!document.IsObject())
   {
-    alarmMgr.badInput(clientIp,"Bad Input (JSON parse error)");
+    alarmMgr.badInput(clientIp, "JSON parse error");
     OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
 
     return oe.render(ciP, "");
@@ -83,7 +83,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
-    alarmMgr.badInput(clientIp,"Bad Input (Empty payload)");
+    alarmMgr.badInput(clientIp, "empty payload");
     OrionError oe(SccBadRequest, "empty payload");
 
     return oe.render(ciP, "");
@@ -91,7 +91,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 
   if (!document.HasMember("subject"))
   {
-    alarmMgr.badInput(clientIp,"Bad Input (No subject specified");
+    alarmMgr.badInput(clientIp, "no subject specified");
     OrionError oe(SccBadRequest, "no subject for subscription specified");
 
     return oe.render(ciP, "");
@@ -99,7 +99,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 
   if (!document.HasMember("notification"))
   {
-    alarmMgr.badInput(clientIp,"Bad Input (No notification specified");
+    alarmMgr.badInput(clientIp, "no notification specified");
     OrionError oe(SccBadRequest, "no notitifcation for subscription specified");
 
     return oe.render(ciP, "");
@@ -107,7 +107,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 
   if (!document.HasMember("expires"))
   {
-    alarmMgr.badInput(clientIp,"Bad Input (No expires specified");
+    alarmMgr.badInput(clientIp, "no expires specified");
     OrionError oe(SccBadRequest, "no expiration for subscription specified");
 
     return oe.render(ciP, "");
@@ -117,7 +117,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 
   if (!expires.IsString())
   {
-    alarmMgr.badInput(clientIp,"Bad Input (Expires is not an string");
+    alarmMgr.badInput(clientIp, "expires is not an string");
     OrionError oe(SccBadRequest, "expires is not an string");
 
     return oe.render(ciP, "");
@@ -127,7 +127,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 
   if (eT == -1)
   {
-    alarmMgr.badInput(clientIp,"Bad Input (Expires has an invalid format");
+    alarmMgr.badInput(clientIp, "expires has an invalid format");
     OrionError oe(SccBadRequest, "expires has a invalid format");
 
     return oe.render(ciP, "");
@@ -165,7 +165,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
   // Entities
   if (!subject.HasMember("entities"))
   {
-    alarmMgr.badInput(clientIp,"Bad Input (No subject entities specified");
+    alarmMgr.badInput(clientIp, "no subject entities specified");
     OrionError oe(SccBadRequest, "no subject entities specified");
 
     return oe.render(ciP, "");
@@ -181,7 +181,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
   //Condition
   if (!subject.HasMember("condition"))
   {
-    alarmMgr.badInput(clientIp,"Bad Input (No subject condition specified");
+    alarmMgr.badInput(clientIp, "no subject condition specified");
     OrionError oe(SccBadRequest, "no subject condition specified");
 
     return oe.render(ciP, "");
@@ -208,7 +208,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 {
   if (!entities.IsArray())
   {
-    alarmMgr.badInput(clientIp,"Bad Input (subject entities is not an array");
+    alarmMgr.badInput(clientIp, "subject entities is not an array");
     OrionError oe(SccBadRequest, "subject entities is not an array");
 
     return oe.render(ciP, "");
@@ -217,14 +217,14 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
   {
     if (!iter->IsObject())
     {
-      alarmMgr.badInput(clientIp,"Bad Input (subject entities element is not an object");
+      alarmMgr.badInput(clientIp, "subject entities element is not an object");
       OrionError oe(SccBadRequest, "subject entities element is not an object");
 
       return oe.render(ciP, "");
     }
     if (!iter->HasMember("id") && !iter->HasMember("idPattern") && !iter->HasMember("type"))
     {
-      alarmMgr.badInput(clientIp,"Bad Input (subject entities element has not id/idPattern nor type");
+      alarmMgr.badInput(clientIp, "subject entities element has not id/idPattern nor type");
       OrionError oe(SccBadRequest, "subject entities element has not id/idPattern");
 
       return oe.render(ciP, "");
@@ -232,7 +232,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
     if (iter->HasMember("id") && iter->HasMember("idPattern"))
     {
-      alarmMgr.badInput(clientIp,"Bad Input (subject entities element has id and idPattern");
+      alarmMgr.badInput(clientIp, "subject entities element has id and idPattern");
       OrionError oe(SccBadRequest, "subject entities element has id and idPattern");
 
       return oe.render(ciP, "");
@@ -249,7 +249,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
       }
       else
       {
-        alarmMgr.badInput(clientIp,"Bad Input (subject entities element id is not a string");
+        alarmMgr.badInput(clientIp, "subject entities element id is not a string");
         OrionError oe(SccBadRequest, "subject entities element id is not a string");
 
         return oe.render(ciP, "");
@@ -263,7 +263,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
       }
       else
       {
-        alarmMgr.badInput(clientIp,"Bad Input (subject entities element idPattern is not a string");
+        alarmMgr.badInput(clientIp, "subject entities element idPattern is not a string");
         OrionError oe(SccBadRequest, "subject entities element idPattern is not a string");
 
         return oe.render(ciP, "");
@@ -286,7 +286,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
       }
       else
       {
-        alarmMgr.badInput(clientIp,"Bad Input (subject entities element type is not a string");
+        alarmMgr.badInput(clientIp, "subject entities element type is not a string");
         OrionError oe(SccBadRequest, "subject entities element type is not a string");
 
         return oe.render(ciP, "");
@@ -315,7 +315,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     const Value& callback = notification["callback"];
     if (!callback.IsString())
     {
-      alarmMgr.badInput(clientIp,"Bad Input (callback is not an string");
+      alarmMgr.badInput(clientIp, "callback is not an string");
       OrionError oe(SccBadRequest, "callback is not an string");
 
       return oe.render(ciP, "");
@@ -324,7 +324,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
   }
   else // missing callback field
   {
-    alarmMgr.badInput(clientIp,"Bad Input (callback is missing");
+    alarmMgr.badInput(clientIp, "callback is missing");
     OrionError oe(SccBadRequest, "callback is missing");
 
     return oe.render(ciP, "");
@@ -333,7 +333,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
   // Attributes
   if (!notification.HasMember("attributes"))
   {
-    alarmMgr.badInput(clientIp,"Bad Input (No notification attributes specified");
+    alarmMgr.badInput(clientIp, "no notification attributes specified");
     OrionError oe(SccBadRequest, "no notification attributes specified");
 
     return oe.render(ciP, "");
@@ -353,7 +353,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     const Value& throttling = notification["throttling"];
     if (!throttling.IsInt64())
     {
-      alarmMgr.badInput(clientIp,"Bad Input (Throttling is not a int");
+      alarmMgr.badInput(clientIp, "throttling is not a int");
       OrionError oe(SccBadRequest, "throttling is not an int");
 
       return oe.render(ciP, "");
@@ -376,7 +376,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditi
   // Attributes
   if (!condition.HasMember("attributes"))
   {
-    alarmMgr.badInput(clientIp,"Bad Input (No condition attributes specified");
+    alarmMgr.badInput(clientIp, "no condition attributes specified");
     OrionError oe(SccBadRequest, "no condition attributes specified");
 
     return oe.render(ciP, "");
@@ -429,7 +429,7 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 
   if (!attributes.IsArray())
   {
-    alarmMgr.badInput(clientIp,"Bad Input (attributes is not an array");
+    alarmMgr.badInput(clientIp, "attributes is not an array");
     OrionError oe(SccBadRequest, "attributes is not an array");
 
     return oe.render(ciP, "");
@@ -438,7 +438,7 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
   {
     if (!iter->IsString())
     {
-      alarmMgr.badInput(clientIp,"Bad Input (attributes element is not an string");
+      alarmMgr.badInput(clientIp, "attributes element is not an string");
       OrionError oe(SccBadRequest, "attributes element is not an string");
 
       return oe.render(ciP, "");
