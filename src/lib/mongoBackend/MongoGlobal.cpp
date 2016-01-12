@@ -2166,8 +2166,17 @@ BSONArray processConditionVector
         condValues.append(nc->condValueList[jx]);
       }
 
+      BSONObjBuilder expression;
+
+      expression << CSUB_CONDITIONS_Q << nc->expression.q
+                 << CSUB_CONDITIONS_GEO << nc->expression.geometry
+                 << CSUB_CONDITIONS_COORDS << nc->expression.coords
+                 << CSUB_CONDITIONS_GEOREL << nc->expression.georel;
+
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
-                        CSUB_CONDITIONS_VALUE << condValues.arr()));
+                        CSUB_CONDITIONS_VALUE << condValues.arr() <<
+                        CSUB_CONDITIONS_EXPR << expression.obj()
+                        ));
 
       if (processOnChangeConditionForSubscription(enV,
                                                   attrL,

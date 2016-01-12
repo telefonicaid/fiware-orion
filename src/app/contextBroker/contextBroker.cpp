@@ -193,6 +193,7 @@
 #include "serviceRoutinesV2/patchEntity.h"
 #include "serviceRoutinesV2/getAllSubscriptions.h"
 #include "serviceRoutinesV2/getSubscription.h"
+#include "serviceRoutinesV2/postSubscriptions.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -729,6 +730,7 @@ static const char* validLogLevels[] =
   { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
+  { "POST",   SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          postSubscriptions        }, \
   { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
