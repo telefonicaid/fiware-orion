@@ -68,18 +68,14 @@ std::string deleteSubscription
 
   TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
 
-  StatusCode      sc  = uncr.statusCode;
-  HttpStatusCode  scc = sc.code;
-
-  if (scc != SccOk)
+  if (uncr.statusCode.code != SccOk)
   {
-    OrionError oe;
+    OrionError oe(uncr.statusCode);
 
-    ciP->httpStatusCode = scc;
-    oe.code             = scc;
-    oe.reasonPhrase     = sc.reasonPhrase;
+    ciP->httpStatusCode = uncr.statusCode.code;
+    oe.reasonPhrase     = uncr.statusCode.reasonPhrase;
 
-    if (scc == SccContextElementNotFound)
+    if (uncr.statusCode.code == SccContextElementNotFound)
     {
       oe.details = "The requested subscription has not been found. Check id";
     }
