@@ -1,6 +1,6 @@
 #<a name="top"></a>Performance tuning
 
-* [MongoDB version](#mongodb-version)
+* [MongoDB configuration](#mongodb-configuration)
 * [Database indexes](#database-indexes)
 * [Write concern](#write-concern)
 * [Notification modes and performance](#notification-modes-and-performance)
@@ -12,7 +12,7 @@
 * [Outgoing HTTP connections timeout](#outgoing-http-connections-timeout)
 * [Subscription cache](#subscription-cache)
 
-##  MongoDB version
+##  MongoDB configuration
 
 Since version 0.21.0, Orion supports both MongoDB 2.6 and MongoDB 3.0 without difference from a functional
 point of view. However, MongoDB 2.6 implements a per-collection lock, while MongoDB 3.0 (when configured
@@ -21,6 +21,15 @@ to use WireTiger storage engine) implements per-document lock. Thus, the lock sy
 
 From a performance point of view, it is recommended to use MongoDB 3.0 with WireTiger, especially
 in update-intensive scenarios.
+
+In addition, take into account the following information from the official MongoDB documentation, as it may have
+impact in performance:
+
+* Check that ulimit settings in your system are ok. MongoDB provides [the following recomendations](https://docs.mongodb.org/manual/reference/ulimit)
+  As described in that document, in RHEL/CentOS you have to create a /etc/security/limits.d/99-mongodb-nproc.conf file,
+  in order to set soft/hard process limit to at least 32000 (check details in the cited document).
+* You should also disable Transparent Huge Pages (HTP) to increment the performance as explain 
+  in [this document](https://docs.mongodb.org/manual/tutorial/transparent-huge-pages/).
 
 [Top](#top)
 

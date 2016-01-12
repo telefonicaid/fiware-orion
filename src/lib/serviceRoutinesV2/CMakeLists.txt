@@ -38,6 +38,8 @@ getEntityAllTypes.cpp
 badVerbGetPutOnly.cpp
 getAllSubscriptions.cpp
 getSubscription.cpp
+postSubscriptions.cpp
+deleteSubscription.cpp
 )
 
 SET (HEADERS
@@ -58,6 +60,8 @@ getEntityAllTypes.h
 badVerbGetPutOnly.h
 getAllSubscriptions.h
 getSubscription.h
+postSubscriptions.h
+deleteSubscription.h
 )
 
 

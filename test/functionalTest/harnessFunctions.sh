@@ -1033,7 +1033,7 @@ function orionCurl()
   #
   dMsg Executing the curl-command
   _response=$(eval $command 2> /dev/null)
-
+  _responseHeaders=$(cat /tmp/httpHeaders.out)
   if [ ! -f /tmp/httpHeaders.out ]
   then
     echo "Broker seems to have died ..."

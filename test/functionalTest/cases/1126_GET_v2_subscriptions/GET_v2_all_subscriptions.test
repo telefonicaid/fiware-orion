@@ -164,7 +164,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?options=count
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 837
+Content-Length: 855
 Content-Type: application/json
 X-Total-Count: 2
 Date: REGEX(.*)
@@ -192,6 +192,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },
@@ -228,6 +229,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },
@@ -260,7 +262,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 896
+Content-Length: 914
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -287,6 +289,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },
@@ -325,6 +328,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },

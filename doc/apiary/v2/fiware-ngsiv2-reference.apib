@@ -231,7 +231,7 @@ There are two representation modes, which must be supported by implementations, 
 
 * *keyValues* mode. This mode represents each entity attribute only by its value, leaving out the information about type and metadata.
   Thus, when this mode is on, only the attribute value is represented and will correspond to the value of the property which represents the attribute.
-  See example below (To be provided).
+  See example below.
 
 ```
 {
@@ -254,7 +254,8 @@ Some operations imply that only a partial representation of an entity will be pr
 
 * `id` and `type` are not allowed in update operations, as they are inmutable properties.
 
-* In the requests in which `type` is allowed, it may be omitted. When omitted, the default value `null` is used for the type.
+* In the requests in which entity `type` is allowed, it may be omitted. When omitted, the default value `null` 
+  is used for the type.
 
 * In some cases, not all the attributes of the entity are shown, e.g. a query which selects a subset of entity attributes.
 
@@ -592,7 +593,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs}]
 
 Retrieves a list of entities which match different criteria (by id, idPattern, type or those which match
 a query or geographical query). A given entity have to match all the criteria to be retrieved
@@ -614,16 +615,19 @@ Response code:
     + type: Room (optional, string) -  comma separated list of elements.
     Retrieve entities which type match one of the elements in the list.
 
-    + idPattern (optional, string) - A correctly formated regular expression.
+    + idPattern: Bode_.* (optional, string) - A correctly formated regular expression.
     Retrieve entities which ID matches the regular expression. Incompatible with id.
     
-    + q (optional, string) - A query expression, composed of a list of statements separated by `;`,
+    + q: temperature>40 (optional, string) - A query expression, composed of a list of statements separated by `;`,
     i.e. q=statement;statements;statement. See [Simple Query Language specification](#simple_query_language). 
     
-    + geometry (optional, string) - Geografical area to which the query is restricted.
-    It is composed of a token list separated by ';'. See [Geographical Queries](#geographical_queries).
+    + georel: near (optional, string) - Spatial relationship between matching entities and a reference
+    shape. See [Geographical Queries](#geographical_queries).
+
+    + geometry: point (optional, string) - Geografical area to which the query is restricted.
+    See [Geographical Queries](#geographical_queries).
     
-    + coords (optional, string) - List of pairs of coordinates (latitude, longitude) separated by ','.
+    + coords: 40.6391,-8.6533 (optional, string) - List of latitude-longitude pairs of coordinates separated by ','.
     See [Geographical Queries](#geographical_queries).
     
     + limit: 20 (optional, number) - Limits the number of entities to be retrieved
@@ -636,7 +640,10 @@ Response code:
     + options (optional, string) - Options dictionary
       + Members
           + count - when used, the total number of entities is returned in the response as a HTTP header named `X-Total-Count`.
-          + canonical - when used, the response payload uses the "canonical form". See JSON entity representation format section for details.
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding 
+          section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
+          section for details.
 
 + Response 200 (application/json)
 
@@ -644,12 +651,20 @@ Response code:
          {
             "type": "Room",
             "id": "DC_S1-D41",
-            "temperature": 35.6
+            "temperature": {
+                "value": 35.6,
+                "type": null,
+                "metadata": {}
+            }
          },
          {
             "type": "Room",
             "id": "Boe-Idearium",
-            "temperature": 22.5
+            "temperature": {
+                "value": 22.5,
+                "type": null,
+                "metadata": {}
+            }
          },
          {
             "type": "Car",
@@ -657,16 +672,21 @@ Response code:
             "speed": {
                 "value": 100,
                 "type": "number",
-                "accuracy": 2,
-                "timestamp": {
-                    "value": "2015-06-04T07:20:27.378Z",
-                    "type": "date"
+                "metadata": {
+                    "accuracy": {
+                        "value": 2,
+                        "type": null
+                    },
+                    "timestamp": {
+                        "value": "2015-06-04T07:20:27.378Z",
+                        "type": "date"
+                    }
                 }
             }
          }
         ]
 
-### Create entity [POST /v2/entities]
+### Create entity [POST /v2/entities{?options}]
 
 The payload is an object representing the entity to be created. The object follows
 the JSON entity representation format (described in a section above).
@@ -682,14 +702,28 @@ Response:
         {
             "type": "Room",
             "id": "Bcn-Welt",
-            "temperature": 21.7,
-            "humidity": 60,
+            "temperature": {
+                "value": 21.7
+            },
+            "humidity": {
+                "value": 60
+            },
             "location": {
-                "value":  "41.3763726, 2.1864475",
+                "value": "41.3763726, 2.1864475",
                 "type": "geo:point",
-                "crs": "WGS84"
+                "metadata": {
+                    "crs": {
+                        "value": "WGS84"
+                    }
+                }
             }
         }
+
++ Parameters
+    + options (optional, string) - Options dictionary
+      + Members
+          + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See corresponding 
+          section for details.
 
 + Response 201
 
@@ -719,18 +753,35 @@ Response:
     + entityId (required, string) - Entity id to be retrieved
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
     data will be included in the response. If this parameter is not included, all the attributes are retrieved.
+    + options (optional, string) - Options dictionary
+      + Members
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See 
+          corresponding section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
+          section for details.
 
 + Response 200 (application/json)
 
         {
             "type": "Room",
             "id": "Bcn_Welt",
-            "temperature": 21.7,
-            "humidity": 60,
+            "temperature": {
+                "value": 21.7,
+                "type": null
+            },
+            "humidity": {
+                "value": 60,
+                "type": null
+            },
             "location": {
-                "value":  "41.3763726, 2.1864475",
+                "value": "41.3763726, 2.1864475",
                 "type": "geo:point",
-                "crs": "WGS84"
+                "metadata": {
+                    "crs": {
+                        "value": "WGS84",
+                        "type": null
+                    }
+                }
             }
         }
 
@@ -761,18 +812,22 @@ Response:
     + options (optional, string) - Operations options
         + Members
             + append - Force an append operation
+            + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
+            corresponding section for details.
 
 + Request (application/json)
 
     + Body
 
             {
-                "ambientNoise": 31.5
+                "ambientNoise": {
+                    "value": 31.5
+                }
             }
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}]
+### Update existing entity attributes [PATCH /v2/entities/{entityId}?{options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -788,17 +843,25 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id to be updated
+    + options (optional, string) - Operations options
+        + Members
+            + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
+            corresponding section for details.
 
 + Request (application/json)
 
         {
-            "temperature": 25.5,
-            "seatsNumber": 6
+            "temperature": {
+                "value": 25.5
+            },
+            "seatsNumber": {
+                "value": 6
+            }
         }
 
 + Response 204
 
-### Replace all entity attributes [PUT /v2/entities/{entityId}]
+### Replace all entity attributes [PUT /v2/entities/{entityId}?{options}]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -814,12 +877,20 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id
+    + options (optional, string) - Operations options
+        + Members
+            + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
+            corresponding section for details.
 
 + Request (application/json)
 
         {
-            "temperature": 25.5,
-            "seatsNumber": 6
+            "temperature": {
+                "value": 25.5
+            },
+            "seatsNumber": {
+                "value": 6
+            }
         }
 
 + Response 204
@@ -861,6 +932,8 @@ Response:
 
         {
             "value": 21.7
+            "type": null,
+            "metadata": {}
         }
 
 ### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}]
@@ -882,7 +955,11 @@ Response:
 
         {
             "value": 25.0,
-            "unitCode": "CEL"
+            "metadata": {
+                "unitCode": {
+                   "value": "CEL"
+                }
+            }
         }
 
 + Response 200
@@ -935,7 +1012,10 @@ Response:
 + Response 200 (application/json)
 
         {
-            "value": 21.7
+            "address": "Ronda de la Comunicacion s/n",
+            "zipCode": 28050,
+            "city": "Madrid",
+            "country": "Spain"
         }
 
 ### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
@@ -966,7 +1046,10 @@ Response:
 + Request (application/json)
 
         {
-            "value": 25.0
+            "address": "Ronda de la Comunicacion s/n",
+            "zipCode": 28050,
+            "city": "Madrid",
+            "country": "Spain"
         }
 
 + Response 200
@@ -1083,7 +1166,7 @@ A `subject` contains the following subfields:
     + `type`: Type of the affected entities (optional).
 + `condition`: Condition that will trigger the notification. It can have two optional properties:
     + `attributes`: array of attribute names
-    + `expression`: an expression composed of `q`, `geometry` and `coords` (see "List entities" operation above
+    + `expression`: an expression composed of `q`, `georel`, `geometry` and `coords` (see "List entities" operation above
    about this field).
 
 A `notification` object contains the following subfields:

@@ -57,3 +57,12 @@ Due to limitations at MongoDB layer, the length of entity ID, type and servicePa
     length(id) + length(type) + length(servicePath) + 10 < 1024
 
 Otherwise, we will get an error at entity creation time.
+
+## Duration format
+
+[ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations) may adopt several formats. The following
+constrains applies to the one that Orion supports in the NGSIv1 API (NGSIv2 doesn't uses ISO801 durations):
+
+* P[n]Y[n]M[n]DT[n]H[n]M[n]S is supported (P[n]W format is not supported)
+* Decimal fractions are supported for seconds (S), but not in other elements.
+

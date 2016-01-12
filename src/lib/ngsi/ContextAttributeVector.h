@@ -48,20 +48,11 @@ typedef struct ContextAttributeVector
   void                     push_back(ContextAttribute* item);
   void                     push_back(ContextAttributeVector* aVec);
   unsigned int             size(void) const;
-  ContextAttribute*        get(unsigned int ix);
-  const ContextAttribute*  get(unsigned int ix) const;
   void                     release(void);
   void                     fill(struct ContextAttributeVector* cavP);
+  
+  ContextAttribute*  operator[](unsigned int ix) const;
 
-  ContextAttribute*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-  }
 
   std::string        check(RequestType          requestType,
                            Format               format,

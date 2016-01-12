@@ -153,7 +153,7 @@ command:
 # ./accumulator-server.py 1028 /accumulate ::1 on
 ```
 
-The accumulator-server.py is also part of the contextBroker-test package (see in the administrator manual [how to install](../../../README.md#optional-packages "wikilink")). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
+The accumulator-server.py is also part of the contextBroker-test package (see [optional packages section in how to install](../admin/install.md#optional-packages)). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
 
 [Top](#top)
 

@@ -155,7 +155,14 @@ extern int64_t toSeconds(int value, char what, bool dayPart);
 */
 extern int64_t parse8601(const std::string& s);
 
-
+/*****************************************************************************
+*
+* parse8601Time -
+*
+* This is common code for Duration and Throttling (at least)
+*
+*/
+int64_t parse8601Time(const std::string& s);
 
 /* ****************************************************************************
 *
