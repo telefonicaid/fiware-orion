@@ -31,9 +31,9 @@ brokerStart CB 0-255
 
 #
 # 01. POST /v2/entities, creating E1
-# 02. PUT /v2/entities/E1?options=keyValues, adding A1 to E1
+# 02. POST /v2/entities/E1?options=keyValues, adding A1 to E1
 # 03. GET /v2/entities/E1
-# 04. PATCH /v2/entities/E1?options=keyValues, adding A2 to E1
+# 04. POST /v2/entities/E1?options=keyValues, adding A2 to E1
 # 05. GET /v2/entities/E1?options=keyValues
 # 06. PUT /v2/entities/E1?options=keyValues, replacing A1+A2 with A3
 # 07. GET /v2/entities/E1?options=keyValues
@@ -54,12 +54,12 @@ echo
 echo
 
 
-echo "02. PUT /v2/entities/E1?options=keyValues, adding A1 to E1"
-echo "=========================================================="
+echo "02. POST /v2/entities/E1?options=keyValues, adding A1 to E1"
+echo "==========================================================="
 payload='{
   "A1": 1
 }'
-orionCurl --url '/v2/entities/E1?options=keyValues'  --payload "$payload" -X PUT --json
+orionCurl --url '/v2/entities/E1?options=keyValues'  --payload "$payload" --json
 echo
 echo
 
@@ -71,12 +71,12 @@ echo
 echo
 
 
-echo "04. PATCH /v2/entities/E1?options=keyValues, adding A2 to E1"
-echo "============================================================"
+echo "04. POST /v2/entities/E1?options=keyValues, adding A2 to E1"
+echo "==========================================================="
 payload='{
   "A2": 2
 }'
-orionCurl --url '/v2/entities/E1?options=keyValues'  --payload "$payload" -X PATCH --json
+orionCurl --url '/v2/entities/E1?options=keyValues'  --payload "$payload" --json
 echo
 echo
 
@@ -150,10 +150,11 @@ Date: REGEX(.*)
 
 
 
-02. PUT /v2/entities/E1?options=keyValues, adding A1 to E1
-==========================================================
-HTTP/1.1 204 No Content
+02. POST /v2/entities/E1?options=keyValues, adding A1 to E1
+===========================================================
+HTTP/1.1 201 Created
 Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
@@ -176,10 +177,11 @@ Date: REGEX(.*)
 }
 
 
-04. PATCH /v2/entities/E1?options=keyValues, adding A2 to E1
-============================================================
-HTTP/1.1 204 No Content
+04. POST /v2/entities/E1?options=keyValues, adding A2 to E1
+===========================================================
+HTTP/1.1 201 Created
 Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
 

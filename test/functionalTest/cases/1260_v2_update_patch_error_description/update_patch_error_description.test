@@ -30,11 +30,11 @@ brokerStart CB
 --SHELL--
 
 #
-## 01. POST /v2/entities to create E1/T1/A1=0
-## 02. POST /v2/entities to create E1/T2/A1=0
-## 03. PATCH /v2/entities/Eno (not found)
-## 04. PATCH /v2/entities/E1 (too many results)
-
+# 01. POST /v2/entities to create E1/T1/A1=0
+# 02. POST /v2/entities to create E1/T2/A1=0
+# 03. PATCH /v2/entities/Eno (not found)
+# 04. PATCH /v2/entities/E1 (too many results)
+#
 
 echo "01. POST /v2/entities to create E1/T1/A1=0"
 echo "=========================================="
@@ -88,16 +88,21 @@ Date: REGEX(.*)
 
 03. PATCH /v2/entities/Eno (not found)
 ======================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 0
+HTTP/1.1 404 Not Found
+Content-Length: 61
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "description": "No context element found",
+    "error": "NotFound"
+}
 
 
 04. PATCH /v2/entities/E1 (too many results)
 ============================================
 HTTP/1.1 409 Conflict
-Content-Length: 121 
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
