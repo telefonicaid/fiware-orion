@@ -194,6 +194,7 @@
 #include "serviceRoutinesV2/getAllSubscriptions.h"
 #include "serviceRoutinesV2/getSubscription.h"
 #include "serviceRoutinesV2/postSubscriptions.h"
+#include "serviceRoutinesV2/deleteSubscription.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -734,6 +735,7 @@ static const char* validLogLevels[] =
   { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
+  { "DELETE", ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          deleteSubscription       }, \
   { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetOnly           }
 
 
