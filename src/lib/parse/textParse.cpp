@@ -92,11 +92,11 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
     caP->numberValue = d;
   }
 
-  // 5. None of the above - it's an error
+  // 5. None of the above - it's a string
   else
   {
-    OrionError oe(SccBadRequest, "attribute value type not recognized");
-    return oe.render(ciP, "");
+    caP->stringValue = ciP->payload;
+    caP->valueType   = orion::ValueTypeString;
   }
 
   return "OK";
