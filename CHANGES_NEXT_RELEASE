@@ -7,3 +7,4 @@
 - Fix: avoid -g compiler flag in release build
 - Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
 - Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
+- Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)

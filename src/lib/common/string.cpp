@@ -234,6 +234,11 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   protocol = urlTokens[0];
 
+  if ((protocol != "https:") && (protocol != "http:"))
+  {
+    return false;
+  }
+
   /* http://some.host.com/my/path
    *      ^^             ^  ^
    *      ||             |  |
@@ -299,6 +304,12 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
     if (components == 2)
     {
+      /* Sanity check (corresponding to http://xxxx:/path) */
+      if (hostTokens[1].length() == 0)
+      {
+        return false;
+      }
+
       port = atoi(hostTokens[1].c_str());
     }
     else
