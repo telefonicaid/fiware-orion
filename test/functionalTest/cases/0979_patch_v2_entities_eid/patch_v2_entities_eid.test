@@ -35,7 +35,7 @@ brokerStart CB
 # 03. GET /v2/entities/E1
 # 04. PATCH /v2/entities/E1 attr1=4
 # 05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)
-# 06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist
+# 06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)
 #
 
 echo "01. Intent to patch a non-existing entity - error, of course"
@@ -76,8 +76,8 @@ echo
 echo
 
 
-echo "06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist"
-echo "================================================================="
+echo "06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)"
+echo "========================================================================="
 payload='{ "attr3": 6 }'
 orionCurl --url /v2/entities/E1 -X PATCH --payload "$payload" --json
 echo
@@ -88,7 +88,7 @@ echo
 01. Intent to patch a non-existing entity - error, of course
 ============================================================
 HTTP/1.1 404 Not Found
-Content-Length: 61 
+Content-Length: 61
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -161,8 +161,8 @@ Date: REGEX(.*)
 }
 
 
-06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist
-=================================================================
+06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)
+=========================================================================
 HTTP/1.1 404 Not Found
 Content-Length: 61
 Content-Type: application/json

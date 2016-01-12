@@ -44,7 +44,7 @@ using namespace rapidjson;
 *
 * parseContextAttributeObject - 
 */
-static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP)
+static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP, bool keyValues = false)
 {
   // valueTypeNone will be overridden inside the 'for' block in case the attribute has an actual value
   caP->valueType = orion::ValueTypeNone;
@@ -121,7 +121,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         return r;
       }
     }
-    else  // ERROR
+    else // ERROR
     {
       LM_W(("Bad Input (unrecognized property for ContextAttribute - '%s')", name.c_str()));
       return "unrecognized property for context attribute";
@@ -139,8 +139,10 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 */
 std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP)
 {
-  std::string name   = iter->name.GetString();
-  std::string type   = jsonParseTypeNames[iter->value.GetType()];
+  std::string name      = iter->name.GetString();
+  std::string type      = jsonParseTypeNames[iter->value.GetType()];
+  bool        keyValues = ciP->uriParamOptions["keyValues"];
+
   
   caP->name = name;
 
@@ -188,9 +190,9 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     //
     // If the Object contains "value", then it is considered an object, not a compound
     //
-    if (iter->value.HasMember("value"))
+    if ((iter->value.HasMember("value")) && (ciP->uriParamOptions["keyValues"] == false))
     {
-      r = parseContextAttributeObject(iter->value, caP);
+      r = parseContextAttributeObject(iter->value, caP, keyValues);
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object");
@@ -229,7 +231,8 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
 */
 std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 {
-  Document document;
+  bool      keyValues = ciP->uriParamOptions["keyValues"];
+  Document  document;
 
   document.Parse(ciP->payload);
 
@@ -254,7 +257,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     return oe.render(ciP, "");
   }
 
-  std::string  r = parseContextAttributeObject(document, caP);
+  std::string  r = parseContextAttributeObject(document, caP, keyValues);
   if (r != "OK")
   {
     OrionError oe(SccBadRequest, r);

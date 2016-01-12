@@ -2921,6 +2921,11 @@ void processContextElement
         buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
         return;
     }
+    else if ((checkEntityExistance == true) && (action == "APPEND") && (entitiesNumber == 0))
+    {
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Entity does not exist");
+      return;
+    }
     else if (entitiesNumber > 1)
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, "There is more than one entity that match the update. Please refine your query.");
