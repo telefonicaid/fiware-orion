@@ -54,8 +54,8 @@ brokerStart CB 0-255
 # 22. Check that A1 == 123
 # 23. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.14
 # 24. Check that A1 == 3.14
-# 25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error
-# 26. Check that A1 == 3.14 still
+# 25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 (which is a valid string)
+# 26. Check that A1 == a.14
 # 27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1
 # 28. Check that A1 == -12.1
 # 29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2
@@ -243,16 +243,16 @@ echo
 echo
 
 
-echo '25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error'
-echo '========================================================================='
+echo '25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 (which is a valid string)'
+echo '======================================================================================='
 payload='a.14'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
 echo
 echo
 
 
-echo '26. Check that A1 == 3.14 still'
-echo '==============================='
+echo '26. Check that A1 == a.14'
+echo '========================='
 orionCurl --url /v2/entities/E1/attrs/A1 --json
 echo
 echo
@@ -560,30 +560,25 @@ Date: REGEX(.*)
 }
 
 
-25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error
-=========================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 74
-Content-Type: application/json
+25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 (which is a valid string)
+=======================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "description": "attribute value type not recognized",
-    "error": "BadRequest"
-}
 
 
-26. Check that A1 == 3.14 still
-===============================
+26. Check that A1 == a.14
+=========================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 42
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": 3.14
+    "value": "a.14"
 }
 
 
