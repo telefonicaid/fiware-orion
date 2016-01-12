@@ -97,13 +97,21 @@ static void setSubject(Subscription* s, const BSONObj& r)
         std::string attr = condValues[jx].String();
         s->subject.condition.attributes.push_back(attr);
       }
+      if (cond.hasField(CSUB_CONDITIONS_EXPR)) {
+        mongo::BSONObj expression = getField(cond, CSUB_CONDITIONS_EXPR).Obj();
+        std::string    q          = getField(expression, CSUB_CONDITIONS_Q).String();
+        std::string    geo        = getField(expression, CSUB_CONDITIONS_GEO).String();
+        std::string    coords     = getField(expression, CSUB_CONDITIONS_COORDS).String();
+        std::string    georel     = getField(expression, CSUB_CONDITIONS_GEOREL).String();
+
+        s->subject.condition.expression.q = q;
+        s->subject.condition.expression.geometry = geo;
+        s->subject.condition.expression.coords = coords;
+        s->subject.condition.expression.georel = georel;
+      }
     }
   }
 
-  // Note that current DB model is based on NGSIv1 and doesn't consider expressions. Thus
-  // subject.condition.expression cannot be filled. The implemetion will be enhanced once
-  // the DB model gets defined
-  // TBD
 }
 
 

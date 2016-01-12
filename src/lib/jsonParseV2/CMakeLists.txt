@@ -28,6 +28,7 @@ SET (SOURCES
     parseMetadata.cpp
     parseAttributeValue.cpp
     jsonParseTypeNames.cpp
+    parseSubscription.cpp
 )
 
 SET (HEADERS
@@ -38,6 +39,7 @@ SET (HEADERS
     parseMetadata.h
     parseAttributeValue.h
     jsonParseTypeNames.h
+    parseSubscription.h
 )
 
 

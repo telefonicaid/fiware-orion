@@ -376,3 +376,23 @@ int64_t parse8601(const std::string& s)
 
   return accumulated;
 }
+
+/*****************************************************************************
+*
+* parse8601Time -
+*
+* This is common code for Duration and Throttling (at least)
+*
+*/
+int64_t parse8601Time(const std::string& s)
+{
+  struct tm   tm = {0};
+  const char* p;
+
+  p = strptime (s.c_str(), " %Y-%m-%dT%T", &tm);
+  if (p == NULL)
+  {
+    return -1;
+  }
+  return (int64_t) timegm(&tm);
+}

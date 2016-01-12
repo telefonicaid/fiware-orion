@@ -116,6 +116,7 @@ std::string Condition::toJson()
     jhe.addString("q", this->expression.q);
     jhe.addString("geometry", this->expression.geometry);
     jhe.addString("coords", this->expression.coords);
+    jhe.addString("georel", this->expression.georel);
 
     jh.addRaw("expression", jhe.str());
   }
