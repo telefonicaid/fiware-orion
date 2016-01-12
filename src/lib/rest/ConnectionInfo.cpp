@@ -40,7 +40,8 @@ static const char* validOptions[] =
   "normalized",
   "values",
   "keyValues",
-  "text"
+  "text",
+  "append"
 };
 
 

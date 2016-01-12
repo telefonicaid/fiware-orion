@@ -32,7 +32,7 @@ brokerStart CB
 #
 # 01. Create E1
 # 02. Make sure E1 exists
-# 03. Try to create E1 again, using POST /v2/entities/E1?op=append
+# 03. Try to create E1 again, using POST /v2/entities/E1?options=append
 # 04. Make sure it didn't work
 # 05. Now update E1, using POST /v2/entities/E1
 # 06. Make sure it worked
@@ -53,10 +53,10 @@ echo
 echo
 
 
-echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append"
-echo "==================================================================="
+echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?options=append"
+echo "========================================================================"
 payload='{  "attr1": 2 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url /v2/entities/E1?options=append --payload "$payload" --json
 echo
 echo
 
@@ -111,8 +111,8 @@ Date: REGEX(.*)
 }
 
 
-03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append
-===================================================================
+03. Try to create E1/T1 again, using POST /v2/entities/E1?options=append
+========================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 108
 Content-Type: application/json
