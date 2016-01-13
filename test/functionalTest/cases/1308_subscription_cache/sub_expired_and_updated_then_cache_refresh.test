@@ -289,9 +289,9 @@ Date: REGEX(.*)
 
 {
     "ids": "REGEX(.*)",
-    "inserts": REGEX((2|3)),
+    "inserts": REGEX((2|3|4)),
     "items": 1,
-    "refresh": REGEX((0|1|2|3)),
+    "refresh": REGEX((0|1|2|3|4)),
     "removes": 1,
     "updates": 1
 }
