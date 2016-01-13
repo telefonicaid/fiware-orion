@@ -86,10 +86,10 @@
     cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
                                                                          \
     cv->add(orion::ValueTypeString,         "",  "22");                  \
-    str  = cv->add(orion::ValueTypeObject,  "",  "");                    \
-    vec  = cv->add(orion::ValueTypeVector,  "",  "");                    \
+    str = cv->add(orion::ValueTypeObject,   "",  "");                    \
+    vec = cv->add(orion::ValueTypeVector,   "",  "");                    \
                                                                          \
-    x    = str->add(orion::ValueTypeVector, "x", "");                    \
+    x = str->add(orion::ValueTypeVector,    "x", "");                    \
     str->add(orion::ValueTypeString,        "y", "3");                   \
                                                                          \
     x->add(orion::ValueTypeString,          "",  "x1");                  \
@@ -110,14 +110,14 @@
                                                                          \
     cv = new orion::CompoundValueNode(orion::ValueTypeObject);           \
                                                                          \
-    x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
-    y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
+    x = cv->add(orion::ValueTypeObject, "x",  "");                       \
+    y = cv->add(orion::ValueTypeVector, "y",  "");                       \
                                                                          \
-    x->add(orion::ValueTypeString,  "x1", "a");                          \
-    x->add(orion::ValueTypeString,  "x2", "b");                          \
+    x->add(orion::ValueTypeString,      "x1", "a");                      \
+    x->add(orion::ValueTypeString,      "x2", "b");                      \
                                                                          \
-    y->add(orion::ValueTypeString,  "",   "y1");                         \
-    y->add(orion::ValueTypeString,  "",   "y2");                         \
+    y->add(orion::ValueTypeString,      "",   "y1");                     \
+    y->add(orion::ValueTypeString,      "",   "y2");                     \
                                                                          \
     cv->shortShow("shortShow2: ");                                       \
     cv->show("show2: ");
@@ -131,20 +131,20 @@
                                                                          \
     cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
                                                                          \
-    cv->add(orion::ValueTypeNumber,  "",  22.0);                         \
+    cv->add(orion::ValueTypeNumber,         "",  22.0);                  \
     str  = cv->add(orion::ValueTypeObject,  "",  "");                    \
     vec  = cv->add(orion::ValueTypeVector,  "",  "");                    \
                                                                          \
     x    = str->add(orion::ValueTypeVector, "x", "");                    \
-    str->add(orion::ValueTypeNumber, "y", 3.0);                          \
-    str->add(orion::ValueTypeNone, "z", "");                             \
+    str->add(orion::ValueTypeNumber,        "y", 3.0);                   \
+    str->add(orion::ValueTypeNone,          "z", "");                    \
                                                                          \
-    x->add(orion::ValueTypeString,   "",  "x1");                         \
-    x->add(orion::ValueTypeString,   "",  "x2");                         \
+    x->add(orion::ValueTypeString,          "",  "x1");                  \
+    x->add(orion::ValueTypeString,          "",  "x2");                  \
                                                                          \
-    vec->add(orion::ValueTypeString, "",  "z1");                         \
-    vec->add(orion::ValueTypeBoolean, "",  false);                       \
-    vec->add(orion::ValueTypeNone, "",  "");                             \
+    vec->add(orion::ValueTypeString,        "",  "z1");                  \
+    vec->add(orion::ValueTypeBoolean,       "",  false);                 \
+    vec->add(orion::ValueTypeNone,          "",  "");                    \
                                                                          \
     cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
@@ -159,13 +159,13 @@
                                                                          \
     x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
     y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
-    cv->add(orion::ValueTypeNone,   "z",  "");                           \
+    cv->add(orion::ValueTypeNone,          "z",  "");                    \
                                                                          \
-    x->add(orion::ValueTypeString,  "x1", "a");                          \
-    x->add(orion::ValueTypeBoolean, "x2", true);                         \
+    x->add(orion::ValueTypeString,         "x1", "a");                   \
+    x->add(orion::ValueTypeBoolean,        "x2", true);                  \
                                                                          \
-    y->add(orion::ValueTypeString,  "",   "y1");                         \
-    y->add(orion::ValueTypeString,  "",   "y2");                         \
+    y->add(orion::ValueTypeString,         "",   "y1");                  \
+    y->add(orion::ValueTypeString,         "",   "y2");                  \
                                                                          \
     cv->shortShow("shortShow2: ");                                       \
     cv->show("show2: ");
