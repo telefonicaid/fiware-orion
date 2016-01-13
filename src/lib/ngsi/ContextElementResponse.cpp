@@ -215,7 +215,7 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);  // LEAK
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
         compoundVectorResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
         break;
 
