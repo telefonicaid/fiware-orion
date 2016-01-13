@@ -1214,7 +1214,7 @@ static int connectionTreat
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   bool      mhdStartError  = true;
-  size_t    memoryLimit    = DEFAULT_CONNECTION_MEM * 1024; // Connection memory is expressed in kilobytes
+  size_t    memoryLimit    = connMemory * 1024; // Connection memory is expressed in kilobytes
   MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)
