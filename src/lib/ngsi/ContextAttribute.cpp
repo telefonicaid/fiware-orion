@@ -366,6 +366,13 @@ std::string ContextAttribute::renderAsJsonObject
         valueIsNumberOrBool = true;
         break;
 
+#if 0
+      // This may be useful for Ken's next PR (otherwise remove)
+      case ValueTypeNone:
+        effectiveValue = "null";
+        break;
+#endif
+
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
@@ -493,6 +500,13 @@ std::string ContextAttribute::render
         effectiveValue      = num;
         valueIsNumberOrBool = true;
         break;
+
+#if 0
+      // This may be useful for Ken's next PR (otherwise remove)
+      case ValueTypeNone:
+        effectiveValue = "null";
+        break;
+#endif
 
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));

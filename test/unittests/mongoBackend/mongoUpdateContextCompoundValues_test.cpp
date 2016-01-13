@@ -126,7 +126,7 @@
     cv->show("show2: ");
 
 
-// Compound1 native: [ 22.0, { x: [x1, x2], y: 3.0 }, [ z1, false ] ]
+// Compound1 native: [ 22.0, { x: [x1, x2], y: 3.0, z: null}, [ z1, false, null ] ]
 #define CREATE_COMPOUND1_NATIVE(cv)                                      \
     orion::CompoundValueNode*  str;                                      \
     orion::CompoundValueNode*  vec;                                      \
@@ -141,19 +141,21 @@
                                                                          \
     x    = str->add(orion::ValueTypeVector, "x", "");                    \
     leaf = str->add(orion::ValueTypeNumber, "y", 3.0);                   \
+    leaf = str->add(orion::ValueTypeNone, "z", "");                      \
                                                                          \
     leaf = x->add(orion::ValueTypeString,   "",  "x1");                  \
     leaf = x->add(orion::ValueTypeString,   "",  "x2");                  \
                                                                          \
     leaf = vec->add(orion::ValueTypeString, "",  "z1");                  \
     leaf = vec->add(orion::ValueTypeBoolean, "",  false);                \
+    leaf = vec->add(orion::ValueTypeNone, "",  "");                      \
                                                                          \
     leaf->check();                                                       \
     cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
 
 
-// Compound2 native: { x: { x1: a, x2: true }, y: [ y1, y2 ] }
+// Compound2 native: { x: { x1: a, x2: true }, y: [ y1, y2 ], z: null }
 #define CREATE_COMPOUND2_NATIVE(cv)                                      \
     orion::CompoundValueNode*  x;                                        \
     orion::CompoundValueNode*  y;                                        \
@@ -163,9 +165,10 @@
                                                                          \
     x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
     y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
+    leaf = cv->add(orion::ValueTypeNone,   "z",  "");                    \
                                                                          \
     leaf = x->add(orion::ValueTypeString,  "x1", "a");                   \
-    leaf = x->add(orion::ValueTypeBoolean,  "x2", true);                 \
+    leaf = x->add(orion::ValueTypeBoolean, "x2", true);                  \
                                                                          \
     leaf = y->add(orion::ValueTypeString,  "",   "y1");                  \
     leaf = y->add(orion::ValueTypeString,  "",   "y2");                  \
@@ -699,8 +702,10 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1Native)
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
     EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
+    EXPECT_TRUE(a1.getField("value").Array()[1].embeddedObject().getField("z").isNull());
     EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
     EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
+    EXPECT_TRUE(a1.getField("value").Array()[2].Array()[2].isNull());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
 
@@ -782,6 +787,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
     EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("z").isNull());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
 
@@ -871,8 +877,10 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
     EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
+    EXPECT_TRUE(a1.getField("value").Array()[1].embeddedObject().getField("z").isNull());
     EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
     EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
+    EXPECT_TRUE(a1.getField("value").Array()[2].Array()[2].isNull());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
@@ -966,6 +974,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("z").isNull());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
