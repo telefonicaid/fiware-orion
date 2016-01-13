@@ -36,9 +36,9 @@ using namespace mongo;
 */
 static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 {
-  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != Object) && (e.type() != Array))
+  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != jstNULL) && (e.type() != Object) && (e.type() != Array))
   {
-    LM_T(LmtSoftError, ("unknown BSON type"));
+    LM_E(("Runtime Error (unknown BSON type: %d)", e.type()));
     return;
   }
 
@@ -60,6 +60,10 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   case NumberDouble:
     child->valueType  = orion::ValueTypeNumber;
     child->numberValue = e.Number();
+    break;
+
+  case jstNULL:
+    child->valueType  = orion::ValueTypeNone;
     break;
 
   case Object:

@@ -875,6 +875,12 @@ CompoundValueNode* CompoundValueNode::clone(void)
     case orion::ValueTypeBoolean:
       me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
       break;
+
+    case orion::ValueTypeNone:
+      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
+      me->valueType = orion::ValueTypeNone;
+      break;
+
     default:
       me = NULL;
       LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));

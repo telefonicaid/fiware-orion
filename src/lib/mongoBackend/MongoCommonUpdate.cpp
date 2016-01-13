@@ -93,6 +93,10 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
     {
       b.append(child->boolValue);
     }
+    else if (child->valueType == orion::ValueTypeNone)
+    {
+      b.appendNull();
+    }
     else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
@@ -137,6 +141,10 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
     {
       b.append(child->name, child->boolValue);
     }
+    else if (child->valueType == orion::ValueTypeNone)
+    {
+      b.appendNull(child->name);
+    }
     else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
@@ -179,8 +187,12 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const ContextAttribute* caP)
       bsonAttr.append(ENT_ATTRS_VALUE, caP->boolValue);
       break;
 
+    case ValueTypeNone:
+      bsonAttr.appendNull(ENT_ATTRS_VALUE);
+      break;
+
     default:
-      LM_E(("Runtime Error (unknown attribute type)"));
+      LM_E(("Runtime Error (unknown attribute type: %d)", caP->valueType));
   }
 }
 
@@ -224,6 +236,11 @@ static void valueBson(const ContextAttribute* caP, BSONObjBuilder& bsonAttr)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->boolValue);
+    }
+    else if (caP->compoundValueP->valueType == orion::ValueTypeNone)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.appendNull(ENT_ATTRS_VALUE);
     }
     else
     {
@@ -335,6 +352,9 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     case String:
       return getStringField(md1, ENT_ATTRS_MD_VALUE) == getStringField(md2, ENT_ATTRS_MD_VALUE);
 
+    case jstNULL:
+      return md2.getField(ENT_ATTRS_MD_VALUE).isNull();
+
     default:
       LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getField(md1, ENT_ATTRS_MD_VALUE).type()));
       return false;
@@ -397,9 +417,10 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 * Check that the attribute doesn't have any value
 *
 */
-bool attributeValueAbsent(ContextAttribute* caP)
+bool attributeValueAbsent(ContextAttribute* caP, const string& apiVersion)
 {
-  return caP->valueType == ValueTypeNone;
+  /* In v2, absent attribute means "null", which has diferent semantics */
+  return ((caP->valueType == ValueTypeNone) && (apiVersion == "v1"));
 }
 
 /* ****************************************************************************
@@ -453,6 +474,9 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
     case String:
       return caP->valueType != ValueTypeString || caP->stringValue != getStringField(attr, ENT_ATTRS_VALUE);
 
+    case jstNULL:
+      return caP->valueType != ValueTypeNone;
+
     default:
       LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
       return false;
@@ -481,8 +505,12 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
+    case orion::ValueTypeNone:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << BSONNULL));
+      return;
+
     default:
-      LM_E(("Runtime Error (unknown attribute type)"));
+      LM_E(("Runtime Error (unknown attribute type: %d)", mdP->valueType));
     }
   }
   else
@@ -515,14 +543,14 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
 * request (caP), and merged them producing the mergedAttr output. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr)
+static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, const std::string& apiVersion)
 {
   BSONObjBuilder ab;
 
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!attributeValueAbsent(caP))
+  if (!attributeValueAbsent(caP, apiVersion))
   {
     valueBson(caP, ab);
   }
@@ -549,6 +577,10 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
       case String:
         ab.append(ENT_ATTRS_VALUE, getStringField(attr, ENT_ATTRS_VALUE));
+        break;
+
+      case jstNULL:
+        ab.appendNull(ENT_ATTRS_VALUE);
         break;
 
       default:
@@ -731,7 +763,8 @@ static bool updateAttribute
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
   bool&               actualUpdate,
-  bool                isReplace
+  bool                isReplace,
+  const string&       apiVersion
 )
 {
   actualUpdate = false;
@@ -773,7 +806,7 @@ static bool updateAttribute
 
     BSONObj newAttr;
     BSONObj attr = getField(attrs, effectiveName).embeddedObject();
-    actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
+    actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
 
     if (actualUpdate)
     {
@@ -807,7 +840,8 @@ static void appendAttribute
   BSONObjBuilder*     toSet,
   BSONArrayBuilder*   toPush,
   ContextAttribute*   caP,
-  bool&               actualUpdate
+  bool&               actualUpdate,
+  const std::string&  apiVersion
 )
 {
   std::string effectiveName = dbDotEncode(caP->name);
@@ -820,7 +854,7 @@ static void appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false);
+    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion);
     return;
   }
 
@@ -1802,11 +1836,12 @@ static bool updateContextAttributeItem
   std::string&              locAttr,
   double&                   coordLat,
   double&                   coordLong,
-  bool                      isReplace
+  bool                      isReplace,
+  const std::string&        apiVersion
 )
 {
 
-  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace))
+  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
     entityModified = actualUpdate || entityModified;
     updateAttrInNotifyCer(notifyCerP, targetAttr);
@@ -1886,12 +1921,13 @@ static bool appendContextAttributeItem
   bool&                     entityModified,
   std::string&              locAttr,
   double&                   coordLat,
-  double&                   coordLong
+  double&                   coordLong,
+  const std::string&        apiVersion
 )
 {
   if (legalIdUsage(attrs, targetAttr))
   {
-    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
+    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
     entityModified = actualUpdate || entityModified;
     updateAttrInNotifyCer(notifyCerP, targetAttr);
 
@@ -2045,7 +2081,8 @@ static bool processContextAttributeVector
   double&                                    coordLat,
   double&                                    coordLong,
   std::string                                tenant,
-  const std::vector<std::string>&            servicePathV
+  const std::vector<std::string>&            servicePathV,
+  const std::string&                         apiVersion
 )
 {
   EntityId*                            eP              = &cerP->contextElement.entityId;
@@ -2088,7 +2125,8 @@ static bool processContextAttributeVector
                                       locAttr,
                                       coordLat,
                                       coordLong,
-                                      strcasecmp(action.c_str(), "replace") == 0))
+                                      strcasecmp(action.c_str(), "replace") == 0,
+                                      apiVersion))
       {
         return false;
       }
@@ -2106,7 +2144,8 @@ static bool processContextAttributeVector
                                       entityModified,
                                       locAttr,
                                       coordLat,
-                                      coordLong))
+                                      coordLong,
+                                      apiVersion))
       {
         return false;
       }
@@ -2479,7 +2518,8 @@ static void updateEntity
   ContextElement*                 ceP,
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
-  std::string*                    attributeAlreadyExistsList
+  std::string*                    attributeAlreadyExistsList,
+  const std::string&              apiVersion
 )
 {
   // Used to accumulate error response information
@@ -2595,7 +2635,8 @@ static void updateEntity
                                      coordLat,
                                      coordLong,
                                      tenant,
-                                     servicePathV))
+                                     servicePathV,
+                                     apiVersion))
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
 
@@ -2800,7 +2841,7 @@ static bool contextElementPreconditionsCheck
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
-      if (attributeValueAbsent(aP) && attributeTypeAbsent(aP) && (aP->metadataVector.size() == 0))
+      if (attributeValueAbsent(aP, apiVersion) && attributeTypeAbsent(aP) && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
@@ -2993,7 +3034,16 @@ void processContextElement
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
   {
-    updateEntity(results[ix], action, tenant, servicePathV, xauthToken, ceP, responseP, &attributeAlreadyExistsError, &attributeAlreadyExistsList);
+    updateEntity(results[ix],
+                 action,
+                 tenant,
+                 servicePathV,
+                 xauthToken,
+                 ceP,
+                 responseP,
+                 &attributeAlreadyExistsError,
+                 &attributeAlreadyExistsList,
+                 apiVersion);
   }
 
   /*

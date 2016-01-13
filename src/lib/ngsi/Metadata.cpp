@@ -161,6 +161,10 @@ Metadata::Metadata(const BSONObj& mdB)
     boolValue = getBoolField(mdB, ENT_ATTRS_MD_VALUE);
     break;
 
+  case jstNULL:
+    valueType = orion::ValueTypeNone;
+    break;
+
   default:
     valueType = orion::ValueTypeUnknown;
     LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
