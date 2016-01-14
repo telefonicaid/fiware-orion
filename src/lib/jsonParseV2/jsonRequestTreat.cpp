@@ -119,6 +119,14 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     }
     break;
 
+  case IndividualSubscriptionRequest:
+    answer = parseSubscription(ciP, parseDataP, /*partial*/ true);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    break;
+
   default:
     answer = "Request Treat function not implemented";
     break;
