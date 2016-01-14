@@ -104,12 +104,11 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     int          port;
     std::string  uriPath;
     std::string  protocol;
-    
+    std::string  initialUrl = url;
+
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
-      std::string details = std::string("sending NotifyContextRequest: malformed URL: '") + url + "'";
-      alarmMgr.badInput(clientIp, details);
-
+      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", initialUrl.c_str()));
       return;
     }
 

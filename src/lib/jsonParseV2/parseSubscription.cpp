@@ -123,7 +123,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     return oe.render(ciP, "");
   }
 
-  int64_t eT= parse8601Time(expires.GetString());
+  int64_t eT = parse8601Time(expires.GetString());
 
   if (eT == -1)
   {

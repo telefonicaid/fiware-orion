@@ -31,6 +31,7 @@
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "alarmMgr/alarmMgr.h"
 #include "jsonParseV2/parseEntity.h"
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseAttributeValue.h"
@@ -108,6 +109,12 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     answer = parseSubscription(ciP, parseDataP);
     if (answer != "OK")
     {
+      return answer;
+    }
+    
+    if ((answer = parseDataP->scr.res.check(SubscribeContext, JSON, "", "", 0)) != "OK")
+    {
+      alarmMgr.badInput(clientIp, "invalid subscription");
       return answer;
     }
     break;

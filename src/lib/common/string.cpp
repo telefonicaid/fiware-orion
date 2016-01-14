@@ -219,6 +219,11 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 * Breaks a URL into pieces. It returns false if the string passed as first
 * argument is not a valid URL. Otherwise, it returns true.
 *
+*
+* NOTE
+*   About the components in a URL: according to https://tools.ietf.org/html/rfc3986#section-3,
+*   the scheme and path components are mandatory, i.e. the 'http://' or 'https://' must be present,
+*   otherwise the URL is invalid.
 */
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
@@ -228,16 +233,6 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     return false;
   }
 
-  /* First: split by the first '/' to get host:ip and path */
-  std::vector<std::string>  urlTokens;
-  int                       components = stringSplit(url, '/', urlTokens);
-
-  protocol = urlTokens[0];
-
-  if ((protocol != "https:") && (protocol != "http:"))
-  {
-    return false;
-  }
 
   /* http://some.host.com/my/path
    *      ^^             ^  ^
@@ -246,6 +241,21 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
    *   0          2       3    4  position in urlTokens vector
    *   1  23             4  5     components
    */
+
+
+  /* First: split by the first '/' to get host:ip and path */
+  std::vector<std::string>  urlTokens;
+  int                       components = stringSplit(url, '/', urlTokens);
+
+  protocol = urlTokens[0];
+
+  //
+  // Ensuring the scheme is present
+  //
+  if ((protocol != "https:") && (protocol != "http:"))
+  {
+    return false;
+  }
 
   if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
   {
@@ -312,7 +322,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
       port = atoi(hostTokens[1].c_str());
     }
-    else
+    else  // port not give - using default ports
     {
       port = urlTokens[0] == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }

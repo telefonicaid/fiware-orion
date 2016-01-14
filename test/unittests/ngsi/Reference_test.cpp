@@ -43,6 +43,7 @@ TEST(Reference, check)
   
   utInit();
 
+  reference.string = "http://ip:12";
   checked = reference.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
