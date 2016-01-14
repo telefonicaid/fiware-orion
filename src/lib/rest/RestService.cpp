@@ -495,7 +495,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // If we have gotten this far, and the status is 200, the Input is OK.
     // So, the 'Bad Input' alarm is cleared for this client.
     //
-    if (ciP->httpStatusCode == SccOk)
+    // Actually, not only 200, also 201, 204 etc, all 2xx codes
+    //
+    if ((ciP->httpStatusCode >= 200) && (ciP->httpStatusCode < 300))
     {
       alarmMgr.badInputReset(clientIp);
     }

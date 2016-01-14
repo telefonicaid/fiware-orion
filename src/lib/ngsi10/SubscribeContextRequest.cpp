@@ -31,6 +31,8 @@
 #include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "alarmMgr/alarmMgr.h"
+
 
 
 /* ****************************************************************************
@@ -87,11 +89,13 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
 
   if (((res = entityIdVector.check(SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
       ((res = attributeList.check(SubscribeContext, format, indent, predetectedError, counter))         != "OK") ||      
+      ((res = reference.check(SubscribeContext, format, indent, predetectedError, counter))             != "OK") ||
       ((res = duration.check(SubscribeContext, format, indent, predetectedError, counter))              != "OK") ||
       ((res = restriction.check(SubscribeContext, format, indent, predetectedError, restrictions))      != "OK") ||
       ((res = notifyConditionVector.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK") ||
       ((res = throttling.check(SubscribeContext, format, indent, predetectedError, counter))            != "OK"))
   {
+    alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
     return response.render(SubscribeContext, format, indent);
   }
