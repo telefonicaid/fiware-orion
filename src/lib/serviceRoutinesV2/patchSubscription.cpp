@@ -75,13 +75,13 @@ std::string patchSubscription
                                                                    ciP->servicePathV,
                                                                    ciP->apiVersion));
 
-  if (ucsr.subscribeError.errorCode.code != SccOk)
+  if (ciP->httpStatusCode != SccOk)
   {
     OrionError oe(ciP->httpStatusCode);
 
     oe.reasonPhrase = ucsr.subscribeError.errorCode.reasonPhrase;
 
-    if (ucsr.subscribeError.errorCode.code == SccContextElementNotFound)
+    if (ciP->httpStatusCode == SccContextElementNotFound)
     {
       oe.details = "The requested subscription has not been found. Check id";
     }
