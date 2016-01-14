@@ -259,7 +259,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
     {
       if ((*iter)["idPattern"].IsString())
       {
-        id = (*iter)["id"].GetString();
+        id = (*iter)["idPattern"].GetString();
       }
       else
       {
@@ -282,7 +282,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
     {
       if ((*iter)["type"].IsString())
       {
-        id = (*iter)["type"].GetString();
+        eiP->type = (*iter)["type"].GetString();
       }
       else
       {
