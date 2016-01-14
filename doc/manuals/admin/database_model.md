@@ -256,39 +256,38 @@ Fields:
 Example document:
 
 ```
- {
-   "_id": ObjectId("5149fd46f0075f83a4ca0300"),
-   "expiration": 1360236300,
-   "lastNotification": 1360232700,
-   "throttling": 10,
-   "reference": "http://notify.me",
-   "entities": [
-       {
-           "id": "E1",
-           "type": "T1",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-        "A1",
-        "A2"
-   ],
-   "conditions": [
-       {
-           "type": "ONCHANGE",
-           "value": [
-               "A1",
-               "A2"
-           ]
-       },
-       "expression" : {
-           "q" : "temperature>40"
-       }
-
-   ],
-   "count": 27,
-   "format": "JSON"
- }
+{
+        "_id" : ObjectId("5697d4d123acbf5e794ab031"),
+        "expiration" : NumberLong(1459864800),
+        "reference" : "http://localhost:1234",
+        "servicePath" : "/",
+        "entities" : [
+                {
+                        "id" : ".*",
+                        "type" : "Room",
+                        "isPattern" : "true"
+                }
+        ],
+        "attrs" : [
+                "humidity",
+                "temperature"
+        ],
+        "conditions" : [
+                {
+                        "type" : "ONCHANGE",
+                        "value" : [
+                                "temperature "
+                        ]
+                }
+        ],
+        "expression" : {
+                "q" : "temperature>40",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "JSON"
+}
 ```
 [Top](#top)
 
