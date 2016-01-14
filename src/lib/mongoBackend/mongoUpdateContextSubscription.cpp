@@ -36,6 +36,7 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "cache/subCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
+#include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
 #include "common/Format.h"
@@ -50,13 +51,14 @@
 */
 HttpStatusCode mongoUpdateContextSubscription
 (
-  UpdateContextSubscriptionRequest*   requestP,
-  UpdateContextSubscriptionResponse*  responseP,
-  Format                              notifyFormat,
-  const std::string&                  tenant,
-  const std::string&                  xauthToken,
-  const std::vector<std::string>&     servicePathV
-)
+    UpdateContextSubscriptionRequest*   requestP,
+    UpdateContextSubscriptionResponse*  responseP,
+    Format                              notifyFormat,
+    const std::string&                  tenant,
+    const std::string&                  xauthToken,
+    const std::vector<std::string>&     servicePathV,
+    std::string                         version
+    )
 { 
   bool          reqSemTaken;
 
@@ -66,6 +68,7 @@ HttpStatusCode mongoUpdateContextSubscription
   BSONObj     sub;
   std::string err;
   OID         id;
+
 
   if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->subscribeError.errorCode)))
   {
@@ -107,10 +110,70 @@ HttpStatusCode mongoUpdateContextSubscription
    */
   BSONObjBuilder newSub;
 
-  /* Entities, attribute list and reference are not updatable, so they are appended directly */
-  newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
-  newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
-  newSub.append(CSUB_REFERENCE, getStringField(sub, CSUB_REFERENCE));
+  if (version != "v2") {
+    /* Entities, attribute list and reference are not updatable, so they are appended directly */
+    newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
+    newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
+    newSub.append(CSUB_REFERENCE, getStringField(sub, CSUB_REFERENCE));
+  }
+  else // v2
+  {
+    // Reference
+    std::string ref;
+    if (!requestP->reference.isEmpty())
+    {
+      ref = requestP->reference.get();
+    }
+    else
+    {
+      ref = getStringField(sub, CSUB_REFERENCE);
+    }
+    newSub.append(CSUB_REFERENCE, ref);
+
+    // Entities
+    if (requestP->entityIdVector.size() >0)
+    {
+      /* Build entities array */
+      BSONArrayBuilder entities;
+      for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+      {
+        EntityId* en = requestP->entityIdVector[ix];
+
+        if (en->type == "")
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
+        else
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_TYPE << en->type <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
+      }
+      newSub.append(CSUB_ENTITIES, entities.arr());
+    }
+    else
+    {
+      newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
+    }
+
+    //Attributes
+    if (requestP->attributeList.size() > 0)
+    {
+      /* Build attributes array */
+      BSONArrayBuilder attrs;
+      for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
+        attrs.append(requestP->attributeList[ix]);
+      }
+      newSub.append(CSUB_ATTRS, attrs.arr());
+    }
+    else
+    {
+      newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
+    }
+
+  }
 
   /* Duration update */
   long long expiration = getCurrentTime() + requestP->duration.parse();
