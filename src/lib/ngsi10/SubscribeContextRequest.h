@@ -54,6 +54,13 @@ typedef struct SubscribeContextRequest
   Throttling             throttling;             // Optional
   int64_t                expires;
 
+  struct {
+    std::string               q;
+    std::string               geometry;
+    std::string               coords;
+    std::string               georel;
+   }                        expression;      // Only used by NGSIv2 subscription
+
   /* The number of restrictions */
   int                    restrictions;
 
