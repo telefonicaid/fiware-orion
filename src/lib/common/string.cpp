@@ -219,11 +219,10 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 * Breaks a URL into pieces. It returns false if the string passed as first
 * argument is not a valid URL. Otherwise, it returns true.
 *
-*
 * NOTE
 *   About the components in a URL: according to https://tools.ietf.org/html/rfc3986#section-3,
-*   the scheme and path components are mandatory, i.e. the 'http://' or 'https://' must be present,
-*   otherwise the URL is invalid.
+*   the scheme component is mandatory, i.e. the 'http://' or 'https://' must be present,
+*   otherwise the URL is invalid. 
 */
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
@@ -322,7 +321,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
       port = atoi(hostTokens[1].c_str());
     }
-    else  // port not give - using default ports
+    else  // port not given - using default ports
     {
       port = urlTokens[0] == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }
