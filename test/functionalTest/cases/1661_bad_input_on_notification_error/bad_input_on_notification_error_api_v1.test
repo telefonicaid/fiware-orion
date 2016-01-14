@@ -157,7 +157,7 @@ echo
 
 echo "06. Check log-file to make sure the Bad Input alarm is reset"
 echo "============================================================"
-grep "BadInput" /tmp/contextBroker.log | cut -d\| -f 9-
+grep "BadInput" /tmp/contextBroker.log | cut -d\| -f 9- | cut -d: -f 2-
 echo
 echo
 
@@ -272,8 +272,8 @@ Date: REGEX(.*)
 
 06. Check log-file to make sure the Bad Input alarm is reset
 ============================================================
- msg=AlarmManager.cpp[213]: Raising alarm BadInput 0.0.0.0: Invalid URL
- msg=AlarmManager.cpp[235]: Releasing alarm BadInput 0.0.0.0
+ Raising alarm BadInput 0.0.0.0: Invalid URL
+ Releasing alarm BadInput 0.0.0.0
 
 
 07. Corrupt reference in subscription (using mongo)
