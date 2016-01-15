@@ -1166,12 +1166,14 @@ static int connectionTreat
   }
 
   //
-  // Here, if the incoming request was too big, return error abouyt it
+  // Here, if the incoming request was too big, return error about it
   //
   if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
     char details[256];
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+    alarmMgr.badInput(clientIp, details);
 
     ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
@@ -1182,9 +1184,11 @@ static int connectionTreat
     std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg);
   }
   else if (ciP->answer != "")
   {
+    alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
   }
   else
