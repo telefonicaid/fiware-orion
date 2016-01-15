@@ -1252,7 +1252,6 @@ static bool addTriggeredSubscriptions_noCache
   std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
   std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
   std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-  //std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
