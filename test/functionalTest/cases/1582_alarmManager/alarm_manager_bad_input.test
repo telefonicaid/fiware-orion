@@ -25,7 +25,7 @@ Bad Input for Alarm Manager
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4
+brokerStart CB 0 IPv4
 
 --SHELL--
 
