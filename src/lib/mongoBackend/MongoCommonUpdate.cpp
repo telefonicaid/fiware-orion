@@ -1143,8 +1143,6 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  // FIXME #1316: subCacheMatch should be modified so empty condValues attributes match any modifiedAttrs (for the
-  // ONANYCHANGE case)
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
 
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
