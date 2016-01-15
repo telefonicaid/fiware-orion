@@ -76,9 +76,9 @@
 #define CSUB_CONDITIONS         "conditions"
 #define CSUB_CONDITIONS_TYPE    "type"
 #define CSUB_CONDITIONS_VALUE   "value"
-#define CSUB_CONDITIONS_EXPR   "expression"
+#define CSUB_CONDITIONS_EXPR    "expression"
 #define CSUB_CONDITIONS_Q       "q"
-#define CSUB_CONDITIONS_GEO     "geometry"
+#define CSUB_CONDITIONS_GEOM    "geometry"
 #define CSUB_CONDITIONS_COORDS  "coords"
 #define CSUB_CONDITIONS_GEOREL  "georel"
 

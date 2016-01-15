@@ -1020,6 +1020,8 @@ Let's examine in detail the different elements included in the payload:
     notified of the value of *temperature* each time the value of
     *pressure* changes may not be too useful. The example is chosen this
     way only to show the enormous flexibility of subscriptions.
+-   You can leave empty the condValue list (or even omit) to make notification
+    triggers whenever any entity attribute (no matter which name) changes.
 -   The throttling element is used to specify a minimum
     inter-notification arrival time. So, setting throttling to 5 seconds
     as in the example above, makes a notification not to be sent
