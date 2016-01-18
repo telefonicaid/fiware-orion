@@ -418,6 +418,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       if (response != "OK")
       {
+        alarmMgr.badInput(clientIp, response);
+
         restReply(ciP, response);
 
         if (reqP != NULL)
@@ -496,16 +498,19 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
 
-    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
-
     //
-    // If we have gotten this far, and the status is 200, the Input is OK.
+    // If we have gotten this far the Input is OK.
+    // Except for all the badVerb/badRequest, etc.
+    // A common factor for all these 'services' is that the verb is '*'
+    //
     // So, the 'Bad Input' alarm is cleared for this client.
     //
-    if (ciP->httpStatusCode == SccOk)
+    if (serviceV[ix].verb != "*")
     {
       alarmMgr.badInputReset(clientIp);
     }
+
+    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     filterRelease(&parseData, serviceV[ix].request);
 

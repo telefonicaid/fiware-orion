@@ -1,0 +1,198 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Bad Input for Alarm Manager
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4
+
+--SHELL--
+
+#
+# Provoke four badInput and make sure only the 1st and the 3rd are in the logfile
+#
+# 01. GET /v1/noService
+# 02. POST /v1/updateContext with invalid JSON
+# 03. POSTT /v1/queryContext - bad verb
+# 04. POST /v1/updateContext without payload
+# 05. POST /v1/queryContext to reset Bad Input
+# 06. One more error, just to show how it looks in the log file ...
+# 07. grep in log-file
+# 
+
+echo "01. GET /v1/noService"
+echo "====================="
+orionCurl --url /v1/noService --json
+echo
+echo
+
+
+echo "02. POST /v1/updateContext with invalid JSON"
+echo "============================================"
+payload='abc'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. POSTT /v1/queryContext - bad verb"
+echo "====================================="
+payload='{
+
+}'
+orionCurl --url /v1/queryContext --payload "$payload" -X GETT --json
+echo
+echo
+
+
+echo "04. POST /v1/updateContext without payload"
+echo "=========================================="
+orionCurl --url /v1/updateContext --json -X POST
+echo
+echo
+
+
+echo "05. POST /v1/queryContext to reset Bad Input"
+echo "============================================"
+payload='{
+  "entities": [
+    {
+      "type": "E",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+echo "06. One more error, just to show how it looks in the log file ..."
+echo "================================================================="
+payload='{
+
+}'
+orionCurl --url /v1/updateContext --json --payload "$payload" -X PROUST
+echo
+echo
+
+echo "07. grep in log-file"
+echo "===================="
+egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v1/noService
+=====================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+02. POST /v1/updateContext with invalid JSON
+============================================
+HTTP/1.1 200 OK
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "JSON Parse Error",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+03. POSTT /v1/queryContext - bad verb
+=====================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+04. POST /v1/updateContext without payload
+==========================================
+HTTP/1.1 411 Length Required
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "411",
+        "details": "Zero/No Content-Length in PUT/POST/PATCH request",
+        "reasonPhrase": "Length Required"
+    }
+}
+
+
+05. POST /v1/queryContext to reset Bad Input
+============================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+06. One more error, just to show how it looks in the log file ...
+=================================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+07. grep in log-file
+====================
+ Raising alarm BadInput 0.0.0.0: service '/v1/noService' not found
+ Releasing alarm BadInput 0.0.0.0
+ Raising alarm BadInput 0.0.0.0: bad verb for url '/v1/updateContext', method 'PROUST'
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

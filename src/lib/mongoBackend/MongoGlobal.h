@@ -298,6 +298,20 @@ extern bool registrationsQuery
 
 /* ****************************************************************************
 *
+* someEmptyCondValue -
+*
+*/
+extern bool someEmptyCondValue(const BSONObj& sub);
+
+/* ****************************************************************************
+*
+* condValueAttrMatch -
+*
+*/
+extern bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
+
+/* ****************************************************************************
+*
 * subToEntityIdVector -
 *
 * Extract the entity ID vector from a BSON document (in the format of the csubs

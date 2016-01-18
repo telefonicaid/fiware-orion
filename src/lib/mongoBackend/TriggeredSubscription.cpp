@@ -79,6 +79,22 @@ TriggeredSubscription::TriggeredSubscription
 
 }
 
+/* ****************************************************************************
+*
+* TriggeredSubscription::fillExpression -
+*
+* TriggeredSubscription class is shared for NGSI9 and NGSI10 subscriptions, so it is better
+* to keep expressions (an artifact for NGSI10) out of the constructor, in its independent fill
+* method
+*
+*/
+void TriggeredSubscription::fillExpression (const std::string& q, const std::string& georel, const std::string& geometry, const std::string& coords)
+{
+  expression.q        = q;
+  expression.georel   = georel;
+  expression.geometry = geometry;
+  expression.coords   = coords;
+}
 
 
 /* ****************************************************************************
@@ -89,7 +105,8 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 {
   std::stringstream ss;
 
-  ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;
+  ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;  
+  ss << expression.q << delimiter << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
 
   return ss.str();
 }

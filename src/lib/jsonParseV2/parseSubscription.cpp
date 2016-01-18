@@ -45,7 +45,7 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification);
 static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject);
 static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities);
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditionVector* ncvP, const Value& condition);
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition);
 
 
 /* ****************************************************************************
@@ -123,7 +123,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     return oe.render(ciP, "");
   }
 
-  int64_t eT= parse8601Time(expires.GetString());
+  int64_t eT = parse8601Time(expires.GetString());
 
   if (eT == -1)
   {
@@ -188,7 +188,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
   }
   else
   {
-    r = parseNotifyConditionVector(ciP, &scrP->notifyConditionVector, subject["condition"]);
+    r = parseNotifyConditionVector(ciP, scrP, subject["condition"]);
     if (r != "") {
       return r;
     }
@@ -259,7 +259,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
     {
       if ((*iter)["idPattern"].IsString())
       {
-        id = (*iter)["id"].GetString();
+        id = (*iter)["idPattern"].GetString();
       }
       else
       {
@@ -282,7 +282,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
     {
       if ((*iter)["type"].IsString())
       {
-        id = (*iter)["type"].GetString();
+        eiP->type = (*iter)["type"].GetString();
       }
       else
       {
@@ -371,8 +371,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
 *
 */
 
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditionVector* ncvP, const Value& condition)
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition)
 {
+  NotifyConditionVector* ncvP = &scrP->notifyConditionVector;
+
   // Attributes
   if (!condition.HasMember("attributes"))
   {
@@ -396,19 +398,19 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditi
     const Value& expression = condition["expression"];
     if (expression.HasMember("q"))
     {
-      nc->expression.q = expression["q"].GetString();
+      scrP->expression.q = expression["q"].GetString();
     }
     if (expression.HasMember("geometry"))
     {
-      nc->expression.geometry = expression["geometry"].GetString();
+      scrP->expression.geometry = expression["geometry"].GetString();
     }
     if (expression.HasMember("coords"))
     {
-      nc->expression.coords = expression["coords"].GetString();
+      scrP->expression.coords = expression["coords"].GetString();
     }
     if (expression.HasMember("georel"))
     {
-      nc->expression.georel = expression["georel"].GetString();
+      scrP->expression.georel = expression["georel"].GetString();
     }
   }
 
