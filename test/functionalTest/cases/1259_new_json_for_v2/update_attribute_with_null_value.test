@@ -31,7 +31,7 @@ brokerStart CB 0
 
 #
 # 01. Create (POST /v2/entities) E1/A1=null
-# 02. Get E1/A1
+# 02. Get E1/A1 (see that A1 has null value)
 # 03. Create E2/A2='03'
 # 04. Modify E2/A2=null (PATCH)
 # 05. Get E2/A2 (A2 stays the same)
@@ -40,15 +40,15 @@ brokerStart CB 0
 # 08. Get E3/A3 (value of A3 has been replaced)
 # 09. Create E4/A4='09'
 # 10. Modify E4/A4=null (POST)
-# 11. Get E4/A4
+# 11. Get E4/A4 (A4 stays the same)
 # 12. Create (POST /v2/entities) E5/A5=null using URI param keyValues
-# 13. Get E5/A5
+# 13. Get E5/A5 (see that A5 has null value)
 # 14. Create E6/A6='14'
 # 15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)
-# 16. Get E6/A6
+# 16. Get E6/A6 (see that A6 is still 14)
 # 17. Create E7/A7='17'
 # 18. Modify E7/A7=null (PUT), with keyValues
-# 19. Get E7/A7
+# 19. Get E7/A7 (see that A7 has been replaced with null)
 # 20. Create E8/A8='20'
 # 21. Modify E8/A8=null (POST), with keyValues
 # 22. GET E8/A8 (see A8 unchanged)
@@ -69,8 +69,8 @@ echo
 echo
 
 
-echo "02. Get E1/A1"
-echo "============="
+echo "02. Get E1/A1 (see that A1 has null value)"
+echo "=========================================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
@@ -184,8 +184,8 @@ echo
 echo
 
 
-echo "13. Get E5/A5"
-echo "============="
+echo "13. Get E5/A5 (see that A5 has null value)"
+echo "=========================================="
 orionCurl --url /v2/entities/E5?options=keyValues --json
 echo
 echo
@@ -213,8 +213,8 @@ echo
 echo
 
 
-echo "16. Get E6/A6"
-echo "============="
+echo "16. Get E6/A6 (see that A6 is still 14)"
+echo "======================================="
 orionCurl --url /v2/entities/E6?options=keyValues --json
 echo
 echo
@@ -242,8 +242,8 @@ echo
 echo
 
 
-echo "19. Get E7/A7"
-echo "============="
+echo "19. Get E7/A7 (see that A7 has been replaced with null)"
+echo "======================================================="
 orionCurl --url /v2/entities/E7?options=keyValues --json
 echo
 echo
@@ -288,8 +288,8 @@ Date: REGEX(.*)
 
 
 
-02. Get E1/A1
-=============
+02. Get E1/A1 (see that A1 has null value)
+==========================================
 HTTP/1.1 200 OK
 Content-Length: 69
 Content-Type: application/json
@@ -421,8 +421,8 @@ Date: REGEX(.*)
 
 
 
-13. Get E5/A5
-=============
+13. Get E5/A5 (see that A5 has null value)
+==========================================
 HTTP/1.1 200 OK
 Content-Length: 33
 Content-Type: application/json
@@ -452,8 +452,8 @@ Date: REGEX(.*)
 
 
 
-16. Get E6/A6
-=============
+16. Get E6/A6 (see that A6 is still 14)
+=======================================
 HTTP/1.1 200 OK
 Content-Length: 33
 Content-Type: application/json
@@ -483,8 +483,8 @@ Date: REGEX(.*)
 
 
 
-19. Get E7/A7
-=============
+19. Get E7/A7 (see that A7 has been replaced with null)
+=======================================================
 HTTP/1.1 200 OK
 Content-Length: 33
 Content-Type: application/json
