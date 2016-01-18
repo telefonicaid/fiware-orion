@@ -46,11 +46,15 @@ using namespace rapidjson;
 */
 static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP, bool keyValues = false)
 {
+  int members = 0;
+
   // valueTypeNone will be overridden inside the 'for' block in case the attribute has an actual value
   caP->valueType = orion::ValueTypeNone;
 
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
+    ++members;
+
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
@@ -86,6 +90,10 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       {
         caP->boolValue    = false;
         caP->valueType    = orion::ValueTypeBoolean;
+      }
+      else if (type == "Null")
+      {
+        caP->valueType    = orion::ValueTypeNone;
       }
       else if (type == "Array")
       {
@@ -126,6 +134,11 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       LM_W(("Bad Input (unrecognized property for ContextAttribute - '%s')", name.c_str()));
       return "unrecognized property for context attribute";
     }
+  }
+
+  if (members == 0)
+  {
+    caP->valueType = orion::ValueTypeNone;
   }
 
   return "OK";
@@ -169,6 +182,11 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     caP->type        = "";
     caP->valueType   = orion::ValueTypeBoolean;
     caP->boolValue   = false;
+  }
+  else if (type == "Null")
+  {
+    caP->type        = "";
+    caP->valueType   = orion::ValueTypeNone;
   }
   else if (type == "Array")
   {

@@ -1,0 +1,534 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute With NULL Value, only APIv2
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Create (POST /v2/entities) E1/A1=null
+# 02. Get E1/A1
+# 03. Create E2/A2='03'
+# 04. Modify E2/A2=null (PATCH)
+# 05. Get E2/A2 (A2 stays the same)
+# 06. Create E3/A3='06'
+# 07. Modify E3/A3=null (PUT)
+# 08. Get E3/A3 (value of A3 has been replaced)
+# 09. Create E4/A4='09'
+# 10. Modify E4/A4=null (POST)
+# 11. Get E4/A4
+# 12. Create (POST /v2/entities) E5/A5=null using URI param keyValues
+# 13. Get E5/A5
+# 14. Create E6/A6='14'
+# 15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)
+# 16. Get E6/A6
+# 17. Create E7/A7='17'
+# 18. Modify E7/A7=null (PUT), with keyValues
+# 19. Get E7/A7
+# 20. Create E8/A8='20'
+# 21. Modify E8/A8=null (POST), with keyValues
+# 22. GET E8/A8 (see A8 unchanged)
+#
+
+echo "01. Create (POST /v2/entities) E1/A1=null"
+echo "========================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A1": {
+    "type": "AT1",
+    "value": null
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Get E1/A1"
+echo "============="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. Create E2/A2='03'"
+echo "====================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A2": {
+    "type": "AT2",
+    "value": "03"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Modify E2/A2=null (PATCH)"
+echo "============================="
+payload='{
+  "A2": null
+}'
+orionCurl --url /v2/entities/E2 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "05. Get E2/A2 (A2 stays the same)"
+echo "================================="
+orionCurl --url /v2/entities/E2 --json
+echo
+echo
+
+
+echo "06. Create E3/A3='06'"
+echo "====================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "A3": {
+    "type": "AT3",
+    "value": "06"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Modify E3/A3=null (PUT)"
+echo "==========================="
+payload='{
+  "A3": null
+}'
+orionCurl --url /v2/entities/E3 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "08. Get E3/A3 (value of A3 has been replaced)"
+echo "============================================="
+orionCurl --url /v2/entities/E3 --json
+echo
+echo
+
+
+echo "09. Create E4/A4='09'"
+echo "====================="
+payload='{
+  "id": "E4",
+  "type": "T",
+  "A4": {
+    "type": "AT4",
+    "value": "09"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Modify E4/A4=null (POST)"
+echo "============================"
+payload='{
+  "A4": null
+}'
+orionCurl --url /v2/entities/E4 --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Get E4/A4 (A4 stays the same)"
+echo "================================="
+orionCurl --url /v2/entities/E4 --json
+echo
+echo
+
+
+echo "12. Create (POST /v2/entities) E5/A5=null using URI param keyValues"
+echo "==================================================================="
+payload='{
+  "id": "E5",
+  "type": "T5",
+  "A5": null
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "13. Get E5/A5"
+echo "============="
+orionCurl --url /v2/entities/E5?options=keyValues --json
+echo
+echo
+
+
+echo "14. Create E6/A6='14'"
+echo "====================="
+payload='{
+  "id": "E6",
+  "type": "T6",
+  "A6": "14"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)"
+echo "==============================================================="
+payload='{
+  "A6": null
+}'
+orionCurl --url /v2/entities/E6?options=keyValues --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "16. Get E6/A6"
+echo "============="
+orionCurl --url /v2/entities/E6?options=keyValues --json
+echo
+echo
+
+
+echo "17. Create E7/A7='17'"
+echo "====================="
+payload='{
+  "id": "E7",
+  "type": "T7",
+  "A7": "17"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "18. Modify E7/A7=null (PUT), with keyValues"
+echo "==========================================="
+payload='{
+  "A7": null
+}'
+orionCurl --url /v2/entities/E7?options=keyValues --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "19. Get E7/A7"
+echo "============="
+orionCurl --url /v2/entities/E7?options=keyValues --json
+echo
+echo
+
+
+echo "20. Create E8/A8='20'"
+echo "====================="
+payload='{
+  "id": "E8",
+  "type": "T8",
+  "A8": "20"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "21. Modify E8/A8=null (POST), with keyValues"
+echo "============================================"
+payload='{
+  "A8": null
+}'
+orionCurl --url /v2/entities/E8?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "22. GET E8/A8 (see A8 unchanged)"
+echo "================================"
+orionCurl --url /v2/entities/E8?options=keyValues --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create (POST /v2/entities) E1/A1=null
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. Get E1/A1
+=============
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "AT1",
+        "value": null
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+03. Create E2/A2='03'
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+04. Modify E2/A2=null (PATCH)
+=============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. Get E2/A2 (A2 stays the same)
+=================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A2": {
+        "metadata": {},
+        "type": "AT2",
+        "value": "03"
+    },
+    "id": "E2",
+    "type": "T"
+}
+
+
+06. Create E3/A3='06'
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3
+Date: REGEX(.*)
+
+
+
+07. Modify E3/A3=null (PUT)
+===========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. Get E3/A3 (value of A3 has been replaced)
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A3": {
+        "metadata": {},
+        "type": null,
+        "value": null
+    },
+    "id": "E3",
+    "type": "T"
+}
+
+
+09. Create E4/A4='09'
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4
+Date: REGEX(.*)
+
+
+
+10. Modify E4/A4=null (POST)
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4
+Date: REGEX(.*)
+
+
+
+11. Get E4/A4 (A4 stays the same)
+=================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A4": {
+        "metadata": {},
+        "type": "AT4",
+        "value": "09"
+    },
+    "id": "E4",
+    "type": "T"
+}
+
+
+12. Create (POST /v2/entities) E5/A5=null using URI param keyValues
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5
+Date: REGEX(.*)
+
+
+
+13. Get E5/A5
+=============
+HTTP/1.1 200 OK
+Content-Length: 33
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A5": null,
+    "id": "E5",
+    "type": "T5"
+}
+
+
+14. Create E6/A6='14'
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E6
+Date: REGEX(.*)
+
+
+
+15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)
+===============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+16. Get E6/A6
+=============
+HTTP/1.1 200 OK
+Content-Length: 33
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A6": "14",
+    "id": "E6",
+    "type": "T6"
+}
+
+
+17. Create E7/A7='17'
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E7
+Date: REGEX(.*)
+
+
+
+18. Modify E7/A7=null (PUT), with keyValues
+===========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+19. Get E7/A7
+=============
+HTTP/1.1 200 OK
+Content-Length: 33
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A7": null,
+    "id": "E7",
+    "type": "T7"
+}
+
+
+20. Create E8/A8='20'
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E8
+Date: REGEX(.*)
+
+
+
+21. Modify E8/A8=null (POST), with keyValues
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E8
+Date: REGEX(.*)
+
+
+
+22. GET E8/A8 (see A8 unchanged)
+================================
+HTTP/1.1 200 OK
+Content-Length: 33
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A8": "20",
+    "id": "E8",
+    "type": "T8"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

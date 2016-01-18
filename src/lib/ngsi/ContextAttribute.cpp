@@ -366,12 +366,9 @@ std::string ContextAttribute::renderAsJsonObject
         valueIsNumberOrBool = true;
         break;
 
-#if 0
-      // This may be useful for Ken's next PR (otherwise remove)
       case ValueTypeNone:
         effectiveValue = "null";
         break;
-#endif
 
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
@@ -501,12 +498,9 @@ std::string ContextAttribute::render
         valueIsNumberOrBool = true;
         break;
 
-#if 0
-      // This may be useful for Ken's next PR (otherwise remove)
       case ValueTypeNone:
         effectiveValue = "null";
         break;
-#endif
 
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
@@ -591,6 +585,10 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     {
       out += (boolValue == true)? "true" : "false";
     }
+    else if (valueType == orion::ValueTypeNone)
+    {
+      out += "null";
+    }
   }
   else  // Render mode: normalized 
   {
@@ -635,6 +633,10 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     else if (valueType == orion::ValueTypeBoolean)
     {
       out += JSON_VALUE_BOOL("value", boolValue);
+    }
+    else if (valueType == orion::ValueTypeNone)
+    {
+      out += JSON_STR("value") + ":" + "null";
     }
     else
     {

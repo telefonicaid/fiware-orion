@@ -46,6 +46,7 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
   else if (nodeType == "False")   return orion::ValueTypeBoolean;
   else if (nodeType == "Object")  return orion::ValueTypeObject;
   else if (nodeType == "Array")   return orion::ValueTypeVector;
+  else if (nodeType == "Null")    return orion::ValueTypeNone;
 
   return orion::ValueTypeString;
 }
@@ -93,6 +94,10 @@ std::string parseContextAttributeCompoundValue
       else if ((nodeType == "True") || (nodeType == "False"))
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
       }
       else if (nodeType == "Object")
       {
@@ -149,6 +154,10 @@ std::string parseContextAttributeCompoundValue
       else if ((nodeType == "True") || (nodeType == "False"))
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
       }
       else if (nodeType == "Object")
       {
@@ -384,6 +393,10 @@ std::string parseContextAttributeCompoundValueStandAlone
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
       }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
+      }
       else if (nodeType == "Object")
       {
         cvnP->path += "/";
@@ -436,6 +449,10 @@ std::string parseContextAttributeCompoundValueStandAlone
       else if ((nodeType == "True") || (nodeType == "False"))
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
       }
       else if (nodeType == "Object")
       {
