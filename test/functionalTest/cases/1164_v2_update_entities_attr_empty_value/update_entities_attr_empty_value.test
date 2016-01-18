@@ -33,7 +33,7 @@ brokerStart CB
 # 01. POST /v2/entities to create E1/A1=0
 # 02. GET /v2/entities/E1/attrs/A1
 # 03. PUT /v2/entities/E1/attrs/A1 (empty)
-# 04. GET /v2/entities/E1/attrs/A1, to see A1 empty
+# 04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged
 #
 
 echo "01. POST /v2/entities to create E1/A1=0"
@@ -46,6 +46,7 @@ payload='{
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
+
 
 echo "02. GET /v2/entities/E1/attrs/A1"
 echo "================================"
@@ -62,8 +63,8 @@ echo
 echo
 
 
-echo "04. GET /v2/entities/E1/attrs/A1, to see A1 empty"
-echo "================================================="
+echo "04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged"
+echo "====================================================="
 orionCurl --url /v2/entities/E1/attrs/A1 --json
 echo
 echo
@@ -97,21 +98,21 @@ Date: REGEX(.*)
 ========================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Date: REGEX(.*) 
+Date: REGEX(.*)
 
 
 
-04. GET /v2/entities/E1/attrs/A1, to see A1 empty
-=================================================
+04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged
+=====================================================
 HTTP/1.1 200 OK
-Content-Length: 45
+Content-Length: 44
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": null
+    "value": 0.0
 }
 
 

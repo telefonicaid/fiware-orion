@@ -458,6 +458,13 @@ void CompoundValueNode::shortShow(const std::string& indent)
 				(boolValue == true)? "true" : "false"));
     return;
   }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValue,      ("%s%s (null)", 
+				indent.c_str(), 
+				name.c_str()));
+    return;
+  }
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValue,      ("%s%s (%f)", 
@@ -524,6 +531,11 @@ void CompoundValueNode::show(const std::string& indent)
     LM_T(LmtCompoundValueShow, ("%sNumber Value:     %f", 
 				indent.c_str(), 
 				numberValue));
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueShow, ("%sNull", 
+				indent.c_str()));
   }
   else if (childV.size() != 0)
   {
@@ -653,6 +665,11 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
     out = valueTag(indent, tagName, boolValue? "true" : "false", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
+    out = valueTag(indent, tagName, "null", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+  }
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
@@ -767,6 +784,19 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     else
     {
       out = JSON_STR(tagName) + ":" + JSON_BOOL(boolValue);
+    }
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
+
+    if (container->valueType == orion::ValueTypeVector)
+    {
+      out = "null";
+    }
+    else
+    {
+      out = JSON_STR(tagName) + ":" + "null";
     }
   }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
