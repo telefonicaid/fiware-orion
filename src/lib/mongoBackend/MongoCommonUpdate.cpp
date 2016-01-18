@@ -1553,10 +1553,8 @@ static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
     return true;
   }
 
-  //TBD (issue #1316). We would need a variant of the qStringFilters function, but
-  // appliying the filter to cerP in memory instead of generating a BSON to be used
-  // with mongo
-  return true;
+  std::vector<BSONObj> filters;   // not really used, just to match qStringFilters signature
+  return qStringFilters(q, filters, cerP);
 }
 
 
