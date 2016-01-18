@@ -1512,7 +1512,7 @@ void processOntimeIntervalCondition(const std::string& subId, int interval, cons
 *
 * matchExpression
 */
-static bool matchExpresion(ContextElementResponse* cerP, const std::string& q)
+static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
 {
   if (q == "")
   {
@@ -1574,7 +1574,7 @@ static bool processSubscriptions
     }
 
     /* Check 2: expression (q) */
-    if (!matchExpresion(notifyCerP, trigs->expression.q))
+    if (!matchExpression(notifyCerP, trigs->expression.q))
     {
       continue;
     }
