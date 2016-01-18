@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUT empty Entity Attribute
+PUT EMPTY Entity Attribute
 
 --SHELL-INIT--
 dbInit CB
@@ -30,24 +30,44 @@ brokerStart CB
 --SHELL--
 
 #
-## 01. POST /v2/entities to create E1/A1=0
-## 02. PUT /v2/entities/E1/attrs/A1/value (empty)
-
+# 01. POST /v2/entities to create E1/A1=0
+# 02. GET /v2/entities/E1/attrs/A1
+# 03. PUT /v2/entities/E1/attrs/A1 (empty)
+# 04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged
+#
 
 echo "01. POST /v2/entities to create E1/A1=0"
 echo "======================================="
-payload='{ "id": "E1", "type": "T1", "A1": 0 }'
+payload='{
+  "id":   "E1",
+  "type": "T1",
+  "A1":   0
+}'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
-echo "02. PUT /v2/entities/E1/attrs/A1 (empty)"
-echo "==============================================="
+
+echo "02. GET /v2/entities/E1/attrs/A1"
+echo "================================"
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo "03. PUT /v2/entities/E1/attrs/A1 (empty)"
+echo "========================================"
 payload='{ }'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
 echo
 echo
 
+
+echo "04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged"
+echo "====================================================="
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
 
 
 --REGEXPECT--
@@ -60,20 +80,42 @@ Date: REGEX(.*)
 
 
 
-02. PUT /v2/entities/E1/attrs/A1 (empty)
-===============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 136 
+02. GET /v2/entities/E1/attrs/A1
+================================
+HTTP/1.1 200 OK
+Content-Length: 44
 Content-Type: application/json
-Date: REGEX(.*) 
+Date: REGEX(.*)
 
 {
-    "description": "Request payload is missing some piece of information. Please, check Orion documentation.",
-    "error": "InvalidModification"
+    "metadata": {},
+    "type": null,
+    "value": 0.0
+}
+
+
+03. PUT /v2/entities/E1/attrs/A1 (empty)
+========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 44
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": 0.0
 }
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-

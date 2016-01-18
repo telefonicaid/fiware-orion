@@ -39,6 +39,7 @@
 
 #include "ngsi/ParseData.h"
 #include "jsonParseV2/jsonRequestTreat.h"
+#include "parse/textParse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/RestService.h"
@@ -50,7 +51,7 @@
 
 
 /* ****************************************************************************
- *
+*
 * delayedRelease - 
 */
 static void delayedRelease(JsonDelayedRelease* releaseP)
@@ -90,6 +91,8 @@ std::string payloadParse
   LM_T(LmtParsedPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
   LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
 
+  ciP->requestType = service->request;
+
   if (ciP->inFormat == XML)
   {
     if (compV[0] == "v2")
@@ -111,6 +114,10 @@ std::string payloadParse
     {
       result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, jsonPP);
     }
+  }
+  else if (ciP->inFormat == TEXT)
+  {
+    result = textRequestTreat(ciP, parseDataP, service->request);
   }
   else
   {

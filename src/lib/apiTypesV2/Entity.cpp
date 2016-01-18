@@ -40,6 +40,7 @@
 */
 Entity::Entity()
 {
+  typeGiven = false;
 }
 
 
@@ -57,25 +58,39 @@ Entity::~Entity()
 /* ****************************************************************************
 *
 * Entity::render - 
+*
+* The rendering of JSON in APIv2 depends on the URI param 'options'
+* Rendering methods:
+*   o 'normalized' (default)
+*   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
+*   o 'values'     (only the values of the attributes are printed, in a vector)
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
+  std::string renderMode = "normalized";
+
+  if (ciP->uriParamOptions["keyValues"] == true)
+  {
+    renderMode = "keyValues";
+  }
+  else if (ciP->uriParamOptions["values"]== true)
+  {
+    renderMode = "values";
+  }
+
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out = "{";
 
     out += JSON_VALUE("id", id);
-
-    if (type != "")
-    {
-      out += ",";
-      out += JSON_VALUE("type", type);
-    }
+    out += ",";
+    out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : "null");
 
     if (attributeVector.size() != 0)
     {
       out += ",";
-      out += attributeVector.toJson(true, false);
+
+      out += attributeVector.toJson(true, false, renderMode);
     }
 
     out += "}";

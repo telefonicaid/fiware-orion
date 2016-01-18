@@ -55,8 +55,8 @@
 * - CompoundValue1PlusSimpleValueNative
 * - CompoundValue2PlusSimpleValueNative
 *
-* Compound 1 is based on: [ 22, {x: [x1, x2], y: 3}, [z1, false] ]
-* Compound 2 is based on: { x: {x1: a, x2: true}, y: [ y1, y2 ] }
+* Compound 1 is based on: [ 22, {x: [x1, x2], y: 3, z: null}, [z1, false, null] ]
+* Compound 2 is based on: { x: {x1: a, x2: true}, y: [ y1, y2 ], z: null }
 *
 */
 
@@ -151,8 +151,9 @@ static void prepareDatabaseNative(void) {
                         "A1" << BSON("type" << "TA1" <<
                              "value" << BSON_ARRAY(22.0 <<
                                                    BSON("x" << BSON_ARRAY("x1" << "x2") <<
-                                                        "y" << 3.0) <<
-                                                   BSON_ARRAY("z1" << false)
+                                                        "y" << 3.0 <<
+                                                        "z" << BSONNULL) <<
+                                                   BSON_ARRAY("z1" << false << BSONNULL)
                                                    )
                              )
                         )
@@ -163,7 +164,8 @@ static void prepareDatabaseNative(void) {
                      "attrs" << BSON(
                         "A2" << BSON("type" << "TA2" <<
                              "value" << BSON("x" << BSON("x1" << "a" << "x2" << true) <<
-                                             "y" << BSON_ARRAY("y1" << "y2")
+                                             "y" << BSON_ARRAY("y1" << "y2" << BSONNULL) <<
+                                             "z" << BSONNULL
                                              )
                              )
                         )
@@ -175,8 +177,9 @@ static void prepareDatabaseNative(void) {
                         "A3" << BSON("type" << "TA3" <<
                              "value" << BSON_ARRAY(22.0 <<
                                                    BSON("x" << BSON_ARRAY("x1" << "x2") <<
-                                                        "y" << 3.0) <<
-                                                   BSON_ARRAY("z1" << false)
+                                                        "y" << 3.0 <<
+                                                        "z" << BSONNULL) <<
+                                                   BSON_ARRAY("z1" << false << BSONNULL)
                                                    )
                              ) <<
                         "A3bis" << BSON("type" << "TA3" << "value" << "val3")
@@ -188,7 +191,8 @@ static void prepareDatabaseNative(void) {
                      "attrs" << BSON(
                         "A4" << BSON("type" << "TA4" <<
                              "value" << BSON("x" << BSON("x1" << "a" << "x2" << true) <<
-                                             "y" << BSON_ARRAY("y1" << "y2")
+                                             "y" << BSON_ARRAY("y1" << "y2") <<
+                                             "z" << BSONNULL
                                              )
                              ) <<
                         "A4bis" << BSON("type" << "TA4" << "value" << "val4")
@@ -512,12 +516,15 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1Native)
     EXPECT_EQ("x2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[1]->stringValue);
     EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->name);
-    EXPECT_EQ(3.0, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->numberValue);
+    EXPECT_EQ(3.0, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->numberValue);    
+    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->valueType);
+    EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->name);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->valueType);
     EXPECT_EQ("z1", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->valueType);
-    EXPECT_FALSE(RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->boolValue);
+    EXPECT_FALSE(RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->boolValue);    
+    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[2]->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -580,6 +587,8 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2Native)
     EXPECT_EQ("y1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->stringValue);
+    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
+    EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->name);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -639,11 +648,14 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1PlusSimpleValueNative
     EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->name);
     EXPECT_EQ(3.0, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->numberValue);
+    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->valueType);
+    EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[2]->name);
     EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->valueType);
     EXPECT_EQ("z1", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->valueType);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->boolValue);
+    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[2]->valueType);
     EXPECT_EQ("A3bis", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ("val3", RES_CER_ATTR(0, 1)->stringValue);
@@ -709,6 +721,8 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValueNative
     EXPECT_EQ("y1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->stringValue);
     EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->valueType);
     EXPECT_EQ("y2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->stringValue);
+    EXPECT_EQ(orion::ValueTypeNone, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->valueType);
+    EXPECT_EQ("z", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->name);
     EXPECT_EQ("A4bis", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ("val4", RES_CER_ATTR(0, 1)->stringValue);

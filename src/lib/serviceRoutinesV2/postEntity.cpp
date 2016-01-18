@@ -66,25 +66,15 @@ std::string postEntity
 
   eP->id = compV[2];
 
-  if (op == "")
-  {
-    op = "APPEND";   // append or update
-  }
-  else if (op == "append") // pure-append
+  if (ciP->uriParamOptions["append"] == true) // pure-append
   {
     op = "APPEND_STRICT";
   }
   else
   {
-    OrionError   error(SccBadRequest, "invalid value for URL parameter op");
-    std::string  res;
-
-    ciP->httpStatusCode = SccBadRequest;
-    
-    TIMED_RENDER(res = error.render(ciP, ""));
-
-    return res;
+    op = "APPEND";   // append or update
   }
+
 
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);

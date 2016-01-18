@@ -45,44 +45,45 @@ echo
 echo "02. POST /v2/entities to create E1"
 echo "======================================="
 payload='{
-      "id":   "E1",
-      "type": "T1",
-      "A0" : {
-          "type": "number",
-          "value" : "255"
-        },
-       "A1" : {
-          "value" : "E1/T1/A1"
-        },
-       "A2" :{
-          "value": "E1/T1/A2",
-          "type": "AT2" 
-        },
-       "A3" :{
-          "type": "a",
-          "value": "E1/T1/A3/M1",
-          "m1": 
-            {
-              "value": "M1"
-            }     
-        },
-        "A4" : {
-          "type": "a4",
-          "value": "E1/T1/A4/M1-3",
-          "m1":
-            {
-              "value": "M1"
-            },
-           "m2" : 
-            {
-              "type": "tm2",
-              "value": "M2"
-            },
-            "m3" :{
-              "type": "number",
-              "value": "3"
-            }
-        }
+  "id":   "E1",
+  "type": "T1",
+  "A0" : {
+    "type": "number",
+    "value" : "255"
+  },
+  "A1" : {
+    "value" : "E1/T1/A1"
+  },
+  "A2" :{
+    "value": "E1/T1/A2",
+    "type": "AT2" 
+  },
+  "A3" :{
+    "type": "a",
+    "value": "E1/T1/A3/M1",
+    "metadata": {
+      "m1": {
+        "value": "M1"
+      }
+    }
+  },
+  "A4" : {
+    "type": "a4",
+    "value": "E1/T1/A4/M1-3",
+    "metadata": {
+      "m1": {
+        "value": "M1"
+      },
+      "m2": {
+        "type": "tm2",
+        "value": "M2"
+      },
+      "m3": {
+        "type": "number",
+        "value": "3"
+      }
+    }
+  }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -122,39 +123,55 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1 (ok)
 ============================
 HTTP/1.1 200 OK
-Content-Length: 286
+Content-Length: 420
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A0": {
-        "type": "number", 
+        "metadata": {},
+        "type": "number",
         "value": "255"
-    }, 
-    "A1": "E1/T1/A1", 
+    },
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": "E1/T1/A1"
+    },
     "A2": {
-        "type": "AT2", 
+        "metadata": {},
+        "type": "AT2",
         "value": "E1/T1/A2"
-    }, 
+    },
     "A3": {
-        "m1": "M1", 
-        "type": "a", 
+        "metadata": {
+            "m1": {
+                "type": null,
+                "value": "M1"
+            }
+        },
+        "type": "a",
         "value": "E1/T1/A3/M1"
-    }, 
+    },
     "A4": {
-        "m1": "M1", 
-        "m2": {
-            "type": "tm2", 
-            "value": "M2"
-        }, 
-        "m3": {
-            "type": "number", 
-            "value": "3"
-        }, 
-        "type": "a4", 
+        "metadata": {
+            "m1": {
+                "type": null,
+                "value": "M1"
+            },
+            "m2": {
+                "type": "tm2",
+                "value": "M2"
+            },
+            "m3": {
+                "type": "number",
+                "value": "3"
+            }
+        },
+        "type": "a4",
         "value": "E1/T1/A4/M1-3"
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 

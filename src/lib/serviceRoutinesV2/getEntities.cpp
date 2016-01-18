@@ -57,6 +57,7 @@
 *   - q
 *   - geometry
 *   - coords
+*   - options=keyValues
 *
 * 01. Fill in QueryContextRequest
 * 02. Call standard op postQueryContext
@@ -71,6 +72,8 @@ std::string getEntities
   ParseData*                 parseDataP
 )
 {
+  LM_M(("In getEntities"));
+
   Entities     entities;
   std::string  answer;
   std::string  pattern    = ".*"; // all entities, default value

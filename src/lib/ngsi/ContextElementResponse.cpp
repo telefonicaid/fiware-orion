@@ -207,6 +207,11 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 
+      case jstNULL:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->valueType = orion::ValueTypeNone;
+        break;
+
       case Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);

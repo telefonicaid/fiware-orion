@@ -79,14 +79,23 @@ Date: REGEX(.*)
 02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 39
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": 1.0, 
-    "A2": 2.0, 
-    "id": "E1"
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "A2": {
+        "metadata": {},
+        "type": null,
+        "value": 2.0
+    },
+    "id": "E1",
+    "type": null
 }
 
 
@@ -101,14 +110,23 @@ Date: REGEX(.*)
 04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 39
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A3": 3.0, 
-    "A4": 4.0, 
-    "id": "E1"
+    "A3": {
+        "metadata": {},
+        "type": null,
+        "value": 3.0
+    },
+    "A4": {
+        "metadata": {},
+        "type": null,
+        "value": 4.0
+    },
+    "id": "E1",
+    "type": null
 }
 
 

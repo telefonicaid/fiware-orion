@@ -32,13 +32,13 @@ brokerStart CB
 #
 # 01. Create E1 with attr1
 # 02. Get E1 (only attr1)
-# 03. POST /v2/entities/E1 atribute 'attr2'
+# 03. POST /v2/entities/E1 attribute 'attr2'
 # 04. Get E1 (attr1, attr2)
-# 05. POST /v2/entities/E1?op=append atribute 'attr3'
+# 05. POST /v2/entities/E1?options=append attribute 'attr3'
 # 06. Get E1 (attr1, attr2, attr3)
-# 07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)
+# 07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)
 # 08. Get E1 (attr1, attr2, attr3, attr4)
-# 09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)
+# 09. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (attr4 already exists. error)
 # 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
 
 echo "01. Create E1 with attr1"
@@ -56,8 +56,8 @@ echo
 echo
 
 
-echo "03. POST /v2/entities/E1 atribute 'attr2'"
-echo "========================================="
+echo "03. POST /v2/entities/E1 attribute 'attr2'"
+echo "=========================================="
 payload='{  "attr2": 2 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
@@ -71,10 +71,10 @@ echo
 echo
 
 
-echo "05. POST /v2/entities/E1?op=append atribute 'attr3'"
-echo "==================================================="
+echo "05. POST /v2/entities/E1?options=append attribute 'attr3'"
+echo "========================================================="
 payload='{  "attr3": 3 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url /v2/entities/E1?options=append --payload "$payload" --json
 echo
 echo
 
@@ -86,8 +86,8 @@ echo
 echo
 
 
-echo "07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)"
-echo "=========================================================="
+echo "07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)"
+echo "==========================================================="
 payload='{  "attr3": 33, "attr4": 4 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
@@ -95,16 +95,16 @@ echo
 
 
 echo "08. Get E1 (attr1, attr2, attr3, att4)"
-echo "======================================="
+echo "======================================"
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo "09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)"
-echo "======================================================================================="
+echo "09. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (attr4 already exists. error)"
+echo "============================================================================================="
 payload='{  "attr4": 44, "attr5": 5 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url /v2/entities/E1?options=append --payload "$payload" --json
 echo
 echo
 
@@ -129,18 +129,23 @@ Date: REGEX(.*)
 02. Get E1 (only attr1)
 =======================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 76
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "id": "E1",
+    "type": null
 }
 
 
-03. POST /v2/entities/E1 atribute 'attr2'
-=========================================
+03. POST /v2/entities/E1 attribute 'attr2'
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
@@ -151,19 +156,28 @@ Date: REGEX(.*)
 04. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 45
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "attr2": {
+        "metadata": {},
+        "type": null,
+        "value": 2.0
+    },
+    "id": "E1",
+    "type": null
 }
 
 
-05. POST /v2/entities/E1?op=append atribute 'attr3'
-===================================================
+05. POST /v2/entities/E1?options=append attribute 'attr3'
+=========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
@@ -174,20 +188,33 @@ Date: REGEX(.*)
 06. Get E1 (attr1, attr2, attr3)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 62
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "attr3": 3.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "attr2": {
+        "metadata": {},
+        "type": null,
+        "value": 2.0
+    },
+    "attr3": {
+        "metadata": {},
+        "type": null,
+        "value": 3.0
+    },
+    "id": "E1",
+    "type": null
 }
 
 
-07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)
-==========================================================
+07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)
+===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
@@ -196,23 +223,40 @@ Date: REGEX(.*)
 
 
 08. Get E1 (attr1, attr2, attr3, att4)
-=======================================
+======================================
 HTTP/1.1 200 OK
-Content-Length: 80
+Content-Length: 236
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "attr3": 33.0,
-    "attr4": 4.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "attr2": {
+        "metadata": {},
+        "type": null,
+        "value": 2.0
+    },
+    "attr3": {
+        "metadata": {},
+        "type": null,
+        "value": 33.0
+    },
+    "attr4": {
+        "metadata": {},
+        "type": null,
+        "value": 4.0
+    },
+    "id": "E1",
+    "type": null
 }
 
 
-09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)
-=======================================================================================
+09. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (attr4 already exists. error)
+=============================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 108
 Content-Type: application/json
@@ -227,17 +271,38 @@ Date: REGEX(.*)
 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 97
+Content-Length: 289
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "attr3": 33.0,
-    "attr4": 4.0,
-    "attr5": 5.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "attr2": {
+        "metadata": {},
+        "type": null,
+        "value": 2.0
+    },
+    "attr3": {
+        "metadata": {},
+        "type": null,
+        "value": 33.0
+    },
+    "attr4": {
+        "metadata": {},
+        "type": null,
+        "value": 4.0
+    },
+    "attr5": {
+        "metadata": {},
+        "type": null,
+        "value": 5.0
+    },
+    "id": "E1",
+    "type": null
 }
 
 

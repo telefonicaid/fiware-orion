@@ -33,24 +33,21 @@ brokerStart CB
 # 01. GET /v2/entities/NONE/attrs/ANY/value
 #
 
-echo "02. GET /v2/entities/NONE/attrs/ANY/value"
+echo "01. GET /v2/entities/NONE/attrs/ANY/value"
 echo "========================================="
-orionCurl --url /v2/entities/NONE/attrs/ANY/value --json
+orionCurl --url /v2/entities/NONE/attrs/ANY/value --json --out text
 echo
 echo
 
 --REGEXPECT--
-02. GET /v2/entities/NONE/attrs/ANY/value
+01. GET /v2/entities/NONE/attrs/ANY/value
 =========================================
 HTTP/1.1 404 Not Found
 Content-Length: 95
-Content-Type: application/json
+Content-Type: text/plain
 Date: REGEX(.*)
 
-{
-    "description": "The requested entity has not been found. Check type and id",
-    "error": "NotFound"
-}
+{"error":"NotFound","description":"The requested entity has not been found. Check type and id"}
 
 
 --TEARDOWN--

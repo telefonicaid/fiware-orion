@@ -66,7 +66,7 @@ typedef struct ContextAttributeVector
                             bool                comma     = false,
                             bool                omitValue = false,
                             bool                attrsAsName = false);
-  std::string        toJson(bool isLastElement, bool types);
+  std::string        toJson(bool isLastElement, bool types, const std::string& renderMode);
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

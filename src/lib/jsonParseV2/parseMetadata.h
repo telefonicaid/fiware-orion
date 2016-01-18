@@ -27,6 +27,8 @@
 */
 #include "rapidjson/document.h"
 
+#include "ngsi/Metadata.h"
+
 using namespace rapidjson;
 
 
