@@ -56,31 +56,6 @@
 
 /* ****************************************************************************
 *
-* IP - 
-*/
-#define  LOCAL_IP_V6  "::"
-#define  LOCAL_IP_V4  "0.0.0.0"
-
-
-
-/* ****************************************************************************
-*
-* PAYLOAD_MAX_SIZE - 
-*/
-#define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
-
-
-
-/* ****************************************************************************
-*
-* STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
-*/
-#define STATIC_BUFFER_SIZE (32 * 1024)
-
-
-
-/* ****************************************************************************
-*
 * Globals
 */
 static RestService*              restServiceV          = NULL;
@@ -92,7 +67,7 @@ static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
-unsigned short                   rushPort              = 0;
+unsigned short                   rushPort              = NO_PORT;
 char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
@@ -103,7 +78,6 @@ __thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
-
 
 
 /* ****************************************************************************
@@ -1194,12 +1168,14 @@ static int connectionTreat
   }
 
   //
-  // Here, if the incoming request was too big, return error abouyt it
+  // Here, if the incoming request was too big, return error about it
   //
   if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
     char details[256];
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+    alarmMgr.badInput(clientIp, details);
 
     ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
@@ -1210,9 +1186,11 @@ static int connectionTreat
     std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg);
   }
   else if (ciP->answer != "")
   {
+    alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
   }
   else
@@ -1242,7 +1220,7 @@ static int connectionTreat
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   bool      mhdStartError  = true;
-  size_t    memoryLimit    = connMemory * 1024; // connMemory is expressed in kilobytes
+  size_t    memoryLimit    = connMemory * 1024; // Connection memory is expressed in kilobytes
   MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)

@@ -57,7 +57,6 @@
 #define SERVICE_PATH_MAX_TOTAL            (((SERVICE_PATH_MAX_COMPONENT_LEN + 1) * SERVICE_PATH_MAX_LEVELS) + 2) * SERVICE_PATH_MAX_COMPONENTS
 
 
-
 /* ****************************************************************************
 *
 * Others -
@@ -67,12 +66,96 @@
 #define STRING_SIZE_FOR_INT  16    // Room enough for an integer
 
 
-
 /* ****************************************************************************
 *
 * Alarm Manager definitions - 
 */
 #define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     1
 #define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              1
+
+
+/* ****************************************************************************
+*
+* Message definitions - 
+*/
+#define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
+#define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
+
+
+/* ****************************************************************************
+*
+* PAYLOAD_MAX_SIZE - 
+*/
+#define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024) // 1 MB Maximum size of the payload
+
+
+/* ****************************************************************************
+*
+* IP - 
+*/
+#define  LOCAL_IP_V6  "::"
+#define  LOCAL_IP_V4  "0.0.0.0"
+
+
+/* ****************************************************************************
+*
+* STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
+*/
+#define STATIC_BUFFER_SIZE (32 * 1024) // 32 KB 
+
+
+/* ****************************************************************************
+*
+* CONSTANTS RESTINIT - 
+*/ 
+#define   DEFAULT_CONNECTION_MEM  	64   
+#define   DEFAULT_MAX_CONNECTIONS   	128   
+#define   DEFAULT_MHD_THREAD_POOLSIZE   128 
+
+
+/* ****************************************************************************
+*
+* HTTP header maximum lengths
+*/
+#define CURL_VERSION_MAX_LENGTH             128
+#define HTTP_HEADER_USER_AGENT_MAX_LENGTH   256
+#define HTTP_HEADER_HOST_MAX_LENGTH         256
+
+
+/* ****************************************************************************
+*
+* Default timeout - 5000 milliseconds
+*/
+#define DEFAULT_TIMEOUT     5000
+
+
+/* ****************************************************************************
+*
+* Pagination definitions - 
+*/
+#define MAX_PAGINATION_LIMIT            "1000"
+
+
+/* ****************************************************************************
+*
+* MAX_LEN_IP - 
+*/
+#define MAX_LEN_IP  64
+
+
+/* ****************************************************************************
+*
+* Values for URI parameters
+*/
+#define DEFAULT_PAGINATION_LIMIT        "20"
+#define DEFAULT_PAGINATION_LIMIT_INT     20 
+
+
+/* ****************************************************************************
+*
+* DB_NAME_MAX_LEN - max length of database name
+*/
+#define DB_NAME_MAX_LEN  10
+
 
 #endif  // SRC_LIB_COMMON_LIMITS_H_

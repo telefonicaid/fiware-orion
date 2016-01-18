@@ -30,8 +30,12 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/subscriptions
+# 01. POST /v2/subscriptions (only type)
 # 02. GET /v2/subscriptions/ID
+# 03. POST /v2/subscriptions (idPatterm)
+# 04. GET /v2/subscriptions/ID2
+# 05. POST /v2/subscriptions (id)
+# 06. GET /v2/subscriptions/ID2
 #
 
 echo "01. POST /v2/subscriptions"
@@ -74,6 +78,89 @@ echo
 echo
 
 
+echo "03. POST /v2/subscriptions (idPattern)"
+echo "======================================"
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "idPattern": "xxx.*",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo "04. GET /v2/subscriptions/ID"
+echo "============================"
+orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+echo
+echo
+
+
+
+echo "05. POST /v2/subscriptions (id)"
+echo "==============================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo "06. GET /v2/subscriptions/ID"
+echo "============================"
+orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /v2/subscriptions
 ==========================
@@ -87,7 +174,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 400
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -118,7 +205,111 @@ Date: REGEX(.*)
             {
                 "id": "",
                 "idPattern": ".*",
-                "type": ""
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+03. POST /v2/subscriptions (idPattern)
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/subscriptions/ID
+============================
+HTTP/1.1 200 OK
+Content-Length: 427
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "expires": "1991-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234"
+    },
+    "status": "expired",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "humidity",
+                "pression",
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": "xxx.*",
+                "type": "special"
+            }
+        ]
+    }
+}
+
+
+05. POST /v2/subscriptions (id)
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+06. GET /v2/subscriptions/ID
+============================
+HTTP/1.1 200 OK
+Content-Length: 425
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "expires": "1991-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234"
+    },
+    "status": "expired",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "humidity",
+                "pression",
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "xxx",
+                "idPattern": "",
+                "type": "special"
             }
         ]
     }

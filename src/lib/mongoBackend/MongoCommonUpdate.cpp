@@ -1240,6 +1240,10 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
+
+    // FIXME P10 #1316: expression needs to be stored in the cache
+    sub->fillExpression("", "", "", "");
+
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
@@ -1254,7 +1258,6 @@ static bool addTriggeredSubscriptions_withCache
 *
 * addTriggeredSubscriptions_noCache
 *
-* Recovered almost verbatim from release 0.23.0
 */
 static bool addTriggeredSubscriptions_noCache
 (
@@ -1283,17 +1286,8 @@ static bool addTriggeredSubscriptions_noCache
   std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
   std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
   std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-  std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
-
-  /* Build attribute list */
-  BSONArrayBuilder ba;
-  for (unsigned int ix = 0; ix < modifiedAttrs.size(); ++ix)
-  {
-    ba.append(modifiedAttrs[ix]);
-  }
-  BSONArray attrs = ba.arr();
 
   /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
   BSONObj queryNoPattern = BSON(
@@ -1303,7 +1297,6 @@ static bool addTriggeredSubscriptions_noCache
                     BSON(entTypeQ << BSON("$exists" << false))) <<
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
-                condValueQ << BSON("$in" << attrs) <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_SERVICE_PATH << spBson);
 
@@ -1332,7 +1325,6 @@ static bool addTriggeredSubscriptions_noCache
 
   queryPattern.append(entPatternQ, "true");
   queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
-  queryPattern.append(condValueQ, BSON("$in" << attrs));
   queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.append(CSUB_SERVICE_PATH, spBson);
   queryPattern.appendCode("$where", function);
@@ -1358,7 +1350,8 @@ static bool addTriggeredSubscriptions_noCache
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
-  /* For each one of the subscriptions found, add it to the map (if not already there) */
+  /* For each one of the subscriptions found, add it to the map (if not already there),
+   * after checking triggering attributes */
   while (moreSafe(cursor))
   {
     BSONObj     sub;
@@ -1387,6 +1380,24 @@ static bool addTriggeredSubscriptions_noCache
 
     if (subs.count(subIdStr) == 0)
     {
+
+      /* Except in the case of ONANYCHANGE subscriptions (the ones with empty condValues), we check if
+       * condValues include some of the modifiedAttributes. In previous versions we defered this to DB
+       * as an additional element in the csubs query (in both pattern and no-pattern "$or branches"), eg:
+       *
+       * "conditions.value": { $in: [ "pressure" ] }
+       *
+       * However, it is difficult to check this condition *OR* empty array (for the case of ONANYCHANGE)
+       * at query level, so now do the check in the code.
+       */
+      if (!someEmptyCondValue(sub))
+      {
+        if (!condValueAttrMatch(sub, modifiedAttrs))
+        {
+          continue;
+        }
+      }
+
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
@@ -1397,9 +1408,20 @@ static bool addTriggeredSubscriptions_noCache
           throttling,
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
-          getStringField(sub, CSUB_REFERENCE),
-          //subToAttributeList(sub)); signature changed in TriggeredSubscription() constructor in 0.24.0
+          getStringField(sub, CSUB_REFERENCE),          
           subToAttributeList(sub), "", "");
+
+      if (sub.hasField(CSUB_CONDITIONS_EXPR))
+      {
+        BSONObj expr = getObjectField(sub, CSUB_CONDITIONS_EXPR);
+
+        std::string q        = expr.hasField(CSUB_CONDITIONS_Q)      ? getStringField(expr, CSUB_CONDITIONS_Q)      : "";
+        std::string georel   = expr.hasField(CSUB_CONDITIONS_GEOREL) ? getStringField(expr, CSUB_CONDITIONS_GEOREL) : "";
+        std::string geometry = expr.hasField(CSUB_CONDITIONS_GEOM)   ? getStringField(expr, CSUB_CONDITIONS_GEOM)   : "";
+        std::string coords   = expr.hasField(CSUB_CONDITIONS_COORDS) ? getStringField(expr, CSUB_CONDITIONS_COORDS) : "";
+
+        trigs->fillExpression(q, georel, geometry, coords);
+      }
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -1519,6 +1541,26 @@ void processOntimeIntervalCondition(const std::string& subId, int interval, cons
 }
 
 
+
+/* ****************************************************************************
+*
+* matchExpression
+*/
+static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
+{
+  if (q == "")
+  {
+    return true;
+  }
+
+  //TBD (issue #1316). We would need a variant of the qStringFilters function, but
+  // appliying the filter to cerP in memory instead of generating a BSON to be used
+  // with mongo
+  return true;
+}
+
+
+
 /* ****************************************************************************
 *
 * processSubscriptions - send a notification for each subscription in the map
@@ -1541,6 +1583,14 @@ static bool processSubscriptions
     std::string             mapSubId  = it->first;
     TriggeredSubscription*  trigs     = it->second;
 
+    /* There are some checks to perform on TriggeredSubscription in order to see if the notification has to be actually sent. Note
+     * that checks are done in increasing cost order (e.g. georel check is done at the end).
+     *
+     * Note that check for triggering based on attributes it isn't part of these checks: it has been already done
+     * before adding the subscription to the map.
+     */
+
+    /* Check 1: timming (not expired and ok from throttling point of view) */
     if (trigs->throttling != 1 && trigs->lastNotification != 1)
     {
       long long current = getCurrentTime();
@@ -1556,6 +1606,15 @@ static bool processSubscriptions
         continue;
       }
     }
+
+    /* Check 2: expression (q) */
+    if (!matchExpression(notifyCerP, trigs->expression.q))
+    {
+      continue;
+    }
+
+    /* Check 3: expresion (georel, which also uses geometry and coords) */
+    // TBD (issue #1678)
 
     /* Send notification */
     LM_T(LmtSubCache, ("NOT ignored: %s", trigs->cacheSubId.c_str()));

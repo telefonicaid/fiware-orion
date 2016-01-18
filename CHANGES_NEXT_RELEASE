@@ -11,3 +11,5 @@
 - Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
 - Add: POST /v2/subscriptions operation (without expression evaluation yet) (Issue #1316)
 - Add: DELETE /v2/subscriptions operation (Issue #1654)
+- Fix: fixed wrong interpretation of empty string keyvalues as empty objects in compounds (Issue #1642)
+- Add: subscriptions triggered by modifications in any attribute without explicitly list them (aka ONANYCHANGE) (Issue #350)

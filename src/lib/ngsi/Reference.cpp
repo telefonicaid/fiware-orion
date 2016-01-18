@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/Request.h"
 #include "ngsi/Reference.h"
 
@@ -53,6 +54,17 @@ std::string Reference::check
     {
       return "Empty Reference";
     }
+  }
+
+  std::string  url = string;
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+
+  if (parseUrl(url, host, port, path, protocol) == false)
+  {
+    return "Invalid URL";
   }
 
   return "OK";
