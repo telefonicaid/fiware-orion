@@ -34,6 +34,8 @@ brokerStart CB 0
 # 02. Get E1/A1
 # 03. Modify E1/A1 (PATCH)
 # 04. Get E1/A1
+# 05. Modify E1/A1 (PUT)
+# 06. Get E1/A1
 #
 
 echo "01. Create (POST /v2/entities) E1/A1=compound with null value inside"
