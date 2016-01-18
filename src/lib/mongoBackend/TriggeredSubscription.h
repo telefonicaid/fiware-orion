@@ -57,6 +57,13 @@ class TriggeredSubscription
   std::string   cacheSubId;
   std::string   tenant;
 
+  struct {
+    std::string               q;
+    std::string               geometry;
+    std::string               coords;
+    std::string               georel;
+   }                        expression;      // Only used by NGSIv2 subscription
+
   TriggeredSubscription(long long           _throttling,
                         long long           _lastNotification,
                         Format              _format,
@@ -68,6 +75,8 @@ class TriggeredSubscription
   TriggeredSubscription(Format               _format,
                         const std::string&   _reference,
                         const AttributeList& _attrL);
+
+  void fillExpression(const std::string& q, const std::string& georel, const std::string& geometry, const std::string& coords);
 
   std::string toString(const std::string& delimiter);
 };

@@ -153,7 +153,7 @@ HttpStatusCode mongoSubscribeContext
     BSONObjBuilder expression;
 
     expression << CSUB_CONDITIONS_Q << requestP->expression.q
-               << CSUB_CONDITIONS_GEO << requestP->expression.geometry
+               << CSUB_CONDITIONS_GEOM << requestP->expression.geometry
                << CSUB_CONDITIONS_COORDS << requestP->expression.coords
                << CSUB_CONDITIONS_GEOREL << requestP->expression.georel;
     sub.append(CSUB_CONDITIONS_EXPR, expression.obj());
