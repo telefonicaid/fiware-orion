@@ -23,7 +23,6 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
-#include <inttypes.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -200,7 +199,7 @@ HttpStatusCode mongoUpdateContextSubscription
   else
   {
     newSub.append(CSUB_EXPIRATION, expiration);
-    LM_T(LmtMongo, ("New subscription expiration: %" PRId64, expiration));
+    LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
   }
 
   /* Restriction update */
