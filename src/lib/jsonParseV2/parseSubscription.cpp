@@ -195,7 +195,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     r = parseEntitiesVector(ciP, &scrP->entityIdVector, subject["entities"]);
     if (r != "") {
       return r;
-    };
+    }
   }
   //Condition
   if (!subject.HasMember("condition"))
