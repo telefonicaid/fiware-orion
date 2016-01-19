@@ -440,4 +440,11 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  std::string*                       perAttrPa,
                                  Format*                            perAttrPaFormat);
 
+
+/* ****************************************************************************
+*
+* qStringFilters -
+*/
+extern bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, ContextElementResponse* cerP = NULL);
+
 #endif
