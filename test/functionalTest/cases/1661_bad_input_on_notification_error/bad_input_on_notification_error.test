@@ -194,55 +194,40 @@ echo
 --REGEXPECT--
 01. Try to create subscription for E1/A1, but with 'reference' x.y.com:abc - see error
 ======================================================================================
-HTTP/1.1 200 OK
-Content-Length: 166
+HTTP/1.1 400 Bad Request
+Content-Length: 50
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "subscribeError": {
-        "errorCode": {
-            "code": "400",
-            "details": "invalid payload: Invalid URL",
-            "reasonPhrase": "Bad Request"
-        }
-    }
+    "description": "Invalid URL",
+    "error": "BadRequest"
 }
 
 
 02. Try to create subscription for E1/A1, but with 'reference' without IP, just a port - see error
 ==================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 166
+HTTP/1.1 400 Bad Request
+Content-Length: 50
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "subscribeError": {
-        "errorCode": {
-            "code": "400",
-            "details": "invalid payload: Invalid URL",
-            "reasonPhrase": "Bad Request"
-        }
-    }
+    "description": "Invalid URL",
+    "error": "BadRequest"
 }
 
 
 03. Try to create subscription for E1/A1, but with 'reference' http://http://abc.a.com:1234 - see error
 =======================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 166
+HTTP/1.1 400 Bad Request
+Content-Length: 50
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "subscribeError": {
-        "errorCode": {
-            "code": "400",
-            "details": "invalid payload: Invalid URL",
-            "reasonPhrase": "Bad Request"
-        }
-    }
+    "description": "Invalid URL",
+    "error": "BadRequest"
 }
 
 

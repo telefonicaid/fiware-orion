@@ -341,6 +341,16 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
       return oe.render(ciP, "");
     }
     scrP->reference.string = callback.GetString();
+
+    std::string refError = scrP->reference.check(SubscribeContext,JSON, "" ,"", 0);
+    if (refError != "OK")
+    {
+      alarmMgr.badInput(clientIp, refError);
+      OrionError oe(SccBadRequest, refError);
+
+      return oe.render(ciP, "");
+    }
+
   }
   else // missing callback field
   {
