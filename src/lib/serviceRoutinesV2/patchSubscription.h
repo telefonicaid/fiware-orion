@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSESUBSCRIPTION_H_
-#define SRC_LIB_JSONPARSEV2_PARSESUBSCRIPTION_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_PATCHSUBCRIPTION_H_
+#define SRC_LIB_SERVICEROUTINESv2_PATCHSUBCRIPTION_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,16 +25,24 @@
 *
 * Author: Orion dev team
 */
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
+#include <string>
+#include <vector>
 
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
 
 /* ****************************************************************************
 *
-* parseSubscription -
+* patchSubcription -
 */
-extern std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, bool partial = false);
+extern std::string patchSubscription
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSESUBSCRIPTION_H_
+#endif  // SRC_LIB_SERVICEROUTINESv2_PATCHSUBCRIPTION_H_
+

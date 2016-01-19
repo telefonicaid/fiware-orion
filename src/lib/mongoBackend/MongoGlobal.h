@@ -352,7 +352,8 @@ extern bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 );
 
 /* ****************************************************************************
@@ -371,7 +372,8 @@ extern BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 );
 
 /* ****************************************************************************
@@ -439,5 +441,12 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  Format*                            perEntPaFormat,
                                  std::string*                       perAttrPa,
                                  Format*                            perAttrPaFormat);
+
+
+/* ****************************************************************************
+*
+* qStringFilters -
+*/
+extern bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, ContextElementResponse* cerP = NULL);
 
 #endif

@@ -60,6 +60,8 @@ typedef struct ContextElement
   void         fill(const struct ContextElement& ce);
   void         fill(ContextElement* ceP);
 
+  ContextAttribute* getAttribute(std::string attrName);
+
   std::string  check(RequestType         requestType,
                      Format              format,
                      const std::string&  indent,

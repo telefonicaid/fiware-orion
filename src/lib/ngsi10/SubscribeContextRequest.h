@@ -39,6 +39,19 @@
 
 
 
+/* ***********************************************
+*
+* Expression
+*/
+struct Expression {
+  std::string               q;
+  std::string               geometry;
+  std::string               coords;
+  std::string               georel;
+  bool                      isSet;
+  Expression(): isSet(false) {}
+ };
+
 /* ****************************************************************************
 *
 * SubscribeContextRequest - 
@@ -53,13 +66,7 @@ typedef struct SubscribeContextRequest
   NotifyConditionVector  notifyConditionVector;  // Optional
   Throttling             throttling;             // Optional
   int64_t                expires;
-
-  struct {
-    std::string               q;
-    std::string               geometry;
-    std::string               coords;
-    std::string               georel;
-   }                        expression;      // Only used by NGSIv2 subscription
+  Expression             expression;      // Only used by NGSIv2 subscription
 
   /* The number of restrictions */
   int                    restrictions;

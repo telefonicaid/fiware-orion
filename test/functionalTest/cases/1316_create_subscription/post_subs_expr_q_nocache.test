@@ -1,0 +1,253 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST Subscriptions V2 q expression without cache
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -noCache
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create subscription with q: temperature==20..40
+# 02. Create entity with t=10 (not notif)
+# 03. Update entity to t=15 (not notif)
+# 04. Update entity to t=25 (notif)
+# 05. Update entity to t=35 (notif)
+# 06. Update entity to t=45 (not notif)
+# 07. Dump accumulator (2 notifications)
+#
+
+echo "01. Create subscription with q: temperature==20..40"
+echo "==================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature" ],
+            "expression": {
+               "q": "temperature==20..40"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:'$LISTENER_PORT'/notify",
+        "attributes": ["temperature" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create entity with t=10 (not notif)"
+echo "======================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "temperature": 10
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Update entity to t=15 (not notif)"
+echo "===================================="
+payload='{
+  "temperature": 15
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "04. Update entity to t=25 (notif)"
+echo "================================="
+payload='{
+  "temperature": 25
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "05. Update entity to t=35 (notif)"
+echo "================================="
+payload='{
+  "temperature": 35
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "06. Update entity to t=45 (not notif)"
+echo "===================================="
+payload='{
+  "temperature": 45
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "07. Get accumulator dump (2 notifications)"
+echo "=========================================="
+accumulatorDump
+echo
+echo
+
+--REGEXPECT--
+01. Create subscription with q: temperature==20..40
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+02. Create entity with t=10 (not notif)
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+03. Update entity to t=15 (not notif)
+====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Update entity to t=25 (notif)
+=================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. Update entity to t=35 (notif)
+=================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Update entity to t=45 (not notif)
+====================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. Get accumulator dump (2 notifications)
+==========================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 471
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "temperature",
+            "type" : "",
+            "value" : 25.000000
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 471
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "temperature",
+            "type" : "",
+            "value" : 35.000000
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB
