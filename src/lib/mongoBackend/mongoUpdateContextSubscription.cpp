@@ -125,8 +125,8 @@ HttpStatusCode mongoUpdateContextSubscription
     LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
-  /* Restriction update */
-  // FIXME: Restrictions not implemented yet
+  /* ServicePath update */
+  newSub.append(CSUB_SERVICE_PATH, (servicePathV.size() == 0)? "" : servicePathV[0]);
 
   /* Throttling update */
   if (!requestP->throttling.isEmpty())

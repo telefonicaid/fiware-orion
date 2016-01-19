@@ -2035,7 +2035,6 @@ bool processOnChangeConditionForSubscription
   const std::vector<std::string>&  servicePathV
 )
 {
-  // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
   std::string                   err;
   NotifyContextRequest          ncr;
   Restriction                   res;
@@ -2066,7 +2065,6 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      // FIXME P10: we are using a dummy scope for the moment, until subscription scopes get implemented
       if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
