@@ -112,6 +112,25 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
 /* ****************************************************************************
 *
+* ContextElement::getAttribute
+*/
+ContextAttribute* ContextElement::getAttribute(std::string attrName)
+{
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* ca = contextAttributeVector[ix];
+    if (ca->name == attrName)
+    {
+      return ca;
+    }
+  }
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElement::check
 */
 std::string ContextElement::check

@@ -902,6 +902,401 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+#define OPR_EXIST     "EXISTS"
+#define OPR_NOT_EXIST "NOT EXIST"
+
+
+/* *****************************************************************************
+*
+* matchFilter -
+*
+* Returns true if cerP match the "q token" based filter expressed in the parameters,
+* false otherwise.
+*
+*/
+static bool matchFilter
+(
+  char*                      left,
+  const std::string&         opr,
+  char*                      right,
+  char*                      rangeFrom,
+  char*                      rangeTo,
+  const std::vector<char*>&  valVector,
+  ContextElementResponse*    cerP
+)
+{
+  /* First, look for unary operators */
+  if ((opr == OPR_EXIST) || (opr == OPR_NOT_EXIST))
+  {
+    /* Special case: entity type */
+    if (std::string(right) == ENT_ENTITY_TYPE)
+    {
+      // FIXME P7: how to check for not existing entity based on EntityID?
+      //cerP->contextElement.entityId.type = ??;
+      return true;
+    }
+
+    /* Regular attribute */
+    ContextAttribute* ca = cerP->contextElement.getAttribute(right);
+    bool exist = (ca != NULL);
+
+    /* This could be re-written as exist ^ (opr == OPR_NOT_EXIST) but the code
+     * would be harder to follow */
+    if (opr == OPR_EXIST)
+    {
+      return exist;
+    }
+    else   // opr == OPR_NOT_EXIST
+    {
+      return !exist;
+    }
+  }
+
+  /* For binary operators, the left side is the name of the attribute to check */
+  ContextAttribute* ca = cerP->contextElement.getAttribute(left);
+
+  /* If the attribute does't exist, no need to go further: filter fails */
+  if (ca == NULL)
+  {
+    return false;
+  }
+
+  if (opr == "==")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      // ranges only can be used on numbers
+      return ((ca->valueType == orion::ValueTypeNumber) &&
+              (ca->numberValue >= atof(rangeFrom)) && (ca->numberValue <= atof(rangeTo)));
+
+    }
+    else if (valVector.size() > 0)
+    {
+      // the attribute value has to match at least one of the elements in the vector (OR)
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
+          {
+            return true;
+          }
+        }
+        else
+        {
+          // string
+          if ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == valVector[ix]))
+          {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
+      }
+      else
+      {
+        // string
+        return ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == right));
+      }
+    }
+  }
+  else if (opr == "!=")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      // ranges only can be used on number
+      return ((ca->valueType == orion::ValueTypeNumber) &&
+              ((ca->numberValue < atof(rangeFrom)) || (ca->numberValue > atof(rangeTo))));
+    }
+    else if (valVector.size() > 0)
+    {
+      // the attribute value has not to match any of the elements in the vector (AND)
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
+          {
+            return false;
+          }
+        }
+        else
+        {
+          // string
+          if ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == valVector[ix]))
+          {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        return !((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
+      }
+      else
+      {
+        // string
+        return !((ca->valueType == orion::ValueTypeString) && (ca->stringValue == right));
+      }
+    }
+  }
+  else if (opr == ">")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue > atof(right)));
+  }
+  else if (opr == "<")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue < atof(right)));
+  }
+  else if (opr == ">=")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= atof(right)));
+  }
+  else if (opr == "<=")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue <= atof(right)));
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown query operator: %s)", opr.c_str()));
+    return false;
+  }
+}
+
+
+
+/* *****************************************************************************
+*
+* addBsonFilter -
+*
+* Add a BSON filter based on a "q token".
+*
+*/
+static void addBsonFilter
+(
+  char*                      left,
+  const std::string&         opr,
+  char*                      right,
+  char*                      rangeFrom,
+  char*                      rangeTo,
+  const std::vector<char*>&  valVector,
+  std::vector<BSONObj>&      filters
+)
+{
+  std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+  bool           pushBackFilter = true;
+  BSONObjBuilder bob;
+  BSONObjBuilder bb;
+  BSONObjBuilder bb2;
+  BSONObj        f;
+
+  if (opr == "==")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else if (valVector.size() > 0)
+    {
+      BSONArrayBuilder ba;
+
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          ba.append(d);
+        }
+        else
+        {
+          // string
+          ba.append(valVector[ix]);
+        }
+      }
+
+      bb.append("$in", ba.arr());
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        bb.append("$in", BSON_ARRAY(d));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+      else
+      {
+        // string
+        bb.append("$in", BSON_ARRAY(right));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+    }
+  }
+  else if (opr == "!=")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      bb2.append("$exists", true).append("$not", bb.obj());
+      bob.append(k, bb2.obj());
+      f = bob.obj();
+    }
+    else if (valVector.size() > 0)
+    {
+      BSONArrayBuilder ba;
+
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          ba.append(d);
+        }
+        else
+        {
+          // string
+          ba.append(valVector[ix]);
+        }
+      }
+
+      bb.append("$exists", true).append("$nin", ba.arr());
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+      else
+      {
+        // string
+        bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+    }
+  }
+  else if (opr == ">")
+  {
+    bb.append("$gt", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == "<")
+  {
+    bb.append("$lt", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == ">=")
+  {
+    bb.append("$gte", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == "<=")
+  {
+    bb.append("$lte", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == OPR_EXIST)
+  {
+    if (std::string(right) == ENT_ENTITY_TYPE)
+    {
+      // Special case: entity type
+      k = std::string("_id.") + ENT_ENTITY_TYPE;
+
+      bb.append("$exists", true).append("$ne", "");
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else
+    {
+      // Regular attribute
+      k = std::string(ENT_ATTRS) + "." + right;
+
+      bb.append("$exists", true);
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+  }
+  else if (opr == OPR_NOT_EXIST)
+  {
+    if (std::string(right) == ENT_ENTITY_TYPE)
+    {
+      // Special case: entity type
+      k = std::string("_id.") + ENT_ENTITY_TYPE;
+      bb.append("$exists", false);
+      bb2.append(k, bb.obj());
+      f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
+    }
+    else
+    {
+      // Regular attribute
+      k = std::string(ENT_ATTRS) + "." + right;
+      bb.append("$exists", false);
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+  }
+  else
+  {
+    std::string details = std::string("unknown query operator: ") + opr;
+    alarmMgr.badInput(clientIp, details);
+    pushBackFilter = false;
+  }
+
+  if (pushBackFilter)
+  {
+    filters.push_back(f);
+  }
+
+}
+
 /* ****************************************************************************
 *
 * qStringFilters -
@@ -909,13 +1304,28 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 * FIXME P9: this function currently abuses of the std::string() wrapping for char* in order to
 * make comparisons work. An smarter solution could be developed.
 *
+* FIXME P7: actually, this functions behaviour depends on the presence of the cerP parameter, in particular
+*
+* - if cerP is NULL, then the output of this function is a set of BSON filters (in the filters vector) to
+*   be applied on MongoDB. The return value is not used. This is the typical use for queryContext and derived
+*   operations
+* - if cerP is not NULL, then the filters are evaluated in memory on the cerP. The return value is used to
+*   specify if cerP match the filter or not. The filters parameter is not used (although the caller needs to
+*   provide it in order to conform with function signature).
+*
+* I don't like too much to have a function with two quite parallel behaviours in the same logic. Probably a
+* smarter design will be to divide this function in two part: the one focused in string parsing and the one
+* focused in appliying filters to each different sytem (either in memory or as BSON).
+*
 */
-static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
+bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, ContextElementResponse* cerP)
 {
   char* str         = strdup(in.c_str());
   char* toFree      = str;
   char* s;
   char* saver;
+
+  bool retval = true;
 
   while ((s = strtok_r(str, ";", &saver)) != NULL)
   {
@@ -975,13 +1385,13 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
     else if (s[0] == '-')
     {
       left  = (char*) "";
-      op    = (char*) "NOT EXISTS";
+      op    = (char*) OPR_NOT_EXIST;
       right = wsStrip(&s[1]);
     }
     else if (s[0] == '+')
     {
       left  = (char*) "";
-      op    = (char*) "EXISTS";
+      op    = (char*) OPR_EXIST;
       right = wsStrip(&s[1]);
     }
     else
@@ -1077,199 +1487,24 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 
     str = NULL;  // So that strtok_r continues eating the initial string
 
-    /* Build the BSON filter */
-    std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
-    bool           pushBackFilter = true;
-    BSONObj        f;
-    BSONObjBuilder bob;
-    BSONObjBuilder bb;
-    BSONObjBuilder bb2;
-
-    if (opr == "==")
+    /* Build the BSON filter (or evaluate on cerP) */
+    if (cerP == NULL)
     {
-      if (std::string(rangeFrom) != "")
-      {
-        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (valVector.size() > 0)
-      {
-        BSONArrayBuilder ba;
-
-        for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-        {
-          double d;
-          if (str2double(valVector[ix], &d))
-          {
-            // number
-            ba.append(d);
-          }
-          else
-          {
-            // string
-            ba.append(valVector[ix]);
-          }
-        }
-
-        bb.append("$in", ba.arr());
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else
-      {
-        double d;
-
-        // Single value
-        if (str2double(right, &d))
-        {
-          // number
-          bb.append("$in", BSON_ARRAY(d));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-        else
-        {
-          // string
-          bb.append("$in", BSON_ARRAY(right));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-      }
-    }
-    else if (opr == "!=")
-    {
-      if (std::string(rangeFrom) != "")
-      {
-        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
-        bb2.append("$exists", true).append("$not", bb.obj());
-        bob.append(k, bb2.obj());
-        f = bob.obj();
-      }
-      else if (valVector.size() > 0)
-      {
-        BSONArrayBuilder ba;
-
-        for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-        {
-          double d;
-
-          if (str2double(valVector[ix], &d))
-          {
-            // number
-            ba.append(d);
-          }
-          else
-          {
-            // string
-            ba.append(valVector[ix]);
-          }
-        }
-
-        bb.append("$exists", true).append("$nin", ba.arr());
-        bob.append(k, bb.obj());
-        f = bob.obj();
-        
-      }
-      else
-      {
-        double d;
-
-        // Single value
-        if (str2double(right, &d))
-        {
-          // number
-          bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-        else
-        {
-          // string
-          bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-      }
-    }
-    else if (opr == ">")
-    {
-      bb.append("$gt", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == "<")
-    {
-      bb.append("$lt", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == ">=")
-    {
-      bb.append("$gte", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == "<=")
-    {
-      bb.append("$lte", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == "EXISTS")
-    {
-      if (std::string(right) == ENT_ENTITY_TYPE)
-      {
-        // Special case: entity type
-        k = std::string("_id.") + ENT_ENTITY_TYPE;
-
-        bb.append("$exists", true).append("$ne", "");
-        bob.append(k, bb.obj());
-        f = bob.obj();        
-      }
-      else
-      {
-        // Regular attribute
-        k = std::string(ENT_ATTRS) + "." + right;
-
-        bb.append("$exists", true);
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-    }
-    else if (opr == "NOT EXISTS")
-    {
-      if (std::string(right) == ENT_ENTITY_TYPE)
-      {
-        // Special case: entity type
-        k = std::string("_id.") + ENT_ENTITY_TYPE;
-        bb.append("$exists", false);
-        bb2.append(k, bb.obj());
-        f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
-      }
-      else
-      {
-        // Regular attribute
-        k = std::string(ENT_ATTRS) + "." + right;
-        bb.append("$exists", false);
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
+      addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters);
     }
     else
     {
-      std::string details = std::string("unknown query operator: ") + op;
-      alarmMgr.badInput(clientIp, details);
-      pushBackFilter = false;
-    }
-
-    if (pushBackFilter)
-    {
-      filters.push_back(f);
+      if (!matchFilter(left, opr, right, rangeFrom, rangeTo, valVector, cerP))
+      {
+        retval = false;
+        break;
+      }
     }
   }
 
   free(toFree);
+
+  return retval;
 }
 
 
