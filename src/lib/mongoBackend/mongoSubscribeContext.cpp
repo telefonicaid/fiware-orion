@@ -97,7 +97,12 @@ HttpStatusCode mongoSubscribeContext
 
     /* Throttling */
     long long throttling = 0;
-    if (!requestP->throttling.isEmpty())
+    if (requestP->throttling.seconds != -1)
+    {
+      throttling = (long long) requestP->throttling.seconds;
+      sub.append(CSUB_THROTTLING, throttling);
+    }
+    else if (!requestP->throttling.isEmpty())
     {
       throttling = (long long) requestP->throttling.parse();
       sub.append(CSUB_THROTTLING, throttling);
@@ -153,7 +158,7 @@ HttpStatusCode mongoSubscribeContext
     BSONObjBuilder expression;
 
     expression << CSUB_CONDITIONS_Q << requestP->expression.q
-               << CSUB_CONDITIONS_GEO << requestP->expression.geometry
+               << CSUB_CONDITIONS_GEOM << requestP->expression.geometry
                << CSUB_CONDITIONS_COORDS << requestP->expression.coords
                << CSUB_CONDITIONS_GEOREL << requestP->expression.georel;
     sub.append(CSUB_CONDITIONS_EXPR, expression.obj());

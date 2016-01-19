@@ -23,6 +23,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <inttypes.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -176,8 +177,18 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
   /* Duration update */
-  long long expiration = getCurrentTime() + requestP->duration.parse();
-  if (requestP->duration.isEmpty())
+  long long expiration = -1;
+
+  if (requestP->expires != -1) //v2
+  {
+    expiration = requestP->expires;
+  }
+  else
+  {
+    expiration = getCurrentTime() + requestP->duration.parse();
+  }
+
+  if (requestP->duration.isEmpty() && requestP->expires ==-1)
   {
     //
     // No duration in incoming request => "inherit" expirationDate from 'old' subscription
@@ -189,7 +200,7 @@ HttpStatusCode mongoUpdateContextSubscription
   else
   {
     newSub.append(CSUB_EXPIRATION, expiration);
-    LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
+    LM_T(LmtMongo, ("New subscription expiration: %" PRId64, expiration));
   }
 
   /* Restriction update */
@@ -205,6 +216,10 @@ HttpStatusCode mongoUpdateContextSubscription
     {
       newSub.append(CSUB_THROTTLING, throttling);
     }
+  }
+  else if (requestP->throttling.seconds > 0) // v2
+  {
+      newSub.append(CSUB_THROTTLING, (long long) requestP->throttling.seconds);
   }
   else
   {
@@ -252,7 +267,23 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
 
-  
+  // Expresssion
+  if (requestP->expression.isSet)
+  {
+    /* Build expression */
+    BSONObjBuilder expression;
+
+    expression << CSUB_CONDITIONS_Q << requestP->expression.q
+             << CSUB_CONDITIONS_GEOM << requestP->expression.geometry
+             << CSUB_CONDITIONS_COORDS << requestP->expression.coords
+             << CSUB_CONDITIONS_GEOREL << requestP->expression.georel;
+    newSub.append(CSUB_CONDITIONS_EXPR, expression.obj());
+  }
+  else if (sub.hasField(CSUB_CONDITIONS_EXPR))
+  {
+    newSub.append(CSUB_CONDITIONS_EXPR, getField(sub, CSUB_CONDITIONS_EXPR).Obj());
+  }
+
   int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
 
   //

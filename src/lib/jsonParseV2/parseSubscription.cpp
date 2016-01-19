@@ -380,6 +380,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     }
     scrP->throttling.seconds = throttling.GetInt64();
   }
+  else // There is notification field, but no throttling was set (update)
+  {
+    scrP->throttling.seconds = 0;
+  }
   return "";
 }
 
@@ -415,6 +419,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
   if (condition.HasMember("expression"))
   {
+    scrP->expression.isSet = true;
     const Value& expression = condition["expression"];
     if (expression.HasMember("q"))
     {
