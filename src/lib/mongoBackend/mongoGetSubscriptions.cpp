@@ -99,12 +99,12 @@ static void setSubject(Subscription* s, const BSONObj& r)
       }
     }
   }
-  if (r.hasField(CSUB_CONDITIONS_EXPR)) {
-    mongo::BSONObj expression = getField(r, CSUB_CONDITIONS_EXPR).Obj();
-    std::string    q          = getField(expression, CSUB_CONDITIONS_Q).String();
-    std::string    geo        = getField(expression, CSUB_CONDITIONS_GEOM).String();
-    std::string    coords     = getField(expression, CSUB_CONDITIONS_COORDS).String();
-    std::string    georel     = getField(expression, CSUB_CONDITIONS_GEOREL).String();
+  if (r.hasField(CSUB_EXPR)) {
+    mongo::BSONObj expression = getField(r, CSUB_EXPR).Obj();
+    std::string    q          = getField(expression, CSUB_EXPR_Q).String();
+    std::string    geo        = getField(expression, CSUB_EXPR_GEOM).String();
+    std::string    coords     = getField(expression, CSUB_EXPR_COORDS).String();
+    std::string    georel     = getField(expression, CSUB_EXPR_GEOREL).String();
 
     s->subject.condition.expression.q = q;
     s->subject.condition.expression.geometry = geo;

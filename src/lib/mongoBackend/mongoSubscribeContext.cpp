@@ -151,17 +151,18 @@ HttpStatusCode mongoSubscribeContext
                                              notifyFormat,
                                              tenant,
                                              xauthToken,
-                                             servicePathV);
+                                             servicePathV,
+                                             requestP->expression.q);
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */
     BSONObjBuilder expression;
 
-    expression << CSUB_CONDITIONS_Q << requestP->expression.q
-               << CSUB_CONDITIONS_GEOM << requestP->expression.geometry
-               << CSUB_CONDITIONS_COORDS << requestP->expression.coords
-               << CSUB_CONDITIONS_GEOREL << requestP->expression.georel;
-    sub.append(CSUB_CONDITIONS_EXPR, expression.obj());
+    expression << CSUB_EXPR_Q << requestP->expression.q
+               << CSUB_EXPR_GEOM << requestP->expression.geometry
+               << CSUB_EXPR_COORDS << requestP->expression.coords
+               << CSUB_EXPR_GEOREL << requestP->expression.georel;
+    sub.append(CSUB_EXPR, expression.obj());
 
     /* Last notification */
     long long lastNotificationTime = 0;
