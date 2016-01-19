@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Subscriptions V2 q expression (not enum string)
+POST Subscriptions V2 q expression (equal enum string)
 
 --SHELL-INIT--
 dbInit CB

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Subscriptions V2 q expression (equal single number)
+POST Subscriptions V2 q expression (equal quoted enum)
 
 --SHELL-INIT--
 dbInit CB
@@ -32,16 +32,16 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Create subscription with q: status==22
-# 02. Create entity with status=23 (not notif)
-# 03. Update entity to status=22 (notif)
-# 04. Update entity to status=24 (not notif)
-# 05. Update entity to status=22 (notif)
+# 01. Create subscription with q: colour!='black,white','red,green'
+# 02. Create entity with colour=black (not notif)
+# 03. Update entity to colour=red,green (notif)
+# 04. Update entity to colour=red (not notif)
+# 05. Update entity to colour=black,white (notif)
 # 06. Dump accumulator (2 notifications)
 #
 
-echo "01. Create subscription with q: status==22"
-echo "=========================================="
+echo "01. Create subscription with q: colour!=black,white"
+echo "==================================================="
 payload='
 {
     "subject": {
@@ -54,7 +54,7 @@ payload='
         "condition": {
             "attributes": [ ],
             "expression": {
-               "q": "status==22"
+               "q": "colour!='black,white','red,green'"
             }
          }
     },
@@ -70,42 +70,42 @@ echo
 echo
 
 
-echo "02. Create entity with status=23 (not notif)"
-echo "============================================"
+echo "02. Create entity with colour=black (not notif)"
+echo "==============================================="
 payload='{
   "id": "E1",
   "type": "T",
-  "status": 23
+  "colour": "black"
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
 
-echo "03. Update entity to status=22 (notif)"
-echo "======================================"
+echo "03. Update entity to colour=red,green (notif)"
+echo "============================================="
 payload='{
-  "status": 22
+  "colour": "red,green"
 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
 echo
 echo
 
 
-echo "04. Update entity to status=24 (not notif)"
-echo "=========================================="
+echo "04. Update entity to colour=red (not notif)"
+echo "==========================================="
 payload='{
-  "status": 24
+  "colour": "red"
 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
 echo
 echo
 
 
-echo "05. Update entity to status=22 (notif)"
-echo "======================================"
+echo "05. Update entity to colour=black,white (notif)"
+echo "============================================="
 payload='{
-  "status": 22
+  "colour": "black,white"
 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
 echo
@@ -120,8 +120,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription with q: status==22
-==========================================
+01. Create subscription with q: colour!=black,white
+===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -129,8 +129,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity with status=23 (not notif)
-============================================
+02. Create entity with colour=black (not notif)
+===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
@@ -138,24 +138,24 @@ Date: REGEX(.*)
 
 
 
-03. Update entity to status=22 (notif)
-======================================
+03. Update entity to colour=red,green (notif)
+=============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-04. Update entity to status=24 (not notif)
-==========================================
+04. Update entity to colour=red (not notif)
+===========================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-05. Update entity to status=22 (notif)
-======================================
+05. Update entity to colour=black,white (notif)
+=============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -165,7 +165,7 @@ Date: REGEX(.*)
 06. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 466
+Content-Length: 468
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -182,9 +182,9 @@ Content-Type: application/json; charset=utf-8
         "id" : "E1",
         "attributes" : [
           {
-            "name" : "status",
+            "name" : "colour",
             "type" : "",
-            "value" : 22.000000
+            "value" : "red,green"
           }
         ]
       },
@@ -197,7 +197,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 466
+Content-Length: 470
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -214,9 +214,9 @@ Content-Type: application/json; charset=utf-8
         "id" : "E1",
         "attributes" : [
           {
-            "name" : "status",
+            "name" : "colour",
             "type" : "",
-            "value" : 22.000000
+            "value" : "black,white"
           }
         ]
       },

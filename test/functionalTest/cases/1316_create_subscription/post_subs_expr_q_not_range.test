@@ -35,10 +35,12 @@ accumulatorStart
 # 01. Create subscription with q: temperature!=20..40
 # 02. Create entity with t=21 (not notif)
 # 03. Update entity to t=15 (notif)
-# 04. Update entity to t=25 (not notif)
-# 05. Update entity to t=35 (not notif)
-# 04. Update entity to t=45 (notif)
-# 06. Dump accumulator (2 notifications)
+# 04. Update entity to "cornercase" t=20 (not notif)
+# 05. Update entity to t=25 (not notif)
+# 06. Update entity to t=35 (not notif)
+# 07. Update entity to "cornercase" t=40 (not notif)
+# 08. Update entity to t=45 (notif)
+# 09. Dump accumulator (2 notifications)
 #
 
 echo "01. Create subscription with q: temperature!=20..40"
@@ -93,7 +95,17 @@ echo
 echo
 
 
-echo "04. Update entity to t=25 (not notif)"
+echo "04. Update entity to "cornercase" t=20 (not notif)"
+echo "=================================================="
+payload='{
+  "temperature": 20
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "05. Update entity to t=25 (not notif)"
 echo "====================================="
 payload='{
   "temperature": 25
@@ -103,7 +115,7 @@ echo
 echo
 
 
-echo "05. Update entity to t=35 (not notif)"
+echo "06. Update entity to t=35 (not notif)"
 echo "====================================="
 payload='{
   "temperature": 35
@@ -113,7 +125,17 @@ echo
 echo
 
 
-echo "06. Update entity to t=45 (notif)"
+echo "07. Update entity to "cornercase" t=40 (not notif)"
+echo "=================================================="
+payload='{
+  "temperature": 40
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "08. Update entity to t=45 (notif)"
 echo "================================="
 payload='{
   "temperature": 45
@@ -123,7 +145,7 @@ echo
 echo
 
 
-echo "07. Get accumulator dump (2 notifications)"
+echo "09. Get accumulator dump (2 notifications)"
 echo "=========================================="
 accumulatorDump
 echo
@@ -156,7 +178,15 @@ Date: REGEX(.*)
 
 
 
-04. Update entity to t=25 (not notif)
+04. Update entity to cornercase t=20 (not notif)
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. Update entity to t=25 (not notif)
 =====================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -164,7 +194,7 @@ Date: REGEX(.*)
 
 
 
-05. Update entity to t=35 (not notif)
+06. Update entity to t=35 (not notif)
 =====================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -172,7 +202,15 @@ Date: REGEX(.*)
 
 
 
-06. Update entity to t=45 (notif)
+07. Update entity to cornercase t=40 (not notif)
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. Update entity to t=45 (notif)
 =================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -180,7 +218,7 @@ Date: REGEX(.*)
 
 
 
-07. Get accumulator dump (2 notifications)
+09. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 471

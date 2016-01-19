@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Subscriptions V2 q expression (enum string)
+POST Subscriptions V2 q expression (equal enum string)
 
 --SHELL-INIT--
 dbInit CB
@@ -40,7 +40,7 @@ accumulatorStart
 # 06. Dump accumulator (2 notifications)
 #
 
-echo "01. Create subscription with q: colour!=black,white"
+echo "01. Create subscription with q: colour==black,white"
 echo "==================================================="
 payload='
 {
@@ -120,7 +120,7 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription with q: colour!=black,white
+01. Create subscription with q: colour==black,white
 ===================================================
 HTTP/1.1 201 Created
 Content-Length: 0

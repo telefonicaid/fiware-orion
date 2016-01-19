@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Subscriptions V2 q expression (not enum string)
+POST Subscriptions V2 q expression (not equal enum string)
 
 --SHELL-INIT--
 dbInit CB
@@ -35,7 +35,7 @@ accumulatorStart
 # 01. Create subscription with q: colour!=black,white
 # 02. Create entity with colour=black (not notif)
 # 03. Update entity to colour=red (notif)
-# 04. Update entity to colour=while (not notif)
+# 04. Update entity to colour=white (not notif)
 # 05. Update entity to colour=green (notif)
 # 06. Dump accumulator (2 notifications)
 #
@@ -92,7 +92,7 @@ echo
 echo
 
 
-echo "04. Update entity to colour=while (not notif)"
+echo "04. Update entity to colour=white (not notif)"
 echo "============================================="
 payload='{
   "colour": "white"
@@ -146,7 +146,7 @@ Date: REGEX(.*)
 
 
 
-04. Update entity to colour=while (not notif)
+04. Update entity to colour=white (not notif)
 =============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
