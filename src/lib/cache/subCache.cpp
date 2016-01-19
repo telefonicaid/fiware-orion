@@ -213,6 +213,11 @@ static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::str
   {
     NotifyCondition* ncP = cSubP->notifyConditionVector[ncvIx];
 
+    if (ncP->condValueList.size() == 0)
+    {
+      return true;
+    }
+
     for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
     {
       for (unsigned int aIx = 0; aIx < attrV.size(); ++aIx)
@@ -349,6 +354,8 @@ static bool subMatch
   //
   // If ONCHANGE and one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
+  // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
+  // case of ONANYCHANGE subscriptions).
   //
   if (!attributeMatch(cSubP, attrV))
   {

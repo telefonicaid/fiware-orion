@@ -39,7 +39,9 @@ static const char* validOptions[] =
   "count",
   "normalized",
   "values",
-  "text"
+  "keyValues",
+  "text",
+  "append"
 };
 
 

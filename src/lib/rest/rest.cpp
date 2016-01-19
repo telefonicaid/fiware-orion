@@ -373,12 +373,12 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 
      std::string format = vec[ix].c_str();
      if (format == "*/*")              { xml  = true; json = true; text=true;}
-     if (format == "*/xml")            xml  = true;
+     if (format == "*/xml")            { xml  = true; }
      if (format == "application/*")    { xml  = true; json = true; }
-     if (format == "application/xml")  xml  = true;
-     if (format == "application/json") json = true;
-     if (format == "*/json")           json = true;
-     if (format == "text/plain")       text = true;
+     if (format == "application/xml")  { xml  = true; }
+     if (format == "application/json") { json = true; }
+     if (format == "*/json")           { json = true; }
+     if (format == "text/plain")       { text = true; }
      
      if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
 
@@ -709,7 +709,8 @@ int servicePathSplit(ConnectionInfo* ciP)
 *   so we don't want to use the default 200
 *
 * NOTE
-*   In version 2 of the protocol, we admit ONLY application/json
+*   In version 1 of the protocol, we admit ONLY application/json and application/xml
+*   In version 2 of the protocol, we admit ONLY application/json and text/plain
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
@@ -717,9 +718,9 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
-  //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
+  //   3. text/xml used and acceptTextXml is set to true (iotAgent only)
   //   4. Content-Type present but not supported
-  //   5. API version 2 and not 'application/json'
+  //   5. API version 2 and not 'application/json' || text/plain
   //
 
 
@@ -750,7 +751,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -761,7 +762,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 5
-  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -928,6 +929,7 @@ static int connectionTreat
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
   static int             reqNo       = 1;
+
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -1166,12 +1168,14 @@ static int connectionTreat
   }
 
   //
-  // Here, if the incoming request was too big, return error abouyt it
+  // Here, if the incoming request was too big, return error about it
   //
   if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
     char details[256];
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+    alarmMgr.badInput(clientIp, details);
 
     ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
@@ -1182,9 +1186,11 @@ static int connectionTreat
     std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg);
   }
   else if (ciP->answer != "")
   {
+    alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
   }
   else

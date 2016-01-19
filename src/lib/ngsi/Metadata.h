@@ -64,6 +64,7 @@ typedef struct Metadata
   std::string        stringValue;  // "value" as a String
   double             numberValue;  // "value" as a Number
   bool               boolValue;    // "value" as a Boolean
+  bool               typeGiven;    // Was 'type' part of the incoming payload?
 
   Metadata();
   Metadata(Metadata* mP);

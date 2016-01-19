@@ -35,11 +35,14 @@
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
+#include "apiTypesV2/ErrorCode.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 
 using namespace orion;
+
+
 
 /* ****************************************************************************
 *
@@ -66,6 +69,7 @@ ContextAttribute::ContextAttribute()
   typeFromXmlAttribute  = "";
   found                 = false;
   skip                  = false;
+  typeGiven             = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -100,6 +104,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   found                 = caP->found;
   typeFromXmlAttribute  = "";
   skip                  = false;
+  typeGiven             = caP->typeGiven;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setFormat(caP->providingApplication.getFormat());
@@ -144,6 +149,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  typeGiven             = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -175,6 +181,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  typeGiven             = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -206,6 +213,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  typeGiven             = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -237,6 +245,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  typeGiven             = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -265,6 +274,7 @@ ContextAttribute::ContextAttribute
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
+  typeGiven             = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -354,6 +364,10 @@ std::string ContextAttribute::renderAsJsonObject
         snprintf(num, sizeof(num), "%f", numberValue);
         effectiveValue      = std::string(num);
         valueIsNumberOrBool = true;
+        break;
+
+      case ValueTypeNone:
+        effectiveValue = "null";
         break;
 
       default:
@@ -484,6 +498,10 @@ std::string ContextAttribute::render
         valueIsNumberOrBool = true;
         break;
 
+      case ValueTypeNone:
+        effectiveValue = "null";
+        break;
+
       default:
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
@@ -530,7 +548,7 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, bool types)
+std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode, RequestType requestType)
 {
   std::string  out;
 
@@ -538,44 +556,57 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types)
   {
     out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
   }
-  else if ((type == "") && (metadataVector.size() == 0))
+  else if ((renderMode == "values") || (renderMode == "keyValues"))
   {
+    out = (renderMode == "keyValues")? JSON_STR(name) + ":" : "";
+
     if (compoundValueP != NULL)
     {
       if (compoundValueP->isObject())
       {
-        out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
+        out += "{" + compoundValueP->toJson(true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
+        out += "[" + compoundValueP->toJson(true) + "]";
       }
     }
     else if (valueType == orion::ValueTypeNumber)
     {
       char num[32];
-
       snprintf(num, sizeof(num), "%f", numberValue);
-      out = JSON_VALUE_NUMBER(name, num);
+      out += num;
     }
     else if (valueType == orion::ValueTypeString)
     {
-      out = JSON_VALUE(name, stringValue);
+      out += JSON_STR(stringValue);
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      out = JSON_VALUE_BOOL(name, boolValue);
+      out += (boolValue == true)? "true" : "false";
+    }
+    else if (valueType == orion::ValueTypeNone)
+    {
+      out += "null";
     }
   }
-  else
+  else  // Render mode: normalized 
   {
-    out = JSON_STR(name) + ":{";
-
-    if (type != "")
+    if (requestType != EntityAttributeResponse)
     {
-      out += JSON_VALUE("type", type) + ",";
+      out = JSON_STR(name) + ":{";
     }
 
+    //
+    // type
+    //
+    out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":" + "null";
+    out += ",";
+
+
+    //
+    // value
+    //
     if (compoundValueP != NULL)
     {
       if (compoundValueP->isObject())
@@ -603,22 +634,104 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types)
     {
       out += JSON_VALUE_BOOL("value", boolValue);
     }
+    else if (valueType == orion::ValueTypeNone)
+    {
+      out += JSON_STR("value") + ":" + "null";
+    }
     else
     {
       out += JSON_VALUE("value", stringValue);
     }
+    out += ",";
 
-    if (metadataVector.size() > 0)
+    //
+    // metadata
+    //
+    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
+
+    if (requestType != EntityAttributeResponse)
     {
-      out += "," + metadataVector.toJson(true);
+      out += "}";
     }
-
-    out += "}";
   }
 
   if (!isLastElement)
   {
     out += ",";
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* toJsonAsValue -
+*/
+std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
+{
+  std::string  out;
+
+  if (ciP->outFormat == JSON)
+  {
+    if (compoundValueP != NULL)
+    {
+      if (compoundValueP->isVector())
+      {
+        out = "[" + compoundValueP->toJson(true) + "]";
+      }
+      else  // Object
+      {
+        out = "{" + compoundValueP->toJson(false) + "}";
+      }
+    }
+    else
+    {
+      ErrorCode ec("NotAcceptable", "accepted MIME types: text/plain");
+      ciP->httpStatusCode = SccNotAcceptable;
+
+      out = ec.toJson(true);
+    }
+  }
+  else  // TEXT
+  {
+    if (compoundValueP != NULL)
+    {
+      if (compoundValueP->isVector())
+      {
+        out = "[" + compoundValueP->toJson(false) + "]";
+      }
+      else  // Object
+      {
+        out = "{" + compoundValueP->toJson(false) + "}";
+      }
+    }
+    else
+    {
+      char buf[64];
+
+      switch (valueType)
+      {
+      case orion::ValueTypeString:
+        out = stringValue;
+        break;
+
+      case orion::ValueTypeNumber:
+        snprintf(buf, sizeof(buf), "%f", numberValue);
+        out = buf;
+        break;
+
+      case orion::ValueTypeBoolean:
+        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
+        out = buf;
+        break;
+
+      default:
+        out = "ERROR";
+        break;
+      }
+    }
   }
 
   return out;
@@ -639,7 +752,7 @@ std::string ContextAttribute::check
   int                 counter
 )
 {
-  if (name == "")
+  if ((name == "") && (requestType != EntityAttributeValueRequest))
   {
     return "missing attribute name";
   }

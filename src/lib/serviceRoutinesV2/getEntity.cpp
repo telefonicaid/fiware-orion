@@ -63,7 +63,6 @@ std::string getEntity
 {
   using namespace std;
 
-
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
   // optional parameter for attributes

@@ -6,9 +6,12 @@
 - Add: reset for notification counters in threadpool mode
 - Fix: avoid -g compiler flag in release build
 - Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
+- Fix: improved JSON representation for APIv2 (Issue #1259)
 - Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
 - Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
 - Add: POST /v2/subscriptions operation (without expression evaluation yet) (Issue #1316)
 - Add: DELETE /v2/subscriptions operation (Issue #1654)
 - Fix: fixed wrong interpretation of empty string keyvalues as empty objects in compounds (Issue #1642)
 - Add: PATCH /v2/subscriptions/{subId} operation (Issue #1658)
+- Add: subscriptions triggered by modifications in any attribute without explicitly list them (aka ONANYCHANGE) (Issue #350)
+

@@ -34,6 +34,7 @@ const char* requestType(RequestType rt)
 {
   switch (rt)
   {
+  case NoRequest:                                   return "NoRequest";
   case RegisterContext:                             return "RegisterContextRequest";
   case RegisterResponse:                            return "RegisterContextResponse";
   case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";

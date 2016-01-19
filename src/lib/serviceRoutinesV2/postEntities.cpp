@@ -64,7 +64,7 @@ static bool legalEntityLength(Entity* eP, const std::string& servicePath)
 * Payload Out: None
 *
 * URI parameters:
-*   - 
+*   options=keyValues
 *
 * 01. Fill in UpdateContextRequest
 * 02. Call standard op postUpdateContext

@@ -53,7 +53,8 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
         return "invalid JSON type for attribute metadata type";
       }
 
-      mP->type = iter->value.GetString();
+      mP->type      = iter->value.GetString();
+      mP->typeGiven = true;
     }
     else if (name == "value")
     {

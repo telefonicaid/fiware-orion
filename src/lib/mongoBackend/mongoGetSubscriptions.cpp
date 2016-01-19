@@ -96,7 +96,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
       {
         std::string attr = condValues[jx].String();
         s->subject.condition.attributes.push_back(attr);
-      }  
+      }
     }
   }
   if (r.hasField(CSUB_CONDITIONS_EXPR)) {

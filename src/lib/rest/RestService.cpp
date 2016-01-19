@@ -39,6 +39,7 @@
 
 #include "ngsi/ParseData.h"
 #include "jsonParseV2/jsonRequestTreat.h"
+#include "parse/textParse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/RestService.h"
@@ -50,7 +51,7 @@
 
 
 /* ****************************************************************************
- *
+*
 * delayedRelease - 
 */
 static void delayedRelease(JsonDelayedRelease* releaseP)
@@ -90,6 +91,8 @@ std::string payloadParse
   LM_T(LmtParsedPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
   LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
 
+  ciP->requestType = service->request;
+
   if (ciP->inFormat == XML)
   {
     if (compV[0] == "v2")
@@ -111,6 +114,10 @@ std::string payloadParse
     {
       result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, jsonPP);
     }
+  }
+  else if (ciP->inFormat == TEXT)
+  {
+    result = textRequestTreat(ciP, parseDataP, service->request);
   }
   else
   {
@@ -411,6 +418,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       if (response != "OK")
       {
+        alarmMgr.badInput(clientIp, response);
+
         restReply(ciP, response);
 
         if (reqP != NULL)
@@ -489,18 +498,19 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
 
-    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
-
     //
-    // If we have gotten this far, and the status is 200, the Input is OK.
+    // If we have gotten this far the Input is OK.
+    // Except for all the badVerb/badRequest, etc.
+    // A common factor for all these 'services' is that the verb is '*'
+    //
     // So, the 'Bad Input' alarm is cleared for this client.
     //
-    // Actually, not only 200, also 201, 204 etc, all 2xx codes
-    //
-    if ((ciP->httpStatusCode >= 200) && (ciP->httpStatusCode < 300))
+    if (serviceV[ix].verb != "*")
     {
       alarmMgr.badInputReset(clientIp);
     }
+
+    std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     filterRelease(&parseData, serviceV[ix].request);
 

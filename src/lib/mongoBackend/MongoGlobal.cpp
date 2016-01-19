@@ -1966,6 +1966,63 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 }
 
 
+
+/* ****************************************************************************
+*
+* someEmptyCondValue -
+*
+* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
+*/
+bool someEmptyCondValue(const BSONObj& sub)
+{
+  std::vector<BSONElement>  conds = getField(sub, CSUB_CONDITIONS).Array();
+
+  for (unsigned int ix = 0; ix < conds.size() ; ++ix)
+  {
+    BSONObj cond = conds[ix].embeddedObject();
+    if (getField(cond, CSUB_CONDITIONS_VALUE).Array().size() == 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* condValueAttrMatch -
+*
+* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
+*/
+bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
+{
+  std::vector<BSONElement>  conds = getField(sub, CSUB_CONDITIONS).Array();
+
+  for (unsigned int ix = 0; ix < conds.size() ; ++ix)
+  {
+    BSONObj cond = conds[ix].embeddedObject();
+    std::vector<BSONElement>  condValues = getField(cond, CSUB_CONDITIONS_VALUE).Array();
+    for (unsigned int jx = 0; jx < condValues.size() ; ++jx)
+    {
+      std::string condValue = condValues[jx].String();
+      for (unsigned int kx = 0; kx < modifiedAttrs.size(); ++kx)
+      {
+        if (condValue == modifiedAttrs[kx])
+        {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+
+
 /* ****************************************************************************
 *
 * subToEntityIdVector -
@@ -1990,6 +2047,7 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 
   return enV;
 }
+
 
 
 /* ****************************************************************************

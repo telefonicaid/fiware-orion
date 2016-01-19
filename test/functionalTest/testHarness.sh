@@ -596,7 +596,7 @@ function partExecute()
         echo -n "(ERROR 9 - .out and .regexpect differ) "
       fi
 
-      if [ "$CB_DIFF_TOOL" != "" ]
+      if [ "$CB_DIFF_TOOL" != "" ] && [ $__tryNo == $MAX_TRIES ]
       then
         endDate=$(date)
         if [ $blockDiff == 'yes' ]
