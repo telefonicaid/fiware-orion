@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <semaphore.h>
+#include <errno.h>
+
 #include <string>
 #include <map>
 
@@ -37,10 +40,17 @@
 * AlarmManager::AlarmManager - 
 */
 AlarmManager::AlarmManager():
+  badInputs(0),
+  badInputResets(0),
+  notificationErrors(0),
+  notificationErrorResets(0),
+  dbErrors(0),
+  dbErrorResets(0),
   dbOk(true),
   notificationErrorLogSampling(0),
   badInputLogSampling(0)
 {
+  semInit();
 }
 
 
@@ -50,11 +60,57 @@ AlarmManager::AlarmManager():
 * AlarmManager::AlarmManager - 
 */
 AlarmManager::AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling):
+  badInputs(0),
+  badInputResets(0),
+  notificationErrors(0),
+  notificationErrorResets(0),
+  dbErrors(0),
+  dbErrorResets(0),
   dbOk(true),
   notificationErrorLogSampling(_notificationErrorLogSampling),
   badInputLogSampling(_badInputLogSampling)
 {
+  semInit();
 }  
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::semInit - 
+*/
+int AlarmManager::semInit(void)
+{
+  if (sem_init(&sem, 0, 1) == -1)
+  {
+    LM_E(("Runtime Error (error initializing 'alarm mgr' semaphore: %s)", strerror(errno)));
+    return -1;
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::semTake - 
+*/
+void AlarmManager::semTake(void)
+{
+  sem_wait(&sem);
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::semGive - 
+*/
+void AlarmManager::semGive(void)
+{
+  sem_post(&sem);
+}
 
 
 
@@ -93,6 +149,8 @@ bool AlarmManager::dbError(const std::string& details)
     return false;
   }
 
+  ++dbErrors;
+
   LM_E(("Raising alarm DatabaseError: %s", details.c_str()));
   dbOk = false;
   return true;
@@ -113,10 +171,52 @@ bool AlarmManager::dbErrorReset(void)
     return false;
   }
 
-  ++dbErrors;
+  ++dbErrorResets;
   LM_E(("Releasing alarm DatabaseError"));
   dbOk = true;
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::dbErrorsGet - 
+*
+* NOTE
+*  dbError active means there is a DB problem: dbOk is false
+*/
+void AlarmManager::dbErrorsGet(bool* active, long long* raised, long long* released)
+{
+  *active    = (dbOk == false)? true : false;
+  *raised    = dbErrors;
+  *released  = dbErrorResets;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::notificationErrorGet - 
+*/
+void AlarmManager::notificationErrorGet(long long* active, long long* raised, long long* released)
+{
+  *active    = notificationV.size();
+  *raised    = notificationErrors;
+  *released  = notificationErrorResets;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::badInputGet - 
+*/
+void AlarmManager::badInputGet(long long* active, long long* raised, long long* released)
+{
+  *active    = badInputV.size();
+  *raised    = badInputs;
+  *released  = badInputResets;
 }
 
 
@@ -175,6 +275,7 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
   notificationV.erase(url);
   LM_W(("Releasing alarm NotificationError %s", url.c_str()));
 
+  ++notificationErrorResets;
   return true;
 }
 
@@ -234,5 +335,6 @@ bool AlarmManager::badInputReset(const std::string& ip)
   badInputV.erase(ip);
   LM_W(("Releasing alarm BadInput %s", ip.c_str()));
 
+  ++badInputResets;
   return true;
 }

@@ -477,6 +477,29 @@ do                                                                        \
 #endif
 
 
+
+#ifdef LM_NO_S
+#define LM_S(s)
+#else
+/* ****************************************************************************
+*
+* LM_S - log summary
+*/
+#define LM_S(s)                                                           \
+do                                                                        \
+{                                                                         \
+  char* text;                                                             \
+                                                                          \
+  if ((text = lmTextGet s) != NULL)                                       \
+  {                                                                       \
+    lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
+} while (0)
+#endif
+
+
+
 #ifdef LM_NO_H
 #define LM_H(s)
 #else
@@ -494,27 +517,6 @@ do                                                                        \
     lmOut(text, 'H', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
   }                                                                       \
-} while (0)
-#endif
-
-
-#ifdef LM_NO_C
-#define LM_S(s)
-#else
-/* ****************************************************************************
-*
-* LM_S - log message with timestamp
-*/
-#define LM_S(s)                                                          \
-do                                                                       \
-{                                                                        \
-  char* text;                                                            \
-                                                                         \
-  if (LM_MASK(LogLevelTimestamp) && (text = lmTextGet s) != NULL)        \
-  {                                                                      \
-    lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-    ::free(text);                                                        \
-  }                                                                      \
 } while (0)
 #endif
 
@@ -569,7 +571,6 @@ do                                                                       \
 *
 * LM_E - log error message
 */
-
 #define LM_E(s)                                                           \
 do                                                                        \
 {                                                                         \

@@ -43,6 +43,7 @@
 #include "common/statistics.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
+#include "logSummary/logSummary.h"
 
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
@@ -1005,6 +1006,7 @@ static int connectionTreat
     // Transaction starts here
     //
     lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+    transactionCounterIncrement();
 
 
     //
