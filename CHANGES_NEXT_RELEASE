@@ -12,5 +12,6 @@
 - Add: POST /v2/subscriptions operation (Issue #1316)
 - Add: DELETE /v2/subscriptions operation (Issue #1654)
 - Fix: fixed wrong interpretation of empty string keyvalues as empty objects in compounds (Issue #1642)
+- Add: PATCH /v2/subscriptions/{subId} operation (Issue #1658)
 - Add: subscriptions triggered by modifications in any attribute without explicitly list them (aka ONANYCHANGE) (Issue #350)
 - Add: 'q' expression evaluation in NGSIv2 subscriptions (Issue #1316)
