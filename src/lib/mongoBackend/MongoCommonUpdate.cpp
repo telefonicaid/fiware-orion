@@ -1411,14 +1411,14 @@ static bool addTriggeredSubscriptions_noCache
           getStringField(sub, CSUB_REFERENCE),          
           subToAttributeList(sub), "", "");
 
-      if (sub.hasField(CSUB_CONDITIONS_EXPR))
+      if (sub.hasField(CSUB_EXPR))
       {
-        BSONObj expr = getObjectField(sub, CSUB_CONDITIONS_EXPR);
+        BSONObj expr = getObjectField(sub, CSUB_EXPR);
 
-        std::string q        = expr.hasField(CSUB_CONDITIONS_Q)      ? getStringField(expr, CSUB_CONDITIONS_Q)      : "";
-        std::string georel   = expr.hasField(CSUB_CONDITIONS_GEOREL) ? getStringField(expr, CSUB_CONDITIONS_GEOREL) : "";
-        std::string geometry = expr.hasField(CSUB_CONDITIONS_GEOM)   ? getStringField(expr, CSUB_CONDITIONS_GEOM)   : "";
-        std::string coords   = expr.hasField(CSUB_CONDITIONS_COORDS) ? getStringField(expr, CSUB_CONDITIONS_COORDS) : "";
+        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringField(expr, CSUB_EXPR_Q)      : "";
+        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringField(expr, CSUB_EXPR_GEOREL) : "";
+        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringField(expr, CSUB_EXPR_GEOM)   : "";
+        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringField(expr, CSUB_EXPR_COORDS) : "";
 
         trigs->fillExpression(q, georel, geometry, coords);
       }

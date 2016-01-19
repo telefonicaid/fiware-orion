@@ -2181,6 +2181,12 @@ bool registrationsQuery
 */
 bool isCondValueInContextElementResponse(ConditionValueList* condValues, ContextElementResponseVector* cerV)
 {
+  /* Empty conValue means that any attribute matches (aka ONANYCHANGE) */
+  if (condValues->size() == 0)
+  {
+    return true;
+  }
+
   for (unsigned int cvlx = 0; cvlx < condValues->size(); ++cvlx)
   {
     for (unsigned int aclx = 0; aclx < cerV->size(); ++aclx)
@@ -2338,7 +2344,8 @@ bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 )
 {
   // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
@@ -2346,6 +2353,13 @@ bool processOnChangeConditionForSubscription
   NotifyContextRequest          ncr;
   Restriction                   res;
   ContextElementResponseVector  rawCerV;
+
+  /* Include scopes for entitiesQuery() if q filter is not empty */
+  if (qFilter != "")
+  {
+    Scope* sc = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qFilter);
+    res.scopeVector.push_back(sc);
+  }
 
   if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV))
   {
@@ -2426,7 +2440,8 @@ BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 )
 {
   BSONArrayBuilder conds;
@@ -2471,7 +2486,8 @@ BSONArray processConditionVector
                                                   format,
                                                   tenant,
                                                   xauthToken,
-                                                  servicePathV))
+                                                  servicePathV,
+                                                  qFilter))
       {
         *notificationDone = true;
       }

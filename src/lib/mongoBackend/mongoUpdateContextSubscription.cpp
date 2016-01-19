@@ -245,8 +245,36 @@ HttpStatusCode mongoUpdateContextSubscription
       /* Build conditions array (including side-effect notifications and threads creation)
        * In order to do so, we have to create and EntityIdVector and AttributeList from sub
        * document, given the processConditionVector() signature */
-       EntityIdVector enV = subToEntityIdVector(sub);
-       AttributeList attrL = subToAttributeList(sub);
+       EntityIdVector enV;
+       AttributeList attrL;
+       if (version == "v1")
+       {
+         enV = subToEntityIdVector(sub);
+         attrL = subToAttributeList(sub);
+       }
+       else // v2
+       {
+         // In v2 entities and attribute are updatable (as part of subject or notification) wo
+         // we have to check in order to know if we get the attribute from the request or from
+         // the subscription
+         if (requestP->entityIdVector.size() > 0)
+         {
+           enV = requestP->entityIdVector;
+         }
+         else
+         {
+           enV = subToEntityIdVector(sub);
+         }
+
+         if (requestP->attributeList.size() > 0)
+         {
+           attrL = requestP->attributeList;
+         }
+         else
+         {
+           attrL = subToAttributeList(sub);
+         }
+       }
 
        BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                                 enV,
@@ -257,7 +285,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 notifyFormat,
                                                 tenant,
                                                 xauthToken,
-                                                servicePathV);
+                                                servicePathV,
+                                                requestP->expression.q);
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
@@ -273,15 +302,15 @@ HttpStatusCode mongoUpdateContextSubscription
     /* Build expression */
     BSONObjBuilder expression;
 
-    expression << CSUB_CONDITIONS_Q << requestP->expression.q
-             << CSUB_CONDITIONS_GEOM << requestP->expression.geometry
-             << CSUB_CONDITIONS_COORDS << requestP->expression.coords
-             << CSUB_CONDITIONS_GEOREL << requestP->expression.georel;
-    newSub.append(CSUB_CONDITIONS_EXPR, expression.obj());
+    expression << CSUB_EXPR_Q << requestP->expression.q
+             << CSUB_EXPR_GEOM << requestP->expression.geometry
+             << CSUB_EXPR_COORDS << requestP->expression.coords
+             << CSUB_EXPR_GEOREL << requestP->expression.georel;
+    newSub.append(CSUB_EXPR, expression.obj());
   }
-  else if (sub.hasField(CSUB_CONDITIONS_EXPR))
+  else if (sub.hasField(CSUB_EXPR))
   {
-    newSub.append(CSUB_CONDITIONS_EXPR, getField(sub, CSUB_CONDITIONS_EXPR).Obj());
+    newSub.append(CSUB_EXPR, getField(sub, CSUB_EXPR).Obj());
   }
 
   int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
