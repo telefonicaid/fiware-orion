@@ -26,6 +26,7 @@
 #include <semaphore.h>
 #include <errno.h>
 #include <pthread.h>
+#include <limits.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -64,7 +65,7 @@ static void* logSummary(void* vP)
     // Has transactionId gone 'round-the-corner'?
     if (transactionsNow < transactionsAtLastSummary)
     {
-      diff = 0x7FFFFFFF - transactionsAtLastSummary + transactionsNow;
+      diff = INT_MAX - transactionsAtLastSummary + transactionsNow;
     }
     else
     {

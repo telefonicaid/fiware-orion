@@ -57,8 +57,6 @@ public:
   AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling);
 
   int  init(void);
-
-  int  semInit(void);
   void semTake(void);
   void semGive(void);
 
@@ -78,6 +76,9 @@ public:
   void dbErrorsGet(bool* active, long long* raised, long long* released);
   void badInputGet(long long* active, long long* raised, long long* released);
   void notificationErrorGet(long long* active, long long* raised, long long* released);
+
+private:
+  int  semInit(void);
 };
 
 #endif  // SRC_LIB_ALARMMGR_ALARMMANAGER_H_

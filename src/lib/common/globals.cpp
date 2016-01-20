@@ -62,8 +62,6 @@ bool                   notifQueueStatistics = false;
 *
 * Unless readonly, add one to the transactionId and return it.
 * If readonly - just return the current transactionId.
-* If the counter has gone 'round-the-corner', return this info in the output
-* variable 'overflow'.
 */
 int transactionIdGet(bool readonly)
 {
