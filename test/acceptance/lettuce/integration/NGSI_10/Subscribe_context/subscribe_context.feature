@@ -1,4 +1,4 @@
-le# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.

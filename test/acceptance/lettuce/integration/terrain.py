@@ -22,7 +22,6 @@
 """
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
-import time
 
 from lettuce import before, world, after
 from integration.tools.general_utils import stop_mock, drop_all_test_databases, check_properties, get_cb_pid, stop_cb
@@ -56,7 +55,6 @@ def before_all():
 
 @after.each_scenario
 def after_each_scenario(scenario):
-    #time.sleep(10)
     stop_mock()
     world.cb[world.cb_count].log = None
 
