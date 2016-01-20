@@ -222,10 +222,10 @@ def verify_that_attribute_types_are_returned_in_response(context, types):
     __logger__.info("...Verified that entities types are returned from a request...")
 
 
-@step(u'verify that attributes types are returned in response')
+@step(u'verify that attributes types are returned in response based on the info in the recorder')
 def verify_that_attribute_types_are_returned_in_response(context):
     """
-    verify that entity types are returned in response
+    verify that attributes types are returned in response based on the info in the recorder
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     __logger__.debug("Verifying that attribute types are returned from a request...")

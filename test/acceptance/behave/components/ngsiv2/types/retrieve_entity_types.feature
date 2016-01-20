@@ -98,7 +98,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     When get entity types
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "car,untyped,home"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
 
   # ------------------------ Service ----------------------------------------------
   @service @BUG_1636 @skip
@@ -132,7 +132,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     When get entity types
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "untyped,home"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | service            |
       |                    |
@@ -172,7 +172,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     When get entity types
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "untyped,home"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
 
   @service_error
   Scenario Outline:  try to get entities types using NGSI v2 with several wrong services headers
@@ -265,7 +265,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     When get entity types
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "untyped,home,car"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | service_path                                                  |
       |                                                               |
@@ -329,7 +329,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     When get entity types
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "untyped,home,car"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
 
   @service_path_error
   Scenario Outline:  try to get entities type using NGSI v2 with wrong service path header
@@ -456,7 +456,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | limit     | <limit> |
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "<types>"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | limit | types            |
       | 1     | untyped          |
@@ -580,7 +580,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | offset    | <offset> |
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "<types>"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | offset | types            |
       | 0      | untyped,home,car |
@@ -675,7 +675,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | offset    | <offset> |
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "<types>"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | limit | offset | types            |
       | 1     | 0      | untyped,home,car |
@@ -738,7 +738,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | options   | count |
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "untyped,home,car"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
 
   @limit_offset_count.row<row.id>
   @limit_offset_count @BUG_1636 @skip
@@ -797,7 +797,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | options   | count    |
     Then verify that receive an "OK" http code
     And verify that entity types are returned in response are: "<types>"
-    And verify that attributes types are returned in response
+    And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | limit | offset | types            |
       | 1     | 0      | untyped,home,car |
