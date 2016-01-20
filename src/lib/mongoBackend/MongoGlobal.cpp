@@ -2364,6 +2364,8 @@ bool processOnChangeConditionForSubscription
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
+    res.release();
+
     return false;
   }
 
@@ -2389,6 +2391,8 @@ bool processOnChangeConditionForSubscription
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
+        res.release();
+
         return false;
       }
 
@@ -2402,6 +2406,7 @@ bool processOnChangeConditionForSubscription
         getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
         allCerV.release();
         ncr.contextElementResponseVector.release();
+        res.release();
 
         return true;
       }
@@ -2412,12 +2417,15 @@ bool processOnChangeConditionForSubscription
     {
       getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
       ncr.contextElementResponseVector.release();
+      res.release();
 
       return true;
     }
   }
 
   ncr.contextElementResponseVector.release();
+  res.release();
+
   return false;
 }
 
