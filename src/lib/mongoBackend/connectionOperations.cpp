@@ -233,6 +233,7 @@ bool collectionCount
     alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
