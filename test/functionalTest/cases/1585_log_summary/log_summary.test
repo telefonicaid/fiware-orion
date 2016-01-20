@@ -42,6 +42,17 @@ brokerStart CB 0 IPv4 -logSummary 3
 # 08. Sleep 3 secs, awaiting a second log summary
 # 09. grep SUMMARY in log-file (1 transaction and one bad input since last time)
 #
+# NOTE:
+#  In part 6 of REGEXPECT, where you would expect FOUR detected Bad Input (from requests 1-4),
+#  we see SIX Bad Input instead:
+#
+#    Bad input active alarms: 1 (created: 6, removed: 0)
+#
+#  (only ONE active alarms as all Bad Inputs origin from the same IP, namely localhost)
+#
+#  This is due to 'overbadinputting' (see issue #1697) and has nothing to do with the Log Summary
+#  Once/If this is fixed, this functest must be modified.
+#
 
 echo "01. PUT /v2/noService"
 echo "====================="

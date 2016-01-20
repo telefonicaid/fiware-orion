@@ -274,7 +274,7 @@ int             lsPeriod;
 #define PIDPATH             _i "/tmp/contextBroker.pid"
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
-#define MAX_PERIOD          (3600 * 24 * 31)  // Once a month ...
+#define ONE_MONTH_PERIOD    (3600 * 24 * 31)
 
 #define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
@@ -377,7 +377,7 @@ PaArgument paArgs[] =
   { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
-  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt, 0,     0,    MAX_PERIOD, LOG_SUMMARY_DESC },
+  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt, 0,     0,    ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
 
   PA_END_OF_ARGS
 };

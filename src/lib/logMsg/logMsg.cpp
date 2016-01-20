@@ -975,6 +975,13 @@ static char* timeGet(int index, char* line, int lineSize)
 /* ****************************************************************************
 *
 * timeStampGet -
+*
+* This function has been removed as the LM_S macro, formerly a 'timestamp macro'
+* has been removed for the Orion Context Broker implementation, to make room for
+* a new LM_S macro, the 'S' standing for 'Summary'.
+*
+* The function is kept in case the LM_S is taken back as a 'timestamp macro' for
+* some other project.
 */
 static char* timeStampGet(char* line, int len)
 {

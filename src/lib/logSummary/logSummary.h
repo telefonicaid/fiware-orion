@@ -30,14 +30,6 @@
 
 /* ****************************************************************************
 *
-* transactionCounterIncrement - 
-*/
-extern void transactionCounterIncrement(void);
-
-
-
-/* ****************************************************************************
-*
 * logSummary - 
 */
 extern int logSummaryInit(int period);

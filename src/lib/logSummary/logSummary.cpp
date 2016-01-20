@@ -39,29 +39,8 @@
 *
 * Global vars
 */
-static sem_t               lsSem;
-static unsigned long long  transactionCounter           = 0;
-static unsigned long long  transactionsSinceLastSummary = 0;
-static bool                logSummaryOn                 = false;
-
-
-
-/* ****************************************************************************
-*
-* transactionCounterIncrement - 
-*/
-void transactionCounterIncrement(void)
-{
-  if (logSummaryOn == false)
-  {
-    return;
-  }
-
-  sem_wait(&lsSem);
-  ++transactionCounter;
-  ++transactionsSinceLastSummary;
-  sem_post(&lsSem);
-}
+static long long  transactionsAtLastSummary  = 0;
+static bool       logSummaryOn               = false;
 
 
 
@@ -75,25 +54,30 @@ static void* logSummary(void* vP)
 
   while (1)
   {
-    long long tCounter;
-    long long tSinceLastSummary;
+    long long transactionsNow;
+    long long diff;
 
     sleep(period);
 
-    //
-    // To minimize the time that the logSummary semaphore is used, the values of the
-    // counters are copied to local variables and the 'volatile' counter is reset.
-    // With this done, the logSummarysemaphore can be released. We have all the info we need.
-    //
-    sem_wait(&lsSem);
-    tCounter          = transactionCounter;
-    tSinceLastSummary = transactionsSinceLastSummary;
-    transactionsSinceLastSummary = 0;
-    sem_post(&lsSem);
+    transactionsNow     = transactionIdGet();
+
+    // Has transactionId gone 'round-the-corner'?
+    if (transactionsNow < transactionsAtLastSummary)
+    {
+      diff = 0x7FFFFFFF - transactionsAtLastSummary + transactionsNow;
+    }
+    else
+    {
+      diff = transactionsNow - transactionsAtLastSummary;
+    }
+
+    // Remember the current transactionId for next loop
+    transactionsAtLastSummary = transactionsNow;
 
 
     //
-    // Same idea with the alarm manager semaphore.
+    // To minimize the time that the alarm manager semaphore is used, the values of the
+    // counters are copied to local variables.
     // Take sem, get data, release sem.
     // After that - without sem, use the data
     //
@@ -115,7 +99,7 @@ static void* logSummary(void* vP)
 
     alarmMgr.semGive();
 
-    LM_S(("Transactions: %lu (new: %lu)", tCounter, tSinceLastSummary));
+    LM_S(("Transactions: %lu (new: %lu)", transactionsNow, diff));
     LM_S(("DB status: %s (created: %d, removed: %d)", deActive? "erroneous" : "ok", deRaised, deReleased));
     LM_S(("Notification failure active alarms: %d (created: %d, removed: %d)", neActive, neRaised, neReleased));
     LM_S(("Bad input active alarms: %d (created: %d, removed: %d)", biActive, biRaised, biReleased));
@@ -140,16 +124,9 @@ int logSummaryInit(int period)
     return 0;
   }
 
-  logSummaryOn = true;
-
-  // 1. Initialize semaphore for transaction counters
-  if (sem_init(&lsSem, 0, 1) == -1)
-  {
-    LM_E(("Runtime Error (error initializing 'log summary' semaphore: %s)", strerror(errno)));
-    return -1;
-  }
-
-  // 2. Start the log summary thread
+  //
+  // Start the log summary thread
+  //
   pthread_t  tid;
   int        ret;
   ret = pthread_create(&tid, NULL, logSummary, (void*) period);
@@ -159,6 +136,8 @@ int logSummaryInit(int period)
     return -2;
   }
   pthread_detach(tid);
+
+  logSummaryOn = true;
 
   return 0;
 }

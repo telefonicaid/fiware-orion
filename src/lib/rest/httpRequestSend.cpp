@@ -44,7 +44,6 @@
 #include "common/sem.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
-#include "logSummary/logSummary.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/rest.h"
@@ -199,7 +198,6 @@ int httpRequestSendWithCurl
   }
 
   lmTransactionStart("to", ip.c_str(), port, resource.c_str());
-  transactionCounterIncrement();
 
   // Preconditions check
   if (port == 0)
