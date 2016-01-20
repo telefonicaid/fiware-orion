@@ -50,7 +50,6 @@ AlarmManager::AlarmManager():
   notificationErrorLogSampling(0),
   badInputLogSampling(0)
 {
-  semInit();
 }
 
 
@@ -70,8 +69,18 @@ AlarmManager::AlarmManager(int _notificationErrorLogSampling, int _badInputLogSa
   notificationErrorLogSampling(_notificationErrorLogSampling),
   badInputLogSampling(_badInputLogSampling)
 {
-  semInit();
 }  
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::init - 
+*/
+int AlarmManager::init(void)
+{
+  return semInit();
+}
 
 
 
@@ -120,7 +129,9 @@ void AlarmManager::semGive(void)
 */
 void AlarmManager::notificationErrorLogSamplingSet(int _notificationErrorLogSampling)
 {
+  semTake();
   notificationErrorLogSampling = _notificationErrorLogSampling;
+  semGive();
 }
 
 
@@ -131,7 +142,9 @@ void AlarmManager::notificationErrorLogSamplingSet(int _notificationErrorLogSamp
 */
 void AlarmManager::badInputLogSamplingSet(int _badInputLogSampling)
 {
+  semTake();
   badInputLogSampling = _badInputLogSampling;
+  semGive();
 }
 
 
@@ -149,10 +162,12 @@ bool AlarmManager::dbError(const std::string& details)
     return false;
   }
 
+  semTake();
   ++dbErrors;
+  dbOk = false;
+  semGive();
 
   LM_E(("Raising alarm DatabaseError: %s", details.c_str()));
-  dbOk = false;
   return true;
 }
 
@@ -171,9 +186,12 @@ bool AlarmManager::dbErrorReset(void)
     return false;
   }
 
+  semTake();
   ++dbErrorResets;
-  LM_E(("Releasing alarm DatabaseError"));
   dbOk = true;
+  semGive();
+
+  LM_E(("Releasing alarm DatabaseError"));
   return true;
 }
 
@@ -184,7 +202,10 @@ bool AlarmManager::dbErrorReset(void)
 * AlarmManager::dbErrorsGet - 
 *
 * NOTE
-*  dbError active means there is a DB problem: dbOk is false
+*   dbError active means there is a DB problem: dbOk is false
+*
+* ALSO NOTE
+*   To read values, no semaphore is used.
 */
 void AlarmManager::dbErrorsGet(bool* active, long long* raised, long long* released)
 {
@@ -198,6 +219,9 @@ void AlarmManager::dbErrorsGet(bool* active, long long* raised, long long* relea
 /* ****************************************************************************
 *
 * AlarmManager::notificationErrorGet - 
+*
+* NOTE
+*   To read values, no semaphore is used.
 */
 void AlarmManager::notificationErrorGet(long long* active, long long* raised, long long* released)
 {
@@ -211,6 +235,9 @@ void AlarmManager::notificationErrorGet(long long* active, long long* raised, lo
 /* ****************************************************************************
 *
 * AlarmManager::badInputGet - 
+*
+* NOTE
+*   To read values, no semaphore is used.
 */
 void AlarmManager::badInputGet(long long* active, long long* raised, long long* released)
 {
@@ -235,6 +262,8 @@ void AlarmManager::badInputGet(long long* active, long long* raised, long long* 
 */
 bool AlarmManager::notificationError(const std::string& url, const std::string& details)
 {
+  semTake();
+
   std::map<std::string, int>::iterator iter = notificationV.find(url);
 
   ++notificationErrors;
@@ -248,11 +277,14 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
       LM_W(("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
     }
 
+    semGive();
     return false;
   }
 
-  LM_W(("Raising alarm NotificationError %s: %s", url.c_str(), details.c_str()));
   notificationV[url] = 1;
+  semGive();
+
+  LM_W(("Raising alarm NotificationError %s: %s", url.c_str(), details.c_str()));
 
   return true;
 }
@@ -267,15 +299,20 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
 */
 bool AlarmManager::notificationErrorReset(const std::string& url)
 {
+  semTake();
+
   if (notificationV.find(url) == notificationV.end())  // Doesn't exist
   {
+    semGive();
     return false;
   }
   
   notificationV.erase(url);
+  ++notificationErrorResets;
+  semGive();
+
   LM_W(("Releasing alarm NotificationError %s", url.c_str()));
 
-  ++notificationErrorResets;
   return true;
 }
 
@@ -295,6 +332,8 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 */
 bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 {
+  semTake();
+
   std::map<std::string, int>::iterator iter = badInputV.find(ip);
 
   ++badInputs;
@@ -308,11 +347,14 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
       LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
     }
 
+    semGive();
     return false;
   }
 
-  LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
   badInputV[ip] = 1;
+  semGive();
+
+  LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
 
   return true;
 }
@@ -327,14 +369,19 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 */
 bool AlarmManager::badInputReset(const std::string& ip)
 {
+  semTake();
+
   if (badInputV.find(ip) == badInputV.end())  // Doesn't exist
   {
+    semGive();
     return false;
   }
 
   badInputV.erase(ip);
+  ++badInputResets;
+  semGive();
+
   LM_W(("Releasing alarm BadInput %s", ip.c_str()));
 
-  ++badInputResets;
   return true;
 }

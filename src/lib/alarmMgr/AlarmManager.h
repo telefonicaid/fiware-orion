@@ -56,6 +56,8 @@ public:
   AlarmManager();
   AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling);
 
+  int  init(void);
+
   int  semInit(void);
   void semTake(void);
   void semGive(void);

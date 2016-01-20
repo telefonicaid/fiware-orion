@@ -199,6 +199,7 @@
 
 #include "contextBroker/version.h"
 #include "common/string.h"
+#include "alarmMgr/alarmMgr.h"
 #include "logSummary/logSummary.h"
 
 using namespace orion;
@@ -311,7 +312,7 @@ int             lsPeriod;
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
-#define LOG_SUMMARY_DESC       "log summary period in seconds"
+#define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
 
 
 
@@ -1739,6 +1740,7 @@ int main(int argC, char* argV[])
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
+  alarmMgr.init();
   logSummaryInit(lsPeriod);
 
   if (rush[0] != 0)

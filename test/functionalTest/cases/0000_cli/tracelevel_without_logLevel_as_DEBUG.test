@@ -70,6 +70,6 @@ Usage:                [option '-U' (extended usage)]
                       [option '-statSemWait' (enable semaphore waiting time statistics)]
                       [option '-statTiming' (enable request-time-measuring statistics)]
                       [option '-statNotifQueue' (enable thread pool notifications queue statistics)]
-                      [option '-logSummary' <log summary period in seconds>]
+                      [option '-logSummary' <log summary period in seconds (defaults to 0, meaning 'off')>]
 
 --TEARDOWN--
