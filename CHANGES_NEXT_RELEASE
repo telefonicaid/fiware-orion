@@ -15,4 +15,5 @@
 - Add: PATCH /v2/subscriptions/{subId} operation (Issue #1658)
 - Add: subscriptions triggered by modifications in any attribute without explicitly list them (aka ONANYCHANGE) (Issue #350)
 - Add: 'q' expression evaluation in NGSIv2 subscription (at subscription creation/update and update context times) (Issue #1316 and #1658)
+- Fix: subscription service path is lost at update subscription time (Issue #1693)
 - Add: Log summary (Issue #1585)
