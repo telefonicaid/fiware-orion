@@ -54,7 +54,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_happy_path |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -67,7 +67,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -80,7 +80,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -93,7 +93,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value      |
       | limit     | 9          |
@@ -112,7 +112,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | <service>        |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -120,7 +120,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -142,7 +142,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -150,7 +150,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -203,7 +203,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_service_path |
       | Fiware-ServicePath | <service_path>    |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -211,7 +211,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -236,7 +236,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | parameter      | value                     |
       | Fiware-Service | test_service_path_without |
       | Content-Type   | application/json          |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | room        |
@@ -244,7 +244,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -341,7 +341,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -349,7 +349,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | temperature       |
       | attributes_value | <attribute_value> |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -385,7 +385,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -393,7 +393,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
     And verify that receive an "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -424,7 +424,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_with_attribute_type |
       | Fiware-ServicePath | /test                         |
       | Content-Type       | application/json              |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -433,7 +433,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_value | <attribute value> |
       | attributes_type  | celcius           |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -469,7 +469,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -478,7 +478,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_value | <attributes_value> |
       | attributes_type  | "celcius"          |
     And verify that receive an "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -509,7 +509,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_happy_path |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -521,7 +521,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm             |
       | metadatas_value  | random=10         |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -557,7 +557,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -569,7 +569,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | "alarm"            |
       | metadatas_value  | "hot"              |
     And verify that receive an "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -600,7 +600,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_without_metadata_type |
       | Fiware-ServicePath | /test                           |
       | Content-Type       | application/json                |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value             |
       | entities_type    | room              |
@@ -611,7 +611,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_name   | very_hot          |
       | metadatas_value  | random=10         |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | limit     | 3     |
@@ -647,7 +647,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_without_attribute_type |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And  create an entity and attribute with special values in raw
       | parameter        | value              |
       | entities_type    | "room"             |
@@ -658,7 +658,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_name   | "very_hot"         |
       | metadatas_value  | "hot"              |
     And verify that receive an "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
     Then verify that receive an "OK" http code
     And verify an entity in raw mode with type "<type>" in attribute value from http response
@@ -691,7 +691,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_limit |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "10" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
@@ -704,7 +704,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value   |
       | limit     | <limit> |
@@ -785,7 +785,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_offset |
       | Fiware-ServicePath | /test                 |
       | Content-Type       | application/json      |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "10" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
@@ -798,7 +798,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value    |
       | offset    | <offset> |
@@ -852,7 +852,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_limit_offset |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "10" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
@@ -865,7 +865,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value    |
       | limit     | <limit>  |
@@ -887,7 +887,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -900,7 +900,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -913,7 +913,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value           |
       | entities_type    | <entities_type> |
@@ -926,7 +926,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm           |
       | metadatas_value  | random=10       |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value                                  |
       | id        | the same value of the previous request |
@@ -961,7 +961,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -974,7 +974,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -987,7 +987,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -1000,7 +1000,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value |
       | id        | <id>  |
@@ -1020,7 +1020,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value         |
       | entities_type    | home          |
@@ -1033,7 +1033,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm         |
       | metadatas_value  | random=10     |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1046,7 +1046,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value           |
       | entities_type    | <entities_type> |
@@ -1059,7 +1059,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm           |
       | metadatas_value  | random=10       |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value                                  |
       | id        | the same value of the previous request |
@@ -1094,7 +1094,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1107,7 +1107,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value       |
       | id        | fdgfdgfdgfd |
@@ -1121,7 +1121,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1134,7 +1134,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value       |
       | id        | <entity_id> |
@@ -1161,7 +1161,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_type |
       | Fiware-ServicePath | /test               |
       | Content-Type       | application/json    |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1174,7 +1174,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1187,7 +1187,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value           |
       | entities_type    | <entities_type> |
@@ -1200,7 +1200,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm           |
       | metadatas_value  | random=10       |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value                                  |
       | type      | the same value of the previous request |
@@ -1235,7 +1235,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_type |
       | Fiware-ServicePath | /test               |
       | Content-Type       | application/json    |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1248,7 +1248,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1261,7 +1261,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -1274,7 +1274,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value  |
       | type      | <type> |
@@ -1294,7 +1294,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_type |
       | Fiware-ServicePath | /test               |
       | Content-Type       | application/json    |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value           |
       | entities_type    | <entities_type> |
@@ -1307,7 +1307,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm           |
       | metadatas_value  | random=10       |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | <entities_type>         |
@@ -1320,7 +1320,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value           |
       | entities_type    | <entities_type> |
@@ -1333,7 +1333,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm           |
       | metadatas_value  | random=10       |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value                                  |
       | type      | the same value of the previous request |
@@ -1368,7 +1368,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_type |
       | Fiware-ServicePath | /test               |
       | Content-Type       | application/json    |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1381,7 +1381,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value       |
       | type      | fdgfdgfdgfd |
@@ -1395,7 +1395,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_type |
       | Fiware-ServicePath | /test               |
       | Content-Type       | application/json    |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1408,7 +1408,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value       |
       | type      | <entity_id> |
@@ -1435,7 +1435,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id_pattern |
       | Fiware-ServicePath | /test                     |
       | Content-Type       | application/json          |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1448,7 +1448,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1461,7 +1461,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "1" entities with "2" attributes
       | parameter        | value           |
       | entities_type    | <entities_type> |
@@ -1474,7 +1474,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm           |
       | metadatas_value  | random=10       |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value        |
       | idPattern | <id_pattern> |
@@ -1506,7 +1506,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id_pattern |
       | Fiware-ServicePath | /test                     |
       | Content-Type       | application/json          |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1519,7 +1519,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1532,7 +1532,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "1" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | vehicles  |
@@ -1545,7 +1545,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value   |
       | idPattern | dfgdg.* |
@@ -1559,7 +1559,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_id_pattern |
       | Fiware-ServicePath | /test                     |
       | Content-Type       | application/json          |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1572,7 +1572,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value  |
       | id        | room1  |
@@ -1590,7 +1590,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_id_type |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1603,7 +1603,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1616,7 +1616,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "10" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | <type>    |
@@ -1629,7 +1629,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value  |
       | id        | <id>   |
@@ -1650,7 +1650,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_id_type |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1663,7 +1663,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1676,7 +1676,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "10" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -1689,7 +1689,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value        |
       | idPattern | <id_pattern> |
@@ -1709,7 +1709,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_id_type |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1722,7 +1722,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1735,7 +1735,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "10" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | <type>    |
@@ -1748,7 +1748,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value    |
       | limit     | <limit>  |
@@ -1772,7 +1772,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_id      | room3       |
@@ -1784,7 +1784,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1797,7 +1797,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "3" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | home                    |
@@ -1810,7 +1810,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -1823,14 +1823,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "1" entities with "1" attributes
       | parameter        | value  |
       | entities_id      | garden |
       | attributes_name  | roses  |
       | attributes_value | red    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -1848,7 +1848,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1861,7 +1861,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -1874,7 +1874,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -1887,14 +1887,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "1" entities with "1" attributes
       | parameter        | value  |
       | entities_id      | garden |
       | attributes_name  | roses  |
       | attributes_value | red    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -1911,7 +1911,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -1924,14 +1924,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "1" entities with "1" attributes
       | parameter        | value  |
       | entities_id      | garden |
       | attributes_name  | roses  |
       | attributes_value | red    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -1973,7 +1973,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -1986,7 +1986,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "3" attributes
       | parameter        | value     |
       | entities_type    | house     |
@@ -2006,7 +2006,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | "temperature"     |
       | attributes_value | <attribute_value> |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2024,7 +2024,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "12" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -2037,7 +2037,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "3" attributes
       | parameter        | value     |
       | entities_type    | house     |
@@ -2057,7 +2057,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | "speed"   |
       | attributes_value | 89        |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2075,7 +2075,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "12" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -2088,7 +2088,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "3" attributes
       | parameter        | value     |
       | entities_type    | house     |
@@ -2108,7 +2108,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | "speed"   |
       | attributes_value | 89        |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2131,7 +2131,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2144,7 +2144,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2157,7 +2157,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_type    | vehicle   |
@@ -2169,28 +2169,28 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "1" entities with "1" attributes
       | parameter        | value  |
       | entities_id      | garden |
       | attributes_name  | roses  |
       | attributes_value | red    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "car"   |
       | attributes_name  | "speed" |
       | attributes_value | 79.2    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_type    | home      |
@@ -2203,7 +2203,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_type    | home      |
@@ -2216,7 +2216,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value   |
       | entities_id      | simple  |
@@ -2224,7 +2224,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_value | one,two |
       | attributes_type  | celsius |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2289,7 +2289,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2302,7 +2302,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2315,7 +2315,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_id      | bus       |
@@ -2326,14 +2326,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2363,7 +2363,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2376,7 +2376,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2389,7 +2389,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_id      | bus       |
@@ -2400,14 +2400,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2438,7 +2438,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2451,7 +2451,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2464,7 +2464,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_id      | bus       |
@@ -2475,14 +2475,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2513,7 +2513,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2526,7 +2526,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2539,7 +2539,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_id      | bus       |
@@ -2550,14 +2550,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2589,7 +2589,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2602,7 +2602,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2615,7 +2615,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_id      | bus       |
@@ -2626,14 +2626,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value     |
       | entities_type    | "vehicle" |
@@ -2641,7 +2641,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | "speed"   |
       | attributes_value | 89.6      |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2672,7 +2672,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2685,7 +2685,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2698,7 +2698,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_id      | bus       |
@@ -2709,14 +2709,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value     |
       | entities_type    | "vehicle" |
@@ -2724,7 +2724,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | "speed"   |
       | attributes_value | 89.6      |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
@@ -2757,7 +2757,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | Fiware-Service     | test_list_only_q |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -2770,7 +2770,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | random=10   |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | house                   |
@@ -2783,7 +2783,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "1" attributes
       | parameter        | value     |
       | entities_id      | bus       |
@@ -2794,14 +2794,14 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value   |
       | entities_id      | "moto"  |
       | attributes_name  | "speed" |
       | attributes_value | 89.6    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create an entity and attribute with special values in raw
       | parameter        | value     |
       | entities_type    | "vehicle" |
@@ -2809,7 +2809,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_name  | "speed"   |
       | attributes_value | 89.6      |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |

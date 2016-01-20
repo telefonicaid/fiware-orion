@@ -53,7 +53,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | Fiware-Service     | test_type_happy_path |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -61,7 +61,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -73,7 +73,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -86,7 +86,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -94,20 +94,21 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "car,untyped,home"
+    And verify that attributes types are returned in response
 
   # ------------------------ Service ----------------------------------------------
-  @service
+  @service @BUG_1636 @skip
   Scenario Outline:  get entity types using NGSI v2 API with several services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -115,7 +116,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -127,10 +128,11 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "untyped,home"
+    And verify that attributes types are returned in response
     Examples:
       | service            |
       |                    |
@@ -140,13 +142,13 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | SERVICE            |
       | max length allowed |
 
-  @service_without
+  @service_without @BUG_1636 @skip
   Scenario:  list all entities using NGSI v2 API without service header
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -154,7 +156,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -166,10 +168,11 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "untyped,home"
+    And verify that attributes types are returned in response
 
   @service_error
   Scenario Outline:  try to get entities types using NGSI v2 with several wrong services headers
@@ -208,7 +211,6 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | error       | BadRequest                                               |
       | description | bad length - a tenant name can be max 50 characters long |
 
-
  # ------------------------ Service path ----------------------------------------------
   @service_path.row<row.id>
   @service_path @BUG_1423 @skip
@@ -218,7 +220,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | Fiware-Service     | test_type_service_path |
       | Fiware-ServicePath | <service_path>         |
       | Content-Type       | application/json       |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -226,7 +228,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -238,7 +240,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -251,7 +253,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -259,10 +261,11 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "untyped,home,car"
+    And verify that attributes types are returned in response
     Examples:
       | service_path                                                  |
       |                                                               |
@@ -275,13 +278,13 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | max length allowed                                            |
       | max length allowed and ten levels                             |
 
-  @service_path_without
+  @service_path_without @BUG_1636 @skip
   Scenario:  get entities type using NGSI v2 without service path header
     Given  a definition of headers
       | parameter      | value                  |
       | Fiware-Service | test_type_service_path |
       | Content-Type   | application/json       |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -289,7 +292,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -301,7 +304,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -314,7 +317,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -322,10 +325,11 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "untyped,home,car"
+    And verify that attributes types are returned in response
 
   @service_path_error
   Scenario Outline:  try to get entities type using NGSI v2 with wrong service path header
@@ -398,14 +402,14 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
 # ------------------ queries parameters -------------------------------
   # --- limit and offset ---
   @only_limit.row<row.id>
-  @only_limit
+  @only_limit @BUG_1636 @skip
   Scenario Outline:  get entities type using NGSI v2 with only limit query parameter
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_type_limit  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -413,7 +417,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -425,7 +429,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -438,7 +442,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -446,17 +450,18 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value   |
       | limit     | <limit> |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "<types>"
+    And verify that attributes types are returned in response
     Examples:
-      | limit |
-      | 1     |
-      | 2     |
-      | 10    |
+      | limit | types            |
+      | 1     | untyped          |
+      | 2     | untyped,car      |
+      | 10    | untyped,home,car |
 
   @only_limit_wrong.row<row.id>
   @only_limit_wrong
@@ -466,7 +471,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | Fiware-Service     | test_type_only_limit_error |
       | Fiware-ServicePath | /test                      |
       | Content-Type       | application/json           |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -474,7 +479,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value   |
       | limit     | <limit> |
@@ -498,7 +503,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | Fiware-Service     | test_type_only_limit_error |
       | Fiware-ServicePath | /test                      |
       | Content-Type       | application/json           |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -506,7 +511,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value   |
       | limit     | <limit> |
@@ -521,14 +526,14 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | 0     |
 
   @only_offset.row<row.id>
-  @only_offset
+  @only_offset @BUG_1636 @skip
   Scenario Outline:  get entities  type using NGSI v2 with only offset query parameter
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_type_only_offset |
       | Fiware-ServicePath | /test                 |
       | Content-Type       | application/json      |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -536,7 +541,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -548,7 +553,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -561,7 +566,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -569,17 +574,18 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value    |
       | offset    | <offset> |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "<types>"
+    And verify that attributes types are returned in response
     Examples:
-      | offset |
-      | 0      |
-      | 1      |
-      | 20     |
+      | offset | types            |
+      | 0      | untyped,home,car |
+      | 1      | home,car         |
+      | 20     |                  |
 
   @only_offset_not_decimal
   Scenario Outline:  try to get entities type using NGSI v2 with only offset query parameter, but the value is not a decimal number
@@ -588,7 +594,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | Fiware-Service     | test_type_only_offset_error |
       | Fiware-ServicePath | /test                       |
       | Content-Type       | application/json            |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -596,7 +602,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value    |
       | offset    | <offset> |
@@ -613,14 +619,15 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | <2     |
       | %@#    |
 
-  @limit_offset
+  @limit_offset.row<row.id>
+  @limit_offsets @BUG_1636 @skip
   Scenario Outline:  get entities type using NGSI v2 with limit and offset queries parameters
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_list_limit_offset |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -628,7 +635,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -640,7 +647,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -653,7 +660,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -661,19 +668,20 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value    |
       | limit     | <limit>  |
       | offset    | <offset> |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "<types>"
+    And verify that attributes types are returned in response
     Examples:
-      | limit | offset |
-      | 1     | 1      |
-      | 20    | 1      |
-      | 1     | 20     |
-      | 5     | 2      |
+      | limit | offset | types            |
+      | 1     | 0      | untyped,home,car |
+      | 20    | 1      | home,car         |
+      | 1     | 20     | home             |
+      | 5     | 2      | home             |
 
  # --- options=count ---
   @only_count @BUG_1636 @skip
@@ -683,7 +691,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | Fiware-Service     | test_type_count  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -691,7 +699,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -703,7 +711,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -716,7 +724,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -724,22 +732,23 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value |
       | options   | count |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "untyped,home,car"
+    And verify that attributes types are returned in response
 
   @limit_offset_count.row<row.id>
-  @limit_offset_count
+  @limit_offset_count @BUG_1636 @skip
   Scenario Outline:  get entities type using NGSI v2 with limit, offset and options=count queries parameters
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_list_limit_offset |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
-    And initialize the accumulator context of entities
+    And initialize entity groups recorder
     And create "5" entities with "2" attributes
       | parameter        | value       |
       | entities_type    | home        |
@@ -747,7 +756,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value                   |
       | entities_id      | room2                   |
@@ -759,7 +768,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm                   |
       | metadatas_value  | random=10               |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value     |
       | entities_type    | car       |
@@ -772,7 +781,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     And create "5" entities with "2" attributes
       | parameter        | value |
       | entities_type    | car   |
@@ -780,18 +789,18 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | attributes_name  | speed |
       | attributes_value | 45    |
     And verify that receive several "Created" http code
-    And accumulate context of entities for use with lists
+    And record entity group
     When get entity types
       | parameter | value    |
       | limit     | <limit>  |
       | offset    | <offset> |
       | options   | count    |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response
+    And verify that entity types are returned in response are: "<types>"
+    And verify that attributes types are returned in response
     Examples:
-      | limit | offset |
-      | 1     | 1      |
-      | 20    | 1      |
-      | 1     | 20     |
-      | 5     | 2      |
-
+      | limit | offset | types            |
+      | 1     | 0      | untyped,home,car |
+      | 20    | 1      | home,car         |
+      | 1     | 20     |                  |
+      | 5     | 2      | home             |

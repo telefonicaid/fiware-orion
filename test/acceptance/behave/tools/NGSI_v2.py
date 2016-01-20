@@ -768,14 +768,31 @@ class NGSI:
                                                                                     (entities_contexts["attributes_name"], str(i+1))
         mongo_driver.disconnect()
 
-    def verify_entity_types(self, queries_parameters, accumulate_entities_context, resp):
+    def verify_entity_types(self, types, resp):
         """
         verify entity types  -- /v2/types
         :param queries_parameters: queries parameters used in the request
         :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
         :param resp: http response
         """
-        types = {}
+        # verify entities types
+        type_list = types.split(",")
+        items_dict = convert_str_to_dict(resp.content, JSON)
+        items_list = items_dict.keys()  # list of keys
+        for item in items_list:
+            if item == EMPTY:
+                item = "untyped"
+            __logger__.debug("verified: %s include in %s" % (item, types))
+            assert item in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
+
+    def verify_attributes_types_with_entity_types(self, queries_parameters, accumulate_entities_context, resp):
+        """
+        verify attributes types with entity types  -- /v2/types
+        :param queries_parameters: queries parameters used in the request
+        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
+        :param resp: http response
+        """
+        types_count = {}
         total = 0
         limit = 20
         offset = 0
@@ -783,11 +800,11 @@ class NGSI:
 
         for entities_group in accumulate_entities_context:
             temp = self.__remove_quote(entities_group["entities_type"])
-            if temp not in types:  # avoid types duplicated
-                types[temp] = int(entities_group["entities_number"])
+            if temp not in types_count:  # avoid types duplicated
+                types_count[temp] = int(entities_group["entities_number"])
                 total += 1
             else:
-                types[temp] += int(entities_group["entities_number"])  # entities counter
+                types_count[temp] += int(entities_group["entities_number"])  # entities counter
 
         if "limit" in queries_parameters:
             limit = int(queries_parameters["limit"])
@@ -798,7 +815,7 @@ class NGSI:
                 count = int(resp.headers["x-total-count"])
 
             if queries_parameters["options"] == "values":
-                pass  # not implemented and not tested yet (pending)
+                pass  # not implemented (develop team) and not tested yet (pending)
 
         # determinate number of items and position in response
         if offset >= total:
@@ -817,7 +834,9 @@ class NGSI:
         __logger__.debug("offset: %s" % str(offset))
         __logger__.debug("items:  %s" % str(items))
         __logger__.debug("pos:    %s" % str(position))
-        __logger__.debug("types:  %s" % str(types))
+        __logger__.debug("types count:  ")
+        for i in types_count:
+            __logger__.debug("   %s = %s" % (i, str(types_count[i])))
 
         # verify entities number
         items_dict = convert_str_to_dict(resp.content, JSON)
@@ -829,20 +848,20 @@ class NGSI:
             if item == EMPTY:
                 type_resp = None
 
-            assert type_resp in types, " ERROR - wrong entity type: %s" % item  # verify that the entities was created
+            assert type_resp in types_count, " ERROR - wrong entity type: %s" % item  # verify that the entities was created
             count_total += int(items_dict[item]["count"])
-            """
-            assert types[type_resp] == int(items_dict[item]["count"]), \
-                " ERROR - the entities counter %s does not match with the expected: %s" % \
-                (items_dict[item]["count"], types[type_resp])
-            """
+
+            assert types_count[type_resp] == int(items_dict[item]["count"]), \
+                " ERROR - the entities type counter %s does not match with the expected: %s" % \
+                (items_dict[item]["count"], types_count[type_resp])
+
             attr_list = items_dict[item]["attrs"].keys()       # list of attributes in each entities group
             for attr in attr_list:
                 for entities_group in accumulate_entities_context:
                     if (entities_group["entities_type"] == type_resp) and (attr.find(entities_group["attributes_name"]) >= 0):
-                      #  if entities_group["attributes_type"] == items_dict[item]["attrs"][attr]["type"]:
-                         attr_exists = True
-                         break
+                        if entities_group["attributes_type"] == items_dict[item]["attrs"][attr]["type"]:
+                            attr_exists = True
+                            break
             assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, items_dict[item]["attrs"][attr]["type"])
 
         # options=count query parameter
