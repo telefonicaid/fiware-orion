@@ -286,6 +286,28 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 }
 ```
 
+## Field syntax restrictions
+
+Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax. These rules applies to:
+
+* Entity id
+* Entity type
+* Attribute name
+* Attribute type
+* Metadata name
+* Metadata type
+
+The rules are:
+
+* Allowed characters are the ones in the plain ASCII set except the following ones: `?`, `/` and `#`.
+* Maximum field length is 256 characters.
+
+In addition to the above rules, given NGSIv2 server implementations could add additional syntactical restrictions in those
+or other fields, e.g. to avoid some cross script injection attacks.
+
+In the case a client attemps to use a field not valid from a syntax point of view, it shall get a "Bad Request" error
+explaining the cause.
+
 
 ## Error responses
 
