@@ -132,6 +132,14 @@ static void* logSummary(void* vP)
 */
 int logSummaryInit(int period)
 {
+  //
+  // If the period is ZERO, then the log summary is turned OFF
+  //
+  if (period == 0)
+  {
+    return 0;
+  }
+
   logSummaryOn = true;
 
   // 1. Initialize semaphore for transaction counters
@@ -139,11 +147,6 @@ int logSummaryInit(int period)
   {
     LM_E(("Runtime Error (error initializing 'log summary' semaphore: %s)", strerror(errno)));
     return -1;
-  }
-
-  if (period == 0)
-  {
-    return 0;
   }
 
   // 2. Start the log summary thread
