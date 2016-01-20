@@ -280,6 +280,7 @@ SET (STATIC_LIBS
     orionTypes
     common
     alarmMgr
+    logSummary
     lm
     pa
     pthread

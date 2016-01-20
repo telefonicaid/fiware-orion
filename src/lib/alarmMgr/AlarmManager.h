@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <semaphore.h>
+
 #include <string>
 #include <map>
 
@@ -38,26 +40,45 @@ class AlarmManager
 {
 private:
   long long                   badInputs;
+  long long                   badInputResets;
   long long                   notificationErrors;
+  long long                   notificationErrorResets;
   long long                   dbErrors;
+  long long                   dbErrorResets;
   bool                        dbOk;
   std::map<std::string, int>  notificationV;
   std::map<std::string, int>  badInputV;
   int                         notificationErrorLogSampling;
   int                         badInputLogSampling;
+  sem_t                       sem;
 
 public:
   AlarmManager();
   AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling);
 
+  int  init(void);
+  void semTake(void);
+  void semGive(void);
+
   void notificationErrorLogSamplingSet(int _notificationErrorLogSampling);
   void badInputLogSamplingSet(int _badInputLogSampling);
+
   bool dbError(const std::string& details);
   bool dbErrorReset(void);
+
   bool notificationError(const std::string& url, const std::string& details);
   bool notificationErrorReset(const std::string& url);
+
   bool badInput(const std::string& ip, const std::string& details);
   bool badInputReset(const std::string& ip);
+
+  // Methods for Log Summary
+  void dbErrorsGet(bool* active, long long* raised, long long* released);
+  void badInputGet(long long* active, long long* raised, long long* released);
+  void notificationErrorGet(long long* active, long long* raised, long long* released);
+
+private:
+  int  semInit(void);
 };
 
 #endif  // SRC_LIB_ALARMMGR_ALARMMANAGER_H_

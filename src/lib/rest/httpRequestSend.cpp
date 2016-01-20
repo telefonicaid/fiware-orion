@@ -43,10 +43,12 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
+
 
 
 /* ****************************************************************************

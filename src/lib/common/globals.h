@@ -155,6 +155,8 @@ extern int64_t toSeconds(int value, char what, bool dayPart);
 */
 extern int64_t parse8601(const std::string& s);
 
+
+
 /*****************************************************************************
 *
 * parse8601Time -
@@ -163,6 +165,22 @@ extern int64_t parse8601(const std::string& s);
 *
 */
 int64_t parse8601Time(const std::string& s);
+
+
+
+/* ****************************************************************************
+*
+* transactionIdGet - 
+*
+* PARAMETERS
+*   readonly:   don't change the transactionId, just return it.
+*
+* Unless readonly, add one to the transactionId and return it.
+* If readonly - just return the current transactionId.
+*/
+int transactionIdGet(bool readonly = true);
+
+
 
 /* ****************************************************************************
 *

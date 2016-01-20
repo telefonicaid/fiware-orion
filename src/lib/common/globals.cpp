@@ -55,6 +55,32 @@ bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
 
 
+
+/* ****************************************************************************
+*
+* transactionIdGet - 
+*
+* Unless readonly, add one to the transactionId and return it.
+* If readonly - just return the current transactionId.
+*/
+int transactionIdGet(bool readonly)
+{
+  static int transactionId = 0;
+
+  if (readonly == false)
+  {
+    ++transactionId;
+    if (transactionId < 0)
+    {
+      transactionId = 1;
+    }
+  }
+
+  return transactionId;
+}
+
+
+
 /* ****************************************************************************
 *
 * transactionIdSet - set the transaction ID
@@ -64,7 +90,13 @@ bool                   notifQueueStatistics = false;
 * Furthermore, a running number is appended for the transaction.
 * A 32 bit signed number is used, so its max value is 0x7FFFFFFF (2,147,483,647).
 *
-* If the running number overflows, a millisecond is added to the start time.
+* If the running number overflows, a millisecond is added to the start time of the broker.
+* As the running number starts from 1 again after overflow, we need this to distinguish the first transaction
+* after a running number overflow from the VERY first transaction (as both will have running number 1).
+* Imagine that the start time of the broker is XXXXXXXXX.123:
+*
+*   XXXXXXXXX.123.1  # the VERY first transaction
+*   XXXXXXXXX.124.1  # the first transaction after running number overflow
 *
 * The whole thing is stored in the thread variable 'transactionId', supported by the
 * logging library 'liblm'.
@@ -72,21 +104,23 @@ bool                   notifQueueStatistics = false;
 */
 void transactionIdSet(void)
 {
-  static int transaction = 0;
+  static int firstTime = true;
 
   transSemTake("transactionIdSet", "changing the transaction id");
-  ++transaction;
 
-  if (transaction < 0)
+  int   transaction = transactionIdGet(false);
+
+  if ((firstTime == false) && (transaction == 1))  // Overflow - see function header for explanation
   {
     logStartTime.tv_usec += 1;
-    transaction = 1;
   }
 
   snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d",
            logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
 
   transSemGive("transactionIdSet", "changing the transaction id");
+
+  firstTime = false;
 }
 
 

@@ -39,6 +39,8 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsiNotify/Notifier.h"
+#include "alarmMgr/alarmMgr.h"
+#include "logSummary/logSummary.h"
 
 #include "unittest.h"
 
@@ -110,6 +112,8 @@ int main(int argC, char** argV)
 
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false);
+  alarmMgr.init();
+  logSummaryInit(0);
   setupDatabase();
 
   LM_M(("Run all tests"));
