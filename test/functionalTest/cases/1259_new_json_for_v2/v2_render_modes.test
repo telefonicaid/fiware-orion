@@ -42,13 +42,6 @@ brokerStart CB 0-255
 echo "01. POST /v2/entities/E1 complete"
 echo "================================="
 payload='{
-  "string": "a1",
-  "int":     19,
-  "float":   3.14,
-  "true":    true,
-  "false":   false,
-  "compound_vector":  [ 1,2,3 ],
-  "compound_object":  { "a": 1, "b": 2 },
   "string_object": {
     "value": "a1",
     "type":  "TA1"
@@ -169,42 +162,15 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 1397
+Content-Length: 979
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "compound_object": {
-        "metadata": {},
-        "type": null,
-        "value": {
-            "a": 1.0,
-            "b": 2.0
-        }
-    },
-    "compound_vector": {
-        "metadata": {},
-        "type": null,
-        "value": [
-            1.0,
-            2.0,
-            3.0
-        ]
-    },
-    "false": {
-        "metadata": {},
-        "type": null,
-        "value": false
-    },
     "false_object": {
         "metadata": {},
         "type": "TA1",
         "value": false
-    },
-    "float": {
-        "metadata": {},
-        "type": null,
-        "value": 3.14
     },
     "float_object": {
         "metadata": {},
@@ -212,11 +178,6 @@ Date: REGEX(.*)
         "value": 22.1
     },
     "id": "E1",
-    "int": {
-        "metadata": {},
-        "type": null,
-        "value": 19.0
-    },
     "int_object": {
         "metadata": {},
         "type": "TA1",
@@ -230,20 +191,10 @@ Date: REGEX(.*)
             "b": 2.0
         }
     },
-    "string": {
-        "metadata": {},
-        "type": null,
-        "value": "a1"
-    },
     "string_object": {
         "metadata": {},
         "type": "TA1",
         "value": "a1"
-    },
-    "true": {
-        "metadata": {},
-        "type": null,
-        "value": true
     },
     "true_object": {
         "metadata": {},
@@ -311,34 +262,20 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 395
+Content-Length: 229
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "compound_object": {
-        "a": 1.0,
-        "b": 2.0
-    },
-    "compound_vector": [
-        1.0,
-        2.0,
-        3.0
-    ],
-    "false": false,
     "false_object": false,
-    "float": 3.14,
     "float_object": 22.1,
     "id": "E1",
-    "int": 19.0,
     "int_object": 21.0,
     "object_object": {
         "a": 1.0,
         "b": 2.0
     },
-    "string": "a1",
     "string_object": "a1",
-    "true": true,
     "true_object": true,
     "type": null,
     "vector_object": [
@@ -352,34 +289,20 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1?options=values
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 218
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributeValues": [
-        {
-            "a": 1.0,
-            "b": 2.0
-        },
-        [
-            1.0,
-            2.0,
-            3.0
-        ],
         false,
-        false,
-        3.14,
         22.1,
-        19.0,
         21.0,
         {
             "a": 1.0,
             "b": 2.0
         },
         "a1",
-        "a1",
-        true,
         true,
         [
             "a",
@@ -395,43 +318,16 @@ Date: REGEX(.*)
 05. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 1399
+Content-Length: 981
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "compound_object": {
-            "metadata": {},
-            "type": null,
-            "value": {
-                "a": 1.0,
-                "b": 2.0
-            }
-        },
-        "compound_vector": {
-            "metadata": {},
-            "type": null,
-            "value": [
-                1.0,
-                2.0,
-                3.0
-            ]
-        },
-        "false": {
-            "metadata": {},
-            "type": null,
-            "value": false
-        },
         "false_object": {
             "metadata": {},
             "type": "TA1",
             "value": false
-        },
-        "float": {
-            "metadata": {},
-            "type": null,
-            "value": 3.14
         },
         "float_object": {
             "metadata": {},
@@ -439,11 +335,6 @@ Date: REGEX(.*)
             "value": 22.1
         },
         "id": "E1",
-        "int": {
-            "metadata": {},
-            "type": null,
-            "value": 19.0
-        },
         "int_object": {
             "metadata": {},
             "type": "TA1",
@@ -457,20 +348,10 @@ Date: REGEX(.*)
                 "b": 2.0
             }
         },
-        "string": {
-            "metadata": {},
-            "type": null,
-            "value": "a1"
-        },
         "string_object": {
             "metadata": {},
             "type": "TA1",
             "value": "a1"
-        },
-        "true": {
-            "metadata": {},
-            "type": null,
-            "value": true
         },
         "true_object": {
             "metadata": {},
@@ -539,35 +420,21 @@ Date: REGEX(.*)
 06. GET /v2/entities?options=keyValues
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 397
+Content-Length: 231
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "compound_object": {
-            "a": 1.0,
-            "b": 2.0
-        },
-        "compound_vector": [
-            1.0,
-            2.0,
-            3.0
-        ],
-        "false": false,
         "false_object": false,
-        "float": 3.14,
         "float_object": 22.1,
         "id": "E1",
-        "int": 19.0,
         "int_object": 21.0,
         "object_object": {
             "a": 1.0,
             "b": 2.0
         },
-        "string": "a1",
         "string_object": "a1",
-        "true": true,
         "true_object": true,
         "type": null,
         "vector_object": [
@@ -582,35 +449,21 @@ Date: REGEX(.*)
 07. GET /v2/entities?options=values
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 220
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
         "attributeValues": [
-            {
-                "a": 1.0,
-                "b": 2.0
-            },
-            [
-                1.0,
-                2.0,
-                3.0
-            ],
             false,
-            false,
-            3.14,
             22.1,
-            19.0,
             21.0,
             {
                 "a": 1.0,
                 "b": 2.0
             },
             "a1",
-            "a1",
-            true,
             true,
             [
                 "a",

@@ -46,7 +46,7 @@ brokerStart CB
 echo "01. POST /v2/entities, creating E1/A1"
 echo "====================================="
 payload='{ "id": "E1", "type": "T1", "A1": "1" }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 

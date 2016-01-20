@@ -96,7 +96,7 @@ echo "============================="
 payload='{
   "A2": null
 }'
-orionCurl --url /v2/entities/E2 --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E2?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -128,7 +128,7 @@ echo "==========================="
 payload='{
   "A3": null
 }'
-orionCurl --url /v2/entities/E3 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E3?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -160,7 +160,7 @@ echo "============================"
 payload='{
   "A4": null
 }'
-orionCurl --url /v2/entities/E4 --payload "$payload" --json
+orionCurl --url '/v2/entities/E4?options=keyValues' --payload "$payload" --json
 echo
 echo
 

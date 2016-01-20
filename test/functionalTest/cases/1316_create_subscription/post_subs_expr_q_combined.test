@@ -77,7 +77,7 @@ payload='{
   "temperature": 21,
   "status": "on"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -88,7 +88,7 @@ payload='{
   "temperature": 19,
   "status": "off"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -98,7 +98,7 @@ echo "======================================================="
 payload='{
   "temperature": 22
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 

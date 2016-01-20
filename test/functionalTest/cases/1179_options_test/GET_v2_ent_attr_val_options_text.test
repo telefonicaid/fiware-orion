@@ -53,7 +53,7 @@ payload='{
   "a_number": 0,
   "a_vector": [ 1, 2, 3, 4 ]
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 

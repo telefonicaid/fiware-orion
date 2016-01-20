@@ -77,7 +77,7 @@ payload='{
   "type": "T",
   "colour": "black"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -87,7 +87,7 @@ echo "======================================="
 payload='{
   "colour": "red"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -97,7 +97,7 @@ echo "============================================="
 payload='{
   "colour": "white"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -107,7 +107,7 @@ echo "========================================="
 payload='{
   "colour": "green"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 

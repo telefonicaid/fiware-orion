@@ -31,6 +31,7 @@ brokerStart CB
 
 #
 # 01. POST /v2/entities, creating first entity with id E1
+# FIXME P10: obsolete preamble? steps need update?
 # 02. POST /v2/entities, creating second entity with id E1
 # 03. POST /v2/entities, creating third entity with id E1
 # 04. POST /v2/entities, creating fourth entity with id E1
@@ -46,7 +47,7 @@ payload='{
     "attr": "value",
     "attr": 1
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
