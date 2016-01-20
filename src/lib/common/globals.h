@@ -174,12 +174,11 @@ int64_t parse8601Time(const std::string& s);
 *
 * PARAMETERS
 *   readonly:   don't change the transactionId, just return it.
-*   overflow:   output parameter, set to TRUE if counter overflowed and got back at 1
 *
 * Unless readonly, add one to the transactionId and return it.
-* If readonly - justreturn the current transactionId.
+* If readonly - just return the current transactionId.
 */
-int transactionIdGet(bool readonly = true, bool* overflow = NULL);
+int transactionIdGet(bool readonly = true);
 
 
 

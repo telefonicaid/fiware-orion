@@ -65,7 +65,7 @@ bool                   notifQueueStatistics = false;
 * If the counter has gone 'round-the-corner', return this info in the output
 * variable 'overflow'.
 */
-int transactionIdGet(bool readonly, bool* overflow)
+int transactionIdGet(bool readonly)
 {
   static int transactionId = 0;
 
@@ -75,10 +75,6 @@ int transactionIdGet(bool readonly, bool* overflow)
     if (transactionId < 0)
     {
       transactionId = 1;
-      if (overflow)
-      {
-        *overflow = true;
-      }
     }
   }
 
@@ -110,20 +106,23 @@ int transactionIdGet(bool readonly, bool* overflow)
 */
 void transactionIdSet(void)
 {
+  static int firstTime = true;
+
   transSemTake("transactionIdSet", "changing the transaction id");
 
-  bool  overflow;
-  int   transaction = transactionIdGet(false, &overflow);
+  int   transaction = transactionIdGet(false);
 
-  if (overflow == 1)
+  if ((firstTime == false) && (transaction == 1))  // Overflow - see function header for explanation
   {
-    logStartTime.tv_usec += 1;  // See function header for explanation
+    logStartTime.tv_usec += 1;
   }
 
   snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d",
            logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
 
   transSemGive("transactionIdSet", "changing the transaction id");
+
+  firstTime = false;
 }
 
 
