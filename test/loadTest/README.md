@@ -81,9 +81,9 @@ Example:
 **orion_soak_test_ngsiv1.jm**: script used to soak tests using NGSI v1. This script only use one host.
 Soak Testing is a type of performance test that verifies a system's stability and performance characteristics over an extended period of time (three days in this case).
 Script flow using NGSI v1:
-  - One thread that creates a ONCHANGE subscription and returns the total of subcriptions each 30 secs with a random "notifyConditions" attribute.
+  - One thread that creates a ONCHANGE subscription and returns the total of subcriptions each 30 secs with a random "notifyConditions" attribute (between A00 and A20).
   - One thread that get subcriptionIds and remove all subcriptions each 7200s (2hrs).
-  - 100 threads that send updates (APPEND) with random attributes name (between E00 and E20) and try to get values of a entity if it does exist. 
+  - N threads that send random updates (APPEND) (between E0000 and E9999) with random attributes name (between A00 and A20) and try to get values of a  random entity (between E0000 and E9999) if it does exist. 
  
 Properties:
 ```
