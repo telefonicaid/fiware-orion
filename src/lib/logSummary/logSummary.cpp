@@ -51,7 +51,7 @@ static bool       logSummaryOn               = false;
 */
 static void* logSummary(void* vP)
 {
-  int period = (long long) vP;
+  int period = *((int*) vP);
 
   while (1)
   {
@@ -115,12 +115,12 @@ static void* logSummary(void* vP)
 *
 * logSummaryInit - 
 */
-int logSummaryInit(int period)
+int logSummaryInit(int* periodP)
 {
   //
   // If the period is ZERO, then the log summary is turned OFF
   //
-  if (period == 0)
+  if (*periodP == 0)
   {
     return 0;
   }
@@ -130,7 +130,7 @@ int logSummaryInit(int period)
   //
   pthread_t  tid;
   int        ret;
-  ret = pthread_create(&tid, NULL, logSummary, (void*) period);
+  ret = pthread_create(&tid, NULL, logSummary, (void*) periodP);
   if (ret != 0)
   {
     LM_E(("Runtime Error (error creating thread: %d)", ret));

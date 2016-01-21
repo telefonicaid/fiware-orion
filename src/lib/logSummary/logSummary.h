@@ -32,6 +32,6 @@
 *
 * logSummary - 
 */
-extern int logSummaryInit(int period);
+extern int logSummaryInit(int* periodP);
 
 #endif
