@@ -46,6 +46,14 @@
 /* ****************************************************************************
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
+* 
+* It has been suggested to use RequestType enum (in Request.h) instead of this
+* of Ngsiv2Flavour. By the moment we see them as separate things (and probably
+* flavours will be removed as Orion evolves and NGSIv1 gets removed) but let's
+* see how it evolves.
+*
+* For more detail on this, please have a look to this dicussion at GitHub: 
+* https://github.com/telefonicaid/fiware-orion/pull/1706#discussion_r50416202
 */
 typedef enum Ngsiv2Flavour
 {
