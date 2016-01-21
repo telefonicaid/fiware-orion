@@ -1241,8 +1241,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
 
-    // FIXME P10 #1316: expression needs to be stored in the cache
-    sub->fillExpression("", "", "", "");
+    sub->fillExpression(cSubP->expression.q, cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
 
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
@@ -1611,7 +1610,7 @@ static bool processSubscriptions
       continue;
     }
 
-    /* Check 3: expresion (georel, which also uses geometry and coords) */
+    /* Check 3: expression (georel, which also uses geometry and coords) */
     // TBD (issue #1678)
 
     /* Send notification */

@@ -202,7 +202,12 @@ HttpStatusCode mongoSubscribeContext
                        throttling,
                        notifyFormat,
                        notificationDone,
-                       lastNotificationTime);
+                       lastNotificationTime,
+                       requestP->expression.q,
+                       requestP->expression.geometry,
+                       requestP->expression.coords,
+                       requestP->expression.georel);
+
     cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);

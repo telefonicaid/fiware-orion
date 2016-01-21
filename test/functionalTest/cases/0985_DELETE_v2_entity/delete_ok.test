@@ -42,9 +42,11 @@ payload='{
   "id": "E1",
   "type": "T1",
   "compattr": {
-    "string":  "1",
-    "number":  2,
-    "bool":    true
+    "value": {
+      "string":  "1",
+      "number":  2,
+      "bool":    true
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
