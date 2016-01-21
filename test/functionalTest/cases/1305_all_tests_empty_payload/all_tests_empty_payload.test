@@ -72,7 +72,7 @@ echo
 echo "03. POST /v2/entities to create E1/A1=0"
 echo "======================================="
 payload='{ "id": "E1", "type": "T1", "A1": 0 }'
-orionCurl --url /v2/entities --payload "$payload" --json -X POST
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json -X POST
 echo
 echo
 

@@ -39,7 +39,7 @@ brokerStart CB
 echo "01. Create E1/A1+A2"
 echo "==================="
 payload='{ "A1": 1, "A2": 2 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -54,7 +54,7 @@ echo
 echo "03. Modify E1 to E1/A3+A4"
 echo "========================="
 payload='{ "A3": 3, "A4": 4 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 

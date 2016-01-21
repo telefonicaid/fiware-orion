@@ -50,9 +50,7 @@ echo "=================================="
 payload='{
    "id":"E1",
    "type":"T1",
-   "A0":255,
-   "A1":"E1/T1/A1",
-   "A2":{
+   "A0":{
       "value":"E1/T1/A2",
       "type":"AT2"
    }
@@ -128,23 +126,13 @@ Date: REGEX(.*)
 03. GET /v2/entities?id=E1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 78
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
         "A0": {
-            "metadata": {},
-            "type": null,
-            "value": 255.0
-        },
-        "A1": {
-            "metadata": {},
-            "type": null,
-            "value": "E1/T1/A1"
-        },
-        "A2": {
             "metadata": {},
             "type": "AT2",
             "value": "E1/T1/A2"
@@ -158,24 +146,14 @@ Date: REGEX(.*)
 04. GET /v2/entities?id=E1&options=count,normalized
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 78
 Content-Type: application/json
 X-Total-Count: 1
 Date: REGEX(.*)
 
 [
-    {
+    {        
         "A0": {
-            "metadata": {},
-            "type": null,
-            "value": 255.0
-        },
-        "A1": {
-            "metadata": {},
-            "type": null,
-            "value": "E1/T1/A1"
-        },
-        "A2": {
             "metadata": {},
             "type": "AT2",
             "value": "E1/T1/A2"
@@ -198,23 +176,13 @@ Date: REGEX(.*)
 06. GET /v2/entities?id=E1,E2
 =============================
 HTTP/1.1 200 OK
-Content-Length: 272
+Content-Length: 168
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
         "A0": {
-            "metadata": {},
-            "type": null,
-            "value": 255.0
-        },
-        "A1": {
-            "metadata": {},
-            "type": null,
-            "value": "E1/T1/A1"
-        },
-        "A2": {
             "metadata": {},
             "type": "AT2",
             "value": "E1/T1/A2"

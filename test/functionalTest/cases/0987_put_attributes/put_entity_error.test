@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. Modify non-existing entity E1"
 echo "================================="
 payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -55,8 +55,9 @@ echo
 
 echo "03. Create E1"
 echo "============="
+# FIXME P10: This creation is not legal! Maybe related with issue #1682
 payload='{ "attr1": 3 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -71,7 +72,7 @@ echo
 echo "05. Modify E1"
 echo "============="
 payload='{ "attr1": 5 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 

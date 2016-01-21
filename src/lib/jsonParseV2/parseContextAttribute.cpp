@@ -44,7 +44,7 @@ using namespace rapidjson;
 *
 * parseContextAttributeObject - 
 */
-static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP, bool keyValues = false)
+static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP)
 {
   int members = 0;
 
@@ -159,58 +159,66 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   
   caP->name = name;
 
-  if (type == "String")
+  if (keyValues)
   {
-    caP->type        = "";
-    caP->stringValue = iter->value.GetString();
-    caP->valueType   = orion::ValueTypeString;
-  }
-  else if (type == "Number")
-  {
-    caP->type        = "";
-    caP->valueType   = orion::ValueTypeNumber;
-    caP->numberValue = iter->value.GetDouble();
-  }
-  else if (type == "True")
-  {
-    caP->type        = "";
-    caP->valueType   = orion::ValueTypeBoolean;
-    caP->boolValue   = true;
-  }
-  else if (type == "False")
-  {
-    caP->type        = "";
-    caP->valueType   = orion::ValueTypeBoolean;
-    caP->boolValue   = false;
-  }
-  else if (type == "Null")
-  {
-    caP->type        = "";
-    caP->valueType   = orion::ValueTypeNone;
-  }
-  else if (type == "Array")
-  {
-    caP->valueType = orion::ValueTypeObject;
-    std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
-    if (r != "OK")
+    if (type == "String")
     {
-      alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
+      caP->type        = "";
+      caP->stringValue = iter->value.GetString();
+      caP->valueType   = orion::ValueTypeString;
+    }
+    else if (type == "Number")
+    {
+      caP->type        = "";
+      caP->valueType   = orion::ValueTypeNumber;
+      caP->numberValue = iter->value.GetDouble();
+    }
+    else if (type == "True")
+    {
+      caP->type        = "";
+      caP->valueType   = orion::ValueTypeBoolean;
+      caP->boolValue   = true;
+    }
+    else if (type == "False")
+    {
+      caP->type        = "";
+      caP->valueType   = orion::ValueTypeBoolean;
+      caP->boolValue   = false;
+    }
+    else if (type == "Null")
+    {
+      caP->type        = "";
+      caP->valueType   = orion::ValueTypeNone;
+    }
+    else if (type == "Array")
+    {
+      caP->valueType = orion::ValueTypeObject;
+      std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+      if (r != "OK")
+      {
+        alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
+        ciP->httpStatusCode = SccBadRequest;
+        return "json error in ContextAttribute::Vector";
+      }
+    }
+    else if (type == "Object")
+    {
+      parseContextAttributeCompoundValue(iter, caP, NULL);
+      caP->valueType = orion::ValueTypeObject;
+    }
+    else
+    {
+      alarmMgr.badInput(clientIp, "bad type for ContextAttribute");
       ciP->httpStatusCode = SccBadRequest;
-      return "json error in ContextAttribute::Vector";
+      return "invalid JSON type for ContextAttribute";
     }
   }
-  else if (type == "Object")
+  else  // no keyValues
   {
-    std::string r;
-
-    //
-    // Either Compound or '{ "type": "xxx", "value": "yyy" }'
-    //
-    // If the Object contains "value", then it is considered an object, not a compound
-    //
-    if ((iter->value.HasMember("value")) && (ciP->uriParamOptions["keyValues"] == false))
+    // Attribute has a regular structure, in which 'value' is mandatory
+    if ((iter->value.HasMember("value")))
     {
-      r = parseContextAttributeObject(iter->value, caP, keyValues);
+      std::string r = parseContextAttributeObject(iter->value, caP);
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object");
@@ -220,15 +228,10 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
     else
     {
-      parseContextAttributeCompoundValue(iter, caP, NULL);
-      caP->valueType = orion::ValueTypeObject;
+      alarmMgr.badInput(clientIp, "no 'value' for ContextAttribute without keyValues");
+      ciP->httpStatusCode = SccBadRequest;
+      return "no 'value' for ContextAttribute without keyValues";
     }
-  }
-  else
-  {
-    alarmMgr.badInput(clientIp, "bad type for ContextAttribute");
-    ciP->httpStatusCode = SccBadRequest;
-    return "invalid JSON type for ContextAttribute";
   }
 
   if (caP->name == "")
@@ -249,7 +252,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
 */
 std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 {
-  bool      keyValues = ciP->uriParamOptions["keyValues"];
   Document  document;
 
   document.Parse(ciP->payload);
@@ -275,7 +277,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     return oe.render(ciP, "");
   }
 
-  std::string  r = parseContextAttributeObject(document, caP, keyValues);
+  std::string  r = parseContextAttributeObject(document, caP);
   if (r != "OK")
   {
     OrionError oe(SccBadRequest, r);

@@ -47,8 +47,6 @@ payload='
 {
    "id":"E1",
    "type":"T1",
-   "A0":255,
-   "A1":"E1/T1/A1",
    "A2":{
       "value":"E1/T1/A2",
       "type":"AT2"

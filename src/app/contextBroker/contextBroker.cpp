@@ -1741,7 +1741,7 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init();
-  logSummaryInit(lsPeriod);
+  logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)
   {

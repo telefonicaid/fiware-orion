@@ -37,13 +37,6 @@ brokerStart CB
 echo "01. POST /v2/entities/E1 complete"
 echo "================================="
 payload='{
-  "string": "a1",
-  "int":     19,
-  "float":   3.14,
-  "true":    true,
-  "false":   false,
-  "compound_vector":  [ 1,2,3 ],
-  "compound_object":  { "a": 1, "b": 2 },
   "string_object": {
     "value": "a1",
     "type":  "TA1"
@@ -130,42 +123,15 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 1397
+Content-Length: 979
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "compound_object": {
-        "metadata": {},
-        "type": null,
-        "value": {
-            "a": 1.0,
-            "b": 2.0
-        }
-    },
-    "compound_vector": {
-        "metadata": {},
-        "type": null,
-        "value": [
-            1.0,
-            2.0,
-            3.0
-        ]
-    },
-    "false": {
-        "metadata": {},
-        "type": null,
-        "value": false
-    },
     "false_object": {
         "metadata": {},
         "type": "TA1",
         "value": false
-    },
-    "float": {
-        "metadata": {},
-        "type": null,
-        "value": 3.14
     },
     "float_object": {
         "metadata": {},
@@ -173,11 +139,6 @@ Date: REGEX(.*)
         "value": 22.1
     },
     "id": "E1",
-    "int": {
-        "metadata": {},
-        "type": null,
-        "value": 19.0
-    },
     "int_object": {
         "metadata": {},
         "type": "TA1",
@@ -191,20 +152,10 @@ Date: REGEX(.*)
             "b": 2.0
         }
     },
-    "string": {
-        "metadata": {},
-        "type": null,
-        "value": "a1"
-    },
     "string_object": {
         "metadata": {},
         "type": "TA1",
         "value": "a1"
-    },
-    "true": {
-        "metadata": {},
-        "type": null,
-        "value": true
     },
     "true_object": {
         "metadata": {},
