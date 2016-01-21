@@ -70,6 +70,7 @@ bool          noCache               = false;
 char          fwdHost[64];
 char          notificationMode[64];
 bool          simulatedNotification;
+int           lsPeriod             = 0;
 
 
 /* ****************************************************************************
@@ -113,7 +114,7 @@ int main(int argC, char** argV)
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false);
   alarmMgr.init();
-  logSummaryInit(0);
+  logSummaryInit(&lsPeriod);
   setupDatabase();
 
   LM_M(("Run all tests"));
