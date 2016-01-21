@@ -2935,7 +2935,7 @@ void processContextElement
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   apiVersion,
-  bool                                 checkEntityExistance
+  const std::string&                   ngsiv2Flavour
 )
 {
   /* Check preconditions */
@@ -2998,9 +2998,7 @@ void processContextElement
 
   auto_ptr<DBClientCursor> cursor;
 
-  // This block is to avoid that several entities with the same ID get updated at the same time, which is
-  // not allowed in NGSIv2. The if is needed, as multiple update has been allowed in NGSIv1 (maybe without
-  // thinking too much about it, but NGSIv1 behaviour now will break backward compatibility)
+  // Several checkings related with NGSIv2
   if (apiVersion == "v2")
   {
     unsigned long long entitiesNumber;
@@ -3012,17 +3010,24 @@ void processContextElement
       return;
     }
 
-    if (entitiesNumber > 0 && checkEntityExistance && action == "APPEND_STRICT")
+    // This is the cae of POST /v2/entities, in order to check that entity doesn't previously exist
+    if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
         return;
     }
-    else if ((checkEntityExistance == true) && (action == "APPEND") && (entitiesNumber == 0))
+
+    // This is the cae of POST /v2/entities/<id>, in order to check that entity previously exist
+    if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPENDORUPDATE))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Entity does not exist");
       return;
     }
-    else if (entitiesNumber > 1)
+
+    // Next block is to avoid that several entities with the same ID get updated at the same time, which is
+    // not allowed in NGSIv2. Note that multi-update has been allowed in NGSIv1 (maybe without
+    // thinking too much about it, but NGSIv1 behaviour has to be preserved to keep backward compatibility)
+    if (entitiesNumber > 1)
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, "There is more than one entity that match the update. Please refine your query.");
       return;

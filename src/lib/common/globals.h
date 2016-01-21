@@ -43,6 +43,13 @@
 
 
 
+/* ****************************************************************************
+*
+* NGSIv2 "flavours" to tune some behaviours in mongoBackend -
+*/
+#define NGSIV2_FLAVOUR_ONCREATE          "onCreate"
+#define NGSIV2_FLAVOUR_ONAPPENDORUPDATE  "onAppendOrUpdate"
+
 
 /* ****************************************************************************
 *

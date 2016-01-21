@@ -30,16 +30,15 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. POST /v2/entities/E1 creating A1=1
+# 01. POST /v2/entities creating E1 A1=1
 # 02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
 # 03. GET /v2/entities/E1/attrs/A1/value as application/json: OK
 #
 
-echo '01. POST /v2/entities/E1 creating A1=1'
+echo '01. POST /v2/entities creating E1 A1=1'
 echo '======================================'
-#FIXME P10: illegal operation!
-payload='{ "A1": 1 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
+payload='{ "id": "E1", "A1": 1 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -60,7 +59,7 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities/E1 creating A1=1
+01. POST /v2/entities creating E1 A1=1
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0

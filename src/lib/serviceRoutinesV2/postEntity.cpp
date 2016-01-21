@@ -80,7 +80,7 @@ std::string postEntity
   parseDataP->upcr.res.fill(eP, op);
 
   // Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPENDORUPDATE);
 
   // Any error in the response?
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;

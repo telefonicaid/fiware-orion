@@ -43,7 +43,7 @@ extern std::string postUpdateContext
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP,
-  bool                       checkEntityExistance = false
+  const std::string&         ngsiv2Flavour = ""
 );
 
 #endif  // SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXT_H_

@@ -49,7 +49,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -63,7 +63,7 @@ echo
 
 echo "03. DELETE /v2/entities/E1"
 echo "=========================="
-orionCurl --url /v2/entities/E1 -X DELETE
+orionCurl --url /v2/entities/E1 -X DELETE --json
 echo
 echo
 
