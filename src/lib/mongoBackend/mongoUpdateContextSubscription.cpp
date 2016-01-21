@@ -295,13 +295,12 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
 
-  //
   // Expresssion
-  //
-  BSONObjBuilder expression;
   if (requestP->expression.isSet)
   {
     /* Build expression */
+    BSONObjBuilder expression;
+
     expression << CSUB_EXPR_Q << requestP->expression.q
              << CSUB_EXPR_GEOM << requestP->expression.geometry
              << CSUB_EXPR_COORDS << requestP->expression.coords
