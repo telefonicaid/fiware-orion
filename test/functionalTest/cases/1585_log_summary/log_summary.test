@@ -42,17 +42,6 @@ brokerStart CB 0 IPv4 -logSummary 3
 # 08. Sleep 3 secs, awaiting a second log summary
 # 09. grep SUMMARY in log-file (1 transaction and one bad input since last time)
 #
-# NOTE:
-#  In part 6 of REGEXPECT, where you would expect FOUR detected Bad Input (from requests 1-4),
-#  we see SIX Bad Input instead:
-#
-#    Bad input active alarms: 1 (created: 6, removed: 0)
-#
-#  (only ONE active alarms as all Bad Inputs origin from the same IP, namely localhost)
-#
-#  This is due to 'overbadinputting' (see issue #1697) and has nothing to do with the Log Summary
-#  Once/If this is fixed, this functest must be modified.
-#
 
 echo "01. PUT /v2/noService"
 echo "====================="
@@ -176,7 +165,7 @@ Date: REGEX(.*)
  Transactions: 4 (new: 4)
  DB status: ok (created: 0, removed: 0)
  Notification failure active alarms: 0 (created: 0, removed: 0)
- Bad input active alarms: 1 (created: 6, removed: 0)
+ Bad input active alarms: 1 (created: 4, removed: 0)
 
 
 07. PUT /v2/noService
@@ -201,11 +190,11 @@ Date: REGEX(.*)
  Transactions: 4 (new: 4)
  DB status: ok (created: 0, removed: 0)
  Notification failure active alarms: 0 (created: 0, removed: 0)
- Bad input active alarms: 1 (created: 6, removed: 0)
+ Bad input active alarms: 1 (created: 4, removed: 0)
  Transactions: 5 (new: 1)
  DB status: ok (created: 0, removed: 0)
  Notification failure active alarms: 0 (created: 0, removed: 0)
- Bad input active alarms: 1 (created: 7, removed: 0)
+ Bad input active alarms: 1 (created: 5, removed: 0)
 
 
 --TEARDOWN--

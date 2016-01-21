@@ -264,6 +264,7 @@ bool            statSemWait;
 bool            statTiming;
 bool            statNotifQueue;
 int             lsPeriod;
+bool            relogAlarms;
 
 
 
@@ -378,6 +379,7 @@ PaArgument paArgs[] =
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
 
   { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt, 0,     0,    ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
+  { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true, "log messages for existing alarms beyond the raising alarm log message itself" },
 
   PA_END_OF_ARGS
 };
@@ -1741,6 +1743,12 @@ int main(int argC, char* argV[])
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
   alarmMgr.init();
+  if (relogAlarms)
+  {
+    alarmMgr.notificationErrorLogSamplingSet(1);
+    alarmMgr.badInputLogSamplingSet(1);
+  }
+
   logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)

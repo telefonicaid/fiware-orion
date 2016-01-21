@@ -342,9 +342,9 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
   {
     iter->second += 1;
 
-    if ((badInputLogSampling != 0) && ((badInputs % badInputLogSampling) == 1))
+    if ((badInputLogSampling != 0) && (((badInputs % badInputLogSampling) == 1) || (badInputLogSampling == 1)))
     {
-      LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
+      LM_W(("Repeated BadInput for %s: %s", ip.c_str(), details.c_str()));
     }
 
     semGive();

@@ -867,8 +867,15 @@ std::string defaultServicePath(const char* url, const char* method)
   if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasecmp(method, "PATCH") == 0)                                 return DEFAULT_SERVICE_PATH;
 
-  std::string details = std::string("cannot find default service path for: (") + method + " " + url + ") - BAD VERB?";
-  alarmMgr.badInput(clientIp, details);
+
+  //
+  // If method == '*', then the BadInput is more accurately reported by the BadVerb* service routines
+  //
+  if ((method[0] == '*') && (method[1] == 0))
+  {
+    std::string details = std::string("cannot find default service path for: (") + method + " " + url + ") - BAD VERB?";
+    alarmMgr.badInput(clientIp, details);
+  }
 
   return DEFAULT_SERVICE_PATH;
 }

@@ -17,3 +17,5 @@
 - Add: 'q' expression evaluation in NGSIv2 subscription (at subscription creation/update and update context times) (Issue #1316 and #1658)
 - Fix: subscription service path is lost at update subscription time (Issue #1693)
 - Add: Enable log summary traces using -logSummary CLI (Issue #1585)
+- Fix: Avoiding a few cases of double BadInput for one and the same request (Issue #1697)
+- Add: New CLI param -relogAlarms to see log messages for existing alarms beyond the raising alarm log message itself in the log file
