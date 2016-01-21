@@ -42,7 +42,7 @@ payload='{
   "type": "T",
   "temperature": 20
 }'
-orionCurl --url /v2/entities --payload "$payload" --tenant T01234567890123456789012345678901234567890123456789 --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --tenant T01234567890123456789012345678901234567890123456789 --json
 echo
 echo
 

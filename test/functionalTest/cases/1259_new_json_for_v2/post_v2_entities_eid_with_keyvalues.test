@@ -129,7 +129,7 @@ echo "==========================================="
 payload='{
   "A4": 10
 }'
-orionCurl --url /v2/entities/E1  --payload "$payload" -X PATCH --json
+orionCurl --url '/v2/entities/E1?options=keyValues'  --payload "$payload" -X PATCH --json
 echo
 echo
 

@@ -64,8 +64,9 @@ brokerStart CB 0-255
 
 echo '01. POST /v2/entities/E1 creating A1=1'
 echo '======================================'
+#FIXME P10: illegal operation!
 payload='{ "A1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
 echo
 echo
 

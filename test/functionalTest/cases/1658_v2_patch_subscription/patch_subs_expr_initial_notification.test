@@ -79,7 +79,7 @@ payload='{
   "humidity": 80,
   "status": "OK"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -93,7 +93,7 @@ payload='{
   "humidity": 70,
   "status": "ERR"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -107,7 +107,7 @@ payload='{
   "humidity": 60,
   "status": "OK"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -121,7 +121,7 @@ payload='{
   "humidity": 50,
   "status": "ERR"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -135,7 +135,7 @@ payload='{
   "humidity": 40,
   "status": "OK"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 

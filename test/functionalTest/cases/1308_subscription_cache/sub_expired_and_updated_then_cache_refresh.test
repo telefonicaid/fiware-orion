@@ -58,7 +58,7 @@ payload='{
   "id": "E10",
   "A1": "01. Creation"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -146,7 +146,7 @@ echo "================="
 payload='{
   "A1": "09. Updated"
 }'
-orionCurl --url /v2/entities/E10 --payload "$payload" --json
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -157,7 +157,7 @@ sleep 2
 payload='{
   "A1": "10. Updated"
 }'
-orionCurl --url /v2/entities/E10 --payload "$payload" --json
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -168,7 +168,7 @@ sleep 2
 payload='{
   "A1": "11. Updated"
 }'
-orionCurl --url /v2/entities/E10 --payload "$payload" --json
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
 echo
 echo
 

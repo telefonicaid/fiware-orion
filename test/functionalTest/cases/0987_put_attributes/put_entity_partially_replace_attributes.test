@@ -39,7 +39,8 @@ brokerStart CB
 echo "01. Create E1/A1+A2"
 echo "==================="
 payload='{ "A1": 1, "A2": 2 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+# FIXME P10: This creation is not legal! Maybe related with issue #1682
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -54,7 +55,7 @@ echo
 echo "03. Modify E1 to E1/A2+A3"
 echo "========================="
 payload='{ "A2": 2, "A3": 3 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 

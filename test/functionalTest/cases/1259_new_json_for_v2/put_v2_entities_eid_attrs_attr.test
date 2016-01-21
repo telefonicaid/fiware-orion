@@ -56,7 +56,7 @@ payload='{
   "type": "T1",
   "A1": "a1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
