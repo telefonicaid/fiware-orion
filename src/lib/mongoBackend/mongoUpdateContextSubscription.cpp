@@ -295,12 +295,13 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
 
+  //
   // Expresssion
+  //
+  BSONObjBuilder expression;
   if (requestP->expression.isSet)
   {
     /* Build expression */
-    BSONObjBuilder expression;
-
     expression << CSUB_EXPR_Q << requestP->expression.q
              << CSUB_EXPR_GEOM << requestP->expression.geometry
              << CSUB_EXPR_COORDS << requestP->expression.coords
@@ -442,7 +443,16 @@ HttpStatusCode mongoUpdateContextSubscription
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
 
-  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(), newSubObject, subscriptionId, servicePath, lastNotificationTime, expiration);
+  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+                                          newSubObject,
+                                          subscriptionId,
+                                          servicePath,
+                                          lastNotificationTime,
+                                          expiration,
+                                          requestP->expression.q,
+                                          requestP->expression.geometry,
+                                          requestP->expression.coords,
+                                          requestP->expression.georel);
 
   if (cSubP != NULL)
   {

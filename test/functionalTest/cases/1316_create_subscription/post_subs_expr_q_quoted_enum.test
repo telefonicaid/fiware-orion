@@ -25,8 +25,7 @@ POST Subscriptions V2 q expression (equal quoted enum)
 
 --SHELL-INIT--
 dbInit CB
-# FIXME P10: replace with just 'brokerStart CB' once cache part gets implemented
-brokerStart CB 0 IPv4 -noCache
+brokerStart CB
 accumulatorStart
 
 --SHELL--
