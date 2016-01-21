@@ -655,7 +655,11 @@ void subCacheItemInsert
   int64_t                   throttling,
   Format                    notifyFormat,
   bool                      notificationDone,
-  int64_t                   lastNotificationTime
+  int64_t                   lastNotificationTime,
+  const std::string&        q,
+  const std::string&        geometry,
+  const std::string&        coords,
+  const std::string&        georel
 )
 {
   //
@@ -704,6 +708,10 @@ void subCacheItemInsert
   cSubP->notifyFormat          = notifyFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->expression.q          = q;
+  cSubP->expression.geometry   = geometry;
+  cSubP->expression.coords     = coords;
+  cSubP->expression.georel     = georel;
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 

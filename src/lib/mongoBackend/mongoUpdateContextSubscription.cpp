@@ -442,7 +442,16 @@ HttpStatusCode mongoUpdateContextSubscription
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
 
-  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(), newSubObject, subscriptionId, servicePath, lastNotificationTime, expiration);
+  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+                                          newSubObject,
+                                          subscriptionId,
+                                          servicePath,
+                                          lastNotificationTime,
+                                          expiration,
+                                          requestP->expression.q,
+                                          requestP->expression.geometry,
+                                          requestP->expression.coords,
+                                          requestP->expression.georel);
 
   if (cSubP != NULL)
   {

@@ -49,12 +49,16 @@ extern int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub);
 */
 extern int mongoSubCacheItemInsert
 (
-  const char*     tenant,
-  const BSONObj&  sub,
-  const char*     subscriptionId,
-  const char*     servicePath,
-  int             lastNotificationTime,
-  long long       expirationTime
+  const char*         tenant,
+  const BSONObj&      sub,
+  const char*         subscriptionId,
+  const char*         servicePath,
+  int                 lastNotificationTime,
+  long long           expirationTime,
+  const std::string&  q,
+  const std::string&  geometry,
+  const std::string&  coords,
+  const std::string&  georel
 );
 
 
