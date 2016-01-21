@@ -2935,7 +2935,7 @@ void processContextElement
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
   const std::string&                   apiVersion,
-  const std::string&                   ngsiv2Flavour
+  Ngsiv2Flavour                        ngsiv2Flavour
 )
 {
   /* Check preconditions */

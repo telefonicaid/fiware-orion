@@ -473,7 +473,7 @@ std::string postUpdateContext
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP,
-  const std::string&         ngsiV2Flavour
+  Ngsiv2Flavour              ngsiV2Flavour
 )
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;

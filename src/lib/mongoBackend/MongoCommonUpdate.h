@@ -44,6 +44,6 @@ extern void processContextElement(ContextElement*                      ceP,
                                   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
                                   const std::string&                   xauthToken,
                                   const std::string&                   apiVersion    = "v1",
-                                  const std::string&                   ngsiV2Flavour = "");
+                                  Ngsiv2Flavour                        ngsiV2Flavour = NGSIV2_NO_FLAVOUR);
 
 #endif

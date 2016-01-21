@@ -47,8 +47,13 @@
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
 */
-#define NGSIV2_FLAVOUR_ONCREATE          "onCreate"
-#define NGSIV2_FLAVOUR_ONAPPENDORUPDATE  "onAppendOrUpdate"
+typedef enum Ngsiv2Flavour
+{
+  NGSIV2_NO_FLAVOUR               = 0,
+  NGSIV2_FLAVOUR_ONCREATE         = 1,
+  NGSIV2_FLAVOUR_ONAPPENDORUPDATE = 2,
+} Ngsiv2Flavour;
+
 
 
 /* ****************************************************************************

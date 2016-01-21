@@ -43,7 +43,7 @@ extern std::string postUpdateContext
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP,
-  const std::string&         ngsiv2Flavour = ""
+  Ngsiv2Flavour              ngsiv2Flavour = NGSIV2_NO_FLAVOUR
 );
 
 #endif  // SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXT_H_
