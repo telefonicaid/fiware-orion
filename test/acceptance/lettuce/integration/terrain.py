@@ -29,6 +29,7 @@ from iotqautils.iotqaLogger import get_logger
 
 @before.all
 def before_all():
+    # Fixme: this line is comment per changes in external library: cb_utils.py
     world.log = get_logger('lettuce', world.config['environment']['log_level'], True) #, True, 'logs/lettuce.log')
     check_properties()
     world.entities = None
@@ -50,6 +51,7 @@ def before_all():
     world.cb_config_to_start = ''
     world.cb_pid = get_cb_pid()
     world.bin_parms = None
+    # Fixme: this line is comment per changes in external library: cb_utils.py
     #drop_all_test_databases(world.config['mongo']['host'], int(world.config['mongo']['port']))
 
 
@@ -60,5 +62,6 @@ def after_each_scenario(scenario):
 
 @after.all
 def after_all(total):
+    # Fixme: this line is comment per changes in external library: cb_utils.py
     #drop_all_test_databases(world.config['mongo']['host'], int(world.config['mongo']['port']))
     stop_cb()
