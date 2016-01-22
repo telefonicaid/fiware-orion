@@ -55,9 +55,8 @@ echo
 
 echo "03. Create E1"
 echo "============="
-# FIXME P10: This creation is not legal! Maybe related with issue #1682
-payload='{ "attr1": 3 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
+payload='{ "id": "E1", "attr1": 3 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 

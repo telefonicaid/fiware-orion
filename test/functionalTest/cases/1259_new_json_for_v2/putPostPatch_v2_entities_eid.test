@@ -30,13 +30,14 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities/E1 complete
+# 01. POST /v2/entities E1 complete
 # 02. GET /v2/entities/E1
 #
 
-echo "01. POST /v2/entities/E1 complete"
+echo "01. POST /v2/entities E1 complete"
 echo "================================="
 payload='{
+  "id": "E1",
   "string_object": {
     "value": "a1",
     "type":  "TA1"
@@ -97,7 +98,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
@@ -111,7 +112,7 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities/E1 complete
+01. POST /v2/entities E1 complete
 =================================
 HTTP/1.1 201 Created
 Content-Length: 0

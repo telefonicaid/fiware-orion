@@ -473,7 +473,7 @@ std::string postUpdateContext
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP,
-  bool                       checkEntityExistance
+  Ngsiv2Flavour              ngsiV2Flavour
 )
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
@@ -520,7 +520,7 @@ std::string postUpdateContext
   attributesToNotFound(upcrP);
   
   HttpStatusCode httpStatusCode;
-  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance));
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, ngsiV2Flavour));
 
   if (ciP->httpStatusCode != SccCreated)
   {
