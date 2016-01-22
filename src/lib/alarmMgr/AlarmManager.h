@@ -55,7 +55,6 @@ private:
 
 public:
   AlarmManager();
-  AlarmManager(bool _notificationErrorLogAlways, bool _badInputLogAlways, bool _dbErrorLogAlways);
 
   int  init(bool logAlreadyRaisedAlarms);
   void semTake(void);

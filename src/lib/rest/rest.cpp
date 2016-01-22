@@ -837,12 +837,14 @@ std::string defaultServicePath(const char* url, const char* method)
    * completeness
    */
 
+  //
   // FIXME P5: this strategy can be improved taking into account full URL. Otherwise, it is
-  // ambigous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
+  // ambiguous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
   // highly improbable that the user uses entities which id (or type) match the name of a
-  // standard operation
-
-  // FIXME P5: unhardwire literals
+  // standard operation.
+  // Also, if we wait (if we can) until we know what service it is, this whole string-search will come for free
+  // Don't think strcasestr is a 'simple' function ...
+  //
   if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
@@ -861,21 +863,12 @@ std::string defaultServicePath(const char* url, const char* method)
    */
   if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasecmp(method, "POST") == 0)                                  return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "PUT") == 0)                                   return DEFAULT_SERVICE_PATH;
+
+  if (strcasecmp(method, "POST")   == 0)                                return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "PUT")    == 0)                                return DEFAULT_SERVICE_PATH;
   if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasecmp(method, "PATCH") == 0)                                 return DEFAULT_SERVICE_PATH;
-
-
-  //
-  // If method == '*', then the BadInput is more accurately reported by the BadVerb* service routines
-  //
-  if ((method[0] == '*') && (method[1] == 0))
-  {
-    std::string details = std::string("cannot find default service path for: (") + method + " " + url + ") - BAD VERB?";
-    alarmMgr.badInput(clientIp, details);
-  }
+  if (strcasecmp(method, "GET")    == 0)                                return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasecmp(method, "PATCH")  == 0)                                return DEFAULT_SERVICE_PATH;
 
   return DEFAULT_SERVICE_PATH;
 }

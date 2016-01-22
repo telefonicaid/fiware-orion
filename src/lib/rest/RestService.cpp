@@ -418,19 +418,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       if (response != "OK")
       {
-        //
-        // NOTE
-        //   This call to badInput has been removed as it provokes multiple BadInput on
-        //   some errors, e.g. 'JSON Parse Error', or any other error reported to alarmMgr during payloadParse.
-        //   If there is still some error (I doubt it) not reported inside payloadParse, then removing this call to alarmMgr.badInput
-        //   makes the error not reported.
-        //
-        //   With the new thread variable 'badInputSent' in AlarmManager, we no longer need to worry about this and
-        //   the call to alarmMgr.badInput is reinstated.
-        //
         alarmMgr.badInput(clientIp, response);
-
-
         restReply(ciP, response);
 
         if (reqP != NULL)
