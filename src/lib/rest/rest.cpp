@@ -1117,7 +1117,6 @@ static int connectionTreat
   // URL and headers checks are delayed to the "third" MHD call, as no 
   // errors can be sent before all the request has been read
   //
-  
   if (urlCheck(ciP, ciP->url) == false)
   {
     alarmMgr.badInput(clientIp, "error in URI path");

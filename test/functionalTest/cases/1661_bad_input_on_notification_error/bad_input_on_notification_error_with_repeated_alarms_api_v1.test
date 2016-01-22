@@ -21,11 +21,11 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Bad Input On Notification Error for API v1
+Bad Input On Notification Error for API v1 (with repeated alarms)
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4 -subCacheIval 5
+brokerStart CB 0-255 IPv4 -subCacheIval 5 -relogAlarms
 accumulatorStart 0.0.0.0 ${LISTENER_PORT}
 
 --SHELL--
@@ -253,6 +253,8 @@ Date: REGEX(.*)
 04. Check log-file to make sure the Bad Input alarm is active
 =============================================================
  Raising alarm BadInput 0.0.0.0: Invalid URL
+ Repeated BadInput for 0.0.0.0: Invalid URL
+ Repeated BadInput for 0.0.0.0: Invalid URL
 
 
 05. Create a valid subscription for E1/A1
@@ -273,6 +275,8 @@ Date: REGEX(.*)
 06. Check log-file to make sure the Bad Input alarm is reset
 ============================================================
  Raising alarm BadInput 0.0.0.0: Invalid URL
+ Repeated BadInput for 0.0.0.0: Invalid URL
+ Repeated BadInput for 0.0.0.0: Invalid URL
  Releasing alarm BadInput 0.0.0.0
 
 

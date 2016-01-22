@@ -392,6 +392,7 @@ std::string xmlTreat
   {
     std::string details = reqP->keyword + ": " + check;
 
+    // FIXME P4: possibly repeating BadInput here (see issue #1697)
     alarmMgr.badInput(clientIp, details);
 
     if (errorMsgP)

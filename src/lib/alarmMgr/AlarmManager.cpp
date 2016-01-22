@@ -37,6 +37,18 @@
 
 /* ****************************************************************************
 *
+* badInputSent - 
+*
+* alarmSent is a variable to keep track of whether a BadInput has already been issued
+* for the current request.
+* We only want ONE Bad Input per request.
+*/
+__thread bool badInputSent = false;
+
+
+
+/* ****************************************************************************
+*
 * AlarmManager::AlarmManager - 
 */
 AlarmManager::AlarmManager():
@@ -272,7 +284,7 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
   {
     iter->second += 1;
 
-    if ((notificationErrorLogSampling != 0) && ((notificationErrors % notificationErrorLogSampling) == 1))
+    if ((notificationErrorLogSampling != 0) && ((notificationErrors % notificationErrorLogSampling) == 0))
     {
       LM_W(("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
     }
@@ -332,6 +344,11 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 */
 bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 {
+  if (badInputSent == true)
+    return false;
+
+  badInputSent = true;
+
   semTake();
 
   std::map<std::string, int>::iterator iter = badInputV.find(ip);
@@ -342,7 +359,7 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
   {
     iter->second += 1;
 
-    if ((badInputLogSampling != 0) && (((badInputs % badInputLogSampling) == 1) || (badInputLogSampling == 1)))
+    if ((badInputLogSampling != 0) && ((badInputs % badInputLogSampling) == 0))
     {
       LM_W(("Repeated BadInput for %s: %s", ip.c_str(), details.c_str()));
     }

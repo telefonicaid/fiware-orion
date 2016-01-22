@@ -70,8 +70,8 @@
 *
 * Alarm Manager definitions - 
 */
-#define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     1
-#define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              1
+#define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     0
+#define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              0
 
 
 /* ****************************************************************************

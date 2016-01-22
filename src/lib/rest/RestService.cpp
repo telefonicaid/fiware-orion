@@ -425,8 +425,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         //   If there is still some error (I doubt it) not reported inside payloadParse, then removing this call to alarmMgr.badInput
         //   makes the error not reported.
         //
-        // alarmMgr.badInput(clientIp, response);
+        //   With the new thread variable 'badInputSent' in AlarmManager, we no longer need to worry about this and
+        //   the call to alarmMgr.badInput is reinstated.
         //
+        alarmMgr.badInput(clientIp, response);
+
 
         restReply(ciP, response);
 
