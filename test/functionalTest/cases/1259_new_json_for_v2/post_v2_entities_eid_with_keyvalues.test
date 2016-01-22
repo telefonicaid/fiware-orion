@@ -171,7 +171,7 @@ Date: REGEX(.*)
 
 02. POST /v2/entities/E1?options=keyValues, adding A1 to E1
 ===========================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)
@@ -198,7 +198,7 @@ Date: REGEX(.*)
 
 04. POST /v2/entities/E1?options=keyValues, adding A2 to E1
 ===========================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)
@@ -244,7 +244,7 @@ Date: REGEX(.*)
 
 08. POST /v2/entities/E1?options=keyValues, adding A4 to E1
 ===========================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)

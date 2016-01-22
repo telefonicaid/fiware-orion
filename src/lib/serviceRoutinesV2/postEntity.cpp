@@ -100,14 +100,14 @@ std::string postEntity
     }
   }
 
-  // Default value for status code: SccCreated
+  // Default value for status code: SccNoContent
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone) || (ciP->httpStatusCode == SccCreated))
   {
     std::string location = "/v2/entities/" + eP->id;
     ciP->httpHeader.push_back("Location");
     ciP->httpHeaderValue.push_back(location);
     
-    ciP->httpStatusCode = SccCreated;
+    ciP->httpStatusCode = SccNoContent;
   }
 
   // Cleanup and return result

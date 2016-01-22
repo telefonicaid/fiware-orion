@@ -146,7 +146,7 @@ Date: REGEX(.*)
 
 03. POST /v2/entities/E1 attribute 'attr2'
 ==========================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)
@@ -178,7 +178,7 @@ Date: REGEX(.*)
 
 05. POST /v2/entities/E1?options=append attribute 'attr3'
 =========================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)
@@ -215,7 +215,7 @@ Date: REGEX(.*)
 
 07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)
 ===========================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)

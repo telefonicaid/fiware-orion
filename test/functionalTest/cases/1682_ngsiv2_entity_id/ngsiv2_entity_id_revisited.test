@@ -1,0 +1,191 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New tests for POST /v2/entities/id operation to check issue 1682
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. POST /v2/entities/E1 A (and check 422 Unprocessable Entity)
+# 02. POST /v2/entities E1 A (and check 201 Created)
+# 03. POST /v2/entities/E1 A (and check 204 No Content)
+# 04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
+# 05. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)
+# 06. POST /v2/entities/E1?options=append C (and check 204 No Content)
+#
+
+echo "01. POST /v2/entities/E1 A (and check 422 Unprocessable Entity)"
+echo "==============================================================="
+payload='{
+  "A": {
+    "value": 10
+  }
+}'
+orionCurl --url /v2/entities/E1  --payload "$payload" --json
+echo
+echo
+
+
+echo "02. POST /v2/entities E1 A (and check 201 Created)"
+echo "=================================================="
+payload='{
+  "id": "E1",
+  "A": {
+    "value": 10
+  }
+}'
+orionCurl --url /v2/entities  --payload "$payload" --json
+echo
+echo
+
+
+echo "03. POST /v2/entities/E1 A (and check 204 No Content)"
+echo "====================================================="
+payload='{
+  "A": {
+    "value": 20
+  }
+}'
+orionCurl --url /v2/entities/E1  --payload "$payload" --json
+echo
+echo
+
+echo "04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)"
+echo "==========================================================================="
+payload='{
+  "A": {
+    "value": 30
+  },
+  "B": {
+    "value": "foo"
+  }
+}'
+orionCurl --url /v2/entities/E1?options=append  --payload "$payload" --json
+echo
+echo
+
+
+echo "05. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)"
+echo "==================================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "06. POST /v2/entities/E1?options=append B (and check 204 No Content)"
+echo "===================================================================="
+payload='{
+  "C": {
+    "value": "foo"
+  }
+}'
+orionCurl --url /v2/entities/E1?options=append  --payload "$payload" --json
+echo
+echo
+
+
+
+--REGEXPECT--
+01. POST /v2/entities/E1 A (and check 422 Unprocessable Entity)
+===============================================================
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Entity does not exist",
+    "error": "InvalidModification"
+}
+
+
+02. POST /v2/entities E1 A (and check 201 Created)
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+03. POST /v2/entities/E1 A (and check 204 No Content)
+=====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "one or more of the attributes in the request already exist: [ A ]",
+    "error": "BadRequest"
+}
+
+
+05. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {},
+        "type": null,
+        "value": 20.0
+    },
+    "B": {
+        "metadata": {},
+        "type": null,
+        "value": "foo"
+    },
+    "id": "E1",
+    "type": null
+}
+
+
+06. POST /v2/entities/E1?options=append B (and check 204 No Content)
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -424,7 +424,7 @@ Content-Type: application/json; charset=utf-8
 
 11. Update s01/A w/o tenant
 ===========================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/s01
 Date: REGEX(.*)
@@ -433,7 +433,7 @@ Date: REGEX(.*)
 
 12. Update s11/A for tenant t1
 ==============================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/s11
 Date: REGEX(.*)
@@ -442,7 +442,7 @@ Date: REGEX(.*)
 
 13. Update s21/A for tenant t2
 ==============================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/s21
 Date: REGEX(.*)

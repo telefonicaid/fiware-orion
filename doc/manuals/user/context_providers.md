@@ -185,9 +185,7 @@ Orion also in that way.
 
 Some additional comments:
 
--   The "-httpTimeout"
-    [CLI
-    parameter](admin/cli.md)
+-   The `-httpTimeout` [CLI parameter](admin/cli.md)
     is used to set the CPr timeout. If a request forwarded to a CPr is
     taking more that that timeout, then Orion closes the connection and
     assumes that the CPr is not responding.
@@ -200,3 +198,6 @@ Some additional comments:
     implementation process multiple forwards in sequence, i.e. waiting
     the response from a given CPr (or timeout expiration) before sending
     the forward request to the following.
+-   You can use the `-cprForwardLimit` [CLI parameter](admin/cli.md) to limit
+    the maximum number of forwarded requests to Context Providers for a single client request
+    You can use 0 to disable Context Providers forwarding at all.

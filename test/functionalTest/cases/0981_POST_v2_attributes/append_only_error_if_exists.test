@@ -144,7 +144,7 @@ Date: REGEX(.*)
 
 05. Now update E1, using POST /v2/entities/E1
 =============================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)

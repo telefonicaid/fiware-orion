@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Error handling For PUT Individual Entity Attribute
+PUT Entity Attribute value fake value and type cases
 
 --SHELL-INIT--
 dbInit CB
@@ -31,8 +31,11 @@ brokerStart CB
 
 #
 # 01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT 
-# 02. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
-# 03. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
+# 02. Create E1-A1
+# 03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
+# 04. Get entity
+# 05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
+# 06. Get entity
 #
 
 echo "01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT"
@@ -43,7 +46,15 @@ echo
 echo
 
 
-echo "02. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload"
+echo "02. Create E1-A1"
+echo "================"
+payload='{ "id": "E1", "A1": { "value": 1 } }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload"
 echo "================================================================="
 payload='{ "type": 1 }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
@@ -51,10 +62,24 @@ echo
 echo
 
 
-echo "03. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload"
+echo "04. Get entity"
+echo "=============="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload"
 echo "========================================================================="
 payload='{ "value": 3, "type": 3 }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "06. Get entity"
+echo "=============="
+orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
@@ -69,29 +94,69 @@ Date: REGEX(.*)
 
 
 
-02. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
+02. Create E1-A1
+================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
 =================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 67
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 82
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "no attribute value specified",
-    "error": "BadRequest"
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": {
+            "type": 1.0
+        }
+    },
+    "id": "E1",
+    "type": null
 }
 
 
-03. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
+05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
 =========================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 85
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 99
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "unexpected JSON field - accepting only /value/",
-    "error": "BadRequest"
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": {
+            "type": 3.0,
+            "value": 3.0
+        }
+    },
+    "id": "E1",
+    "type": null
 }
 
 

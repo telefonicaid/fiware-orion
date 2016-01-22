@@ -387,7 +387,7 @@ Date: REGEX(.*)
 
 10. Modify E4/A4=null (POST)
 ============================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E4
 Date: REGEX(.*)
@@ -508,7 +508,7 @@ Date: REGEX(.*)
 
 21. Modify E8/A8=null (POST), with keyValues
 ============================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Location: /v2/entities/E8
 Date: REGEX(.*)

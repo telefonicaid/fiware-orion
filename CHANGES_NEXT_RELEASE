@@ -6,7 +6,7 @@
 - Add: reset for notification counters in threadpool mode
 - Fix: avoid -g compiler flag in release build
 - Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
-- Fix: improved JSON representation for APIv2 (Issue #1259)
+- Fix: entity/attribute operations to align them with the last JSON representation format defined for NGSIv2 (Issue #1259)
 - Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
 - Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
 - Add: POST /v2/subscriptions operation (Issue #1316)
