@@ -131,7 +131,7 @@ extern bool collectionRangedQuery
     return false;
   }
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
+  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'", col.c_str(), limit, offset, q.toString().c_str()));
 
   try
   {

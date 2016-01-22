@@ -1344,7 +1344,7 @@ static bool addTriggeredSubscriptions_noCache
   {
     alarmMgr.dbError(errorString);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1425,7 +1425,7 @@ static bool addTriggeredSubscriptions_noCache
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   return true;
 }
@@ -3041,7 +3041,7 @@ void processContextElement
   DBClientBase* connection = getMongoConnection();
   if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
     return;
@@ -3057,6 +3057,7 @@ void processContextElement
   //
 
   std::vector<BSONObj> results;
+  unsigned int         docs = 0;
   while (moreSafe(cursor))
   {
     BSONObj r;
@@ -3065,7 +3066,8 @@ void processContextElement
       LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     BSONElement idField = getField(r, "_id");
 
@@ -3083,7 +3085,7 @@ void processContextElement
     }
     results.push_back(r);
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   LM_T(LmtServicePath, ("Docs found: %d", results.size()));
 

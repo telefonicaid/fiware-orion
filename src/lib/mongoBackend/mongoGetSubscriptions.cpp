@@ -236,7 +236,7 @@ void mongoListSubscriptions
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection, getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, count, &err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
@@ -245,6 +245,7 @@ void mongoListSubscriptions
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  unsigned int docs = 0;
   while (moreSafe(cursor))
   {
     BSONObj r;    
@@ -254,7 +255,8 @@ void mongoListSubscriptions
       LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     Subscription  s;
 
@@ -265,7 +267,7 @@ void mongoListSubscriptions
 
     subs->push_back(s);
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
   *oe = OrionError(SccOk);
@@ -309,7 +311,7 @@ void mongoGetSubscription
   DBClientBase* connection = getMongoConnection();
   if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
@@ -318,18 +320,19 @@ void mongoGetSubscription
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  unsigned int n = 0;
   if (moreSafe(cursor))
   {
     BSONObj r;    
     if (!nextSafeOrError(cursor, &r, &err))
     {
-      releaseMongoConnection(connection, &cursor);
+      releaseMongoConnection(connection);
       LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", n, r.toString().c_str()));
 
     setSubscriptionId(sub, r);
     setSubject(sub, r);
@@ -338,7 +341,7 @@ void mongoGetSubscription
 
     if (moreSafe(cursor))
     {
-      releaseMongoConnection(connection, &cursor);
+      releaseMongoConnection(connection);
       // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
@@ -348,13 +351,13 @@ void mongoGetSubscription
   }
   else
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccSubscriptionIdNotFound);
     return;
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
   *oe = OrionError(SccOk);
