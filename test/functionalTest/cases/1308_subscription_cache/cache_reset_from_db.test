@@ -426,7 +426,6 @@ Content-Type: application/json; charset=utf-8
 ===========================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s01
 Date: REGEX(.*)
 
 
@@ -435,7 +434,6 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s11
 Date: REGEX(.*)
 
 
@@ -444,7 +442,6 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s21
 Date: REGEX(.*)
 
 

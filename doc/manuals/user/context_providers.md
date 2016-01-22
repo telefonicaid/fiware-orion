@@ -199,5 +199,5 @@ Some additional comments:
     the response from a given CPr (or timeout expiration) before sending
     the forward request to the following.
 -   You can use the `-cprForwardLimit` [CLI parameter](admin/cli.md) to limit
-    the maximum number of forwarded requests to Context Providers for a single client request
+    the maximum number of forwarded requests to Context Providers for a single client request.
     You can use 0 to disable Context Providers forwarding at all.

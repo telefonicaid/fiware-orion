@@ -110,7 +110,7 @@ The list of available options is the following:
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
     for forwarding messages and for notifications.
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
-    (default is no limit). Use 0 to disable Context Providers forwarding at all.
+    (default is no limit). Use 0 to disable Context Providers forwarding completely.
 -   **-corsOrigin <domain>**. Configures CORS for GET requests,
     specifing the allowed origin (use `__ALL` for `*`).
 -   **-reqMutexPolicy <all|none|write|read>**. Specifies the internal

@@ -173,7 +173,6 @@ Date: REGEX(.*)
 ===========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
@@ -200,7 +199,6 @@ Date: REGEX(.*)
 ===========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
@@ -246,7 +244,6 @@ Date: REGEX(.*)
 ===========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
