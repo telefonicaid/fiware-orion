@@ -59,8 +59,9 @@ AlarmManager::AlarmManager():
   dbErrors(0),
   dbErrorResets(0),
   dbOk(true),
-  notificationErrorLogSampling(0),
-  badInputLogSampling(0)
+  notificationErrorLogAlways(false),
+  badInputLogAlways(false),
+  dbErrorLogAlways(false)
 {
 }
 
@@ -68,29 +69,14 @@ AlarmManager::AlarmManager():
 
 /* ****************************************************************************
 *
-* AlarmManager::AlarmManager - 
-*/
-AlarmManager::AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling):
-  badInputs(0),
-  badInputResets(0),
-  notificationErrors(0),
-  notificationErrorResets(0),
-  dbErrors(0),
-  dbErrorResets(0),
-  dbOk(true),
-  notificationErrorLogSampling(_notificationErrorLogSampling),
-  badInputLogSampling(_badInputLogSampling)
-{
-}  
-
-
-
-/* ****************************************************************************
-*
 * AlarmManager::init - 
 */
-int AlarmManager::init(void)
+int AlarmManager::init(bool logAlreadyRaisedAlarms)
 {
+  notificationErrorLogAlways = logAlreadyRaisedAlarms;
+  badInputLogAlways          = logAlreadyRaisedAlarms;
+  dbErrorLogAlways           = logAlreadyRaisedAlarms;
+
   return semInit();
 }
 
@@ -137,12 +123,12 @@ void AlarmManager::semGive(void)
 
 /* ****************************************************************************
 *
-* AlarmManager::notificationErrorLogSamplingSet - 
+* AlarmManager::notificationErrorLogAlwaysSet - 
 */
-void AlarmManager::notificationErrorLogSamplingSet(int _notificationErrorLogSampling)
+void AlarmManager::notificationErrorLogAlwaysSet(bool _notificationErrorLogAlways)
 {
   semTake();
-  notificationErrorLogSampling = _notificationErrorLogSampling;
+  notificationErrorLogAlways = _notificationErrorLogAlways;
   semGive();
 }
 
@@ -150,12 +136,25 @@ void AlarmManager::notificationErrorLogSamplingSet(int _notificationErrorLogSamp
 
 /* ****************************************************************************
 *
-* AlarmManager::badInputLogSamplingSet - 
+* AlarmManager::badInputLogAlwaysSet - 
 */
-void AlarmManager::badInputLogSamplingSet(int _badInputLogSampling)
+void AlarmManager::badInputLogAlwaysSet(bool _badInputLogAlways)
 {
   semTake();
-  badInputLogSampling = _badInputLogSampling;
+  badInputLogAlways = _badInputLogAlways;
+  semGive();
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::dbErrorLogAlwaysSet - 
+*/
+void AlarmManager::dbErrorLogAlwaysSet(bool _dbErrorLogAlways)
+{
+  semTake();
+  dbErrorLogAlways = _dbErrorLogAlways;
   semGive();
 }
 
@@ -171,6 +170,11 @@ bool AlarmManager::dbError(const std::string& details)
 {
   if (dbOk == false)
   {
+    if (dbErrorLogAlways)
+    {
+      LM_W(("Repeated Database Error: %s", details.c_str()));
+    }
+
     return false;
   }
 
@@ -284,7 +288,7 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
   {
     iter->second += 1;
 
-    if ((notificationErrorLogSampling != 0) && ((notificationErrors % notificationErrorLogSampling) == 0))
+    if (notificationErrorLogAlways)
     {
       LM_W(("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
     }
@@ -359,7 +363,7 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
   {
     iter->second += 1;
 
-    if ((badInputLogSampling != 0) && ((badInputs % badInputLogSampling) == 0))
+    if (badInputLogAlways)
     {
       LM_W(("Repeated BadInput for %s: %s", ip.c_str(), details.c_str()));
     }

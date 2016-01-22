@@ -113,7 +113,7 @@ int main(int argC, char** argV)
 
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false);
-  alarmMgr.init();
+  alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
   setupDatabase();
 
