@@ -18,3 +18,4 @@
 - Fix: subscription service path is lost at update subscription time (Issue #1693)
 - Add: Enable log summary traces using -logSummary CLI (Issue #1585)
 - Fix: Avoiding cases of double BadInput for one and the same request (Issue #1697)
+- Add: New CLI parameter '-relogAlarms' to see ALL possible alarm-provoking failures in the log-file
