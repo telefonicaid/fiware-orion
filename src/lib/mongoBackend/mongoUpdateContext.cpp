@@ -57,7 +57,7 @@ HttpStatusCode mongoUpdateContext
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                    xauthToken,
   const std::string&                    apiVersion,
-  bool                                  checkEntityExistance
+  Ngsiv2Flavour                         ngsiv2Flavour
 )
 {
     bool reqSemTaken;
@@ -87,7 +87,7 @@ HttpStatusCode mongoUpdateContext
                                 uriParams,
                                 xauthToken,
                                 apiVersion,
-                                checkEntityExistance);
+                                ngsiv2Flavour);
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this

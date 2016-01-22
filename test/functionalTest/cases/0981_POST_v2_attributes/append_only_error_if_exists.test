@@ -40,8 +40,8 @@ brokerStart CB
 
 echo "01. Create E1"
 echo "============="
-payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
+payload='{ "id": "E1", "attr1": 1 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
