@@ -349,7 +349,9 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 {
   if (badInputSent == true)
+  {
     return false;
+  }
 
   badInputSent = true;
 
