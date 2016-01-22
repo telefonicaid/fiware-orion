@@ -870,6 +870,9 @@ std::string defaultServicePath(const char* url, const char* method)
   if (strcasecmp(method, "GET")    == 0)                                return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasecmp(method, "PATCH")  == 0)                                return DEFAULT_SERVICE_PATH;
 
+  std::string details = std::string("cannot find default service path for: (") + method + " " + url + ") - BAD VERB?";
+  alarmMgr.badInput(clientIp, details);
+
   return DEFAULT_SERVICE_PATH;
 }
 
