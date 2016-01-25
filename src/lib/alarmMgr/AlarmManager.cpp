@@ -37,13 +37,13 @@
 
 /* ****************************************************************************
 *
-* badInputSent - 
+* badInputSeen - 
 *
-* alarmSent is a variable to keep track of whether a BadInput has already been issued
+* badInputSeen is a variable to keep track of whether a BadInput has already been issued
 * for the current request.
 * We only want ONE Bad Input per request.
 */
-__thread bool badInputSent = false;
+__thread bool badInputSeen = false;
 
 
 
@@ -282,8 +282,6 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
 
   std::map<std::string, int>::iterator iter = notificationV.find(url);
 
-  ++notificationErrors;
-
   if (iter != notificationV.end())  // Already exists - add to the 'url-specific' counter
   {
     iter->second += 1;
@@ -296,6 +294,8 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
     semGive();
     return false;
   }
+
+  ++notificationErrors;
 
   notificationV[url] = 1;
   semGive();
@@ -348,18 +348,16 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 */
 bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 {
-  if (badInputSent == true)
+  if (badInputSeen == true)
   {
     return false;
   }
 
-  badInputSent = true;
+  badInputSeen = true;
 
   semTake();
 
   std::map<std::string, int>::iterator iter = badInputV.find(ip);
-
-  ++badInputs;
 
   if (iter != badInputV.end())  // Already exists - add to the 'ip-specific' counter
   {
@@ -373,6 +371,8 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
     semGive();
     return false;
   }
+
+  ++badInputs;
 
   badInputV[ip] = 1;
   semGive();
