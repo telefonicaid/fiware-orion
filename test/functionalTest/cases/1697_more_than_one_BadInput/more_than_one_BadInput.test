@@ -119,7 +119,7 @@ Date: REGEX(.*)
  Transactions: 4 (new: 4)
  DB status: ok (created: 0, removed: 0)
  Notification failure active alarms: 0 (created: 0, removed: 0)
- Bad input active alarms: 1 (created: 4, removed: 0)
+ Bad input active alarms: 1 (created: 1, removed: 0)
 
 
 04. grep BadInput in log-file (4 lines found)
