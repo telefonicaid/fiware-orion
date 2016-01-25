@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Bad Input On Notification Error (with repeated alarms)
+Bad Input On Notification Error for API v1 (with relogged alarms)
 
 --SHELL-INIT--
 dbInit CB
@@ -46,24 +46,25 @@ accumulatorStart 0.0.0.0 ${LISTENER_PORT}
 echo "01. Try to create subscription for E1/A1, but with 'reference' x.y.com:abc - see error"
 echo "======================================================================================"
 payload='{
-  "subject": {
-    "entities": [
-      {
+  "entities": [
+    {
+        "type": "ET",
+        "isPattern": "false",
         "id": "E1"
-      }
-    ],
-    "condition": {
-      "attributes": [ "A1" ]
     }
-  },
-  "notification": {
-    "callback": "x.y.com:abc",
-    "attributes": ["A1"],
-    "throttling": 5
-  },
-  "expires": "2026-04-05T14:00:00.00Z"
+  ],
+  "reference": "x.y.com:abc",
+  "duration": "P1M",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
 echo
 echo
 
@@ -71,24 +72,25 @@ echo
 echo "02. Try to create subscription for E1/A1, but with 'reference' without IP, just a port - see error"
 echo "=================================================================================================="
 payload='{
-  "subject": {
-    "entities": [
-      {
+  "entities": [
+    {
+        "type": "ET",
+        "isPattern": "false",
         "id": "E1"
-      }
-    ],
-    "condition": {
-      "attributes": [ "A1" ]
     }
-  },
-  "notification": {
-    "callback": "1234",
-    "attributes": ["A1"],
-    "throttling": 5
-  },
-  "expires": "2026-04-05T14:00:00.00Z"
+  ],
+  "reference": "1234",
+  "duration": "P1M",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
 echo
 echo
 
@@ -96,24 +98,25 @@ echo
 echo "03. Try to create subscription for E1/A1, but with 'reference' http://http://abc.a.com:1234 - see error"
 echo "======================================================================================================="
 payload='{
-  "subject": {
-    "entities": [
-      {
+  "entities": [
+    {
+        "type": "ET",
+        "isPattern": "false",
         "id": "E1"
-      }
-    ],
-    "condition": {
-      "attributes": [ "A1" ]
     }
-  },
-  "notification": {
-    "callback": "http://http://abc.a.com:1234",
-    "attributes": ["A1"],
-    "throttling": 5
-  },
-  "expires": "2026-04-05T14:00:00.00Z"
+  ],
+  "reference": "http://http://abc.a.com:1234",
+  "duration": "P1M",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
 echo
 echo
 
@@ -128,25 +131,26 @@ echo
 echo "05. Create a valid subscription for E1/A1"
 echo "========================================="
 payload='{
-  "subject": {
-    "entities": [
-      {
+  "entities": [
+    {
+        "type": "ET",
+        "isPattern": "false",
         "id": "E1"
-      }
-    ],
-    "condition": {
-      "attributes": [ "A1" ]
     }
-  },
-  "notification": {
-    "callback": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-    "attributes": ["A1"],
-    "throttling": 5
-  },
-  "expires": "2026-04-05T14:00:00.00Z"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
-SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
 
@@ -177,7 +181,7 @@ echo "======================================================================="
 payload='{
   "A1": 12,
   "id": "E1",
-  "type": "T1"
+  "type": "ET"
 }'
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
@@ -194,40 +198,55 @@ echo
 --REGEXPECT--
 01. Try to create subscription for E1/A1, but with 'reference' x.y.com:abc - see error
 ======================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 50
+HTTP/1.1 200 OK
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Invalid URL",
-    "error": "BadRequest"
+    "subscribeError": {
+        "errorCode": {
+            "code": "400",
+            "details": "invalid payload: Invalid URL",
+            "reasonPhrase": "Bad Request"
+        }
+    }
 }
 
 
 02. Try to create subscription for E1/A1, but with 'reference' without IP, just a port - see error
 ==================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 50
+HTTP/1.1 200 OK
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Invalid URL",
-    "error": "BadRequest"
+    "subscribeError": {
+        "errorCode": {
+            "code": "400",
+            "details": "invalid payload: Invalid URL",
+            "reasonPhrase": "Bad Request"
+        }
+    }
 }
 
 
 03. Try to create subscription for E1/A1, but with 'reference' http://http://abc.a.com:1234 - see error
 =======================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 50
+HTTP/1.1 200 OK
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Invalid URL",
-    "error": "BadRequest"
+    "subscribeError": {
+        "errorCode": {
+            "code": "400",
+            "details": "invalid payload: Invalid URL",
+            "reasonPhrase": "Bad Request"
+        }
+    }
 }
 
 
@@ -240,11 +259,17 @@ Date: REGEX(.*)
 
 05. Create a valid subscription for E1/A1
 =========================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 
 
 06. Check log-file to make sure the Bad Input alarm is reset

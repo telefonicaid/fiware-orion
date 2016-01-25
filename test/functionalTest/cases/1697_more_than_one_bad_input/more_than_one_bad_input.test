@@ -34,8 +34,8 @@ brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
 #
 # 01. Provoke FOUR Bad Inputs
 # 02. Sleep 3 secs, awaiting a log summary report
-# 03. grep SUMMARY in log-file (1 transaction, 1 bad input)
-# 04. grep BadInput in log-file (1 line found)
+# 03. grep SUMMARY in log-file (4 transactions, 1 bad input)
+# 04. grep BadInput in log-file (4 lines found)
 #
 # Request that give only ONE BadInput:
 #   - PUT /v2/noService
@@ -59,8 +59,8 @@ echo
 echo
 
 
-echo "03. grep SUMMARY in log-file (4 transactions, 4 bad inputs)"
-echo "==========================================================="
+echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
+echo "=========================================================="
 egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
 echo
 echo
@@ -114,12 +114,12 @@ Date: REGEX(.*)
 ===============================================
 
 
-03. grep SUMMARY in log-file (4 transactions, 4 bad inputs)
-===========================================================
+03. grep SUMMARY in log-file (4 transactions, 1 bad input)
+==========================================================
  Transactions: 4 (new: 4)
- DB status: ok (created: 0, removed: 0)
- Notification failure active alarms: 0 (created: 0, removed: 0)
- Bad input active alarms: 1 (created: 1, removed: 0)
+ DB status: ok, created: (total: 0, new: 0), removed: (total: 0, new: 0)
+ Notification failure active alarms: 0, created: (total: 0, new: 0), removed: (total: 0, new: 0)
+ Bad input active alarms: 1, created: (total: 1, new: 1), removed: (total: 0, new: 0)
 
 
 04. grep BadInput in log-file (4 lines found)

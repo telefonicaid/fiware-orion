@@ -42,6 +42,12 @@
 */
 static long long  transactionsAtLastSummary  = 0;
 static bool       logSummaryOn               = false;
+static long long  deRaisedInLastSummary      = 0;
+static long long  deReleasedInLastSummary    = 0;
+static long long  neRaisedInLastSummary      = 0;
+static long long  neReleasedInLastSummary    = 0;
+static long long  biRaisedInLastSummary      = 0;
+static long long  biReleasedInLastSummary    = 0;
 
 
 
@@ -100,10 +106,33 @@ static void* logSummary(void* vP)
 
     alarmMgr.semGive();
 
+    long long deRaisedNew   = deRaised   - deRaisedInLastSummary;
+    long long deReleasedNew = deReleased - deReleasedInLastSummary;
+    long long neRaisedNew   = neRaised   - neRaisedInLastSummary;
+    long long neReleasedNew = neReleased - neReleasedInLastSummary;
+    long long biRaisedNew   = biRaised   - biRaisedInLastSummary;
+    long long biReleasedNew = biReleased - biReleasedInLastSummary;
+
+    // Round the corner?
+    if (deRaisedNew   < 0)  { deRaisedNew   = LONG_MAX - deRaisedInLastSummary   + deRaised;   }
+    if (deReleasedNew < 0)  { deReleasedNew = LONG_MAX - deReleasedInLastSummary + deReleased; }
+    if (neRaisedNew   < 0)  { neRaisedNew   = LONG_MAX - neRaisedInLastSummary   + neRaised;   }
+    if (neReleasedNew < 0)  { neReleasedNew = LONG_MAX - neReleasedInLastSummary + neReleased; }
+    if (biRaisedNew   < 0)  { biRaisedNew   = LONG_MAX - biRaisedInLastSummary   + biRaised;   }
+    if (biReleasedNew < 0)  { biReleasedNew = LONG_MAX - biReleasedInLastSummary + biReleased; }
+
+
     LM_S(("Transactions: %lu (new: %lu)", transactionsNow, diff));
-    LM_S(("DB status: %s (created: %d, removed: %d)", deActive? "erroneous" : "ok", deRaised, deReleased));
-    LM_S(("Notification failure active alarms: %d (created: %d, removed: %d)", neActive, neRaised, neReleased));
-    LM_S(("Bad input active alarms: %d (created: %d, removed: %d)", biActive, biRaised, biReleased));
+    LM_S(("DB status: %s, created: (total: %d, new: %d), removed: (total: %d, new: %d)", deActive? "erroneous" : "ok", deRaised, deRaisedNew, deReleased, deReleasedNew));
+    LM_S(("Notification failure active alarms: %d, created: (total: %d, new: %d), removed: (total: %d, new: %d)", neActive, neRaised, neRaisedNew, neReleased, neReleasedNew));
+    LM_S(("Bad input active alarms: %d, created: (total: %d, new: %d), removed: (total: %d, new: %d)", biActive, biRaised, biRaisedNew, biReleased, biReleasedNew));
+
+    deRaisedInLastSummary   = deRaised;
+    deReleasedInLastSummary = deReleased;
+    neRaisedInLastSummary   = neRaised;
+    neReleasedInLastSummary = neReleased;
+    biRaisedInLastSummary   = biRaised;
+    biReleasedInLastSummary = biReleased;
   }
 
   return NULL;
