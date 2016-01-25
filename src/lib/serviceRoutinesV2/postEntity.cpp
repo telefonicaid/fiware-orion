@@ -100,14 +100,11 @@ std::string postEntity
     }
   }
 
-  // Default value for status code: SccCreated
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone) || (ciP->httpStatusCode == SccCreated))
+  // Default value for status code: SccNoContent. This is needed as mongoBackend typically
+  // uses SccOk (as SccNoContent doesn't exist for NGSIv1)
+  if (ciP->httpStatusCode == SccOk)
   {
-    std::string location = "/v2/entities/" + eP->id;
-    ciP->httpHeader.push_back("Location");
-    ciP->httpHeaderValue.push_back(location);
-    
-    ciP->httpStatusCode = SccCreated;
+    ciP->httpStatusCode = SccNoContent;
   }
 
   // Cleanup and return result

@@ -35,7 +35,7 @@ accumulatorStart
 # 02. Create entity E1 with A (notif)
 # 03. Create entity E2 without A (not notif)
 # 04. Append attribute A to E2 (notif)
-# 04. Dump accumulator (2 notifications)
+# 05. Dump accumulator (2 notifications)
 #
 
 echo "01. Create subscription with q: +A"
@@ -141,9 +141,8 @@ Date: REGEX(.*)
 
 04. Append attribute A to E2 (notif)
 ====================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E2
 Date: REGEX(.*)
 
 

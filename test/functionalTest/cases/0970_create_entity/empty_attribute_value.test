@@ -65,19 +65,21 @@ Location: /v2/entities/ID
 Date: REGEX(.*)
 
 
+
 02. GET /v2/entities/ID
 =======================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr": {
-        "value": "", 
-        "type": "AT"
-    }, 
-    "id": "ID", 
+        "metadata": {},
+        "type": "AT",
+        "value": ""
+    },
+    "id": "ID",
     "type": "WT"
 }
 
