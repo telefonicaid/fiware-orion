@@ -365,7 +365,7 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 
     if (badInputLogAlways)
     {
-      LM_W(("Repeated BadInput for %s: %s", ip.c_str(), details.c_str()));
+      LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
     }
 
     semGive();

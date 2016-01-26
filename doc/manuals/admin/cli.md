@@ -140,5 +140,7 @@ The list of available options is the following:
 -   **-reqPoolSize**. Size of thread pool for incoming connections. Default value is 0, meaning *no thread pool*.
 -   **-statCounters**, **-statSemWait**, **-statTiming** and **-statNotifQueue**. Enable statistics
     generation. See [statistics documentation](statistics.md).
--   **-logSummary**. Log summary period in seconds. Defaults to 0, meaning *Log Summary is off*. Min value: 0. Max value: one month (3600 * 24 * 31 == 2678400 seconds)
--   **-relogAlarms**. To see *every* possible alarm-provoking failure in the log-file, even when an alarm is already active, use this option.
+-   **-logSummary**. Log summary period in seconds. Defaults to 0, meaning *Log Summary is off*. Min value: 0. Max value: one month (3600 * 24 * 31 == 2678400 seconds).
+    See [logs documentation](logs.md#summary-traces) for more detail.
+-   **-relogAlarms**. To see *every* possible alarm-provoking failure in the log-file, even when an alarm is already active, use this option. See [logs documentation](logs.md#alarms)
+    for more detail.
