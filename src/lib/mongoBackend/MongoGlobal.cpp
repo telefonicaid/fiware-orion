@@ -221,21 +221,18 @@ DBClientBase* getMongoConnection(void)
 /* ****************************************************************************
 *
 * releaseMongoConnection - give back mongo connection to connection pool
+*
+* Older versions of this function planned to use a std::auto_ptr<DBClientCursor>* parameter
+* in order to invoke kill() on it for a "safer" connection releasing. However, at the end
+* it seems that kill() will not help at all (see deetails in https://github.com/telefonicaid/fiware-orion/issues/1568)
+* and after some testing we have checked that the current solution is stable.
+*
 */
-void releaseMongoConnection(DBClientBase* connection, std::auto_ptr<DBClientCursor>*  cursor)
+void releaseMongoConnection(DBClientBase* connection)
 {
 #ifdef UNIT_TEST
   return;
 #else
-#if MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
-  // it seems that the kill() method was added in a MongoDB C++ driver version newer than the one
-  // we officially use (legacy-1.0.2). Thus, I'm leaving this block of code to be prepared to the
-  // time we have this. See issue: https://github.com/telefonicaid/fiware-orion/issues/1568
-  if (cursor != NULL)
-  {
-    cursor->kill();
-  }
-#endif // MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
   return mongoPoolConnectionRelease(connection);
 #endif // UNIT_TEST
 }
@@ -514,7 +511,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   DBClientBase* connection = getMongoConnection();
   if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), query, &cursor, &err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
@@ -531,7 +528,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
     }
     treatFunction(tenant, sub);
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 }
 
 
@@ -1676,13 +1673,14 @@ bool entitiesQuery
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  unsigned int docs = 0;
   while (moreSafe(cursor))
   {
     BSONObj  r;
@@ -1738,21 +1736,22 @@ bool entitiesQuery
     {
       *err = e.what();
       LM_E(("Runtime Error (exception in nextSafe(): %s)", e.what()));
-      releaseMongoConnection(connection, &cursor);
+      releaseMongoConnection(connection);
       return false;
     }
     catch (...)
     {
       *err = "generic exception at nextSafe()";
       LM_E(("Runtime Error (generic exception in nextSafe())"));
-      releaseMongoConnection(connection, &cursor);
+      releaseMongoConnection(connection);
       return false;
     }
 
     alarmMgr.dbErrorReset();
 
     // Build CER from BSON retrieved from DB
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty);
     cer->statusCode.fill(SccOk);
 
@@ -1781,7 +1780,7 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
    * entities are added. Only if limitReached is being used, i.e. not NULL
@@ -1791,6 +1790,7 @@ bool entitiesQuery
     *limitReached = (cerV->size() >= (unsigned int) limit);
     if (*limitReached)
     {
+      LM_T(LmtMongo, ("entities limit reached"));
       return true;
     }
   }
@@ -2133,13 +2133,14 @@ bool registrationsQuery
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  unsigned int docs = 0;
   while (moreSafe(cursor))
   {
     BSONObj r;
@@ -2148,7 +2149,8 @@ bool registrationsQuery
       LM_E(("Runtime Error (exception in nextSafe(): %s", err->c_str()));
       continue;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     //
     // Default format is XML, in the case the field is not found in the
@@ -2169,7 +2171,7 @@ bool registrationsQuery
      * same registration ID. Thus, it could be interesting to post-process the response vector, to
      * "compact" removing duplicated responses.*/
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   return true;
 }

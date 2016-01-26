@@ -232,7 +232,7 @@ static bool addTriggeredSubscriptions
   if (!collectionQuery(connection, getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
   {
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -277,7 +277,7 @@ static bool addTriggeredSubscriptions
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   return true;
 }
