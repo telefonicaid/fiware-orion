@@ -72,8 +72,8 @@ The different fields in each line are as follows:
     -   DEBUG: This level designates fine-grained informational events
         that are most useful to debug an application. Only shown when
         tracelevels are in use (set with the -t command line option.
-    -   SUMMARY: This is an special level used by log summary traces,
-        enabled with the `-logSummary` CLI opation. Have a look to [the
+    -   SUMMARY: This is a special level used by log summary traces,
+        enabled with the `-logSummary` CLI option. Have a look at [the
         section on summary traces](#summary-traces) for details.
 -   **trans (transaction id)**. Can be either "N/A" (for log messages
     "out of transaction", as the ones corresponding to Orion Context
