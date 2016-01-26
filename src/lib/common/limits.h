@@ -68,14 +68,6 @@
 
 /* ****************************************************************************
 *
-* Alarm Manager definitions - 
-*/
-#define ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING     1
-#define ALARM_MGR_BAD_INPUT_LOG_SAMPLING              1
-
-
-/* ****************************************************************************
-*
 * Message definitions - 
 */
 #define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)

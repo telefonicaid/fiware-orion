@@ -30,5 +30,7 @@
 /* ****************************************************************************
 *
 * alarmMgr - 
+*
+* Initialized to NOT show repeated logs for already raised alarms.
 */
-AlarmManager alarmMgr(ALARM_MGR_NOTIFICATION_ERROR_LOG_SAMPLING, ALARM_MGR_BAD_INPUT_LOG_SAMPLING);
+AlarmManager alarmMgr;

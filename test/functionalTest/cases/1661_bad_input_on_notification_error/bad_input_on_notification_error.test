@@ -120,7 +120,7 @@ echo
 
 echo "04. Check log-file to make sure the Bad Input alarm is active"
 echo "============================================================="
-grep "BadInput" /tmp/contextBroker.log | cut -d\| -f 9- | awk -F: '{ print $2 }'
+grep "BadInput" /tmp/contextBroker.log | cut -d\| -f 9- | cut -d: -f 2-
 echo
 echo
 
@@ -233,7 +233,7 @@ Date: REGEX(.*)
 
 04. Check log-file to make sure the Bad Input alarm is active
 =============================================================
- Raising alarm BadInput 0.0.0.0
+ Raising alarm BadInput 0.0.0.0: Invalid URL
 
 
 05. Create a valid subscription for E1/A1

@@ -48,20 +48,21 @@ private:
   bool                        dbOk;
   std::map<std::string, int>  notificationV;
   std::map<std::string, int>  badInputV;
-  int                         notificationErrorLogSampling;
-  int                         badInputLogSampling;
+  bool                        notificationErrorLogAlways;
+  bool                        badInputLogAlways;
+  bool                        dbErrorLogAlways;
   sem_t                       sem;
 
 public:
   AlarmManager();
-  AlarmManager(int _notificationErrorLogSampling, int _badInputLogSampling);
 
-  int  init(void);
+  int  init(bool logAlreadyRaisedAlarms);
   void semTake(void);
   void semGive(void);
 
-  void notificationErrorLogSamplingSet(int _notificationErrorLogSampling);
-  void badInputLogSamplingSet(int _badInputLogSampling);
+  void notificationErrorLogAlwaysSet(bool _notificationErrorLogAlways);
+  void badInputLogAlwaysSet(bool _badInputLogAlways);
+  void dbErrorLogAlwaysSet(bool _dbErrorLogAlways);
 
   bool dbError(const std::string& details);
   bool dbErrorReset(void);

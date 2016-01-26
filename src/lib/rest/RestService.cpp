@@ -419,7 +419,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       if (response != "OK")
       {
         alarmMgr.badInput(clientIp, response);
-
         restReply(ciP, response);
 
         if (reqP != NULL)
