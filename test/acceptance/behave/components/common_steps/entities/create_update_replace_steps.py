@@ -47,34 +47,53 @@ __logger__ = logging.getLogger("steps")
 # ------------------ create_entities ------------------------------------------------
 
 @step(u'a definition of headers')
-def service_and_service_path(context):
+def definition_of_headers(context):
     """
-    configuration of service an service path in headers
+    configuration of  different header (service, service path, Content-Type, Accept, etc)
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    __logger__.info("Reading CB properties from properties.json file...")
     props = properties_class.read_properties()[CONTEXT_BROKER_ENV]
     context.cb = CB(protocol=props["CB_PROTOCOL"], host=props["CB_HOST"], port=props["CB_PORT"])
+    __logger__.info("Define header used in request...")
     context.cb.definition_headers(context)
 
-
-@step(u'create "([^"]*)" entities with "([^"]*)" attributes')
-def create_entities_with_properties(context, entities_number, attributes_number):
+@step(u'properties to entities')
+def properties_to_entities(context):
     """
-    create N entities with N attributes and another optional parameters:
-        -  entity_type, entity_id, attributes_name, attributes_value, attribute_type, metadata_name and metadata_value
+    properties to entities (previous step to create or update entities request)
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.info("Define the properties used in the entities")
+    context.cb.properties_to_entities(context)
+
+
+@step(u'create entity group with "([^"]*)" entities in "([^"]*)" mode')
+def create_entities_with_properties(context, entities_number, mode):
+    """
+    create N entities with the properties loaded in the "properties to entities" step
+        | parameter     | prefix |
+        | entities_id   | true   |
+        | entities_type | true   |
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entities_number: number of entities
-    :param attributes_number: number of attributes
+    :param mode: mode in that will be created the entity (normalized | keyValues | values), It is not the query parameter.
+                     normalized:
+                                "attr": {
+                                     "value": "45",
+                                     ...
+                                }
+                     keyValues:
+                                "attr": "45"
     """
-    __logger__.debug("Creating %s entities with %s attributes..." % (entities_number, attributes_number))
-    context.resp_list = context.cb.create_entities(context, entities_number, attributes_number)
-    __logger__.info("...Created %s entities with %s attributes" % (entities_number, attributes_number))
+    __logger__.debug("Creating %s entities in mode %s..." % (entities_number, mode))
+    context.resp_list = context.cb.create_entities(context, entities_number, mode)
+    __logger__.info("...Created %s entities in mode %s" % (entities_number, mode))
 
-
-@step(u'create an entity and attribute with special values in raw')
-def create_an_entity_and_attribute_with_special_values(context):
+@step(u'create an entity in raw and "([^"]*)" modes')
+def create_an_entity_in_raw(context, mode):
     """
-    create an entity and attribute with special values in raw
+    create an entity with raw values
        ex:
              "value": true
              "value": false
@@ -86,11 +105,19 @@ def create_an_entity_and_attribute_with_special_values(context):
              "value": "2017-06-17T07:21:24.238Z"  -->  "type: "date"
         Some cases are not parsed correctly to dict in python
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param mode: mode in that will be created the entity (normalized | keyValues | values), It is not the query parameter.
+                     normalized:
+                                "attr": {
+                                     "value": "45",
+                                     ...
+                                }
+                     keyValues:
+                                "attr": "45"
       """
     global cb, resp
-    __logger__.debug("Creating an entity with attributes in raw mode...")
-    context.resp = context.cb.create_entity_raw(context)
-    __logger__.info("...Created an entity with attributes in raw mode")
+    __logger__.debug("Creating an entity with an attribute in raw mode...")
+    context.resp = context.cb.create_entity_raw(context, mode)
+    __logger__.info("...Created an entity with an attribute in raw mode")
 
 
 # ------------------------ update, append and replace -----------------------------------------------
