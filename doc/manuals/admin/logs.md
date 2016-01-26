@@ -152,7 +152,7 @@ time=... | lvl=WARNING | Releasing alarm BadInput 0.0.0.0
 ```
 
 Log traces between "Raising" and "Releasing" messages use "Repeated" in the message text. Note that the details part of the message is not necesarily the same
-in all traces, so re-logging alarms could be a mean to get extra information when debuging problems. In the exampel above, it could correspond to a client
+in all traces, so re-logging alarms could be a means to get extra information when debugging problems. In the example above, it could correspond to a client
 that after fixing the problem with the JSON payload now has a new problem with the URL of the Orion API operation.
 
 
