@@ -1005,6 +1005,16 @@ typedef struct CachedSubSaved
 * 4. Update 'count' for each item in savedSubV where count != 0
 * 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
 * 6. Free the vector created in step 1 - savedSubV
+*
+* FIXME P2
+*   This function runs in a separate thread and it allocates temporal objects (in savedSubV).
+*   If the broker dies when thid function is executing, all thses temporal objects will be reported
+*   as memory leaks.
+*   We see this in our valgrind tests, where we force the broker to die.
+*   This is of course not a real leak, we only see this as a leak as the function hasn't finished to
+*   execute until the point where the temporal objects are deleted (See '6. Free the vector savedSubV').
+*   To fix this little problem, we would need the broker to exit in a more ordered manner, checking the statre of the
+*   sub-cache and await it to finish its synchronization before exiting the broker.
 */
 void subCacheSync(void)
 {
