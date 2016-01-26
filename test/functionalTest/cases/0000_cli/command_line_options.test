@@ -71,5 +71,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-statNotifQueue' (enable thread pool notifications queue statistics)]
                       [option '-logSummary' <log summary period in seconds (defaults to 0, meaning 'off')>]
                       [option '-relogAlarms' (log messages for existing alarms beyond the raising alarm log message itself)]
+                      [option '-ngsiv1CheckIdFields' (additional checks for ids and types in v1)]
 
 --TEARDOWN--

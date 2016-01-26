@@ -48,7 +48,8 @@ typedef struct ContextRegistrationResponse
   void         present(const std::string& indent);
   void         release(void);
 
-  std::string  check(RequestType         requestType,
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
                      Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,

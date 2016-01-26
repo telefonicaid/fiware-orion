@@ -371,7 +371,7 @@ void rcrRelease(ParseData* parseDataP)
 */
 std::string rcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->rcr.res.check(RegisterContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->rcr.res.check(ciP, RegisterContext, ciP->outFormat, "", parseDataP->errorString, 0);
 }
 
 

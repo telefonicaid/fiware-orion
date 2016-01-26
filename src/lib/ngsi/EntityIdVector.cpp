@@ -68,6 +68,7 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
 */
 std::string EntityIdVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -93,7 +94,7 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;

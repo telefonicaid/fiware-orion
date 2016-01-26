@@ -298,7 +298,7 @@ void jsonScarRelease(ParseData* reqDataP)
 std::string jsonScarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   std::string s;
-  s = reqData->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
+  s = reqData->scar.res.check(ciP, SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
   return s;
 }
 

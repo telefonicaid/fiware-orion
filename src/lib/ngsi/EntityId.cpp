@@ -151,6 +151,7 @@ std::string EntityId::render
 */
 std::string EntityId::check
 (
+  ConnectionInfo* ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,

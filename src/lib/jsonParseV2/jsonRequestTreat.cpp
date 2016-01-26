@@ -112,7 +112,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
       return answer;
     }
     
-    if ((answer = parseDataP->scr.res.check(SubscribeContext, JSON, "", "", 0)) != "OK")
+    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, JSON, "", "", 0)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid subscription");
       return answer;

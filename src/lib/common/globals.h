@@ -44,6 +44,15 @@
 
 
 /* ****************************************************************************
+ *
+ * MAX_ID_LEN
+ */
+#ifndef MAX_ID_LEN
+#define MAX_ID_LEN 256
+#endif
+
+
+/* ****************************************************************************
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
 * 
@@ -106,6 +115,8 @@ extern bool               timingStatistics;
 extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
+extern bool               checkIdv1;
+
 
 
 /* ****************************************************************************
@@ -120,7 +131,8 @@ extern void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics
+  bool               _notifQueueStatistics,
+  bool               _checkIdv1
 );
 
 

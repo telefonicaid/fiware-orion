@@ -47,7 +47,8 @@ typedef struct MetadataVector
   void            tagSet(const std::string& tagName);
   std::string     render(Format format, const std::string& indent, bool comma = false);
   std::string     toJson(bool isLastElement);
-  std::string     check(RequestType requestType,
+  std::string     check(ConnectionInfo* ciP,
+                      RequestType requestType,
                       Format format,
                       const std::string& indent,
                       const std::string& predetectedError,

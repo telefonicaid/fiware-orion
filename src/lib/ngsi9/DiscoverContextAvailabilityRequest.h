@@ -52,7 +52,8 @@ typedef struct DiscoverContextAvailabilityRequest
   void                 release(void);
   void                 present(const std::string& indent);
 
-  std::string          check(RequestType         requestType,
+  std::string          check(ConnectionInfo*     ciP,
+                             RequestType         requestType,
                              Format              format,
                              const std::string&  indent,
                              const std::string&  predetectedError,

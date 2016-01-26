@@ -139,7 +139,7 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
     return response.render(ciP, UpdateContext, indent);
   }
 
-  if (((res = contextElementVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") || 
+  if (((res = contextElementVector.check(ciP, requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check(requestType,     ciP->outFormat, indent, predetectedError, counter)) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);

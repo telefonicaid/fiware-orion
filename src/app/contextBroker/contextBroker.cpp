@@ -265,6 +265,8 @@ bool            statTiming;
 bool            statNotifQueue;
 int             lsPeriod;
 bool            relogAlarms;
+bool            strictIdv1;
+
 
 
 
@@ -315,6 +317,8 @@ bool            relogAlarms;
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 #define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
+#define CHECK_v1_ID_DESC       "additional checks for ids and types in v1"
+
 
 
 
@@ -381,6 +385,8 @@ PaArgument paArgs[] =
 
   { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt,   0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
   { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
+
+  { "-ngsiv1CheckIdFields",  &strictIdv1, "CHECK_ID_V1",  PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC  },
 
   PA_END_OF_ARGS
 };
@@ -1739,7 +1745,7 @@ int main(int argC, char* argV[])
 
   pidFile();
   SemOpType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
