@@ -144,7 +144,9 @@ class NGSI:
                 " ERROR -- creDate field does not exists in document"
             assert u'modDate' in entity,\
                 " ERROR -- modDate field does not exists in document"
-        __logger__.debug(" Entity id: \"%s\" is successful stored in mongo" % entities_contexts["entities_id"])
+        __logger__.debug(" Entity id prefix: \"%s\" is successful stored in mongo" % entities_contexts["entities_id"])
+        __logger__.debug(" Entity type prefix: \"%s\" is successful stored in mongo" % entities_contexts["entities_type"])
+
 
     def verify_entities_stored_in_mongo(self, mongo_driver, entities_contexts, headers, stored=True):
         """
@@ -186,11 +188,10 @@ class NGSI:
         curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
 
         # verify entities
-        __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
         for i in range(int(entities_contexts["entities_number"])):
             # verify if the entity is stored in mongo
             if stored:
-                __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
+                __logger__.debug("Number of doc read from mongo: %s" % str(i+1))
                 assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
                 entity = curs_list[i]  # manages N entities
                 # verify attributes
@@ -199,6 +200,9 @@ class NGSI:
             else:
                 assert len(curs_list) == 0, "  ERROR - the entities should not have been saved in mongo"
                 __logger__.debug(" Entity id: \"%s\" is not stored in mongo as expected" % entities_contexts["entities_id"])
+
+        __logger__.debug("Total of entities: %s" % str(entities_contexts["entities_number"]))
+        __logger__.debug("Total of docs read from mongo: %s" % str(len(curs_list)))
         mongo_driver.disconnect()
 
     def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers):
