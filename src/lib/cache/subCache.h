@@ -38,6 +38,17 @@
 using namespace mongo;
 
 
+/* ****************************************************************************
+*
+* SubCacheState - 
+*/
+typedef enum SubCacheState
+{
+  ScsIdle,
+  ScsSynchronizing
+} SubCacheState;
+
+
 
 /* ****************************************************************************
 *
@@ -96,7 +107,8 @@ struct CachedSubscription
 *
 * subCacheActive - 
 */
-extern bool subCacheActive;
+extern bool                    subCacheActive;
+extern volatile SubCacheState  subCacheState;
 
 
 

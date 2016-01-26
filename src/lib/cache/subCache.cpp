@@ -38,6 +38,14 @@ using std::map;
 
 
 
+/* ****************************************************************************
+*
+* subCacheState - maintains the state of the subscription cache
+* 
+*/
+volatile SubCacheState subCacheState = ScsIdle;
+
+
 //
 // The subscription cache maintains in memory all subscriptions of type ONCHANGE.
 // The reason for this cache is to avoid a very slow mongo operation ... (Fermin)
@@ -1006,21 +1014,24 @@ typedef struct CachedSubSaved
 * 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
 * 6. Free the vector created in step 1 - savedSubV
 *
-* FIXME P2
+* NOTE
 *   This function runs in a separate thread and it allocates temporal objects (in savedSubV).
 *   If the broker dies when this function is executing, all these temporal objects will be reported
 *   as memory leaks.
 *   We see this in our valgrind tests, where we force the broker to die.
 *   This is of course not a real leak, we only see this as a leak as the function hasn't finished to
 *   execute until the point where the temporal objects are deleted (See '6. Free the vector savedSubV').
-*   To fix this little problem, we would need the broker to exit in a more ordered manner, checking the state of the
-*   sub-cache and await it to finish its synchronization before exiting the broker.
+*   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
+*   the sub-cache synchronization is working.
+*   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a 
+*   sleep for a few seconds is performed beofre the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)
 {
   std::map<std::string, CachedSubSaved*> savedSubV;
 
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
+  subCacheState = ScsSynchronizing;
 
 
   //
@@ -1096,6 +1107,7 @@ void subCacheSync(void)
   savedSubV.clear();
 
 
+  subCacheState = ScsIdle;
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
 }
 
