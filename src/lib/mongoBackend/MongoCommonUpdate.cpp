@@ -1597,8 +1597,6 @@ static bool processSubscriptions
       {
         LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
         LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %l", trigs->cacheSubId.c_str(), current));
-        trigs->attrL.release();
-        delete trigs;
 
         continue;
       }
@@ -1664,13 +1662,10 @@ static bool processSubscriptions
         cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
       }
     }
-
-    /* Release object created dynamically (including the value in the map created by addTriggeredSubscriptions */
-    trigs->attrL.release();
-    delete trigs;
   }
 
-  subs.clear();
+  releaseTriggeredSubscriptions(subs);
+
   return ret;
 }
 
@@ -2265,6 +2260,7 @@ static bool processContextAttributeVector
 
   /* Add triggered ONCHANGE subscriptions */
   std::string err;
+
   if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
@@ -2807,6 +2803,7 @@ static void updateEntity
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     responseP->contextElementResponseVector.push_back(cerP);
+
     releaseTriggeredSubscriptions(subsToNotify);
 
     notifyCerP->release();
@@ -3177,6 +3174,7 @@ void processContextElement
         {
           attrNames.push_back(ceP->contextAttributeVector[ix]->name);
         }
+
         if (!addTriggeredSubscriptions(enP->id,
                                        enP->type,
                                        attrNames,
@@ -3185,6 +3183,7 @@ void processContextElement
                                        tenant,
                                        servicePathV))
         {
+          releaseTriggeredSubscriptions(subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);
           responseP->contextElementResponseVector.push_back(cerP);
           return;  // Error already in responseP
@@ -3201,6 +3200,7 @@ void processContextElement
 
         notifyCerP->release();
         delete notifyCerP;
+        releaseTriggeredSubscriptions(subsToNotify);
       }
 
       responseP->contextElementResponseVector.push_back(cerP);

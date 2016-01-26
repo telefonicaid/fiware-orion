@@ -214,10 +214,20 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 
 /* ****************************************************************************
 *
-* parseUrl -
+* parseUrl - parse a URL and return its pieces
 *
 * Breaks a URL into pieces. It returns false if the string passed as first
 * argument is not a valid URL. Otherwise, it returns true.
+*
+* PARAMETERS
+*   - url
+*   - host
+*   - port
+*   - path
+*   - protocol
+*
+* RETURN VALUE
+*   parseUrl returns TRUE on successful operation, FALSE otherwise
 *
 * NOTE
 *   About the components in a URL: according to https://tools.ietf.org/html/rfc3986#section-3,

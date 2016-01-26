@@ -25,8 +25,9 @@
 
 #include <string>
 #include <sstream>
-#include "mongoBackend/TriggeredSubscription.h"
 
+#include "logMsg/logMsg.h"
+#include "mongoBackend/TriggeredSubscription.h"
 
 
 /* ****************************************************************************
@@ -51,7 +52,6 @@ TriggeredSubscription::TriggeredSubscription
   cacheSubId        (_cacheSubId),
   tenant            ((_tenant == NULL)? "" : _tenant)
 {
-
 }
 
 
@@ -76,8 +76,19 @@ TriggeredSubscription::TriggeredSubscription
   cacheSubId        (""),
   tenant            ("")
 {
-
 }
+
+
+
+/* ****************************************************************************
+*
+* TriggeredSubscription::~TriggeredSubscription - 
+*/
+TriggeredSubscription::~TriggeredSubscription()
+{
+}
+
+
 
 /* ****************************************************************************
 *

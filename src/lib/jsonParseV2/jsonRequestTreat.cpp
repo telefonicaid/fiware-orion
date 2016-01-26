@@ -106,7 +106,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   case SubscriptionsRequest:
-    answer = parseSubscription(ciP, parseDataP);
+    answer = parseSubscription(ciP, parseDataP, releaseP);
     if (answer != "OK")
     {
       return answer;
@@ -120,11 +120,12 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   case IndividualSubscriptionRequest:
-    answer = parseSubscription(ciP, parseDataP, /*partial*/ true);
+    answer = parseSubscription(ciP, parseDataP, releaseP, true);  // NOTE: partial == true
     if (answer != "OK")
     {
       return answer;
     }
+
     break;
 
   default:
