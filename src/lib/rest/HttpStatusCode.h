@@ -28,6 +28,8 @@
 * Author: developer
 */
 
+#define ERROR_STRING_PARSERROR  "ParseError"
+
 /* ****************************************************************************
 *
 * HttpStatusCode - 

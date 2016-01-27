@@ -65,7 +65,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
-    eP->errorCode.fill("ParseError", "Errors found in incoming JSON buffer");
+    eP->errorCode.fill(ERROR_STRING_PARSERROR, "Errors found in incoming JSON buffer");
     ciP->httpStatusCode = SccBadRequest;
     return eP->render(ciP, EntitiesRequest);
   }
@@ -74,7 +74,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   if (!document.IsObject())
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error");
-    eP->errorCode.fill("ParseError", "Error parsing incoming JSON buffer");
+    eP->errorCode.fill(ERROR_STRING_PARSERROR, "Error parsing incoming JSON buffer");
     ciP->httpStatusCode = SccBadRequest;;
     return eP->render(ciP, EntitiesRequest);
   }

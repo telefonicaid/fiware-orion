@@ -72,7 +72,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, bool u
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
-    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
+    OrionError oe(ERROR_STRING_PARSERROR, "Errors found in incoming JSON buffer");
 
     return oe.render(ciP, "");
   }
