@@ -150,4 +150,13 @@
 #define DB_NAME_MAX_LEN  10
 
 
+
+/* ****************************************************************************
+ *
+ * MAX_ID_LEN - max length of id and type for entities, attributes and metadata
+ */
+#ifndef MAX_ID_LEN
+#define MAX_ID_LEN 256
+#endif
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_

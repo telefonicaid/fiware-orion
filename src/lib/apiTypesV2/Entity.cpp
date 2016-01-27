@@ -114,18 +114,35 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 */
 std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 {
+  size_t len;
+  char errorMsg[128];
+
   if ((requestType == EntitiesRequest) && (id == ""))
   {
     return "No Entity ID";
   }
 
-  if (forbiddenChars(id.c_str()))
+  if ( (len = strlen(id.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, id.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
     return "Invalid characters in entity id";
   }
 
-  if (forbiddenChars(type.c_str()))
+  if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
     return "Invalid characters in entity type";
@@ -137,7 +154,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return "Invalid characters in entity isPattern";
   }
 
-  return attributeVector.check(requestType, JSON, "", "", 0);
+  return attributeVector.check(ciP, requestType, JSON, "", "", 0);
 }
 
 

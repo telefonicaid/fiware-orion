@@ -96,7 +96,7 @@ void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& in
 *
 * UpdateContextAvailabilitySubscriptionRequest::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                                    res;
   UpdateContextAvailabilitySubscriptionResponse  response;
@@ -107,7 +107,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requ
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))      != "OK") ||
+  else if (((res = entityIdVector.check(ciP, UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))      != "OK") ||
            ((res = attributeList.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))       != "OK") ||
            ((res = duration.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))            != "OK") ||
            ((res = restriction.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))         != "OK") ||

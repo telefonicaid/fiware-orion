@@ -562,7 +562,7 @@ void jsonScrRelease(ParseData* parseDataP)
 std::string jsonScrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
   std::string s;
-  s = parseDataP->scr.res.check(SubscribeContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  s = parseDataP->scr.res.check(ciP, SubscribeContext, ciP->outFormat, "", parseDataP->errorString, 0);
   return s;
 }
 

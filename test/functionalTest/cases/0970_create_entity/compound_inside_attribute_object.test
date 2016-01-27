@@ -40,11 +40,11 @@ payload='{
   "id": "E1",
   "type": "T1",
   "attr01": {
-    "type": "Compound Object",
+    "type": "Compound-Object",
     "value": { "a":"1", "b":2, "c": true }
   },
   "attr02": {
-    "type": "Compound Vector",
+    "type": "Compound-Vector",
     "value":  [ "a", "b", "c" ]
   }
 }'
@@ -80,7 +80,7 @@ Date: REGEX(.*)
 {
     "attr01": {
         "metadata": {},
-        "type": "Compound Object",
+        "type": "Compound-Object",
         "value": {
             "a": "1",
             "b": 2.0,
@@ -89,7 +89,7 @@ Date: REGEX(.*)
     },
     "attr02": {
         "metadata": {},
-        "type": "Compound Vector",
+        "type": "Compound-Vector",
         "value": [
             "a",
             "b",

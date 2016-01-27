@@ -233,7 +233,8 @@ void ucasRelease(ParseData* reqData)
 */
 std::string ucasCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->ucas.res.check(UpdateContextAvailabilitySubscription,
+  return reqData->ucas.res.check(ciP,
+                                 UpdateContextAvailabilitySubscription,
                                  ciP->outFormat,
                                  "",
                                  reqData->errorString,

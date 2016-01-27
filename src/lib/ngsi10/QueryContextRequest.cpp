@@ -127,7 +127,7 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
+  else if (((res = entityIdVector.check(ciP, QueryContext, ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
            ((res = attributeList.check(QueryContext,  ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
            ((res = restriction.check(QueryContext,    ciP->outFormat, indent, predetectedError, restrictions)) != "OK"))
   {

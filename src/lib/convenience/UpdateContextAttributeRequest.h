@@ -52,7 +52,7 @@ typedef struct UpdateContextAttributeRequest
 
   UpdateContextAttributeRequest();
   std::string  render(ConnectionInfo* ciP, Format format, std::string indent);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
+  std::string  check(ConnectionInfo* ciP, RequestType requestType, Format format, std::string indent, std::string preError, int counter);
   void         present(std::string indent);
   void         release();
 } UpdateContextAttributeRequest;

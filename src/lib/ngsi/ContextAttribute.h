@@ -92,7 +92,8 @@ typedef struct ContextAttribute
   /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
   std::string  toStringValue(void) const;
 
-  std::string  check(RequestType         requestType,
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
                      Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,

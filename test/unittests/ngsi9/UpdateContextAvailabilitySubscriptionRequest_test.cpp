@@ -119,12 +119,12 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucasP->check(UpdateContextAvailabilitySubscription, JSON, "", "predetected error", 0);
+  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, JSON, "", "predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ucasP->duration.set("eeeee");
-  out = ucasP->check(UpdateContextAvailabilitySubscription, JSON, "", "", 0);
+  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, JSON, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

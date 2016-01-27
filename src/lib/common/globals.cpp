@@ -53,7 +53,7 @@ bool                   countersStatistics   = false;
 bool                   semWaitStatistics    = false;
 bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
-
+bool                   checkIdv1            = false;
 
 
 /* ****************************************************************************
@@ -130,15 +130,14 @@ void transactionIdSet(void)
 * orionInit - 
 */
 void orionInit
-(
-  OrionExitFunction  exitFunction,
+(OrionExitFunction  exitFunction,
   const char*        version,
   SemOpType          reqPolicy,
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics
-)
+  bool               _notifQueueStatistics,
+  bool _checkIdv1)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -169,6 +168,8 @@ void orionInit
   notifQueueStatistics = _notifQueueStatistics;
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
+
+  checkIdv1 = _checkIdv1;
 }
 
 
