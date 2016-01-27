@@ -141,18 +141,19 @@ TEST(NotifyContextAvailabilityRequest, check)
   std::string                       out;
   const char*                       outfile1 = "ngsi9.notifyContextAvailabilityResponse.predetectedError.valid.xml";
   const char*                       outfile2 = "ngsi9.notifyContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
+  ConnectionInfo                    ci;
 
   utInit();
 
-  out = ncr.check(NotifyContextAvailability, XML, "", "", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, XML, "", "", 0);
   EXPECT_EQ("OK", out);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ncr.check(NotifyContextAvailability, XML, "", "predetected error", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, XML, "", "predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
  
   ncr.subscriptionId.set("12345");
-  out = ncr.check(NotifyContextAvailability, XML, "", "", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, XML, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   

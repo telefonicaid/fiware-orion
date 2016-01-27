@@ -41,10 +41,11 @@ TEST(ContextElementResponseVector, check)
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
+  ConnectionInfo                ci;
 
   utInit();
 
-  out = cerv.check(UpdateContext, XML, "", "", 0);
+  out = cerv.check(&ci, UpdateContext, XML, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";
@@ -53,7 +54,7 @@ TEST(ContextElementResponseVector, check)
   cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
-  out = cerv.check(UpdateContext, XML, "", "", 0);
+  out = cerv.check(&ci, UpdateContext, XML, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();

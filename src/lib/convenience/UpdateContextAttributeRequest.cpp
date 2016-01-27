@@ -97,11 +97,12 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
 */
 std::string UpdateContextAttributeRequest::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  predetectedError,
-  int          counter
+  ConnectionInfo* ciP,
+  RequestType     requestType,
+  Format          format,
+  std::string     indent,
+  std::string     predetectedError,
+  int             counter
 )
 {
   StatusCode       response;
@@ -121,7 +122,7 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  else if ((res = metadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }

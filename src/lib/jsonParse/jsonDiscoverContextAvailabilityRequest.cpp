@@ -251,7 +251,8 @@ void jsonDcarRelease(ParseData* reqDataP)
 */
 std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->dcar.res.check(DiscoverContextAvailability,
+  return reqDataP->dcar.res.check(ciP,
+                                  DiscoverContextAvailability,
                                   ciP->outFormat,
                                   "",
                                   reqDataP->errorString,

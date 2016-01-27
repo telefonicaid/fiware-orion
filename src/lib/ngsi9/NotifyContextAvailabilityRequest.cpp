@@ -71,7 +71,7 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Fo
 *
 * NotifyContextAvailabilityRequest::check - 
 */
-std::string NotifyContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextAvailabilityRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                        res;
   NotifyContextAvailabilityResponse  response;
@@ -81,7 +81,7 @@ std::string NotifyContextAvailabilityRequest::check(RequestType requestType, For
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = subscriptionId.check(QueryContext, format, indent, predetectedError, 0))                    != "OK") ||
-           ((res = contextRegistrationResponseVector.check(QueryContext, format, indent, predetectedError, 0)) != "OK"))
+           ((res = contextRegistrationResponseVector.check(ciP, QueryContext, format, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }

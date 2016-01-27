@@ -27,6 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/globals.h"
+
 #include "parse/forbiddenChars.h"
 
 
@@ -60,6 +62,47 @@ bool forbiddenChars(const char* s, const char* exceptions)
     case ';':
     case '(':
     case ')':
+      return true;
+    }
+
+    ++s;
+  }
+
+  return false;
+}
+
+/* ****************************************************************************
+*
+* forbiddenIdChars -
+*/
+bool forbiddenIdChars(const std::string& api, const char* s, const char* exceptions)
+{
+  if (api == "v1" && !checkIdv1) {
+    return forbiddenChars(s, exceptions);  // old behavior
+  }
+
+  if (s == (void*) 0)
+  {
+    return false;
+  }
+
+  while (*s != 0)
+  {
+    if ((exceptions != NULL) && (strchr(exceptions, *s) != NULL))
+    {
+      ++s;
+      continue;
+    }
+    if (*s >= 127 || *s <= 32)
+    {
+      return true;
+    }
+    switch (*s)
+    {
+    case '?':
+    case '/':
+    case '#':
+    case '&':
       return true;
     }
 

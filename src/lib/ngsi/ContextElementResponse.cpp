@@ -319,6 +319,7 @@ void ContextElementResponse::release(void)
 */
 std::string ContextElementResponse::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -328,7 +329,7 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = contextElement.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

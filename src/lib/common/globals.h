@@ -42,7 +42,6 @@
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 
 
-
 /* ****************************************************************************
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
@@ -106,6 +105,8 @@ extern bool               timingStatistics;
 extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
+extern bool               checkIdv1;
+
 
 
 /* ****************************************************************************
@@ -120,7 +121,8 @@ extern void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics
+  bool               _notifQueueStatistics,
+  bool               _checkIdv1
 );
 
 
