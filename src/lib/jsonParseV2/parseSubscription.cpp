@@ -75,16 +75,14 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
   if (document.HasParseError())
   {
-    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
-
+    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
     return oe.render(ciP, "");
   }
 
   if (!document.IsObject())
   {
-    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
-
+    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
     return oe.render(ciP, "");
   }

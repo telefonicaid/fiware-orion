@@ -49,7 +49,8 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   if (document.HasParseError())
   {
     alarmMgr.badInput(clientIp, "JSON parse error");
-    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer");
+    oe.reasonPhrase = ERROR_STRING_PARSERROR;
+    oe.details      = "Errors found in incoming JSON buffer";
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
   }
