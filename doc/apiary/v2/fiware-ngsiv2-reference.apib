@@ -441,7 +441,7 @@ can be useful in urderstanding the format.
     "value": {
       "type": "Point",
       "coordinates": [2.186447514, 41.3763726]
-    },
+    }
     "type": "application/vnd.geo+json"
   }
 }
@@ -953,7 +953,7 @@ Response:
 + Response 200 (application/json)
 
         {
-            "value": 21.7,
+            "value": 21.7
             "type": null,
             "metadata": {}
         }
@@ -1242,8 +1242,8 @@ Response:
                         }
                     ],
                     "condition": {
-                       "attrs": [ "temperature " ],
-                       "expression": {
+                       "attrs:" [ "temperature " ],
+                       "expression:" {
                           "q": "temperature>40"
                        }
                     }
@@ -1281,8 +1281,8 @@ Response:
                     }
                 ],
                 "condition": {
-                    "attributes": [ "temperature " ],
-                    "expression": {
+                    "attributes:" [ "temperature " ],
+                    "expression:" {
                        "q": "temperature>40"
                     }
                  }
@@ -1290,7 +1290,7 @@ Response:
             "notification": {
                 "callback": "http://localhost:1234",
                 "attributes": ["temperature", "humidity"],
-                "throttling": 5
+                "throttling": 5,
             },            
             "expires": "2016-04-05T14:00:00.00Z"
         }
@@ -1327,8 +1327,8 @@ Response:
                     }
                 ],
                 "condition": {
-                    "attributes": [ "temperature " ],
-                    "expression": {
+                    "attributes:" [ "temperature " ],
+                    "expression:" {
                        "q": "temperature>40"
                     }
                  }
@@ -1695,7 +1695,7 @@ Response:
 
         {
           "actionType": "CREATE",
-          "registrations": [
+          "registrations: [
              {
                "subject": {
                   "entities": [
@@ -1798,25 +1798,22 @@ Response code:
             "id": "abcde",
             "subject": {
               "entities": [
-		{
                 "id": "Foo",
                 "type": "myFooType"
-		}
               ],
               "attributes": [
                 "humidity"
               ]
             },
             "callback": "http://localhost:1234",
-            "duration": "PT1M",
-            
+            "duration": "PT1M"
+          },
+          {
             "id": "efgh",
             "subject": {
               "entities": [
-		{
                 "id": "myBar",
                 "type": "myBarType"
-                }
               ],
               "attributes": [
                 "speed"
