@@ -354,7 +354,7 @@ std::string Metadata::toJson(bool isLastElement)
 
   out = JSON_STR(name) + ":{";
 
-  out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":" + "null";
+  out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":null";
   out += ",";
 
   if (valueType == orion::ValueTypeString)
@@ -374,7 +374,7 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNone)
   {
-    out += JSON_STR("value") + ":" + "null";
+    out += JSON_STR("value") + ":null";
   }
   else
   {
