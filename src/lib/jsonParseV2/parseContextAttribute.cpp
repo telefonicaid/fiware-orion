@@ -258,7 +258,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    OrionError oe(ERROR_STRING_PARSERROR, "Errors found in incoming JSON buffer");
+    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
 
     alarmMgr.badInput(clientIp, "JSON parse error");
     ciP->httpStatusCode = SccBadRequest;
@@ -269,7 +269,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject())
   {
-    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
+    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
 
     alarmMgr.badInput(clientIp, "JSON Parse Error");
     ciP->httpStatusCode = SccBadRequest;

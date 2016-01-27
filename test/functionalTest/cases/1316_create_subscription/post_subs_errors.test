@@ -319,7 +319,7 @@ Date: REGEX(.*)
 
 {
     "description": "Error parsing incoming JSON buffer",
-    "error": "BadRequest"
+    "error": "ParseError"
 }
 
 
