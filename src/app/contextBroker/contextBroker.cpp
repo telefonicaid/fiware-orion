@@ -317,7 +317,7 @@ bool            strictIdv1;
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 #define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
-#define CHECK_v1_ID_DESC       "additional checks for ids and types in v1"
+#define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 
 
 
@@ -386,7 +386,7 @@ PaArgument paArgs[] =
   { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt,   0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
   { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
 
-  { "-ngsiv1CheckIdFields",  &strictIdv1, "CHECK_ID_V1",  PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC  },
+  { "-strictNgsiv1Ids",  &strictIdv1, "CHECK_ID_V1",  PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC  },
 
   PA_END_OF_ARGS
 };
