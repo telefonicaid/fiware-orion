@@ -1,0 +1,87 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Bug in /v2/entities without options=keyValues
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# Issue #1716 reports that a normal v2 entity using "POST /v2/entities" and a payload of
+# '{"type": "house", "id": "bathroom", "temperature": "34"}' crashes the broker.
+# The payload is invalid, as the value of "temperature" would have to be a JSON object.
+# [ the same payload is valid if '?options=keyValues' is used ]
+# 
+# 01. Normal (but erroneous) v2 entity creation without keyValues (without crashing the broker)
+# 02. GET the entity to make sure the creation did NOT work
+#
+
+echo "01. Normal (but erroneous) v2 entity creation without keyValues (without crashing the broker)"
+echo "============================================================================================="
+payload='{"type": "house", "id": "bathroom", "temperature": "34"}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. GET the entity to make sure the creation did NOT work"
+echo "========================================================="
+orionCurl --url /v2/entities/bathroom --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Normal (but erroneous) v2 entity creation without keyValues (without crashing the broker)
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "not a JSON object",
+    "error": "BadRequest"
+}
+
+
+02. GET the entity to make sure the creation did NOT work
+=========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

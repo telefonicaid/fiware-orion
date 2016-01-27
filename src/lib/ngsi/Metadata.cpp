@@ -351,6 +351,10 @@ std::string Metadata::toJson(bool isLastElement)
   {
     out += JSON_VALUE_BOOL("value", boolValue);
   }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    out += JSON_STR("value") + ":" + "null";
+  }
   else
   {
     LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));

@@ -510,7 +510,7 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
       return;
 
     default:
-      LM_E(("Runtime Error (unknown attribute type: %d)", mdP->valueType));
+      LM_E(("Runtime Error (unknown metadata type: %d)", mdP->valueType));
     }
   }
   else
@@ -529,8 +529,12 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
+    case orion::ValueTypeNone:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << BSONNULL));
+      return;
+
     default:
-      LM_E(("Runtime Error (unknown attribute type)"));
+      LM_E(("Runtime Error (unknown metadata type)"));
     }
   }
 }

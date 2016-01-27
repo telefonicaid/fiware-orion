@@ -1033,11 +1033,12 @@ function orionCurl()
   #
   dMsg Executing the curl-command
   _response=$(eval $command 2> /dev/null)
-  _responseHeaders=$(cat /tmp/httpHeaders.out)
+
   if [ ! -f /tmp/httpHeaders.out ]
   then
     echo "Broker seems to have died ..."
   else
+    _responseHeaders=$(cat /tmp/httpHeaders.out)
     #
     # Remove "Connection: Keep-Alive" and "Connection: close" headers
     #
