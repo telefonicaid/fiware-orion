@@ -42,16 +42,6 @@
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 
 
-
-/* ****************************************************************************
- *
- * MAX_ID_LEN
- */
-#ifndef MAX_ID_LEN
-#define MAX_ID_LEN 256
-#endif
-
-
 /* ****************************************************************************
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
