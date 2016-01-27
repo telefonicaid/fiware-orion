@@ -79,7 +79,7 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
 *
 * SubscribeContextRequest::check - 
 */
-std::string SubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -87,7 +87,7 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  if (((res = entityIdVector.check(SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
+  if (((res = entityIdVector.check(ciP, SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
       ((res = attributeList.check(SubscribeContext, format, indent, predetectedError, counter))         != "OK") ||      
       ((res = reference.check(SubscribeContext, format, indent, predetectedError, counter))             != "OK") ||
       ((res = duration.check(SubscribeContext, format, indent, predetectedError, counter))              != "OK") ||

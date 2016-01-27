@@ -37,6 +37,16 @@
 
 /* ****************************************************************************
 *
+* NotifyConditionVector::NotifyConditionVector - 
+*/
+NotifyConditionVector::NotifyConditionVector()
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * NotifyConditionVector::render -
 */
 std::string NotifyConditionVector::render(Format format, const std::string& indent, bool comma)

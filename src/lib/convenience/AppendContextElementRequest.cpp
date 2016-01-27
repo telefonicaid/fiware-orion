@@ -102,11 +102,11 @@ std::string AppendContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(ciP, AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  else if ((res = domainMetadataVector.check(ciP, AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }

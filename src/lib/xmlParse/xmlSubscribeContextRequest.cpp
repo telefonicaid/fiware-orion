@@ -477,7 +477,7 @@ void scrRelease(ParseData* reqData)
 */
 std::string scrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->scr.res.check(SubscribeContext, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->scr.res.check(ciP, SubscribeContext, ciP->outFormat, "", reqData->errorString, 0);
 }
 
 

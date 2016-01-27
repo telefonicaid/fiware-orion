@@ -156,7 +156,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   std::string type      = jsonParseTypeNames[iter->value.GetType()];
   bool        keyValues = ciP->uriParamOptions["keyValues"];
 
-  
   caP->name = name;
 
   if (keyValues)
@@ -215,6 +214,16 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
   else  // no keyValues
   {
+    // First of all, if no keyValues, we must be in a JSON object.
+    std::string type   = jsonParseTypeNames[iter->value.GetType()];
+    if (type != "Object")
+    {
+      std::string details = "not a JSON object";
+      alarmMgr.badInput(clientIp, details);
+      ciP->httpStatusCode = SccBadRequest;
+      return details;
+    }
+
     // Attribute has a regular structure, in which 'value' is mandatory
     if ((iter->value.HasMember("value")))
     {

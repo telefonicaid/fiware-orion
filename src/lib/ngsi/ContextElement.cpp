@@ -135,6 +135,7 @@ ContextAttribute* ContextElement::getAttribute(std::string attrName)
 */
 std::string ContextElement::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -144,7 +145,7 @@ std::string ContextElement::check
 {
   std::string res;
 
-  if ((res = entityId.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = entityId.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
@@ -154,12 +155,12 @@ std::string ContextElement::check
     return res;
   }
 
-  if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextAttributeVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = domainMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = domainMetadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

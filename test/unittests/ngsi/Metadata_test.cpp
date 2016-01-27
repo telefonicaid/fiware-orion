@@ -94,20 +94,21 @@ TEST(Metadata, render)
 */
 TEST(Metadata, check)
 {
-  Metadata     m1("", "Type", "Value");
-  Metadata     m2("Name", "Type", "");
-  Metadata     m3("Name", "Type", "Value");
-  std::string  checked;
+  Metadata        m1("", "Type", "Value");
+  Metadata        m2("Name", "Type", "");
+  Metadata        m3("Name", "Type", "Value");
+  std::string     checked;
+  ConnectionInfo  ci;
 
   utInit();
 
-  checked = m1.check(RegisterContext, XML, "", "", 0);
+  checked = m1.check(&ci, RegisterContext, XML, "", "", 0);
   EXPECT_STREQ("missing metadata name", checked.c_str());
 
-  checked = m2.check(RegisterContext, JSON, "", "", 0);
+  checked = m2.check(&ci, RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("missing metadata value", checked.c_str());
   
-  checked = m3.check(RegisterContext, XML, "", "", 0);
+  checked = m3.check(&ci, RegisterContext, XML, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

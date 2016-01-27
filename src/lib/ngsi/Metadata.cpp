@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/limits.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -38,6 +39,8 @@
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+
+#include "rest/ConnectionInfo.h"
 
 using namespace mongo;
 
@@ -200,6 +203,7 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
 */
 std::string Metadata::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -207,19 +211,36 @@ std::string Metadata::check
   int                 counter
 )
 {
+  size_t len;
+  char   errorMsg[128];
+
   if (name == "")
   {
     alarmMgr.badInput(clientIp, "missing metadata name");
     return "missing metadata name";
   }
 
-  if (forbiddenChars(name.c_str()))
+  if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion , name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
   }
 
-  if (forbiddenChars(type.c_str()))
+  if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
     return "Invalid characters in metadata type";
@@ -333,7 +354,7 @@ std::string Metadata::toJson(bool isLastElement)
 
   out = JSON_STR(name) + ":{";
 
-  out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":" + "null";
+  out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":null";
   out += ",";
 
   if (valueType == orion::ValueTypeString)
@@ -350,6 +371,10 @@ std::string Metadata::toJson(bool isLastElement)
   else if (valueType == orion::ValueTypeBoolean)
   {
     out += JSON_VALUE_BOOL("value", boolValue);
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    out += JSON_STR("value") + ":null";
   }
   else
   {

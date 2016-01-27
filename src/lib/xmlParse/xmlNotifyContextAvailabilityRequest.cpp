@@ -71,7 +71,7 @@ void ncarRelease(ParseData* parseDataP)
 */
 std::string ncarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncar.res.check(NotifyContextAvailability, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->ncar.res.check(ciP, NotifyContextAvailability, ciP->outFormat, "", parseDataP->errorString, 0);
 }
 
 

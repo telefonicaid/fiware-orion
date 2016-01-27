@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
@@ -745,6 +746,7 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
 */
 std::string ContextAttribute::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -752,18 +754,35 @@ std::string ContextAttribute::check
   int                 counter
 )
 {
+  size_t len;
+  char errorMsg[128];
+
   if ((name == "") && (requestType != EntityAttributeValueRequest))
   {
     return "missing attribute name";
   }
 
-  if (forbiddenChars(name.c_str()))
+  if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
     return "Invalid characters in attribute name";
   }
 
-  if (forbiddenChars(type.c_str()))
+  if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
@@ -785,7 +804,7 @@ std::string ContextAttribute::check
     }
   }
 
-  return metadataVector.check(requestType, format, indent + "  ", predetectedError, counter);
+  return metadataVector.check(ciP, requestType, format, indent + "  ", predetectedError, counter);
 }
 
 

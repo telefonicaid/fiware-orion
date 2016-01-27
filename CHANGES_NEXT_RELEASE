@@ -19,3 +19,4 @@
 - Add: Enable log summary traces using -logSummary CLI (Issue #1585)
 - Add: New CLI parameter '-relogAlarms' to see ALL possible alarm-provoking failures in the log-file
 - Fix: Mongo driver migrated to legacy-1.0.7 (to get the fix for https://jira.mongodb.org/browse/CXX-699) (Issue #1568)
+- Add: id fields checking for NGSIv2 API and (if -strictNgsiv1Ids is enabled) NGSIv1 API (#1601)

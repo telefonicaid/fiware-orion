@@ -123,9 +123,9 @@ static void* logSummary(void* vP)
 
 
     LM_S(("Transactions: %lu (new: %lu)", transactionsNow, diff));
-    LM_S(("DB status: %s, created: (total: %d, new: %d), removed: (total: %d, new: %d)", deActive? "erroneous" : "ok", deRaised, deRaisedNew, deReleased, deReleasedNew));
-    LM_S(("Notification failure active alarms: %d, created: (total: %d, new: %d), removed: (total: %d, new: %d)", neActive, neRaised, neRaisedNew, neReleased, neReleasedNew));
-    LM_S(("Bad input active alarms: %d, created: (total: %d, new: %d), removed: (total: %d, new: %d)", biActive, biRaised, biRaisedNew, biReleased, biReleasedNew));
+    LM_S(("DB status: %s, raised: (total: %d, new: %d), released: (total: %d, new: %d)", deActive? "erroneous" : "ok", deRaised, deRaisedNew, deReleased, deReleasedNew));
+    LM_S(("Notification failure active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)", neActive, neRaised, neRaisedNew, neReleased, neReleasedNew));
+    LM_S(("Bad input active alarms: %d, raised: (total: %d, new: %d), released: (total: %d, new: %d)", biActive, biRaised, biRaisedNew, biReleased, biReleasedNew));
 
     deRaisedInLastSummary   = deRaised;
     deReleasedInLastSummary = deReleased;

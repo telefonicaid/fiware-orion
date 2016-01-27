@@ -173,7 +173,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       eP->type      = iter->value.GetString();
       eP->typeGiven = true;
     }
-    else
+    else  // attribute
     {
       ContextAttribute* caP = new ContextAttribute();
       

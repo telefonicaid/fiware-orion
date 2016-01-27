@@ -28,6 +28,7 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "jsonParseV2/jsonRequestTreat.h"
 
 
 
@@ -35,6 +36,6 @@
 *
 * parseSubscription -
 */
-extern std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, bool partial = false);
+extern std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDelayedRelease* releaseP, bool partial = false);
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSESUBSCRIPTION_H_

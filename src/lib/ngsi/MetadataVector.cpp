@@ -160,6 +160,7 @@ std::string MetadataVector::toJson(bool isLastElement)
 */
 std::string MetadataVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -171,7 +172,7 @@ std::string MetadataVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

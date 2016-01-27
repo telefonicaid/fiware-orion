@@ -78,6 +78,10 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
         mP->valueType     = orion::ValueTypeBoolean;
         mP->boolValue     = false;
       }
+      else if (type == "Null")
+      {
+        mP->valueType     = orion::ValueTypeNone;
+      }
       else
       {
         std::string details = std::string("ContextAttribute::Metadata::type is '") + type + "'";
@@ -136,6 +140,10 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   {
     mP->valueType    = orion::ValueTypeBoolean;
     mP->boolValue    = false;
+  }
+  else if (type == "Null")
+  {
+    mP->valueType    = orion::ValueTypeNone;
   }
   else
   {

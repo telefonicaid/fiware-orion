@@ -117,17 +117,17 @@ Date: REGEX(.*)
 03. grep SUMMARY in log-file (4 transactions, 1 bad input)
 ==========================================================
  Transactions: 4 (new: 4)
- DB status: ok, created: (total: 0, new: 0), removed: (total: 0, new: 0)
- Notification failure active alarms: 0, created: (total: 0, new: 0), removed: (total: 0, new: 0)
- Bad input active alarms: 1, created: (total: 1, new: 1), removed: (total: 0, new: 0)
+ DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Bad input active alarms: 1, raised: (total: 1, new: 1), released: (total: 0, new: 0)
 
 
 04. grep BadInput in log-file (4 lines found)
 =============================================
  Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
- Repeated BadInput for 0.0.0.0: JSON parse error
- Repeated BadInput for 0.0.0.0: bad verb for url '/v2/entities', method 'GETT'
- Repeated BadInput for 0.0.0.0: {"error":"LengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
+ Repeated BadInput 0.0.0.0: JSON parse error
+ Repeated BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'GETT'
+ Repeated BadInput 0.0.0.0: {"error":"LengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
 
 
 --TEARDOWN--

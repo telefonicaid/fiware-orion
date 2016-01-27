@@ -352,12 +352,12 @@ Date: REGEX(.*)
 07. POST /v2/subscriptions (missing notification)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
+Content-Length: 81
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "no notitifcation for subscription specified",
+    "description": "no notification for subscription specified",
     "error": "BadRequest"
 }
 
