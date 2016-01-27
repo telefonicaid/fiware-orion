@@ -30,7 +30,7 @@ brokerStart CB 0-255
 --SHELL--
 
 # The bug that this test covers was that step 4 returned vehicle1,
-# vehicle2 and vehicle 3 entities. Steps 5 and eyond are hardening of
+# vehicle2 and vehicle 3 entities. Steps 5 and beyond are hardening of
 # the base case
 #
 # 01. Create entity vehicle1
