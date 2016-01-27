@@ -34,7 +34,6 @@ brokerStart CB 0
 # 02. Making sure no entity was created in part 01
 #
 
-LONG=$(printf '=%.0s' {1..255})
 
 echo "01. POST /v2/entities (Room1)"
 echo "============================="
