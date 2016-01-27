@@ -76,6 +76,8 @@ class TriggeredSubscription
                         const std::string&   _reference,
                         const AttributeList& _attrL);
 
+  ~TriggeredSubscription();
+
   void fillExpression(const std::string& q, const std::string& georel, const std::string& geometry, const std::string& coords);
 
   std::string toString(const std::string& delimiter);

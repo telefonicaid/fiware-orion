@@ -67,6 +67,18 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
     releaseP->attribute->release();
     releaseP->attribute = NULL;
   }
+
+  if (releaseP->scrP != NULL)
+  {
+    releaseP->scrP->release();
+    releaseP->scrP = NULL;
+  }
+
+  if (releaseP->ucsrP != NULL)
+  {
+    releaseP->ucsrP->release();
+    releaseP->ucsrP = NULL;
+  }
 }
 
 
