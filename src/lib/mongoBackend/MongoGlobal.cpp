@@ -1348,6 +1348,19 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
 
     s = wsStrip(s);
 
+    //
+    // Rudimentary sanity checks
+    //
+    // 1. If a range is present, the op MUST be either '==' OR '!=' 
+    //
+    if (strstr(s, "..") != NULL)
+    {
+      if ((strstr(s, "==") == NULL) && (strstr(s, "!=") == NULL))
+      {
+        return false;
+      }
+    }
+
     left = s;
     if ((op = (char*) strstr(s, "==")) != NULL)
     {
