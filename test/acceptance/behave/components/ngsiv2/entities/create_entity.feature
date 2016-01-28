@@ -690,7 +690,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
 
   @entities_type_error.row<row.id>
-  @entities_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
+  @entities_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728
   Scenario Outline:  try to create entities using NGSI v2 with several wrong entities type values
     Given  a definition of headers
       | parameter          | value                    |
@@ -879,7 +879,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | description | no entity id specified |
     And verify that entities are not stored in mongo
 
-  @entities_id_wrong @BUG_1093 @BUG_1200 @BUG_1351  @BUG_1728 @skip
+  @entities_id_wrong @BUG_1093 @BUG_1200 @BUG_1351  @BUG_1728
   Scenario Outline:  try to create entities using NGSI v2 with several wrong entities id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -1047,7 +1047,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest                                            |
       | description | attribute name length: 257, max length supported: 256 |
 
-  @attributes_name_error @BUG1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
+  @attributes_name_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes names
     Given  a definition of headers
       | parameter          | value                      |
@@ -1686,7 +1686,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @attributes_type_wrong_p @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
+  @attributes_type_wrong @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes types
     Given  a definition of headers
       | parameter          | value                      |
@@ -1934,7 +1934,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest                                           |
       | description | metadata name length: 257, max length supported: 256 |
 
-  @attributes_metadata_name_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
+  @attributes_metadata_name_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata name without metadata type
     Given  a definition of headers
       | parameter          | value                    |
@@ -1970,7 +1970,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_10     | house_#       |
       | room_11     | my house      |
 
-  @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
+  @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata name with metadata type
     Given  a definition of headers
       | parameter          | value                                 |
@@ -2283,30 +2283,9 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room6"   | -5.00002                   |
       | "room15"  | "41.3763726, 2.1864475,14" |
       | "room16"  | "2017-06-17T07:21:24.238Z" |
+      | "room17"  | null                       |
 
-  @attributes_metadata_value_special_5 @BUG_1106 @BUG_1713 @skip
-  Scenario Outline:  create an entity using NGSI v2 with several attributes metadata special values with metadata type (null, boolean, etc)
-    Given  a definition of headers
-      | parameter          | value                       |
-      | Fiware-Service     | test_metadata_value_special |
-      | Fiware-ServicePath | /test                       |
-      | Content-Type       | application/json            |
-    And properties to entities
-      | parameter        | value            |
-      | entities_type    | "room"           |
-      | entities_id      | <entity_id>      |
-      | attributes_name  | "temperature"    |
-      | attributes_value | "34"             |
-      | metadatas_name   | "alarm"          |
-      | metadatas_value  | <metadata_value> |
-      | metadatas_type   | "nothing"        |
-    When create an entity in raw and "normalized" modes
-    Then verify that receive an "Created" http code
-    Examples:
-      | entity_id | metadata_value |
-      | "room17"  | null           |
-
-  @attributes_metadata_value_special_6 @ISSUE_1712 @skip
+   @attributes_metadata_value_special_6 @ISSUE_1712 @skip
    # The json values still are not allowed.
   Scenario Outline:  create an entity using NGSI v2 with several attributes metadata json values with metadata type (null, boolean, etc)
     Given  a definition of headers
@@ -2599,7 +2578,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | metadatas_value  | random=6        |
       | metadatas_type   | <metadata_type> |
     When create entity group with "1" entities in "normalized" mode
-   Then verify that receive several "Bad Request" http code
+    Then verify that receive several "Bad Request" http code
     And verify several error responses
       | parameter   | value                               |
       | error       | BadRequest                          |
@@ -2634,7 +2613,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest                                           |
       | description | metadata type length: 257, max length supported: 256 |
 
-  @attributes_metadata_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
+  @attributes_metadata_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata type
     Given  a definition of headers
       | parameter          | value                    |
