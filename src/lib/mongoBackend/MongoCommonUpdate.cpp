@@ -129,35 +129,37 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
   {
     orion::CompoundValueNode* child = children[ix];
 
+    std::string effectiveName = dbDotEncode(child->name);
+
     if (child->valueType == orion::ValueTypeString)
     {
-      b.append(child->name, child->stringValue);
+      b.append(effectiveName, child->stringValue);
     }
     else if (child->valueType == orion::ValueTypeNumber)
     {
-      b.append(child->name, child->numberValue);
+      b.append(effectiveName, child->numberValue);
     }
     else if (child->valueType == orion::ValueTypeBoolean)
     {
-      b.append(child->name, child->boolValue);
+      b.append(effectiveName, child->boolValue);
     }
     else if (child->valueType == orion::ValueTypeNone)
     {
-      b.appendNull(child->name);
+      b.appendNull(effectiveName);
     }
     else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba);
-      b.append(child->name, ba.arr());
+      b.append(effectiveName, ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder bo;
 
       compoundValueBson(child->childV, bo);
-      b.append(child->name, bo.obj());
+      b.append(effectiveName, bo.obj());
     }
     else
     {

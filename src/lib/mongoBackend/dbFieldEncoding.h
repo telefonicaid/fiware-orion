@@ -70,13 +70,13 @@ inline std::string idPart(std::string name)
 * dbDotEncode -
 *
 */
-extern std::string dbDotEncode(std::string fromString);
+extern std::string dbDotEncode(const std::string& fromString);
 
 /* ****************************************************************************
 *
 * dbDotDecode -
 *
 */
-extern std::string dbDotDecode(std::string fromString);
+extern std::string dbDotDecode(const std::string& fromString);
 
 #endif // SRC_LIB_MONGOBACKEND_DBFIELDENCODING_H_

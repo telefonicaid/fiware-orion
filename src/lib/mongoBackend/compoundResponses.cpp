@@ -26,6 +26,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "mongoBackend/compoundResponses.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 using namespace mongo;
 
@@ -43,7 +44,7 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   }
 
   orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
-  child->name = e.fieldName();
+  child->name = dbDotDecode(e.fieldName());
 
   switch (e.type())
   {

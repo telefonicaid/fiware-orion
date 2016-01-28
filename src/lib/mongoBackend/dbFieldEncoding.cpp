@@ -41,8 +41,9 @@
 * Replace:
 *   . => =
 */
-std::string dbDotEncode(std::string s)
+std::string dbDotEncode(const std::string& _s)
 {
+  std::string s = _s; // replace cannot be used in const std::string&
   std::replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
   return s;
 }
@@ -55,8 +56,9 @@ std::string dbDotEncode(std::string s)
 * Replace:
 *   = => .
 */
-std::string dbDotDecode(std::string s)
+std::string dbDotDecode(const std::string& _s)
 {
+  std::string s = _s; // replace cannot be used in const std::string&
   std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
   return s;
 }
