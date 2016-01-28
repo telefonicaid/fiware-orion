@@ -30,3 +30,11 @@ However, take into account that some of the filters (e. g. greater/less, range, 
 for numeric values. Thus, in order to work properly, these filters (although using a 
 `POST /v1/queryContext`) needs that the attributes to which they refer were created using NGSIv2 operations.
 
+# Checking ID fields
+
+NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
+or metadata name/type) which are described in the "Field syntax restrictions" section in the
+[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/). In order to
+keep backward compatibility, these restrictions are not used in the NGSIv1 API by default, but
+you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md).
+
