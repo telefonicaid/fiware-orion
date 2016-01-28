@@ -297,9 +297,11 @@ HttpStatusCode mongoQueryContext
     std::string err;
     bool        ok;
     bool        limitReached = false;
+    bool        badInput     = false;
     bool        reqSemTaken;
 
     ContextElementResponseVector rawCerV;    
+
     reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
@@ -312,7 +314,16 @@ HttpStatusCode mongoQueryContext
                        offset,
                        limit,
                        &limitReached,
-                       countP);
+                       countP,
+                       &badInput);
+
+    if (badInput)
+    {
+      responseP->errorCode.fill(SccBadRequest, err);
+      rawCerV.release();
+      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+      return SccOk;      
+    }
 
     if (!ok)
     {

@@ -1092,7 +1092,7 @@ static bool matchFilter
 * Add a BSON filter based on a "q token".
 *
 */
-static void addBsonFilter
+static bool addBsonFilter
 (
   char*                      left,
   const std::string&         opr,
@@ -1230,12 +1230,24 @@ static void addBsonFilter
   }
   else if (opr == ">=")
   {
+    if ((right == NULL) || (*right == 0))
+    {
+      alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in GTE");
+      return false;
+    }
+
     bb.append("$gte", atof(right));
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == "<=")
   {
+    if ((right == NULL) || (*right == 0))
+    {
+      alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in LTE");
+      return false;
+    }
+
     bb.append("$lte", atof(right));
     bob.append(k, bb.obj());
     f = bob.obj();
@@ -1282,9 +1294,9 @@ static void addBsonFilter
   }
   else
   {
-    std::string details = std::string("unknown query operator: ") + opr;
+    std::string details = std::string("unknown query operator: '") + opr + "'";
     alarmMgr.badInput(clientIp, details);
-    pushBackFilter = false;
+    return false;
   }
 
   if (pushBackFilter)
@@ -1292,6 +1304,7 @@ static void addBsonFilter
     filters.push_back(f);
   }
 
+  return true;
 }
 
 /* ****************************************************************************
@@ -1487,7 +1500,11 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
     /* Build the BSON filter (or evaluate on cerP) */
     if (cerP == NULL)
     {
-      addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters);
+      if (addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters) == false)
+      {
+        retval = false;
+        break;
+      }
     }
     else
     {
@@ -1564,7 +1581,8 @@ bool entitiesQuery
   int                              offset,
   int                              limit,
   bool*                            limitReached,
-  long long*                       countP
+  long long*                       countP,
+  bool*                            badInputP
 )
 {
 
@@ -1647,7 +1665,16 @@ bool entitiesQuery
     }
     else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      qStringFilters(sco->value, filters);
+      if (qStringFilters(sco->value, filters) != true)
+      {
+        if (badInputP)
+        {
+          *badInputP = true;
+          *err       = "invalid query expression";
+        }
+
+        return false;
+      }
     }
     else
     {
