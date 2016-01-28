@@ -592,6 +592,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
 
   # ---------- entity type "type" --------------------------------
 
+  @entities_type.row<row.id>
   @entities_type
   Scenario Outline:  create entities using NGSI v2 with several entities type values
     Given  a definition of headers
@@ -623,14 +624,36 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_11     | house.flat    |
       | room_12     | house-flat    |
       | room_13     | house@flat    |
-      | room_14     | habitación    |
-      | room_15     | españa        |
-      | room_16     | barça         |
-      | room_17     | random=10     |
-      | room_18     | random=100    |
-      | room_19     | random=256    |
+      | room_14     | random=10     |
+      | room_15     | random=100    |
+      | room_16     | random=256    |
 
-  @entities_type_length_exceed @ISSUE_1601 @skip
+  @entities_type_not_allowed
+  Scenario Outline:  try to create entities using NGSI v2 with several entities type values with not plain ascii
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_entities_type |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    And properties to entities
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | temperature     |
+      | attributes_value | 34              |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                             |
+      | error       | BadRequest                        |
+      | description | Invalid characters in entity type |
+    Examples:
+      | entities_id | entities_type |
+      | room_17     | habitación    |
+      | room_18     | españa        |
+      | room_19     | barça         |
+
+  @entities_type_length_exceed @ISSUE_1601
   Scenario:  try to create entities using NGSI v2 with entity type length that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                        |
@@ -666,7 +689,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @entities_type_error @BUG_1093 @BUG_1200 @BUG_1351 @skip
+  @entities_type_error.row<row.id>
+  @entities_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong entities type values
     Given  a definition of headers
       | parameter          | value                    |
@@ -785,14 +809,37 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_11       | house.flat  |
       | room_12       | house-flat  |
       | room_13       | house@flat  |
-      | room_14       | habitación  |
-      | room_15       | españa      |
-      | room_16       | barça       |
       | room_17       | random=10   |
       | room_18       | random=100  |
       | room_19       | random=256  |
 
-  @entities_id_length_exceed @ISSUE_1601 @skip
+  @entities_id_not_allowed
+  Scenario Outline:  try to create entities using NGSI v2 with several entities id values with not plain ascii
+    Given  a definition of headers
+      | parameter          | value            |
+      | Fiware-Service     | test_entities_id |
+      | Fiware-ServicePath | /test            |
+      | Content-Type       | application/json |
+    And properties to entities
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | temperature     |
+      | attributes_value | 34              |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                           |
+      | error       | BadRequest                      |
+      | description | Invalid characters in entity id |
+
+    Examples:
+      | entities_type | entities_id |
+      | room_14       | habitación  |
+      | room_15       | españa      |
+      | room_16       | barça       |
+
+  @entities_id_length_exceed @ISSUE_1601
   Scenario:  try to create entities using NGSI v2 with with entity id length that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                      |
@@ -832,7 +879,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | description | no entity id specified |
     And verify that entities are not stored in mongo
 
-  @entities_id_wrong @BUG_1093 @BUG_1200 @BUG_1351 @skip
+  @entities_id_wrong @BUG_1093 @BUG_1200 @BUG_1351  @BUG_1728 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong entities id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -951,14 +998,36 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house.flat      |
       | house-flat      |
       | house@flat      |
-      | habitación      |
-      | españa          |
-      | barça           |
       | random=10       |
       | random=100      |
       | random=256      |
 
-  @attributes_name_max_length @ISSUE_1601 @skip
+  @attributes_name_not_allowed @ISSUE_1090
+  Scenario Outline:  try to create entities using NGSI v2 with several attributes names with not plain ascii
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_attributes_name |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    And properties to entities
+      | parameter        | value             |
+      | entities_type    | house             |
+      | entities_id      | room              |
+      | attributes_name  | <attributes_name> |
+      | attributes_value | 34                |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | Invalid characters in attribute name |
+    Examples:
+      | attributes_name |
+      | habitación      |
+      | españa          |
+      | barça           |
+
+  @attributes_name_max_length @ISSUE_1601
   Scenario:  try to create entities using NGSI v2 with an attributes name that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                |
@@ -978,7 +1047,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest                                            |
       | description | attribute name length: 257, max length supported: 256 |
 
-  @attributes_name_error @BUG1093 @BUG_1200 @BUG_1351 @skip
+  @attributes_name_error @BUG1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes names
     Given  a definition of headers
       | parameter          | value                      |
@@ -1535,8 +1604,11 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
     Examples:
       | attributes_type |
-      | dgdgdfgd        |
+      | temperature     |
       | 34              |
+      | false           |
+      | true            |
+      | 34.4E-34        |
       | temp.34         |
       | temp_34         |
       | temp-34         |
@@ -1545,16 +1617,38 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house.flat      |
       | house-flat      |
       | house@flat      |
-      | habitación      |
-      | españa          |
-      | barça           |
       | random=10       |
-      | random=50       |
       | random=100      |
       | random=150      |
       | random=256      |
 
-  @attributes_type_max_length @ISSUE_1601 @skip
+  @attributes_type_not_allowed
+  Scenario Outline:  try to create entities using NGSI v2 with several attributes type with not plain ascii
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_attributes_type |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    And properties to entities
+      | parameter        | value             |
+      | entities_type    | house             |
+      | entities_id      | room              |
+      | attributes_name  | temperature       |
+      | attributes_value | 56                |
+      | attributes_type  | <attributes_type> |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | Invalid characters in attribute type |
+    Examples:
+      | attributes_type |
+      | habitación      |
+      | españa          |
+      | barça           |
+
+  @attributes_type_max_length @ISSUE_1601
   Scenario:  try to create entities using NGSI v2 with an attributes type that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                |
@@ -1592,7 +1686,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @attributes_type_wrong_p @BUG_1093 @BUG_1200 @BUG_1351 @skip
+  @attributes_type_wrong_p @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes types
     Given  a definition of headers
       | parameter          | value                      |
@@ -1702,8 +1796,11 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
     Examples:
       | metadata_name |
-      | dgdgdfgd      |
+      | temperature   |
       | 34            |
+      | false         |
+      | true          |
+      | 34.4E-34      |
       | temp.34       |
       | temp_34       |
       | temp-34       |
@@ -1712,12 +1809,38 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house.flat    |
       | house-flat    |
       | house@flat    |
+      | random=10     |
+      | random=100    |
+      | random=150    |
+      # In metadata name always is added a suffix in code. Ex: _0
+      | random=254    |
+
+  @attributes_metadata_name_not_allowed
+  Scenario Outline:  try to create entities using NGSI v2 with several attributes metadata name without metadata type but with not plain ascii
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_metadata_name |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    And properties to entities
+      | parameter        | value           |
+      | entities_type    | house           |
+      | entities_id      | room            |
+      | attributes_name  | temperature     |
+      | attributes_value | 56              |
+      | metadatas_name   | <metadata_name> |
+      | metadatas_value  | random=5        |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | Invalid characters in metadata name |
+    Examples:
+      | metadata_name |
       | habitación    |
       | españa        |
       | barça         |
-      | random=10     |
-      | random=100    |
-      | random=256    |
 
   @attributes_metadata_name_with_type
   Scenario Outline:  create entities using NGSI v2 with several attributes metadata name with metadata type
@@ -1740,8 +1863,11 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
     Examples:
       | metadata_name |
-      | dgdgdfgd      |
+      | temperature   |
       | 34            |
+      | false         |
+      | true          |
+      | 34.4E-34      |
       | temp.34       |
       | temp_34       |
       | temp-34       |
@@ -1750,14 +1876,41 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house.flat    |
       | house-flat    |
       | house@flat    |
+      | random=10     |
+      | random=100    |
+      | random=150    |
+       # In metadata name always is added a suffix in code. Ex: _0
+      | random=254    |
+
+  @attributes_metadata_name_with_type_not_allowed
+  Scenario Outline:  try to create entities using NGSI v2 with several attributes metadata name with metadata type and not plain ascii
+    Given  a definition of headers
+      | parameter          | value                        |
+      | Fiware-Service     | test_metadata_name_with_type |
+      | Fiware-ServicePath | /test                        |
+      | Content-Type       | application/json             |
+    And properties to entities
+      | parameter        | value           |
+      | entities_type    | house           |
+      | entities_id      | room            |
+      | attributes_name  | temperature     |
+      | attributes_value | 56              |
+      | metadatas_name   | <metadata_name> |
+      | metadatas_value  | random=5        |
+      | metadatas_type   | random=6        |
+    When create entity group with "1" entities in "normalized" mode
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | Invalid characters in metadata name |
+    Examples:
+      | metadata_name |
       | habitación    |
       | españa        |
       | barça         |
-      | random=10     |
-      | random=100    |
-      | random=256    |
 
-  @attributes_metadata_name_max_length @ISSUE_1601 @skip
+  @attributes_metadata_name_max_length @ISSUE_1601
   Scenario:  try to create entities using NGSI v2 with an attributes metadata name that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                |
@@ -1771,16 +1924,17 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | attributes_name  | temperature |
       | attributes_value | 56          |
       | attributes_type  | celcius     |
-      | metadatas_name   | random=257  |
+      | metadatas_name   | random=255  |
       | metadatas_value  | random=5    |
     When create entity group with "1" entities in "normalized" mode
     Then verify that receive several "Bad Request" http code
+    # the metadata name is incremented in 2 chars because it is added with a suffix. Ex: "_0"
     And verify several error responses
       | parameter   | value                                                |
       | error       | BadRequest                                           |
       | description | metadata name length: 257, max length supported: 256 |
 
-  @attributes_metadata_name_error @BUG_1093 @BUG_1200 @BUG_1351 @skip
+  @attributes_metadata_name_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata name without metadata type
     Given  a definition of headers
       | parameter          | value                    |
@@ -1816,7 +1970,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_10     | house_#       |
       | room_11     | my house      |
 
-  @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200 @BUG_1351 @skip
+  @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata name with metadata type
     Given  a definition of headers
       | parameter          | value                                 |
@@ -2042,7 +2196,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest             |
       | description | missing metadata value |
 
-  @attributes_metadata_value_special_1 @BUG_1106 @BUG_1713
+  @attributes_metadata_value_special.row<row.id>
+  @attributes_metadata_value_special @BUG_1106 @BUG_1713
   Scenario Outline:  create an entity using NGSI v2 with several attributes metadata special values without metadata type (null, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
@@ -2067,32 +2222,12 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room4"   | -34                        |
       | "room5"   | 5.00002                    |
       | "room6"   | -5.00002                   |
-      | "room15"  | "41.3763726, 2.1864475,14" |
-      | "room16"  | "2017-06-17T07:21:24.238Z" |
-
-  @attributes_metadata_value_special_2 @BUG_1106 @BUG_1713 @skip
-  Scenario Outline:  create an entity using NGSI v2 with several attributes metadata special values without metadata type (null, boolean, etc)
-    Given  a definition of headers
-      | parameter          | value                       |
-      | Fiware-Service     | test_metadata_value_special |
-      | Fiware-ServicePath | /test                       |
-      | Content-Type       | application/json            |
-    And properties to entities
-      | parameter        | value            |
-      | entities_type    | "room"           |
-      | entities_id      | <entity_id>      |
-      | attributes_name  | "temperature"    |
-      | attributes_value | "34"             |
-      | metadatas_name   | "alarm"          |
-      | metadatas_value  | <metadata_value> |
-    When create an entity in raw and "normalized" modes
-    Then verify that receive an "Created" http code
-    Examples:
-      | entity_id | metadata_value |
-      | "room17"  | null           |
+      | "room7"   | "41.3763726, 2.1864475,14" |
+      | "room8"   | "2017-06-17T07:21:24.238Z" |
+      | "room9"   | null                       |
 
   @attributes_metadata_value_special_3 @ISSUE_1712 @skip
-   # The json values still are not allowed.
+  # The json values still are not allowed.
   Scenario Outline:  create an entity using NGSI v2 with several attributes metadata json values without metadata type (null, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
@@ -2429,8 +2564,11 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are stored in mongo
     Examples:
       | metadata_type |
-      | dgdgdfgd      |
+      | temperature   |
       | 34            |
+      | false         |
+      | true          |
+      | 34.4E-34      |
       | temp.34       |
       | temp_34       |
       | temp-34       |
@@ -2439,14 +2577,40 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house.flat    |
       | house-flat    |
       | house@flat    |
+      | random=10     |
+      | random=100    |
+      | random=150    |
+      | random=256    |
+
+  @attributes_metadata_type_not_allowed
+  Scenario Outline:  try to create entities using NGSI v2 with several attributes with metadata types and not plain ascii
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_metadata_type |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    And properties to entities
+      | parameter        | value           |
+      | entities_type    | room            |
+      | entities_id      | room2           |
+      | attributes_name  | temperature     |
+      | attributes_value | 34              |
+      | metadatas_name   | random=5        |
+      | metadatas_value  | random=6        |
+      | metadatas_type   | <metadata_type> |
+    When create entity group with "1" entities in "normalized" mode
+   Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | Invalid characters in metadata type |
+    Examples:
+      | metadata_type |
       | habitación    |
       | españa        |
       | barça         |
-      | random=10     |
-      | random=100    |
-      | random=256    |
 
-  @attributes_metadata_type_max_length @ISSUE_1601 @skip
+  @attributes_metadata_type_max_length @ISSUE_1601
   Scenario:  try to create entities using NGSI v2 with an attributes metadata type that exceeds the maximum allowed (256)
     Given  a definition of headers
       | parameter          | value                |
@@ -2470,7 +2634,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | error       | BadRequest                                           |
       | description | metadata type length: 257, max length supported: 256 |
 
-  @attributes_metadata_type_error @BUG_1093 @BUG_1200 @BUG_1351 @skip
+  @attributes_metadata_type_error @BUG_1093 @BUG_1200 @BUG_1351 @BUG_1728 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata type
     Given  a definition of headers
       | parameter          | value                    |
@@ -2669,7 +2833,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house(flat) | normalized |
       | house(flat) | keyValues  |
 
-  @qp_key_values_off_only_value @BUG_1716 @skip
+  @qp_key_values_off_only_value.row<row.id>
+  @qp_key_values_off_only_value @BUG_1716
   Scenario Outline:  try to create an entity using NGSI v2 without keyValues mode activated, but in  only values format
     Given  a definition of headers
       | parameter          | value               |
@@ -2685,9 +2850,9 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     When create an entity in raw and "keyValues" modes
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                |
-      | error       | ParseError                           |
-      | description | Errors found in incoming JSON buffer |
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | not a JSON object |
     Examples:
       | entity_id | attribute_value                                                               |
       | "room0"   | "34"                                                                          |
@@ -2700,15 +2865,39 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
       | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
       | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-      | "room10"  | {"x": "x1","x2": "b"}                                                         |
-      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
-      | "room15"  | "41.3763726, 2.1864475,14"                                                    |
-      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    |
-      | "room17"  | null                                                                          |
-      | "room18"  | "sdfsdf.sdfsdf"                                                               |
+      | "room10"  | "2017-06-17T07:21:24.238Z"                                                    |
+      | "room11"  | null                                                                          |
+      | "room12"  | "sdfsdf.sdfsdf"                                                               |
+      | "room13"  | "41.3763726, 2.1864475,14"                                                    |
+
+  @qp_key_values_off_only_value @BUG_1716
+  Scenario Outline:  try to create an entity using NGSI v2 without keyValues mode activated, but in  only values format
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_key_value_mode |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    And properties to entities
+      | parameter        | value             |
+      | entities_type    | "house"           |
+      | entities_id      | <entity_id>       |
+      | attributes_name  | "temperature"     |
+      | attributes_value | <attribute_value> |
+    When create an entity in raw and "keyValues" modes
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                             |
+      | error       | BadRequest                                        |
+      | description | no 'value' for ContextAttribute without keyValues |
+    Examples:
+      | entity_id | attribute_value                                |
+
+      | "room14"  | {"x": {"x1": "a","x2": "b"}}                   |
+      | "room15"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}      |
+      | "room16"  | {"x": ["a", 45, "rt"],"x2": "b"}               |
+      | "room17"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"} |
+      | "room18"  | {"x": "x1","x2": "b"}                          |
+
 
   @qp_key_values_on_only_value
   Scenario Outline:  create an entity using NGSI v2 with keyValues mode activated, but in only values format
