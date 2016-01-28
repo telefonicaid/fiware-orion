@@ -1152,10 +1152,35 @@ static bool addBsonFilter
         bob.append(k, bb.obj());
         f = bob.obj();
       }
+      else if (*right == '\'')  // Forced string
+      {
+        ++right;
+        if (right[strlen(right) - 1] != '\'')
+        {
+          alarmMgr.badInput(clientIp, "invalid expression - no ending single-quote in forced string");
+          return false;
+        }
+        right[strlen(right) - 1] = 0;
+
+        bb.append("$in", BSON_ARRAY(right));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
       else
       {
-        // string
-        bb.append("$in", BSON_ARRAY(right));
+        if (strcmp(right, "true") == 0)
+        {
+          bb.append("$in", BSON_ARRAY(true));
+        }
+        else if (strcmp(right, "false") == 0)
+        {
+          bb.append("$in", BSON_ARRAY(false));
+        }
+        else // string
+        {
+          bb.append("$in", BSON_ARRAY(right));
+        }
+
         bob.append(k, bb.obj());
         f = bob.obj();
       }
@@ -1206,10 +1231,36 @@ static bool addBsonFilter
         bob.append(k, bb.obj());
         f = bob.obj();
       }
+      else if (*right == '\'')  // Forced string
+      {
+        ++right;
+        if (right[strlen(right) - 1] != '\'')
+        {
+          alarmMgr.badInput(clientIp, "invalid expression - no ending single-quote in forced string");
+          return false;
+        }
+        right[strlen(right) - 1] = 0;
+
+
+        bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
       else
       {
-        // string
-        bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+        if (strcmp(right, "true") == 0)
+        {
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(true));
+        }
+        else if (strcmp(right, "false") == 0)
+        {
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(false));
+        }
+        else // string
+        {
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+        }
+
         bob.append(k, bb.obj());
         f = bob.obj();
       }
@@ -1363,7 +1414,6 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
 
       right = &op[2];
       op    = (char*) "==";
-
     }
     else if ((op = (char*) strstr(s, "!=")) != NULL)
     {
