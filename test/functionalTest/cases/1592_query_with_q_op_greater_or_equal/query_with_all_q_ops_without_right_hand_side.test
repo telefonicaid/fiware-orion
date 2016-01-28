@@ -1,0 +1,207 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with q string filter using all ops but without right-hand-value
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Operation +
+# 02. Operation -
+# 03. Operation ==
+# 04. Operation !=
+# 05. Operation >
+# 06. Operation <
+# 07. Operation >=
+# 08. Operation <=
+#
+
+
+echo "01. Operation +"
+echo "==============="
+orionCurl --url '/v2/entities?q=+' --json
+echo
+echo
+
+
+echo "02. Operation -"
+echo "==============="
+orionCurl --url '/v2/entities?q=-' --json
+echo
+echo
+
+
+echo "03. Operation =="
+echo "================"
+orionCurl --url '/v2/entities?q=A1==' --json
+echo
+echo
+
+
+echo "04. Operation !="
+echo "================"
+orionCurl --url '/v2/entities?q=A1!=' --json
+echo
+echo
+
+
+echo "05. Operation >"
+echo "==============="
+orionCurl --url '/v2/entities?q=A1>' --json
+echo
+echo
+
+
+echo "06. Operation <"
+echo "==============="
+orionCurl --url '/v2/entities?q=A1<' --json
+echo
+echo
+
+
+echo "07. Operation >="
+echo "================"
+orionCurl --url '/v2/entities?q=A1>=' --json
+echo
+echo
+
+
+echo "08. Operation <="
+echo "================"
+orionCurl --url '/v2/entities?q=A1<=' --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Operation +
+===============
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+02. Operation -
+===============
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+03. Operation ==
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+04. Operation !=
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+05. Operation >
+===============
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+06. Operation <
+===============
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+07. Operation >=
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+08. Operation <=
+================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
