@@ -144,3 +144,5 @@ The list of available options is the following:
     See [logs documentation](logs.md#summary-traces) for more detail.
 -   **-relogAlarms**. To see *every* possible alarm-provoking failure in the log-file, even when an alarm is already active, use this option. See [logs documentation](logs.md#alarms)
     for more detail.
+-   **-strictNgsiv1Ids**. To apply to the NGSIv1 API the same restrictions that apply to NGSIv2 for id fields regarding
+    forbidden characters and length limit. See also [this section of the documentation](../user/v1_v2_coexistence.md#checking-id-fields).

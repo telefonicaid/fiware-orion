@@ -1104,7 +1104,6 @@ static bool addBsonFilter
 )
 {
   std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
-  bool           pushBackFilter = true;
   BSONObjBuilder bob;
   BSONObjBuilder bb;
   BSONObjBuilder bb2;
@@ -1294,16 +1293,12 @@ static bool addBsonFilter
   }
   else
   {
-    std::string details = std::string("unknown query operator: '") + opr + "'";
+    std::string details = std::string("unknown query operator: /") + opr + "/";
     alarmMgr.badInput(clientIp, details);
     return false;
   }
 
-  if (pushBackFilter)
-  {
-    filters.push_back(f);
-  }
-
+  filters.push_back(f);
   return true;
 }
 
@@ -1678,6 +1673,7 @@ bool entitiesQuery
     }
     else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
+      // FIXME P4: Once issue #1705 is implemented, this check can be removed.
       if (qStringFilters(sco->value, filters) != true)
       {
         if (badInputP)

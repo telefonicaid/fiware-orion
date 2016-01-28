@@ -31,7 +31,26 @@
 
 #include "parse/forbiddenChars.h"
 
-
+/************************************
+*
+* commonForbidden
+*/
+inline static bool commonForbidden(char c)
+{
+  switch (c)
+  {
+  case '<':
+  case '>':
+  case '"':
+  case '\'':
+  case '=':
+  case ';':
+  case '(':
+  case ')':
+    return true;
+  }
+  return false;
+}
 
 /* ****************************************************************************
 *
@@ -52,16 +71,8 @@ bool forbiddenChars(const char* s, const char* exceptions)
       continue;
     }
 
-    switch (*s)
+    if(commonForbidden(*s))
     {
-    case '<':
-    case '>':
-    case '"':
-    case '\'':
-    case '=':
-    case ';':
-    case '(':
-    case ')':
       return true;
     }
 
@@ -103,6 +114,12 @@ bool forbiddenIdChars(const std::string& api, const char* s, const char* excepti
     case '/':
     case '#':
     case '&':
+      return true;
+    }
+
+    // Plus common set of forbidden chars
+    if(commonForbidden(*s))
+    {
       return true;
     }
 
