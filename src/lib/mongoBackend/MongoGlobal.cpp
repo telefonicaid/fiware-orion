@@ -1109,7 +1109,22 @@ static bool addBsonFilter
   BSONObjBuilder bb2;
   BSONObj        f;
 
-  if ((right == NULL) || (*right == 0))
+  //
+  // The right-hand-side can enter in 3 different ways (params to this function):
+  //   - right                normal case)
+  //   - valVector            as a vector of values, in the case of 'X==a,b,c'
+  //   - rangeFrom/rangeTo    as two values when '..' is used to denote a range
+  //
+  // To check that 'the right hand side is empty', we need to make sure all these three
+  // 'different ways' are empty.
+  //
+  // rangeFrom and rangeTo are treated separately, just in case some day we'd want to use 
+  // some construction with only upper/lower limit.
+  //
+  if (((right == NULL) || (*right == 0)) && 
+      (valVector.size() == 0) && 
+      ((rangeFrom == NULL) || (*rangeFrom == 0)) && 
+      ((rangeTo == NULL) || (*rangeTo == 0)))
   {
     alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in filter operation");
     return false;
