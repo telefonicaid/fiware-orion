@@ -1403,6 +1403,7 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
     {
       if ((strstr(s, "==") == NULL) && (strstr(s, "!=") == NULL))
       {
+        free(toFree);
         return false;
       }
     }
