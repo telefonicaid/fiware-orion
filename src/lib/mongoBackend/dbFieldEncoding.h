@@ -65,18 +65,31 @@ inline std::string idPart(std::string name)
 
 }
 
+#define ESCAPE_1_DECODED  '.'
+#define ESCAPE_1_ENCODED  '='
+
 /* ****************************************************************************
 *
 * dbDotEncode -
 *
 */
-extern std::string dbDotEncode(const std::string& fromString);
+inline std::string dbDotEncode(const std::string& _s)
+{
+  std::string s(_s);   // replace cannot be used in const std::string&
+  std::replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
+  return s;
+}
 
 /* ****************************************************************************
 *
 * dbDotDecode -
 *
 */
-extern std::string dbDotDecode(const std::string& fromString);
+inline std::string dbDotDecode(const std::string& _s)
+{
+  std::string s(_s);   // replace cannot be used in const std::string&
+  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
+  return s;
+}
 
 #endif // SRC_LIB_MONGOBACKEND_DBFIELDENCODING_H_
