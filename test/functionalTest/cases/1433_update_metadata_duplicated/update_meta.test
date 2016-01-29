@@ -36,7 +36,7 @@ brokerStart CB
 # 01. Create a metadata
 # 02. GET the entity to make sure the creation worked
 # 03. Update metadata changing type
-# 04. GET the entity to make sure the creation worked
+# 04. GET the entity to make sure the update worked
 #
 
 echo "01. Create a metadata"
