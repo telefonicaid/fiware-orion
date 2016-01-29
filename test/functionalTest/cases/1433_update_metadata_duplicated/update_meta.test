@@ -58,7 +58,7 @@ payload='
             },
             "house_flat_0": {
                 "type": "alarm",
-                "value": "hot"
+                "value": "icy"
             }
         }
     }
@@ -86,7 +86,7 @@ payload='
             "value": "5678"
         },
         "house_flat_0": {
-            "value": "5678"
+            "value": "1234"
         }
     }
 }'
@@ -130,7 +130,7 @@ Date: REGEX(.*)
         "metadata": {
             "house_flat_0": {
                 "type": "alarm",
-                "value": "hot"
+                "value": "icy"
             },
             "house_flat_1": {
                 "type": "alarm",
@@ -170,7 +170,7 @@ Date: REGEX(.*)
         "metadata": {
             "house_flat_0": {
                 "type": null,
-                "value": "5678"
+                "value": "1234"
             },
             "house_flat_1": {
                 "type": null,
