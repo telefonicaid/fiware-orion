@@ -286,8 +286,6 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
   {
     Metadata* md = caP->metadataVector[ix];
 
-    /* Note that, unlike entity types or attribute types, for attribute metadata we don't consider empty type
-     * as a wildcard in order to keep it simpler */
     if ((md->name == name))
     {
       return true;
@@ -323,13 +321,13 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
 
 
   // Same declared type ?
-  if (getField(md1, ENT_ATTRS_MD_TYPE).type()!= getField(md2, ENT_ATTRS_MD_TYPE).type())
+  if (getField(md1, ENT_ATTRS_MD_TYPE).type() != getField(md2, ENT_ATTRS_MD_TYPE).type())
   {
     return false;
   }
   switch (getField(md1, ENT_ATTRS_MD_TYPE).type())
   {
-    /* FIXME not yet
+    /* FIXME not yet, issue #1068 Support array and object in metadata value
     case Object:
       ...
       break;
