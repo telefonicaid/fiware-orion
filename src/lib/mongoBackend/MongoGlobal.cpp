@@ -1109,6 +1109,12 @@ static bool addBsonFilter
   BSONObjBuilder bb2;
   BSONObj        f;
 
+  if ((right == NULL) || (*right == 0))
+  {
+    alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in filter operation");
+    return false;
+  }
+
   if (opr == "==")
   {
     if (std::string(rangeFrom) != "")
@@ -1280,24 +1286,12 @@ static bool addBsonFilter
   }
   else if (opr == ">=")
   {
-    if ((right == NULL) || (*right == 0))
-    {
-      alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in GTE");
-      return false;
-    }
-
     bb.append("$gte", atof(right));
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == "<=")
   {
-    if ((right == NULL) || (*right == 0))
-    {
-      alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in LTE");
-      return false;
-    }
-
     bb.append("$lte", atof(right));
     bob.append(k, bb.obj());
     f = bob.obj();
