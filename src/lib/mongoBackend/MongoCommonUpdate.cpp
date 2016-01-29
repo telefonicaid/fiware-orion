@@ -288,7 +288,7 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 
     /* Note that, unlike entity types or attribute types, for attribute metadata we don't consider empty type
      * as a wildcard in order to keep it simpler */
-    if ((md->name == name) && (md->type == type))
+    if ((md->name == name))
     {
       return true;
     }
@@ -307,15 +307,10 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 */
 static bool matchMetadata(BSONObj& md1, BSONObj& md2)
 {
-  if (md1.hasField(ENT_ATTRS_MD_TYPE))
-  {
-    return md2.hasField(ENT_ATTRS_MD_TYPE) &&
-      getStringField(md1, ENT_ATTRS_MD_TYPE) == getStringField(md2, ENT_ATTRS_MD_TYPE) &&
-      getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
-  }
 
-  return !md2.hasField(ENT_ATTRS_MD_TYPE) &&
-    getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
+  // Metadata is identified by name, type is not part of identity any more
+  return  getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
+
 }
 
 /* ****************************************************************************
@@ -326,6 +321,59 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
 static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
 {
 
+
+  // Same declared type ?
+  if (getField(md1, ENT_ATTRS_MD_TYPE).type()!= getField(md2, ENT_ATTRS_MD_TYPE).type())
+  {
+    return false;
+  }
+  switch (getField(md1, ENT_ATTRS_MD_TYPE).type())
+  {
+    /* FIXME not yet
+    case Object:
+      ...
+      break;
+
+    case Array:
+      ...
+      break;
+    */
+
+    case NumberDouble:
+      if (getField(md1, ENT_ATTRS_MD_TYPE).Number() != getField(md2, ENT_ATTRS_MD_TYPE).Number())
+      {
+        return false;
+      }
+      break;
+
+    case Bool:
+      if (getBoolField(md1, ENT_ATTRS_MD_TYPE) != getBoolField(md2, ENT_ATTRS_MD_TYPE))
+      {
+        return false;
+      }
+      break;
+
+    case String:
+      if (getStringField(md1, ENT_ATTRS_MD_TYPE) != getStringField(md2, ENT_ATTRS_MD_TYPE))
+      {
+        return false;
+      }
+      break;
+
+    case jstNULL:
+      if (!md2.getField(ENT_ATTRS_MD_TYPE).isNull())
+      {
+        return false;
+      }
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown metadata type type in DB: %d)", getField(md1, ENT_ATTRS_MD_TYPE).type()));
+      return false;
+      break;
+  }
+
+  // declared types are equal. Same value ?
   if (getField(md1, ENT_ATTRS_MD_VALUE).type() != getField(md2, ENT_ATTRS_MD_VALUE).type())
   {
     return false;
@@ -373,6 +421,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
 */
 static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 {
+
   bool found = false;
 
   for (BSONObj::iterator i1 = mdV1.begin(); i1.more();)
@@ -515,6 +564,7 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
   }
   else
   {
+
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
@@ -618,6 +668,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     {
       continue;
     }
+
     appendMetadata(&mdVBuilder, mdP);
   }
 
@@ -631,19 +682,19 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
-      Metadata*  md = new Metadata(i.next().embeddedObject());
+      Metadata  md(i.next().embeddedObject());
 
       mdVSize++;
 
-      if (!hasMetadata(md->name, md->type, caP))
+      if (!hasMetadata(md.name, md.type, caP))
       {
-        appendMetadata(&mdVBuilder, md);
+        appendMetadata(&mdVBuilder, &md);
       }
-      delete md;
     }
   }
 
   BSONObj mdNewV = mdVBuilder.arr();
+
 
   if (mdVBuilder.arrSize() > 0)
   {
@@ -2183,6 +2234,7 @@ static bool processContextAttributeVector
                                       strcasecmp(action.c_str(), "replace") == 0,
                                       apiVersion))
       {
+
         return false;
       }
     }
