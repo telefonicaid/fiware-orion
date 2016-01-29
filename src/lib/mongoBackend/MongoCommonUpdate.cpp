@@ -366,7 +366,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       break;
 
     default:
-      LM_E(("Runtime Error (unknown metadata type type in DB: %d)", getField(md1, ENT_ATTRS_MD_TYPE).type()));
+      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getField(md1, ENT_ATTRS_MD_TYPE).type()));
       return false;
       break;
   }
