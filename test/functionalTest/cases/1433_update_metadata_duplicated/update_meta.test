@@ -30,7 +30,8 @@ brokerStart CB
 --SHELL--
 
 #
-# Issue #1713 reports that NULL value for metadatas isn't working.
+# Issue #1433 reports duplicated metada when updating metadata
+# Changing type caused to be view as a different element
 #
 # 01. Create a metadata
 # 02. GET the entity to make sure the creation worked
