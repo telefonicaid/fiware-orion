@@ -7,7 +7,7 @@ Orion Context Broker reference distribution is CentOS 6.x. This doesn't mean tha
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.41 (the one that comes in EPEL6 repository)
-* libmicrohttpd: 0.9.22 (the one that comes in EPEL6 repository)
+* libmicrohttpd: 0.9.48 (from source)
 * libcurl: 7.19.7
 * Mongo Driver: legacy-1.0.7 (from source)
 * rapidjson: 1.0.2
@@ -24,9 +24,9 @@ commands that require root privilege):
 
         sudo yum install make cmake gcc-c++ scons
 
-* Install the required libraries (except the mongo driver and gmock, described in following steps).
+* Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo yum install libmicrohttpd-devel boost-devel libcurl-devel
+        sudo yum install boost-devel libcurl-devel
 
 * Install the Mongo Driver from source:
 
@@ -41,6 +41,16 @@ commands that require root privilege):
         wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
         tar xfvz v1.0.2.tar.gz
         sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
+
+* Install microhttpd from sources:
+
+        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
+        tar xvf libmicrohttpd-0.9.48.tar.gz
+        cd libmicrohttpd-0.9.48
+        ./configure --disable-messages --disable-postprocessor --disable-dauth --disable-epoll
+        make
+        sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
+        sudo ldconfig      # just in case... it doesn't hurt :)
 
 * Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the current CMakeLists.txt configuration)
 
