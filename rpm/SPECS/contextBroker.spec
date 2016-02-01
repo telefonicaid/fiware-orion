@@ -31,12 +31,12 @@ Release:   %{broker_release}
 License:   AGPLv3
 Group:     Applications/Engineering
 Vendor:     Telefónica I+D
-Packager:   Fermín Galán <fermin@tid.es>
+Packager:   Fermín Galán <fermin.galanmarquez@telefonica.com>
 URL:        http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, libcurl, logrotate
-Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, libcurl-devel, boost-devel
+Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libcurl, logrotate
+Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libcurl-devel, boost-devel
 Requires(pre): shadow-utils
 
 %description
