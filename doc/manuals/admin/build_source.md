@@ -26,7 +26,7 @@ commands that require root privilege):
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo yum install boost-devel libcurl-devel
+        sudo yum install boost-devel libcurl-devel gnutls-devel
 
 * Install the Mongo Driver from source:
 
