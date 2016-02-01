@@ -576,7 +576,7 @@ do                                                                        \
 {                                                                         \
   char* text;                                                             \
                                                                           \
-  if ((text = lmTextGet s) != NULL)                                       \
+  if (LM_MASK(LogLevelError) && (text = lmTextGet s) != NULL)             \
   {                                                                       \
     lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
