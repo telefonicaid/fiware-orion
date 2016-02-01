@@ -325,7 +325,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
   bool md1TypeExist = md1.hasField(ENT_ATTRS_MD_TYPE);
   bool md2TypeExist = md2.hasField(ENT_ATTRS_MD_TYPE);
 
-  // If type exist in one metadata but not in the other, then result is unequality
+  // If type exists in one metadata but not in the other, then the result is unequality
   if ((md1TypeExist && !md2TypeExist) || (!md1TypeExist && md2TypeExist))
   {
     return false;
