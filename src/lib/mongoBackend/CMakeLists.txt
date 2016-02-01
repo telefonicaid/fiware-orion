@@ -43,8 +43,7 @@ SET (SOURCES
     mongoGetSubscriptions.cpp
     connectionOperations.cpp
     mongoSubCache.cpp
-    safeMongo.cpp
-    dbFieldEncoding.cpp
+    safeMongo.cpp    
     compoundResponses.cpp
 )
 

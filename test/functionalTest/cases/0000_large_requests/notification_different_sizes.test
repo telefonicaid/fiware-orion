@@ -171,7 +171,7 @@ grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $9 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
 
 --REGEXPECT--
 HTTP/1.1 200 OK

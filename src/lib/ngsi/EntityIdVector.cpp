@@ -31,8 +31,11 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Request.h"
+
 
 
 /* ****************************************************************************
@@ -65,6 +68,7 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
 */
 std::string EntityIdVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -81,7 +85,7 @@ std::string EntityIdVector::check
   {
     if (vec.size() == 0)
     {
-      LM_W(("Bad Input (mandatory entity list missing)"));
+      alarmMgr.badInput(clientIp, "mandatory entity list missing");
       return "No entities";
     }
   }
@@ -90,9 +94,9 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of EntityIds)"));
+      alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;
     }
   }
@@ -186,16 +190,15 @@ bool EntityIdVector::push_back_if_absent(EntityId* item)
 
 /* ****************************************************************************
 *
-* EntityIdVector::get -
+* EntityIdVector::operator[] -
 */
-EntityId* EntityIdVector::get(int ix)
+EntityId* EntityIdVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
-}
-
-const EntityId* EntityIdVector::get(int ix) const
-{
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 

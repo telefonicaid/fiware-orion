@@ -42,6 +42,25 @@
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 
 
+/* ****************************************************************************
+*
+* NGSIv2 "flavours" to tune some behaviours in mongoBackend -
+* 
+* It has been suggested to use RequestType enum (in Request.h) instead of this
+* of Ngsiv2Flavour. By the moment we see them as separate things (and probably
+* flavours will be removed as Orion evolves and NGSIv1 gets removed) but let's
+* see how it evolves.
+*
+* For more detail on this, please have a look to this dicussion at GitHub: 
+* https://github.com/telefonicaid/fiware-orion/pull/1706#discussion_r50416202
+*/
+typedef enum Ngsiv2Flavour
+{
+  NGSIV2_NO_FLAVOUR               = 0,
+  NGSIV2_FLAVOUR_ONCREATE         = 1,
+  NGSIV2_FLAVOUR_ONAPPENDORUPDATE = 2,
+} Ngsiv2Flavour;
+
 
 
 /* ****************************************************************************
@@ -86,6 +105,8 @@ extern bool               timingStatistics;
 extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
+extern bool               checkIdv1;
+
 
 
 /* ****************************************************************************
@@ -100,7 +121,8 @@ extern void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics
+  bool               _notifQueueStatistics,
+  bool               _checkIdv1
 );
 
 
@@ -154,6 +176,31 @@ extern int64_t toSeconds(int value, char what, bool dayPart);
 *
 */
 extern int64_t parse8601(const std::string& s);
+
+
+
+/*****************************************************************************
+*
+* parse8601Time -
+*
+* This is common code for Duration and Throttling (at least)
+*
+*/
+int64_t parse8601Time(const std::string& s);
+
+
+
+/* ****************************************************************************
+*
+* transactionIdGet - 
+*
+* PARAMETERS
+*   readonly:   don't change the transactionId, just return it.
+*
+* Unless readonly, add one to the transactionId and return it.
+* If readonly - just return the current transactionId.
+*/
+int transactionIdGet(bool readonly = true);
 
 
 

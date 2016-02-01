@@ -29,6 +29,7 @@
 #include "common/string.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -83,7 +84,7 @@ bool collectionQuery
       " - query(): " + q.toString() +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -92,9 +93,10 @@ bool collectionQuery
       " - query(): " + q.toString() +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -129,7 +131,7 @@ extern bool collectionRangedQuery
     return false;
   }
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col.c_str(), q.toString().c_str()));
+  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'", col.c_str(), limit, offset, q.toString().c_str()));
 
   try
   {
@@ -156,7 +158,7 @@ extern bool collectionRangedQuery
       " - query(): " + q.toString() +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -165,10 +167,11 @@ extern bool collectionRangedQuery
       " - query(): " + q.toString() +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
 
+  alarmMgr.dbErrorReset();
   return true;
 }
 
@@ -215,7 +218,7 @@ bool collectionCount
       " - count(): " + q.toString() +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -227,9 +230,10 @@ bool collectionCount
       " - query(): " + q.toString() +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -277,7 +281,7 @@ extern bool collectionFindOne
         " - findOne(): " + q.toString() +
         " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -289,9 +293,10 @@ extern bool collectionFindOne
         " - findOne(): " + q.toString() +
         " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -339,7 +344,7 @@ bool collectionInsert
       " - insert(): " + doc.toString() +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -351,9 +356,10 @@ bool collectionInsert
       " - insert(): " + doc.toString() +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -403,7 +409,7 @@ bool collectionUpdate
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -415,9 +421,10 @@ bool collectionUpdate
       " - update(): <" + q.toString() + "," + doc.toString() + ">" +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -465,7 +472,7 @@ bool collectionRemove
       " - remove(): " + q.toString() +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -477,9 +484,10 @@ bool collectionRemove
       " - remove(): " + q.toString() +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -526,7 +534,7 @@ bool collectionCreateIndex
       " - createIndex(): " + indexes.toString() +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -538,9 +546,10 @@ bool collectionCreateIndex
       " - createIndex(): " + indexes.toString() +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -628,7 +637,7 @@ bool runCollectionCommand
       " - runCommand(): " + command.toString() +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -643,9 +652,10 @@ bool runCollectionCommand
       " - runCommand(): " + command.toString() +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -676,7 +686,7 @@ bool setWriteConcern
     std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() +*/
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -685,9 +695,10 @@ bool setWriteConcern
     std::string msg = std::string("setWritteConcern(): ") + /*wc.nodes() + */
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }
@@ -717,7 +728,7 @@ bool getWriteConcern
     std::string msg = std::string("getWritteConern()") +
       " - exception: " + e.what();
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
   catch (...)
@@ -725,9 +736,10 @@ bool getWriteConcern
     std::string msg = std::string("getWritteConern()") +
       " - exception: generic";
     *err = "Database Error (" + msg + ")";
-    LM_E((err->c_str()));
+    alarmMgr.dbError(msg);
     return false;
   }
+  alarmMgr.dbErrorReset();
 
   return true;
 }

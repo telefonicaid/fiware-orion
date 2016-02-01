@@ -91,25 +91,25 @@ echo
 
 echo "02. GET /v2/entities/8787GHY/attrs/brand/value"
 echo "=============================================="
-orionCurl --url /v2/entities/8787GHY/attrs/brand/value --json
+orionCurl --url /v2/entities/8787GHY/attrs/brand/value --json --out text
 echo
 echo
 
 echo "03. GET /v2/entities/8787GHY/attrs/model/value"
 echo "=============================================="
-orionCurl --url /v2/entities/8787GHY/attrs/model/value --json
+orionCurl --url /v2/entities/8787GHY/attrs/model/value --json --out text
 echo
 echo
 
 echo "04. GET /v2/entities/8787GHY/attrs/speed/value"
 echo "=============================================="
-orionCurl --url /v2/entities/8787GHY/attrs/speed/value --json
+orionCurl --url /v2/entities/8787GHY/attrs/speed/value --json --out text
 echo
 echo
 
 echo "05. GET /v2/entities/8787GHY/attrs/A3/value"
 echo "==========================================="
-orionCurl --url /v2/entities/8787GHY/attrs/A3/value --json
+orionCurl --url /v2/entities/8787GHY/attrs/A3/value --json --out text
 echo
 echo
 
@@ -180,49 +180,41 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY/attrs/brand/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 25
-Content-Type: application/json
+Content-Length: 13
+Content-Type: text/plain
 Date: REGEX(.*)
 
-{
-    "value": "Mercedes Benz"
-}
+Mercedes Benz
 
 
 03. GET /v2/entities/8787GHY/attrs/model/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 20
-Content-Type: application/json
+Content-Length: 8
+Content-Type: text/plain
 Date: REGEX(.*)
 
-{
-    "value": "Klasse C"
-}
+Klasse C
 
 
 04. GET /v2/entities/8787GHY/attrs/speed/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 15
-Content-Type: application/json
+Content-Length: 3
+Content-Type: text/plain
 Date: REGEX(.*)
 
-{ 
-    "value": "150"
-}
+150
 
 
 05. GET /v2/entities/8787GHY/attrs/A3/value
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 23
-Content-Type: application/json
+Content-Length: 11
+Content-Type: text/plain
 Date: REGEX(.*)
 
-{
-    "value": "E1/T1/A3/M1"
-}
+E1/T1/A3/M1
 
 
 --TEARDOWN--

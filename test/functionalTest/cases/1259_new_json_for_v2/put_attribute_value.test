@@ -1,0 +1,636 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT Attribute Value
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. POST /v2/entities creating E1 A1=1
+# 02. PUT /v2/entities/E1/attrs/A1/value with erroneous JSON payload
+# 03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
+# 04. Check that A1 == "that JSON object"
+# 05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
+# 06. Check that A1 == "that JSON array"
+# 07. PUT /v2/entities/E1/attrs/A1/value with TEXT payload "STRING"
+# 08. Check that A1 == "STRING"
+# 09. PUT /v2/entities/E1/attrs/A1/value with TEXT payload true
+# 10. Check that A1 == true
+# 11. PUT /v2/entities/E1/attrs/A1/value with TEXT payload TRUE
+# 12. Check that A1 == true
+# 13. PUT /v2/entities/E1/attrs/A1/value with TEXT payload True
+# 14. Check that A1 == true
+# 15. PUT /v2/entities/E1/attrs/A1/value with TEXT payload false
+# 16. Check that A1 == false
+# 17. PUT /v2/entities/E1/attrs/A1/value with TEXT payload FALSE
+# 18. Check that A1 == false
+# 19. PUT /v2/entities/E1/attrs/A1/value with TEXT payload False
+# 20. Check that A1 == false
+# 21. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 123
+# 22. Check that A1 == 123
+# 23. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.14
+# 24. Check that A1 == 3.14
+# 25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error
+# 26. Check that A1 == 3.14 still
+# 27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1
+# 28. Check that A1 == -12.1
+# 29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2
+# 30. Check that A1 == 3.2e2
+#
+
+echo '01. POST /v2/entities creating E1 A1=1'
+echo '======================================'
+payload='{ "id": "E1", "A1": 1 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo '02. PUT /v2/entities/E1/attrs/A1/value with erroneous JSON payload'
+echo '=================================================================='
+payload='{ "A1" }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo '03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload'
+echo '=================================================================='
+payload='{ "a": "1", "b": 2 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo '04. Check that A1 == "that JSON object"'
+echo '======================================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload'
+echo '================================================================='
+payload='[ "a", "b", "c" ]'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo '06. Check that A1 == "that JSON array"'
+echo '======================================'
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '07. PUT /v2/entities/E1/attrs/A1/value with TEXT payload "STRING"'
+echo '================================================================='
+payload='"STRING"'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '08. Check that A1 == "STRING"'
+echo '============================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '09. PUT /v2/entities/E1/attrs/A1/value with TEXT payload true'
+echo '============================================================='
+payload='true'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '10. Check that A1 == true'
+echo '========================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '11. PUT /v2/entities/E1/attrs/A1/value with TEXT payload TRUE'
+echo '============================================================='
+payload='TRUE'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '12. Check that A1 == true'
+echo '========================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '13. PUT /v2/entities/E1/attrs/A1/value with TEXT payload True'
+echo '============================================================='
+payload='True'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '14. Check that A1 == true'
+echo '========================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '15. PUT /v2/entities/E1/attrs/A1/value with TEXT payload false'
+echo '=============================================================='
+payload='false'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '16. Check that A1 == false'
+echo '=========================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '17. PUT /v2/entities/E1/attrs/A1/value with TEXT payload FALSE'
+echo '=============================================================='
+payload='FALSE'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '18. Check that A1 == false'
+echo '=========================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '19. PUT /v2/entities/E1/attrs/A1/value with TEXT payload False'
+echo '=============================================================='
+payload='False'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '20. Check that A1 == false'
+echo '=========================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '21. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 123'
+echo '============================================================'
+payload='123'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '22. Check that A1 == 123'
+echo '========================'
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '23. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.14'
+echo '============================================================='
+payload='3.14'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '24. Check that A1 == 3.14'
+echo '========================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo '25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error'
+echo '========================================================================='
+payload='a.14'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo '26. Check that A1 == 3.14 still'
+echo '==============================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo "27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1"
+echo "=============================================================="
+payload='-12.1'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo "28. Check that A1 == -12.1"
+echo "=========================="
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo "29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2"
+echo "=============================================================="
+payload='3.2e2'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo "30. Check that A1 == 3.2e2"
+echo "=========================="
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities creating E1 A1=1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. PUT /v2/entities/E1/attrs/A1/value with erroneous JSON payload
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer",
+    "error": "ParseError"
+}
+
+
+03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
+==================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Check that A1 == "that JSON object"
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 58
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": {
+        "a": "1",
+        "b": 2.0
+    }
+}
+
+
+05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
+=================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Check that A1 == "that JSON array"
+======================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": [
+        "a",
+        "b",
+        "c"
+    ]
+}
+
+
+07. PUT /v2/entities/E1/attrs/A1/value with TEXT payload "STRING"
+=================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. Check that A1 == "STRING"
+=============================
+HTTP/1.1 200 OK
+Content-Length: 44
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": "STRING"
+}
+
+
+09. PUT /v2/entities/E1/attrs/A1/value with TEXT payload true
+=============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+10. Check that A1 == true
+=========================
+HTTP/1.1 200 OK
+Content-Length: 40
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": true
+}
+
+
+11. PUT /v2/entities/E1/attrs/A1/value with TEXT payload TRUE
+=============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+12. Check that A1 == true
+=========================
+HTTP/1.1 200 OK
+Content-Length: 40
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": true
+}
+
+
+13. PUT /v2/entities/E1/attrs/A1/value with TEXT payload True
+=============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+14. Check that A1 == true
+=========================
+HTTP/1.1 200 OK
+Content-Length: 40
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": true
+}
+
+
+15. PUT /v2/entities/E1/attrs/A1/value with TEXT payload false
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+16. Check that A1 == false
+==========================
+HTTP/1.1 200 OK
+Content-Length: 41
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": false
+}
+
+
+17. PUT /v2/entities/E1/attrs/A1/value with TEXT payload FALSE
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+18. Check that A1 == false
+==========================
+HTTP/1.1 200 OK
+Content-Length: 41
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": false
+}
+
+
+19. PUT /v2/entities/E1/attrs/A1/value with TEXT payload False
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+20. Check that A1 == false
+==========================
+HTTP/1.1 200 OK
+Content-Length: 41
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": false
+}
+
+
+21. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 123
+============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+22. Check that A1 == 123
+========================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": 123.0
+}
+
+
+23. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.14
+=============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+24. Check that A1 == 3.14
+=========================
+HTTP/1.1 200 OK
+Content-Length: 44
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": 3.14
+}
+
+
+25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "attribute value type not recognized",
+    "error": "BadRequest"
+}
+
+
+26. Check that A1 == 3.14 still
+===============================
+HTTP/1.1 200 OK
+Content-Length: 44
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": 3.14
+}
+
+
+27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+28. Check that A1 == -12.1
+==========================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": -12.1
+}
+
+
+29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+30. Check that A1 == 3.2e2
+==========================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": 320.0
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -57,6 +57,7 @@
 *   - q
 *   - geometry
 *   - coords
+*   - options=keyValues
 *
 * 01. Fill in QueryContextRequest
 * 02. Call standard op postQueryContext
@@ -90,7 +91,10 @@ std::string getEntities
   }
   else if (id != "")
   {
-    // FIXME: a more efficient query could be possible ...
+    pattern = "";
+
+    // FIXME P5: a more efficient query could be possible (this ends as a regex
+    // at MongoDB and regex are *expensive* in performance terms)
     std::vector<std::string> idsV;
 
     stringSplit(id, ',', idsV);
@@ -99,10 +103,14 @@ std::string getEntities
     {
       if (ix != 0)
       {
-        pattern += "|";
+        pattern += "|^";
+      }
+      else
+      {
+        pattern += "^";
       }
 
-      pattern += idsV[ix];
+      pattern += idsV[ix] + "$";
     }
   }
   else if (idPattern != "")

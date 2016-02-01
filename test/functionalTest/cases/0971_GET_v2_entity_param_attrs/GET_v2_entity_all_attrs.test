@@ -95,37 +95,37 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "speed", 
-                        "type": "number", 
+                        "name": "speed",
+                        "type": "number",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "brand", 
-                        "type": "string", 
+                        "name": "brand",
+                        "type": "string",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "plateCountry", 
-                        "type": "", 
+                        "name": "plateCountry",
+                        "type": "",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "madeInCountry", 
-                        "type": "", 
+                        "name": "madeInCountry",
+                        "type": "",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "model", 
-                        "type": "myString", 
+                        "name": "model",
+                        "type": "myString",
                         "value": ""
                     }
-                ], 
-                "id": "8787GHY", 
-                "isPattern": "false", 
+                ],
+                "id": "8787GHY",
+                "isPattern": "false",
                 "type": "Car"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -136,26 +136,37 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY?attrs=speed,brand,plateCountry,madeInCountry,model
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 321
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "brand": {
-        "type": "string", 
+        "metadata": {},
+        "type": "string",
         "value": "Mercedes Benz"
-    }, 
-    "id": "8787GHY", 
-    "madeInCountry": "DE", 
+    },
+    "id": "8787GHY",
+    "madeInCountry": {
+        "metadata": {},
+        "type": null,
+        "value": "DE"
+    },
     "model": {
-        "type": "myString", 
+        "metadata": {},
+        "type": "myString",
         "value": "Klasse C"
-    }, 
-    "plateCountry": "ES", 
+    },
+    "plateCountry": {
+        "metadata": {},
+        "type": null,
+        "value": "ES"
+    },
     "speed": {
-        "type": "number", 
+        "metadata": {},
+        "type": "number",
         "value": "150"
-    }, 
+    },
     "type": "Car"
 }
 

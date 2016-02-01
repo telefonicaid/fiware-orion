@@ -74,7 +74,7 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
   }
   else if (((res = subscriptionId.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))               != "OK") ||
            ((res = originator.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))                   != "OK") ||
-           ((res = contextElementResponseVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK"))
+           ((res = contextElementResponseVector.check(ciP, QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }

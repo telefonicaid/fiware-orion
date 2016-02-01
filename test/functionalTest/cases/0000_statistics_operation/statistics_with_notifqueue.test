@@ -43,6 +43,7 @@ Date: REGEX(.*)
 {
     "measuring_interval_in_secs": REGEX(\d+),
     "notifQueue": {
+        "avgTimeInQueue": 0.0,
         "in": 0,
         "out": 0,
         "reject": 0,

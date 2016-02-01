@@ -86,7 +86,7 @@ std::string UpdateContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(UpdateContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(ciP, UpdateContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }

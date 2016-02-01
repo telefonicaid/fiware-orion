@@ -319,6 +319,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
 
   switch (request)
   {
+  case NoRequest:                                        break;
   case RegisterContext:                                  ++noOfRegistrations; break;
   case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
   case SubscribeContextAvailability:                     ++noOfAvailabilitySubscriptions; break;

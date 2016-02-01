@@ -112,7 +112,7 @@ std::string getAttributeValueInstance
   //
   if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)  
   {
-    ContextElementResponse* cerP = parseDataP->qcrs.res.contextElementResponseVector.get(0);
+    ContextElementResponse* cerP = parseDataP->qcrs.res.contextElementResponseVector[0];
 
     //
     // FIXME P4: as long as mongoQueryContext() signature is based on NGSI standard operations and that
@@ -125,9 +125,9 @@ std::string getAttributeValueInstance
     //
     for (unsigned int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
     {
-      if (cerP->contextElement.contextAttributeVector.get(i)->getId() == metaIdValue)
+      if (cerP->contextElement.contextAttributeVector[i]->getId() == metaIdValue)
       {
-        response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector.get(i));
+        response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector[i]);
       }
     }
 

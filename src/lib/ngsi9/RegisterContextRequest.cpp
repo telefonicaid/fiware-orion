@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/Format.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/Duration.h"
 #include "ngsi/ContextRegistrationVector.h"
@@ -69,30 +70,32 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
 
   if (predetectedError != "")
   {
-    LM_W(("Bad Input (%s)", predetectedError.c_str()));
+    alarmMgr.badInput(clientIp, predetectedError);
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (contextRegistrationVector.size() == 0)
   {
-    LM_W(("Bad Input (empty contextRegistration list)"));
+    alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   }
-  else if (((res = contextRegistrationVector.check(RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
+  else if (((res = contextRegistrationVector.check(ciP, RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
   return response.render(RegisterContext, format, indent);
 }

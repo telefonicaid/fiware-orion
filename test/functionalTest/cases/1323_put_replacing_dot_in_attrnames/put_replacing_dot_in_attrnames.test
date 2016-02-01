@@ -30,19 +30,23 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create E1/A1+A2
-# 02. Make sure E1 is as created
-# 03. Modify E1 to E1/A2+A3
-# 04. Make sure E1 is as modified
-# 05. GET attribute A2..y
-# 06. GET attribute A3.Z
-# 07. Check attributes in DB
+# 01.  Create E1/A1+A2
+# 02.  Make sure E1 is as created
+# 02b. Now look at E1 with options=keyValues
+# 03.  Modify E1 to E1/A2+A3
+# 04.  Make sure E1 is as modified
+# 04b. Now look at E1 with options=keyValues
+# 05.  GET attribute A2..y
+# 05b. GET attribute A2..y using options=keyValues
+# 06.  GET attribute A3.Z
+# 06b. GET attribute A3.Z using options=keyValues
+# 07.  Check attributes in DB
 #
 
 echo "01. Create E1/A1+A2"
 echo "==================="
-payload='{ "A1.X": 1, "A2..y": 2 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+payload='{ "id": "E1", "A1.X": 1, "A2..y": 2 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -54,10 +58,17 @@ echo
 echo
 
 
+echo "02b. Now look at E1 with options=keyValues"
+echo "=========================================="
+orionCurl --url /v2/entities/E1?options=keyValues --json
+echo
+echo
+
+
 echo "03. Modify E1 to E1/A2+A3"
 echo "========================="
 payload='{ "A2..y": 2, "A3.Z": 3 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -69,9 +80,23 @@ echo
 echo
 
 
+echo "04b. Now look at E1 with options=keyValues"
+echo "=========================================="
+orionCurl --url /v2/entities/E1?options=keyValues --json
+echo
+echo
+
+
 echo "05. GET attribute A2..y"
 echo "======================="
 orionCurl --url "/v2/entities/E1/attrs/A2..y" --json
+echo
+echo
+
+
+echo "05b. GET attribute A2..y using options=keyValues"
+echo "================================================"
+orionCurl --url "/v2/entities/E1/attrs/A2..y?options=keyValues" --json
 echo
 echo
 
@@ -83,11 +108,19 @@ echo
 echo
 
 
+echo "06b. GET attribute A3.Z using options=keyValues"
+echo "==============================================="
+orionCurl --url "/v2/entities/E1/attrs/A3.Z?options=keyValues" --json
+echo
+echo
+
+
 echo "07. Check attributes in DB"
 echo "=========================="
 echo 'db.entities.find({ "_id" : { "id" : "E1",  "servicePath" : "/" } }, {_id:0, attrNames: 1})'  | mongo $CB_DB_NAME --quiet
 echo
 echo
+
 
 --REGEXPECT--
 01. Create E1/A1+A2
@@ -102,14 +135,38 @@ Date: REGEX(.*)
 02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1.X": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "A2..y": {
+        "metadata": {},
+        "type": null,
+        "value": 2.0
+    },
+    "id": "E1",
+    "type": null
+}
+
+
+02b. Now look at E1 with options=keyValues
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 56
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1.X": 1.0,
     "A2..y": 2.0,
-    "id": "E1"
+    "id": "E1",
+    "type": null
 }
 
 
@@ -124,19 +181,57 @@ Date: REGEX(.*)
 04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A2..y": {
+        "metadata": {},
+        "type": null,
+        "value": 2.0
+    },
+    "A3.Z": {
+        "metadata": {},
+        "type": null,
+        "value": 3.0
+    },
+    "id": "E1",
+    "type": null
+}
+
+
+04b. Now look at E1 with options=keyValues
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 56
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A2..y": 2.0,
     "A3.Z": 3.0,
-    "id": "E1"
+    "id": "E1",
+    "type": null
 }
 
 
 05. GET attribute A2..y
 =======================
+HTTP/1.1 200 OK
+Content-Length: 44
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": 2.0
+}
+
+
+05b. GET attribute A2..y using options=keyValues
+================================================
 HTTP/1.1 200 OK
 Content-Length: 18
 Content-Type: application/json
@@ -149,6 +244,20 @@ Date: REGEX(.*)
 
 06. GET attribute A3.Z
 ======================
+HTTP/1.1 200 OK
+Content-Length: 44
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": null,
+    "value": 3.0
+}
+
+
+06b. GET attribute A3.Z using options=keyValues
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 17
 Content-Type: application/json

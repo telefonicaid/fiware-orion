@@ -76,6 +76,12 @@
 #define CSUB_CONDITIONS         "conditions"
 #define CSUB_CONDITIONS_TYPE    "type"
 #define CSUB_CONDITIONS_VALUE   "value"
+#define CSUB_EXPR               "expression"
+#define CSUB_EXPR_Q             "q"
+#define CSUB_EXPR_GEOM          "geometry"
+#define CSUB_EXPR_COORDS        "coords"
+#define CSUB_EXPR_GEOREL        "georel"
+
 #define CSUB_THROTTLING         "throttling"
 #define CSUB_ENTITIES           "entities"
 #define CSUB_ATTRS              "attrs"

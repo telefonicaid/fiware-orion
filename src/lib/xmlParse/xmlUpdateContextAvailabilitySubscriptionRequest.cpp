@@ -29,6 +29,8 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Restriction.h"
@@ -75,7 +77,7 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     parseDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }
@@ -231,7 +233,8 @@ void ucasRelease(ParseData* reqData)
 */
 std::string ucasCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->ucas.res.check(UpdateContextAvailabilitySubscription,
+  return reqData->ucas.res.check(ciP,
+                                 UpdateContextAvailabilitySubscription,
                                  ciP->outFormat,
                                  "",
                                  reqData->errorString,

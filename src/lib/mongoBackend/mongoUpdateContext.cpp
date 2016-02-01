@@ -31,6 +31,8 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
@@ -39,6 +41,8 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi/NotifyCondition.h"
 #include "rest/HttpStatusCode.h"
+
+
 
 /* ****************************************************************************
 *
@@ -53,7 +57,7 @@ HttpStatusCode mongoUpdateContext
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                    xauthToken,
   const std::string&                    apiVersion,
-  bool                                  checkEntityExistance
+  Ngsiv2Flavour                         ngsiv2Flavour
 )
 {
     bool reqSemTaken;
@@ -63,15 +67,19 @@ HttpStatusCode mongoUpdateContext
     /* Check that the service path vector has only one element, returning error otherwise */
     if (servicePathV.size() > 1)
     {
-        LM_W(("Bad Input (service path length %d is greater than the one in update)", servicePathV.size()));
-        responseP->errorCode.fill(SccBadRequest, "service path length greater than one in update");
+      char lenV[STRING_SIZE_FOR_INT];
+      snprintf(lenV, sizeof(lenV), "%lu", servicePathV.size());
+
+      std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
+      alarmMgr.badInput(clientIp, details);
+      responseP->errorCode.fill(SccBadRequest, "service path length greater than one in update");
     }
     else
     {
         /* Process each ContextElement */
         for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
         {
-          processContextElement(requestP->contextElementVector.get(ix),
+          processContextElement(requestP->contextElementVector[ix],
                                 responseP,
                                 requestP->updateActionType.get(),
                                 tenant,
@@ -79,7 +87,7 @@ HttpStatusCode mongoUpdateContext
                                 uriParams,
                                 xauthToken,
                                 apiVersion,
-                                checkEntityExistance);
+                                ngsiv2Flavour);
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this

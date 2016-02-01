@@ -43,7 +43,7 @@ brokerStart CB
 echo "01. POST /v2/entities to create E1/A1=1+A2=1"
 echo "============================================"
 payload='{ "id": "E1", "type": "T1", "A1": 1, "A2": 1 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -72,7 +72,7 @@ echo
 
 echo "05. PUT /v2/entities/E1/attrs/A1 with metadata m1 and m2"
 echo "========================================================"
-payload='{ "value": 5, "m1": 55, "m2": "55" }'
+payload='{ "value": 5, "metadata": { "m1": 55, "m2": "55" } }'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
 echo
 echo
@@ -113,13 +113,21 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 to see A1==1 and A2==1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": 1.0,
-    "A2": 1.0,
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
+    "A2": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -136,13 +144,21 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 to see A1==3 and A2==1 (A2 untouched)
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1": 3.0,
-    "A2": 1.0,
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": 3.0
+    },
+    "A2": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -159,17 +175,30 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 to see metadata m1 and m2
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 191
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
-        "m1": 55.0,
-        "m2": "55",
+        "metadata": {
+            "m1": {
+                "type": null,
+                "value": 55.0
+            },
+            "m2": {
+                "type": null,
+                "value": "55"
+            }
+        },
+        "type": null,
         "value": 5.0
     },
-    "A2": 1.0,
+    "A2": {
+        "metadata": {},
+        "type": null,
+        "value": 1.0
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -186,17 +215,27 @@ Date: REGEX(.*)
 08. GET /v2/entities/E1 to see A2::type == 'newtype'
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 110
+Content-Length: 193
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
-        "m1": 55.0,
-        "m2": "55",
+        "metadata": {
+            "m1": {
+                "type": null,
+                "value": 55.0
+            },
+            "m2": {
+                "type": null,
+                "value": "55"
+            }
+        },
+        "type": null,
         "value": 5.0
     },
     "A2": {
+        "metadata": {},
         "type": "newtype",
         "value": "VAL"
     },

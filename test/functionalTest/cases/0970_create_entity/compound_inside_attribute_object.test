@@ -40,11 +40,11 @@ payload='{
   "id": "E1",
   "type": "T1",
   "attr01": {
-    "type": "Compound Object",
+    "type": "Compound-Object",
     "value": { "a":"1", "b":2, "c": true }
   },
   "attr02": {
-    "type": "Compound Vector",
+    "type": "Compound-Vector",
     "value":  [ "a", "b", "c" ]
   }
 }'
@@ -73,28 +73,30 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 157
+Content-Length: 185
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr01": {
-        "type": "Compound Object", 
+        "metadata": {},
+        "type": "Compound-Object",
         "value": {
-            "a": "1", 
-            "b": 2.0, 
+            "a": "1",
+            "b": 2.0,
             "c": true
         }
-    }, 
+    },
     "attr02": {
-        "type": "Compound Vector", 
+        "metadata": {},
+        "type": "Compound-Vector",
         "value": [
-            "a", 
-            "b", 
+            "a",
+            "b",
             "c"
         ]
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 

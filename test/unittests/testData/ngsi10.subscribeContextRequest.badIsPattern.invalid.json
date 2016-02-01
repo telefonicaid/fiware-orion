@@ -16,7 +16,7 @@
 		"occupancy",
 		"lightstatus"
 	],
-	"reference": "127.0.0.1",
+	"reference": "http://127.0.0.1",
 	"duration": "PT1S",
 	"restriction": {
 		"attributeExpression": "testRestriction",

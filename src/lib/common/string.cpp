@@ -28,10 +28,12 @@
 #include <string>
 #include <vector>
 
-#include "common/string.h"
-#include "common/wsStrip.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/string.h"
+#include "common/wsStrip.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -212,11 +214,25 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 
 /* ****************************************************************************
 *
-* parseUrl -
+* parseUrl - parse a URL and return its pieces
 *
 * Breaks a URL into pieces. It returns false if the string passed as first
 * argument is not a valid URL. Otherwise, it returns true.
 *
+* PARAMETERS
+*   - url
+*   - host
+*   - port
+*   - path
+*   - protocol
+*
+* RETURN VALUE
+*   parseUrl returns TRUE on successful operation, FALSE otherwise
+*
+* NOTE
+*   About the components in a URL: according to https://tools.ietf.org/html/rfc3986#section-3,
+*   the scheme component is mandatory, i.e. the 'http://' or 'https://' must be present,
+*   otherwise the URL is invalid. 
 */
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
@@ -226,11 +242,6 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     return false;
   }
 
-  /* First: split by the first '/' to get host:ip and path */
-  std::vector<std::string>  urlTokens;
-  int                       components = stringSplit(url, '/', urlTokens);
-
-  protocol = urlTokens[0];
 
   /* http://some.host.com/my/path
    *      ^^             ^  ^
@@ -239,6 +250,21 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
    *   0          2       3    4  position in urlTokens vector
    *   1  23             4  5     components
    */
+
+
+  /* First: split by the first '/' to get host:ip and path */
+  std::vector<std::string>  urlTokens;
+  int                       components = stringSplit(url, '/', urlTokens);
+
+  protocol = urlTokens[0];
+
+  //
+  // Ensuring the scheme is present
+  //
+  if ((protocol != "https:") && (protocol != "http:"))
+  {
+    return false;
+  }
 
   if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
   {
@@ -297,9 +323,15 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
     if (components == 2)
     {
+      /* Sanity check (corresponding to http://xxxx:/path) */
+      if (hostTokens[1].length() == 0)
+      {
+        return false;
+      }
+
       port = atoi(hostTokens[1].c_str());
     }
-    else
+    else  // port not given - using default ports
     {
       port = urlTokens[0] == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }
@@ -412,8 +444,10 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
   if (err.length() > 0)
   {
+    std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     latitude = oldLatitude;
-    LM_W(("Bad Input (bad latitude value in coordinate string '%s')", initial));
     ret = false;
   }
   else
@@ -422,22 +456,28 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
     if (err.length() > 0)
     {
+      std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
+      alarmMgr.badInput(clientIp, details);
+
       /* Rollback latitude */
       latitude = oldLatitude;
       longitude = oldLongitude;
-      LM_W(("Bad Input (bad longitude value in coordinate string '%s')", initial));
       ret = false;
     }
   }
 
   if ((latitude > 90) || (latitude < -90))
   {
-    LM_W(("Bad Input (bad value for latitude '%s')", initial));
+    std::string details = std::string("bad value for latitude '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     ret = false;
   }
   else if ((longitude > 180) || (longitude < -180))
   {
-    LM_W(("Bad Input (bad value for longitude '%s')", initial));
+    std::string details = std::string("bad value for longitude '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
     ret = false;
   }
 
@@ -690,7 +730,9 @@ std::string servicePathCheck(const char* servicePath)
       ;
     else
     {
-      LM_W(("Bad Input (Bad Character '%c' in Service-Path)", *servicePath));
+      std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
+      alarmMgr.badInput(clientIp, details);
+
       return "Bad Character in Service-Path";
     }
 

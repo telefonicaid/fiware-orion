@@ -27,6 +27,7 @@
 
 #include "logMsg/traceLevels.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -39,6 +40,7 @@
 */
 Entity::Entity()
 {
+  typeGiven = false;
 }
 
 
@@ -56,25 +58,39 @@ Entity::~Entity()
 /* ****************************************************************************
 *
 * Entity::render - 
+*
+* The rendering of JSON in APIv2 depends on the URI param 'options'
+* Rendering methods:
+*   o 'normalized' (default)
+*   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
+*   o 'values'     (only the values of the attributes are printed, in a vector)
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
+  std::string renderMode = "normalized";
+
+  if (ciP->uriParamOptions["keyValues"] == true)
+  {
+    renderMode = "keyValues";
+  }
+  else if (ciP->uriParamOptions["values"]== true)
+  {
+    renderMode = "values";
+  }
+
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out = "{";
 
     out += JSON_VALUE("id", id);
-
-    if (type != "")
-    {
-      out += ",";
-      out += JSON_VALUE("type", type);
-    }
+    out += ",";
+    out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : "null");
 
     if (attributeVector.size() != 0)
     {
       out += ",";
-      out += attributeVector.toJson(true, false);
+
+      out += attributeVector.toJson(true, false, renderMode);
     }
 
     out += "}";
@@ -98,30 +114,47 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 */
 std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 {
+  size_t len;
+  char errorMsg[128];
+
   if ((requestType == EntitiesRequest) && (id == ""))
   {
     return "No Entity ID";
   }
 
-  if (forbiddenChars(id.c_str()))
+  if ( (len = strlen(id.c_str())) > MAX_ID_LEN)
   {
-    LM_W(("Bad Input (found a forbidden character in the id of an entity"));
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, id.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the id of an entity");
     return "Invalid characters in entity id";
   }
 
-  if (forbiddenChars(type.c_str()))
+  if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
-    LM_W(("Bad Input (found a forbidden character in the type of an entity"));
+    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  {
+    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an entity");
     return "Invalid characters in entity type";
   }
 
   if (forbiddenChars(isPattern.c_str()))
   {
-    LM_W(("Bad Input (found a forbidden character in the pattern of an entity"));
+    alarmMgr.badInput(clientIp, "found a forbidden character in the pattern of an entity");
     return "Invalid characters in entity isPattern";
   }
 
-  return attributeVector.check(requestType, JSON, "", "", 0);
+  return attributeVector.check(ciP, requestType, JSON, "", "", 0);
 }
 
 

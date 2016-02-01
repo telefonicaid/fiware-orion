@@ -62,15 +62,16 @@ echo
 echo "04. PATCH /v2/entities/E1 (unrecognized content type)"
 echo "====================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>'
-orionCurl --url /v2/entities/E1 --payload "${payload}" --in "text/plain" --out "application/json" -X PATCH 
+orionCurl --url /v2/entities/E1 --payload "${payload}" --in "text/plain" --out "application/json" -X PATCH
 echo
 echo
+
 
 --REGEXPECT--
 01. PATCH /v2/ent=ities/E1 (invalid URI)
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63 
+Content-Length: 63
 Content-Type: application/json
 Date: REGEX(.*)
 

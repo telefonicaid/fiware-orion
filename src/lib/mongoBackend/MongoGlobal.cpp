@@ -39,6 +39,9 @@
 #include "common/globals.h"
 #include "common/sem.h"
 #include "common/string.h"
+#include "common/wsStrip.h"
+#include "common/statistics.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
 
@@ -58,12 +61,9 @@
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 
-#include "common/wsStrip.h"
-
-#include "common/statistics.h"
-
 using namespace mongo;
 using std::auto_ptr;
+
 
 
 /* ****************************************************************************
@@ -221,21 +221,18 @@ DBClientBase* getMongoConnection(void)
 /* ****************************************************************************
 *
 * releaseMongoConnection - give back mongo connection to connection pool
+*
+* Older versions of this function planned to use a std::auto_ptr<DBClientCursor>* parameter
+* in order to invoke kill() on it for a "safer" connection releasing. However, at the end
+* it seems that kill() will not help at all (see deetails in https://github.com/telefonicaid/fiware-orion/issues/1568)
+* and after some testing we have checked that the current solution is stable.
+*
 */
-void releaseMongoConnection(DBClientBase* connection, std::auto_ptr<DBClientCursor>*  cursor)
+void releaseMongoConnection(DBClientBase* connection)
 {
 #ifdef UNIT_TEST
   return;
 #else
-#if MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
-  // it seems that the kill() method was added in a MongoDB C++ driver version newer than the one
-  // we officially use (legacy-1.0.2). Thus, I'm leaving this block of code to be prepared to the
-  // time we have this. See issue: https://github.com/telefonicaid/fiware-orion/issues/1568
-  if (cursor != NULL)
-  {
-    cursor->kill();
-  }
-#endif // MONGO_DRIVER_LEGACY_1_0_6_OR_NEWER
   return mongoPoolConnectionRelease(connection);
 #endif // UNIT_TEST
 }
@@ -514,7 +511,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
   DBClientBase* connection = getMongoConnection();
   if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), query, &cursor, &err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
@@ -531,7 +528,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
     }
     treatFunction(tenant, sub);
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 }
 
 
@@ -546,9 +543,11 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   // Paranoia check:  _id exists?
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+    alarmMgr.dbError(details);
     return;
   }
+  alarmMgr.dbErrorReset();
 
   std::string  subId   = idField.OID().toString();
 
@@ -556,9 +555,11 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   BSONElement conditionsField = getField(sub, CSUB_CONDITIONS);
   if (conditionsField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving 'conditions' field) for subscription '%s'", subId.c_str()));
+    std::string details = std::string("error retrieving 'conditions' field for subscription '") + subId + "'";
+    alarmMgr.dbError(details);
     return;
   }
+  alarmMgr.dbErrorReset();
 
   std::vector<BSONElement> condV = getField(sub, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < condV.size(); ++ix)
@@ -599,7 +600,8 @@ static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+    alarmMgr.dbError(details);
     return;
   }
 
@@ -640,7 +642,8 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     idMatch = false;
     if (regcomp(&regex, en2->id.c_str(), 0) != 0)
     {
-      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
+      std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
+      alarmMgr.badInput(clientIp, details);
     }
     else
     {
@@ -691,7 +694,7 @@ bool includedAttribute(const ContextRegistrationAttribute& attr, const Attribute
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV.get(ix) == attr.name)
+    if (attrsV[ix] == attr.name)
     {
       return true;
     }
@@ -827,9 +830,10 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 {
   if (!mongoLocationCapable())
   {
-    LM_W(("Bad Input (location scope was found but your MongoDB version doesn't support it."
-          " Please upgrade MongoDB server to 2.4 or newer)"));
+    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+      "Please upgrade MongoDB server to 2.4 or newer)";
 
+    alarmMgr.badInput(clientIp, details);
     return false;
   }
 
@@ -876,7 +880,7 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
   }
   else
   {
-    LM_W(("Bad Input (unknown area type)"));
+    alarmMgr.badInput(clientIp, "unknown area type");
     return false;
   }
 
@@ -895,6 +899,469 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+#define OPR_EXIST     "EXISTS"
+#define OPR_NOT_EXIST "NOT EXIST"
+
+
+/* *****************************************************************************
+*
+* matchFilter -
+*
+* Returns true if cerP match the "q token" based filter expressed in the parameters,
+* false otherwise.
+*
+*/
+static bool matchFilter
+(
+  char*                      left,
+  const std::string&         opr,
+  char*                      right,
+  char*                      rangeFrom,
+  char*                      rangeTo,
+  const std::vector<char*>&  valVector,
+  ContextElementResponse*    cerP
+)
+{
+  /* First, look for unary operators */
+  if ((opr == OPR_EXIST) || (opr == OPR_NOT_EXIST))
+  {
+    /* Special case: entity type */
+    if (std::string(right) == ENT_ENTITY_TYPE)
+    {
+      // FIXME P7: how to check for not existing entity based on EntityID?
+      //cerP->contextElement.entityId.type = ??;
+      return true;
+    }
+
+    /* Regular attribute */
+    ContextAttribute* ca = cerP->contextElement.getAttribute(right);
+    bool exist = (ca != NULL);
+
+    /* This could be re-written as exist ^ (opr == OPR_NOT_EXIST) but the code
+     * would be harder to follow */
+    if (opr == OPR_EXIST)
+    {
+      return exist;
+    }
+    else   // opr == OPR_NOT_EXIST
+    {
+      return !exist;
+    }
+  }
+
+  /* For binary operators, the left side is the name of the attribute to check */
+  ContextAttribute* ca = cerP->contextElement.getAttribute(left);
+
+  /* If the attribute does't exist, no need to go further: filter fails */
+  if (ca == NULL)
+  {
+    return false;
+  }
+
+  if (opr == "==")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      // ranges only can be used on numbers
+      return ((ca->valueType == orion::ValueTypeNumber) &&
+              (ca->numberValue >= atof(rangeFrom)) && (ca->numberValue <= atof(rangeTo)));
+
+    }
+    else if (valVector.size() > 0)
+    {
+      // the attribute value has to match at least one of the elements in the vector (OR)
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
+          {
+            return true;
+          }
+        }
+        else
+        {
+          // string
+          if ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == valVector[ix]))
+          {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
+      }
+      else
+      {
+        // string
+        return ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == right));
+      }
+    }
+  }
+  else if (opr == "!=")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      // ranges only can be used on number
+      return ((ca->valueType == orion::ValueTypeNumber) &&
+              ((ca->numberValue < atof(rangeFrom)) || (ca->numberValue > atof(rangeTo))));
+    }
+    else if (valVector.size() > 0)
+    {
+      // the attribute value has not to match any of the elements in the vector (AND)
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
+          {
+            return false;
+          }
+        }
+        else
+        {
+          // string
+          if ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == valVector[ix]))
+          {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        return !((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
+      }
+      else
+      {
+        // string
+        return !((ca->valueType == orion::ValueTypeString) && (ca->stringValue == right));
+      }
+    }
+  }
+  else if (opr == ">")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue > atof(right)));
+  }
+  else if (opr == "<")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue < atof(right)));
+  }
+  else if (opr == ">=")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= atof(right)));
+  }
+  else if (opr == "<=")
+  {
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue <= atof(right)));
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown query operator: %s)", opr.c_str()));
+    return false;
+  }
+}
+
+
+
+/* *****************************************************************************
+*
+* addBsonFilter -
+*
+* Add a BSON filter based on a "q token".
+*
+*/
+static bool addBsonFilter
+(
+  char*                      left,
+  const std::string&         opr,
+  char*                      right,
+  char*                      rangeFrom,
+  char*                      rangeTo,
+  const std::vector<char*>&  valVector,
+  std::vector<BSONObj>&      filters
+)
+{
+  std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+  BSONObjBuilder bob;
+  BSONObjBuilder bb;
+  BSONObjBuilder bb2;
+  BSONObj        f;
+
+  //
+  // The right-hand-side can enter in 3 different ways (params to this function):
+  //   - right                normal case)
+  //   - valVector            as a vector of values, in the case of 'X==a,b,c'
+  //   - rangeFrom/rangeTo    as two values when '..' is used to denote a range
+  //
+  // To check that 'the right hand side is empty', we need to make sure all these three
+  // 'different ways' are empty.
+  //
+  // rangeFrom and rangeTo are treated separately, just in case some day we'd want to use 
+  // some construction with only upper/lower limit.
+  //
+  if (((right == NULL) || (*right == 0)) && 
+      (valVector.size() == 0) && 
+      ((rangeFrom == NULL) || (*rangeFrom == 0)) && 
+      ((rangeTo == NULL) || (*rangeTo == 0)))
+  {
+    alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in filter operation");
+    return false;
+  }
+
+  if (opr == "==")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else if (valVector.size() > 0)
+    {
+      BSONArrayBuilder ba;
+
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          ba.append(d);
+        }
+        else
+        {
+          // string
+          ba.append(valVector[ix]);
+        }
+      }
+
+      bb.append("$in", ba.arr());
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        bb.append("$in", BSON_ARRAY(d));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+      else if (*right == '\'')  // Forced string
+      {
+        ++right;
+        if (right[strlen(right) - 1] != '\'')
+        {
+          alarmMgr.badInput(clientIp, "invalid expression - no ending single-quote in forced string");
+          return false;
+        }
+        right[strlen(right) - 1] = 0;
+
+        bb.append("$in", BSON_ARRAY(right));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+      else
+      {
+        if (strcmp(right, "true") == 0)
+        {
+          bb.append("$in", BSON_ARRAY(true));
+        }
+        else if (strcmp(right, "false") == 0)
+        {
+          bb.append("$in", BSON_ARRAY(false));
+        }
+        else // string
+        {
+          bb.append("$in", BSON_ARRAY(right));
+        }
+
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+    }
+  }
+  else if (opr == "!=")
+  {
+    if (std::string(rangeFrom) != "")
+    {
+      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      bb2.append("$exists", true).append("$not", bb.obj());
+      bob.append(k, bb2.obj());
+      f = bob.obj();
+    }
+    else if (valVector.size() > 0)
+    {
+      BSONArrayBuilder ba;
+
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        double d;
+
+        if (str2double(valVector[ix], &d))
+        {
+          // number
+          ba.append(d);
+        }
+        else
+        {
+          // string
+          ba.append(valVector[ix]);
+        }
+      }
+
+      bb.append("$exists", true).append("$nin", ba.arr());
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else
+    {
+      double d;
+
+      // Single value
+      if (str2double(right, &d))
+      {
+        // number
+        bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+      else if (*right == '\'')  // Forced string
+      {
+        ++right;
+        if (right[strlen(right) - 1] != '\'')
+        {
+          alarmMgr.badInput(clientIp, "invalid expression - no ending single-quote in forced string");
+          return false;
+        }
+        right[strlen(right) - 1] = 0;
+
+
+        bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+      else
+      {
+        if (strcmp(right, "true") == 0)
+        {
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(true));
+        }
+        else if (strcmp(right, "false") == 0)
+        {
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(false));
+        }
+        else // string
+        {
+          bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
+        }
+
+        bob.append(k, bb.obj());
+        f = bob.obj();
+      }
+    }
+  }
+  else if (opr == ">")
+  {
+    bb.append("$gt", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == "<")
+  {
+    bb.append("$lt", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == ">=")
+  {
+    bb.append("$gte", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == "<=")
+  {
+    bb.append("$lte", atof(right));
+    bob.append(k, bb.obj());
+    f = bob.obj();
+  }
+  else if (opr == OPR_EXIST)
+  {
+    if (std::string(right) == ENT_ENTITY_TYPE)
+    {
+      // Special case: entity type
+      k = std::string("_id.") + ENT_ENTITY_TYPE;
+
+      bb.append("$exists", true).append("$ne", "");
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+    else
+    {
+      // Regular attribute
+      k = std::string(ENT_ATTRS) + "." + right;
+
+      bb.append("$exists", true);
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+  }
+  else if (opr == OPR_NOT_EXIST)
+  {
+    if (std::string(right) == ENT_ENTITY_TYPE)
+    {
+      // Special case: entity type
+      k = std::string("_id.") + ENT_ENTITY_TYPE;
+      bb.append("$exists", false);
+      bb2.append(k, bb.obj());
+      f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
+    }
+    else
+    {
+      // Regular attribute
+      k = std::string(ENT_ATTRS) + "." + right;
+      bb.append("$exists", false);
+      bob.append(k, bb.obj());
+      f = bob.obj();
+    }
+  }
+  else
+  {
+    std::string details = std::string("unknown query operator: /") + opr + "/";
+    alarmMgr.badInput(clientIp, details);
+    return false;
+  }
+
+  filters.push_back(f);
+  return true;
+}
+
 /* ****************************************************************************
 *
 * qStringFilters -
@@ -902,13 +1369,28 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 * FIXME P9: this function currently abuses of the std::string() wrapping for char* in order to
 * make comparisons work. An smarter solution could be developed.
 *
+* FIXME P7: actually, this functions behaviour depends on the presence of the cerP parameter, in particular
+*
+* - if cerP is NULL, then the output of this function is a set of BSON filters (in the filters vector) to
+*   be applied on MongoDB. The return value is not used. This is the typical use for queryContext and derived
+*   operations
+* - if cerP is not NULL, then the filters are evaluated in memory on the cerP. The return value is used to
+*   specify if cerP match the filter or not. The filters parameter is not used (although the caller needs to
+*   provide it in order to conform with function signature).
+*
+* I don't like too much to have a function with two quite parallel behaviours in the same logic. Probably a
+* smarter design will be to divide this function in two part: the one focused in string parsing and the one
+* focused in appliying filters to each different sytem (either in memory or as BSON).
+*
 */
-static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
+bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, ContextElementResponse* cerP)
 {
   char* str         = strdup(in.c_str());
   char* toFree      = str;
   char* s;
   char* saver;
+
+  bool retval = true;
 
   while ((s = strtok_r(str, ";", &saver)) != NULL)
   {
@@ -921,6 +1403,20 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 
     s = wsStrip(s);
 
+    //
+    // Rudimentary sanity checks
+    //
+    // 1. If a range is present, the op MUST be either '==' OR '!=' 
+    //
+    if (strstr(s, "..") != NULL)
+    {
+      if ((strstr(s, "==") == NULL) && (strstr(s, "!=") == NULL))
+      {
+        free(toFree);
+        return false;
+      }
+    }
+
     left = s;
     if ((op = (char*) strstr(s, "==")) != NULL)
     {
@@ -928,7 +1424,6 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 
       right = &op[2];
       op    = (char*) "==";
-
     }
     else if ((op = (char*) strstr(s, "!=")) != NULL)
     {
@@ -968,13 +1463,13 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
     else if (s[0] == '-')
     {
       left  = (char*) "";
-      op    = (char*) "NOT EXISTS";
+      op    = (char*) OPR_NOT_EXIST;
       right = wsStrip(&s[1]);
     }
     else if (s[0] == '+')
     {
       left  = (char*) "";
-      op    = (char*) "EXISTS";
+      op    = (char*) OPR_EXIST;
       right = wsStrip(&s[1]);
     }
     else
@@ -1070,205 +1565,34 @@ static void qStringFilters(const std::string& in, std::vector<BSONObj> &filters)
 
     str = NULL;  // So that strtok_r continues eating the initial string
 
-    /* Build the BSON filter */
-    std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
-    bool           pushBackFilter = true;
-    BSONObj        f;
-    BSONObjBuilder bob;
-    BSONObjBuilder bb;
-    BSONObjBuilder bb2;
-
-    if (opr == "==")
+    /* Build the BSON filter (or evaluate on cerP) */
+    if (cerP == NULL)
     {
-      if (std::string(rangeFrom) != "")
+      if (addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters) == false)
       {
-        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (valVector.size() > 0)
-      {
-        BSONArrayBuilder ba;
-
-        for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-        {
-          double d;
-          if (str2double(valVector[ix], &d))
-          {
-            // number
-            ba.append(d);
-          }
-          else
-          {
-            // string
-            ba.append(valVector[ix]);
-          }
-        }
-
-        bb.append("$in", ba.arr());
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else
-      {
-        double d;
-
-        // Single value
-        if (str2double(right, &d))
-        {
-          // number
-          bb.append("$in", BSON_ARRAY(d));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-        else
-        {
-          // string
-          bb.append("$in", BSON_ARRAY(right));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-      }
-    }
-    else if (opr == "!=")
-    {
-      if (std::string(rangeFrom) != "")
-      {
-        bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
-        bb2.append("$exists", true).append("$not", bb.obj());
-        bob.append(k, bb2.obj());
-        f = bob.obj();
-      }
-      else if (valVector.size() > 0)
-      {
-        BSONArrayBuilder ba;
-
-        for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-        {
-          double d;
-
-          if (str2double(valVector[ix], &d))
-          {
-            // number
-            ba.append(d);
-          }
-          else
-          {
-            // string
-            ba.append(valVector[ix]);
-          }
-        }
-
-        bb.append("$exists", true).append("$nin", ba.arr());
-        bob.append(k, bb.obj());
-        f = bob.obj();
-        
-      }
-      else
-      {
-        double d;
-
-        // Single value
-        if (str2double(right, &d))
-        {
-          // number
-          bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-        else
-        {
-          // string
-          bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
-          bob.append(k, bb.obj());
-          f = bob.obj();
-        }
-      }
-    }
-    else if (opr == ">")
-    {
-      bb.append("$gt", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == "<")
-    {
-      bb.append("$lt", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == ">=")
-    {
-      bb.append("$gte", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == "<=")
-    {
-      bb.append("$lte", atof(right));
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (opr == "EXISTS")
-    {
-      if (std::string(right) == ENT_ENTITY_TYPE)
-      {
-        // Special case: entity type
-        k = std::string("_id.") + ENT_ENTITY_TYPE;
-
-        bb.append("$exists", true).append("$ne", "");
-        bob.append(k, bb.obj());
-        f = bob.obj();        
-      }
-      else
-      {
-        // Regular attribute
-        k = std::string(ENT_ATTRS) + "." + right;
-
-        bb.append("$exists", true);
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-    }
-    else if (opr == "NOT EXISTS")
-    {
-      if (std::string(right) == ENT_ENTITY_TYPE)
-      {
-        // Special case: entity type
-        k = std::string("_id.") + ENT_ENTITY_TYPE;
-        bb.append("$exists", false);
-        bb2.append(k, bb.obj());
-        f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
-      }
-      else
-      {
-        // Regular attribute
-        k = std::string(ENT_ATTRS) + "." + right;
-        bb.append("$exists", false);
-        bob.append(k, bb.obj());
-        f = bob.obj();
+        retval = false;
+        break;
       }
     }
     else
     {
-       LM_W(("Bad Input (unknown query operator: %s", op));
-       pushBackFilter = false;
-    }
-
-    if (pushBackFilter)
-    {
-      filters.push_back(f);
+      if (!matchFilter(left, opr, right, rangeFrom, rangeTo, valVector, cerP))
+      {
+        retval = false;
+        break;
+      }
     }
   }
 
   free(toFree);
+
+  return retval;
 }
 
 
 /* *****************************************************************************
 *
 * addFilterScopes -
-*
 */
 static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
 {
@@ -1285,14 +1609,17 @@ static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
     }
     else
     {
-      LM_W(("Bad Input (unknown value for %s filter: '%s'", SCOPE_FILTER_EXISTENCE, scoP->value.c_str()));
+      std::string details = std::string("unknown value for '") + SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
+      alarmMgr.badInput(clientIp, details);
     }
   }
   else
   {
-    LM_W(("Bad Input (unknown filter type '%s'", scoP->type.c_str()));
+    std::string details = std::string("unknown filter type '") + scoP->type + "'";
+    alarmMgr.badInput(clientIp, details);
   }
 }
+
 
 
 /* ****************************************************************************
@@ -1322,7 +1649,8 @@ bool entitiesQuery
   int                              offset,
   int                              limit,
   bool*                            limitReached,
-  long long*                       countP
+  long long*                       countP,
+  bool*                            badInputP
 )
 {
 
@@ -1344,7 +1672,7 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    fillQueryEntity(orEnt, enV.get(ix));
+    fillQueryEntity(orEnt, enV[ix]);
   }
 
   /* The result of orEnt is appended to the final query */
@@ -1358,7 +1686,7 @@ bool entitiesQuery
   BSONArrayBuilder attrs;
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
-    std::string attrName = attrL.get(ix);
+    std::string attrName = attrL[ix];
 
     attrs.append(attrName);
     LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
@@ -1377,7 +1705,7 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
-    const Scope* sco = res.scopeVector.get(ix);
+    const Scope* sco = res.scopeVector[ix];
 
     if (sco->type.find(SCOPE_FILTER) == 0)
     {
@@ -1389,7 +1717,7 @@ bool entitiesQuery
       geoScopes++;
       if (geoScopes > 1)
       {
-        LM_W(("Bad Input (current version supports only one area scope, extra geoScope is ignored"));
+        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
       }
       else
       {
@@ -1405,11 +1733,22 @@ bool entitiesQuery
     }
     else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      qStringFilters(sco->value, filters);
+      // FIXME P4: Once issue #1705 is implemented, this check can be removed.
+      if (qStringFilters(sco->value, filters) != true)
+      {
+        if (badInputP)
+        {
+          *badInputP = true;
+          *err       = "invalid query expression";
+        }
+
+        return false;
+      }
     }
     else
     {
-      LM_W(("Bad Input (unknown scope type '%s', ignoring)", sco->type.c_str()));
+      std::string details = std::string("unknown scope type '") + sco->type + "', ignoring";
+      alarmMgr.badInput(clientIp, details);
     }
   }
 
@@ -1430,13 +1769,14 @@ bool entitiesQuery
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection, getEntitiesCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  unsigned int docs = 0;
   while (moreSafe(cursor))
   {
     BSONObj  r;
@@ -1457,7 +1797,7 @@ bool entitiesQuery
       const char* invalidPolygon      = "Exterior shell of polygon is invalid";
       const char* defaultErrorString  = "Error at querying MongoDB";
 
-      LM_W(("Database Error (%s)", exErr.c_str()));
+      alarmMgr.dbError(exErr);
 
       if (strncmp(exErr.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
       {
@@ -1492,19 +1832,22 @@ bool entitiesQuery
     {
       *err = e.what();
       LM_E(("Runtime Error (exception in nextSafe(): %s)", e.what()));
-      releaseMongoConnection(connection, &cursor);
+      releaseMongoConnection(connection);
       return false;
     }
     catch (...)
     {
       *err = "generic exception at nextSafe()";
       LM_E(("Runtime Error (generic exception in nextSafe())"));
-      releaseMongoConnection(connection, &cursor);
+      releaseMongoConnection(connection);
       return false;
     }
 
+    alarmMgr.dbErrorReset();
+
     // Build CER from BSON retrieved from DB
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty);
     cer->statusCode.fill(SccOk);
 
@@ -1512,11 +1855,11 @@ bool entitiesQuery
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
     {
       bool         found     = false;
-      std::string  attrName  = attrL.get(ix);
+      std::string  attrName  = attrL[ix];
 
       for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
       {
-        if (attrName == cer->contextElement.contextAttributeVector.get(jx)->name)
+        if (attrName == cer->contextElement.contextAttributeVector[jx]->name)
         {
           found = true;
           break;
@@ -1533,7 +1876,7 @@ bool entitiesQuery
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
    * entities are added. Only if limitReached is being used, i.e. not NULL
@@ -1543,6 +1886,7 @@ bool entitiesQuery
     *limitReached = (cerV->size() >= (unsigned int) limit);
     if (*limitReached)
     {
+      LM_T(LmtMongo, ("entities limit reached"));
       return true;
     }
   }
@@ -1551,15 +1895,15 @@ bool entitiesQuery
    * used before pruning in the CPr calculation logic */
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    if (enV.get(ix)->isPattern != "true")
+    if (enV[ix]->isPattern != "true")
     {
       bool needToAdd = true;
 
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
-        EntityId* eP = &cerV->get(jx)->contextElement.entityId;
+        EntityId eP = (*cerV)[jx]->contextElement.entityId;
 
-        if ((eP->id == enV.get(ix)->id) && (eP->type == enV.get(ix)->type))
+        if ((eP.id == enV[ix]->id) && (eP.type == enV[ix]->type))
         {
           needToAdd = false;
           break;  /* jx */
@@ -1570,8 +1914,8 @@ bool entitiesQuery
       {
         ContextElementResponse* cerP = new ContextElementResponse();
 
-        cerP->contextElement.entityId.id = enV.get(ix)->id;
-        cerP->contextElement.entityId.type = enV.get(ix)->type;
+        cerP->contextElement.entityId.id = enV[ix]->id;
+        cerP->contextElement.entityId.type = enV[ix]->type;
         cerP->contextElement.entityId.isPattern = "false";
 
         //
@@ -1583,7 +1927,7 @@ bool entitiesQuery
 
         for (unsigned int jx = 0; jx < attrL.size(); ++jx)
         {
-          ContextAttribute* caP = new ContextAttribute(attrL.get(jx), "", "", false);
+          ContextAttribute* caP = new ContextAttribute(attrL[jx], "", "", false);
 
           cerP->contextElement.contextAttributeVector.push_back(caP);
         }
@@ -1610,7 +1954,7 @@ void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementR
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
-    ContextElementResponse* cerP = oldCerV.get(ix);
+    ContextElementResponse* cerP = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
     /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
@@ -1800,7 +2144,7 @@ bool registrationsQuery
 
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    const EntityId* en = enV.get(ix);
+    const EntityId* en = enV[ix];
 
     if (isTrue(en->isPattern))
     {
@@ -1836,7 +2180,7 @@ bool registrationsQuery
 
   for (unsigned int ix = 0; ix < attrL.size(); ++ix)
   {
-    std::string attrName = attrL.get(ix);
+    std::string attrName = attrL[ix];
 
     attrs.append(attrName);
     LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
@@ -1885,13 +2229,14 @@ bool registrationsQuery
   DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection, getRegistrationsCollectionName(tenant), query, limit, offset, &cursor, countP, err))
   {
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  unsigned int docs = 0;
   while (moreSafe(cursor))
   {
     BSONObj r;
@@ -1900,7 +2245,8 @@ bool registrationsQuery
       LM_E(("Runtime Error (exception in nextSafe(): %s", err->c_str()));
       continue;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     //
     // Default format is XML, in the case the field is not found in the
@@ -1921,7 +2267,7 @@ bool registrationsQuery
      * same registration ID. Thus, it could be interesting to post-process the response vector, to
      * "compact" removing duplicated responses.*/
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   return true;
 }
@@ -1933,15 +2279,21 @@ bool registrationsQuery
 */
 bool isCondValueInContextElementResponse(ConditionValueList* condValues, ContextElementResponseVector* cerV)
 {
+  /* Empty conValue means that any attribute matches (aka ONANYCHANGE) */
+  if (condValues->size() == 0)
+  {
+    return true;
+  }
+
   for (unsigned int cvlx = 0; cvlx < condValues->size(); ++cvlx)
   {
     for (unsigned int aclx = 0; aclx < cerV->size(); ++aclx)
     {
-      ContextAttributeVector caV = cerV->get(aclx)->contextElement.contextAttributeVector;
+      ContextAttributeVector caV = (*cerV)[aclx]->contextElement.contextAttributeVector;
 
       for (unsigned int kx = 0; kx < caV.size(); ++kx)
       {
-        if (caV.get(kx)->name == condValues->get(cvlx))
+        if (caV[kx]->name == (*condValues)[cvlx])
         {
           return true;
         }
@@ -1951,6 +2303,63 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 
   return false;
 }
+
+
+
+/* ****************************************************************************
+*
+* someEmptyCondValue -
+*
+* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
+*/
+bool someEmptyCondValue(const BSONObj& sub)
+{
+  std::vector<BSONElement>  conds = getField(sub, CSUB_CONDITIONS).Array();
+
+  for (unsigned int ix = 0; ix < conds.size() ; ++ix)
+  {
+    BSONObj cond = conds[ix].embeddedObject();
+    if (getField(cond, CSUB_CONDITIONS_VALUE).Array().size() == 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* condValueAttrMatch -
+*
+* This logic would be MUCH simpler in the case conditions was a single field instead of a vector.
+*/
+bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
+{
+  std::vector<BSONElement>  conds = getField(sub, CSUB_CONDITIONS).Array();
+
+  for (unsigned int ix = 0; ix < conds.size() ; ++ix)
+  {
+    BSONObj cond = conds[ix].embeddedObject();
+    std::vector<BSONElement>  condValues = getField(cond, CSUB_CONDITIONS_VALUE).Array();
+    for (unsigned int jx = 0; jx < condValues.size() ; ++jx)
+    {
+      std::string condValue = condValues[jx].String();
+      for (unsigned int kx = 0; kx < modifiedAttrs.size(); ++kx)
+      {
+        if (condValue == modifiedAttrs[kx])
+        {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 
 
 /* ****************************************************************************
@@ -1977,6 +2386,7 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 
   return enV;
 }
+
 
 
 /* ****************************************************************************
@@ -2032,19 +2442,28 @@ bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 )
 {
-  // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
   std::string                   err;
   NotifyContextRequest          ncr;
   Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
+  /* Include scopes for entitiesQuery() if q filter is not empty */
+  if (qFilter != "")
+  {
+    Scope* sc = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qFilter);
+    res.scopeVector.push_back(sc);
+  }
+
   if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
+    res.release();
+
     return false;
   }
 
@@ -2066,11 +2485,12 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      // FIXME P10: we are using a dummy scope for the moment, until subscription scopes get implemented
       if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
+        res.release();
+
         return false;
       }
 
@@ -2084,6 +2504,7 @@ bool processOnChangeConditionForSubscription
         getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
         allCerV.release();
         ncr.contextElementResponseVector.release();
+        res.release();
 
         return true;
       }
@@ -2094,12 +2515,15 @@ bool processOnChangeConditionForSubscription
     {
       getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
       ncr.contextElementResponseVector.release();
+      res.release();
 
       return true;
     }
   }
 
   ncr.contextElementResponseVector.release();
+  res.release();
+
   return false;
 }
 
@@ -2120,7 +2544,8 @@ BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 )
 {
   BSONArrayBuilder conds;
@@ -2129,13 +2554,13 @@ BSONArray processConditionVector
 
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
-    NotifyCondition* nc = ncvP->get(ix);
+    NotifyCondition* nc = (*ncvP)[ix];
 
     if (nc->type == ON_TIMEINTERVAL_CONDITION)
     {
       Duration interval;
 
-      interval.set(nc->condValueList.get(0));
+      interval.set(nc->condValueList[0]);
       interval.parse();
 
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_TIMEINTERVAL_CONDITION <<
@@ -2150,11 +2575,12 @@ BSONArray processConditionVector
 
       for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
       {
-        condValues.append(nc->condValueList.get(jx));
+        condValues.append(nc->condValueList[jx]);
       }
 
       conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_CHANGE_CONDITION <<
-                        CSUB_CONDITIONS_VALUE << condValues.arr()));
+                        CSUB_CONDITIONS_VALUE << condValues.arr()
+                        ));
 
       if (processOnChangeConditionForSubscription(enV,
                                                   attrL,
@@ -2164,7 +2590,8 @@ BSONArray processConditionVector
                                                   format,
                                                   tenant,
                                                   xauthToken,
-                                                  servicePathV))
+                                                  servicePathV,
+                                                  qFilter))
       {
         *notificationDone = true;
       }
@@ -2340,7 +2767,7 @@ void fillContextProviders(ContextElementResponse* cer, ContextRegistrationRespon
 {
   for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
   {
-    ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(ix);
+    ContextAttribute* ca = cer->contextElement.contextAttributeVector[ix];
 
     if (ca->found)
     {
@@ -2418,12 +2845,12 @@ void cprLookupByAttribute
 
   for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
-    ContextRegistrationResponse* crr = crrV.get(crrIx);
+    ContextRegistrationResponse* crr = crrV[crrIx];
 
     /* Is there a matching entity in the CRR? */
     for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
     {
-      EntityId* regEn = crr->contextRegistration.entityIdVector.get(enIx);
+      EntityId* regEn = crr->contextRegistration.entityIdVector[enIx];
 
       if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {
@@ -2443,7 +2870,7 @@ void cprLookupByAttribute
       /* Is there a matching entity or the absence of attributes? */
       for (unsigned attrIx = 0; attrIx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++attrIx)
       {
-        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(attrIx)->name;
+        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector[attrIx]->name;
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result keep searching in CRR vector, so we return */
@@ -2456,4 +2883,3 @@ void cprLookupByAttribute
     }
   }
 }
-

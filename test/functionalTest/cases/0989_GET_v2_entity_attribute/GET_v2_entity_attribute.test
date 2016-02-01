@@ -38,7 +38,7 @@ brokerStart CB
 #
 
 echo "01. POST /v2/entities/8787GHY"
-echo "=========================="
+echo "============================="
 payload='{
     "id": "8787GHY",
     "type": "Car",
@@ -66,9 +66,11 @@ payload='{
     "A3" : {
           "type": "a",
           "value": "E1/T1/A3/M1",
-          "m1": 
-            {
-              "value": "M1"
+          "metadata": {
+            "m1": 
+              {
+                "value": "M1"
+              }
             }
         }
 
@@ -104,7 +106,7 @@ echo
 
 --REGEXPECT--
 01. POST /v2/entities/8787GHY
-==========================
+=============================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/8787GHY
@@ -115,61 +117,61 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY/attrs/brand
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 55
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "brand": {
-        "type": "string", 
-        "value": "Mercedes Benz"
-    }
+    "metadata": {},
+    "type": "string",
+    "value": "Mercedes Benz"
 }
 
 
 03. GET /v2/entities/8787GHY/attrs/model
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 48
+Content-Length: 52
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "model": {
-        "type": "myString", 
-        "value": "Klasse C"
-    }
+    "metadata": {},
+    "type": "myString", 
+    "value": "Klasse C"
 }
 
 
 04. GET /v2/entities/8787GHY/attrs/speed
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 41
+Content-Length: 45
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "speed": {
-        "type": "number", 
-        "value": "150"
-    }
+    "metadata": {},
+    "type": "number", 
+    "value": "150"
 }
 
 
 05. GET /v2/entities/8787GHY/attrs/A3
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 79
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A3": {
-        "m1": "M1", 
-        "type": "a", 
-        "value": "E1/T1/A3/M1"
-    }
+    "metadata": {
+        "m1": {
+            "type": null,
+            "value": "M1"
+        }
+    },
+    "type": "a", 
+    "value": "E1/T1/A3/M1"
 }
 
 

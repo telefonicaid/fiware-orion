@@ -32,6 +32,8 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "convenience/RegisterProviderRequest.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/MetadataVector.h"
@@ -86,11 +88,12 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
 */
 std::string RegisterProviderRequest::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  predetectedError,
-  int          counter
+  ConnectionInfo* ciP,
+  RequestType     requestType,
+  Format          format,
+  std::string     indent,
+  std::string     predetectedError,
+  int             counter
 )
 {
   DiscoverContextAvailabilityResponse  response;
@@ -100,7 +103,7 @@ std::string RegisterProviderRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = metadataVector.check(requestType, format, indent, "", counter))  != "OK") ||
+  else if (((res = metadataVector.check(ciP, requestType, format, indent, "", counter))  != "OK") ||
            ((res = duration.check(requestType, format, indent, "", 0))              != "OK") ||
            ((res = providingApplication.check(requestType, format, indent, "", 0))  != "OK") ||
            ((res = registrationId.check(requestType, format, indent, "", 0))        != "OK"))
@@ -112,7 +115,8 @@ std::string RegisterProviderRequest::check
     return "OK";
   }
 
-  LM_W(("Bad Input (RegisterProviderRequest Error: %s)", res.c_str()));
+  std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
+  alarmMgr.badInput(clientIp, details);
 
   return response.render(DiscoverContextAvailability, format, indent);
 }

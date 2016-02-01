@@ -29,6 +29,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -109,7 +110,7 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV.get(ix) == attr.name)
+    if (attrsV[ix] == attr.name)
     {
       return true;
     }
@@ -206,6 +207,11 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 
+      case jstNULL:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->valueType = orion::ValueTypeNone;
+        break;
+
       case Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
@@ -214,7 +220,7 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);  // LEAK
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
         compoundVectorResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
         break;
 
@@ -313,6 +319,7 @@ void ContextElementResponse::release(void)
 */
 std::string ContextElementResponse::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -322,7 +329,7 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = contextElement.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
@@ -380,7 +387,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   //
   // FIXME P7: If more than one context element is found, we simply select the first one.
   //           A better approach would be to change this convop to return a vector of responses.
-  //           Adding a warning with 'Bad Input' - with this I mean that the user that sends the 
+  //           Adding a call to alarmMgr::badInput - with this I mean that the user that sends the 
   //           query needs to avoid using this conv op to make any queries that can give more than
   //           one unique context element :-).
   //           This FIXME is related to github issue #588 and (probably) #650.
@@ -388,7 +395,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   //
   if (qcrP->contextElementResponseVector.size() > 1)
   {
-    LM_W(("Bad Input (more than one context element found the this query - selecting the first one"));
+    alarmMgr.badInput(clientIp, "more than one context element found the this query - selecting the first one");
   }
 
   contextElement.fill(&qcrP->contextElementResponseVector[0]->contextElement);

@@ -66,31 +66,21 @@ std::string postEntity
 
   eP->id = compV[2];
 
-  if (op == "")
-  {
-    op = "APPEND";   // append or update
-  }
-  else if (op == "append") // pure-append
+  if (ciP->uriParamOptions["append"] == true) // pure-append
   {
     op = "APPEND_STRICT";
   }
   else
   {
-    OrionError   error(SccBadRequest, "invalid value for URL parameter op");
-    std::string  res;
-
-    ciP->httpStatusCode = SccBadRequest;
-    
-    TIMED_RENDER(res = error.render(ciP, ""));
-
-    return res;
+    op = "APPEND";   // append or update
   }
+
 
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);
 
   // Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPENDORUPDATE);
 
   // Any error in the response?
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
@@ -110,14 +100,11 @@ std::string postEntity
     }
   }
 
-  // Default value for status code: SccCreated
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone) || (ciP->httpStatusCode == SccCreated))
+  // Default value for status code: SccNoContent. This is needed as mongoBackend typically
+  // uses SccOk (as SccNoContent doesn't exist for NGSIv1)
+  if (ciP->httpStatusCode == SccOk)
   {
-    std::string location = "/v2/entities/" + eP->id;
-    ciP->httpHeader.push_back("Location");
-    ciP->httpHeaderValue.push_back(location);
-    
-    ciP->httpStatusCode = SccCreated;
+    ciP->httpStatusCode = SccNoContent;
   }
 
   // Cleanup and return result

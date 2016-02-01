@@ -63,6 +63,7 @@ struct Condition
     std::string q;
     std::string geometry;
     std::string coords;
+    std::string georel;
   }                        expression;
   std::string toJson();
 };

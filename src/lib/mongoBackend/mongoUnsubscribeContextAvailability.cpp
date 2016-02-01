@@ -27,14 +27,16 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContextAvailability.h"
 #include "mongoBackend/safeMongo.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
-
 #include "common/sem.h"
+
+
 
 /* ****************************************************************************
 *
@@ -67,7 +69,9 @@ HttpStatusCode mongoUnsubscribeContextAvailability
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (safeGetSubId fail)", reqSemTaken);
     if (responseP->statusCode.code == SccContextElementNotFound)
     {
-      LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+      // FIXME: doubt: invalid OID format? Or, subscription not found?
+      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+      alarmMgr.badInput(clientIp, details);
     }
     else // SccReceiverInternalError
     {
@@ -80,9 +84,10 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    LM_E(("Database Error (%s)", responseP->statusCode.details.c_str()));
+    alarmMgr.dbError(responseP->statusCode.details);
     return SccOk;
   }
+  alarmMgr.dbErrorReset();
 
   if (sub.isEmpty())
   {

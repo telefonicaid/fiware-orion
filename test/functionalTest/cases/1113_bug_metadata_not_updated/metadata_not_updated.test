@@ -42,7 +42,7 @@ payload='{
   "id": "E1",
   "temp": {
     "value": "1",
-    "m1": 1
+    "metadata": { "m1": 1 }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -55,7 +55,7 @@ echo "==============================================="
 payload='{
   "temp": {
     "value": "1",
-    "m1": 2
+    "metadata": { "m1": 2 }
   }
 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json
@@ -82,9 +82,8 @@ Date: REGEX(.*)
 
 02. POST /v2/entities/E1 with metadata 'm1' = 2
 ===============================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
@@ -92,14 +91,20 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 58
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "id": "E1",
     "temp": {
-        "m1": 2.0,
+        "metadata": {
+            "m1": {
+                "type": null,
+                "value": 2.0
+            }
+        },
+        "type": null,
         "value": "1"
     },
     "type": "T1"

@@ -101,6 +101,7 @@ Format formatParse(const std::string& formatString, std::string* charsetP)
   else if (format == "text/xml")                          return XML;
   else if (format == "text/json")                         return JSON;
   else if (format == "application/json")                  return JSON;
+  else if (format == "text/plain")                        return TEXT;
 
   return XML;
 }

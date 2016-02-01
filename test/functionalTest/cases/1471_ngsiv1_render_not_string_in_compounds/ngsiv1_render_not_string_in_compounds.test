@@ -49,7 +49,7 @@ payload='{
     "y": [ 24, "y2", true ]
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -69,7 +69,7 @@ payload='{
     [ "z1", true ]
   ]
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 

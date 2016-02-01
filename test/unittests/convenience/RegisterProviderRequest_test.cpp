@@ -74,15 +74,15 @@ TEST(RegisterProviderRequest, xml_ok)
   // 2. Destroying metadata to provoke an error
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   
-  reqData.rpr.res.metadataVector.get(0)->name = "";
-  checked = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "", 0);
+  reqData.rpr.res.metadataVector[0]->name = "";
+  checked = reqData.rpr.res.check(&ci, DiscoverContextAvailability, XML, "", "", 0);
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
 
   // 3. sending a 'predetected error' to the check function
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
   
-  checked   = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "forced predetectedError", 0);
+  checked   = reqData.rpr.res.check(&ci, DiscoverContextAvailability, XML, "", "forced predetectedError", 0);
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
   // Just for coverage
@@ -135,15 +135,15 @@ TEST(RegisterProviderRequest, json_ok)
   // 2. Destroying metadata to provoke an error
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
 
-  reqData.rpr.res.metadataVector.get(0)->name = "";
-  checked = reqData.rpr.res.check(DiscoverContextAvailability, JSON, "", "", 0);
+  reqData.rpr.res.metadataVector[0]->name = "";
+  checked = reqData.rpr.res.check(&ci, DiscoverContextAvailability, JSON, "", "", 0);
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
 
   // 3. sending a 'predetected error' to the check function
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
 
-  checked   = reqData.rpr.res.check(DiscoverContextAvailability, JSON, "", "forced predetectedError", 0);
+  checked   = reqData.rpr.res.check(&ci, DiscoverContextAvailability, JSON, "", "forced predetectedError", 0);
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
   // Just for coverage

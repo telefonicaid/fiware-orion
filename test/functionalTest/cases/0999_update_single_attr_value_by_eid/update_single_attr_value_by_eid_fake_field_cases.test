@@ -1,0 +1,165 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT Entity Attribute value fake value and type cases
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT 
+# 02. Create E1-A1
+# 03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
+# 04. Get entity
+# 05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
+# 06. Get entity
+#
+
+echo "01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT"
+echo "==========================================================================="
+payload='{ "value": 1 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X BADVERB
+echo
+echo
+
+
+echo "02. Create E1-A1"
+echo "================"
+payload='{ "id": "E1", "A1": { "value": 1 } }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload"
+echo "================================================================="
+payload='{ "type": 1 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "04. Get entity"
+echo "=============="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload"
+echo "========================================================================="
+payload='{ "value": 3, "type": 3 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "06. Get entity"
+echo "=============="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT
+===========================================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET, PUT
+Date: REGEX(.*)
+
+
+
+02. Create E1-A1
+================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+03. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
+=================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 82
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": {
+            "type": 1.0
+        }
+    },
+    "id": "E1",
+    "type": null
+}
+
+
+05. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
+=========================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Get entity
+==============
+HTTP/1.1 200 OK
+Content-Length: 99
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": {
+            "type": 3.0,
+            "value": 3.0
+        }
+    },
+    "id": "E1",
+    "type": null
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/EntityId.h"
 #include "ngsi9/RegisterContextRequest.h"
@@ -89,7 +90,7 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     parseDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }
@@ -326,7 +327,7 @@ static int entityIdList(xml_node<>* node, ParseData* parseDataP)
   if (parseDataP->rcr.crP->entityIdVectorPresent == true)
   {
     parseDataP->errorString = "Got an entityIdList when one was present already";
-    LM_W(("Bad Input (more than one list of entityId)"));
+    alarmMgr.badInput(clientIp, "more than one list of entityId");
     return 1;
   }
 
@@ -370,7 +371,7 @@ void rcrRelease(ParseData* parseDataP)
 */
 std::string rcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->rcr.res.check(RegisterContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->rcr.res.check(ciP, RegisterContext, ciP->outFormat, "", parseDataP->errorString, 0);
 }
 
 

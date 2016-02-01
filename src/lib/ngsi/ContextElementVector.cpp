@@ -116,13 +116,16 @@ void ContextElementVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextElementVector::get -
+* ContextElementVector::operator[] -
 */
-ContextElement* ContextElementVector::get(int ix)
+ContextElement* ContextElementVector::operator[](unsigned int ix) const
 {
-  return vec[ix];
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+    return NULL;
 }
-
 
 
 /* ****************************************************************************
@@ -142,6 +145,7 @@ unsigned int ContextElementVector::size(void)
 */
 std::string ContextElementVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -161,7 +165,7 @@ std::string ContextElementVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

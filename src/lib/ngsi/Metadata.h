@@ -64,6 +64,7 @@ typedef struct Metadata
   std::string        stringValue;  // "value" as a String
   double             numberValue;  // "value" as a Number
   bool               boolValue;    // "value" as a Boolean
+  bool               typeGiven;    // Was 'type' part of the incoming payload?
 
   Metadata();
   Metadata(Metadata* mP);
@@ -80,7 +81,8 @@ typedef struct Metadata
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;
 
-  std::string  check(RequestType         requestType,
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
                      Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,

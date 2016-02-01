@@ -40,6 +40,7 @@
 
 #include "common/globals.h"     /* transactionIdSet                          */
 
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
 
 
 /******************************************************************************
@@ -476,6 +477,29 @@ do                                                                        \
 #endif
 
 
+
+#ifdef LM_NO_S
+#define LM_S(s)
+#else
+/* ****************************************************************************
+*
+* LM_S - log summary
+*/
+#define LM_S(s)                                                           \
+do                                                                        \
+{                                                                         \
+  char* text;                                                             \
+                                                                          \
+  if ((text = lmTextGet s) != NULL)                                       \
+  {                                                                       \
+    lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
+} while (0)
+#endif
+
+
+
 #ifdef LM_NO_H
 #define LM_H(s)
 #else
@@ -493,27 +517,6 @@ do                                                                        \
     lmOut(text, 'H', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
   }                                                                       \
-} while (0)
-#endif
-
-
-#ifdef LM_NO_C
-#define LM_S(s)
-#else
-/* ****************************************************************************
-*
-* LM_S - log message with timestamp
-*/
-#define LM_S(s)                                                          \
-do                                                                       \
-{                                                                        \
-  char* text;                                                            \
-                                                                         \
-  if (LM_MASK(LogLevelTimestamp) && (text = lmTextGet s) != NULL)        \
-  {                                                                      \
-    lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-    ::free(text);                                                        \
-  }                                                                      \
 } while (0)
 #endif
 
@@ -568,7 +571,6 @@ do                                                                       \
 *
 * LM_E - log error message
 */
-
 #define LM_E(s)                                                           \
 do                                                                        \
 {                                                                         \
@@ -1322,6 +1324,9 @@ extern bool lmNoTracesToFileIfHookActive;
 extern bool lmSilent;
 
 extern __thread char   transactionId[64];
+extern __thread char   service[SERVICE_NAME_MAX_LEN + 1];
+extern __thread char   subService[101];                 // Using SERVICE_PATH_MAX_TOTAL will be too much
+extern __thread char   fromIp[IP_LENGTH_MAX + 1];
 
 
 /* ****************************************************************************
@@ -1773,22 +1778,28 @@ extern int lmLogLinesGet(void);
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_RESET -
+* lmTransactionReset -
 */
-inline void LM_TRANSACTION_RESET()
+inline void lmTransactionReset()
 {
   strncpy(transactionId, "N/A", sizeof(transactionId));
+  strncpy(service,       "N/A", sizeof(service));
+  strncpy(subService,    "N/A", sizeof(subService));
+  strncpy(fromIp,        "N/A", sizeof(fromIp));
 }
 
 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START -
+* lmTransactionStart -
 */
-inline void LM_TRANSACTION_START(const char* keyword, const char* ip, int port, const char* path)
+inline void lmTransactionStart(const char* keyword, const char* ip, int port, const char* path)
 {
   transactionIdSet();
+  snprintf(service,    sizeof(service),    "pending");
+  snprintf(subService, sizeof(subService), "pending");
+  snprintf(fromIp,     sizeof(fromIp),     "pending");
   LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));
 }
 
@@ -1796,24 +1807,85 @@ inline void LM_TRANSACTION_START(const char* keyword, const char* ip, int port, 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START_URL -
+* lmTransactionSetService -
 */
-inline void LM_TRANSACTION_START_URL(const char* url)
+inline void lmTransactionSetService(const char* _service)
 {
-  transactionIdSet();
-  LM_I(("Starting transaction from %s", url));
+  if (strlen(_service) != 0)
+  {
+    snprintf(service, sizeof(service), "%s", _service);
+  }
+  else
+  {
+    snprintf(service, sizeof(service), "%s", "<default>");
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_END -
+* lmTransactionSetSubservice -
 */
-inline void LM_TRANSACTION_END()
+inline void lmTransactionSetSubservice(const char* _subService)
+{
+  if (strlen(_subService) != 0)
+  {
+    snprintf(subService, sizeof(service), "%s", _subService);
+  }
+  else
+  {
+    snprintf(subService, sizeof(service), "%s", "<default>");
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* lmTransactionSetFrom -
+*/
+inline void lmTransactionSetFrom(const char* _fromIp)
+{
+  if (strlen(_fromIp) != 0)
+  {
+    snprintf(fromIp, sizeof(fromIp), "%s", _fromIp);
+  }
+  else
+  {
+    snprintf(fromIp, sizeof(fromIp), "%s", "<no ip>");
+  }
+}
+
+
+
+#if 0
+
+// This piece of code seems not be in use. Maybe it is related with ONTIMENOTIFICATION
+// notifications... let's hold in until OTI (deprecated in 0.26.0) gets definitivealy
+// removed from code
+
+/* ****************************************************************************
+*
+* lmTransactionStart_URL -
+*/
+inline void lmTransactionStart_URL(const char* url)
+{
+  transactionIdSet();
+  LM_I(("Starting transaction from %s", url));
+}
+#endif
+
+
+
+/* ****************************************************************************
+*
+* lmTransactionEnd -
+*/
+inline void lmTransactionEnd()
 {
   LM_I(("Transaction ended"));
-  LM_TRANSACTION_RESET();
+  lmTransactionReset();
 }
 
 #endif  // SRC_LIB_LOGMSG_LOGMSG_H_

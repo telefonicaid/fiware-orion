@@ -59,8 +59,7 @@ def a_standard_context_subscription_is_asked_with_the_before_information(step):
 
 @step('a standard context registration is asked with the before information')
 def a_standard_context_registration_is_asked_with_the_before_information(step):
-    world.responses[world.response_count] = world.cb[world.cb_count].register_context(
-        world.payloads[world.payloads_count])
+    world.responses[world.response_count] = world.cb[world.cb_count].register_context(world.payloads[world.payloads_count])
 
 
 @step('a standard disconver context availability is asked with the before information')

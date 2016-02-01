@@ -31,6 +31,8 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "apiTypesV2/EntityVector.h"
 
@@ -79,7 +81,7 @@ std::string EntityVector::check
 
     if ((res = vec[ix]->check(ciP, requestType)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of Entity)"));
+      alarmMgr.badInput(clientIp, "invalid vector of Entity");
       return res;
     }
   }
@@ -118,11 +120,15 @@ void EntityVector::push_back(Entity* item)
 
 /* ****************************************************************************
 *
-* EntityVector::get -
+* EntityVector::operator[] -
 */
-Entity* EntityVector::get(int ix)
+Entity*  EntityVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+      return vec[ix];
+   }
+   return NULL;
 }
 
 

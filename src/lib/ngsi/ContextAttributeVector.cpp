@@ -80,7 +80,7 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, bool types)
+std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const std::string& renderMode)
 {
   if (vec.size() == 0)
   {
@@ -117,6 +117,12 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types)
   //
   std::string  out;
   int          renderedAttributes = 0;
+
+  if (renderMode == "values")
+  {
+    out = JSON_STR("attributeValues") + ":" + "[";
+  }
+  
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
@@ -125,7 +131,12 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types)
     }
 
     ++renderedAttributes;
-    out += vec[ix]->toJson(renderedAttributes == validAttributes, types);
+    out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
+  }
+
+  if (renderMode == "values")
+  {
+    out += "]";
   }
 
   return out;
@@ -240,6 +251,7 @@ std::string ContextAttributeVector::render
 */
 std::string ContextAttributeVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -251,7 +263,7 @@ std::string ContextAttributeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, 0)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, 0)) != "OK")
       return res;
   }
 
@@ -301,26 +313,6 @@ void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
   }
 }
 
-
-/* ****************************************************************************
-*
-* ContextAttributeVector::get - 
-*/
-ContextAttribute* ContextAttributeVector::get(unsigned int ix)
-{
-  if (ix < vec.size())
-    return vec[ix];
-  return NULL;
-}
-
-const ContextAttribute* ContextAttributeVector::get(unsigned int ix) const
-{
-  if (ix < vec.size())
-    return vec[ix];
-  return NULL;
-}
-
-
 /* ****************************************************************************
 *
 * ContextAttributeVector::size - 
@@ -328,6 +320,20 @@ const ContextAttribute* ContextAttributeVector::get(unsigned int ix) const
 unsigned int ContextAttributeVector::size(void) const
 {
   return vec.size();
+}
+
+
+/* ****************************************************************************
+*
+* ContextAttributeVector::operator[] -
+*/
+ContextAttribute*  ContextAttributeVector::operator[](unsigned int ix) const
+{
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+  return NULL;
 }
 
 
@@ -360,7 +366,7 @@ void ContextAttributeVector::fill(ContextAttributeVector* cavP)
 
   for (unsigned int ix = 0; ix < cavP->size(); ++ix)
   {
-    ContextAttribute* from = cavP->get(ix);
+    ContextAttribute* from = (*cavP)[ix];
     ContextAttribute* caP = new ContextAttribute(from);
 
     push_back(caP);

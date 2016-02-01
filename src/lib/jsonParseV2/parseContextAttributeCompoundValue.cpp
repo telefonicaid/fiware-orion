@@ -46,6 +46,7 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
   else if (nodeType == "False")   return orion::ValueTypeBoolean;
   else if (nodeType == "Object")  return orion::ValueTypeObject;
   else if (nodeType == "Array")   return orion::ValueTypeVector;
+  else if (nodeType == "Null")    return orion::ValueTypeNone;
 
   return orion::ValueTypeString;
 }
@@ -93,6 +94,10 @@ std::string parseContextAttributeCompoundValue
       else if ((nodeType == "True") || (nodeType == "False"))
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
       }
       else if (nodeType == "Object")
       {
@@ -149,6 +154,10 @@ std::string parseContextAttributeCompoundValue
       else if ((nodeType == "True") || (nodeType == "False"))
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
       }
       else if (nodeType == "Object")
       {
@@ -295,6 +304,155 @@ std::string parseContextAttributeCompoundValue
       else if ((nodeType == "True") || (nodeType == "False"))
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->path += "/";
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->path += "/";
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      parent->childV.push_back(cvnP);
+        
+      //
+      // Recursive call if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        parseContextAttributeCompoundValue(iter, caP, cvnP);
+      }
+
+      ++counter;
+    }
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseContextAttributeCompoundValueStandAlone - 
+*/
+std::string parseContextAttributeCompoundValueStandAlone
+(
+  Document&            document,
+  ContextAttribute*    caP,
+  orion::ValueType     valueType
+)
+{
+  caP->compoundValueP            = new orion::CompoundValueNode();
+  caP->compoundValueP->name      = "TOP";
+  caP->compoundValueP->container = caP->compoundValueP;
+  caP->compoundValueP->valueType = caP->valueType;  // Convert to other type?
+  caP->compoundValueP->path      = "/";
+  caP->compoundValueP->rootP     = caP->compoundValueP;
+  caP->compoundValueP->level     = 0;
+  caP->compoundValueP->siblingNo = 0;
+
+  orion::CompoundValueNode*   parent  = caP->compoundValueP;
+
+
+  //
+  // Children of the node
+  //
+  if (caP->valueType == orion::ValueTypeVector)
+  {
+    int counter  = 0;
+
+    for (Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
+    {
+      std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
+      orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
+      char                       itemNo[4];
+
+      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
+
+      cvnP->valueType  = stringToCompoundType(nodeType);
+      cvnP->container  = parent;
+      cvnP->rootP      = parent->rootP;
+      cvnP->level      = parent->level + 1;
+      cvnP->siblingNo  = counter;
+      cvnP->path       = parent->path + "[" + itemNo + "]";
+
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue = iter->GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
+      }
+      else if (nodeType == "Object")
+      {
+        cvnP->path += "/";
+        cvnP->valueType = orion::ValueTypeObject;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->path += "/";
+        cvnP->valueType = orion::ValueTypeVector;
+      }
+
+      parent->childV.push_back(cvnP);
+
+      //
+      // Recursive call if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        parseContextAttributeCompoundValue(iter, caP, cvnP);
+      }
+
+      ++counter;
+    }
+  }
+  else if (caP->valueType == orion::ValueTypeObject)
+  {
+    int counter  = 0;
+
+    for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
+    {
+      std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
+      orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
+
+      cvnP->name       = iter->name.GetString();
+      cvnP->valueType  = stringToCompoundType(nodeType);
+      cvnP->container  = parent;
+      cvnP->rootP      = parent->rootP;
+      cvnP->level      = parent->level + 1;
+      cvnP->siblingNo  = counter;
+      cvnP->path       = parent->path + cvnP->name;
+
+      if (nodeType == "String")
+      {
+        cvnP->stringValue = iter->value.GetString();
+      }
+      else if (nodeType == "Number")
+      {
+        cvnP->numberValue = iter->value.GetDouble();
+      }
+      else if ((nodeType == "True") || (nodeType == "False"))
+      {
+        cvnP->boolValue   = (nodeType == "True")? true : false;
+      }
+      else if (nodeType == "Null")
+      {
+        cvnP->valueType = orion::ValueTypeNone;
       }
       else if (nodeType == "Object")
       {

@@ -72,15 +72,22 @@ Feature: general operations in Context Broker using NGSI API v1 and v2
     And verify statistics "<field>" field does exists
     Examples:
       | field                      |
-      | versionRequests            |
-      | statisticsRequests         |
       | uptime_in_secs             |
       | measuring_interval_in_secs |
-      | subCacheRefreshs           |
-      | subCacheInserts            |
-      | subCacheRemoves            |
-      | subCacheUpdates            |
-      | subCacheItems              |
+
+  @cache_statistics
+  Scenario Outline: verifying fields in Context Broker cache statistics request
+    When send a cache statistics request
+    Then verify that receive an "OK" http code
+    And verify statistics "<field>" field does exists
+    Examples:
+      | field   |
+      | ids     |
+      | refresh |
+      | inserts |
+      | removes |
+      | updates |
+      | items   |
 
   @api_entry_point
   Scenario Outline: launch API entry point request using NGSI v2

@@ -53,6 +53,8 @@
 #include "logMsg/time.h"
 #include "logMsg/logMsg.h"      /* Own interface                             */
 
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+
 extern "C" pid_t gettid(void);
 
 
@@ -264,7 +266,7 @@ do                                                \
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
-#define F_LEN            128
+#define F_LEN            150
 #define TF_LEN           64
 #define INFO_LEN         512
 #define TMS_LEN          20
@@ -339,10 +341,13 @@ typedef struct Line
 *
 * globals
 */
-int             inSigHandler      = 0;
-char*           progName;                   /* needed for messages (and by lmLib) */
-char            progNameV[512];             /* where to store progName            */
-__thread char   transactionId[64] = "N/A";
+int             inSigHandler                      = 0;
+char*           progName;                         /* needed for messages (and by lmLib) */
+char            progNameV[512];                   /* where to store progName            */
+__thread char   transactionId[64]                 = "N/A";
+__thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
+__thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
+__thread char   fromIp[IP_LENGTH_MAX + 1]          = "N/A";
 
 
 
@@ -966,10 +971,17 @@ static char* timeGet(int index, char* line, int lineSize)
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * timeStampGet -
+*
+* This function has been removed as the LM_S macro, formerly a 'timestamp macro'
+* has been removed for the Orion Context Broker implementation, to make room for
+* a new LM_S macro, the 'S' standing for 'Summary'.
+*
+* The function is kept in case the LM_S is taken back as a 'timestamp macro' for
+* some other project.
 */
 static char* timeStampGet(char* line, int len)
 {
@@ -981,7 +993,7 @@ static char* timeStampGet(char* line, int len)
 
   return line;
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -1006,6 +1018,7 @@ const char* longTypeName(char type)
   case 'M':  return "DEBUG";
   case 'F':  return "DEBUG";
   case 'I':  return "INFO";
+  case 'S':  return "SUMMARY";
   }
 
   return "N/A";
@@ -1066,6 +1079,18 @@ static char* lmLineFix
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
     {
       STRING_ADD(transactionId, 8);
+    }
+    else if (strncmp(&format[fi], "SERVICE", 7) == 0)
+    {
+      STRING_ADD(service, 7);
+    }
+    else if (strncmp(&format[fi], "SUB_SERVICE", 11) == 0)
+    {
+      STRING_ADD(subService, 11);
+    }
+    else if (strncmp(&format[fi], "FROM_IP", 7) == 0)
+    {
+      STRING_ADD(fromIp, 7);
     }
     else if (strncmp(&format[fi], "EXEC", 4) == 0)
     {
@@ -2258,11 +2283,6 @@ LmStatus lmOut
       {
         snprintf(line, LINE_MAX, "%s\n%c", text, 0);
       }
-    }
-    else if (type == 'S')
-    {
-      char stampStr[128];
-      snprintf(line, LINE_MAX, "%s:%s", text, timeStampGet(stampStr, 128));
     }
     else
     {

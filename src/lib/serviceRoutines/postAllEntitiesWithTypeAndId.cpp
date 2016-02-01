@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -105,7 +106,7 @@ std::string postAllEntitiesWithTypeAndId
   {
     std::string  out;
 
-    LM_W(("Bad Input (unknown field)"));
+    alarmMgr.badInput(clientIp, "unknown field");
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
 
     TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
@@ -117,7 +118,7 @@ std::string postAllEntitiesWithTypeAndId
   // 03. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
@@ -129,7 +130,7 @@ std::string postAllEntitiesWithTypeAndId
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");

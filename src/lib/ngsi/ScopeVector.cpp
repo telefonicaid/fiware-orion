@@ -31,6 +31,8 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/limits.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ScopeVector.h"
 
 
@@ -80,7 +82,10 @@ std::string ScopeVector::check
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
     {
-      LM_W(("Bad Input (error in scope %d: %s)", ix, res.c_str()));
+      char ixV[STRING_SIZE_FOR_INT];
+      snprintf(ixV, sizeof(ixV), "%d", ix);
+      std::string details = std::string("error in scope ") + ixV + ": " + res;
+      alarmMgr.badInput(clientIp, details);
       return res;
     }
   }
@@ -128,15 +133,15 @@ void ScopeVector::push_back(Scope* item)
 
 /* ****************************************************************************
 *
-* ScopeVector::get -
+* ScopeVector::operator[] -
 */
-Scope* ScopeVector::get(int ix)
+Scope* ScopeVector::operator[](unsigned int ix) const
 {
-  return vec[ix];
-}
-const Scope* ScopeVector::get(int ix) const
-{
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 

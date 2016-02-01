@@ -1,0 +1,422 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+ONANYCHANGE with empty cond values
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create ONANYCHANGE subscription
+# 02. Create entity E2 not covered by subscription (no notification)
+# 03. Create entity E1 covered by subscription with attributes A1 and A2 (notification)
+# 04. Update A1 (notification)
+# 05. Update A2 (notification)
+# 06. Append A3 (notification)
+# 07. Get accumulator dump (4 notifications)
+#
+
+echo "01. Create ONANYCHANGE subscription"
+echo "==================================="
+payload='{
+  "entities": [
+    {
+        "type": "T",
+        "isPattern": "false",
+        "id": "E1"
+    }
+  ],
+  "reference": "http://localhost:'$LISTENER_PORT'/notify",
+  "duration": "P1M",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [ ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create entity E2 not covered by subscription (no notification)"
+echo "=================================================================="
+payload='{
+    "id": "E2",
+    "type": "T",
+    "isPattern": "false",
+    "attributes": [
+        {
+            "name": "A1",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities --payload "${payload}" --json
+echo
+echo
+
+
+echo "03. Create entity E1 covered by subscription with attributes A1 and A2 (notification)"
+echo "====================================================================================="
+payload='{
+    "id": "E1",
+    "type": "T",
+    "isPattern": "false",
+    "attributes": [
+        {
+            "name": "A1",
+            "value": "10"
+        },
+        {
+            "name": "A2",
+            "value": "20"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities --payload "${payload}" --json
+echo
+echo
+
+
+echo "04. Update A1 (notification)"
+echo "============================"
+payload='{
+    "value": "aa"
+}'
+orionCurl --url /v1/contextEntities/E1/attributes/A1 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "05. Update A2 (notification)"
+echo "============================"
+payload='{
+    "value": "bb"
+}'
+orionCurl --url /v1/contextEntities/E1/attributes/A2 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "06. Append A3 (notification)"
+echo "============================"
+payload='{
+    "value": "cc"
+}'
+orionCurl --url /v1/contextEntities/E1/attributes/A3 --payload "$payload" --json -X POST
+echo
+echo
+
+
+echo "Get accumulator dump (4 notifications)"
+echo "===================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create ONANYCHANGE subscription
+===================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create entity E2 not covered by subscription (no notification)
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 309
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1",
+                    "type": "",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E2",
+    "isPattern": "false",
+    "type": "T"
+}
+
+
+03. Create entity E1 covered by subscription with attributes A1 and A2 (notification)
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 401
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1",
+                    "type": "",
+                    "value": ""
+                },
+                {
+                    "name": "A2",
+                    "type": "",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E1",
+    "isPattern": "false",
+    "type": "T"
+}
+
+
+04. Update A1 (notification)
+============================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+05. Update A2 (notification)
+============================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+06. Append A3 (notification)
+============================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+Get accumulator dump (4 notifications)
+====================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 561
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "",
+            "value" : "10"
+          },
+          {
+            "name" : "A2",
+            "type" : "",
+            "value" : "20"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 561
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "",
+            "value" : "aa"
+          },
+          {
+            "name" : "A2",
+            "type" : "",
+            "value" : "20"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 561
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "",
+            "value" : "aa"
+          },
+          {
+            "name" : "A2",
+            "type" : "",
+            "value" : "bb"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 665
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "",
+            "value" : "aa"
+          },
+          {
+            "name" : "A2",
+            "type" : "",
+            "value" : "bb"
+          },
+          {
+            "name" : "A3",
+            "type" : "",
+            "value" : "cc"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

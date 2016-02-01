@@ -36,10 +36,14 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "cache/subCache.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
+#include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
 #include "common/Format.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
+
+
 
 /* ****************************************************************************
 *
@@ -47,13 +51,14 @@
 */
 HttpStatusCode mongoUpdateContextSubscription
 (
-  UpdateContextSubscriptionRequest*   requestP,
-  UpdateContextSubscriptionResponse*  responseP,
-  Format                              notifyFormat,
-  const std::string&                  tenant,
-  const std::string&                  xauthToken,
-  const std::vector<std::string>&     servicePathV
-)
+    UpdateContextSubscriptionRequest*   requestP,
+    UpdateContextSubscriptionResponse*  responseP,
+    Format                              notifyFormat,
+    const std::string&                  tenant,
+    const std::string&                  xauthToken,
+    const std::vector<std::string>&     servicePathV,
+    std::string                         version
+    )
 { 
   bool          reqSemTaken;
 
@@ -64,12 +69,14 @@ HttpStatusCode mongoUpdateContextSubscription
   std::string err;
   OID         id;
 
+
   if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->subscribeError.errorCode)))
   {
     reqSemGive(__FUNCTION__, "ngsi10 update subscription request (safeGetSubId fail)", reqSemTaken);
     if (responseP->subscribeError.errorCode.code == SccContextElementNotFound)
     {
-      LM_W(("Bad Input (invalid OID format: %s)", requestP->subscriptionId.get().c_str()));
+      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+      alarmMgr.badInput(clientIp, details);
     }
     else // SccReceiverInternalError
     {
@@ -103,14 +110,84 @@ HttpStatusCode mongoUpdateContextSubscription
    */
   BSONObjBuilder newSub;
 
-  /* Entities, attribute list and reference are not updatable, so they are appended directly */
-  newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
-  newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
-  newSub.append(CSUB_REFERENCE, getStringField(sub, CSUB_REFERENCE));
+  if (version != "v2") {
+    /* Entities, attribute list and reference are not updatable, so they are appended directly */
+    newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
+    newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
+    newSub.append(CSUB_REFERENCE, getStringField(sub, CSUB_REFERENCE));
+  }
+  else // v2
+  {
+    // Reference
+    std::string ref;
+    if (!requestP->reference.isEmpty())
+    {
+      ref = requestP->reference.get();
+    }
+    else
+    {
+      ref = getStringField(sub, CSUB_REFERENCE);
+    }
+    newSub.append(CSUB_REFERENCE, ref);
+
+    // Entities
+    if (requestP->entityIdVector.size() >0)
+    {
+      /* Build entities array */
+      BSONArrayBuilder entities;
+      for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+      {
+        EntityId* en = requestP->entityIdVector[ix];
+
+        if (en->type == "")
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
+        else
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_TYPE << en->type <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
+      }
+      newSub.append(CSUB_ENTITIES, entities.arr());
+    }
+    else
+    {
+      newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES).Obj());
+    }
+
+    //Attributes
+    if (requestP->attributeList.size() > 0)
+    {
+      /* Build attributes array */
+      BSONArrayBuilder attrs;
+      for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
+        attrs.append(requestP->attributeList[ix]);
+      }
+      newSub.append(CSUB_ATTRS, attrs.arr());
+    }
+    else
+    {
+      newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS).Obj());
+    }
+
+  }
 
   /* Duration update */
-  long long expiration = getCurrentTime() + requestP->duration.parse();
-  if (requestP->duration.isEmpty())
+  long long expiration = -1;
+
+  if (requestP->expires != -1) //v2
+  {
+    expiration = requestP->expires;
+  }
+  else
+  {
+    expiration = getCurrentTime() + requestP->duration.parse();
+  }
+
+  if (requestP->duration.isEmpty() && requestP->expires ==-1)
   {
     //
     // No duration in incoming request => "inherit" expirationDate from 'old' subscription
@@ -122,11 +199,11 @@ HttpStatusCode mongoUpdateContextSubscription
   else
   {
     newSub.append(CSUB_EXPIRATION, expiration);
-    LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
+    LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
   }
 
-  /* Restriction update */
-  // FIXME: Restrictions not implemented yet
+  /* ServicePath update */
+  newSub.append(CSUB_SERVICE_PATH, (servicePathV.size() == 0)? "" : servicePathV[0]);
 
   /* Throttling update */
   if (!requestP->throttling.isEmpty())
@@ -138,6 +215,10 @@ HttpStatusCode mongoUpdateContextSubscription
     {
       newSub.append(CSUB_THROTTLING, throttling);
     }
+  }
+  else if (requestP->throttling.seconds > 0) // v2
+  {
+      newSub.append(CSUB_THROTTLING, (long long) requestP->throttling.seconds);
   }
   else
   {
@@ -163,8 +244,36 @@ HttpStatusCode mongoUpdateContextSubscription
       /* Build conditions array (including side-effect notifications and threads creation)
        * In order to do so, we have to create and EntityIdVector and AttributeList from sub
        * document, given the processConditionVector() signature */
-       EntityIdVector enV = subToEntityIdVector(sub);
-       AttributeList attrL = subToAttributeList(sub);
+       EntityIdVector enV;
+       AttributeList attrL;
+       if (version == "v1")
+       {
+         enV = subToEntityIdVector(sub);
+         attrL = subToAttributeList(sub);
+       }
+       else // v2
+       {
+         // In v2 entities and attribute are updatable (as part of subject or notification) wo
+         // we have to check in order to know if we get the attribute from the request or from
+         // the subscription
+         if (requestP->entityIdVector.size() > 0)
+         {
+           enV = requestP->entityIdVector;
+         }
+         else
+         {
+           enV = subToEntityIdVector(sub);
+         }
+
+         if (requestP->attributeList.size() > 0)
+         {
+           attrL = requestP->attributeList;
+         }
+         else
+         {
+           attrL = subToAttributeList(sub);
+         }
+       }
 
        BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                                 enV,
@@ -175,7 +284,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 notifyFormat,
                                                 tenant,
                                                 xauthToken,
-                                                servicePathV);
+                                                servicePathV,
+                                                requestP->expression.q);
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
@@ -185,7 +295,23 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
 
-  
+  // Expresssion
+  if (requestP->expression.isSet)
+  {
+    /* Build expression */
+    BSONObjBuilder expression;
+
+    expression << CSUB_EXPR_Q << requestP->expression.q
+             << CSUB_EXPR_GEOM << requestP->expression.geometry
+             << CSUB_EXPR_COORDS << requestP->expression.coords
+             << CSUB_EXPR_GEOREL << requestP->expression.georel;
+    newSub.append(CSUB_EXPR, expression.obj());
+  }
+  else if (sub.hasField(CSUB_EXPR))
+  {
+    newSub.append(CSUB_EXPR, getField(sub, CSUB_EXPR).Obj());
+  }
+
   int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT) : 0;
 
   //
@@ -316,7 +442,16 @@ HttpStatusCode mongoUpdateContextSubscription
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
 
-  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(), newSubObject, subscriptionId, servicePath, lastNotificationTime, expiration);
+  int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
+                                          newSubObject,
+                                          subscriptionId,
+                                          servicePath,
+                                          lastNotificationTime,
+                                          expiration,
+                                          requestP->expression.q,
+                                          requestP->expression.geometry,
+                                          requestP->expression.coords,
+                                          requestP->expression.georel);
 
   if (cSubP != NULL)
   {

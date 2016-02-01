@@ -64,6 +64,7 @@ std::string ContextRegistrationAttributeVector::render(Format format, const std:
 */
 std::string ContextRegistrationAttributeVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -75,7 +76,7 @@ std::string ContextRegistrationAttributeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }
@@ -115,11 +116,15 @@ void ContextRegistrationAttributeVector::push_back(ContextRegistrationAttribute*
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::get -
+* ContextRegistrationAttributeVector::operator[] -
 */
-ContextRegistrationAttribute* ContextRegistrationAttributeVector::get(int ix)
+ContextRegistrationAttribute* ContextRegistrationAttributeVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+    return NULL;  
 }
 
 

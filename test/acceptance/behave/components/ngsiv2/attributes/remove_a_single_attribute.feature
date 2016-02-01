@@ -137,18 +137,34 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
     When delete an attribute "temperature_0" in entities with id "room"
     Then verify that receive a "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                                                                                                         |
-      | error       | BadRequest                                                                                                                                    |
-      | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
+      | parameter   | value                                                                                  |
+      | error       | BadRequest                                                                             |
+      | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
     Examples:
-      | service                         |
-      | service.sr                      |
-      | Service-sr                      |
-      | Service(sr)                     |
-      | Service=sr                      |
-      | Service<sr>                     |
-      | Service,sr                      |
-      | greater than max length allowed |
+      | service     |
+       | service.sr  |
+      | Service-sr  |
+      | Service(sr) |
+      | Service=sr  |
+      | Service<sr> |
+      | Service,sr  |
+      | service#sr  |
+      | service%sr  |
+      | service&sr  |
+
+  @service_delete_bad_length
+  Scenario: Try to delete an attribute by entity ID using NGSI v2 with bad length service header values
+    Given a definition of headers
+      | parameter          | value                           |
+      | Fiware-Service     | greater than max length allowed |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
+    When delete an attribute "temperature_0" in entities with id "room"
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                    |
+      | error       | BadRequest                                               |
+      | description | bad length - a tenant name can be max 50 characters long |
 
   # ------------------------ Service path ----------------------------------------------
 
@@ -504,11 +520,11 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | error       | BadRequest               |
       | description | invalid character in URI |
     Examples:
-      | entity_id | attributes_name     |
-      | room_9    | house_?             |
-      | room_10   | house_&             |
-      | room_11   | house_/             |
-      | room_12   | house_#             |
+      | entity_id | attributes_name |
+      | room_9    | house_?         |
+      | room_10   | house_&         |
+      | room_11   | house_/         |
+      | room_12   | house_#         |
 
   @attribute_name_empty
   Scenario:  try to delete an attribute by entity ID using NGSI v2 API with empty attribute name

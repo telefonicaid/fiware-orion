@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
@@ -107,7 +108,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::id differs in URL and payload";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
@@ -120,7 +121,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::type differs in URL and payload";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
@@ -134,7 +135,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::isPattern set to true in contextUpdate convenience operation";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));
@@ -146,7 +147,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "invalid request: mandatory entityId::id missing";
 
-    LM_W(("Bad Input (%s)", error.c_str()));
+    alarmMgr.badInput(clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(ciP, IndividualContextEntity, ""));

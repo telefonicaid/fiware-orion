@@ -38,7 +38,11 @@
 */
 #define MAX_LEN_IP  64
 
-
+/* ****************************************************************************
+*
+* CONSTANTS RESTINIT - 
+*/ 
+#define   NO_PORT 0
 
 /* ****************************************************************************
 *
@@ -55,7 +59,7 @@ typedef enum IpVersion
 
 /* ****************************************************************************
 *
-* ipVersionUsed - 
+* Global vars - 
 */
 extern IpVersion       ipVersionUsed;  
 extern std::string     rushHost;
@@ -81,14 +85,14 @@ extern void restInit
 (
    RestService*        _restServiceV,
    IpVersion           _ipVersion,
-   const char*         _bindAddress,
+   const char*         _bindAddress, 
    unsigned short      _port,
    bool                _multitenant       = false,
-   unsigned int        _connectionMemory  = 64,
-   unsigned int        _maxConnections    = 128,
-   unsigned int        _mhdThreadPoolSize = 128,
+   unsigned int        _connectionMemory  = DEFAULT_CONNECTION_MEM,
+   unsigned int        _maxConnections    = DEFAULT_MAX_CONNECTIONS,
+   unsigned int        _mhdThreadPoolSize = DEFAULT_MHD_THREAD_POOLSIZE,
    const std::string&  _rushHost          = "",
-   unsigned short      _rushPort          = 0,
+   unsigned short      _rushPort          = NO_PORT,
    const char*         _allowedOrigin     = NULL,
    const char*         _httpsKey          = NULL,
    const char*         _httpsCert         = NULL,

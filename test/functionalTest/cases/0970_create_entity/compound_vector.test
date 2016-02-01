@@ -41,7 +41,7 @@ payload='{
   "type": "T1",
   "cvec": [ 1, 2, 3 ]
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -66,17 +66,21 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 59
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "cvec": [
-        1.0, 
-        2.0, 
-        3.0
-    ], 
-    "id": "E1", 
+    "cvec": {
+        "metadata": {},
+        "type": null,
+        "value": [
+            1.0,
+            2.0,
+            3.0
+        ]
+    },
+    "id": "E1",
     "type": "T1"
 }
 

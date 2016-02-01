@@ -47,25 +47,12 @@ OrionError::OrionError()
 
 /* ****************************************************************************
 *
-* OrionError::OrionError - 
+* OrionError::OrionError -
 */
-OrionError::OrionError(HttpStatusCode _code, const std::string& _details)
+OrionError::OrionError(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {
   code          = _code;
-  reasonPhrase  = httpStatusCodeString(code);
-  details       = _details;
-}
-
-
-
-/* ****************************************************************************
-*
-* OrionError::OrionError - 
-*/
-OrionError::OrionError(HttpStatusCode _code, std::string& _details)
-{
-  code          = _code;
-  reasonPhrase  = httpStatusCodeString(code);
+  reasonPhrase  = _reasonPhrase == "" ? httpStatusCodeString(code) : _reasonPhrase;
   details       = _details;
 }
 
@@ -81,7 +68,6 @@ OrionError::OrionError(StatusCode& sc)
   reasonPhrase  = httpStatusCodeString(code);
   details       = sc.details;
 }
-
 
 
 /* ****************************************************************************
@@ -151,6 +137,11 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
     if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
     {
       ciP->httpStatusCode = SccBadRequest;
+    }
+
+    if (details == "Already Exists")
+    {
+      details = "Entity already exists";
     }
 
     reasonPhrase = errorStringForV2(reasonPhrase);

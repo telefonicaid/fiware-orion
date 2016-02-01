@@ -160,6 +160,7 @@ std::string MetadataVector::toJson(bool isLastElement)
 */
 std::string MetadataVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -171,7 +172,7 @@ std::string MetadataVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }
@@ -215,16 +216,15 @@ void MetadataVector::push_back(Metadata* item)
 
 /* ****************************************************************************
 *
-* MetadataVector::get -
+* MetadataVector::operator[] -
 */
-Metadata* MetadataVector::get(int ix)
+Metadata* MetadataVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
-}
-
-const Metadata* MetadataVector::get(int ix) const
-{
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 /* ****************************************************************************
@@ -267,7 +267,7 @@ void MetadataVector::fill(MetadataVector* mvP)
 {
   for (unsigned int ix = 0; ix < mvP->size(); ++ix)
   {
-    Metadata* mP = new Metadata(mvP->get(ix));
+    Metadata* mP = new Metadata((*mvP)[ix]);
 
     push_back(mP);
   }

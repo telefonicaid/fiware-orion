@@ -42,7 +42,7 @@ typedef struct Throttling
   std::string   string;
   int64_t       seconds;
 
-  Throttling();
+  Throttling(): seconds(-1) {}
 
   void               set(const std::string& value);
   const std::string  get(void);

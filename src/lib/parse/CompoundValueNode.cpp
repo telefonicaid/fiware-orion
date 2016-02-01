@@ -30,6 +30,8 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "orionTypes/OrionValueType.h"
 #include "rest/ConnectionInfo.h"
 #include "parse/CompoundValueNode.h"
@@ -456,6 +458,13 @@ void CompoundValueNode::shortShow(const std::string& indent)
 				(boolValue == true)? "true" : "false"));
     return;
   }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValue,      ("%s%s (null)", 
+				indent.c_str(), 
+				name.c_str()));
+    return;
+  }
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValue,      ("%s%s (%f)", 
@@ -523,6 +532,11 @@ void CompoundValueNode::show(const std::string& indent)
 				indent.c_str(), 
 				numberValue));
   }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueShow, ("%sNull", 
+				indent.c_str()));
+  }
   else if (childV.size() != 0)
   {
     std::string childrenString;
@@ -577,7 +591,7 @@ void CompoundValueNode::check(void)
         rootP->error =
           std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
 
-        LM_W(("Bad Input (%s)", rootP->error.c_str()));
+        alarmMgr.badInput(clientIp, rootP->error);
         return;
       }
     }
@@ -596,7 +610,7 @@ void CompoundValueNode::check(void)
         if (childV[ix]->name == childV[ix2]->name)
         {
           rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
-          LM_W(("Bad Input (%s)", rootP->error.c_str()));
+          alarmMgr.badInput(clientIp, rootP->error);
 
           return;
         }
@@ -650,6 +664,11 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
   {
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
     out = valueTag(indent, tagName, boolValue? "true" : "false", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
+    out = valueTag(indent, tagName, "null", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
@@ -767,6 +786,19 @@ std::string CompoundValueNode::toJson(bool isLastElement)
       out = JSON_STR(tagName) + ":" + JSON_BOOL(boolValue);
     }
   }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
+
+    if (container->valueType == orion::ValueTypeVector)
+    {
+      out = "null";
+    }
+    else
+    {
+      out = JSON_STR(tagName) + ":" + "null";
+    }
+  }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
   {
     //
@@ -873,6 +905,12 @@ CompoundValueNode* CompoundValueNode::clone(void)
     case orion::ValueTypeBoolean:
       me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
       break;
+
+    case orion::ValueTypeNone:
+      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
+      me->valueType = orion::ValueTypeNone;
+      break;
+
     default:
       me = NULL;
       LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));

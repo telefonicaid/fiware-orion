@@ -46,11 +46,13 @@ payload='{
   {
     "type": "date",
     "value": 19,
-    "meta1":
-    {
-      "value": { "compound": "value" }
-    },
-    "meta2": [ 1, 2, 3 ]
+    "metadata": {
+      "meta1":
+      {
+        "value": { "compound": "value" }
+      },
+      "meta2": [ 1, 2, 3 ]
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -68,7 +70,7 @@ Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for attribute metadata value", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 

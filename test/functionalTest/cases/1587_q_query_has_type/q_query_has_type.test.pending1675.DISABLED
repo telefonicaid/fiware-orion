@@ -1,0 +1,192 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 query with q=+type
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# Part 5 of this test has been DISABLED as the current MHD version has a bug that converts '+' in the URL into SPACE.
+# The issue #1675 is to fix this and this test is to be fully enabled (and completed) when 1675 is fixed.
+#
+#
+# 01. Create an entity E1 with type=T1
+# 02. Create an entity E2 with type=T2
+# 03. Create an entity E3 without type
+# 04. GET all entities
+# 05. GET entities with type (disabled, see issue 1675)
+# 06. GET entities without type
+#
+
+echo "01. Create an entity E1 with type=T1"
+echo "===================================="
+payload='{
+    "type": "T1",
+    "id": "E1"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create an entity E2 with type=T2"
+echo "===================================="
+payload='{
+    "type": "T2",
+    "id": "E2"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Create an entity E3 without type"
+echo "===================================="
+payload='{
+    "id": "E3"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+
+echo "04. GET all entities"
+echo "===================="
+orionCurl --url /v2/entities --json
+echo
+echo
+
+
+#
+# FIXME P8: '+' in URL is converted to SPACE - see issue #1675
+#
+#echo "05. GET entities with type"
+#echo "=========================="
+#orionCurl --url '/v2/entities?q=+type' --json
+#echo
+#echo
+#
+#
+# regexpect:
+#
+# 05. GET entities with type
+# ==========================
+# HTTP/1.1 200 OK
+# Content-Length: 
+# Content-Type: application/json
+# Date: REGEX(.*)
+# 
+# [
+#     {
+#         "id": "E1",
+#         "type": "T1"
+#     },
+#     {
+#         "id": "E2",
+#         "type": "T2"
+#     }
+# ]
+
+
+
+echo "06. GET entities without type"
+echo "============================="
+orionCurl --url '/v2/entities?q=-type' --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with type=T1
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. Create an entity E2 with type=T2
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+03. Create an entity E3 without type
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3
+Date: REGEX(.*)
+
+
+
+04. GET all entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E2",
+        "type": "T2"
+    },
+    {
+        "id": "E3",
+        "type": null
+    }
+]
+
+
+06. GET entities without type
+=============================
+HTTP/1.1 200 OK
+Content-Length: 25
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E3",
+        "type": null
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

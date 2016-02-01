@@ -29,6 +29,9 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
+#include "logMsg/traceLevels.h"
 
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
@@ -39,6 +42,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
@@ -103,10 +107,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   //
   if (parseUrl(qcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", qcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
+      
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
@@ -142,6 +150,8 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   std::string     out;
   int             r;
 
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
+
   r = httpRequestSend(ip,
                       port,
                       protocol,
@@ -157,13 +167,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
                       &out,
                       mimeType);
 
-
   if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "notification failure");
+    qcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding query");
     LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
 
 
   //
@@ -334,6 +345,16 @@ std::string postQueryContext
   qcrsP->errorCode.fill(SccOk);
 
   TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP));
+
+  if (qcrsP->errorCode.code == SccBadRequest)
+  {
+    // Bad Input detected by Mongo Backend - request ends here !
+    OrionError oe(qcrsP->errorCode);
+
+    TIMED_RENDER(answer = oe.render(ciP, ""));
+    qcrP->release();
+    return answer;
+  }
 
 
   //

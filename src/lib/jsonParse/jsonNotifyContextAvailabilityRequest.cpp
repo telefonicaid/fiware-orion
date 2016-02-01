@@ -382,7 +382,7 @@ void jsonNcarRelease(ParseData* parseDataP)
 */
 std::string jsonNcarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncar.res.check(NotifyContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->ncar.res.check(ciP, NotifyContext, ciP->outFormat, "", parseDataP->errorString, 0);
 }
 
 

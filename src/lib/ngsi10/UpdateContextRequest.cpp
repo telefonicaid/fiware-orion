@@ -31,6 +31,7 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
@@ -138,7 +139,7 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
     return response.render(ciP, UpdateContext, indent);
   }
 
-  if (((res = contextElementVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") || 
+  if (((res = contextElementVector.check(ciP, requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check(requestType,     ciP->outFormat, indent, predetectedError, counter)) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
@@ -312,7 +313,7 @@ void UpdateContextRequest::fill
     }
     else if (mP->stringValue != metaID)
     {
-      LM_W(("Bad Input (metaID differs in URI and payload"));
+      alarmMgr.badInput(clientIp, "metaID differs in URI and payload");
     }
   }
 

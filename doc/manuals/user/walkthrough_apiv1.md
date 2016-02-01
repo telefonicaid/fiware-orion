@@ -153,7 +153,7 @@ command:
 # ./accumulator-server.py 1028 /accumulate ::1 on
 ```
 
-The accumulator-server.py is also part of the contextBroker-test package (see in the administrator manual [how to install](../../../README.md#optional-packages "wikilink")). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
+The accumulator-server.py is also part of the contextBroker-test package (see [optional packages section in how to install](../admin/install.md#optional-packages)). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
 
 [Top](#top)
 
@@ -1020,6 +1020,8 @@ Let's examine in detail the different elements included in the payload:
     notified of the value of *temperature* each time the value of
     *pressure* changes may not be too useful. The example is chosen this
     way only to show the enormous flexibility of subscriptions.
+-   You can leave the condValue list empty (or even omit it) to make a notification
+    trigger on any entity attribute change (regardless of the name of the attribute).
 -   The throttling element is used to specify a minimum
     inter-notification arrival time. So, setting throttling to 5 seconds
     as in the example above, makes a notification not to be sent

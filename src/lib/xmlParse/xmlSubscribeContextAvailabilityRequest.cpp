@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "common/wsStrip.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Metadata.h"
@@ -78,7 +79,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
   }
   else
   {
-    LM_W(("Bad Input (XML parse error)"));
+    alarmMgr.badInput(clientIp, "XML parse error");
     reqDataP->errorString = "Bad Input (XML parse error)";
     return 1;
   }
@@ -240,7 +241,7 @@ void scarRelease(ParseData* reqDataP)
 */
 std::string scarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqDataP->errorString, 0);
+  return reqDataP->scar.res.check(ciP, SubscribeContextAvailability, ciP->outFormat, "", reqDataP->errorString, 0);
 }
 
 

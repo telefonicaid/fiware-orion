@@ -68,13 +68,20 @@ HttpStatusCode mongoSubscribeContext
     // Calculate expiration (using the current time and the duration field in the request).
     // If expiration is not present, use a default value
     //
-    if (requestP->duration.isEmpty())
+    long long expiration = -1;
+    if (requestP->expires > 0)
     {
-      requestP->duration.set(DEFAULT_DURATION);
+      expiration = requestP->expires;
     }
+    else
+    {
+      if (requestP->duration.isEmpty())
+      {
+        requestP->duration.set(DEFAULT_DURATION);
+      }
 
-    long long expiration = getCurrentTime() + requestP->duration.parse();
-
+      expiration = getCurrentTime() + requestP->duration.parse();
+    }
     LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
 
     /* Create the mongoDB subscription document */
@@ -90,7 +97,12 @@ HttpStatusCode mongoSubscribeContext
 
     /* Throttling */
     long long throttling = 0;
-    if (!requestP->throttling.isEmpty())
+    if (requestP->throttling.seconds != -1)
+    {
+      throttling = (long long) requestP->throttling.seconds;
+      sub.append(CSUB_THROTTLING, throttling);
+    }
+    else if (!requestP->throttling.isEmpty())
     {
       throttling = (long long) requestP->throttling.parse();
       sub.append(CSUB_THROTTLING, throttling);
@@ -106,7 +118,7 @@ HttpStatusCode mongoSubscribeContext
     BSONArrayBuilder entities;
     for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
     {
-        EntityId* en = requestP->entityIdVector.get(ix);
+        EntityId* en = requestP->entityIdVector[ix];
 
         if (en->type == "")
         {
@@ -125,7 +137,7 @@ HttpStatusCode mongoSubscribeContext
     /* Build attributes array */
     BSONArrayBuilder attrs;
     for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList.get(ix));
+        attrs.append(requestP->attributeList[ix]);
     }
     sub.append(CSUB_ATTRS, attrs.arr());
 
@@ -139,9 +151,20 @@ HttpStatusCode mongoSubscribeContext
                                              notifyFormat,
                                              tenant,
                                              xauthToken,
-                                             servicePathV);
+                                             servicePathV,
+                                             requestP->expression.q);
     sub.append(CSUB_CONDITIONS, conds);
 
+    /* Build expression */
+    BSONObjBuilder expression;
+
+    expression << CSUB_EXPR_Q << requestP->expression.q
+               << CSUB_EXPR_GEOM << requestP->expression.geometry
+               << CSUB_EXPR_COORDS << requestP->expression.coords
+               << CSUB_EXPR_GEOREL << requestP->expression.georel;
+    sub.append(CSUB_EXPR, expression.obj());
+
+    /* Last notification */
     long long lastNotificationTime = 0;
     if (notificationDone)
     {
@@ -179,7 +202,12 @@ HttpStatusCode mongoSubscribeContext
                        throttling,
                        notifyFormat,
                        notificationDone,
-                       lastNotificationTime);
+                       lastNotificationTime,
+                       requestP->expression.q,
+                       requestP->expression.geometry,
+                       requestP->expression.coords,
+                       requestP->expression.georel);
+
     cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);

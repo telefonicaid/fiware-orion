@@ -39,6 +39,7 @@
 #include "rest/mhd.h"
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
+#include "ngsi/Request.h"
 
 struct ParseData;
 
@@ -158,6 +159,7 @@ public:
   unsigned short             port;
   std::string                ip;
   std::string                apiVersion;
+  RequestType                requestType;
 
   std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;

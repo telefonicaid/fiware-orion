@@ -32,6 +32,8 @@
 
 #include "common/clockFunctions.h"
 #include "common/string.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -191,9 +193,14 @@ static DBClientBase* mongoConnect
 
   if (connected == false)
   {
-    LM_E(("Database Error (connection failed, after %d retries: '%s')", retries, err.c_str()));
+    char cV[64];
+    snprintf(cV, sizeof(cV), "connection failed, after %d retries", retries);
+    std::string details = std::string(cV) + ": " + err;
+    
+    alarmMgr.dbError(details);
     return NULL;
   }
+  alarmMgr.dbErrorReset();
 
   LM_I(("Successful connection to database"));
 
@@ -213,9 +220,11 @@ static DBClientBase* mongoConnect
 
   if (writeConcernCheck.nodes() != wc.nodes())
   {
-    LM_E(("Database Error (Write Concern not set as desired)"));
+    alarmMgr.dbError("Write Concern not set as desired)");
     return NULL;
   }
+  alarmMgr.dbErrorReset();
+
   LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
 
   /* Authentication is different depending if multiservice is used or not. In the case of not

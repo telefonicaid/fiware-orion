@@ -33,7 +33,7 @@ brokerStart CB
 # 01. GET /v2/entities?id=E1
 # 02. POST /v2/entities, creating E1
 # 03. GET /v2/entities?id=E1
-# 04. GET /v2/entities?id=E1&options=count,normalized
+# 04. GET /v2/entities?id=E1&options=count
 # 05. POST /v2/entities, creating E2 with compound attribute value
 # 06. GET /v2/entities?id=E1,E2
 # 07. GET /v2/entities?id=E2,E3
@@ -47,13 +47,10 @@ echo
 
 echo "02. POST /v2/entities, creating E1"
 echo "=================================="
-payload='
-{
+payload='{
    "id":"E1",
    "type":"T1",
-   "A0":255,
-   "A1":"E1/T1/A1",
-   "A2":{
+   "A0":{
       "value":"E1/T1/A2",
       "type":"AT2"
    }
@@ -70,25 +67,23 @@ echo
 echo
 
 
-echo "04. GET /v2/entities?id=E1&options=count,normalized"
-echo "==================================================="
-orionCurl --url "/v2/entities?id=E1&options=count,normalized" --json
+echo "04. GET /v2/entities?id=E1&options=count"
+echo "========================================"
+orionCurl --url "/v2/entities?id=E1&options=count" --json
 echo
 echo
 
 
 echo "05. POST /v2/entities, creating E2 with compound attribute value"
 echo "================================================================="
-payload='
-    {
-      "id":   "E2",
-      "type": "T1",
-      "A0" :
-        {
-          "value" : { "i1": 1, "s1": "s" }
-        }
-    }
-'
+payload='{
+  "id":   "E2",
+  "type": "T1",
+  "A0":
+  {
+    "value" : { "i1": 1, "s1": "s" }
+  }
+}'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
@@ -106,6 +101,8 @@ echo "============================="
 orionCurl --url /v2/entities?id=E2,E3 --json
 echo
 echo
+
+
 --REGEXPECT--
 01. GET /v2/entities?id=E1
 ==========================
@@ -129,15 +126,14 @@ Date: REGEX(.*)
 03. GET /v2/entities?id=E1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 78
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A0": 255.0,
-        "A1": "E1/T1/A1",
-        "A2": {
+        "A0": {
+            "metadata": {},
             "type": "AT2",
             "value": "E1/T1/A2"
         },
@@ -147,19 +143,18 @@ Date: REGEX(.*)
 ]
 
 
-04. GET /v2/entities?id=E1&options=count,normalized
-===================================================
+04. GET /v2/entities?id=E1&options=count
+========================================
 HTTP/1.1 200 OK
-Content-Length: 96
+Content-Length: 78
 Content-Type: application/json
 X-Total-Count: 1
 Date: REGEX(.*)
 
 [
-    {
-        "A0": 255.0,
-        "A1": "E1/T1/A1",
-        "A2": {
+    {        
+        "A0": {
+            "metadata": {},
             "type": "AT2",
             "value": "E1/T1/A2"
         },
@@ -181,15 +176,14 @@ Date: REGEX(.*)
 06. GET /v2/entities?id=E1,E2
 =============================
 HTTP/1.1 200 OK
-Content-Length: 150
+Content-Length: 168
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A0": 255.0,
-        "A1": "E1/T1/A1",
-        "A2": {
+        "A0": {
+            "metadata": {},
             "type": "AT2",
             "value": "E1/T1/A2"
         },
@@ -198,8 +192,12 @@ Date: REGEX(.*)
     },
     {
         "A0": {
-            "i1": 1.0,
-            "s1": "s"
+            "metadata": {},
+            "type": null,
+            "value": {
+                "i1": 1.0,
+                "s1": "s"
+            }
         },
         "id": "E2",
         "type": "T1"
@@ -210,15 +208,19 @@ Date: REGEX(.*)
 07. GET /v2/entities?id=E2,E3
 =============================
 HTTP/1.1 200 OK
-Content-Length: 55
+Content-Length: 91
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
         "A0": {
-            "i1": 1.0,
-            "s1": "s"
+            "metadata": {},
+            "type": null,
+            "value": {
+                "i1": 1.0,
+                "s1": "s"
+            }
         },
         "id": "E2",
         "type": "T1"

@@ -35,7 +35,7 @@ brokerStart CB
 # 03. POST /v2/entities, creating E3/T3
 # 04. POST /v2/entities, creating E4/T4
 # 05. POST /v2/entities, creating E5/T5
-# 06. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count,normalized
+# 06. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count
 # 07. GET /v2/entities?id=E1,E2,E3,E4,E5&offset=2
 #
 
@@ -99,9 +99,9 @@ echo
 echo
 
 
-echo "06. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count,normalized"
-echo "======================================================================="
-orionCurl --url '/v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count,normalized' --json
+echo "06. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count"
+echo "============================================================"
+orionCurl --url '/v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count' --json
 echo
 echo
 
@@ -159,8 +159,8 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count,normalized
-=======================================================================
+06. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count
+============================================================
 HTTP/1.1 200 OK
 Content-Length: 49
 Content-Type: application/json

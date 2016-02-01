@@ -436,7 +436,7 @@ void jsonRcrRelease(ParseData* reqDataP)
 */
 std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rcr.res.check(RegisterContext, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->rcr.res.check(ciP, RegisterContext, ciP->outFormat, "", reqData->errorString, 0);
 }
 
 

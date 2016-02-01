@@ -1,0 +1,304 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Preserve service path updating subscriptions in NGSIv1
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription in service path /sp1
+# 02. Get subscriptions by /sp1 and get it
+# 03. Update subscription with service path /sp1
+# 04. Get subscriptions by /sp1 and get it
+# 05. Update subscription with service path /sp2
+# 06. Get subscriptions by /sp1 without results
+# 07. Get subscriptions by /sp2 and get it
+#
+
+
+echo "01. Create subscription in service path /sp1"
+echo "============================================"
+payload='{
+  "entities": [
+    {
+      "isPattern": "false",
+      "id": "S1"
+    }
+  ],
+  "reference": "http://localhost:1234/notify",
+  "duration": "P1M",
+  "throttling": "PT2S",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --servicePath /s1 --json
+SUB1=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+echo
+echo
+
+
+echo "02. Get subscriptions by /sp1 and get it"
+echo "========================================"
+orionCurl --url /v2/subscriptions --servicePath /s1 --json
+echo
+echo
+
+
+echo "03. Update subscription with service path /sp1"
+echo "=============================================="
+payload='{
+  "subscriptionId": "'$SUB1'",
+  "duration": "P5Y",
+  "throttling": "PT10S"
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --servicePath /s1 --json
+echo
+echo
+
+
+echo "04. Get subscriptions by /sp1 and get it"
+echo "========================================"
+orionCurl --url /v2/subscriptions --servicePath /s1 --json
+echo
+echo
+
+
+echo "05. Update subscription with service path /sp2"
+echo "=============================================="
+payload='{
+  "subscriptionId": "'$SUB1'",
+  "duration": "P5Y",
+  "throttling": "PT20S"
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --servicePath /s2 --json
+echo
+echo
+
+
+echo "06. Get subscriptions by /sp1 without results"
+echo "============================================="
+orionCurl --url /v2/subscriptions --servicePath /s1 --json
+echo
+echo
+
+
+echo "07. Get subscriptions by /sp2 and get it"
+echo "========================================"
+orionCurl --url /v2/subscriptions --servicePath /s2 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription in service path /sp1
+============================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT2S"
+    }
+}
+
+
+02. Get subscriptions by /sp1 and get it
+========================================
+HTTP/1.1 200 OK
+Content-Length: 336
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "REGEX(.*)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [],
+            "callback": "http://localhost:1234/notify",
+            "throttling": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "A"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "georel": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "S1",
+                    "idPattern": "",
+                    "type": ""
+                }
+            ]
+        }
+    }
+]
+
+
+03. Update subscription with service path /sp1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT10S"
+    }
+}
+
+
+04. Get subscriptions by /sp1 and get it
+========================================
+HTTP/1.1 200 OK
+Content-Length: 337
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "REGEX(.*)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [],
+            "callback": "http://localhost:1234/notify",
+            "throttling": 10
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "A"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "georel": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "S1",
+                    "idPattern": "",
+                    "type": ""
+                }
+            ]
+        }
+    }
+]
+
+
+05. Update subscription with service path /sp2
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT20S"
+    }
+}
+
+
+06. Get subscriptions by /sp1 without results
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+07. Get subscriptions by /sp2 and get it
+========================================
+HTTP/1.1 200 OK
+Content-Length: 337
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "REGEX(.*)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [],
+            "callback": "http://localhost:1234/notify",
+            "throttling": 20
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "A"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "georel": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "S1",
+                    "idPattern": "",
+                    "type": ""
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

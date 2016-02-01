@@ -164,6 +164,30 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Feb 01 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.27.0-1
+- Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
+- Add: Enable log summary traces using -logSummary CLI (Issue #1585)
+- Add: New CLI parameter '-relogAlarms' to see ALL possible alarm-provoking failures in the log-file
+- Add: subscriptions triggered by modifications in any attribute without explicitly list them (aka ONANYCHANGE) (Issue #350)
+- Add: 'q' expression evaluation in NGSIv2 subscription (at subscription creation/update and update context times) (Issue #1316 and #1658)
+- Add: srv=, subsrv= and from= fields to log (Issue #1593)
+- Add: POST /v2/subscriptions operation (Issue #1316)
+- Add: DELETE /v2/subscriptions operation (Issue #1654)
+- Add: PATCH /v2/subscriptions/{subId} operation (Issue #1658)
+- Add: reset for notification counters in threadpool mode
+- Add: id fields checking for NGSIv2 API and (if -strictNgsiv1Ids is enabled) NGSIv1 API (#1601)
+- Fix: entity/attribute operations to align them with the last JSON representation format defined for NGSIv2 (Issue #1259)
+- Fix: avoid rendering invalid JSON characters in response payloads (Issue #1172)
+- Fix: avoid escaping / in callback field in GET /v2/subscriptions and GET /v2/subscriptions/<subId> operations
+- Fix: wrong accumulation in counter sentOK
+- Fix: more descriptive error messages for CPr update/query forward fail
+- Fix: avoid -g compiler flag in release build
+- Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
+- Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
+- Fix: fixed wrong interpretation of empty string keyvalues as empty objects in compounds (Issue #1642)
+- Fix: subscription service path is lost at update subscription time (Issue #1693)
+- Fix: Mongo driver migrated to legacy-1.0.7 (to get the fix for https://jira.mongodb.org/browse/CXX-699) (Issue #1568)
+
 * Wed Dec 09 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.1-1
 - Default -subIvalCache changed to 60 seconds
 - Add: servicePath header filtering in GET /v2/subscriptions operation (Issue #1557)
@@ -366,30 +390,30 @@ fi
 - Fix:  Service-Path is taken into account in 'GET /v1/contextTypes' and 'GET /v1/contextTypes/{entityType}' operations (Issue #676)
 
 * Fri Nov 28 2014 Fermin Galan <fermin@tid.es> 0.17.0-1 (FIWARE-4.1.2-1)
-Add: New convop: "POST /v1/contextEntities" (Issue #613).
-     Note also that AppendContextElementRequest has been added an EntityId field.
-Add: Convenience operations that respond with AppendContextElementResponse now get the
-     EntityId info included in the response.
-Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
-     The old name will be supported as well. (Issue #633)
-Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
-Add: "/" is used as implicit service path for entities. (Issue #646)
-Add: Queries without Fiware-ServicePath are resolved on "/#" implicitly (i.e. all the paths). (Issue #646)
-Fix: Attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
-Fix: Changed max-length of tenant names from 20 characters to 50.
-     Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)
-Fix: No longer responding with 'Service not found: $URL'. (Issue #619)
-Fix: Requests with payload containing forbidden characters are now rejected. (Issue #619)
-Fix: Fixed a bug that made the broker crash on problems with EntityId during XML-parse (in very rare situations).
-Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one is still supported to ensure backward compatibility. (Issue #627)
-Fix: Fixed a leak for each forwarding of messages to Context Providers.
-Fix: Changed max-length of service path elements from 10 characteres to 50. (Issue #649)
-Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
-Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
-Fix: Using 443 as default port for "https" notifications. (Issue #639)
-Fix: Fixed RPM package so PID file is stored in /var/run/contextBroker instead of /var/log/contextBroker. (Issue #612)
-Fix: Payload no longer accepts 'operator' as part of a Scope. (Issue #618)
-Fix: Made compound attribute values for for convenience operations (Issue #660)
+- Add: New convop: "POST /v1/contextEntities" (Issue #613).
+       Note also that AppendContextElementRequest has been added an EntityId field.
+- Add: Convenience operations that respond with AppendContextElementResponse now get the
+       EntityId info included in the response.
+- Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
+       The old name will be supported as well. (Issue #633)
+- Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
+- Add: "/" is used as implicit service path for entities. (Issue #646)
+- Add: Queries without Fiware-ServicePath are resolved on "/#" implicitly (i.e. all the paths). (Issue #646)
+- Fix: Attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
+- Fix: Changed max-length of tenant names from 20 characters to 50.
+       Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)
+- Fix: No longer responding with 'Service not found: $URL'. (Issue #619)
+- Fix: Requests with payload containing forbidden characters are now rejected. (Issue #619)
+- Fix: Fixed a bug that made the broker crash on problems with EntityId during XML-parse (in very rare situations).
+- Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one is still supported to ensure backward compatibility. (Issue #627)
+- Fix: Fixed a leak for each forwarding of messages to Context Providers.
+- Fix: Changed max-length of service path elements from 10 characteres to 50. (Issue #649)
+- Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
+- Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
+- Fix: Using 443 as default port for "https" notifications. (Issue #639)
+- Fix: Fixed RPM package so PID file is stored in /var/run/contextBroker instead of /var/log/contextBroker. (Issue #612)
+- Fix: Payload no longer accepts 'operator' as part of a Scope. (Issue #618)
+- Fix: Made compound attribute values for for convenience operations (Issue #660)
 
 * Mon Nov 03 2014 Fermin Galan <fermin@tid.es> 0.16.0-1 (FIWARE-4.1.1-1)
 - Add: Adding alternative (preferred) URLs: '/ngsi10' => '/v1' AND '/ngsi9' => '/v1/registry' (Issue #559)

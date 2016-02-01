@@ -55,7 +55,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -80,48 +80,52 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 270
+Content-Length: 306
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "compattr": {
-        "a": "1", 
-        "b": 2.0, 
-        "c": true, 
-        "d": false, 
-        "e": {
-            "bvec": [
-                true, 
-                false, 
-                true, 
-                false, 
-                false
-            ], 
-            "f": 5.0, 
-            "g": "6", 
-            "h": true, 
-            "ivec": [
-                1.0, 
-                2.0, 
-                3.0, 
-                4.0, 
-                5.0
-            ], 
-            "obj": {
-                "oa": 1.0, 
-                "ob": false
-            }, 
-            "svec": [
-                "s0", 
-                "s1", 
-                "s2", 
-                "s3", 
-                "s4"
-            ]
+        "metadata": {},
+        "type": null,
+        "value": {
+            "a": "1",
+            "b": 2.0,
+            "c": true,
+            "d": false,
+            "e": {
+                "bvec": [
+                    true,
+                    false,
+                    true,
+                    false,
+                    false
+                ],
+                "f": 5.0,
+                "g": "6",
+                "h": true,
+                "ivec": [
+                    1.0,
+                    2.0,
+                    3.0,
+                    4.0,
+                    5.0
+                ],
+                "obj": {
+                    "oa": 1.0,
+                    "ob": false
+                },
+                "svec": [
+                    "s0",
+                    "s1",
+                    "s2",
+                    "s3",
+                    "s4"
+                ]
+            }
         }
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 

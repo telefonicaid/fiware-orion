@@ -28,7 +28,9 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/tag.h"
+#include "common/limits.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
 #include "orionTypes/EntityType.h"
@@ -125,7 +127,8 @@ std::string EntityType::check
     return "Empty Type";
   }
 
-  return contextAttributeVector.check(EntityTypes, ciP->outFormat, indent, "", 0);
+  return contextAttributeVector.check(ciP, EntityTypes, ciP->outFormat, indent, "", 0);
+
 }
 
 
@@ -160,14 +163,14 @@ void EntityType::release(void)
 std::string EntityType::toJson(ConnectionInfo* ciP)
 {
   std::string  out = "{";
-  char         countV[16];
+  char         countV[STRING_SIZE_FOR_INT];
 
   snprintf(countV, sizeof(countV), "%lld", count);
 
   out += JSON_STR("attrs") + ":";
 
   out += "{";
-  out += contextAttributeVector.toJson(false, true);
+  out += contextAttributeVector.toJson(false, true, "normalized");
   out += "}";
 
   out += "," + JSON_STR("count") + ":" + countV;

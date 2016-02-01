@@ -83,13 +83,6 @@ class NGSI:
         __logger__.info("collection verified: entities")
         __logger__.info("service path verified: %s" % service_path)
         curs_list = []
-        '''
-        if operation.lower() == "create":
-            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.type": type,
-                     "_id.servicePath": service_path}
-        elif operation.lower() == "update":
-            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path}
-        '''
         if type is not None:
             query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path,
                      "_id.type": type}
@@ -123,7 +116,7 @@ class NGSI:
                 # the '=' is translated back to '.', thus from user perspective all works fine.
                 if attr_name.find(".") >= 0:
                     attr_name = attr_name.replace(".", "=")
-                    __logger__.debug("attribute name: %s is changed by \"=\" because \".\" is forbidden in MongoDB keys" % attr_name)
+                    __logger__.warn("attribute name: %s is changed by \"=\" because \".\" is forbidden in MongoDB keys" % attr_name)
 
                 assert attr_name in entity[u'attrs'], \
                     " ERROR -- attribute: %s is not stored in mongo" % attr_name
@@ -151,7 +144,8 @@ class NGSI:
                 " ERROR -- creDate field does not exists in document"
             assert u'modDate' in entity,\
                 " ERROR -- modDate field does not exists in document"
-        __logger__.debug(" Entity id: \"%s\" is successful stored in mongo" % entities_contexts["entities_id"])
+        __logger__.debug(" Entity id prefix: \"%s\" is successful stored in mongo" % entities_contexts["entities_id"])
+        __logger__.debug(" Entity type prefix: \"%s\" is successful stored in mongo" % entities_contexts["entities_type"])
 
 
     def verify_entities_stored_in_mongo(self, mongo_driver, entities_contexts, headers, stored=True):
@@ -194,11 +188,10 @@ class NGSI:
         curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
 
         # verify entities
-        __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
         for i in range(int(entities_contexts["entities_number"])):
             # verify if the entity is stored in mongo
             if stored:
-                __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
+                __logger__.debug("Number of doc read from mongo: %s" % str(i+1))
                 assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
                 entity = curs_list[i]  # manages N entities
                 # verify attributes
@@ -207,6 +200,9 @@ class NGSI:
             else:
                 assert len(curs_list) == 0, "  ERROR - the entities should not have been saved in mongo"
                 __logger__.debug(" Entity id: \"%s\" is not stored in mongo as expected" % entities_contexts["entities_id"])
+
+        __logger__.debug("Total of entities: %s" % str(entities_contexts["entities_number"]))
+        __logger__.debug("Total of docs read from mongo: %s" % str(len(curs_list)))
         mongo_driver.disconnect()
 
     def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers):
@@ -216,12 +212,11 @@ class NGSI:
         :param headers: headers used (see "definition_headers" method in cb_v2_utils.py)
         """
         entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
-        assert  len(entity_list) > 0, " ERROR - notihing is returned from mongo, review the query in behave log"
+        assert len(entity_list) > 0, " ERROR - notihing is returned from mongo, review the query in behave log"
         entity = entity_list[0]
         # verify attributes
         self.__verify_attributes(entity, entities_contexts)
         mongo_driver.disconnect()
-
 
     def verify_error_response(self, context, resp):
         """
@@ -251,6 +246,115 @@ class NGSI:
                 'ERROR - description error: "%s" is not the expected: "%s"' % (str(resp_list["description"]),
                                                                                str(error["description"]))
 
+    def __get_simple_quote_values(self, value):
+        """
+        get values with simple quote
+        :param value: query parameter (string)
+        :return list
+        """
+        text_to_comma_replace = "<&_i_&>"
+        final_list = []
+        posi = 0
+        has_quote = True
+
+        while has_quote:
+            quote = value[posi:].find("\'")
+            if quote < 0:
+                has_quote = False
+            else:
+                posi = posi + quote + 1
+                if posi >= 0:
+                    posf = value[posi:].find("'")
+                    comma = value[posi:posf+posi].find(",")
+                    if comma >= 0:
+                        comma += posi
+                        value = "%s%s%s" % (value[:comma], text_to_comma_replace, value[comma+1:])
+                posi = posi+posf + len(text_to_comma_replace) + 1
+        l = value.split(",")
+        for e in l:
+            e = e.replace("'", "")  # remove the simpl quote
+            e = e.replace(text_to_comma_replace, ",")  # replace temporal text to comma
+            final_list.append(e)
+        return final_list
+
+    def __binary_unary_statements(self, value, entity_context):
+        """
+        determine if the statement matchs with the entity context
+        :param entity_context: entity context to verify
+        :return string
+        """
+        result = None
+        unary_operator = ["+", "-"]
+        binary_operator = ["==", "!=", ">", ">=", "<", "<="]
+        q_list = value.split(";")
+
+        for statement in q_list:
+            result = None
+            if statement[:1] in unary_operator:
+                # unary statement
+                op = statement[:1]
+                # Unary type
+                if statement.find("type") >= 0:
+                    if op == "+" and entity_context["entities_type"] is not None:
+                        result = "this entity has type"
+                    if op == "-" and entity_context["entities_type"] is None:
+                        result = "this entity has not type"
+                # Unary attribute
+                else:
+                    if op == "+" and entity_context["attributes_name"] == statement[1:]:
+                        result = "this attribute does exist"
+                    if op == "-" and entity_context["attributes_name"] != statement[1:]:
+                        result = "this attribute does not exist"
+
+            # binary statement
+            op = None
+            for e in binary_operator:
+                if statement.find(e) >= 0:
+                    op = e
+            if op is not None:
+                result = None
+                value = statement.split(op)
+                assert len(value) == 2, " ERROR - It is necessary attribute and value (in that order)"
+                if value[0].find(self.__remove_quote(entity_context["attributes_name"])) >= 0:
+                    items = []
+                    if value[1].find("..") >= 0:  # value is a range, specified as a minimum and maximum separated by ..
+                        items.append("range")
+                        min_max = value[1].split("..")
+                        items.append(min_max)
+
+                        assert len(min_max) == 2, " WARN - It is necessary two values in range (minimum and maximum)"
+                    else:   # The value is a single element
+                        items = self.__get_simple_quote_values(value[1])
+
+                    if items[0] == "range":
+                        try:
+                            if op == "==" and \
+                                ((float(entity_context["attributes_value"]) >= float(items[1][0])) and \
+                                (float(entity_context["attributes_value"]) <= float(items[1][1]))):
+                                    result = "this statement does match"  # range q=attr==x..y
+                            elif op == "!=" and ((float(entity_context["attributes_value"]) <= float(items[1][0])) or \
+                                (float(entity_context["attributes_value"]) >= float(items[1][1]))):
+                                    result = "this statement does match"  # range q=attr!=x..y
+                        except Exception, e:
+                            __logger__.warn("some value is not numeric format, %s" % str(e))
+                    else:
+                        for it in items:
+                            eval = eval_binary_expr(entity_context["attributes_value"], op, it)
+                            if op == "!=":  # AND operation
+                                if eval:
+                                    result = "this statement does match"
+                                else:
+                                    result = None
+                                break
+                            else:     # OR operation
+                                if eval:
+                                    result = "this statement does match"
+                                    break
+
+            if result is None:
+                    break
+        return result
+
     def __get_entities_context_group(self, accumulate, elements):
         """
         get entities context groups
@@ -262,15 +366,21 @@ class NGSI:
         for entities_group in accumulate:
             group_exists = False
             for key, value in elements.items():
+                result = None
                 if key == "idPattern":
                     result = re.search(value, entities_group["entities_id"])
+                elif key == "q":
+                    result = self.__binary_unary_statements(value, entities_group)
                 else:
-                    result = re.search(entities_group[key], value)
+                    if entities_group[key] is not None:
+                        result = re.search(self.__remove_quote(entities_group[key]), value)
+
                 if result is not None:
                     group_exists = True
                 else:
                     group_exists = False
                     break
+            __logger__.debug("group_exists: %s" % str(group_exists))
             if group_exists:
                 entities_list.append(copy.deepcopy(entities_group))
         return entities_list
@@ -283,16 +393,17 @@ class NGSI:
         :param resp: http response
         """
         total = 0
-        limit = 10000000000
+        limit = 20
         offset = 0
         ids = []
         types = []
         elements = {}
         group = []
         for entities_group in accumulate_entities_context:
-            total = total + int(entities_group["entities_number"])
-            ids.append(entities_group["entities_id"])
-            types.append(entities_group["entities_type"])
+            total += int(entities_group["entities_number"])
+            ids.append(self.__remove_quote(entities_group["entities_id"]))
+            types.append(self.__remove_quote(entities_group["entities_type"]))
+
         if "limit" in queries_parameters:
             limit = int(queries_parameters["limit"])
         if "offset" in queries_parameters:
@@ -300,16 +411,17 @@ class NGSI:
         if "id" in queries_parameters:
             del ids[:]
             ids = convert_str_to_list(queries_parameters["id"], ",")
-            elements ["entities_id"] = queries_parameters["id"]
+            elements["entities_id"] = queries_parameters["id"]
         if "idPattern" in queries_parameters:
             del ids[:]
             ids = [queries_parameters["idPattern"]]
-            elements ["idPattern"] = queries_parameters["idPattern"]
+            elements["idPattern"] = queries_parameters["idPattern"]
         if "type" in queries_parameters:
             del types[:]
             types = convert_str_to_list(queries_parameters["type"], ",")
-            elements ["entities_type"] = queries_parameters["type"]
-
+            elements["entities_type"] = queries_parameters["type"]
+        if "q" in queries_parameters:
+            elements["q"] = queries_parameters["q"]
         if elements != {}:
             total = 0
             group = self.__get_entities_context_group(accumulate_entities_context, elements)
@@ -341,8 +453,10 @@ class NGSI:
         items_list = convert_str_to_dict(resp.content, JSON)
         assert len(items_list) == items, "ERROR - in number of items in response\n  received: %s \n  expected: %s" % \
                                          (str(len(items_list)), str(items))
-
+        sub_elements = {}
         for i in range(items):
+            del sub_elements
+            sub_elements = {}
             # verify entity id and entity type
             id_exists = False
             type_exists = False
@@ -351,20 +465,22 @@ class NGSI:
                     id_exists = True
                     break
             assert id_exists, 'ERROR - id %s does not exist' % items_list[i]["id"]
-            for tp in types:
-                if items_list[i]["type"].find(tp) >= 0:
-                    type_exists = True
-                    break
-            assert type_exists, 'ERROR - type %s does not exist' % items_list[i]["type"]
+            sub_elements["entities_id"] = items_list[i]["id"]
+
+            if "type" in items_list[i]:
+                for tp in types:
+                    if tp is not None and items_list[i]["type"].find(tp) >= 0:
+                        type_exists = True
+                        break
+                assert type_exists, 'ERROR - type field with value "%s" does not exist' % items_list[i]["type"]
+                sub_elements["entities_type"] = items_list[i]["type"]
 
             # verify attributes names
-            sub_elements = {"entities_id": items_list[i]["id"],
-                           "entities_type": items_list[i]["type"]}
             sub_group_list = self.__get_entities_context_group(accumulate_entities_context, sub_elements)
             assert len(sub_group_list) == 1, " ERROR - the id and type do not exist"
             sub_group = sub_group_list[0]
             if int(sub_group["attributes_number"]) == 1:
-                attr_name = sub_group["attributes_name"]
+                attr_name = self.__remove_quote(sub_group["attributes_name"])
             else:
                 # prefix plus _<consecutive>. ex: room1_2
                 for a in range(int(sub_group["attributes_number"])):
@@ -382,10 +498,10 @@ class NGSI:
             else:
                 if sub_group["metadatas_number"] > 0:
                     assert sub_group["attributes_value"] == attribute["value"], \
-                        'ERROR - in attribute value "%s" in position: %s without attribute type nor metadatas' % (sub_group["attributes_value"], str(i))
-                else:
-                    assert sub_group["attributes_value"] == attribute, \
                         'ERROR - in attribute value "%s" in position: %s without attribute type but with metadatas' % (sub_group["attributes_value"], str(i))
+                else:
+                    assert sub_group["attributes_value"] == unicode(attribute), \
+                        'ERROR - in attribute value "%s" in position: %s without attribute type nor metadatas' % (sub_group["attributes_value"], str(i))
 
             # verify attribute metadatas
             if sub_group["metadatas_number"] > 0:
@@ -410,8 +526,9 @@ class NGSI:
         :param text:
         :return: string
         """
-        text = text.lstrip('"')
-        return text.rstrip('"')
+        if text is not None:
+            text = text.lstrip('"')
+            return text.rstrip('"')
 
     @staticmethod
     def __verify_if_is_int_or_str(value):
@@ -452,15 +569,11 @@ class NGSI:
                 'ERROR - in attribute type "%s" in raw mode' % self.__remove_quote(entities_context["attributes_type"])
 
             attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-            __logger__.debug("type:  %s" % field_type)
-            __logger__.debug('field type: %s' % str(type(attribute)))
             assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                 'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
         else:
             if entities_context["metadatas_number"] > 0:
                 attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-                __logger__.debug("type:  %s" % (field_type))
-                __logger__.debug('field type: %s' % str(type(attribute)))
 
                 assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type but with metadatas' % (str(attribute["value"]), field_type)
@@ -468,7 +581,6 @@ class NGSI:
                 attribute = self.__verify_if_is_int_or_str(attribute)
                 assert str(type(attribute)) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type and without metadatas' % (str(attribute), field_type)
-
 
     def verify_an_entity_by_id(self, queries_parameters, entities_context, resp, entity_id_to_test):
         """
@@ -612,15 +724,11 @@ class NGSI:
                 'ERROR - in attribute type "%s" in raw mode' % (self.__remove_quote(entities_context["attributes_type"]))
 
             attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-            __logger__.debug("type:  %s" % (field_type))
-            __logger__.debug('field type: %s' % str(type(attribute)))
             assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                 'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
         else:
             if entities_context["metadatas_number"] > 0:
                 attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-                __logger__.debug("type:  %s" % field_type)
-                __logger__.debug('field type: %s' % str(type(attribute)))
 
                 assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type but with metadatas' % (str(attribute["value"]), field_type)
@@ -629,6 +737,20 @@ class NGSI:
                 assert str(type(attribute)) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type and ' \
                     'without metadatas' % (str(attribute), field_type)
+
+    def verify_an_attribute_value_by_id(self, entities_context, resp):
+        """
+        verify an attribute value by ID
+        :param entities_context:
+        :param resp:
+        ex:
+            {
+                value: "017-06-17T07:21:24.238Z"
+            }
+        """
+        resp_json = convert_str_to_dict(resp.content, JSON)
+        assert "value" in resp_json, 'ERROR - value key dos not exist in response: \n %s' %  resp.content
+        assert resp_json["value"] == entities_context["attributes_value"], "ERROR - the value %s is not the expected: %s" % (resp_json["value"], entities_context["attributes_value"])
 
     def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers):
         """
@@ -647,6 +769,109 @@ class NGSI:
             assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
             entity = curs_list[i]  # manages N entities
             assert entities_contexts["attributes_name"] not in entity["attrNames"], " ERROR - the attribute: %s exists in the entity No: %s" % \
-                                                                                (entities_contexts["attributes_name"], str(i+1))
+                                                                                    (entities_contexts["attributes_name"], str(i+1))
         mongo_driver.disconnect()
+
+    def verify_entity_types(self, types, resp):
+        """
+        verify entity types  -- /v2/types
+        :param queries_parameters: queries parameters used in the request
+        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
+        :param resp: http response
+        """
+        # verify entities types
+        type_list = types.split(",")
+        items_dict = convert_str_to_dict(resp.content, JSON)
+        items_list = items_dict.keys()  # list of keys
+        for item in items_list:
+            if item == EMPTY:
+                item = "untyped"
+            __logger__.debug("verified: %s include in %s" % (item, types))
+            assert item in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
+
+    def verify_attributes_types_with_entity_types(self, queries_parameters, accumulate_entities_context, resp):
+        """
+        verify attributes types with entity types  -- /v2/types
+        :param queries_parameters: queries parameters used in the request
+        :param accumulate_entities_context: accumulate of all entities context. See "entity_context" dict in cb_v2_utils.py
+        :param resp: http response
+        """
+        types_count = {}
+        total = 0
+        limit = 20
+        offset = 0
+        count_total = 0
+
+        for entities_group in accumulate_entities_context:
+            temp = self.__remove_quote(entities_group["entities_type"])
+            if temp not in types_count:  # avoid types duplicated
+                types_count[temp] = int(entities_group["entities_number"])
+                total += 1
+            else:
+                types_count[temp] += int(entities_group["entities_number"])  # entities counter
+
+        if "limit" in queries_parameters:
+            limit = int(queries_parameters["limit"])
+        if "offset" in queries_parameters:
+            offset = int(queries_parameters["offset"])
+        if "options" in queries_parameters:
+            if queries_parameters["options"] == "count":
+                count = int(resp.headers["x-total-count"])
+
+            if queries_parameters["options"] == "values":
+                pass  # not implemented (develop team) and not tested yet (pending)
+
+        # determinate number of items and position in response
+        if offset >= total:
+            items = 0
+            position = 0
+        elif limit+offset > total:
+            items = total-offset
+            position = offset
+        else:
+            items = limit
+            position = offset
+
+        #  info in log
+        __logger__.debug("total:  %s" % str(total))
+        __logger__.debug("limit:  %s" % str(limit))
+        __logger__.debug("offset: %s" % str(offset))
+        __logger__.debug("items:  %s" % str(items))
+        __logger__.debug("pos:    %s" % str(position))
+        __logger__.debug("types count:  ")
+        for i in types_count:
+            __logger__.debug("   %s = %s" % (i, str(types_count[i])))
+
+        # verify entities number
+        items_dict = convert_str_to_dict(resp.content, JSON)
+        items_list = items_dict.keys()  # list of keys
+        assert items == len(items_list), " ERROR - the entities group total: %d is not the expected:%d" % (len(items_list), items)
+        for item in items_list:
+            attr_exists = False
+            type_resp = item
+            if item == EMPTY:
+                type_resp = None
+
+            assert type_resp in types_count, " ERROR - wrong entity type: %s" % item  # verify that the entities was created
+            count_total += int(items_dict[item]["count"])
+
+            assert types_count[type_resp] == int(items_dict[item]["count"]), \
+                " ERROR - the entities type counter %s does not match with the expected: %s" % \
+                (items_dict[item]["count"], types_count[type_resp])
+
+            attr_list = items_dict[item]["attrs"].keys()       # list of attributes in each entities group
+            for attr in attr_list:
+                for entities_group in accumulate_entities_context:
+                    if (entities_group["entities_type"] == type_resp) and (attr.find(entities_group["attributes_name"]) >= 0):
+                        if entities_group["attributes_type"] == items_dict[item]["attrs"][attr]["type"]:
+                            attr_exists = True
+                            break
+            assert attr_exists, ' ERROR - the attribute: "%s" with type: "%s" does not exist...' % (attr, items_dict[item]["attrs"][attr]["type"])
+
+        # options=count query parameter
+        if "options" in queries_parameters:
+            if queries_parameters["options"] == "count":
+                count = int(resp.headers["x-total-count"])
+                assert count == count_total, " ERROR - the x-total-count header: %d does not match with the expected total: %d" \
+                                             % (count, count_total)
 

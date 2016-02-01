@@ -129,7 +129,7 @@ payload='{
   "id": "s01",
   "A": 4
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -140,7 +140,7 @@ payload='{
   "id": "s11",
   "A": 5
 }'
-orionCurl --url /v2/entities --payload "$payload" --json --tenant t1
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json --tenant t1
 echo
 echo
 
@@ -151,7 +151,7 @@ payload='{
   "id": "s21",
   "A": 6
 }'
-orionCurl --url /v2/entities --payload "$payload" --json --tenant t2
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json --tenant t2
 echo
 echo
 
@@ -189,7 +189,7 @@ echo "==========================="
 payload='{
   "A": 11
 }'
-orionCurl --url /v2/entities/s01 --payload "$payload" --json
+orionCurl --url '/v2/entities/s01?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -199,7 +199,7 @@ echo "=============================="
 payload='{
   "A": 12
 }'
-orionCurl --url /v2/entities/s11 --payload "$payload" --json --tenant t1
+orionCurl --url '/v2/entities/s11?options=keyValues' --payload "$payload" --json --tenant t1
 echo
 echo
 
@@ -209,7 +209,7 @@ echo "=============================="
 payload='{
   "A": 13
 }'
-orionCurl --url /v2/entities/s21 --payload "$payload" --json --tenant t2
+orionCurl --url '/v2/entities/s21?options=keyValues' --payload "$payload" --json --tenant t2
 echo
 echo
 
@@ -424,27 +424,24 @@ Content-Type: application/json; charset=utf-8
 
 11. Update s01/A w/o tenant
 ===========================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s01
 Date: REGEX(.*)
 
 
 
 12. Update s11/A for tenant t1
 ==============================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s11
 Date: REGEX(.*)
 
 
 
 13. Update s21/A for tenant t2
 ==============================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s21
 Date: REGEX(.*)
 
 

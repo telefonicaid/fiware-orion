@@ -37,6 +37,16 @@
 
 /* ****************************************************************************
 *
+* NotifyConditionVector::NotifyConditionVector - 
+*/
+NotifyConditionVector::NotifyConditionVector()
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * NotifyConditionVector::render -
 */
 std::string NotifyConditionVector::render(Format format, const std::string& indent, bool comma)
@@ -120,11 +130,15 @@ void NotifyConditionVector::push_back(NotifyCondition* item)
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::get -
+* NotifyConditionVector::operator[] -
 */
-NotifyCondition* NotifyConditionVector::get(int ix)
+NotifyCondition* NotifyConditionVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 

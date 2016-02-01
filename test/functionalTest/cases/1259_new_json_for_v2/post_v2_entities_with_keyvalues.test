@@ -1,0 +1,279 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST /v2/entities with key-values
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# We now have two different ways of parsing "POST /v2/entities":
+#
+# 1. The 'old way', or "Normalized", which is the default parsing method:
+#
+# {
+#   "id": "",
+#   "type: "",
+#   "attr1": {
+#   },
+#   "attr2: {
+#   }
+# }
+#
+# Note that the right-hand side for "attr" must be a JSON object, describing an attribute.
+# It cannot be a JSON vector, nor an arbitrary JSON object.
+# It can be an empty object though: {}, the meaning would be:
+# - value:    null
+# - type:     unchanged
+# - metadata: unchanged
+#
+# If not empty, the JSON object must contain at least one of the three { value, type, metadata },
+# otherwise it is considered a *compound value* and that is not valid in this mode (it is in ?options=keyValues).
+#
+#
+# 2. The options=keyValues parsing method:
+#
+# {
+#   "id": "",
+#   "type: "",
+#   "intAttr": 12,
+#   "floatAttr": 3.14,
+#   "vecAttr": [ ... ],
+#   "objAttr": { "a": 3, "b": false },
+#   "polemic1": { "value": 12, "type": 16 }
+# }
+#
+# Pretty clear here. The only polemic part is the attribute called 'polemic1', it is just like
+# a "normalized" attribute, but as options=keyValues is turned on, it should be understood as a compound.
+# So, "type" is an integer and that is OK (would fail in normalized as "type" must be a string).
+#
+# Now to the metadatas.
+# In "normalized mode", metadatas are parsed like the attributes, anything else would be confusing:
+#
+# {
+#   "id": "",
+#   "attr1": {
+#     "metadata": {
+#       "m1": {
+#         "value": 24,
+#         "type": "MT1
+#       }
+#     }
+#   }
+# }
+#
+# In keyValues mode, there are no metadata for attributes. If you need that, use the "normalized" method.
+# 
+#
+# An example just for curiosity ...
+#
+# {
+#   "id": "",
+#   "type: "",
+#   "attr1": {
+#     "value": 39,
+#     "type": "T1",
+#     "metadata": {
+#       "m1": {
+#          "type": "MT1",
+#          "value": [ 1, 2, 3 ]
+#       }
+#     }
+#   }
+# }
+#
+# In this example (remember, we're in keyValues mode), attr1 is understood as a compound object
+# Note that compound values for metadatas are not implemented. So, had we been in "normalized" mode,
+# this example would give a parse error, as m1 has a vector as a value.
+# However, the whole thing is slallowed as a compound, as we are in keyValues mode ... :-)
+#
+#
+
+
+#
+# 01. POST /v2/entities?options=keyValues, creating compound E1/a1
+# 02. POST /v2/entities, creating 'normal' E2/a1, same payload, just without options=keyValues
+# 03. GET /v2/entities
+# 04. GET /v2/entities?options=keyValues
+#
+# NOTE that E1/a1 has a compound value, as options=keyValues was used in step 01.
+#
+
+echo "01. POST /v2/entities?options=keyValues"
+echo "======================================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "a1": {
+    "value": "25",
+    "type": "AT1",
+    "metadata": {
+      "meta1": 24,
+      "meta2": false,
+      "meta3": "string"
+    }
+  }
+}'
+orionCurl --url /v2/entities?options=keyValues  --payload "$payload" --json
+echo
+echo
+
+
+echo "02. POST /v2/entities, creating 'normal' E2/a1, same payload, just without options=keyValues"
+echo "============================================================================================"
+payload='{
+  "id": "E2",
+  "type": "T1",
+  "a1": {
+    "value": "25",
+    "type": "AT1",
+    "metadata": {
+      "meta1": 24,
+      "meta2": false,
+      "meta3": "string"
+    }
+  }
+}'
+orionCurl --url /v2/entities  --payload "$payload" --json
+echo
+echo
+
+
+echo "03. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities --json
+echo
+echo
+
+
+echo "04. GET /v2/entities?options=keyValues"
+echo "======================================"
+orionCurl --url /v2/entities?options=keyValues --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities?options=keyValues
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. POST /v2/entities, creating 'normal' E2/a1, same payload, just without options=keyValues
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 341
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "a1": {
+            "metadata": {},
+            "type": null,
+            "value": {
+                "metadata": {
+                    "meta1": 24.0,
+                    "meta2": false,
+                    "meta3": "string"
+                },
+                "type": "AT1",
+                "value": "25"
+            }
+        },
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "a1": {
+            "metadata": {
+                "meta1": {
+                    "type": null,
+                    "value": 24.0
+                },
+                "meta2": {
+                    "type": null,
+                    "value": false
+                },
+                "meta3": {
+                    "type": null,
+                    "value": "string"
+                }
+            },
+            "type": "AT1",
+            "value": "25"
+        },
+        "id": "E2",
+        "type": "T1"
+    }
+]
+
+
+04. GET /v2/entities?options=keyValues
+======================================
+HTTP/1.1 200 OK
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "a1": {
+            "metadata": {
+                "meta1": 24.0,
+                "meta2": false,
+                "meta3": "string"
+            },
+            "type": "AT1",
+            "value": "25"
+        },
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "a1": "25",
+        "id": "E2",
+        "type": "T1"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

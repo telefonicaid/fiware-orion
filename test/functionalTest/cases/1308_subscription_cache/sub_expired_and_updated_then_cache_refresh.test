@@ -58,7 +58,7 @@ payload='{
   "id": "E10",
   "A1": "01. Creation"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -146,7 +146,7 @@ echo "================="
 payload='{
   "A1": "09. Updated"
 }'
-orionCurl --url /v2/entities/E10 --payload "$payload" --json
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -157,7 +157,7 @@ sleep 2
 payload='{
   "A1": "10. Updated"
 }'
-orionCurl --url /v2/entities/E10 --payload "$payload" --json
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -168,7 +168,7 @@ sleep 2
 payload='{
   "A1": "11. Updated"
 }'
-orionCurl --url /v2/entities/E10 --payload "$payload" --json
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -289,9 +289,9 @@ Date: REGEX(.*)
 
 {
     "ids": "REGEX(.*)",
-    "inserts": REGEX((2|3)),
+    "inserts": REGEX((2|3|4)),
     "items": 1,
-    "refresh": REGEX((0|1|2|3)),
+    "refresh": REGEX((0|1|2|3|4)),
     "removes": 1,
     "updates": 1
 }
@@ -299,27 +299,24 @@ Date: REGEX(.*)
 
 09. Update E10/A1
 =================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E10
 Date: REGEX(.*)
 
 
 
 10. Update E10/A1
 =================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E10
 Date: REGEX(.*)
 
 
 
 11. Update E10/A1
 =================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E10
 Date: REGEX(.*)
 
 

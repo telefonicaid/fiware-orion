@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entity Attribute Value, options=text V2
+GET Entity Attribute Value using text encoding in NGSIv2
 
 --SHELL-INIT--
 dbInit CB
@@ -31,10 +31,11 @@ brokerStart CB
 
 #
 # 01. POST /v2/entities
-# 02. GET /v2/entities/E1/a_string/value?options=text
-# 03. GET /v2/entities/E1/a_bool/value?options=text
-# 04. GET /v2/entities/E1/a_compound/value?options=text
-# 05. GET /v2/entities/E1/a_number/value?options=text
+# 02. GET /v2/entities/E1/a_string/value
+# 03. GET /v2/entities/E1/a_bool/value
+# 04. GET /v2/entities/E1/a_compound/value
+# 05. GET /v2/entities/E1/a_number/value
+# 06. GET /v2/entities/E1/attrs/a_vector/value
 #
 
 echo "01. POST /v2/entities"
@@ -42,48 +43,55 @@ echo "====================="
 payload='{
   "id": "E1",
   "type": "T1",
-  "a_string":"some value",
-  "a_bool" : true,
+  "a_string": "some value",
+  "a_bool": true,
   "a_compound": {
-    "string":  "1",
-    "number":  2,
-    "bool":    true
+    "string": "1",
+    "number": 2,
+    "bool": true
   },
   "a_number": 0,
-  "a_vector": [1,2,3,4]
+  "a_vector": [ 1, 2, 3, 4 ]
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
-echo
-echo
-echo "02. GET /v2/entities/E!/attrs/a_string/value?options=text"
-echo "========================================================="
-orionCurl --url /v2/entities/E1/attrs/a_string/value?options=text --out any
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
-echo "03. GET /v2/entities/E1/attrs/a_bool/value?options=text"
-echo "======================================================="
-orionCurl --url /v2/entities/E1/attrs/a_bool/value?options=text --out any
+
+echo "02. GET /v2/entities/E!/attrs/a_string/value"
+echo "============================================"
+orionCurl --url /v2/entities/E1/attrs/a_string/value --out text
 echo
 echo
 
-echo "04. GET /v2/entities/E1/attrs/a_number/value?options=text"
-echo "========================================================="
-orionCurl --url /v2/entities/E1/attrs/a_number/value?options=text --out any
+
+echo "03. GET /v2/entities/E1/attrs/a_bool/value"
+echo "=========================================="
+orionCurl --url /v2/entities/E1/attrs/a_bool/value --out text
 echo
 echo
 
-echo "05. GET /v2/entities/E1/attrs/a_compound/value?options=text"
-echo "==========================================================="
-orionCurl --url /v2/entities/E1/attrs/a_compound/value?options=text --out any
+
+echo "04. GET /v2/entities/E1/attrs/a_number/value"
+echo "============================================"
+orionCurl --url /v2/entities/E1/attrs/a_number/value --out text
 echo
 echo
 
-echo "05. GET /v2/entities/E1/attrs/a_vector/value?options=text"
-echo "========================================================="
-orionCurl --url /v2/entities/E1/attrs/a_vector/value?options=text --out any
+
+echo "05. GET /v2/entities/E1/attrs/a_compound/value"
+echo "=============================================="
+orionCurl --url /v2/entities/E1/attrs/a_compound/value --out json
 echo
 echo
+
+
+echo "06. GET /v2/entities/E1/attrs/a_vector/value"
+echo "============================================"
+orionCurl --url /v2/entities/E1/attrs/a_vector/value --out json
+echo
+echo
+
 
 --REGEXPECT--
 01. POST /v2/entities
@@ -95,8 +103,8 @@ Date: REGEX(.*)
 
 
 
-02. GET /v2/entities/E!/attrs/a_string/value?options=text
-=========================================================
+02. GET /v2/entities/E!/attrs/a_string/value
+============================================
 HTTP/1.1 200 OK
 Content-Length: 10
 Content-Type: text/plain
@@ -105,8 +113,8 @@ Date: REGEX(.*)
 some value
 
 
-03. GET /v2/entities/E1/attrs/a_bool/value?options=text
-=======================================================
+03. GET /v2/entities/E1/attrs/a_bool/value
+==========================================
 HTTP/1.1 200 OK
 Content-Length: 4
 Content-Type: text/plain
@@ -115,8 +123,8 @@ Date: REGEX(.*)
 true
 
 
-04. GET /v2/entities/E1/attrs/a_number/value?options=text
-=========================================================
+04. GET /v2/entities/E1/attrs/a_number/value
+============================================
 HTTP/1.1 200 OK
 Content-Length: 8
 Content-Type: text/plain
@@ -125,24 +133,33 @@ Date: REGEX(.*)
 0.000000
 
 
-05. GET /v2/entities/E1/attrs/a_compound/value?options=text
-===========================================================
+05. GET /v2/entities/E1/attrs/a_compound/value
+==============================================
 HTTP/1.1 200 OK
 Content-Length: 44
-Content-Type: text/plain
+Content-Type: application/json
 Date: REGEX(.*)
 
-{"string":"1","number":2.000000,"bool":true}
+{
+    "bool": true,
+    "number": 2.0,
+    "string": "1"
+}
 
 
-05. GET /v2/entities/E1/attrs/a_vector/value?options=text
-=========================================================
+06. GET /v2/entities/E1/attrs/a_vector/value
+============================================
 HTTP/1.1 200 OK
 Content-Length: 37
-Content-Type: text/plain
+Content-Type: application/json
 Date: REGEX(.*)
 
-[1.000000,2.000000,3.000000,4.000000]
+[
+    1.0,
+    2.0,
+    3.0,
+    4.0
+]
 
 
 --TEARDOWN--

@@ -29,6 +29,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -76,9 +77,10 @@ std::string ContextAttributeResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(ciP, requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK")
   {
-    LM_W(("Bad Input (contextAttributeVector: '%s')", res.c_str()));
+    std::string details = std::string("contextAttributeVector: '") + res + "'";
+    alarmMgr.badInput(clientIp, details);
     statusCode.fill(SccBadRequest, res);
 
     //
@@ -177,7 +179,7 @@ void ContextAttributeResponse::fill
   //
   // FIXME P7: If more than one context element is found, we simply select the first one.
   //           A better approach would be to change this convop to return a vector of responses.
-  //           Adding a warning with 'Bad Input' - with this I mean that the user that sends the 
+  //           Adding a call to alarmMgr::badInput - with this I mean that the user that sends the 
   //           query needs to avoid using this conv op to make any queries that can give more than
   //           one unique context element :-).
   //           This FIXME is related to github issue #588 and (probably) #650.
@@ -185,7 +187,7 @@ void ContextAttributeResponse::fill
   //
   if (qcrP->contextElementResponseVector.size() > 1)
   {
-    LM_W(("Bad Input (more than one context element found in this query - selecting the first one"));
+    alarmMgr.badInput(clientIp, "more than one context element found in this query - selecting the first one");
   }
 
   //

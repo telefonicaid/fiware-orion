@@ -31,9 +31,11 @@
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "alarmMgr/alarmMgr.h"
 #include "jsonParseV2/parseEntity.h"
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseAttributeValue.h"
+#include "jsonParseV2/parseSubscription.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 
 
@@ -103,8 +105,33 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     }
     break;
 
+  case SubscriptionsRequest:
+    answer = parseSubscription(ciP, parseDataP, releaseP);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    
+    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, JSON, "", "", 0)) != "OK")
+    {
+      alarmMgr.badInput(clientIp, "invalid subscription");
+      return answer;
+    }
+    break;
+
+  case IndividualSubscriptionRequest:
+    answer = parseSubscription(ciP, parseDataP, releaseP, true);  // NOTE: partial == true
+    if (answer != "OK")
+    {
+      return answer;
+    }
+
+    break;
+
   default:
-    answer = "Request Treat function not implemented";
+    OrionError error(SccNotImplemented, "Request Treat function not implemented");
+    answer = error.render(ciP, "");
+    ciP->httpStatusCode = SccNotImplemented;
     break;
   }
   

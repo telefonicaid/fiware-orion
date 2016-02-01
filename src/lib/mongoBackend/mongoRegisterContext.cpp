@@ -24,12 +24,16 @@
 */
 #include <string>
 
+#include "mongo/client/dbclient.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
 #include "common/defaultValues.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "mongoBackend/mongoRegisterContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
@@ -40,9 +44,9 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 
-#include "mongo/client/dbclient.h"
-
 using namespace mongo;
+
+
 
 /* ****************************************************************************
 *
@@ -91,7 +95,9 @@ HttpStatusCode mongoRegisterContext
       ++noOfRegistrationUpdateErrors;
       if (responseP->errorCode.code == SccContextElementNotFound)
       {
-        LM_W(("Bad Input (invalid OID format: %s)", requestP->registrationId.get().c_str()));
+        // FIXME: doubt: invalid OID format?
+        std::string details = std::string("invalid OID format: '") + requestP->registrationId.get() + "'";
+        alarmMgr.badInput(clientIp, details);
       }
       else // SccReceiverInternalError
       {
