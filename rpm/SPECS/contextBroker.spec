@@ -164,6 +164,30 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Feb 01 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.27.0-1
+- Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
+- Add: Enable log summary traces using -logSummary CLI (Issue #1585)
+- Add: New CLI parameter '-relogAlarms' to see ALL possible alarm-provoking failures in the log-file
+- Add: subscriptions triggered by modifications in any attribute without explicitly list them (aka ONANYCHANGE) (Issue #350)
+- Add: 'q' expression evaluation in NGSIv2 subscription (at subscription creation/update and update context times) (Issue #1316 and #1658)
+- Add: srv=, subsrv= and from= fields to log (Issue #1593)
+- Add: POST /v2/subscriptions operation (Issue #1316)
+- Add: DELETE /v2/subscriptions operation (Issue #1654)
+- Add: PATCH /v2/subscriptions/{subId} operation (Issue #1658)
+- Add: reset for notification counters in threadpool mode
+- Add: id fields checking for NGSIv2 API and (if -strictNgsiv1Ids is enabled) NGSIv1 API (#1601)
+- Fix: entity/attribute operations to align them with the last JSON representation format defined for NGSIv2 (Issue #1259)
+- Fix: avoid rendering invalid JSON characters in response payloads (Issue #1172)
+- Fix: avoid escaping / in callback field in GET /v2/subscriptions and GET /v2/subscriptions/<subId> operations
+- Fix: wrong accumulation in counter sentOK
+- Fix: more descriptive error messages for CPr update/query forward fail
+- Fix: avoid -g compiler flag in release build
+- Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
+- Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
+- Fix: fixed wrong interpretation of empty string keyvalues as empty objects in compounds (Issue #1642)
+- Fix: subscription service path is lost at update subscription time (Issue #1693)
+- Fix: Mongo driver migrated to legacy-1.0.7 (to get the fix for https://jira.mongodb.org/browse/CXX-699) (Issue #1568)
+
 * Wed Dec 09 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.1-1
 - Default -subIvalCache changed to 60 seconds
 - Add: servicePath header filtering in GET /v2/subscriptions operation (Issue #1557)
