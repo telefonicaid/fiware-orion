@@ -1,0 +1,1 @@
+- Fix: microhttpd is now compiled by hand (version 0.9.48) and included in broker as a static lib (solves issue #1675)
