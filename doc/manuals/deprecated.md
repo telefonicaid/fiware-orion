@@ -43,14 +43,14 @@ information in the case you want to use old versions:
   available at the [Orion github repository](http://github.com/telefonicaid/fiware-orion). Each release number
   (e.g. 0.23.0) has associated the following:
   * A tag, e.g. `0.23.0`. It points to the base version.
-  * A release branch, `release/0.23.0`. The HEAD of this branch usually match with the aforementioned tag. However, if some
+  * A release branch, `release/0.23.0`. The HEAD of this branch usually matches the aforementioned tag. However, if some
     hotfixes were developed on the base version, this branch contains such hotfixes.
 * Documentation corresponding to old versions can be found:
   * For 0.23.0 and before: documentation is available at FIWARE public wiki ([user manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
     and [admin manual](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)).
-  * For 0.24.0 in advance: documentation is available at [readthedocs.org](https://fiware-orion.readthedocs.org).
-    Use the pannel at the left bottom corner to navigate to the right version.
-* Docker images corresponding to Orion 0.24.0 in advance can be found at [Dockerhub](https://hub.docker.com/r/fiware/orion/tags/).
+  * For 0.24.0 or newer: documentation is available at [readthedocs.org](https://fiware-orion.readthedocs.org).
+    Use the panel in the left bottom corner to navigate to the right version.
+* Docker images corresponding to Orion 0.24.0 and newer can be found at [Dockerhub](https://hub.docker.com/r/fiware/orion/tags/).
 
 The following table provides information about the last Orion version supporting currently removed features:
 
