@@ -313,6 +313,7 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
 
 }
 
+
 /* ****************************************************************************
 *
 * equalMetadataValues -
@@ -321,23 +322,33 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
 static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
 {
 
+  bool md1TypeExist = md1.hasField(ENT_ATTRS_MD_TYPE);
+  bool md2TypeExist = md2.hasField(ENT_ATTRS_MD_TYPE);
 
-  // Same declared type ?
-  if (getField(md1, ENT_ATTRS_MD_TYPE).type() != getField(md2, ENT_ATTRS_MD_TYPE).type())
+  // If type exist in one metadata but not in the other, then result is unequality
+  if ((md1TypeExist && !md2TypeExist) || (!md1TypeExist && md2TypeExist))
   {
     return false;
   }
-  switch (getField(md1, ENT_ATTRS_MD_TYPE).type())
-  {
-    /* FIXME not yet, issue #1068 Support array and object in metadata value
-    case Object:
-      ...
-      break;
 
-    case Array:
-      ...
-      break;
-    */
+  // If type exists in both metadata elments, check if they are the same
+  if (md1TypeExist && md2TypeExist)
+  {
+    if (getField(md1, ENT_ATTRS_MD_TYPE).type() != getField(md2, ENT_ATTRS_MD_TYPE).type())
+    {
+      return false;
+    }
+    switch (getField(md1, ENT_ATTRS_MD_TYPE).type())
+    {
+      /* FIXME not yet, issue #1068 Support array and object in metadata value
+      case Object:
+        ...
+        break;
+
+       case Array:
+        ...
+        break;
+      */
 
     case NumberDouble:
       if (getField(md1, ENT_ATTRS_MD_TYPE).Number() != getField(md2, ENT_ATTRS_MD_TYPE).Number())
@@ -371,6 +382,7 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getField(md1, ENT_ATTRS_MD_TYPE).type()));
       return false;
       break;
+    }
   }
 
   // declared types are equal. Same value ?
