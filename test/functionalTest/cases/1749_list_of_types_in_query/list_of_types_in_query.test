@@ -45,7 +45,8 @@ brokerStart CB
 # 13. Create an entity E12 of type T1
 # 14. GET /v2/entities?type=T1&idPattern=E1.*, see E1/T1 and E12/T1
 # 15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1
-# 
+# 16. GET /v2/entities?type=T1,T2&id=E1,E12, see E1/T1, E1/T2 and E12/T1
+#
 
 echo "01. Create an entity E1 of type T1"
 echo "=================================="
@@ -172,6 +173,13 @@ echo
 echo "15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1"
 echo "==========================================================================="
 orionCurl --url '/v2/entities?type=T1,T2&idPattern=E1.*' --json
+echo
+echo
+
+
+echo "16. GET /v2/entities?type=T1,T2&id=E1,E12, see E1/T1, E1/T2 and E12/T1"
+echo "======================================================================"
+orionCurl --url '/v2/entities?type=T1,T2&id=E1,E12' --json
 echo
 echo
 
@@ -401,6 +409,29 @@ Date: REGEX(.*)
 
 15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1
 ===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E12",
+        "type": "T1"
+    }
+]
+
+
+16. GET /v2/entities?type=T1,T2&id=E1,E12, see E1/T1, E1/T2 and E12/T1
+======================================================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
