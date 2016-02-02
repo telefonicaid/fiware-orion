@@ -83,7 +83,6 @@ std::string getEntities
   std::string  geometry   = ciP->uriParam["geometry"];
   std::string  coords     = ciP->uriParam["coords"];
   std::string  out;
-  bool         isPattern  = true;
 
   if ((idPattern != "") && (id != ""))
   {
@@ -115,8 +114,6 @@ std::string getEntities
 
       pattern += idsV[ix] + "$";
     }
-
-    isPattern = false;
   }
   else if (idPattern != "")
   {
@@ -251,12 +248,12 @@ std::string getEntities
   else
   {
     //
-    // More than one type listed in 'q':
+    // More than one type listed in URI param 'type':
     // Add an entity per type to QueryContextRequest::entityIdVector
     //
     for (unsigned int ix = 0; ix < ciP->uriParamTypes.size(); ++ix)
     {
-      EntityId* entityId = new EntityId(pattern, ciP->uriParamTypes[ix], isPattern? "true" : "false");
+      EntityId* entityId = new EntityId(pattern, ciP->uriParamTypes[ix], "true");
 
       parseDataP->qcr.res.entityIdVector.push_back(entityId);
     }
