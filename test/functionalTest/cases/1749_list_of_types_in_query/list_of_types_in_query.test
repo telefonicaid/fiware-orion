@@ -38,8 +38,14 @@ brokerStart CB
 # 06. GET /v2/entities?type=T1,T2 see E1/T1 and E1/T2
 # 07. GET /v2/entities?type=T1,T3 see E1/T1 and E1/T3
 # 08. GET /v2/entities?type=T1,T2,T3 see E1/T1, E1/T2 and E1/T3
-#
-
+# 09. GET /v2/entities?type=T1,T2,T3&id=E1, see E1/T1, E1/T2 and E1/T3
+# 10. Create an entity E2 of type T1
+# 11. Create an entity E2 of type T3
+# 12. GET /v2/entities?type=T1,T3, see E1/T1, E1/T3, E2/T1, and E2/T3
+# 13. Create an entity E12 of type T1
+# 14. GET /v2/entities?type=T1&idPattern=E1.*, see E1/T1 and E12/T1
+# 15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1
+# 
 
 echo "01. Create an entity E1 of type T1"
 echo "=================================="
@@ -105,6 +111,67 @@ echo
 echo "08. GET /v2/entities?type=T1,T2,T3 see E1/T1, E1/T2 and E1/T3"
 echo "============================================================="
 orionCurl --url '/v2/entities?type=T1,T2,T3' --json
+echo
+echo
+
+
+echo "09. GET /v2/entities?type=T1,T2,T3&id=E1, see E1/T1, E1/T2 and E1/T3"
+echo "===================================================================="
+orionCurl --url '/v2/entities?type=T1,T2,T3&id=E1' --json
+echo
+echo
+
+
+echo "10. Create an entity E2 of type T1"
+echo "=================================="
+payload='{
+    "id": "E2",
+    "type": "T1"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Create an entity E2 of type T3"
+echo "=================================="
+payload='{
+    "id": "E2",
+    "type": "T3"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "12. GET /v2/entities?type=T1,T3, see E1/T1, E1/T3, E2/T1, and E2/T3"
+echo "==================================================================="
+orionCurl --url '/v2/entities?type=T1,T3' --json
+echo
+echo
+
+
+echo "13. Create an entity E12 of type T1"
+echo "==================================="
+payload='{
+    "id": "E12",
+    "type": "T1"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "14. GET /v2/entities?type=T1&idPattern=E1.*, see E1/T1 and E12/T1"
+echo "================================================================="
+orionCurl --url '/v2/entities?type=T1&idPattern=E1.*' --json
+echo
+echo
+
+
+echo "15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1"
+echo "==========================================================================="
+orionCurl --url '/v2/entities?type=T1,T2&idPattern=E1.*' --json
 echo
 echo
 
@@ -232,6 +299,125 @@ Date: REGEX(.*)
     {
         "id": "E1",
         "type": "T3"
+    }
+]
+
+
+09. GET /v2/entities?type=T1,T2,T3&id=E1, see E1/T1, E1/T2 and E1/T3
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E1",
+        "type": "T3"
+    }
+]
+
+
+10. Create an entity E2 of type T1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+11. Create an entity E2 of type T3
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+12. GET /v2/entities?type=T1,T3, see E1/T1, E1/T3, E2/T1, and E2/T3
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T3"
+    },
+    {
+        "id": "E2",
+        "type": "T1"
+    },
+    {
+        "id": "E2",
+        "type": "T3"
+    }
+]
+
+
+13. Create an entity E12 of type T1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E12
+Date: REGEX(.*)
+
+
+
+14. GET /v2/entities?type=T1&idPattern=E1.*, see E1/T1 and E12/T1
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 50
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E12",
+        "type": "T1"
+    }
+]
+
+
+15. GET /v2/entities?type=T1,T2&idPattern=E1.*, see E1/T1, E1/T2 and E12/T1
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E1",
+        "type": "T2"
+    },
+    {
+        "id": "E12",
+        "type": "T1"
     }
 ]
 
