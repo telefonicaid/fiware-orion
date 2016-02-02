@@ -26,7 +26,7 @@ commands that require root privilege):
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo yum install boost-devel libcurl-devel gnutls-devel
+        sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel
 
 * Install the Mongo Driver from source:
 
@@ -47,7 +47,7 @@ commands that require root privilege):
         wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
         tar xvf libmicrohttpd-0.9.48.tar.gz
         cd libmicrohttpd-0.9.48
-        ./configure --disable-messages --disable-postprocessor --disable-dauth --disable-epoll
+        ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
