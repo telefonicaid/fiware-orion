@@ -58,6 +58,8 @@
 *   - geometry
 *   - coords
 *   - options=keyValues
+*   - type=TYPE
+*   - type=TYPE1,TYPE2,...TYPEN
 *
 * 01. Fill in QueryContextRequest
 * 02. Call standard op postQueryContext
@@ -115,7 +117,7 @@ std::string getEntities
   }
   else if (idPattern != "")
   {
-    pattern = idPattern;
+    pattern   = idPattern;
   }
 
 
@@ -199,7 +201,7 @@ std::string getEntities
   //
   // 01. Fill in QueryContextRequest - type "" is valid for all types
   //
-  parseDataP->qcr.res.fill(pattern, ciP->uriParam["type"], "true", EntityTypeEmptyOrNotEmpty, "");
+
 
   // If URI param 'q' is given, its value must be put in a scope
   if (q != "")
@@ -226,6 +228,35 @@ std::string getEntities
     }
 
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
+
+
+  //
+  // URI param 'type', three options:
+  // 1. Not used, so empty
+  // 2. Used with a single type name, so add it to the fill
+  // 3. Used and with more than ONE typename
+
+  if (ciP->uriParamTypes.size() == 0)
+  {
+    parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
+  }
+  else if (ciP->uriParamTypes.size() == 1)
+  {
+    parseDataP->qcr.res.fill(pattern, ciP->uriParam["type"], "true", EntityTypeNotEmpty, "");
+  }
+  else
+  {
+    //
+    // More than one type listed in URI param 'type':
+    // Add an entity per type to QueryContextRequest::entityIdVector
+    //
+    for (unsigned int ix = 0; ix < ciP->uriParamTypes.size(); ++ix)
+    {
+      EntityId* entityId = new EntityId(pattern, ciP->uriParamTypes[ix], "true");
+
+      parseDataP->qcr.res.entityIdVector.push_back(entityId);
+    }
   }
 
 

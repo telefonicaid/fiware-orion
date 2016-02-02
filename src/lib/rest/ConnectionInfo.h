@@ -163,6 +163,7 @@ public:
 
   std::map<std::string, std::string>   uriParam;
   std::map<std::string, bool>          uriParamOptions;
+  std::vector<std::string>             uriParamTypes;
 
   bool                       inCompoundValue;
   orion::CompoundValueNode*  compoundValueP;    // Points to current node in the tree
@@ -185,5 +186,13 @@ public:
 * uriParamOptionsParse - 
 */
 extern int uriParamOptionsParse(ConnectionInfo* ciP, const char* value);
+
+
+
+/* ****************************************************************************
+*
+* uriParamTypesParse - parse the URI param 'type' into uriParamTypes vector
+*/
+extern void uriParamTypesParse(ConnectionInfo* ciP, const char* value);
 
 #endif

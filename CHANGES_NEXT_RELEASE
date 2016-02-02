@@ -1,3 +1,4 @@
-- Fix: libmicrohttpd 0.9.48 included in contextBroker as static lib (previous Orion versions used 0.99.22 as dynamic library) (Issue #1675)
 - Fix: error level traces ignoring -logLevel NONE
 - Fix: wrong over-logging at error level updating attributes having metadata without type 
+- Fix: libmicrohttpd 0.9.48 included in contextBroker as static lib (previous Orion versions used 0.99.22 as dynamic library) (Issue #1675)
+- Fix: list of attribute names in URI param 'type' (Issue #1749)
