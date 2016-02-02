@@ -42,7 +42,7 @@ commands that require root privilege):
         tar xfvz v1.0.2.tar.gz
         sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 
-* Install microhttpd from sources:
+* Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
         wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
         tar xvf libmicrohttpd-0.9.48.tar.gz
