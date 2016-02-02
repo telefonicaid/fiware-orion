@@ -1,1 +1,1 @@
-- Fix: microhttpd is now compiled by hand (version 0.9.48) and included in broker as a static lib (solves issue #1675)
+- Fix: libmicrohttpd 0.9.48 included in contextBroker as static lib (previous Orion versions used 0.99.22 as dynamic library) (Issue #1675)
