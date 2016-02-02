@@ -91,3 +91,21 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
   return 0;
 }
+
+
+
+/* ****************************************************************************
+*
+* uriParamTypesParse - parse the URI param 'type' into uriParamTypes vector
+*/
+void uriParamTypesParse(ConnectionInfo* ciP, const char* value)
+{
+  std::vector<std::string> vec;
+
+  stringSplit(value, ',', vec);
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    ciP->uriParamTypes.push_back(vec[ix]);
+  }
+}

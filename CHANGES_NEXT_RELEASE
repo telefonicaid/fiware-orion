@@ -1,2 +1,3 @@
 -Fix: error level traces ignoring -logLevel NONE
 -Fix: wrong over-logging at error level updating attributes having metadata without type 
+-Fix: list of attribute names in URI param 'type' (Issue #1749)

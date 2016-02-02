@@ -190,6 +190,19 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->answer         = error.render(ciP, "");
     }
   }
+  else if (key == URI_PARAM_TYPE)
+  {
+    ciP->uriParam[URI_PARAM_TYPE] = value;
+
+    if (strstr(val, ","))  // More than ONE type?
+    {
+      uriParamTypesParse(ciP, val);
+    }
+    else
+    {
+      ciP->uriParamTypes.push_back(val);
+    }
+  }
   else
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 
