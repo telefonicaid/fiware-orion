@@ -769,7 +769,6 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 
     for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
     {
-      LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
 
       //
       // Add "null" in the following service path cases: / or /#. In order to avoid adding null
@@ -781,7 +780,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
         nullAdded = true;
       }
 
-      char path[SERVICE_NAME_MAX_LEN * 2];
+      char path[SERVICE_PATH_MAX_TOTAL * 2];
       slashEscape(servicePath[ix].c_str(), path, sizeof(path));
 
       if (path[strlen(path) - 1] == '#')
