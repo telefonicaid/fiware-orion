@@ -1379,18 +1379,32 @@ static bool addBsonFilter
 *   provide it in order to conform with function signature).
 *
 * I don't like too much to have a function with two quite parallel behaviours in the same logic. Probably a
-* smarter design will be to divide this function in two part: the one focused in string parsing and the one
-* focused in appliying filters to each different sytem (either in memory or as BSON).
+* smarter design would be to divide this function in two parts: one focused on string parsing and the other one
+* focused on applying filters to each different system (either in memory or as BSON).
 *
 */
 bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, ContextElementResponse* cerP)
 {
+  //
+  // Initial Sanity check (of the entire string)
+  // - Not empty
+  // - Not just a single ';'
+  // - Not two ';' in a row
+  //
+  if ((in == "")  || 
+      (in == ";") ||
+      (strstr(in.c_str(), ";;") != NULL))
+  {
+    return false;
+  }
+
   char* str         = strdup(in.c_str());
   char* toFree      = str;
   char* s;
   char* saver;
-
-  bool retval = true;
+  bool  rightHandSideMandatory = true;
+  bool  leftHandSideMandatory  = true;
+  bool  retval                 = true;
 
   while ((s = strtok_r(str, ";", &saver)) != NULL)
   {
@@ -1404,11 +1418,17 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
     s = wsStrip(s);
 
     //
-    // Rudimentary sanity checks
+    // Rudimentary sanity checks (of *this* part of 'q')
     //
-    // 1. If a range is present, the op MUST be either '==' OR '!=' 
+    // 1. If the 'q-part' is empty, error
+    // 2. If a range is present, the op MUST be either '==' OR '!=' 
     //
-    if (strstr(s, "..") != NULL)
+    if (*s == 0)
+    {
+      free(toFree);
+      return false;
+    }
+    else if (strstr(s, "..") != NULL)
     {
       if ((strstr(s, "==") == NULL) && (strstr(s, "!=") == NULL))
       {
@@ -1460,26 +1480,38 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
       right = &op[1];
       op    = (char*) ">";
     }
-    else if (s[0] == '-')
+    else if (s[0] == '!')
     {
       left  = (char*) "";
       op    = (char*) OPR_NOT_EXIST;
       right = wsStrip(&s[1]);
-    }
-    else if (s[0] == '+')
-    {
-      left  = (char*) "";
-      op    = (char*) OPR_EXIST;
-      right = wsStrip(&s[1]);
+      leftHandSideMandatory = false;
     }
     else
     {
-      op    = (char*) "";
-      right = (char*) "";
+      left  = (char*) "";
+      op    = (char*) OPR_EXIST;
+      right = wsStrip(s);
+      leftHandSideMandatory = false;
     }
 
     left  = wsStrip(left);
     right = wsStrip(right);
+
+    //
+    // Sanity check for left-hand and right-hand non-empty
+    //
+    if ((rightHandSideMandatory == true) && (*right == 0))
+    {
+      free(toFree);
+      return false;
+    }
+
+    if ((leftHandSideMandatory == true) && (*left == 0))
+    {
+      free(toFree);
+      return false;
+    }
 
     std::string opr = op;
 

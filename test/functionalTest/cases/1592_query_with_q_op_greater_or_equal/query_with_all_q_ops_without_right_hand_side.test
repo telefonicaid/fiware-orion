@@ -30,27 +30,35 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Operation +
-# 02. Operation -
+# 01. Empty q
+# 02. Operation NOT EXIST
 # 03. Operation ==
 # 04. Operation !=
 # 05. Operation >
 # 06. Operation <
 # 07. Operation >=
 # 08. Operation <=
+# 09. Q-part empty I
+# 10. Q-part empty II
+# 11. Operation == without left-hand-side
+# 12. Operation != without left-hand-side
+# 13. Operation > without left-hand-side
+# 14. Operation < without left-hand-side
+# 15. Operation >= without left-hand-side
+# 16. Operation <= without left-hand-side
 #
 
 
-echo "01. Operation +"
-echo "==============="
-orionCurl --url '/v2/entities?q=+' --json
+echo "01. Empty q"
+echo "==========="
+orionCurl --url '/v2/entities?q=' --json
 echo
 echo
 
 
-echo "02. Operation -"
-echo "==============="
-orionCurl --url '/v2/entities?q=-' --json
+echo "02. Operation NOT EXIST"
+echo "======================="
+orionCurl --url '/v2/entities?q=!' --json
 echo
 echo
 
@@ -97,22 +105,79 @@ echo
 echo
 
 
+echo "09. Q-part empty I"
+echo "=================="
+orionCurl --url '/v2/entities?q=;' --json
+echo
+echo
+
+
+echo "10. Q-part empty II"
+echo "==================="
+orionCurl --url '/v2/entities?q=type;;' --json
+echo
+echo
+
+
+echo "11. Operation == without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q===12' --json
+echo
+echo
+
+
+echo "12. Operation != without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q===12' --json
+echo
+echo
+
+
+echo "13. Operation > without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=>12' --json
+echo
+echo
+
+
+echo "14. Operation < without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=<12' --json
+echo
+echo
+
+
+echo "15. Operation >= without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=>=12' --json
+echo
+echo
+
+
+echo "16. Operation <= without left-hand-side"
+echo "======================================="
+orionCurl --url '/v2/entities?q=<=12' --json
+echo
+echo
+
+
+
 --REGEXPECT--
-01. Operation +
-===============
+01. Empty q
+===========
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 78
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "Empty right-hand-side for URI param /q/",
     "error": "BadRequest"
 }
 
 
-02. Operation -
-===============
+02. Operation NOT EXIST
+=======================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
@@ -191,6 +256,110 @@ Date: REGEX(.*)
 
 08. Operation <=
 ================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+09. Q-part empty I
+==================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+10. Q-part empty II
+===================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+11. Operation == without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+12. Operation != without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+13. Operation > without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+14. Operation < without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+15. Operation >= without left-hand-side
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
+
+
+16. Operation <= without left-hand-side
+=======================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json

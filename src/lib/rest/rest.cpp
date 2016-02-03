@@ -80,6 +80,7 @@ static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
 
 
+
 /* ****************************************************************************
 *
 * uriArgumentGet - 
@@ -89,6 +90,14 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
+
+  if (*val == 0)
+  {
+    OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer         = error.render(ciP, "");
+    return MHD_YES;
+  }
 
   if (key == URI_PARAM_NOTIFY_FORMAT)
   {

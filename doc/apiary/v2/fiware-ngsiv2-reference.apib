@@ -24,7 +24,7 @@ context information including updates, queries, registrations and subscriptions.
 ## Acknowledgements
 
 The editors would like to express their gratitude to the following people who actively contributed to this specification:
-Juan José Hierro, Marcos Reyes, Ken Gunnar, Antonio López, ... 
+Juan José Hierro, Marcos Reyes, Ken Zangelin, Antonio López, ... 
   
 ## Status
 
@@ -506,12 +506,14 @@ The list of operators (and the format of the values they use) is as follows:
 In the case of equal or unequal, if the value to match include a `,`, you can use simple quote
 (`'`), e.g: `color=='light,green','deep,blue'`.
 
-Unary statements are composed of a unary operator (either `+`or `-`) and are used in two situations:
+Unary negatory statements use the unary operator `!`, while affirmative unary statements use no operator at all.
+The unary statements are used in two situations:
 
-+ To check for attribute existence. E.g. `+temperature`matches entities which have
-  a temperature attribute (no matter its value), while `-temperature` matches entities which do not have
++ To check for attribute existence. E.g. `temperature` matches entities that have
+  a temperature attribute (no matter its value), while `!temperature` matches entities that do not have
   a temperature attribute.
-+ To check for entity type existence, with the `type`keyword. E.g, `-type`   matches entities which do not have a type.
++ To check for entity type existence, with the `type` keyword. E.g, `-type` matches entities which do not have a type,
+  while `type` matches entities with a type..
   
  
 ## Geographical Queries

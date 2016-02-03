@@ -31,14 +31,14 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Create subscription with q: -A
+# 01. Create subscription with q:!A (attribute A does not exist)
 # 02. Create entity E1 with A (not notif)
 # 03. Create entity E2 without A (notif)
 # 04. Dump accumulator (1 notifications)
 #
 
-echo "01. Create subscription with q: -A"
-echo "=================================="
+echo "01. Create subscription with q:!A (attribute A does not exist)"
+echo "=============================================================="
 payload='
 {
     "subject": {
@@ -51,7 +51,7 @@ payload='
         "condition": {
             "attributes": [ ],
             "expression": {
-               "q": "-A"
+               "q": "!A"
             }
          }
     },
@@ -101,8 +101,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription with q: -A
-==================================
+01. Create subscription with q:!A (attribute A does not exist)
+==============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})

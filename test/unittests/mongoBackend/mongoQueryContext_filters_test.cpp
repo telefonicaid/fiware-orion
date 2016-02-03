@@ -949,7 +949,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "+S");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -992,7 +992,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "-S");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "!S");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1036,7 +1036,7 @@ TEST(mongoQueryContextRequest_filters, withEntityType)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "+type");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "type");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1083,7 +1083,7 @@ TEST(mongoQueryContextRequest_filters, withoutEntityType)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "-type");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "!type");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
