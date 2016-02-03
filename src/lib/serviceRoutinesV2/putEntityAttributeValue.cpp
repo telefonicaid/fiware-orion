@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
@@ -79,6 +81,15 @@ std::string putEntityAttributeValue
     }
   }
 
+  if (ciP->httpStatusCode == SccConflict)
+  {
+    ErrorCode   ec("TooManyResults", "There is more than one entity that match the update. Please refine your query.");
+    std::string answer;
+
+    TIMED_RENDER(answer = ec.toJson(true));
+
+    return answer;
+  }
 
   // 04. Prepare HTTP headers
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
