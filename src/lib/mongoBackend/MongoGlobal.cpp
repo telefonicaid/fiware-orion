@@ -842,15 +842,21 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 
   if (scoP->areaType == orion::CircleType)
   {
-    double radians = scoP->circle.radius() / EARTH_RADIUS_METERS;
-
-    geoWithin = BSON("$centerSphere" <<
-                     BSON_ARRAY(
-                       BSON_ARRAY(scoP->circle.center.longitude() <<
-                                  scoP->circle.center.latitude()) <<
-                       radians));
-
     inverted  = scoP->circle.inverted();
+    
+    BSONArray coords = BSON_ARRAY(scoP->circle.center.longitude() << scoP->circle.center.latitude());
+    BSONObj geometry = BSON("type" << "Point" << "coordinates" << coords);
+    
+    BSONObjBuilder builder;
+    if (inverted) {
+      builder.append("$minDistance", scoP->circle.radius());
+    }
+    else {
+      builder.append("$maxDistance", scoP->circle.radius());      
+    }
+    
+    builder.append("$geometry", geometry);
+    areaQuery = BSON("$near" << builder.obj());
   }
   else if (scoP->areaType == orion::PolygonType)
   {
@@ -877,22 +883,21 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
     /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
     geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
     inverted  = scoP->polygon.inverted();
+    if (inverted)
+    {
+      /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
+       * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
+      areaQuery = BSON("$exists" << true << "$not" << BSON("$geoWithin" << geoWithin));
+    }
+    else
+    {
+      areaQuery = BSON("$geoWithin" << geoWithin);
+    }
   }
   else
   {
     alarmMgr.badInput(clientIp, "unknown area type");
     return false;
-  }
-
-  if (inverted)
-  {
-    /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
-     * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
-    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoWithin" << geoWithin));
-  }
-  else
-  {
-    areaQuery = BSON("$geoWithin" << geoWithin);
   }
 
   return true;
@@ -1763,7 +1768,10 @@ bool entitiesQuery
   auto_ptr<DBClientCursor>  cursor;
   Query                     query(finalQuery.obj());
 
-  query.sort(BSON(ENT_CREATION_DATE << 1));
+  if(geoScopes == 0)
+  {
+    query.sort(BSON(ENT_CREATION_DATE << 1));
+  }
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
