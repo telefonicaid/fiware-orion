@@ -130,7 +130,13 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 *
 * Note that statusCode is not touched by this constructor.
 */
-ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, const AttributeList& attrL, bool includeEmpty)
+ContextElementResponse::ContextElementResponse
+(
+  const mongo::BSONObj&  entityDoc,
+  const AttributeList&   attrL,
+  bool                   includeEmpty,
+  const std::string&     apiVersion
+)
 {
   prune = false;
 
@@ -236,11 +242,14 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
       caP->metadataVector.push_back(md);
     }
 
-    /* Setting location metatda (if found) */
-    if (locAttr == ca.name)
+    if (apiVersion == "v1")
     {
-      Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
-      caP->metadataVector.push_back(md);
+      /* Setting location metadata (if found) */
+      if (locAttr == ca.name)
+      {
+        Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
+        caP->metadataVector.push_back(md);
+      }
     }
 
     /* Setting custom metadata (if any) */

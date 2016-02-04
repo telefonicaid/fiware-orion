@@ -120,6 +120,17 @@ std::string postEntities
 
     TIMED_RENDER(answer = oe.render(ciP, ""));
   }
+  else if (rhttpcode == SccInvalidParameter)
+  {
+    // This v1 -> v2 error conversion is a little crazy (for example, the same
+    // SccInvalidParameter at v1 level could match two different error conditions
+    // at v2 level, making harder de logic). However, I'm afraid that we need
+    // to live with this while NGSIv1 and NGSIv2 coexists :(
+    OrionError oe(SccRequestEntityTooLarge, "NoResourcesAvailable", "No more than one geo-location attribute allowed");
+    ciP->httpStatusCode = SccRequestEntityTooLarge;
+    TIMED_RENDER(answer = oe.render(ciP, ""));
+  }
+
 
 
   // 04. Cleanup and return result

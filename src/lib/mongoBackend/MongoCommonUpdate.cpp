@@ -1,4 +1,4 @@
-/*
+﻿/*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
@@ -883,7 +883,6 @@ static bool updateAttribute
     }
   }
 
-
   return true;
 }
 
@@ -897,12 +896,13 @@ static bool updateAttribute
 * original value of the attribute was different than the one used in the update (this is
 * important for ONCHANGE notifications). Otherwise it is false
 *
-* (Previous versions of this function used the return value for that, but we have
-* modified to make in similar to updateAttribute()
+* In addition, return value is as follows:
+* - true: there was an actual append change
+* - false: there was an append-as-update change
 *
 * Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document
 */
-static void appendAttribute
+static bool appendAttribute
 (
   BSONObj&            attrs,
   BSONObjBuilder*     toSet,
@@ -923,7 +923,7 @@ static void appendAttribute
   if (attrs.hasField(effectiveName.c_str()))
   {
     updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion);
-    return;
+    return false;
   }
 
   /* Build the attribute to append */
@@ -953,6 +953,7 @@ static void appendAttribute
   toPush->append(caP->name);
 
   actualUpdate = true;
+  return true;
 }
 
 
@@ -1065,7 +1066,8 @@ static bool processLocation
   std::string&                   locAttr,
   double&                        coordLat,
   double&                        coordLong,
-  std::string*                   errDetail
+  std::string*                   errDetail,
+  const std::string&             apiVersion
 )
 {
   locAttr = "";
@@ -1074,35 +1076,30 @@ static bool processLocation
   {
     const ContextAttribute* caP = caV[ix];
 
-    for (unsigned jx = 0; jx < caP->metadataVector.size(); ++jx)
+    std::string location = caP->getLocation(apiVersion);
+
+    if (location.length() > 0)
     {
-      const Metadata* mdP = caP->metadataVector[jx];
-
-      if (mdP->name == NGSI_MD_LOCATION)
+      if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
       {
-        if (locAttr.length() > 0)
-        {
-          *errDetail = "You cannot use more than one location attribute "
-            "when creating an entity [see Orion user manual]";
-          return false;
-        }
-        else
-        {
-          if ((mdP->stringValue != LOCATION_WGS84) && (mdP->stringValue != LOCATION_WGS84_LEGACY))
-          {
-            *errDetail = "only WGS84 are supported, found: " + mdP->stringValue;
-            return false;
-          }
-
-          if (!string2coords(caP->stringValue, coordLat, coordLong))
-          {
-            *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
-            return false;
-          }
-
-          locAttr = caP->name;
-        }
+        *errDetail = "only WGS84 are supported, found: " + location;
+        return false;
       }
+
+      if (locAttr.length() > 0)
+      {
+        *errDetail = "You cannot use more than one location attribute "
+                     "when creating an entity [see Orion user manual]";
+        return false;
+      }
+
+      if (!string2coords(caP->stringValue, coordLat, coordLong))
+      {
+        *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
+        return false;
+      }
+
+      locAttr = caP->name;
     }
   }
 
@@ -1952,21 +1949,22 @@ static bool updateContextAttributeItem
   BSONArrayBuilder*         toPush,
   bool&                     actualUpdate,
   bool&                     entityModified,
-  std::string&              locAttr,
+  std::string*              currentLocAttrName,
   double&                   coordLat,
   double&                   coordLong,
   bool                      isReplace,
   const std::string&        apiVersion
 )
 {
-
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
+    // Attribute was found
     entityModified = actualUpdate || entityModified;
     updateAttrInNotifyCer(notifyCerP, targetAttr);
   }
   else
   {
+    // Attribute was not found
     if (!isReplace)
     {
       /* If updateAttribute() returns false, then that particular attribute has not
@@ -1992,28 +1990,74 @@ static bool updateContextAttributeItem
   // given that the logic in NGSIv2 for specifying location attributes is gogint to change
   // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
   // removed from code)
-  if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr)
-  {
-    cerP->statusCode.fill(SccInvalidParameter,
-                          std::string("action: UPDATE") +
-                          " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->toString() +
-                          " - location nature of an attribute has to be defined at creation time, with APPEND");
+  std::string locationString = targetAttr->getLocation(apiVersion);
 
-    alarmMgr.badInput(clientIp, "location nature of an attribute has to be defined at creation time, with APPEND");
+  /* Check that location (if any) is using the correct coordinates string (it only
+   * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
+  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  {
+    cerP->statusCode.fill(
+          SccInvalidParameter,
+          std::string("action: UPDATE") +
+          " - entity: [" + eP->toString() + "]" +
+          " - offending attribute: " + targetAttr->toString() +
+          " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
+    alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
     return false;
   }
 
-  if (locAttr == targetAttr->name)
+  /* Case 1: update attribute from no-location -> location. There are 2 sub-cases */
+  if (locationString.length() > 0)
   {
+    /* Case 1a: there is a previous (which different name) location attribute -> error */
+    if (*currentLocAttrName != targetAttr->name)
+    {
+      cerP->statusCode.fill(
+            SccInvalidParameter,
+            std::string("action: UPDATE") +
+            " - entity: [" + eP->toString() + "]" +
+            " - offending attribute: " + targetAttr->toString() +
+            " - attempt to define a location attribute [" + targetAttr->name + "]" +
+            " when another one has been previously defined [" + *currentLocAttrName + "]");
+      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
+      return false;
+    }
+
+    /* Case 1b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
+    if (*currentLocAttrName == "")
+    {
+      /* Check coordinates syntax (and get parsed valued if they are correct) */
+      if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
+      {
+        cerP->statusCode.fill(SccInvalidParameter,
+                              std::string("action: UPDATE") +
+                              " - entity: [" + eP->toString() + "]" +
+                              " - offending attribute: " + targetAttr->toString() +
+                              " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
+        alarmMgr.badInput(clientIp, "error parsing location attribute");
+        return false;
+      }
+
+      *currentLocAttrName = targetAttr->name;
+    }
+  }
+  /* Check 2: update attribute from location -> current location is nullified
+   * attribute, then remove location attribute (Disabled in NGSIv1 due to compatibility issues) */
+  else if ((apiVersion == "v2") && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
+  {
+    *currentLocAttrName = "";
+  }
+  /* Case 3: update the current location attribute (Onfly for NGSIv1)  */
+  else if ((apiVersion == "v1") && (*currentLocAttrName == targetAttr->name))
+  {
+    /* Check coordinates syntax (and get parsed valued if they are correct) */
     if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
     {
       cerP->statusCode.fill(SccInvalidParameter,
                             std::string("action: UPDATE") +
                             " - entity: [" + eP->toString() + "]" +
                             " - offending attribute: " + targetAttr->toString() +
-                            " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
-
+                            " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
       alarmMgr.badInput(clientIp, "error parsing location attribute");
       return false;
     }
@@ -2021,6 +2065,8 @@ static bool updateContextAttributeItem
 
   return true;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -2038,7 +2084,7 @@ static bool appendContextAttributeItem
   BSONArrayBuilder*         toPush,
   bool&                     actualUpdate,
   bool&                     entityModified,
-  std::string&              locAttr,
+  std::string*              currentLocAttrName,
   double&                   coordLat,
   double&                   coordLong,
   const std::string&        apiVersion
@@ -2046,14 +2092,46 @@ static bool appendContextAttributeItem
 {
   if (legalIdUsage(attrs, targetAttr))
   {
-    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
+    bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
     entityModified = actualUpdate || entityModified;
     updateAttrInNotifyCer(notifyCerP, targetAttr);
 
     /* Check aspects related with location */
-    if (targetAttr->getLocation().length() > 0)
+    std::string locationString = targetAttr->getLocation(apiVersion);
+
+    /* Check that location (if any) is using the correct coordinates string (it only
+     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
+    if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
     {
-      if (locAttr.length() > 0 && targetAttr->name != locAttr)
+      cerP->statusCode.fill(
+            SccInvalidParameter,
+            std::string("action: APPEND") +
+            " - entity: [" + eP->toString() + "]" +
+            " - offending attribute: " + targetAttr->toString() +
+            " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
+      alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
+      return false;
+    }
+
+    /* Check coordinates syntax (and get parsed valued in the case they will needed at the end, if they are correct) */
+    double preLat;
+    double preLong;
+    if ((locationString.length() > 0) && (!string2coords(targetAttr->stringValue, preLat, preLong)))
+    {
+      cerP->statusCode.fill(SccInvalidParameter,
+                            std::string("action: APPEND") +
+                            " - entity: [" + eP->toString() + "]" +
+                            " - offending attribute: " + targetAttr->toString() +
+                            " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
+      alarmMgr.badInput(clientIp, "error parsing location attribute");
+      return false;
+    }
+
+    /* Case 1: append of new location attribute */
+    if (actualAppend && (locationString.length() > 0))
+    {
+      /* Case 1a: there is a previous location attribute -> error */
+      if (currentLocAttrName->length() != 0)
       {
         cerP->statusCode.fill(
               SccInvalidParameter,
@@ -2061,37 +2139,48 @@ static bool appendContextAttributeItem
               " - entity: [" + eP->toString() + "]" +
               " - offending attribute: " + targetAttr->toString() +
               " - attempt to define a location attribute [" + targetAttr->name + "]" +
-              " when another one has been previously defined [" + locAttr + "]");
-
+              " when another one has been previously defined [" + *currentLocAttrName + "]");
         alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
         return false;
       }
-
-      if ((targetAttr->getLocation() != LOCATION_WGS84) && (targetAttr->getLocation() != LOCATION_WGS84_LEGACY))
+      /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
+      else
+      {
+        *currentLocAttrName = targetAttr->name;
+        coordLat            = preLat;
+        coordLong           = preLong;
+      }
+    }
+    /* Case 2: append-as-update changing attribute type from no-location -> location */
+    else if (!actualAppend && (locationString.length() > 0))
+    {
+      /* Case 2a: there is a previous (which different name) location attribute -> error */
+      if (*currentLocAttrName != targetAttr->name)
       {
         cerP->statusCode.fill(
               SccInvalidParameter,
               std::string("action: APPEND") +
               " - entity: [" + eP->toString() + "]" +
               " - offending attribute: " + targetAttr->toString() +
-              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-
-        alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
+              " - attempt to define a location attribute [" + targetAttr->name + "]" +
+              " when another one has been previously defined [" + *currentLocAttrName + "]");
+        alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
         return false;
       }
 
-      if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
+      /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
+      if (*currentLocAttrName == "")
       {
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: APPEND") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
-                              " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
-        alarmMgr.badInput(clientIp, "error parsing location attribute");
-        return false;
+        *currentLocAttrName = targetAttr->name;
+        coordLat            = preLat;
+        coordLong           = preLong;
       }
-
-      locAttr = targetAttr->name;
+    }
+    /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
+     * attribute, then remove location attribute */
+    else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
+    {
+      *currentLocAttrName = "";
     }
   }
   else
@@ -2126,8 +2215,9 @@ static bool deleteContextAttributeItem
   EntityId*                             eP,
   BSONObjBuilder*                       toUnset,
   bool&                                 entityModified,
-  std::string&                          locAttr,
-  std::map<std::string, unsigned int>*  deletedAttributesCounter
+  std::string*                          currentLocAttrName,
+  std::map<std::string, unsigned int>*  deletedAttributesCounter,
+  const std::string&                    apiVersion
 )
 {
   if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
@@ -2136,7 +2226,7 @@ static bool deleteContextAttributeItem
     entityModified = true;
 
     /* Check aspects related with location */
-    if (targetAttr->getLocation().length() > 0)
+    if (targetAttr->getLocation(apiVersion).length() > 0)
     {
       cerP->statusCode.fill(SccInvalidParameter,
                             std::string("action: DELETE") +
@@ -2148,11 +2238,11 @@ static bool deleteContextAttributeItem
       return false;
     }
 
-    /* Check aspects related with location. "Nullining" locAttr is the way of specifying
+    /* Check aspects related with location. "Nullining" currentLocAttrName is the way of specifying
      * that location field is no longer used */
-    if (locAttr == targetAttr->name)
+    if (*currentLocAttrName == targetAttr->name)
     {
-      locAttr = "";
+      *currentLocAttrName = "";
     }
 
     ca->found = true;
@@ -2196,7 +2286,7 @@ static bool processContextAttributeVector
   BSONArrayBuilder*                          toPush,
   BSONArrayBuilder*                          toPull,
   ContextElementResponse*                    cerP,
-  std::string&                               locAttr,
+  std::string*                               currentLocAttrName,
   double&                                    coordLat,
   double&                                    coordLong,
   std::string                                tenant,
@@ -2241,13 +2331,12 @@ static bool processContextAttributeVector
                                       toPush,
                                       actualUpdate,
                                       entityModified,
-                                      locAttr,
+                                      currentLocAttrName,
                                       coordLat,
                                       coordLong,
                                       strcasecmp(action.c_str(), "replace") == 0,
                                       apiVersion))
       {
-
         return false;
       }
     }
@@ -2262,7 +2351,7 @@ static bool processContextAttributeVector
                                       toPush,
                                       actualUpdate,
                                       entityModified,
-                                      locAttr,
+                                      currentLocAttrName,
                                       coordLat,
                                       coordLong,
                                       apiVersion))
@@ -2280,8 +2369,9 @@ static bool processContextAttributeVector
                                       eP,
                                       toUnset,
                                       entityModified,
-                                      locAttr,
-                                      &deletedAttributesCounter))
+                                      currentLocAttrName,
+                                      &deletedAttributesCounter,
+                                      apiVersion))
       {
         return false;
       }
@@ -2370,7 +2460,8 @@ static bool createEntity
   const ContextAttributeVector&    attrsV,
   std::string*                     errDetail,
   std::string                      tenant,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               apiVersion
 )
 {
   LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
@@ -2394,7 +2485,7 @@ static bool createEntity
   double       coordLat;
   double       coordLong;
 
-  if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail))
+  if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail, apiVersion))
   {
     return false;
   }
@@ -2695,15 +2786,11 @@ static void updateEntity
 
   if (r.hasField(ENT_LOCATION))
   {
-    //
-    // FIXME P2: potentially, assertion error will happen if the field is not as expected.
-    //           Although this shouldn't happen (if it happens, it means that somebody has manipulated the
-    //           DB out-of-band of the context broker), a safer way of parsing BSON object
-    //           will be needed. This is a general comment, applicable to many places in the mongoBackend code
-    //
     BSONObj loc = getObjectField(r, ENT_LOCATION);
 
     locAttr     = getStringField(loc, ENT_LOCATION_ATTRNAME);
+
+    // FIXME P10: this only works for "Point" locations. NGSIv2 allows other types.
     coordLong   = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[0].Double();
     coordLat    = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[1].Double();
   }
@@ -2752,7 +2839,7 @@ static void updateEntity
                                      &toPush,
                                      &toPull,
                                      cerP,
-                                     locAttr,
+                                     &locAttr,
                                      coordLat,
                                      coordLong,
                                      tenant,
@@ -3229,7 +3316,7 @@ void processContextElement
     {
       std::string errReason, errDetail;
 
-      if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV))
+      if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV, apiVersion))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
       }

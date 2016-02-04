@@ -56,9 +56,8 @@ payload='{
   "type": "City",
   "location":
   {
-    "type":     "coords",
-    "value":    "40.418889, -3.691944",
-    "metadata": { "location": "WGS84" }
+    "type":     "geo:point",
+    "value":    "40.418889, -3.691944"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -73,9 +72,8 @@ payload='{
   "type": "City",
   "location":
   {
-    "type":     "coords",
-    "value":    "40.316667, -3.75",
-    "metadata": { "location": "WGS84" }
+    "type":     "geo:point",
+    "value":    "40.316667, -3.75"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -90,9 +88,8 @@ payload='{
   "type": "City",
   "location":
   {
-    "type":     "coords",
-    "value":    "40.533333, -3.633333",
-    "metadata": { "location": "WGS84" }
+    "type":     "geo:point",
+    "value":    "40.533333, -3.633333"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -222,7 +219,7 @@ Date: REGEX(.*)
 04. GET /v2/entities - see all three cities
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 323
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -230,13 +227,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -244,13 +236,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -258,13 +245,8 @@ Date: REGEX(.*)
     {
         "id": "Alcobendas",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.533333, -3.633333"
         },
         "type": "City"
@@ -275,7 +257,7 @@ Date: REGEX(.*)
 05. GET /v2/entities, circle with wide radius capturing all three cities
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 323
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -283,13 +265,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -297,13 +274,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -311,13 +283,8 @@ Date: REGEX(.*)
     {
         "id": "Alcobendas",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.533333, -3.633333"
         },
         "type": "City"
@@ -328,7 +295,7 @@ Date: REGEX(.*)
 06. GET /v2/entities, circle with not so wide radius capturing only Madrid and Leganes
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 212
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -336,13 +303,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -350,13 +312,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -367,7 +324,7 @@ Date: REGEX(.*)
 07. GET /v2/entities, circle with narrow radius capturing only Madrid
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -375,13 +332,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -392,7 +344,7 @@ Date: REGEX(.*)
 08. GET /v2/entities, inverted circle with narrow radius capturing Leganes and Alcobendas
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 216
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -400,13 +352,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -414,13 +361,8 @@ Date: REGEX(.*)
     {
         "id": "Alcobendas",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.533333, -3.633333"
         },
         "type": "City"
@@ -431,7 +373,7 @@ Date: REGEX(.*)
 09. GET /v2/entities, polygon capturing only Leganes
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 146
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -439,13 +381,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -456,7 +393,7 @@ Date: REGEX(.*)
 10. GET /v2/entities, inverted polygon capturing all but Leganes
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 301
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -464,13 +401,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -478,13 +410,8 @@ Date: REGEX(.*)
     {
         "id": "Alcobendas",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.533333, -3.633333"
         },
         "type": "City"
@@ -495,7 +422,7 @@ Date: REGEX(.*)
 11. GET /v2/entities, polygon capturing only Alcobendas
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 153
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -503,13 +430,8 @@ Date: REGEX(.*)
     {
         "id": "Alcobendas",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.533333, -3.633333"
         },
         "type": "City"
@@ -520,7 +442,7 @@ Date: REGEX(.*)
 12. GET /v2/entities, inverted polygon capturing all but Alcobendas
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 212
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -528,13 +450,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -542,13 +459,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -559,7 +471,7 @@ Date: REGEX(.*)
 13. GET /v2/entities, polygon capturing only Madrid
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -567,13 +479,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -584,7 +491,7 @@ Date: REGEX(.*)
 14. GET /v2/entities, inverted polygon capturing all but Madrid
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 216
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -592,13 +499,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -606,13 +508,8 @@ Date: REGEX(.*)
     {
         "id": "Alcobendas",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.533333, -3.633333"
         },
         "type": "City"
@@ -623,7 +520,7 @@ Date: REGEX(.*)
 15. GET /v2/entities, polygon capturing all three cities
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 323
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -631,13 +528,8 @@ Date: REGEX(.*)
     {
         "id": "Madrid",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.418889, -3.691944"
         },
         "type": "City"
@@ -645,13 +537,8 @@ Date: REGEX(.*)
     {
         "id": "Leganes",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.316667, -3.75"
         },
         "type": "City"
@@ -659,13 +546,8 @@ Date: REGEX(.*)
     {
         "id": "Alcobendas",
         "location": {
-            "metadata": {
-                "location": {
-                    "type": "string",
-                    "value": "WGS84"
-                }
-            },
-            "type": "coords",
+            "metadata": {},
+            "type": "geo:point",
             "value": "40.533333, -3.633333"
         },
         "type": "City"
