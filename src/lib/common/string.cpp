@@ -417,7 +417,6 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   char*  comma;
   char*  number1;
   char*  number2;
-  bool   ret = true;
 
   cP    = wsStrip(cP);
 
@@ -432,57 +431,29 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
   number1 = cP;
   number2 = comma;
-
   number1 = wsStrip(number1);
   number2 = wsStrip(number2);
 
-  std::string  err;
-  double       oldLatitude  = latitude;
-  double       oldLongitude = longitude;
-
-  latitude                  = atoF(number1, &err);
-
-  if (err.length() > 0)
+  if ((str2double(number1, &latitude) == false) || (latitude > 90) || (latitude < -90))
   {
     std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
     alarmMgr.badInput(clientIp, details);
 
-    latitude = oldLatitude;
-    ret = false;
-  }
-  else
-  {
-    longitude = atoF(number2, &err);
-
-    if (err.length() > 0)
-    {
-      std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
-      alarmMgr.badInput(clientIp, details);
-
-      /* Rollback latitude */
-      latitude = oldLatitude;
-      longitude = oldLongitude;
-      ret = false;
-    }
+    free(initial);
+    return false;
   }
 
-  if ((latitude > 90) || (latitude < -90))
+  if ((str2double(number2, &longitude) == false) || (longitude > 180) || (longitude < -180))
   {
-    std::string details = std::string("bad value for latitude '") + initial + "'";
+    std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
     alarmMgr.badInput(clientIp, details);
 
-    ret = false;
-  }
-  else if ((longitude > 180) || (longitude < -180))
-  {
-    std::string details = std::string("bad value for longitude '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
-
-    ret = false;
+    free(initial);
+    return false;
   }
 
   free(initial);
-  return ret;
+  return true;
 }
 
 
@@ -774,11 +745,12 @@ std::string servicePathCheck(const char* servicePath)
 * It IS a double, but this function will say it is not, as it actually is not a valid double for
 * this computer as the computer cannot represent it as the C builtin type 'double' ... OK!
 */
-bool str2double(char* s, double* dP)
+bool str2double(const char* s, double* dP)
 {
-  char*   rest = s;
+  char*   rest = (char*) s;
   double  d;
 
+  errno = 0;
   d = strtod(s, &rest);
 
   if ((rest == s) || (errno == ERANGE))
