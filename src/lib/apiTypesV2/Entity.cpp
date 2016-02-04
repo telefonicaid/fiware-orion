@@ -27,6 +27,7 @@
 
 #include "logMsg/traceLevels.h"
 #include "common/tag.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
@@ -212,7 +213,7 @@ void Entity::fill(QueryContextResponse* qcrsP)
       //
       // If there are more than one entity, we return an error
       //
-      errorCode.fill("TooManyResults", "There is more than one entity with that id. Refine your query.");
+      errorCode.fill("TooManyResults", MORE_MATCHING_ENT);
   }
   else
   {

@@ -1,9 +1,12 @@
 - Fix: error level traces ignoring -logLevel NONE
 - Fix: wrong over-logging at error level updating attributes having metadata without type 
+- Fix: '+' supported in entity ids and names in URLs (Issue #1675)
 - Fix: libmicrohttpd 0.9.48 included in contextBroker as static lib (previous Orion versions used 0.9.22 as dynamic library) (Issue #1675)
 - Fix: list of attribute names in URI param 'type' (Issue #1749)
 - Fix: long servicepath when getting in NGSIv2 (#1423)
 - Fix: syntax change in string query 'q' for exist and not-exist (Issue #1751)
 - Fix: sanity check for string query 'q' - detect 'left-hand-side missing' (Issue #1754)
 - Fix: more sanity checks for string query 'q' (q empty, parts of 'q' empty - parts of 'q' are separated by ';')
-- Fix: sanity checks for numbers (Issue #1306)
+- Fix: error message when updating attribute value for two entities with same id (Issue #1387)
+- Add: sanity checks for numbers (Issue #1306)
+- Fix: bug causing false not-a-number when it really is a valid number (very very rarely)
