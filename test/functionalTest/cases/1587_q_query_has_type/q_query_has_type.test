@@ -38,7 +38,7 @@ brokerStart CB
 # 02. Create an entity E2 with type=T2
 # 03. Create an entity E3 without type
 # 04. GET all entities
-# 05. GET entities with type (disabled, see issue 1675)
+# 05. GET entities with type
 # 06. GET entities without type
 #
 
@@ -82,41 +82,16 @@ echo
 echo
 
 
-#
-# FIXME P8: '+' in URL is converted to SPACE - see issue #1675
-#
-#echo "05. GET entities with type"
-#echo "=========================="
-#orionCurl --url '/v2/entities?q=+type' --json
-#echo
-#echo
-#
-#
-# regexpect:
-#
-# 05. GET entities with type
-# ==========================
-# HTTP/1.1 200 OK
-# Content-Length: 
-# Content-Type: application/json
-# Date: REGEX(.*)
-# 
-# [
-#     {
-#         "id": "E1",
-#         "type": "T1"
-#     },
-#     {
-#         "id": "E2",
-#         "type": "T2"
-#     }
-# ]
-
+echo "05. GET entities with type"
+echo "=========================="
+orionCurl --url '/v2/entities?q=type' --json
+echo
+echo
 
 
 echo "06. GET entities without type"
 echo "============================="
-orionCurl --url '/v2/entities?q=-type' --json
+orionCurl --url '/v2/entities?q=!type' --json
 echo
 echo
 
@@ -168,6 +143,25 @@ Date: REGEX(.*)
     {
         "id": "E3",
         "type": null
+    }
+]
+
+
+05. GET entities with type
+==========================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "type": "T1"
+    },
+    {
+        "id": "E2",
+        "type": "T2"
     }
 ]
 
