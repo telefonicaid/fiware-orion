@@ -382,6 +382,7 @@ int64_t parse8601(const std::string& s)
 
       if (what == 'S')  // We support floats for the seconds, but only to round to an integer
       {
+        // NOTE: here we use atof and not str2double on purpose
         float secs  = atof(start);
         value       = (int) round(secs);
       }

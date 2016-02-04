@@ -228,16 +228,20 @@ std::string Scope::check
         return "Missing longitude for circle center";
       }
 
-      float latitude = atof(circle.center.latitudeString().c_str());
-      if ((latitude > 90) || (latitude < -90))
+      double latitude;
+      double longitude;
+      bool   ok;
+
+      ok = str2double(circle.center.latitudeString().c_str(), &latitude);
+      if ((ok == false) || (latitude > 90) || (latitude < -90))
       {
         std::string details = std::string("invalid value for latitude (") + circle.center.latitudeString() + ")";
         alarmMgr.badInput(clientIp, details);
         return "invalid value for latitude";
       }
 
-      float longitude = atof(circle.center.longitudeString().c_str());
-      if ((longitude > 180) || (longitude < -180))
+      ok = str2double(circle.center.longitudeString().c_str(), &longitude);
+      if ((ok == false) || (longitude > 180) || (longitude < -180))
       {
         std::string details = std::string("invalid value for longitude: '") + circle.center.longitudeString() + "'";
         alarmMgr.badInput(clientIp, details);
@@ -280,16 +284,21 @@ std::string Scope::check
           return std::string("missing longitude value for polygon vertex");
         }
 
-        float latitude = atof(polygon.vertexList[ix]->latitudeString().c_str());
-        if ((latitude > 90) || (latitude < -90))
+        double latitude;
+        double longitude;
+        bool   ok;
+
+
+        ok = str2double(polygon.vertexList[ix]->latitudeString().c_str(), &latitude);
+        if ((ok == false) || (latitude > 90) || (latitude < -90))
         {
           std::string details = std::string("invalid value for latitude: '") + polygon.vertexList[ix]->latitudeString() + "'";
           alarmMgr.badInput(clientIp, details);
           return "invalid value for latitude";
         }
 
-        float longitude = atof(polygon.vertexList[ix]->longitudeString().c_str());
-        if ((longitude > 180) || (longitude < -180))
+        ok = str2double(polygon.vertexList[ix]->longitudeString().c_str(), &longitude);
+        if ((ok == false) || (longitude > 180) || (longitude < -180))
         {
           std::string details = std::string("invalid value for longitude: '") + polygon.vertexList[ix]->longitudeString() + "'";
           alarmMgr.badInput(clientIp, details);

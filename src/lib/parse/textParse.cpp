@@ -24,6 +24,7 @@
 */
 #include <string>
 
+#include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
@@ -78,22 +79,14 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
     caP->valueType   = orion::ValueTypeNone;
   }
 
-  //
-  // 4. Valid Double?
-  // FIXME P4: this is much more complex than just (atof(string) != 0 || string == "0")
-  //           0.000 also is a valid float and it given 0 - 0.0000000000, and 0e0 also ...
-  //           And, even worse, 123K gives 123.0 back, we would need to analyze the string to try to
-  //           find garbage bytes after it if we want to detect this error.
-  //           However, all of this is not so extremely important and for now, (strtod(string) != 0 || string== "0") is good enough
-  //
-  else if (((d = strtod(ciP->payload, NULL)) != 0) || ((ciP->payload[0] == '0') && (ciP->payload[1] == 0)))
+  // 4. Is it a valid double?
+  else if (str2double(ciP->payload, &d) == true)
   {
     caP->valueType   = orion::ValueTypeNumber;
     caP->numberValue = d;
   }
 
-  // 5. None of the above - it's an error
-  else
+  else  // 5. None of the above - it's an error
   {
     OrionError oe(SccBadRequest, "attribute value type not recognized");
     return oe.render(ciP, "");

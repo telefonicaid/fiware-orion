@@ -8,4 +8,5 @@
 - Fix: sanity check for string query 'q' - detect 'left-hand-side missing' (Issue #1754)
 - Fix: more sanity checks for string query 'q' (q empty, parts of 'q' empty - parts of 'q' are separated by ';')
 - Fix: error message when updating attribute value for two entities with same id (Issue #1387)
- 
+- Hardening: sanity checks for numbers (Issue #1306)
+- Fix: bug causing false not-a-number when it really is a valid number (very very rarely)

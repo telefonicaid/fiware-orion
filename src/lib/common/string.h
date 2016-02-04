@@ -153,7 +153,7 @@ extern std::string servicePathCheck(const char* servicePath);
 *
 * str2double - is the string a correct float (double)?
 */
-extern bool str2double(char* s, double* dP = NULL);
+extern bool str2double(const char* s, double* dP = NULL);
 
 
 

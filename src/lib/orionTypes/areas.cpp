@@ -77,6 +77,7 @@ void Point::fill(Point* p)
 */
 double Point::latitude(void) const
 {
+  // NOTE: here we use atof and not str2double on purpose
   return atof(_latitude.c_str());
 }
 
@@ -87,6 +88,7 @@ double Point::latitude(void) const
 */
 double Point::longitude(void) const
 {
+  // NOTE: here we use atof and not str2double on purpose
   return atof(_longitude.c_str());
 }
 
@@ -157,6 +159,7 @@ bool Circle::inverted(void) const
 */
 double Circle::radius(void) const
 {
+  // NOTE: here we use atof and not str2double on purpose
   return atof(_radius.c_str());
 }
 

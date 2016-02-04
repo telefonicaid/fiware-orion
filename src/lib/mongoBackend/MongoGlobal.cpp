@@ -961,9 +961,23 @@ static bool matchFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      // ranges only can be used on numbers
-      return ((ca->valueType == orion::ValueTypeNumber) &&
-              (ca->numberValue >= atof(rangeFrom)) && (ca->numberValue <= atof(rangeTo)));
+      double from;
+      double to;
+
+      //
+      // Ranges can only be used on numbers
+      //
+      // FIXME P5: in the future, dates are to be supported as well.
+      //           There is a function 'parse8601Time' in common/globals.cpp that we
+      //           can use to verify that a string is a valid date.
+      //           NOTE: this FIXME is valid for ALL operators where Numbers are allowed
+      //
+      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      {
+        return false;
+      }
+
+      return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= from) && (ca->numberValue <= to));
 
     }
     else if (valVector.size() > 0)
@@ -1012,9 +1026,22 @@ static bool matchFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      // ranges only can be used on number
-      return ((ca->valueType == orion::ValueTypeNumber) &&
-              ((ca->numberValue < atof(rangeFrom)) || (ca->numberValue > atof(rangeTo))));
+      double from;
+      double to;
+
+      //
+      // Ranges can only be used on numbers
+      //
+      // FIXME P5: in the future, dates are to be supported as well.
+      //           There is a function 'parse8601Time' in common/globals.cpp that we
+      //           can use to verify that a string is a valid date
+      //
+      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      {
+        return false;
+      }
+
+      return ((ca->valueType == orion::ValueTypeNumber) && ((ca->numberValue < from) || (ca->numberValue > to)));
     }
     else if (valVector.size() > 0)
     {
@@ -1061,19 +1088,47 @@ static bool matchFilter
   }
   else if (opr == ">")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue > atof(right)));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue > d));
   }
   else if (opr == "<")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue < atof(right)));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue < d));
   }
   else if (opr == ">=")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= atof(right)));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= d));
   }
   else if (opr == "<=")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue <= atof(right)));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue <= d));
   }
   else
   {
@@ -1125,7 +1180,6 @@ static bool addBsonFilter
       ((rangeFrom == NULL) || (*rangeFrom == 0)) && 
       ((rangeTo == NULL) || (*rangeTo == 0)))
   {
-    alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in filter operation");
     return false;
   }
 
@@ -1133,7 +1187,15 @@ static bool addBsonFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      double from;
+      double to;
+
+      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      {
+        return false;
+      }
+
+      bb.append("$gte", from).append("$lte", to);
       bob.append(k, bb.obj());
       f = bob.obj();
     }
@@ -1210,7 +1272,15 @@ static bool addBsonFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      double from;
+      double to;
+
+      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      {
+        return false;
+      }
+
+      bb.append("$gte", from).append("$lte", to);
       bb2.append("$exists", true).append("$not", bb.obj());
       bob.append(k, bb2.obj());
       f = bob.obj();
@@ -1288,25 +1358,53 @@ static bool addBsonFilter
   }
   else if (opr == ">")
   {
-    bb.append("$gt", atof(right));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+    
+    bb.append("$gt", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == "<")
   {
-    bb.append("$lt", atof(right));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+    
+    bb.append("$lt", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == ">=")
   {
-    bb.append("$gte", atof(right));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    bb.append("$gte", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == "<=")
   {
-    bb.append("$lte", atof(right));
+    double d;
+
+    if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    bb.append("$lte", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
@@ -1767,7 +1865,7 @@ bool entitiesQuery
       // FIXME P4: Once issue #1705 is implemented, this check can be removed.
       if (qStringFilters(sco->value, filters) != true)
       {
-        if (badInputP)
+        if (badInputP)  // Bad Input reported by higher level
         {
           *badInputP = true;
           *err       = "invalid query expression";

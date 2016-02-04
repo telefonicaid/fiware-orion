@@ -40,6 +40,7 @@ brokerStart CB
 # 08. Erroneous GET entities with q=A1<0..20
 # 09. Correct GET entities with q=A1==0..20 (2 hits)
 # 10. Correct GET entities with q=A1!=0..20 (1 hit)
+# 11. Erroneous GET entities with q=A1==a..b 
 #
 
 
@@ -119,6 +120,13 @@ echo
 echo "10. Correct GET entities with q=A1!=0..20 (1 hit)"
 echo "================================================="
 orionCurl --url '/v2/entities?q=A1!=0..20' --json
+echo
+echo
+
+
+echo "11. Erroneous GET entities with q=A1==a..b"
+echo "=========================================="
+orionCurl --url '/v2/entities?q=A1==a..b' --json
 echo
 echo
 
@@ -288,6 +296,19 @@ Date: REGEX(.*)
         "type": null
     }
 ]
+
+
+11. Erroneous GET entities with q=A1==a..b
+==========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
 
 
 --TEARDOWN--

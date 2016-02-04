@@ -215,6 +215,25 @@ std::string getEntities
   // If URI params 'geometry' and 'coords' are given, another scope is to be created for this
   if ((coords != "") && (geometry != ""))
   {
+    //
+    // Sanity check of coords
+    //
+    for (unsigned int ix = 0; ix < coordsV.size(); ++ix)
+    {
+      double                    d;
+      std::string               copy = coordsV[ix];
+      std::vector<std::string>  cV;
+      
+      stringSplit(copy, ',', cV);
+
+      if ((cV.size() != 2) || (str2double(cV[0].c_str(), &d) == false) || (str2double(cV[1].c_str(), &d) == false))
+      {
+        OrionError oe(SccBadRequest, "invalid coordinates");
+        TIMED_RENDER(out = oe.render(ciP, ""));
+        return out;
+      }
+    }
+
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
@@ -223,6 +242,9 @@ std::string getEntities
       OrionError oe(SccBadRequest, errorString);
 
       TIMED_RENDER(out = oe.render(ciP, ""));
+
+      scopeP->release();
+      delete scopeP;
 
       return out;
     }
