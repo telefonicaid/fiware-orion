@@ -1870,10 +1870,6 @@ bool entitiesQuery
           *badInputP = true;
           *err       = "invalid query expression";
         }
-        else
-        {
-          alarmMgr.badInput(clientIp, "invalid query expression");
-        }
 
         return false;
       }
