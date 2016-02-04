@@ -417,6 +417,8 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   char*  comma;
   char*  number1;
   char*  number2;
+  double newLatitude;
+  double newLongitude;
 
   cP    = wsStrip(cP);
 
@@ -434,7 +436,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   number1 = wsStrip(number1);
   number2 = wsStrip(number2);
 
-  if ((str2double(number1, &latitude) == false) || (latitude > 90) || (latitude < -90))
+  if ((str2double(number1, &newLatitude) == false) || (newLatitude > 90) || (newLatitude < -90))
   {
     std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
     alarmMgr.badInput(clientIp, details);
@@ -443,7 +445,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
     return false;
   }
 
-  if ((str2double(number2, &longitude) == false) || (longitude > 180) || (longitude < -180))
+  if ((str2double(number2, &newLongitude) == false) || (newLongitude > 180) || (newLongitude < -180))
   {
     std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
     alarmMgr.badInput(clientIp, details);
@@ -451,6 +453,9 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
     free(initial);
     return false;
   }
+
+  latitude  = newLatitude;
+  longitude = newLongitude;
 
   free(initial);
   return true;

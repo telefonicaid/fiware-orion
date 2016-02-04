@@ -6,3 +6,4 @@
 - Fix: syntax change in string query 'q' for exist and not-exist (Issue #1751)
 - Fix: sanity check for string query 'q' - detect 'left-hand-side missing' (Issue #1754)
 - Fix: more sanity checks for string query 'q' (q empty, parts of 'q' empty - parts of 'q' are separated by ';')
+- Fix: sanity checks for numbers (Issue #1306)
