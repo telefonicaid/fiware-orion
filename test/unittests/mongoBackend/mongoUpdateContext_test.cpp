@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/errorMessages.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
@@ -9949,7 +9950,7 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ(SccConflict, RES_CER_STATUS(0).code);
   EXPECT_EQ("Too Many Results", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("There is more than one entity that match the update. Please refine your query.", RES_CER_STATUS(0).details);
+  EXPECT_EQ(MORE_MATCHING_ENT, RES_CER_STATUS(0).details);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

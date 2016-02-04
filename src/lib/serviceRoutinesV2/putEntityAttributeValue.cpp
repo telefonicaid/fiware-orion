@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "common/statistics.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -83,7 +84,7 @@ std::string putEntityAttributeValue
 
   if (ciP->httpStatusCode == SccConflict)
   {
-    ErrorCode   ec("TooManyResults", "There is more than one entity that match the update. Please refine your query.");
+    ErrorCode   ec("TooManyResults", MORE_MATCHING_ENT);
     std::string answer;
 
     TIMED_RENDER(answer = ec.toJson(true));
