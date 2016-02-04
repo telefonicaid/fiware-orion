@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
@@ -74,7 +75,7 @@ std::string getEntityAttributeValue
   // Render entity attribute response
   if (attribute.errorCode.error == "TooManyResults")
   {
-    ErrorCode ec("TooManyResults", "There is more than one entity with that id - please refine your query");
+    ErrorCode ec("TooManyResults", MORE_MATCHING_ENT);
 
     ciP->httpStatusCode = SccConflict;
 

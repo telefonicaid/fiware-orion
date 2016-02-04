@@ -37,6 +37,7 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "common/statistics.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -3094,7 +3095,7 @@ void processContextElement
     // thinking too much about it, but NGSIv1 behaviour has to be preserved to keep backward compatibility)
     if (entitiesNumber > 1)
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, "There is more than one entity that match the update. Please refine your query.");
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, MORE_MATCHING_ENT);
       return;
     }
 

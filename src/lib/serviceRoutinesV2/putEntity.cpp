@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -94,7 +95,7 @@ std::string putEntity
   }
   else if (ciP->httpStatusCode == SccConflict)
   {
-    OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
+    OrionError orionError(SccConflict, MORE_MATCHING_ENT);
 
     TIMED_RENDER(answer = orionError.render(ciP, ""));
   }

@@ -21,75 +21,66 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update TooManyResults
+Error Put Attributes Two Entities Same ID
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB
 
 --SHELL--
 
 #
-# 01. POST /v2/entities (Room1-Room)
-# 02. POST /v2/entities (Room1-Space)
-# 03. PUT /v2/entities/Room1 getting TooManyResults error
-#
+## 01. POST /v2/entities to create E1/T1/A1=0
+## 02. POST /v2/entities to create E1/T2/A1=0
+## 03. PUT /v2/entities/E1/atttrs/A1/value (too many results)
 
-echo "01. POST /v2/entities (Room1-Room)"
-echo "=================================="
-payload='{
-  "id": "Room1",
-  "type": "Room",
-  "temp": "29"
-}'
+
+
+echo "01. POST /v2/entities to create E1/T1/A1=0"
+echo "=========================================="
+payload='{ "id": "E1", "type": "T1", "A1": 0 }'
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
 
-echo "02. POST /v2/entities (Room1-Space)"
-echo "=================================="
-payload='{
-  "id": "Room1",
-  "type": "Space",
-  "temp": "30"
-}'
+echo "02. POST /v2/entities to create E1/T2/A1=0"
+echo "=========================================="
+payload='{ "id": "E1", "type": "T2", "A1": 0 }'
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
 
-echo "03. PUT /v2/entities/Room1 getting TooManyResults error"
-echo "======================================================="
-payload='{
-  "temp": "31"
-}'
-orionCurl --url '/v2/entities/Room1?options=keyValues' --payload "$payload" --json
+echo "03. PUT /v2/entities/E1/atttrs/A1/value (too many results)"
+echo "=========================================================="
+payload='{ "value": 1 }'
+orionCurl --url '/v2/entities/E1/attrs/A1/value' --payload "$payload" --json -X PUT
 echo
 echo
 
 
 --REGEXPECT--
-01. POST /v2/entities (Room1-Room)
-==================================
+01. POST /v2/entities to create E1/T1/A1=0
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Room1
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
 
-02. POST /v2/entities (Room1-Space)
-==================================
+02. POST /v2/entities to create E1/T2/A1=0
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Room1
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
 
-03. PUT /v2/entities/Room1 getting TooManyResults error
-=======================================================
+03. PUT /v2/entities/E1/atttrs/A1/value (too many results)
+==========================================================
 HTTP/1.1 409 Conflict
 Content-Length: 98
 Content-Type: application/json
@@ -104,4 +95,5 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+
 
