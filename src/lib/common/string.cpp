@@ -752,13 +752,13 @@ std::string servicePathCheck(const char* servicePath)
 */
 bool str2double(const char* s, double* dP)
 {
-  char*   rest = (char*) s;
+  char*   rest = NULL;
   double  d;
 
   errno = 0;
   d = strtod(s, &rest);
 
-  if ((rest == s) || (errno == ERANGE))
+  if ((rest == NULL) || (errno == ERANGE))
   {
     return false;
   }
