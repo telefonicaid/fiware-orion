@@ -60,12 +60,13 @@ std::string getEntityAttributeValue
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
   Attribute    attribute;
+  std::string  answer;
+  std::string  type       = ciP->uriParam["type"];
   bool         text       = (ciP->uriParamOptions["options"] == true || ciP->outFormat == TEXT);
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
