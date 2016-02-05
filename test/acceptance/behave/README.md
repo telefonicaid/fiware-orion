@@ -265,7 +265,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
-| list_entities                               |    506       | GET     | /v2/entities/                                        | No        | Yes            |
+| list_entities                               |    510       | GET     | /v2/entities/                                        | No        | Yes            |
 | create_entity                               |    693       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
 | retrieve_entity                             |    212       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
