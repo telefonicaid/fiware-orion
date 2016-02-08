@@ -38,7 +38,6 @@ CONTEXT_BROKER_ENV = u'context_broker_env'
 MONGO_ENV = u'mongo_env'
 
 properties_class = Properties()
-props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
 
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
@@ -255,6 +254,7 @@ def entities_are_stored_in_mongo(context):
     verify that entities are stored in mongo
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     __logger__.debug(" >> verifying entities are stored in mongo")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
@@ -269,6 +269,7 @@ def entities_are_not_stored_in_mongo(context):
     verify that entities are not stored in mongo
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     __logger__.debug(" >> verifying entities are not stored in mongo")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
@@ -283,6 +284,7 @@ def verify_that_an_entity_is_updated_in_mongo(context):
     verify that an entity is updated in mongo
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     __logger__.debug(" >> verifying that an entity is updating in mongo")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
