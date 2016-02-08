@@ -35,7 +35,6 @@ CONTEXT_BROKER_ENV = u'context_broker_env'
 MONGO_ENV = u'mongo_env'
 
 properties_class = Properties()
-props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
 
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
@@ -81,6 +80,7 @@ def verify_that_the_attribute_is_deleted_into_mongo(context):
     """
     verify that the attribute is deleted into mongo
     """
+    props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     __logger__.debug("Verifying if the atribute is deleted...")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
