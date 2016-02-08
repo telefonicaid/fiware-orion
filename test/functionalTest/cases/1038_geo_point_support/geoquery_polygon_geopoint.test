@@ -1,0 +1,615 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query test (polygon) with geo:point (NGSIv2)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# Inspired by 0000_ngsi10_geolocation_query tests
+#
+# FIXME P10: currently steps 4 to 8 are based in NGSIv1, but they will be
+# changed to NGSIv2 georel/geometry/coords as we progress in the
+# implementation
+#
+# 01. Create Point A
+# 02. Create Point B
+# 03. Create Point C
+# 04. Rectangle in: A, B
+# 05. Rectangle in: B, C
+# 06. Triangle in: A
+# 07. Rectangle out: A
+# 08. Triangle out: B, C
+#
+
+echo "01. Create Point A"
+echo "=================="
+payload='{
+  "id": "A",
+  "type": "Point",
+  "location": {
+    "value": "3, 2",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "02. Create Point B"
+echo "=================="
+payload='{
+  "id": "B",
+  "type": "Point",
+  "location": {
+    "value": "5, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "03. Create Point C"
+echo "=================="
+payload='{
+  "id": "C",
+  "type": "Point",
+  "location": {
+    "value": "7, 4",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "04. Rectangle in: A, B"
+echo "======================"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Rectangle in: B, C"
+echo "======================"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Triangle in: A"
+echo "=================="
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Rectangle out: A"
+echo "===================="
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ],
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Triangle out: B, C"
+echo "======================"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ],
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Point A
+==================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/A
+Date: REGEX(.*)
+
+
+
+02. Create Point B
+==================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/B
+Date: REGEX(.*)
+
+
+
+03. Create Point C
+==================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/C
+Date: REGEX(.*)
+
+
+
+04. Rectangle in: A, B
+======================
+HTTP/1.1 200 OK
+Content-Length: 1126
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Rectangle in: B, C
+======================
+HTTP/1.1 200 OK
+Content-Length: 1126
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. Triangle in: A
+==================
+HTTP/1.1 200 OK
+Content-Length: 579
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+07. Rectangle out: A
+====================
+HTTP/1.1 200 OK
+Content-Length: 579
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+08. Triangle out: B, C
+======================
+HTTP/1.1 200 OK
+Content-Length: 1126
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

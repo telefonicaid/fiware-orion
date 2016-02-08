@@ -41,6 +41,23 @@
 #define FIWARE_LOCATION             "FIWARE::Location"
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 
+#define EARTH_RADIUS_METERS     6371000
+
+#define LOCATION_WGS84          "WGS84"
+#define LOCATION_WGS84_LEGACY   "WSG84"    /* We fixed the right string at 0.17.0, but the old one needs to be mantained */
+
+
+
+/* ****************************************************************************
+*
+* "geo:" types
+*/
+#define GEO_POINT    "geo:point"
+#define GEO_LINE     "geo:line"
+#define GEO_BOX      "geo:box"
+#define GEO_POLYGON  "geo:polygon"
+
+
 
 /* ****************************************************************************
 *

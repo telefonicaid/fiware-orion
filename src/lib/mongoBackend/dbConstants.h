@@ -103,11 +103,6 @@
 #define CASUB_COUNT             "count"
 #define CASUB_FORMAT            "format"
 
-#define EARTH_RADIUS_METERS     6371000
-
-#define LOCATION_WGS84          "WGS84"
-#define LOCATION_WGS84_LEGACY   "WSG84"    /* We fixed the right string at 0.17.0, but the old one needs to be mantained */
-
 
 #endif // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_
 

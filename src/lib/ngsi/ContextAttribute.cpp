@@ -306,13 +306,23 @@ std::string ContextAttribute::getId(void) const
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation() const
+std::string ContextAttribute::getLocation(const std::string& apiVersion) const
 {
-  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+  if (apiVersion == "v1")
   {
-    if (metadataVector[ix]->name == NGSI_MD_LOCATION)
+    for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
     {
-      return metadataVector[ix]->stringValue;
+      if (metadataVector[ix]->name == NGSI_MD_LOCATION)
+      {
+        return metadataVector[ix]->stringValue;
+      }
+    }
+  }
+  else // v2
+  {
+    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON))
+    {
+      return LOCATION_WGS84;
     }
   }
 

@@ -90,14 +90,24 @@ std::string postEntity
     if ((upcrsP->contextElementResponseVector[ix]->statusCode.code != SccOk) &&
         (upcrsP->contextElementResponseVector[ix]->statusCode.code != SccNone))
     {
+      if (upcrsP->contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
+      {
+        // Ugly v1 -> v2 error conversion here :(
+        OrionError error(SccRequestEntityTooLarge, "NoResourcesAvailable", "No more than one geo-location attribute allowed");
+        std::string res;
+        ciP->httpStatusCode = error.code;
+        TIMED_RENDER(res = error.render(ciP, ""));
+        eP->release();
+        return res;
+      }
+
       OrionError error(upcrsP->contextElementResponseVector[ix]->statusCode);
       std::string  res;
 
       ciP->httpStatusCode = error.code;
       TIMED_RENDER(res = error.render(ciP, ""));
       eP->release();
-
-      return res;      
+      return res;
     }
   }
 
