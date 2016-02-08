@@ -12,4 +12,5 @@
 - Fix: bug causing false not-a-number when it really is a valid number (very very rarely)
 - Add: type param for GET entity in v2 (Issue #915, #972, #990, #998)
 - Add: type param for DELETE entity in v2 (Issue #986, #994)
+- Add: type param for PATCH entity in v2 (Issue #980)
 
