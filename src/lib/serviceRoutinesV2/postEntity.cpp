@@ -64,7 +64,8 @@ std::string postEntity
   Entity*      eP  = &parseDataP->ent.res;
   std::string  op  = ciP->uriParam["op"];
 
-  eP->id = compV[2];
+  eP->id   = compV[2];
+  eP->type = ciP->uriParam["type"];
 
   if (ciP->uriParamOptions["append"] == true) // pure-append
   {
