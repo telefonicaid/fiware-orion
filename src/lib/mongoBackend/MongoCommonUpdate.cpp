@@ -1078,29 +1078,31 @@ static bool processLocation
 
     std::string location = caP->getLocation(apiVersion);
 
-    if (location.length() > 0)
+    if (location.length() == 0)
     {
-      if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
-      {
-        *errDetail = "only WGS84 are supported, found: " + location;
-        return false;
-      }
-
-      if (locAttr.length() > 0)
-      {
-        *errDetail = "You cannot use more than one location attribute "
-                     "when creating an entity [see Orion user manual]";
-        return false;
-      }
-
-      if (!string2coords(caP->stringValue, coordLat, coordLong))
-      {
-        *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
-        return false;
-      }
-
-      locAttr = caP->name;
+      continue;
     }
+
+    if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
+    {
+      *errDetail = "only WGS84 are supported, found: " + location;
+      return false;
+    }
+
+    if (locAttr.length() > 0)
+    {
+      *errDetail = "You cannot use more than one location attribute "
+                     "when creating an entity [see Orion user manual]";
+      return false;
+    }
+
+    if (!string2coords(caP->stringValue, coordLat, coordLong))
+    {
+      *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
+      return false;
+    }
+
+    locAttr = caP->name;
   }
 
   return true;
@@ -2090,100 +2092,7 @@ static bool appendContextAttributeItem
   const std::string&        apiVersion
 )
 {
-  if (legalIdUsage(attrs, targetAttr))
-  {
-    bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
-    entityModified = actualUpdate || entityModified;
-    updateAttrInNotifyCer(notifyCerP, targetAttr);
-
-    /* Check aspects related with location */
-    std::string locationString = targetAttr->getLocation(apiVersion);
-
-    /* Check that location (if any) is using the correct coordinates string (it only
-     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-    if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
-    {
-      cerP->statusCode.fill(
-            SccInvalidParameter,
-            std::string("action: APPEND") +
-            " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->toString() +
-            " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-      alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
-      return false;
-    }
-
-    /* Check coordinates syntax (and get parsed valued in the case they will needed at the end, if they are correct) */
-    double preLat;
-    double preLong;
-    if ((locationString.length() > 0) && (!string2coords(targetAttr->stringValue, preLat, preLong)))
-    {
-      cerP->statusCode.fill(SccInvalidParameter,
-                            std::string("action: APPEND") +
-                            " - entity: [" + eP->toString() + "]" +
-                            " - offending attribute: " + targetAttr->toString() +
-                            " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
-      alarmMgr.badInput(clientIp, "error parsing location attribute");
-      return false;
-    }
-
-    /* Case 1: append of new location attribute */
-    if (actualAppend && (locationString.length() > 0))
-    {
-      /* Case 1a: there is a previous location attribute -> error */
-      if (currentLocAttrName->length() != 0)
-      {
-        cerP->statusCode.fill(
-              SccInvalidParameter,
-              std::string("action: APPEND") +
-              " - entity: [" + eP->toString() + "]" +
-              " - offending attribute: " + targetAttr->toString() +
-              " - attempt to define a location attribute [" + targetAttr->name + "]" +
-              " when another one has been previously defined [" + *currentLocAttrName + "]");
-        alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-        return false;
-      }
-      /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
-      else
-      {
-        *currentLocAttrName = targetAttr->name;
-        coordLat            = preLat;
-        coordLong           = preLong;
-      }
-    }
-    /* Case 2: append-as-update changing attribute type from no-location -> location */
-    else if (!actualAppend && (locationString.length() > 0))
-    {
-      /* Case 2a: there is a previous (which different name) location attribute -> error */
-      if (*currentLocAttrName != targetAttr->name)
-      {
-        cerP->statusCode.fill(
-              SccInvalidParameter,
-              std::string("action: APPEND") +
-              " - entity: [" + eP->toString() + "]" +
-              " - offending attribute: " + targetAttr->toString() +
-              " - attempt to define a location attribute [" + targetAttr->name + "]" +
-              " when another one has been previously defined [" + *currentLocAttrName + "]");
-        alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-        return false;
-      }
-
-      /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
-      if (*currentLocAttrName == "")
-      {
-        *currentLocAttrName = targetAttr->name;
-        coordLat            = preLat;
-        coordLong           = preLong;
-      }
-    }
-    /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
-     * attribute, then remove location attribute */
-    else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
-    {
-      *currentLocAttrName = "";
-    }
-  }
-  else
+  if (!legalIdUsage(attrs, targetAttr))
   {
     /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
      * we interrupt the processing and early return with
@@ -2195,6 +2104,97 @@ static bool appendContextAttributeItem
                           " - attribute can not be appended");
     alarmMgr.badInput(clientIp, "attribute can not be appended");
     return false;
+  }
+
+  bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
+  entityModified = actualUpdate || entityModified;
+  updateAttrInNotifyCer(notifyCerP, targetAttr);
+
+  /* Check aspects related with location */
+  std::string locationString = targetAttr->getLocation(apiVersion);
+
+  /* Check that location (if any) is using the correct coordinates string (it only
+     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
+  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  {
+    cerP->statusCode.fill(
+          SccInvalidParameter,
+          std::string("action: APPEND") +
+          " - entity: [" + eP->toString() + "]" +
+          " - offending attribute: " + targetAttr->toString() +
+          " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
+    alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
+    return false;
+  }
+
+  /* Check coordinates syntax (and get parsed valued in the case they will needed at the end, if they are correct) */
+  double preLat;
+  double preLong;
+  if ((locationString.length() > 0) && (!string2coords(targetAttr->stringValue, preLat, preLong)))
+  {
+    cerP->statusCode.fill(SccInvalidParameter,
+                          std::string("action: APPEND") +
+                          " - entity: [" + eP->toString() + "]" +
+                          " - offending attribute: " + targetAttr->toString() +
+                          " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
+    alarmMgr.badInput(clientIp, "error parsing location attribute");
+    return false;
+  }
+
+  /* Case 1: append of new location attribute */
+  if (actualAppend && (locationString.length() > 0))
+  {
+    /* Case 1a: there is a previous location attribute -> error */
+    if (currentLocAttrName->length() != 0)
+    {
+      cerP->statusCode.fill(
+            SccInvalidParameter,
+            std::string("action: APPEND") +
+            " - entity: [" + eP->toString() + "]" +
+            " - offending attribute: " + targetAttr->toString() +
+            " - attempt to define a location attribute [" + targetAttr->name + "]" +
+            " when another one has been previously defined [" + *currentLocAttrName + "]");
+      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
+      return false;
+    }
+    /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
+    else
+    {
+      *currentLocAttrName = targetAttr->name;
+      coordLat            = preLat;
+      coordLong           = preLong;
+    }
+  }
+  /* Case 2: append-as-update changing attribute type from no-location -> location */
+  else if (!actualAppend && (locationString.length() > 0))
+  {
+    /* Case 2a: there is a previous (which different name) location attribute -> error */
+    if (*currentLocAttrName != targetAttr->name)
+    {
+      cerP->statusCode.fill(
+            SccInvalidParameter,
+            std::string("action: APPEND") +
+            " - entity: [" + eP->toString() + "]" +
+            " - offending attribute: " + targetAttr->toString() +
+            " - attempt to define a location attribute [" + targetAttr->name + "]" +
+            " when another one has been previously defined [" + *currentLocAttrName + "]");
+      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
+      return false;
+    }
+
+    /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
+    if (*currentLocAttrName == "")
+    {
+      *currentLocAttrName = targetAttr->name;
+      coordLat            = preLat;
+      coordLong           = preLong;
+    }
+  }
+  /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
+     * attribute, then remove location attribute */
+  else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
+  {
+    *currentLocAttrName = "";
   }
 
   return true;
