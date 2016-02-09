@@ -15,3 +15,4 @@
 - Add: type param for PATCH entity in v2 (Issue #980)
 - Add: type param for POST entity in v2 (Issue #982, #984)
 - Add: support for geo:point type as a way of specifying location attribute in NGSIv2 (Issue #1038)
+- Add: type param for PUT entity in v2 (Issue #988, #992, #1000)

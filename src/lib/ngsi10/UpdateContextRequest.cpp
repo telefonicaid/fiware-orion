@@ -346,10 +346,11 @@ void UpdateContextRequest::fill
 (
   const std::string&   entityId,
   ContextAttribute*    attributeP,
-  const std::string&   _updateActionType
+  const std::string&   _updateActionType,
+  const std::string&   type
 )
 {
-  ContextElement*   ceP = new ContextElement(entityId, "", "false");
+  ContextElement*   ceP = new ContextElement(entityId, type, "false");
   ContextAttribute* aP  = new ContextAttribute(attributeP);
 
   ceP->contextAttributeVector.push_back(aP);
