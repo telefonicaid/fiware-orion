@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
-#define SRC_LIB_APITYPESV2_ERRORCODE_H_
+#ifndef SRC_LIB_APITYPESV2_BATCHQUERY_H_
+#define SRC_LIB_APITYPESV2_BATCHQUERY_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,31 +26,34 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "common/Format.h"
+#include "ngsi/AttributeList.h"
 #include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "ngsi/ScopeVector.h"
+#include "apiTypesV2/Entities.h"
+#include "apiTypesV2/ErrorCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* ErrorCode - 
+* BatchQuery - 
 */
-typedef struct ErrorCode
+class BatchQuery
 {
-  std::string     error;            // Mandatory
-  std::string     description;      // Mandatory
+public:
+  Entities       entities;
+  AttributeList  attributeV;
+  ScopeVector    scopeV;
 
-  ErrorCode();
-  ErrorCode(const std::string& _error, const std::string& _description);
+  BatchQuery();
+  ~BatchQuery();
 
-  std::string  toJson(bool isLastElement);
-  void         fill(const std::string& _error, const std::string& _description);
-  void         fill(const StatusCode& sc);
-  void         present(const std::string& indent);
-  void         release(void);
-} ErrorCode;
+  std::string    check(ConnectionInfo* ciP, RequestType requestType);
+  void           present(const std::string& indent);
+  void           release(void);
+};
 
-#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_
+#endif  // SRC_LIB_APITYPESV2_BATCHQUERY_H_

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
-#define SRC_LIB_APITYPESV2_ERRORCODE_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSESCOPEVECTOR_H_
+#define SRC_LIB_JSONPARSEV2_PARSESCOPEVECTOR_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,30 +27,24 @@
 */
 #include <string>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "rapidjson/document.h"
+
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ScopeVector.h"
+
+using namespace rapidjson;
 
 
 
 /* ****************************************************************************
 *
-* ErrorCode - 
+* parseScopeVector - 
 */
-typedef struct ErrorCode
-{
-  std::string     error;            // Mandatory
-  std::string     description;      // Mandatory
+extern std::string parseScopeVector
+(
+  ConnectionInfo*                    ciP,
+  const Value::ConstMemberIterator&  iter,
+  ScopeVector*                       svP
+);
 
-  ErrorCode();
-  ErrorCode(const std::string& _error, const std::string& _description);
-
-  std::string  toJson(bool isLastElement);
-  void         fill(const std::string& _error, const std::string& _description);
-  void         fill(const StatusCode& sc);
-  void         present(const std::string& indent);
-  void         release(void);
-} ErrorCode;
-
-#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSESCOPEVECTOR_H_

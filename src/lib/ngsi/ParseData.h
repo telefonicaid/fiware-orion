@@ -54,6 +54,7 @@
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "apiTypesV2/Entity.h"
+#include "apiTypesV2/BatchQuery.h"
 
 
 
@@ -380,6 +381,17 @@ typedef struct AttributeValueData
 
 /* ****************************************************************************
 *
+* BatchQueryData - 
+*/
+typedef struct BatchQueryData
+{
+  BatchQuery res;
+} BatchQueryData;
+
+
+
+/* ****************************************************************************
+*
 * ParseData -
 */
 typedef struct ParseData
@@ -415,6 +427,7 @@ typedef struct ParseData
   EntityData                                  ent;
   AttributeData                               attr;
   AttributeValueData                          av;
+  BatchQueryData                              bq;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_

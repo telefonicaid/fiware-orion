@@ -10,3 +10,4 @@
 - Fix: error message when updating attribute value for two entities with same id (Issue #1387)
 - Hardening: sanity checks for numbers (Issue #1306)
 - Fix: bug causing false not-a-number when it really is a valid number (very very rarely)
+- Add: implemented new request: POST /v2/op/query (Issue #1080)

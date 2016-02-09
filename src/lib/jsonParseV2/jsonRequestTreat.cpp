@@ -36,6 +36,7 @@
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseAttributeValue.h"
 #include "jsonParseV2/parseSubscription.h"
+#include "jsonParseV2/parseBatchQuery.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 
 
@@ -125,7 +126,14 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     {
       return answer;
     }
+    break;
 
+  case BatchQueryRequest:
+    answer = parseBatchQuery(ciP, &parseDataP->bq.res);
+    if (answer != "OK")
+    {
+      return answer;
+    }
     break;
 
   default:

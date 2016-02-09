@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
+#include "apiTypesV2/EntityVector.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Request.h"
@@ -227,4 +228,23 @@ void EntityIdVector::release(void)
   }
 
   vec.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityIdVector::fill(EntityIdVector) -
+*
+*/
+void EntityIdVector::fill(EntityVector& _vec)
+{
+  for (unsigned int ix = 0; ix < _vec.size(); ++ix)
+  {
+    Entity*   entityP   = _vec[ix];
+    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern);
+
+    vec.push_back(entityIdP);
+  }
+
 }

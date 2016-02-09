@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
-#define SRC_LIB_APITYPESV2_ERRORCODE_H_
-
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,30 +24,46 @@
 */
 #include <string>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "rapidjson/document.h"
+
+#include "logMsg/logMsg.h"
+
+#include "ngsi/ContextAttribute.h"
+
+#include "apiTypesV2/Entities.h"
+#include "rest/ConnectionInfo.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseEntityObject.h"
+#include "jsonParseV2/parseEntityVector.h"
 
 
 
 /* ****************************************************************************
 *
-* ErrorCode - 
+* parseEntityVector - 
 */
-typedef struct ErrorCode
+std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, Entities* evP)
 {
-  std::string     error;            // Mandatory
-  std::string     description;      // Mandatory
+  std::string type = jsonParseTypeNames[iter->value.GetType()];
 
-  ErrorCode();
-  ErrorCode(const std::string& _error, const std::string& _description);
+  if (type != "Array")
+  {
+    return "not a JSON array";
+  }
 
-  std::string  toJson(bool isLastElement);
-  void         fill(const std::string& _error, const std::string& _description);
-  void         fill(const StatusCode& sc);
-  void         present(const std::string& indent);
-  void         release(void);
-} ErrorCode;
+  for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+  {
+    std::string  r;
+    Entity*      eP = new Entity();
 
-#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_
+    evP->vec.push_back(eP);
+
+    r = parseEntityObject(ciP, iter2, eP, false);
+    if (r != "OK")
+    {
+      return r;
+    }
+  }
+
+  return "OK";
+}
