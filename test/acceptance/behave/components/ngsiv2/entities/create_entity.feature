@@ -28,7 +28,7 @@
 #
 
 # Missing Tests:
-#   - verification of Maximum Length Allowed in Fields
+#   - verification of headers response
 #   - verification of Special Attribute Types
 #
 
@@ -157,8 +157,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | description | Entity already exists |
 
   @maximum_size @BUG_1199
-    # 8013 is a way of generating a request longer than 1MB (in fact, 1048624 bytes)
-  Scenario:  try to create a new entity NGSI v2 with maximum size in payload (8013 attributes = 1048624 bytes)
+    # 8137 is a way of generating a request longer than 1MB (in fact, 1048594 bytes)
+  Scenario:  try to create a new entity NGSI v2 with maximum size in payload (8137 attributes = 1048594 bytes)
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_maximum_size |
@@ -168,7 +168,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | parameter         | value      |
       | entities_type     | room       |
       | entities_id       | room2      |
-      | attributes_number | 8013       |
+      | attributes_number | 8137       |
       | attributes_name   | max_size   |
       | attributes_value  | temperatur |
       | attributes_type   | my_type    |
@@ -181,7 +181,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify several error responses
       | parameter   | value                                              |
       | error       | RequestEntityTooLarge                              |
-      | description | payload size: 1048624, max size supported: 1048576 |
+      | description | payload size: 1048594, max size supported: 1048576 |
     And verify that entities are not stored in mongo
 
   @content_type_without @BUG_1199
@@ -1924,11 +1924,10 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | attributes_name  | temperature |
       | attributes_value | 56          |
       | attributes_type  | celcius     |
-      | metadatas_name   | random=255  |
+      | metadatas_name   | random=257  |
       | metadatas_value  | random=5    |
     When create entity group with "1" entities in "normalized" mode
     Then verify that receive several "Bad Request" http code
-    # the metadata name is incremented in 2 chars because it is added with a suffix. Ex: "_0"
     And verify several error responses
       | parameter   | value                                                |
       | error       | BadRequest                                           |
@@ -2876,7 +2875,6 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room16"  | {"x": ["a", 45, "rt"],"x2": "b"}               |
       | "room17"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"} |
       | "room18"  | {"x": "x1","x2": "b"}                          |
-
 
   @qp_key_values_on_only_value
   Scenario Outline:  create an entity using NGSI v2 with keyValues mode activated, but in only values format
