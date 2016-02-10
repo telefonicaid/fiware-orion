@@ -2941,7 +2941,7 @@ static void updateEntity
   }
 
   // The servicePath of THIS object is entitySPath
-  char espath[SERVICE_NAME_MAX_LEN];
+  char espath[SERVICE_PATH_MAX_TOTAL];
   slashEscape(entitySPath.c_str(), espath, sizeof(espath));
 
   // servicePathString from earlier in this function
@@ -3126,7 +3126,7 @@ void processContextElement
                           servicePathV[0].c_str(),
                           action.c_str()));
 
-    char               path[SERVICE_NAME_MAX_LEN];
+    char               path[SERVICE_PATH_MAX_TOTAL];
     slashEscape(servicePathV[0].c_str(), path, sizeof(path));
 
     const std::string  servicePathValue  = std::string("^") + path + "$";
