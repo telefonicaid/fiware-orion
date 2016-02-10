@@ -246,5 +246,4 @@ void EntityIdVector::fill(EntityVector& _vec)
 
     vec.push_back(entityIdP);
   }
-
 }
