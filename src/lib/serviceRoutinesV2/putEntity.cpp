@@ -68,7 +68,8 @@ std::string putEntity
   std::string answer = "";
   Entity*     eP     = &parseDataP->ent.res;
 
-  eP->id = compV[2];
+  eP->id   = compV[2];
+  eP->type = ciP->uriParam["type"];
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "REPLACE");

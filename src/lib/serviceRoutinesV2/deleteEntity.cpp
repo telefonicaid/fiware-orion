@@ -65,7 +65,8 @@ std::string deleteEntity
   string  answer;
   Entity* eP    = new Entity();
 
-  eP->id = compV[2];
+  eP->id   = compV[2];
+  eP->type = ciP->uriParam["type"];
 
   if (compV.size() == 5)  // Deleting an attribute
   {

@@ -1779,7 +1779,8 @@ bool entitiesQuery
   int                              limit,
   bool*                            limitReached,
   long long*                       countP,
-  bool*                            badInputP
+  bool*                            badInputP,
+  const std::string                apiVersion
 )
 {
 
@@ -1977,7 +1978,7 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
     cer->statusCode.fill(SccOk);
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */

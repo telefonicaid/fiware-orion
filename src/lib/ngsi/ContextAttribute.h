@@ -78,7 +78,7 @@ typedef struct ContextAttribute
 
   /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId() const;
-  std::string  getLocation() const;
+  std::string  getLocation(const std::string& apiValue ="v1") const;
 
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);

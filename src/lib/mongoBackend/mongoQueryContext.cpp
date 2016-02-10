@@ -277,7 +277,8 @@ HttpStatusCode mongoQueryContext
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  long long*                           countP
+  long long*                           countP,
+  const std::string&                   apiVersion
 )
 {
     int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -315,7 +316,8 @@ HttpStatusCode mongoQueryContext
                        limit,
                        &limitReached,
                        countP,
-                       &badInput);
+                       &badInput,
+                       apiVersion);
 
     if (badInput)
     {

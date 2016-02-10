@@ -61,19 +61,18 @@ std::string getEntity
   ParseData*                 parseDataP
 )
 {
-  using namespace std;
+   std::string attrs  = ciP->uriParam["attrs"];
+   std::string type   = ciP->uriParam["type"];
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
-  // optional parameter for attributes
-  string attrs = ciP->uriParam["attrs"];
+  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   if (attrs != "")
   {
-    vector<string> attrsV;
+    std::vector<std::string> attrsV;
 
     stringSplit(attrs, ',', attrsV);
-    for (vector<string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
     {
       parseDataP->qcr.res.attributeList.push_back_if_absent(*it);
     }

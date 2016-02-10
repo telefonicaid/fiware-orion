@@ -265,8 +265,8 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
-| list_entities                               |    497       | GET     | /v2/entities/                                        | No        | Yes            |
-| create_entity                               |    679       | POST    | /v2/entities/                                        | Yes       | Yes            |    
+| list_entities                               |    510       | GET     | /v2/entities/                                        | No        | Yes            |
+| create_entity                               |    693       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
 | retrieve_entity                             |    212       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
 | update_or_append_entity_attributes          |    768       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
@@ -312,23 +312,27 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
       The number after "=" is the number of chars
         ex: | attr_name | random=10 |
-  - If attributes number is equal to "1", the attribute name has not suffix, ex: `attributes_name=temperature`
-    else attributes number is major than "1" the attributes name are value plus a suffix (consecutive), ex:
-        `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
-  - If would like a query parameter name, use `qp_` prefix into `properties to entities` step   
-  - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
-  - It is possible to use the same value of the previous request in another request using this string: 
-       `the same value of the previous request`.
   - If entity id prefix is true, the entity id is value plus a suffix (consecutive), ex:
         `entity_id=room_0, entity_id=room_1, ..., entity_id=room_N`
   - If entity type prefix is true, the entity type is value plus a suffix (consecutive), ex:
         `entity_type=room_0, entity_type=room_1, ..., entity_type=room_N`        
+  - If attributes number is equal to "1", the attribute name has not suffix, ex: `attributes_name=temperature`
+    else attributes number is major than "1" the attributes name are value plus a suffix (consecutive), ex:
+        `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
+  - If metadatas number is equal to "1", the attribute name has not suffix, ex: `metadatas_name=alarm`
+    else metadatas number is major than "1" the metadatas name are value plus a suffix (consecutive), ex:
+        `metadatas_name=alarm_0, alarm_1, ..., alarm_N`
+  - If would like a query parameter name in POST, PUT or PATCH requests, use `qp_` prefix into `properties to entities` step   
+  - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
+  - It is possible to use the same value of the previous request in another request using this string: 
+       `the same value of the previous request`.
+  
 
 
 ## Tags
 
 You can to use multiples tags in each scenario, possibles tags used:
 
-    - happy_path, skip, errors_40x, only_develop, ISSUE_XXX, BUG_XXX, etc
+    - happy_path, skip, errors_40x, only_develop, too_slow, ISSUE_XXX, BUG_XXX, etc
 
 and to filter scenarios by these tags: see [Executing Tests](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#executing-tests) section.

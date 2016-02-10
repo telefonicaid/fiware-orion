@@ -64,11 +64,12 @@ std::string putEntityAttribute
   std::string  answer;
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
+  std::string  type           = ciP->uriParam["type"];
 
   // 01. Fill in UpdateContextRequest from URL and payload
   parseDataP->attr.attribute.name = attributeName;
 
-  parseDataP->upcr.res.fill(entityId, &parseDataP->attr.attribute, "UPDATE");
+  parseDataP->upcr.res.fill(entityId, &parseDataP->attr.attribute, "UPDATE", type);
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
