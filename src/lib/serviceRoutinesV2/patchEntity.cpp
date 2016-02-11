@@ -28,7 +28,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
-
+#include "parse/forbiddenChars.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -70,6 +70,12 @@ std::string patchEntity
 
   eP->id = compV[2];
   eP->type = ciP->uriParam["type"];
+
+  if (forbiddenIdChars(ciP->apiVersion, eP->id.c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, "invalid character in URI");
+    return oe.render(ciP, "");
+  }
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "UPDATE");
