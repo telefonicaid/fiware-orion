@@ -65,7 +65,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | attributes_number | 3           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
-      | attributes_type   | celcius     |
+      | attributes_type   | celsius     |
       | metadatas_number  | 2           |
       | metadatas_name    | very_hot    |
       | metadatas_type    | alarm       |
@@ -201,7 +201,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | attributes_number | 5           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
-      | attributes_type   | celcius     |
+      | attributes_type   | celsius     |
       | metadatas_number  | 2           |
       | metadatas_name    | very_hot    |
       | metadatas_type    | alarm       |

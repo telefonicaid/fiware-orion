@@ -1923,7 +1923,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 56          |
-      | attributes_type  | celcius     |
+      | attributes_type  | celsius     |
       | metadatas_name   | random=257  |
       | metadatas_value  | random=5    |
     When create entity group with "1" entities in "normalized" mode
@@ -2601,7 +2601,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 56          |
-      | attributes_type  | celcius     |
+      | attributes_type  | celsius     |
       | metadatas_name   | temperature |
       | metadatas_value  | random=5    |
       | metadatas_type   | random=257  |

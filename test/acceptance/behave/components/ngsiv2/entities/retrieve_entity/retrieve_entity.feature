@@ -60,7 +60,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | attributes_number | 3           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
-      | attributes_type   | celcius     |
+      | attributes_type   | celsius     |
       | metadatas_number  | 2           |
       | metadatas_name    | very_hot    |
       | metadatas_type    | alarm       |
@@ -433,7 +433,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | entities_id      | room              |
       | attributes_name  | temperature       |
       | attributes_value | <attribute_value> |
-      | attributes_type  | celcius           |
+      | attributes_type  | celsius           |
     And create entity group with "3" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -477,7 +477,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
-      | attributes_type  | "celcius"          |
+      | attributes_type  | "celsius"          |
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
     When get all entities
@@ -565,7 +565,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
-      | attributes_type  | "celcius"          |
+      | attributes_type  | "celsius"          |
       | metadatas_number | 2                  |
       | metadatas_name   | "very_hot"         |
       | metadatas_type   | "alarm"            |
@@ -658,7 +658,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
-      | attributes_type  | "celcius"          |
+      | attributes_type  | "celsius"          |
       | metadatas_number | 2                  |
       | metadatas_name   | "very_hot"         |
       | metadatas_value  | "hot"              |
@@ -703,7 +703,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | attributes_number | 3           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
-      | attributes_type   | celcius     |
+      | attributes_type   | celsius     |
       | metadatas_number  | 2           |
       | metadatas_name    | very_hot    |
       | metadatas_type    | alarm       |
@@ -737,7 +737,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | attributes_number | 3           |
       | attributes_name   | temperature |
       | attributes_value  | 34          |
-      | attributes_type   | celcius     |
+      | attributes_type   | celsius     |
       | metadatas_number  | 2           |
       | metadatas_name    | very_hot    |
       | metadatas_type    | alarm       |

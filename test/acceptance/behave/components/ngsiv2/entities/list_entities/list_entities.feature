@@ -539,7 +539,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | attributes_number | 2                 |
       | attributes_name   | temperature       |
       | attributes_value  | <attribute value> |
-      | attributes_type   | celcius           |
+      | attributes_type   | celsius           |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -587,7 +587,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
-      | attributes_type  | "celcius"          |
+      | attributes_type  | "celsius"          |
     And create an entity in raw and "normalized" modes
     And verify that receive an "Created" http code
     And record entity group
