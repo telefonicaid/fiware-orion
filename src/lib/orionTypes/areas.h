@@ -41,7 +41,10 @@ typedef enum AreaType
 {
   NoArea,
   CircleType,
-  PolygonType
+  PolygonType,
+  PointType,
+  LineType,
+  BoxType
 } AreaType;
 
 
@@ -55,10 +58,13 @@ class Point
  private:
   ::std::string _latitude;
   ::std::string _longitude;
+  double        lat;
+  double        lon;
 
  public:
   Point();
   Point(::std::string latitude, ::std::string longitude);
+  Point(double _lat, double _lon);
 
   void   fill(Point* p);
   double latitude(void) const;
@@ -67,6 +73,42 @@ class Point
   void   longitudeSet(::std::string longitude);
   ::std::string latitudeString(void);
   ::std::string longitudeString(void);
+};
+
+
+
+/* ****************************************************************************
+*
+* Line -
+*/
+class Line
+{
+public:
+  Point start;
+  Point end;
+
+  Line();
+  Line(Point* startP, Point* endP);
+
+  void fill(Point* startP, Point* endP);
+};
+
+
+
+/* ****************************************************************************
+*
+* Box -
+*/
+class Box
+{
+public:
+  Point lowerLeft;
+  Point upperRight;
+
+  Box();
+  Box(Point* lowerLeftP, Point* upperRightP);
+
+  void fill(Point* lowerLeftP, Point* upperRightP);
 };
 
 
@@ -114,6 +156,25 @@ class Polygon
   ::std::string         invertedString(void) const;
   void                  vertexAdd(Point* p);
   void                  release(void);
+};
+
+
+
+/* ****************************************************************************
+*
+* Georel - 
+*/
+class Georel
+{
+public:
+  Georel();
+
+  void         fill(Georel* georelP);         
+  int          parse(const char* in, std::string* errorString);
+
+  std::string  type;
+  double       maxDistance;
+  double       minDistance;
 };
 
 

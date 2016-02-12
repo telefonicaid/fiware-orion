@@ -57,6 +57,7 @@
 *   - q
 *   - geometry
 *   - coords
+*   - georel
 *   - options=keyValues
 *   - type=TYPE
 *   - type=TYPE1,TYPE2,...TYPEN
@@ -82,6 +83,7 @@ std::string getEntities
   std::string  q          = ciP->uriParam["q"];
   std::string  geometry   = ciP->uriParam["geometry"];
   std::string  coords     = ciP->uriParam["coords"];
+  std::string  georel     = ciP->uriParam["georel"];
   std::string  out;
 
   if ((idPattern != "") && (id != ""))
@@ -121,7 +123,9 @@ std::string getEntities
   }
 
 
-  // Making sure geometry and coords are not used individually
+  //
+  // Making sure geometry, georel and coords are not used individually
+  //
   if ((coords != "") && (geometry == ""))
   {
     OrionError   oe(SccBadRequest, "URI param /coords/ used without /geometry/");
@@ -134,11 +138,48 @@ std::string getEntities
     OrionError oe(SccBadRequest, "URI param /geometry/ used without /coords/");
 
     TIMED_RENDER(out = oe.render(ciP, ""));
-
     return out;
   }
 
-  // Making sure geometry is valid (if present)
+  if ((georel != "") && (geometry == ""))
+  {
+    OrionError   oe(SccBadRequest, "URI param /georel/ used without /geometry/");
+
+    TIMED_RENDER(out = oe.render(ciP, ""));
+    return out;
+  }
+
+
+  //
+  // If URI param 'geometry' is present, create a new scope.
+  // The fill() method of the scope checks the validity of the info in:
+  // - geometry
+  // - georel
+  // - coords
+  //
+  if (geometry != "")
+  {
+    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+    std::string  errorString;
+
+    if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
+    {
+      OrionError oe(SccBadRequest, errorString);
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+
+      scopeP->release();
+      delete scopeP;
+
+      return out;
+    }
+
+    LM_W(("KZ: radius in scope: %f", scopeP->circle.radius()));
+    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
+
+#if 0
+  // Making sure geometry is valid (if present) - TAKEN CARE OF BY Scope::fill()
   orion::Geometry           geo;
   std::vector<std::string>  coordsV;
 
@@ -196,7 +237,7 @@ std::string getEntities
       return out;
     }
   }
-
+#endif
 
   //
   // 01. Fill in QueryContextRequest - type "" is valid for all types
@@ -212,6 +253,7 @@ std::string getEntities
   }
 
 
+#if 0
   // If URI params 'geometry' and 'coords' are given, another scope is to be created for this
   if ((coords != "") && (geometry != ""))
   {
@@ -233,25 +275,8 @@ std::string getEntities
         return out;
       }
     }
-
-    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
-    std::string  errorString;
-
-    if (scopeP->fill(&geo, coordsV, &errorString) != 0)
-    {
-      OrionError oe(SccBadRequest, errorString);
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-
-      scopeP->release();
-      delete scopeP;
-
-      return out;
-    }
-
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
-
+#endif
 
   //
   // URI param 'type', three options:

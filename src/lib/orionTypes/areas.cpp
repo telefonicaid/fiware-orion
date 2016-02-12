@@ -61,12 +61,24 @@ Point::Point(::std::string latitude, ::std::string longitude): _latitude(latitud
 
 /* ****************************************************************************
 *
+* Point::Point - 
+*/
+Point::Point(double _lat, double _lon)
+{
+  lat = _lat;
+  lon = _lon;
+}
+
+
+
+/* ****************************************************************************
+*
 * Point::fill - 
 */
 void Point::fill(Point* p)
 {
-  _latitude  = p->_latitude;
-  _longitude = p->_longitude;
+  lat = p->lat;
+  lon = p->lon;
 }
 
 
@@ -134,6 +146,73 @@ void Point::longitudeSet(::std::string longitude)
   return _longitude;
 }
 
+
+
+/* ****************************************************************************
+*
+* Line::Line - 
+*/
+Line::Line()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* Line::Line - 
+*/
+Line::Line(Point* startP, Point* endP)
+{
+  start.fill(startP);
+  end.fill(endP);
+}
+
+
+
+/* ****************************************************************************
+*
+* Line::fill - 
+*/
+void Line::fill(Point* startP, Point* endP)
+{
+  start.fill(startP);
+  end.fill(endP);
+}
+
+
+
+/* ****************************************************************************
+*
+* Box::Box - 
+*/
+Box::Box()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* Box::Box - 
+*/
+Box::Box(Point* lowerLeftP, Point* upperRightP)
+{
+  lowerLeft.fill(lowerLeftP);
+  upperRight.fill(upperRightP);
+}
+
+
+
+/* ****************************************************************************
+*
+* Box::fill - 
+*/
+void Box::fill(Point* lowerLeftP, Point* upperRightP)
+{
+  lowerLeft.fill(lowerLeftP);
+  upperRight.fill(upperRightP);
+}
 
 
 /* ****************************************************************************
@@ -325,6 +404,121 @@ void Polygon::release(void)
 
 /* ****************************************************************************
 *
+* Georel::Georel - 
+*/
+Georel::Georel(): maxDistance(0), minDistance(0)
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* Georel::parse - 
+*/
+int Georel::parse(const char* in, std::string* errorString)
+{
+  std::vector<std::string>  items;
+  bool                      maxDistanceSet = false;
+  bool                      minDistanceSet = false;
+
+  if (stringSplit(in, ';', items) == 0)
+  {
+    *errorString = "empty georel";
+    return -1;
+  }
+
+  for (unsigned int ix = 0; ix < items.size(); ++ix)
+  {
+    const char* item = items[ix].c_str();
+
+    if ((items[ix] == "near") || (items[ix] == "coveredBy") || (items[ix] == "intersects") || (items[ix] == "equals") || (items[ix] == "disjoint"))
+    {
+      if (type != "")
+      {
+        *errorString = "georel type present more than once";
+        return -1;
+      }
+
+      type = items[ix];
+    }
+    else if (strncmp(item, "maxDistance=", 12) == 0)
+    {
+      if (maxDistanceSet)
+      {
+        *errorString = "maxDistance present more than once";
+        return -1;
+      }
+
+      if (str2double(&item[12], &maxDistance) == false)
+      {
+        *errorString = "invalid number for maxDistance";
+        return -1;
+      }
+
+      maxDistanceSet = true;
+    }
+    else if (strncmp(item, "minDistance=", 12) == 0)
+    {
+      if (minDistanceSet)
+      {
+        *errorString = "minDistance present more than once";
+        return -1;
+      }
+
+      if (str2double(&item[12], &minDistance) == false)
+      {
+        *errorString = "invalid number for minDistance";
+        return -1;
+      }
+
+      minDistanceSet = true;
+    }
+    else
+    {
+      *errorString = "Invalid selector in georel specification";
+      return -1;
+    }
+  }
+
+  if (maxDistanceSet && (type != "near"))
+  {
+    *errorString = std::string("maxDistance erroneously used with georel /") + type + "/";
+    return -1;
+  }
+
+  if (minDistanceSet && (type != "near"))
+  {
+    *errorString = std::string("minDistance erroneously used with georel /") + type + "/";
+    return -1;
+  }
+
+  if ((type == "near") && !maxDistanceSet && !minDistanceSet)
+  {
+    *errorString = "georel /near/ without either minDistance nor maxDistance";
+    return -1;
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* Georel::fill - 
+*/
+void Georel::fill(Georel* georelP)
+{
+  type        = georelP->type;
+  maxDistance = georelP->maxDistance;
+  minDistance = georelP->minDistance;
+}
+
+
+
+/* ****************************************************************************
+*
 * Geometry::Geometry - 
 */
 Geometry::Geometry(): areaType(""), radius(-1), external(false)
@@ -359,6 +553,7 @@ int Geometry::parse(const char* in, std::string* errorString)
       }
 
       areaType = items[ix];
+      LM_W(("KZ: Got an areaType of %s", areaType.c_str()));
     }
     else if (strncmp(items[ix].c_str(), "radius", 6) == 0)
     {
@@ -369,10 +564,12 @@ int Geometry::parse(const char* in, std::string* errorString)
         *errorString = "Invalid value of /radius/";
         return -1;
       }
+      LM_W(("KZ: Got a radius of '%f'", radius));
     }
     else if (items[ix] == "external")
     {
       external = true;
+      LM_W(("KZ: Got an EXTERNAL"));
     }
     else
     {
