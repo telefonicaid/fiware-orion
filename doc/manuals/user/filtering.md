@@ -151,7 +151,7 @@ The scope corresponding to this type is "FIWARE::StringQuery".
             "scopes": [
                 {
                     "type": "FIWARE::StringQuery",
-                    "value": "temperature<24;humidity==75..90;status=running"
+                    "value": "temperature<24;humidity==75..90;status==running"
                 }
             ]
         }
