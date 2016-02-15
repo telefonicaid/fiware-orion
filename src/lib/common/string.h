@@ -170,4 +170,14 @@ template <typename T> std::string toString(T t)
   return ss.str();
 }
 
+
+
+/*****************************************************************************
+*
+* isodate2str -
+*
+*/
+extern std::string isodate2str(long long timestamp);
+
+
 #endif  // SRC_LIB_COMMON_STRING_H_
