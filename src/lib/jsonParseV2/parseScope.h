@@ -39,11 +39,15 @@ using namespace rapidjson;
 /* ****************************************************************************
 *
 * parseScope - 
+*
+* Using 'const Value::GenericValue*' for 'value' causes compilation problems in
+* some environments (in particular, at least in Debian 8.2 with gcc 4.9.2)
+*
 */
 extern std::string parseScope
 (
   ConnectionInfo*            ciP,
-  const Value::GenericValue* valueP,
+  Value::ConstValueIterator  valueP,
   Scope*                     scopeP
 );
 

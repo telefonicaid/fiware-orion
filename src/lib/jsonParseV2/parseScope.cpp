@@ -38,7 +38,7 @@ using namespace rapidjson;
 *
 * parseScope - 
 */
-std::string parseScope(ConnectionInfo* ciP, const Value::GenericValue* valueP, Scope* scopeP)
+std::string parseScope(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Scope* scopeP)
 {
   std::string type  = jsonParseTypeNames[valueP->GetType()];
 
