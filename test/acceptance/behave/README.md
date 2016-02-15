@@ -270,7 +270,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 | retrieve_entity                             |    220       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
 | update_or_append_entity_attributes          |    768       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
-| update_existing_entity_attributes           |    657       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | No             |
+| update_existing_entity_attributes           |    642       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | Yes            |
 | replace_all_entity_attributes               |    563       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | No             |  
 | remove_entity                               |     68       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
 |                                                                                                                                                          |
@@ -327,6 +327,21 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
   - It is possible to use the same value of the previous request in another request using this string: 
        `the same value of the previous request`.
+  - If we wanted an empty payload in a second request, use:
+      ```
+          | parameter          |
+          | without_properties |
+      ```
+  - If we wanted attributes in keyValues mode in create or update request, use `keyValues` else use `normalized ` value. ex:
+      ```
+          create entity group with "3" entities in "keyValues" mode
+          or
+          create entity group with "3" entities in "normalized" mode
+      ```
+  - If we need to use No-String values (boolean, null, json object, etc) use raw step appropriate.Ex:
+       ```
+       create an entity in raw and "normalized" modes
+       ```
     
 
 ## Tags
