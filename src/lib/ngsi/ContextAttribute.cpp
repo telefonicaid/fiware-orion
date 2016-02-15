@@ -371,10 +371,15 @@ std::string ContextAttribute::renderAsJsonObject
         break;
 
       case ValueTypeNumber:
-        char num[32];
-        snprintf(num, sizeof(num), "%f", numberValue);
-        effectiveValue      = std::string(num);
-        valueIsNumberOrBool = true;
+        if (type == DATE_TYPE)
+        {
+          effectiveValue = isodate2str(numberValue);
+        }
+        else // regular number
+        {
+          effectiveValue      = toString(numberValue);
+          valueIsNumberOrBool = true;
+        }
         break;
 
       case ValueTypeNone:
@@ -503,10 +508,15 @@ std::string ContextAttribute::render
         break;
 
       case ValueTypeNumber:
-        char num[32];
-        snprintf(num, sizeof(num), "%f", numberValue);
-        effectiveValue      = num;
-        valueIsNumberOrBool = true;
+        if (type == DATE_TYPE)
+        {
+          effectiveValue = isodate2str(numberValue);
+        }
+        else // regular number
+        {
+          effectiveValue      = toString(numberValue);
+          valueIsNumberOrBool = true;
+        }
         break;
 
       case ValueTypeNone:
@@ -584,9 +594,14 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      char num[32];
-      snprintf(num, sizeof(num), "%f", numberValue);
-      out += num;
+      if (type == DATE_TYPE)
+      {
+        out += isodate2str(numberValue);
+      }
+      else // regular number
+      {
+        out += toString(numberValue);
+      }
     }
     else if (valueType == orion::ValueTypeString)
     {
@@ -631,11 +646,14 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      char num[32];
-
-      snprintf(num, sizeof(num), "%f", numberValue);
-
-      out += JSON_VALUE_NUMBER("value", num);
+      if (type == DATE_TYPE)
+      {
+        out += JSON_VALUE("value", isodate2str(numberValue));;
+      }
+      else // regular number
+      {
+        out += JSON_VALUE_NUMBER("value", toString(numberValue));
+      }
     }
     else if (valueType == orion::ValueTypeString)
     {
@@ -729,8 +747,15 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
         break;
 
       case orion::ValueTypeNumber:
-        snprintf(buf, sizeof(buf), "%f", numberValue);
-        out = buf;
+        if (type == DATE_TYPE)
+        {
+          out = isodate2str(numberValue);
+        }
+        else // regular number
+        {
+          snprintf(buf, sizeof(buf), "%f", numberValue);
+          out = buf;
+        }
         break;
 
       case orion::ValueTypeBoolean:
@@ -906,18 +931,18 @@ void ContextAttribute::release(void)
 
 /* ****************************************************************************
 *
-* toString - 
+* ContextAttribute::getName -
 */
-std::string ContextAttribute::toString(void)
+std::string ContextAttribute::getName(void)
 {
   return name;
 }
 
 /* ****************************************************************************
 *
-* toStringValue -
+* ContextAttribute::getValue -
 */
-std::string ContextAttribute::toStringValue(void) const
+std::string ContextAttribute::getValue(void) const
 {
   char buffer[64];
 

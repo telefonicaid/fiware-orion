@@ -141,6 +141,22 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     caP->valueType = orion::ValueTypeNone;
   }
 
+  // Is it a date?
+  if (caP->type == DATE_TYPE)
+  {
+    caP->numberValue =  parse8601Time(caP->stringValue);
+
+    if (caP->numberValue == -1)
+    {
+      return "date has invalid format";
+    }
+
+    // Probably reseting stringValue is not needed, but let's do it for cleanness
+    caP->stringValue = "";
+    caP->valueType   = orion::ValueTypeNumber;
+
+  }
+
   return "OK";
 }
 

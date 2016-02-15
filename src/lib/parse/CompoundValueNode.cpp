@@ -655,10 +655,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
-    char num[32];
-    snprintf(num, sizeof(num), "%f", numberValue);
-    std::string effectiveValue = num;
-    out = valueTag(indent, tagName, effectiveValue, format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, tagName, toString(numberValue), format, jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -759,18 +756,14 @@ std::string CompoundValueNode::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    char  num[32];
-
     LM_T(LmtCompoundValueRender, ("I am a Number (%s)", name.c_str()));
-    snprintf(num, sizeof(num), "%f", numberValue);
-
     if (container->valueType == orion::ValueTypeVector)
     {
-      out = JSON_NUMBER(num);
+      out = JSON_NUMBER(toString(numberValue));
     }
     else
     {
-      out = JSON_STR(tagName) + ":" + JSON_NUMBER(num);
+      out = JSON_STR(tagName) + ":" + JSON_NUMBER(toString(numberValue));
     }
   }
   else if (valueType == orion::ValueTypeBoolean)

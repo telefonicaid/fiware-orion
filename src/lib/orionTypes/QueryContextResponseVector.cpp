@@ -110,7 +110,7 @@ void QueryContextResponseVector::present(void)
         ContextAttribute* aP = ceP->contextAttributeVector[aIx];
         LM_T(LmtPresent, ("  attribute %02d: %s: %s", 
 			  aIx, aP->name.c_str(), 
-			  aP->toStringValue().c_str()));
+        aP->getValue().c_str()));
       }
     }
 
