@@ -1,4 +1,4 @@
-# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,40 +21,47 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-ONANYCHANGE omitting cond values
+Subscription Cache Throttling and expiration after Refresh
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+dbInit CB t1
+brokerStart CB 38,101 IPv4 -multiservice -subCacheIval 10
 accumulatorStart
 
 --SHELL--
 
 #
-# 01. Create ONANYCHANGE subscription
-# 02. Create entity E2 not covered by subscription (no notification)
-# 03. Create entity E1 covered by subscription with attributes A1 and A2 (notification)
-# 04. Update A1 (notification)
-# 05. Update A2 (notification)
-# 06. Append A3 (notification)
-# 07. Get accumulator dump (4 notifications)
+# 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs
+# 02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
+# 03. Create entity s01 w/ attr A w/o tenant
+# 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+# 05. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+# 06. Wait 5 secs so that the throttling of 4 secs is OK
+# 07. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
+# 08. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+# 09. Wait 6 secs more, to make subscription expire
+# 10. Modify entity s01 w/ attr A w/o tenant - no notification as expired
+# 11. Dump accumulator - see two notifications
 #
 
-echo "01. Create ONANYCHANGE subscription"
-echo "==================================="
+
+echo "01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs"
+echo "==========================================================================================="
 payload='{
   "entities": [
     {
-        "type": "T",
-        "isPattern": "false",
-        "id": "E1"
+      "isPattern": "true",
+      "id": "s0.*"
     }
   ],
-  "reference": "http://localhost:'$LISTENER_PORT'/notify",
-  "duration": "P1M",
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "PT21S",
+  "throttling": "PT4S",
   "notifyConditions": [
     {
-        "type": "ONCHANGE"
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
     }
   ]
 }'
@@ -63,205 +70,193 @@ echo
 echo
 
 
-echo "02. Create entity E2 not covered by subscription (no notification)"
-echo "=================================================================="
+echo "02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh"
+echo "============================================================================================"
+sleep 11
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "03. Create entity s01 w/ attr A w/o tenant"
+echo "=========================================="
 payload='{
-    "id": "E2",
-    "type": "T",
-    "isPattern": "false",
-    "attributes": [
-        {
-            "name": "A1",
-            "value": "10"
-        }
-    ]
+  "id": "s01",
+  "A": "03. Creation"
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
 
-echo "03. Create entity E1 covered by subscription with attributes A1 and A2 (notification)"
-echo "====================================================================================="
-payload='{
-    "id": "E1",
-    "type": "T",
-    "isPattern": "false",
-    "attributes": [
-        {
-            "name": "A1",
-            "value": "10"
-        },
-        {
-            "name": "A2",
-            "value": "20"
-        }
-    ]
-}'
-orionCurl --url /v1/contextEntities --payload "${payload}" --json
+echo "04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
+echo "============================================================================"
+payload='{ "A": "04. notification lost by throttling" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
 echo
 echo
 
 
-echo "04. Update A1 (notification)"
-echo "============================"
-payload='{
-    "value": "aa"
-}'
-orionCurl --url /v1/contextEntities/E1/attributes/A1 --payload "$payload" --json -X PUT
+echo "05. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
+echo "============================================================================"
+payload='{ "A": "05. notification lost by throttling" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
 echo
 echo
 
 
-echo "05. Update A2 (notification)"
-echo "============================"
-payload='{
-    "value": "bb"
-}'
-orionCurl --url /v1/contextEntities/E1/attributes/A2 --payload "$payload" --json -X PUT
+echo "06. To avoid a race condition in the order of notifications"
+echo "==========================================================="
+sleep 0.5s
+valgrindSleep 5
+echo 
+echo
+
+
+echo "07. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling"
+echo "================================================================================"
+payload='{ "A": "07. Modification" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
 echo
 echo
 
 
-echo "06. Append A3 (notification)"
-echo "============================"
-payload='{
-    "value": "cc"
-}'
-orionCurl --url /v1/contextEntities/E1/attributes/A3 --payload "$payload" --json -X POST
+echo "08. Modify entity s01 w/ attr A=5 w/o tenant - notification lost by throttling"
+echo "=============================================================================="
+payload='{ "A": "08. notification lost by throttling" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
 echo
 echo
 
 
-echo "Get accumulator dump (4 notifications)"
-echo "===================================="
+echo "09. Wait 6 secs more, to make subscription expire"
+echo "================================================="
+sleep 6
+valgrindSleep 6
+echo
+echo
+
+
+echo "10. Modify entity s01 w/ attr A w/o tenant - no notification as expired"
+echo "======================================================================="
+payload='{ "A": "10. no notification as expired" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Dump accumulator - see two notifications"
+echo "============================================"
 accumulatorDump
 echo
 echo
 
 
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1|2))",
+#
+# If started with -noCache:  0
+# Normal start:              1
+# Under valgrind:            2 (possibly, depending on timing)
+#
+
+
 --REGEXPECT--
-01. Create ONANYCHANGE subscription
-===================================
+01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs
+===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 137
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P1M",
-        "subscriptionId": "REGEX([0-9a-f]{24})"
+        "duration": "PT21S",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT4S"
     }
 }
 
 
-02. Create entity E2 not covered by subscription (no notification)
-==================================================================
+02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
+============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 309
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextResponses": [
-        {
-            "attributes": [
-                {
-                    "name": "A1",
-                    "type": "",
-                    "value": ""
-                }
-            ],
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ],
-    "id": "E2",
-    "isPattern": "false",
-    "type": "T"
+    "ids": "REGEX([0-9a-f]{24})",
+    "inserts": REGEX((1|2)),
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 0,
+    "updates": 0
 }
 
 
-03. Create entity E1 covered by subscription with attributes A1 and A2 (notification)
-=====================================================================================
-HTTP/1.1 200 OK
-Content-Length: 401
-Content-Type: application/json
+03. Create entity s01 w/ attr A w/o tenant
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/s01
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "attributes": [
-                {
-                    "name": "A1",
-                    "type": "",
-                    "value": ""
-                },
-                {
-                    "name": "A2",
-                    "type": "",
-                    "value": ""
-                }
-            ],
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ],
-    "id": "E1",
-    "isPattern": "false",
-    "type": "T"
-}
 
 
-04. Update A1 (notification)
-============================
-HTTP/1.1 200 OK
-Content-Length: 46
-Content-Type: application/json
+04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "code": "200",
-    "reasonPhrase": "OK"
-}
 
 
-05. Update A2 (notification)
-============================
-HTTP/1.1 200 OK
-Content-Length: 46
-Content-Type: application/json
+05. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "code": "200",
-    "reasonPhrase": "OK"
-}
 
 
-06. Append A3 (notification)
-============================
-HTTP/1.1 200 OK
-Content-Length: 46
-Content-Type: application/json
+06. Wait 5 secs so that the throttling of 4 secs is OK
+======================================================
+
+
+07. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
+================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-    "code": "200",
-    "reasonPhrase": "OK"
-}
 
 
-Get accumulator dump (4 notifications)
-====================================
+08. Modify entity s01 w/ attr A=5 w/o tenant - notification lost by throttling
+==============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. Wait 6 secs more, to make subscription expire
+=================================================
+
+
+10. Modify entity s01 w/ attr A w/o tenant - no notification as expired
+=======================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+11. Dump accumulator - see two notifications
+============================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 561
+Content-Length: 466
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -273,19 +268,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "T",
+        "type" : "",
         "isPattern" : "false",
-        "id" : "E1",
+        "id" : "s01",
         "attributes" : [
           {
-            "name" : "A1",
+            "name" : "A",
             "type" : "",
-            "value" : "10"
-          },
-          {
-            "name" : "A2",
-            "type" : "",
-            "value" : "20"
+            "value" : "03. Creation"
           }
         ]
       },
@@ -298,7 +288,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 561
+Content-Length: 470
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -310,98 +300,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "T",
+        "type" : "",
         "isPattern" : "false",
-        "id" : "E1",
+        "id" : "s01",
         "attributes" : [
           {
-            "name" : "A1",
+            "name" : "A",
             "type" : "",
-            "value" : "aa"
-          },
-          {
-            "name" : "A2",
-            "type" : "",
-            "value" : "20"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Content-Length: 561
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/json; charset=utf-8
-
-{
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "",
-            "value" : "aa"
-          },
-          {
-            "name" : "A2",
-            "type" : "",
-            "value" : "bb"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Content-Length: 665
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/json; charset=utf-8
-
-{
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "",
-            "value" : "aa"
-          },
-          {
-            "name" : "A2",
-            "type" : "",
-            "value" : "bb"
-          },
-          {
-            "name" : "A3",
-            "type" : "",
-            "value" : "cc"
+            "value" : "07. Modification"
           }
         ]
       },
@@ -417,5 +323,5 @@ Content-Type: application/json; charset=utf-8
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop $LISTENER_PORT
 dbDrop CB
+dbDrop CB t1
