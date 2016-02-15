@@ -55,6 +55,7 @@ echo
 echo "02. Sleep 3 secs, awaiting a log summary report"
 echo "==============================================="
 sleep 3
+valgrindSleep 5
 echo
 echo
 
@@ -112,7 +113,6 @@ Date: REGEX(.*)
 
 02. Sleep 3 secs, awaiting a log summary report
 ===============================================
-
 
 03. grep SUMMARY in log-file (4 transactions, 1 bad input)
 ==========================================================

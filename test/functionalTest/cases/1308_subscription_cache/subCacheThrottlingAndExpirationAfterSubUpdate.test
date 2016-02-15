@@ -116,15 +116,19 @@ echo
 echo
 
 
-echo "05. Wait 5 secs so that the throttling of 4 secs is OK"
+echo "05. To avoid a race condition in the order of notifications"
 echo "======================================================"
-if [ "$VALGRIND" == "" ]
+sleep 0.5s
+valgrindSleep 4
+
+
+# Subscribe for 5 seconds (6 if VALGRIND)
+duration=PT5S
+if [ "$VALGRIND" == 1 ]
 then
-  sleep 5
-else
-  sleep 4
+  duration=PT6S
 fi
-echo
+echo 
 echo
 
 
