@@ -36,6 +36,8 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "parse/forbiddenChars.h"
+#include "rest/OrionError.h"
 
 
 
@@ -64,6 +66,18 @@ std::string getEntityAttributeValue
   std::string  answer;
   std::string  type       = ciP->uriParam["type"];
   bool         text       = (ciP->uriParamOptions["options"] == true || ciP->outFormat == TEXT);
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");

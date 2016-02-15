@@ -36,7 +36,7 @@
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "rest/OrionError.h"
-
+#include "parse/forbiddenChars.h"
 
 
 /* ****************************************************************************
@@ -70,6 +70,12 @@ std::string putEntity
 
   eP->id   = compV[2];
   eP->type = ciP->uriParam["type"];
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "REPLACE");

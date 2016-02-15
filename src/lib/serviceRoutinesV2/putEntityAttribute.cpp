@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -34,6 +35,7 @@
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttribute.h"
 #include "rest/OrionError.h"
+#include "parse/forbiddenChars.h"
 
 
 
@@ -65,6 +67,18 @@ std::string putEntityAttribute
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
+
+  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   // 01. Fill in UpdateContextRequest from URL and payload
   parseDataP->attr.attribute.name = attributeName;

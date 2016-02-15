@@ -27,6 +27,6 @@
 */
 
 #define MORE_MATCHING_ENT "More than one matching entity. Please refine your query"
-
+#define INVAL_CHAR_URI    "invalid character in URI"
 
 #endif // SRC_LIB_COMMON_ERRORMESSAGES_H

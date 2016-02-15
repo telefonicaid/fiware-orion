@@ -28,6 +28,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -35,7 +36,8 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
-
+#include "rest/OrionError.h"
+#include "parse/forbiddenChars.h"
 
 
 /* ****************************************************************************
@@ -63,6 +65,12 @@ std::string getEntity
 {
    std::string attrs  = ciP->uriParam["attrs"];
    std::string type   = ciP->uriParam["type"];
+
+   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+   {
+     OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+     return oe.render(ciP, "");
+   }
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");

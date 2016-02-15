@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Entities.h"
 #include "ngsi/ParseData.h"
@@ -38,7 +39,7 @@
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
-
+#include "parse/forbiddenChars.h"
 
 
 /* ****************************************************************************
@@ -66,6 +67,12 @@ std::string postEntity
 
   eP->id   = compV[2];
   eP->type = ciP->uriParam["type"];
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   if (ciP->uriParamOptions["append"] == true) // pure-append
   {
