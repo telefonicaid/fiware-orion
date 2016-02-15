@@ -540,7 +540,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | entities_id      | "<entities_id>" |
       | attributes_name  | "temperature"   |
       | attributes_value | 34              |
-      | attributes_type  | "celcius"       |
+      | attributes_type  | "celsius"       |
       | metadatas_name   | "very_hot"      |
       | metadatas_type   | "alarm"         |
       | metadatas_value  | "hot"           |
@@ -750,7 +750,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | random=256    |
 
   @only_type_list.row<row.id>
-  @only_type_list @BUG_1749 @skip
+  @only_type_list @BUG_1749
   Scenario Outline:  list all entities using NGSI v2 with only type query parameter with a list of types
     Given  a definition of headers
       | parameter          | value               |
@@ -836,7 +836,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | entities_id      | "bedroom"         |
       | attributes_name  | "temperature"     |
       | attributes_value | 34                |
-      | attributes_type  | "celcius"         |
+      | attributes_type  | "celsius"         |
       | metadatas_name   | "very_hot"        |
       | metadatas_type   | "alarm"           |
       | metadatas_value  | "hot"             |

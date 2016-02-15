@@ -61,6 +61,13 @@
 
 /* ****************************************************************************
 *
+* other special types
+*/
+#define DATE_TYPE  "date"
+
+
+/* ****************************************************************************
+*
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
 * 
 * It has been suggested to use RequestType enum (in Request.h) instead of this

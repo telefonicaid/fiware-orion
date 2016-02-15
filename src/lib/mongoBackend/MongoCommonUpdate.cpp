@@ -1978,7 +1978,7 @@ static bool updateContextAttributeItem
       cerP->statusCode.fill(SccInvalidParameter,
                             std::string("action: UPDATE") +
                             " - entity: [" + eP->toString() + "]" +
-                            " - offending attribute: " + targetAttr->toString());
+                            " - offending attribute: " + targetAttr->getName());
 
       /* Although ca has been already pushed into cerP, it can be used */
       ca->found = false;
@@ -2002,7 +2002,7 @@ static bool updateContextAttributeItem
           SccInvalidParameter,
           std::string("action: UPDATE") +
           " - entity: [" + eP->toString() + "]" +
-          " - offending attribute: " + targetAttr->toString() +
+          " - offending attribute: " + targetAttr->getName() +
           " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
     alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
     return false;
@@ -2018,7 +2018,7 @@ static bool updateContextAttributeItem
             SccInvalidParameter,
             std::string("action: UPDATE") +
             " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->toString() +
+            " - offending attribute: " + targetAttr->getName() +
             " - attempt to define a location attribute [" + targetAttr->name + "]" +
             " when another one has been previously defined [" + *currentLocAttrName + "]");
       alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
@@ -2034,7 +2034,7 @@ static bool updateContextAttributeItem
         cerP->statusCode.fill(SccInvalidParameter,
                               std::string("action: UPDATE") +
                               " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
+                              " - offending attribute: " + targetAttr->getName() +
                               " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
         alarmMgr.badInput(clientIp, "error parsing location attribute");
         return false;
@@ -2058,7 +2058,7 @@ static bool updateContextAttributeItem
       cerP->statusCode.fill(SccInvalidParameter,
                             std::string("action: UPDATE") +
                             " - entity: [" + eP->toString() + "]" +
-                            " - offending attribute: " + targetAttr->toString() +
+                            " - offending attribute: " + targetAttr->getName() +
                             " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
       alarmMgr.badInput(clientIp, "error parsing location attribute");
       return false;
@@ -2100,7 +2100,7 @@ static bool appendContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter,
                           std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->toString() +
+                          " - offending attribute: " + targetAttr->getName() +
                           " - attribute can not be appended");
     alarmMgr.badInput(clientIp, "attribute can not be appended");
     return false;
@@ -2121,7 +2121,7 @@ static bool appendContextAttributeItem
           SccInvalidParameter,
           std::string("action: APPEND") +
           " - entity: [" + eP->toString() + "]" +
-          " - offending attribute: " + targetAttr->toString() +
+          " - offending attribute: " + targetAttr->getName() +
           " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
     alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
     return false;
@@ -2135,7 +2135,7 @@ static bool appendContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter,
                           std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->toString() +
+                          " - offending attribute: " + targetAttr->getName() +
                           " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
     alarmMgr.badInput(clientIp, "error parsing location attribute");
     return false;
@@ -2151,7 +2151,7 @@ static bool appendContextAttributeItem
             SccInvalidParameter,
             std::string("action: APPEND") +
             " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->toString() +
+            " - offending attribute: " + targetAttr->getName() +
             " - attempt to define a location attribute [" + targetAttr->name + "]" +
             " when another one has been previously defined [" + *currentLocAttrName + "]");
       alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
@@ -2175,7 +2175,7 @@ static bool appendContextAttributeItem
             SccInvalidParameter,
             std::string("action: APPEND") +
             " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->toString() +
+            " - offending attribute: " + targetAttr->getName() +
             " - attempt to define a location attribute [" + targetAttr->name + "]" +
             " when another one has been previously defined [" + *currentLocAttrName + "]");
       alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
@@ -2231,7 +2231,7 @@ static bool deleteContextAttributeItem
       cerP->statusCode.fill(SccInvalidParameter,
                             std::string("action: DELETE") +
                             " - entity: [" + eP->toString() + "]" +
-                            " - offending attribute: " + targetAttr->toString() +
+                            " - offending attribute: " + targetAttr->getName() +
                             " - location attribute has to be defined at creation time, with APPEND");
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
@@ -2255,7 +2255,7 @@ static bool deleteContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter,
                           std::string("action: DELETE") +
                           " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->toString() +
+                          " - offending attribute: " + targetAttr->getName() +
                           " - attribute not found");
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
     ca->found = false;
@@ -2514,7 +2514,7 @@ static bool createEntity
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),
                     attrsV[ix]->type.c_str(),
-                    attrsV[ix]->toStringValue().c_str()));
+                    attrsV[ix]->getValue().c_str()));
 
     /* Custom metadata */
     BSONObj mdV;

@@ -87,10 +87,10 @@ typedef struct ContextAttribute
   std::string  toJsonAsValue(ConnectionInfo* ciP);
   void         present(const std::string& indent, int ix);
   void         release(void);
-  std::string  toString(void);
+  std::string  getName(void);
 
   /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
-  std::string  toStringValue(void) const;
+  std::string  getValue(void) const;
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,
