@@ -30,18 +30,18 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity with wrong date
+# 01. Create entity with invalid date
 # 02. Check entity hasn't been created
 # 03. Create entity with right date
 # 04. Get entity
-# 05. Update entity with wrong date
+# 05. Update entity with invalid date
 # 06. Check entity hasn't been modified
 # 07. Update entity with right date
 # 08. Get entity
 #
 
-echo "01. Create entity with wrong date"
-echo "================================="
+echo "01. Create entity with invalid date"
+echo "==================================="
 payload='{
   "id": "E1",
   "type": "T1",
@@ -84,8 +84,8 @@ echo
 echo
 
 
-echo "05. Update entity with wrong date"
-echo "================================="
+echo "05. Update entity with invalid date"
+echo "==================================="
 payload='{
   "birthdate": {
     "value": "bar",
@@ -98,7 +98,7 @@ echo
 
 
 echo "06. Check entity hasn't been modified"
-echo "===================================="
+echo "====================================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
@@ -125,8 +125,8 @@ echo
 
 
 --REGEXPECT--
-01. Create entity with wrong date
-=================================
+01. Create entity with invalid date
+===================================
 HTTP/1.1 400 Bad Request
 Content-Length: 62
 Content-Type: application/json
@@ -178,8 +178,8 @@ Date: REGEX(.*)
 }
 
 
-05. Update entity with wrong date
-=================================
+05. Update entity with invalid date
+===================================
 HTTP/1.1 400 Bad Request
 Content-Length: 62
 Content-Type: application/json
@@ -192,7 +192,7 @@ Date: REGEX(.*)
 
 
 06. Check entity hasn't been modified
-====================================
+=====================================
 HTTP/1.1 200 OK
 Content-Length: 99
 Content-Type: application/json

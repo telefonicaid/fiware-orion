@@ -377,9 +377,7 @@ std::string ContextAttribute::renderAsJsonObject
         }
         else // regular number
         {
-          char num[32];
-          snprintf(num, sizeof(num), "%f", numberValue);
-          effectiveValue      = std::string(num);
+          effectiveValue      = toString(numberValue);
           valueIsNumberOrBool = true;
         }
         break;
@@ -516,9 +514,7 @@ std::string ContextAttribute::render
         }
         else // regular number
         {
-          char num[32];
-          snprintf(num, sizeof(num), "%f", numberValue);
-          effectiveValue      = num;
+          effectiveValue      = toString(numberValue);
           valueIsNumberOrBool = true;
         }
         break;
@@ -604,9 +600,7 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
       }
       else // regular number
       {
-        char num[32];
-        snprintf(num, sizeof(num), "%f", numberValue);
-        out += num;
+        out += toString(numberValue);
       }
     }
     else if (valueType == orion::ValueTypeString)
@@ -658,9 +652,7 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
       }
       else // regular number
       {
-        char num[32];
-        snprintf(num, sizeof(num), "%f", numberValue);
-        out += JSON_VALUE_NUMBER("value", num);
+        out += JSON_VALUE_NUMBER("value", toString(numberValue));
       }
     }
     else if (valueType == orion::ValueTypeString)
@@ -939,18 +931,18 @@ void ContextAttribute::release(void)
 
 /* ****************************************************************************
 *
-* toString - 
+* ContextAttribute::getName -
 */
-std::string ContextAttribute::toString(void)
+std::string ContextAttribute::getName(void)
 {
   return name;
 }
 
 /* ****************************************************************************
 *
-* toStringValue -
+* ContextAttribute::getValue -
 */
-std::string ContextAttribute::toStringValue(void) const
+std::string ContextAttribute::getValue(void) const
 {
   char buffer[64];
 

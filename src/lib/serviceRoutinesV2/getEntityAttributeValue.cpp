@@ -136,7 +136,7 @@ std::string getEntityAttributeValue
       }
       else
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->toStringValue());
+        TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
       }
 
       ciP->outFormat = TEXT;

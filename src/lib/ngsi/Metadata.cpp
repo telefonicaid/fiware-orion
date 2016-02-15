@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/limits.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -363,10 +364,7 @@ std::string Metadata::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    char num[32];
-
-    snprintf(num, sizeof(num), "%f", numberValue);
-    out += JSON_VALUE_NUMBER("value", num);
+    out += JSON_VALUE_NUMBER("value", toString(numberValue));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
