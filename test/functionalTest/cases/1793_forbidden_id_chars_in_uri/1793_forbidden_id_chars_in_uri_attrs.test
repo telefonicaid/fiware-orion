@@ -30,42 +30,42 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. PUT entity attribute with forbidden char in ID
-# 05. PUT entity attribute value with forbidden char in ID
-# 03. GET entity attribute with forbidden char in ID
-# 04. GET entity attrbute value with forbidden char in ID
+# 01. PUT entity attribute with forbidden char in attr name
+# 05. PUT entity attribute value with forbidden char in attr name
+# 03. GET entity attribute with forbidden char in attr name
+# 04. GET entity attrbute value with forbidden char in attr name
 #
 
 
-echo "01. PUT entity attribute with forbidden char in ID"
-echo "=================================================="
+echo "01. PUT entity attribute with forbidden char in attr name"
+echo "========================================================="
 payload='{ "value": 1 }'
 orionCurl --url '/v2/entities/E1/attrs/A&' -X PUT --payload "$payload" --json
 echo
 echo
 
-echo "02. PUT entity attribute value with forbidden char in ID"
-echo "========================================================"
+echo "02. PUT entity attribute value with forbidden char in attr name"
+echo "==============================================================="
 payload='{"value":1}'
 orionCurl --url '/v2/entities/E1/attrs/A&/value' -X PUT --payload "$payload" --json
 echo
 echo
 
-echo "03. GET entity attribute with forbidden char in ID"
-echo "=================================================="
+echo "03. GET entity attribute with forbidden char in attr name"
+echo "========================================================="
 orionCurl --url '/v2/entities/E1/attrs/A&' --json
 echo
 echo
 
-echo "04. GET entity attrbute value with forbidden char in ID"
-echo "======================================================="
+echo "04. GET entity attrbute value with forbidden char in attr name"
+echo "=============================================================="
 orionCurl --url '/v2/entities/E1/attrs/A&/value' --json
 echo
 echo
 
 --REGEXPECT--
-01. PUT entity attribute with forbidden char in ID
-==================================================
+01. PUT entity attribute with forbidden char in attr name
+=========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
@@ -77,8 +77,8 @@ Date: REGEX(.*)
 }
 
 
-02. PUT entity attribute value with forbidden char in ID
-========================================================
+02. PUT entity attribute value with forbidden char in attr name
+===============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
@@ -90,8 +90,8 @@ Date: REGEX(.*)
 }
 
 
-03. GET entity attribute with forbidden char in ID
-==================================================
+03. GET entity attribute with forbidden char in attr name
+=========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
@@ -103,8 +103,8 @@ Date: REGEX(.*)
 }
 
 
-04. GET entity attrbute value with forbidden char in ID
-=======================================================
+04. GET entity attrbute value with forbidden char in attr name
+==============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
