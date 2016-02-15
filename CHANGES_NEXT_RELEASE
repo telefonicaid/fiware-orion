@@ -17,4 +17,4 @@
 - Add: support for geo:point type as a way of specifying location attribute in NGSIv2 (Issue #1038)
 - Add: type param for PUT entity in v2 (Issue #988, #992, #1000)
 - Fix: not detecting forbidden chars in entityID for PATCH v2 (Issue #1782)
-- Add: detect forbidden chars in ids and atrr names in URI (Issue #1793)
+- Add: detect forbidden chars in ids and attr names in URI (Issue #1793)
