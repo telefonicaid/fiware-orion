@@ -66,7 +66,7 @@ std::string postBatchQuery
   std::string           answer;
 
   qcrP->fill(bqP);
-  bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed;
+  bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
 
   answer = postQueryContext(ciP, components, compV, parseDataP);
 

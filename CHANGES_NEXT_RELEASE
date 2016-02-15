@@ -19,4 +19,4 @@
 - Fix: not detecting forbidden chars in entityID for PATCH v2 (Issue #1782)
 - Add: detect forbidden chars in entity ids and attr names in URI (Issue #1793)
 - Add: dates support in attribute values (Issue #1038)
-- Add: implemented new request: POST /v2/op/query (Issue #1080)
+- Add: implemented new operation: POST /v2/op/query (Issue #1080)
