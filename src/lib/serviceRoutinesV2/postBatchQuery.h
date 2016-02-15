@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
-#define SRC_LIB_APITYPESV2_ERRORCODE_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_POSTBATCHQUERY_H_
+#define SRC_LIB_SERVICEROUTINESv2_POSTBATCHQUERY_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,31 +26,22 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
-
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
 
 /* ****************************************************************************
 *
-* ErrorCode - 
+* postBatchQuery -
 */
-typedef struct ErrorCode
-{
-  std::string     error;            // Mandatory
-  std::string     description;      // Mandatory
+extern std::string postBatchQuery
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  ErrorCode();
-  ErrorCode(const std::string& _error, const std::string& _description);
-
-  std::string  toJson(bool isLastElement);
-  void         fill(const std::string& _error, const std::string& _description);
-  void         fill(const StatusCode& sc);
-  void         present(const std::string& indent);
-  void         release(void);
-} ErrorCode;
-
-#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_
+#endif  // SRC_LIB_SERVICEROUTINESv2_POSTBATCHQUERY_H_

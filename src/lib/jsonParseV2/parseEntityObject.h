@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
-#define SRC_LIB_APITYPESV2_ERRORCODE_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEENTITYOBJECT_H_
+#define SRC_LIB_JSONPARSEV2_PARSEENTITYOBJECT_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,32 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
+#include "rapidjson/document.h"
 
-#include "common/Format.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+
+using namespace rapidjson;
 
 
 
 /* ****************************************************************************
 *
-* ErrorCode - 
+* parseEntityObject - 
 */
-typedef struct ErrorCode
-{
-  std::string     error;            // Mandatory
-  std::string     description;      // Mandatory
+extern std::string parseEntityObject(ConnectionInfo* ciP, const Value::GenericValue* value, Entity* eP, bool attrsAllowed);
 
-  ErrorCode();
-  ErrorCode(const std::string& _error, const std::string& _description);
-
-  std::string  toJson(bool isLastElement);
-  void         fill(const std::string& _error, const std::string& _description);
-  void         fill(const StatusCode& sc);
-  void         present(const std::string& indent);
-  void         release(void);
-} ErrorCode;
-
-#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSEENTITYOBJECT_H_

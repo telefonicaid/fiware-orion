@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
-#define SRC_LIB_APITYPESV2_ERRORCODE_H_
-
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,30 +24,46 @@
 */
 #include <string>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/AttributeList.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseAttributeList.h"
 
 
 
 /* ****************************************************************************
 *
-* ErrorCode - 
+* parseAttributeList - 
 */
-typedef struct ErrorCode
+std::string parseAttributeList
+(
+  ConnectionInfo*                    ciP,
+  const Value::ConstMemberIterator&  iter,
+  AttributeList*                     aP
+)
 {
-  std::string     error;            // Mandatory
-  std::string     description;      // Mandatory
+  std::string type = jsonParseTypeNames[iter->value.GetType()];
 
-  ErrorCode();
-  ErrorCode(const std::string& _error, const std::string& _description);
+  if (type != "Array")
+  {
+    return "the field /attributes/ must be a JSON array";
+  }
 
-  std::string  toJson(bool isLastElement);
-  void         fill(const std::string& _error, const std::string& _description);
-  void         fill(const StatusCode& sc);
-  void         present(const std::string& indent);
-  void         release(void);
-} ErrorCode;
+  for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
+  {
+    std::string  r;
+    std::string  val;
 
-#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_
+    type = jsonParseTypeNames[iter2->GetType()];
+
+    if (type != "String")
+    {
+      return "only JSON Strings allowed in attribute list";
+    }
+
+    val  = iter2->GetString();
+    aP->push_back(val);
+  }
+
+  return "OK";
+}

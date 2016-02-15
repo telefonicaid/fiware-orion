@@ -171,3 +171,31 @@ void ScopeVector::release(void)
 
   vec.clear();
 }
+
+
+
+/* ****************************************************************************
+*
+* ScopeVector::fill(ScopeVector) - 
+*
+* If the parameter 'copy' is set to false, then no copy of the scopes is made, 
+* they are just referenced from this ScopeVector as well.
+* This case is meant to save some time, allocating new scopes anf freeing the old scopes.
+* Doesn't make much sense to on allocate new and delete the 'original'.
+* So, what the caller of this method must do after calling ScopeVector::fill, is to
+* simply *clear* the original ScopeVector to avoid a double free on the scopes.
+*/
+void ScopeVector::fill(const ScopeVector& scopeV, bool copy)
+{
+  for (unsigned int ix = 0; ix < scopeV.vec.size(); ++ix)
+  {
+    if (copy == false)
+    {
+      vec.push_back(scopeV[ix]);
+    }
+    else
+    {
+      // FIXME P5: if this is ever needed, it must be implemented here
+    }
+  }
+}
