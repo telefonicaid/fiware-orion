@@ -145,28 +145,30 @@ def update_or_append_an_attribute_by_ID_in_raw_mode(context, entity_id):
     __logger__.info("...updated or appended an attribute by id in raw mode")
 
 
-@step(u'update an attribute by ID "([^"]*)" if it exists')
-def update_an_attribute_by_id_if_it_exists(context, entity_id):
+@step(u'update attributes by ID "([^"]*)" if it exists and with "([^"]*)" mode')
+def update_attributes_by_id_if_it_exists(context, entity_id, mode):
     """
-    update an attribute by ID if it exists
+    update attributes by ID if it exists
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized |behave keyValues)
     """
-    __logger__.debug("updating or appending an attribute by id if it exists...")
-    context.resp = context.cb.update_or_append_an_attribute_by_id("PATCH", context, entity_id)
-    __logger__.info("...updated or appended an attribute by id if it exists")
+    __logger__.debug("updating attributes by id if it exists (PATCH)...")
+    context.resp = context.cb.update_or_append_an_attribute_by_id("PATCH", context, entity_id, mode)
+    __logger__.info("...updated attributes by id if it exists")
 
 
-@step(u'update an attribute by ID "([^"]*)" if it exists in raw mode')
-def update_an_attribute_by_id_if_it_exists_in_raw_mode(context, entity_id):
+@step(u'update attributes by ID "([^"]*)" if it exists in raw and "([^"]*)" modes')
+def update_attributse_by_id_if_it_exists_in_raw_mode(context, entity_id, mode):
     """
-    update or append attributes by ID in raw mode
+    update attributes by ID if it exists in raw mode
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized |behave keyValues)
     """
-    __logger__.debug("updating or appending an attribute by id in raw mode if it exists...")
-    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("PATCH", context, entity_id)
-    __logger__.info("...updated or appended an attribute by id in raw mode if it exists")
+    __logger__.debug("updating attributes by id in raw mode if it exists (PATCH)...")
+    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("PATCH", context, entity_id, mode)
+    __logger__.info("...updated attributes by id in raw mode if it exists")
 
 
 @step(u'replace attributes by ID "([^"]*)"')

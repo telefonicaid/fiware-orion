@@ -122,9 +122,8 @@ class NGSI:
                     " ERROR -- attribute: %s is not stored in mongo" % attr_name
                 assert entities_contexts["attributes_value"] == entity[u'attrs'][attr_name][u'value'], \
                     " ERROR -- attribute value: %s is not stored successful in mongo" % str(entities_contexts["attributes_value"])
-                if entities_contexts["attributes_type"] is None:
-                    entities_contexts["attributes_type"] = EMPTY
-                assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
+                if entities_contexts["attributes_type"] is not None:
+                    assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
                     " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
                 # verify metadatas
                 if entities_contexts["metadatas_number"] > 0:
@@ -616,7 +615,7 @@ class NGSI:
                 "id":"room_0",
                 "type":"house",
                 "temperature_0":{
-                    "type":"celcius",
+                    "type":"celsius",
                     "value":"34",
                     "very_hot_1":{
                         "type":"alarm",
