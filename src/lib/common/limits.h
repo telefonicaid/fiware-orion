@@ -62,8 +62,9 @@
 * Others -
 *
 */
-#define IP_LENGTH_MAX        15    // Based on xxx.xxx.xxx.xxx
-#define STRING_SIZE_FOR_INT  16    // Room enough for an integer
+#define IP_LENGTH_MAX           15    // Based on xxx.xxx.xxx.xxx
+#define STRING_SIZE_FOR_INT     16    // Room enough for an integer
+#define STRING_SIZE_FOR_DOUBLE  64    // Room enough for a double
 
 
 /* ****************************************************************************

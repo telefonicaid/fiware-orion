@@ -162,13 +162,15 @@ int Scope::fill
 
     if (!str2double(coordV[0].c_str(), &latitude))
     {
-      *errorStringP = "non-numeric latitude-coordinate in URI param /coords/";
+      // *errorStringP = "non-numeric latitude-coordinate in URI param /coords/";
+      *errorStringP = "invalid coordinates";
       return -1;
     }
 
-    if (!str2double(coordV[0].c_str(), &longitude))
+    if (!str2double(coordV[1].c_str(), &longitude))
     {
-      *errorStringP = "non-numeric longitude-coordinate in URI param /coords/";
+      // *errorStringP = "non-numeric longitude-coordinate in URI param /coords/";
+      *errorStringP = "invalid coordinates";
       return -1;
     }
 
@@ -192,7 +194,7 @@ int Scope::fill
     {
       if (pointV.size() != 1)
       {
-        *errorStringP = "too many coordinates for circle";
+        *errorStringP = "Too many coordinates for circle";
         pointVectorRelease(pointV);
         pointV.clear();
         return -1;
@@ -200,7 +202,6 @@ int Scope::fill
 
       areaType = orion::CircleType;
 
-      LM_W(("KZ: setting radius: %f", geometry.radius));
       circle.radiusSet(geometry.radius);
       circle.invertedSet(geometry.external);
       circle.centerSet(pointV[0]);
@@ -211,6 +212,42 @@ int Scope::fill
   {
     areaType = orion::PolygonType;
     
+    if ((apiVersion == "v1") && (pointV.size() < 3))
+    {
+      *errorStringP = "Too few coordinates for polygon";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+#if 1  // for now ...
+    if ((apiVersion == "v2") && (pointV.size() < 3))
+    {
+      *errorStringP = "Too few coordinates for polygon";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+#else
+    else if ((apiVersion == "v2") && (pointV.size() < 4))
+    {
+      *errorStringP = "Too few coordinates for polygon";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+
+    //
+    // If v2, first and last point must be identical
+    //
+    if ((apiVersion == "v2") && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
+    {
+      *errorStringP = "First and last point in polygon not the same";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+#endif
+
     polygon.invertedSet(geometry.external);
 
     for (unsigned int ix = 0; ix < pointV.size(); ++ix)

@@ -42,7 +42,7 @@ namespace orion
 *
 * Point::Point - 
 */
-Point::Point()
+Point::Point(): valid(true), lat(0), lon(0)
 {
 }
 
@@ -52,9 +52,12 @@ Point::Point()
 *
 * Point::Point - 
 */
-Point::Point(::std::string latitude, ::std::string longitude): _latitude(latitude), _longitude(longitude)
+Point::Point(::std::string latitude, ::std::string longitude): valid(true)
 {
-
+  if ((str2double(latitude.c_str(), &lat) == false) || (str2double(longitude.c_str(), &lon) == false))
+  {
+    valid = false;
+  }
 }
 
 
@@ -89,8 +92,7 @@ void Point::fill(Point* p)
 */
 double Point::latitude(void) const
 {
-  // NOTE: here we use atof and not str2double on purpose
-  return atof(_latitude.c_str());
+  return lat;
 }
 
 
@@ -100,8 +102,7 @@ double Point::latitude(void) const
 */
 double Point::longitude(void) const
 {
-  // NOTE: here we use atof and not str2double on purpose
-  return atof(_longitude.c_str());
+  return lon;
 }
 
 
@@ -111,7 +112,7 @@ double Point::longitude(void) const
 */
 void Point::latitudeSet(::std::string latitude)
 {
-  _latitude  = latitude;
+  valid = str2double(latitude.c_str(), &lat);
 }
 
 
@@ -122,7 +123,23 @@ void Point::latitudeSet(::std::string latitude)
 */
 void Point::longitudeSet(::std::string longitude)
 {
-  _longitude = longitude;
+  valid = str2double(longitude.c_str(), &lon);
+}
+
+
+
+/* ****************************************************************************
+*
+* Point::equals -
+*/
+bool Point::equals(Point* p)
+{
+  if ((p->lat != lat) || (p->lon != lon))
+  {
+    return false;
+  }
+
+  return true;
 }
 
 
@@ -133,7 +150,10 @@ void Point::longitudeSet(::std::string longitude)
 */
 ::std::string Point::latitudeString(void)
 {
-  return _latitude;
+  char cV[STRING_SIZE_FOR_DOUBLE]; 
+
+  snprintf(cV, sizeof(cV), "%f", lat);
+  return cV;
 }
 
 
@@ -143,7 +163,10 @@ void Point::longitudeSet(::std::string longitude)
 */
 ::std::string Point::longitudeString(void)
 {
-  return _longitude;
+  char cV[STRING_SIZE_FOR_DOUBLE]; 
+
+  snprintf(cV, sizeof(cV), "%f", lon);
+  return cV;
 }
 
 
@@ -239,7 +262,9 @@ bool Circle::inverted(void) const
 double Circle::radius(void) const
 {
   // NOTE: here we use atof and not str2double on purpose
-  return atof(_radius.c_str());
+  float r = atof(_radius.c_str());
+
+  return r;
 }
 
 
@@ -250,7 +275,7 @@ double Circle::radius(void) const
 */
 ::std::string Circle::radiusString(void) const
 {
-  return  _radius;
+  return _radius;
 }
 
 
@@ -318,9 +343,9 @@ void Circle::invertedSet(bool inverted)
 *
 * Circle::centerSet -
 */
-void Circle::centerSet(Point* _center)
+void Circle::centerSet(Point* centerP)
 {
-  center.fill(_center);
+  center.fill(centerP);
 }
 
 
@@ -553,7 +578,6 @@ int Geometry::parse(const char* in, std::string* errorString)
       }
 
       areaType = items[ix];
-      LM_W(("KZ: Got an areaType of %s", areaType.c_str()));
     }
     else if (strncmp(items[ix].c_str(), "radius", 6) == 0)
     {
@@ -564,12 +588,10 @@ int Geometry::parse(const char* in, std::string* errorString)
         *errorString = "Invalid value of /radius/";
         return -1;
       }
-      LM_W(("KZ: Got a radius of '%f'", radius));
     }
     else if (items[ix] == "external")
     {
       external = true;
-      LM_W(("KZ: Got an EXTERNAL"));
     }
     else
     {

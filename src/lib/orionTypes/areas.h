@@ -56,10 +56,9 @@ typedef enum AreaType
 class Point
 {
  private:
-  ::std::string _latitude;
-  ::std::string _longitude;
-  double        lat;
-  double        lon;
+  bool    valid;
+  double  lat;
+  double  lon;
 
  public:
   Point();
@@ -69,8 +68,12 @@ class Point
   void   fill(Point* p);
   double latitude(void) const;
   double longitude(void) const;
+  void   latitudeSet(double latitude);
   void   latitudeSet(::std::string latitude);
+  void   longitudeSet(double longitude);
   void   longitudeSet(::std::string longitude);
+  bool   equals(Point* p);
+
   ::std::string latitudeString(void);
   ::std::string longitudeString(void);
 };

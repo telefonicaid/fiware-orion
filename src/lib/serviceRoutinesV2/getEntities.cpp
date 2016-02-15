@@ -174,75 +174,12 @@ std::string getEntities
       return out;
     }
 
-    LM_W(("KZ: radius in scope: %f", scopeP->circle.radius()));
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
-
-#if 0
-  // Making sure geometry is valid (if present) - TAKEN CARE OF BY Scope::fill()
-  orion::Geometry           geo;
-  std::vector<std::string>  coordsV;
-
-  if (geometry != "")
-  {
-    std::string  errorString;
-
-    if (geo.parse(geometry.c_str(), &errorString) != 0)
-    {
-      OrionError oe(SccBadRequest, std::string("error parsing geometry: ") + errorString);
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-
-      return out;
-    }
-
-    if ((geo.areaType != "polygon") && (geo.areaType != "circle"))
-    {
-      OrionError oe(SccBadRequest, "URI param /geometry/ must be either /polygon/ or /circle/");
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-
-      return out;
-    }
-
-    //
-    // As 'geometry' is present, so is 'coords' - checking coords
-    //
-    int noOfCoords = stringSplit(coords, ';', coordsV);
-
-    if (noOfCoords == 0)
-    {
-      OrionError oe(SccBadRequest, "URI param /coords/ has no coordinates");
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-
-      return out;
-    }
-
-    if ((geo.areaType == "circle") && (noOfCoords != 1))
-    {
-      OrionError oe(SccBadRequest, "Too many coordinates for circle");
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-
-      return out;
-    }
-
-    if ((geo.areaType == "polygon") && (noOfCoords < 3))
-    {
-      OrionError oe(SccBadRequest, "Too few coordinates for polygon");
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-
-      return out;
-    }
-  }
-#endif
 
   //
   // 01. Fill in QueryContextRequest - type "" is valid for all types
   //
-
 
   // If URI param 'q' is given, its value must be put in a scope
   if (q != "")
@@ -252,31 +189,6 @@ std::string getEntities
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
-
-#if 0
-  // If URI params 'geometry' and 'coords' are given, another scope is to be created for this
-  if ((coords != "") && (geometry != ""))
-  {
-    //
-    // Sanity check of coords
-    //
-    for (unsigned int ix = 0; ix < coordsV.size(); ++ix)
-    {
-      double                    d;
-      std::string               copy = coordsV[ix];
-      std::vector<std::string>  cV;
-      
-      stringSplit(copy, ',', cV);
-
-      if ((cV.size() != 2) || (str2double(cV[0].c_str(), &d) == false) || (str2double(cV[1].c_str(), &d) == false))
-      {
-        OrionError oe(SccBadRequest, "invalid coordinates");
-        TIMED_RENDER(out = oe.render(ciP, ""));
-        return out;
-      }
-    }
-  }
-#endif
 
   //
   // URI param 'type', three options:
