@@ -38,7 +38,7 @@ using namespace rapidjson;
 *
 * parseEntityObject - 
 */
-std::string parseEntityObject(ConnectionInfo* ciP, const Value::GenericValue* valueP, Entity* eP, bool attrsAllowed)
+std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Entity* eP, bool attrsAllowed)
 {
   std::string type  = jsonParseTypeNames[valueP->GetType()];
 
