@@ -124,7 +124,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 979
+Content-Length: 924
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -143,14 +143,14 @@ Date: REGEX(.*)
     "int_object": {
         "metadata": {},
         "type": "TA1",
-        "value": 21.0
+        "value": 21
     },
     "object_object": {
         "metadata": {},
         "type": "TA1",
         "value": {
-            "a": 1.0,
-            "b": 2.0
+            "a": 1,
+            "b": 2
         }
     },
     "string_object": {
@@ -184,7 +184,7 @@ Date: REGEX(.*)
             },
             "md_int": {
                 "type": null,
-                "value": 1.0
+                "value": 1
             },
             "md_object_false": {
                 "type": "MDBOOL",
@@ -196,7 +196,7 @@ Date: REGEX(.*)
             },
             "md_object_int": {
                 "type": "MDINT",
-                "value": 1.0
+                "value": 1
             },
             "md_object_string": {
                 "type": "MDSTRING",
@@ -216,7 +216,7 @@ Date: REGEX(.*)
             }
         },
         "type": "MT1",
-        "value": 0.0
+        "value": 0
     }
 }
 

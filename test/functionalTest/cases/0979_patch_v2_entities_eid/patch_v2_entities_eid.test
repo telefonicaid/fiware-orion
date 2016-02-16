@@ -110,7 +110,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -118,12 +118,12 @@ Date: REGEX(.*)
     "attr1": {
         "metadata": {},
         "type": null,
-        "value": 2.0
+        "value": 2
     },
     "attr2": {
         "metadata": {},
         "type": null,
-        "value": 2.0
+        "value": 2
     },
     "id": "E1",
     "type": "T1"
@@ -141,7 +141,7 @@ Date: REGEX(.*)
 05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -149,12 +149,12 @@ Date: REGEX(.*)
     "attr1": {
         "metadata": {},
         "type": null,
-        "value": 4.0
+        "value": 4
     },
     "attr2": {
         "metadata": {},
         "type": null,
-        "value": 2.0
+        "value": 2
     },
     "id": "E1",
     "type": "T1"

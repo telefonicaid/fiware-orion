@@ -75,7 +75,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 185
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -83,7 +83,7 @@ Date: REGEX(.*)
     "attr01": {
         "metadata": {},
         "type": null,
-        "value": 7.0
+        "value": 7
     },
     "attr02": {
         "metadata": {},
@@ -93,7 +93,7 @@ Date: REGEX(.*)
     "attr03": {
         "metadata": {},
         "type": "number",
-        "value": 9.0
+        "value": 9
     },
     "id": "E1",
     "type": "T1"

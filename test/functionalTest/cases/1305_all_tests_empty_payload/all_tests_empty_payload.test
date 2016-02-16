@@ -426,14 +426,14 @@ Date: REGEX(.*)
 17a. GET /v2/entities/E1/attrs/A1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 37
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": 0.0
+    "value": 0
 }
 
 
@@ -448,14 +448,14 @@ Date: REGEX(.*)
 17c. GET /v2/entities/E1/attrs/A1 - A1 should be as in 17a
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 37
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": 0.0
+    "value": 0
 }
 
 

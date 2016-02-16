@@ -115,7 +115,7 @@ Date: REGEX(.*)
 02. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 237
+Content-Length: 230
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -123,7 +123,7 @@ Date: REGEX(.*)
     "humidity": {
         "metadata": {},
         "type": null,
-        "value": 78.0
+        "value": 78
     },
     "id": "Room10",
     "temperature": {
@@ -155,7 +155,7 @@ Date: REGEX(.*)
 04. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 233
+Content-Length: 226
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -163,7 +163,7 @@ Date: REGEX(.*)
     "humidity": {
         "metadata": {},
         "type": null,
-        "value": 78.0
+        "value": 78
     },
     "id": "Room10",
     "temperature": {

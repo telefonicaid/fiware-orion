@@ -113,7 +113,7 @@ Date: REGEX(.*)
 02. Get E1/A1
 =============
 HTTP/1.1 200 OK
-Content-Length: 88
+Content-Length: 81
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -123,7 +123,7 @@ Date: REGEX(.*)
         "type": "AT1",
         "value": {
             "a": null,
-            "b": 0.0
+            "b": 0
         }
     },
     "id": "E1",
