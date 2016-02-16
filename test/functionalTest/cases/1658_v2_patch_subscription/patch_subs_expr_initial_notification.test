@@ -238,7 +238,7 @@ Date: REGEX(.*)
 08. Dump accumulator (1 notification with E1+E2)
 ================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1278
+Content-Length: 1250
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -257,7 +257,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "humidity",
             "type" : "",
-            "value" : 80.000000
+            "value" : 80
           },
           {
             "name" : "status",
@@ -267,7 +267,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "temperature",
             "type" : "",
-            "value" : 20.000000
+            "value" : 20
           }
         ]
       },
@@ -285,7 +285,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "humidity",
             "type" : "",
-            "value" : 70.000000
+            "value" : 70
           },
           {
             "name" : "status",
@@ -295,7 +295,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "temperature",
             "type" : "",
-            "value" : 30.000000
+            "value" : 30
           }
         ]
       },

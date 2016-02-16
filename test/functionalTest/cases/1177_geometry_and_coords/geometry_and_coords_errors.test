@@ -127,92 +127,92 @@ Date: REGEX(.*)
 
 02. GET /v2/entities with erroneous areaType - ERROR
 ====================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 105
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "error parsing geometry: Invalid selector in geometry specification",
-    "error": "BadRequest"
+    "description": "Query not supported: error parsing geometry: Invalid selector in geometry specification",
+    "error": "InvalidModification"
 }
 
 
 03. GET /v2/entities with Geometry but no Coordinates - ERROR
 =============================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 81
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "URI param /geometry/ used without /coords/",
-    "error": "BadRequest"
+    "description": "Query not supported: URI param /geometry/ used without /coords/",
+    "error": "InvalidModification"
 }
 
 
 04. GET /v2/entities with Coordinates but no Geometry - ERROR
 =============================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 81
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 111
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "URI param /coords/ used without /geometry/",
-    "error": "BadRequest"
+    "description": "Query not supported: URI param /coords/ used without /geometry/",
+    "error": "InvalidModification"
 }
 
 
 05. GET /v2/entities with Polygon with only two vertices - ERROR
 ================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 70
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 100
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Too few coordinates for polygon",
-    "error": "BadRequest"
+    "description": "Query not supported: Too few coordinates for polygon",
+    "error": "InvalidModification"
 }
 
 
 06. GET /v2/entities with Circle with two vertices - ERROR
 ==========================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 70
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 100
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Too many coordinates for circle",
-    "error": "BadRequest"
+    "description": "Query not supported: Too many coordinates for circle",
+    "error": "InvalidModification"
 }
 
 
 07. GET /v2/entities with Circle but no radius - ERROR
 ======================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 83
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 113
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "error parsing geometry: no radius for circle",
-    "error": "BadRequest"
+    "description": "Query not supported: error parsing geometry: no radius for circle",
+    "error": "InvalidModification"
 }
 
 
 08. GET /v2/entities with Polygon with radius - ERROR
 =====================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 85
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "error parsing geometry: radius set for polygon",
-    "error": "BadRequest"
+    "description": "Query not supported: error parsing geometry: radius set for polygon",
+    "error": "InvalidModification"
 }
 
 

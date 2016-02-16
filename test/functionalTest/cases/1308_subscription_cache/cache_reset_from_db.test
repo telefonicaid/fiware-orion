@@ -311,7 +311,7 @@ Date: REGEX(.*)
 07. Dump accumulator1 - see s01/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -330,7 +330,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 4.000000
+            "value" : 4
           }
         ]
       },
@@ -347,7 +347,7 @@ Content-Type: application/json; charset=utf-8
 08. Dump accumulator2 - see s11/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -367,7 +367,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 5.000000
+            "value" : 5
           }
         ]
       },
@@ -384,7 +384,7 @@ Content-Type: application/json; charset=utf-8
 09. Dump accumulator3 - see s21/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -404,7 +404,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 6.000000
+            "value" : 6
           }
         ]
       },
@@ -449,7 +449,7 @@ Date: REGEX(.*)
 14. Dump accumulator1 - see s01/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -468,7 +468,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 4.000000
+            "value" : 4
           }
         ]
       },
@@ -481,7 +481,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 454
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -500,7 +500,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 11.000000
+            "value" : 11
           }
         ]
       },
@@ -517,7 +517,7 @@ Content-Type: application/json; charset=utf-8
 15. Dump accumulator2 - see s11/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -537,7 +537,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 5.000000
+            "value" : 5
           }
         ]
       },
@@ -550,7 +550,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 454
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -570,7 +570,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 12.000000
+            "value" : 12
           }
         ]
       },
@@ -587,7 +587,7 @@ Content-Type: application/json; charset=utf-8
 16. Dump accumulator3 - see s21/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 453
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -607,7 +607,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 6.000000
+            "value" : 6
           }
         ]
       },
@@ -620,7 +620,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 454
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -640,7 +640,7 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "A",
             "type" : "",
-            "value" : 13.000000
+            "value" : 13
           }
         ]
       },

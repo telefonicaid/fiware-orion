@@ -86,7 +86,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 327
+Content-Length: 278
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -97,16 +97,16 @@ Date: REGEX(.*)
         "value": {
             "objAndVecInVec": [
                 {
-                    "a": 1.0,
+                    "a": 1,
                     "b": "2",
                     "c": true
                 },
                 [
-                    1.0,
-                    2.0,
-                    3.0,
-                    4.0,
-                    5.0
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
                 ]
             ]
         }
@@ -117,7 +117,7 @@ Date: REGEX(.*)
         "value": {
             "objAndVecInObj": {
                 "nestedObj": {
-                    "noa": 1.0,
+                    "noa": 1,
                     "nob": "2",
                     "noc": true,
                     "nod": false

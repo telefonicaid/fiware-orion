@@ -322,7 +322,7 @@ Date: REGEX(.*)
 04. Check that A1 == "that JSON object"
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 58
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -331,7 +331,7 @@ Date: REGEX(.*)
     "type": null,
     "value": {
         "a": "1",
-        "b": 2.0
+        "b": 2
     }
 }
 
@@ -527,14 +527,14 @@ Date: REGEX(.*)
 22. Check that A1 == 123
 ========================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": 123.0
+    "value": 123
 }
 
 
@@ -549,7 +549,7 @@ Date: REGEX(.*)
 24. Check that A1 == 3.14
 =========================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -576,7 +576,7 @@ Date: REGEX(.*)
 26. Check that A1 == 3.14 still
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -598,7 +598,7 @@ Date: REGEX(.*)
 28. Check that A1 == -12.1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 41
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -620,14 +620,14 @@ Date: REGEX(.*)
 30. Check that A1 == 3.2e2
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 46
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": 320.0
+    "value": 320
 }
 
 

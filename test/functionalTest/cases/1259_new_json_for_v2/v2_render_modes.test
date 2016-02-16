@@ -163,7 +163,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 979
+Content-Length: 924
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -182,14 +182,14 @@ Date: REGEX(.*)
     "int_object": {
         "metadata": {},
         "type": "TA1",
-        "value": 21.0
+        "value": 21
     },
     "object_object": {
         "metadata": {},
         "type": "TA1",
         "value": {
-            "a": 1.0,
-            "b": 2.0
+            "a": 1,
+            "b": 2
         }
     },
     "string_object": {
@@ -223,7 +223,7 @@ Date: REGEX(.*)
             },
             "md_int": {
                 "type": null,
-                "value": 1.0
+                "value": 1
             },
             "md_object_false": {
                 "type": "MDBOOL",
@@ -235,7 +235,7 @@ Date: REGEX(.*)
             },
             "md_object_int": {
                 "type": "MDINT",
-                "value": 1.0
+                "value": 1
             },
             "md_object_string": {
                 "type": "MDSTRING",
@@ -255,7 +255,7 @@ Date: REGEX(.*)
             }
         },
         "type": "MT1",
-        "value": 0.0
+        "value": 0
     }
 }
 
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 196
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -271,10 +271,10 @@ Date: REGEX(.*)
     "false_object": false,
     "float_object": 22.1,
     "id": "E1",
-    "int_object": 21.0,
+    "int_object": 21,
     "object_object": {
-        "a": 1.0,
-        "b": 2.0
+        "a": 1,
+        "b": 2
     },
     "string_object": "a1",
     "true_object": true,
@@ -283,14 +283,14 @@ Date: REGEX(.*)
         "a",
         "b"
     ],
-    "with_metadata01": 0.0
+    "with_metadata01": 0
 }
 
 
 04. GET /v2/entities/E1?options=values
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 126
+Content-Length: 93
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -298,10 +298,10 @@ Date: REGEX(.*)
     "attributeValues": [
         false,
         22.1,
-        21.0,
+        21,
         {
-            "a": 1.0,
-            "b": 2.0
+            "a": 1,
+            "b": 2
         },
         "a1",
         true,
@@ -309,7 +309,7 @@ Date: REGEX(.*)
             "a",
             "b"
         ],
-        0.0
+        0
     ],
     "id": "E1",
     "type": null
@@ -319,7 +319,7 @@ Date: REGEX(.*)
 05. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 981
+Content-Length: 926
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -339,14 +339,14 @@ Date: REGEX(.*)
         "int_object": {
             "metadata": {},
             "type": "TA1",
-            "value": 21.0
+            "value": 21
         },
         "object_object": {
             "metadata": {},
             "type": "TA1",
             "value": {
-                "a": 1.0,
-                "b": 2.0
+                "a": 1,
+                "b": 2
             }
         },
         "string_object": {
@@ -380,7 +380,7 @@ Date: REGEX(.*)
                 },
                 "md_int": {
                     "type": null,
-                    "value": 1.0
+                    "value": 1
                 },
                 "md_object_false": {
                     "type": "MDBOOL",
@@ -392,7 +392,7 @@ Date: REGEX(.*)
                 },
                 "md_object_int": {
                     "type": "MDINT",
-                    "value": 1.0
+                    "value": 1
                 },
                 "md_object_string": {
                     "type": "MDSTRING",
@@ -412,7 +412,7 @@ Date: REGEX(.*)
                 }
             },
             "type": "MT1",
-            "value": 0.0
+            "value": 0
         }
     }
 ]
@@ -421,7 +421,7 @@ Date: REGEX(.*)
 06. GET /v2/entities?options=keyValues
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 231
+Content-Length: 198
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -430,10 +430,10 @@ Date: REGEX(.*)
         "false_object": false,
         "float_object": 22.1,
         "id": "E1",
-        "int_object": 21.0,
+        "int_object": 21,
         "object_object": {
-            "a": 1.0,
-            "b": 2.0
+            "a": 1,
+            "b": 2
         },
         "string_object": "a1",
         "true_object": true,
@@ -442,7 +442,7 @@ Date: REGEX(.*)
             "a",
             "b"
         ],
-        "with_metadata01": 0.0
+        "with_metadata01": 0
     }
 ]
 
@@ -450,7 +450,7 @@ Date: REGEX(.*)
 07. GET /v2/entities?options=values
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -459,10 +459,10 @@ Date: REGEX(.*)
         "attributeValues": [
             false,
             22.1,
-            21.0,
+            21,
             {
-                "a": 1.0,
-                "b": 2.0
+                "a": 1,
+                "b": 2
             },
             "a1",
             true,
@@ -470,7 +470,7 @@ Date: REGEX(.*)
                 "a",
                 "b"
             ],
-            0.0
+            0
         ],
         "id": "E1",
         "type": null

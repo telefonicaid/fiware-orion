@@ -144,7 +144,7 @@ Date: REGEX(.*)
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 223
+Content-Length: 202
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -153,7 +153,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 1.0
+            "value": 1
         },
         "id": "E1",
         "type": null
@@ -162,7 +162,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 2.0
+            "value": 2
         },
         "id": "E2",
         "type": null
@@ -171,7 +171,7 @@ Date: REGEX(.*)
         "A3": {
             "metadata": {},
             "type": null,
-            "value": 3.0
+            "value": 3
         },
         "id": "E3",
         "type": null
@@ -182,7 +182,7 @@ Date: REGEX(.*)
 05. GET entities with attribute A1 (2 entities)
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -191,7 +191,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 1.0
+            "value": 1
         },
         "id": "E1",
         "type": null
@@ -200,7 +200,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 2.0
+            "value": 2
         },
         "id": "E2",
         "type": null
@@ -221,7 +221,7 @@ Date: REGEX(.*)
 07. GET entities with attribute A3 (1 entity)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 75
+Content-Length: 68
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -230,7 +230,7 @@ Date: REGEX(.*)
         "A3": {
             "metadata": {},
             "type": null,
-            "value": 3.0
+            "value": 3
         },
         "id": "E3",
         "type": null
@@ -241,7 +241,7 @@ Date: REGEX(.*)
 08. GET entities without attribute A3 (2 entities)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -250,7 +250,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 1.0
+            "value": 1
         },
         "id": "E1",
         "type": null
@@ -259,7 +259,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 2.0
+            "value": 2
         },
         "id": "E2",
         "type": null
