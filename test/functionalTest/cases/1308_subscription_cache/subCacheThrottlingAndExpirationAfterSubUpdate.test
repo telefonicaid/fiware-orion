@@ -117,8 +117,8 @@ echo
 echo
 
 
-# 05. Wait 5 secs so that the throttling of 4 secs is OK
-echo "=================================================="
+echo "05. Wait 5 secs so that the throttling of 4 secs is OK"
+echo "======================================================"
 if [ "$VALGRIND" == "" ]
 then
   sleep 5
