@@ -447,6 +447,9 @@ int Georel::parse(const char* in, std::string* errorString)
   bool                      maxDistanceSet = false;
   bool                      minDistanceSet = false;
 
+  maxDistance = -1;
+  minDistance = -1;
+
   if (stringSplit(in, ';', items) == 0)
   {
     *errorString = "empty georel";

@@ -320,6 +320,8 @@ int Scope::fill
   //
   // Georel 'near' only valid for a Point geometry
   //
+  // FIXME P10: remove this limitation in the near future
+  //
   if ((georel.type == "near") && (geometry.areaType != "point"))
   {
     areaType = orion::NoArea;

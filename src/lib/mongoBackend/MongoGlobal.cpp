@@ -898,6 +898,160 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+/* *****************************************************************************
+*
+* processAreaScopeV2 -
+*
+* Returns true if areaQuery was filled, false otherwise
+*
+*/
+static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
+{
+  if (!mongoLocationCapable())
+  {
+    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+      "Please upgrade MongoDB server to 2.4 or newer)";
+
+    alarmMgr.badInput(clientIp, details);
+    return false;
+  }
+
+  // Fill BSON corresponding to geometry
+  BSONObj geometry;
+  if (scoP->areaType == orion::PointType)
+  {
+    geometry = BSON("type" << "Point" << "coordinates" << BSON_ARRAY(scoP->point.longitude() << scoP->point.latitude()));
+  }
+  else if (scoP->areaType == orion::LineType)
+  {
+    // FIXME P10: LineString could have an arbitrary list of coordinates, not only start and end
+    BSONObj start = BSON_ARRAY(scoP->line.start.longitude() << scoP->line.start.latitude());
+    BSONObj end   = BSON_ARRAY(scoP->line.end.longitude()   << scoP->line.end.latitude());
+    geometry = BSON("type" << "LineString" << "coordinates" << BSON_ARRAY(start << end));
+  }
+  else if (scoP->areaType == orion::BoxType)
+  {
+    BSONObj p1 = BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude());
+    BSONObj p2 = BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.lowerLeft.latitude());
+    BSONObj p3 = BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.upperRight.latitude());
+    BSONObj p4 = BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.upperRight.latitude());
+    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(BSON_ARRAY(p1 << p2 << p3 << p4 << p1)));
+  }
+  else if (scoP->areaType == orion::PolygonType)
+  {
+    // Arbitrary number of points
+    BSONArrayBuilder ps;
+    for (unsigned int ix = 0; scoP->polygon.vertexList.size(); ++ix)
+    {
+      orion::Point* p = scoP->polygon.vertexList[ix];
+      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+    }
+    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
+  }
+  else
+  {
+    // TBD: Runtime Error in the proper way
+    return false;
+  }
+
+  if (scoP->georel.type == "near")
+  {
+    BSONObjBuilder near;
+    near.append("$geometry", geometry);
+    if (scoP->georel.maxDistance >= 0)
+    {
+      near.append("$maxDistance", scoP->georel.maxDistance);
+    }
+    if (scoP->georel.minDistance >= 0)
+    {
+      near.append("$minDistance", scoP->georel.minDistance);
+    }
+    areaQuery = BSON("$near" << near.obj());
+  }
+  else if (scoP->georel.type == "coveredBy")
+  {
+    // TBD
+  }
+  else if (scoP->georel.type == "intersect")
+  {
+    // TBD
+  }
+  else if (scoP->georel.type == "equals")
+  {
+    // TBD
+  }
+  else
+  {
+    // TBD: Runtime Error (in the proper way)
+    return false;
+  }
+
+#if 0
+  bool     inverted = false;
+  BSONObj  geoWithin;
+
+  if (scoP->areaType == orion::CircleType)
+  {
+    double radians = scoP->circle.radius() / EARTH_RADIUS_METERS;
+
+    geoWithin = BSON("$centerSphere" <<
+                     BSON_ARRAY(
+                       BSON_ARRAY(scoP->circle.center.longitude() <<
+                                  scoP->circle.center.latitude()) <<
+                       radians));
+
+    inverted  = scoP->circle.inverted();
+  }
+  else if (scoP->areaType == orion::PolygonType)
+  {
+    BSONArrayBuilder  vertex;
+    double            lat0 = 0;
+    double            lon0 = 0;
+
+    for (unsigned int jx = 0; jx < scoP->polygon.vertexList.size() ; ++jx)
+    {
+      double  lat  = scoP->polygon.vertexList[jx]->latitude();
+      double  lon  = scoP->polygon.vertexList[jx]->longitude();
+
+      if (jx == 0)
+      {
+        lat0 = lat;
+        lon0 = lon;
+      }
+      vertex.append(BSON_ARRAY(lon << lat));
+    }
+
+    /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
+    vertex.append(BSON_ARRAY(lon0 << lat0));
+
+    /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
+    geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
+    inverted  = scoP->polygon.inverted();
+  }
+  else
+  {
+    alarmMgr.badInput(clientIp, "unknown area type");
+    return false;
+  }
+
+  if (inverted)
+  {
+    /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
+     * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
+    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoWithin" << geoWithin));
+  }
+  else
+  {
+    areaQuery = BSON("$geoWithin" << geoWithin);
+  }
+#endif
+
+  LM_F(("FGM: %s", areaQuery.toString().c_str()));
+
+  return true;
+}
+
+
 #define OPR_EXIST     "EXISTS"
 #define OPR_NOT_EXIST "NOT EXIST"
 
@@ -1857,6 +2011,24 @@ bool entitiesQuery
         {
           std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
 
+          finalQuery.append(locCoords, areaQuery);
+        }
+      }
+    }
+    else if (sco->type == FIWARE_LOCATION_V2)
+    {
+      geoScopes++;
+      if (geoScopes > 1)
+      {
+        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
+      }
+      else
+      {
+        BSONObj areaQuery;
+
+        if (processAreaScopeV2(sco, areaQuery))
+        {
+          std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
           finalQuery.append(locCoords, areaQuery);
         }
       }
