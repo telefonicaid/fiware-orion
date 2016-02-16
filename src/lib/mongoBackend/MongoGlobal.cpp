@@ -1842,7 +1842,7 @@ bool entitiesQuery
       // FIXME P5: NGSI "v1" filter, probably to be removed in the future
       addFilterScope(sco, filters);
     }
-    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED)
+    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED || sco->type == FIWARE_LOCATION_V2)
     {
       geoScopes++;
       if (geoScopes > 1)
