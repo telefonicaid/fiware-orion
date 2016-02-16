@@ -97,16 +97,24 @@ int Scope::fill
 )
 {
   Geometry                    geometry;
-  Georel                      georel;
   std::vector<std::string>    pointStringV;
   int                         points;
   std::vector<orion::Point*>  pointV;
+
+  if (apiVersion == "v1")
+  {
+    type = FIWARE_LOCATION;
+  }
+  else
+  {
+    type = FIWARE_LOCATION_V2;
+  }
 
   //
   // parse geometry
   //
   std::string errorString;
-  if (geometry.parse(geometryString.c_str(), &errorString) != 0)
+  if (geometry.parse(apiVersion, geometryString.c_str(), &errorString) != 0)
   {
     *errorStringP = std::string("error parsing geometry: ") + errorString;
     return -1;
@@ -308,6 +316,21 @@ int Scope::fill
     return -1;
   }
 
+
+  //
+  // Georel 'near' only valid for a Point geometry
+  //
+  if ((georel.type == "near") && (geometry.areaType != "point"))
+  {
+    areaType = orion::NoArea;
+
+    *errorStringP = std::string("georel /near/ used with geometry /") + geometry.areaType + "/";
+    pointVectorRelease(pointV);
+    pointV.clear();
+    return -1;
+  }
+
+  pointV.clear();
   return 0;
 }
 
@@ -511,63 +534,75 @@ void Scope::present(const std::string& indent, int ix)
   }
   else
   {
-    LM_T(LmtPresent, ("%sScope %d:",    
-		      indent.c_str(),
-		      ix));
+    LM_T(LmtPresent, ("%sScope %d:",    indent.c_str(), ix));
   }
 
-  LM_T(LmtPresent, ("%s  Type:     '%s'", 
-		    indent.c_str(), 
-		    type.c_str()));
+  LM_T(LmtPresent, ("%s  Type:     '%s'", indent.c_str(), type.c_str()));
   
   if (oper != "")
-    LM_T(LmtPresent, ("%s  Operator: '%s'", 
-		      indent.c_str(), 
-		      oper.c_str()));
+    LM_T(LmtPresent, ("%s  Operator: '%s'", indent.c_str(), oper.c_str()));
 
   if (areaType == orion::NoArea)
   {
-    LM_T(LmtPresent, ("%s  Value:    %s", 
-		      indent.c_str(), 
-		      value.c_str()));
+    LM_T(LmtPresent, ("%s  Value:    %s", indent.c_str(), value.c_str()));
   }
   else if (areaType == orion::CircleType)
   {
     LM_T(LmtPresent, ("%s  FI-WARE Circle Area:", indent.c_str()));
-    LM_T(LmtPresent, ("%s    Radius:     %s", 
-	  indent.c_str(), 
-	  circle.radiusString().c_str()));
-    LM_T(LmtPresent, ("%s    Longitude:  %s", 
-	  indent.c_str(), 
-	  circle.center.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s    Latitude:   %s", 
-	  indent.c_str(), 
-	  circle.center.latitudeString().c_str()));
-    LM_T(LmtPresent, ("%s    Inverted:   %s", 
-	  indent.c_str(), 
-	  circle.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s    Radius:     %s",     indent.c_str(), circle.radiusString().c_str()));
+    LM_T(LmtPresent, ("%s    Longitude:  %s",     indent.c_str(), circle.center.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Latitude:   %s", 	  indent.c_str(), circle.center.latitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", 	  indent.c_str(), circle.invertedString().c_str()));
   }
   else if (areaType == orion::PolygonType)
   {
-    LM_T(LmtPresent, ("%s  FI-WARE Polygon Area (%lu vertices):", 
-		      indent.c_str(), 
-		      polygon.vertexList.size()));
+    LM_T(LmtPresent, ("%s  FI-WARE Polygon Area (%lu vertices):", indent.c_str(), polygon.vertexList.size()));
 
-    LM_T(LmtPresent, ("%s    Inverted:   %s", 
-		      indent.c_str(), 
-		      polygon.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", indent.c_str(), polygon.invertedString().c_str()));
     for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
     {
-      LM_T(LmtPresent, ("%s    Vertex %d", 
-			indent.c_str(), 
-			ix));
-      LM_T(LmtPresent, ("%s      Longitude:  %s", 
-			indent.c_str(), 
-			polygon.vertexList[ix]->longitudeString().c_str()));
-      LM_T(LmtPresent, ("%s      Latitude:   %s", 
-			indent.c_str(), 
+      LM_T(LmtPresent, ("%s    Vertex %d",        indent.c_str(), ix));
+      LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), polygon.vertexList[ix]->longitudeString().c_str()));
+      LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(), 
 			polygon.vertexList[ix]->latitudeString().c_str()));
     }
+  }
+  else if (areaType == orion::PointType)
+  {
+    LM_T(LmtPresent, ("%s  FI-WARE Point:", indent.c_str()));
+    LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), point.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(), point.latitudeString().c_str()));
+  }
+  else if (areaType == orion::BoxType)
+  {
+    LM_T(LmtPresent, ("%s  FI-WARE Box:", indent.c_str()));
+    LM_T(LmtPresent, ("%s      lowerLeft.longitude:   %s", indent.c_str(), box.lowerLeft.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      lowerLeft.latitude:    %s", indent.c_str(), box.lowerLeft.latitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      upperRight.longitude:  %s", indent.c_str(), box.upperRight.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      upperRight.latitude:   %s", indent.c_str(), box.upperRight.latitudeString().c_str()));
+  }
+  else if (areaType == orion::LineType)
+  {
+    LM_T(LmtPresent, ("%s  FI-WARE Line:", indent.c_str()));
+    LM_T(LmtPresent, ("%s      start.longitude:   %s", indent.c_str(), line.start.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      start.latitude:    %s", indent.c_str(), line.start.latitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      end.longitude:     %s", indent.c_str(), line.end.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      end.latitude:      %s", indent.c_str(), line.end.latitudeString().c_str()));
+  }
+  else
+  {
+    LM_T(LmtPresent, ("%s  Unknown areaType '%d'", indent.c_str(), areaType));
+  }
+
+  if (georel.type == "near")
+  {
+    LM_T(LmtPresent, ("%s  Georel: 'near'", indent.c_str()));
+    LM_T(LmtPresent, ("%s    maxDistance:  %f", georel.maxDistance));
+    LM_T(LmtPresent, ("%s    minDistance:  %f", georel.minDistance));
+  }
+  else if ((georel.type == "coveredBy") || (georel.type == "intersects") || (georel.type == "equals") || (georel.type == "disjoint"))
+  {
+    LM_T(LmtPresent, ("%s  Georel: '%s'", indent.c_str(), georel.type.c_str()));
   }
 }
 

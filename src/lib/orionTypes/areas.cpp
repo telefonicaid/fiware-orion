@@ -557,7 +557,7 @@ Geometry::Geometry(): areaType(""), radius(-1), external(false)
 *
 * Geometry::parse - 
 */
-int Geometry::parse(const char* in, std::string* errorString)
+int Geometry::parse(const std::string& apiVersion, const char* in, std::string* errorString)
 {
   std::vector<std::string> items;
 
@@ -569,16 +569,37 @@ int Geometry::parse(const char* in, std::string* errorString)
 
   for (unsigned int ix = 0; ix < items.size(); ++ix)
   {
-    if ((items[ix] == "polygon") || (items[ix] == "circle"))
+    if ((apiVersion == "v1") && ((items[ix] == "polygon") || (items[ix] == "circle")))
     {
       if (areaType != "")
       {
         *errorString = "polygon/circle present more than once";
         return -1;
       }
+      areaType = items[ix];
+    }
+    else if ((apiVersion == "v2") && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
+    {
+      if (areaType != "")
+      {
+        *errorString = "geometry-type present more than once";
+        return -1;
+      }
 
       areaType = items[ix];
     }
+#if 1
+    else if ((apiVersion == "v2") && (items[ix] == "circle"))  // Temporal - circle not supported any more in v2
+    {
+      if (areaType != "")
+      {
+        *errorString = "geometry-type present more than once";
+        return -1;
+      }
+
+      areaType = items[ix];
+    }
+#endif
     else if (strncmp(items[ix].c_str(), "radius", 6) == 0)
     {
       radius = atoi((char*) &items[ix].c_str()[7]);
