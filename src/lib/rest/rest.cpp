@@ -235,7 +235,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   //
   bool containsForbiddenChars = false;
 
-  if (key == "geometry")
+  if ((key == "geometry") || (key == "georel"))
   {
     containsForbiddenChars = forbiddenChars(val, "=;");
   }
@@ -243,7 +243,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     containsForbiddenChars = forbiddenChars(val, ";");
   }
-  else if ((key != "q") && (key != "idPattern") && (key != "geometry") && (key != "georel"))
+  else if ((key != "q") && (key != "idPattern"))
   {
     containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
   }
