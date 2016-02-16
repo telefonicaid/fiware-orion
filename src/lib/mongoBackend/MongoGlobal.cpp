@@ -941,7 +941,7 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
   {
     // Arbitrary number of points
     BSONArrayBuilder ps;
-    for (unsigned int ix = 0; scoP->polygon.vertexList.size(); ++ix)
+    for (unsigned int ix = 0; ix < scoP->polygon.vertexList.size(); ++ix)
     {
       orion::Point* p = scoP->polygon.vertexList[ix];
       ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
@@ -950,7 +950,7 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
   }
   else
   {
-    // TBD: Runtime Error in the proper way
+    LM_E(("Runtime Error (unknown area type: %d)", scoP->areaType));
     return false;
   }
 
@@ -970,81 +970,25 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
   }
   else if (scoP->georel.type == "coveredBy")
   {
-    // TBD
+    areaQuery = BSON("$geoWithin" << BSON("$geometry" << geometry));
   }
   else if (scoP->georel.type == "intersect")
   {
-    // TBD
+    areaQuery = BSON("$geoIntersects" << BSON("$geometry" << geometry));
+  }
+  else if (scoP->georel.type == "disjoint")
+  {
+    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoIntersects" << BSON("$geometry" << geometry)));
   }
   else if (scoP->georel.type == "equals")
   {
-    // TBD
+    areaQuery = geometry;
   }
   else
   {
-    // TBD: Runtime Error (in the proper way)
+    LM_E(("Runtime Error (unknown georel type: '%s')", scoP->georel.type.c_str()));
     return false;
   }
-
-#if 0
-  bool     inverted = false;
-  BSONObj  geoWithin;
-
-  if (scoP->areaType == orion::CircleType)
-  {
-    double radians = scoP->circle.radius() / EARTH_RADIUS_METERS;
-
-    geoWithin = BSON("$centerSphere" <<
-                     BSON_ARRAY(
-                       BSON_ARRAY(scoP->circle.center.longitude() <<
-                                  scoP->circle.center.latitude()) <<
-                       radians));
-
-    inverted  = scoP->circle.inverted();
-  }
-  else if (scoP->areaType == orion::PolygonType)
-  {
-    BSONArrayBuilder  vertex;
-    double            lat0 = 0;
-    double            lon0 = 0;
-
-    for (unsigned int jx = 0; jx < scoP->polygon.vertexList.size() ; ++jx)
-    {
-      double  lat  = scoP->polygon.vertexList[jx]->latitude();
-      double  lon  = scoP->polygon.vertexList[jx]->longitude();
-
-      if (jx == 0)
-      {
-        lat0 = lat;
-        lon0 = lon;
-      }
-      vertex.append(BSON_ARRAY(lon << lat));
-    }
-
-    /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
-    vertex.append(BSON_ARRAY(lon0 << lat0));
-
-    /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
-    geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
-    inverted  = scoP->polygon.inverted();
-  }
-  else
-  {
-    alarmMgr.badInput(clientIp, "unknown area type");
-    return false;
-  }
-
-  if (inverted)
-  {
-    /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
-     * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
-    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoWithin" << geoWithin));
-  }
-  else
-  {
-    areaQuery = BSON("$geoWithin" << geoWithin);
-  }
-#endif
 
   LM_F(("FGM: %s", areaQuery.toString().c_str()));
 
@@ -1996,7 +1940,7 @@ bool entitiesQuery
       // FIXME P5: NGSI "v1" filter, probably to be removed in the future
       addFilterScope(sco, filters);
     }
-    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED)
+    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED || sco->type == FIWARE_LOCATION_V2)
     {
       geoScopes++;
       if (geoScopes > 1)
@@ -2007,26 +1951,17 @@ bool entitiesQuery
       {
         BSONObj areaQuery;
 
-        if (processAreaScope(sco, areaQuery))
+        bool result;
+        if (sco->type == FIWARE_LOCATION_V2)
         {
-          std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-
-          finalQuery.append(locCoords, areaQuery);
+          result = processAreaScopeV2(sco, areaQuery);
         }
-      }
-    }
-    else if (sco->type == FIWARE_LOCATION_V2)
-    {
-      geoScopes++;
-      if (geoScopes > 1)
-      {
-        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
-      }
-      else
-      {
-        BSONObj areaQuery;
+        else // FIWARE Location NGSIv1 (legacy)
+        {
+          result = processAreaScope(sco, areaQuery);
+        }
 
-        if (processAreaScopeV2(sco, areaQuery))
+        if (result)
         {
           std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
           finalQuery.append(locCoords, areaQuery);
