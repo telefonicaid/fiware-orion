@@ -169,15 +169,13 @@ int Scope::fill
     }
 
     if (!str2double(coordV[0].c_str(), &latitude))
-    {
-      // *errorStringP = "non-numeric latitude-coordinate in URI param /coords/";
+    {      
       *errorStringP = "invalid coordinates";
       return -1;
     }
 
     if (!str2double(coordV[1].c_str(), &longitude))
     {
-      // *errorStringP = "non-numeric longitude-coordinate in URI param /coords/";
       *errorStringP = "invalid coordinates";
       return -1;
     }
@@ -225,15 +223,6 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-#if 0  // for now ...
-    if ((apiVersion == "v2") && (pointV.size() < 3))
-    {
-      *errorStringP = "Too few coordinates for polygon";
-      pointVectorRelease(pointV);
-      pointV.clear();
-      return -1;
-    }
-#else
     else if ((apiVersion == "v2") && (pointV.size() < 4))
     {
       *errorStringP = "Too few coordinates for polygon";
@@ -252,7 +241,6 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-#endif
 
     polygon.invertedSet(geometry.external);
 
@@ -266,7 +254,7 @@ int Scope::fill
   {
     areaType = orion::LineType;
 
-    if (pointV.size() >= 2)
+    if (pointV.size() < 2)
     {
       *errorStringP = "invalid number of coordinates for /line/";
       pointVectorRelease(pointV);
@@ -318,23 +306,34 @@ int Scope::fill
     return -1;
   }
 
+  //pointVectorRelease(pointV); ??
+  pointV.clear();
 
-  //
-  // Georel 'near' only valid for a Point geometry
-  //
-  // FIXME P10: remove this limitation in the near future
-  //
-  if ((georel.type == "near") && (geometry.areaType != "point"))
+  // Check invalid combinations
+  if ((geometry.areaType == "line") && (georel.type == "coveredBy"))
   {
-    areaType = orion::NoArea;
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
+     *    { $geoWithin: { $geometry: { type: "LineString", coordinates: [ [ 5.0...", code: 17287 }
+     */
 
-    *errorStringP = std::string("georel /near/ used with geometry /") + geometry.areaType + "/";
-    pointVectorRelease(pointV);
-    pointV.clear();
+    *errorStringP = "line geometry cannot be used with coveredBy georel";
     return -1;
   }
 
-  pointV.clear();
+  if ((geometry.areaType == "point") && (georel.type == "coveredBy"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
+     *    { $geoWithin: { $geometry: { type: "Point", coordinates: [ [ 5.0...", code: 17287 }
+     */
+
+    *errorStringP = "point geometry cannot be used with coveredBy georel";
+    return -1;
+  }
+
   return 0;
 }
 

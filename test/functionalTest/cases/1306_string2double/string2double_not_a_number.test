@@ -118,14 +118,14 @@ echo
 
 echo "11. Not a number for circle center latitude"
 echo "==========================================="
-orionCurl --url '/v2/entities?geometry=circle;radius=10&coords=B,5' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=B,5' --json
 echo
 echo
 
 
 echo "12. Not a number for circle center longitude"
 echo "============================================"
-orionCurl --url '/v2/entities?geometry=circle;radius=10&coords=5,B' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=5,B' --json
 echo
 echo
 
@@ -271,53 +271,53 @@ Date: REGEX(.*)
 
 11. Not a number for circle center latitude
 ===========================================
-HTTP/1.1 400 Bad Request
-Content-Length: 58
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 88
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid coordinates",
-    "error": "BadRequest"
+    "description": "Query not supported: invalid coordinates",
+    "error": "InvalidModification"
 }
 
 
 12. Not a number for circle center longitude
 ============================================
-HTTP/1.1 400 Bad Request
-Content-Length: 58
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 88
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid coordinates",
-    "error": "BadRequest"
+    "description": "Query not supported: invalid coordinates",
+    "error": "InvalidModification"
 }
 
 
 13. Not a number for polygon vertex latitude
 ============================================
-HTTP/1.1 400 Bad Request
-Content-Length: 58
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 88
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid coordinates",
-    "error": "BadRequest"
+    "description": "Query not supported: invalid coordinates",
+    "error": "InvalidModification"
 }
 
 
 14. Not a number for polygon vertex longitude
 =============================================
-HTTP/1.1 400 Bad Request
-Content-Length: 58
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 88
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid coordinates",
-    "error": "BadRequest"
+    "description": "Query not supported: invalid coordinates",
+    "error": "InvalidModification"
 }
 
 

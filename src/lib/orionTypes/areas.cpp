@@ -594,18 +594,6 @@ int Geometry::parse(const std::string& apiVersion, const char* in, std::string* 
 
       areaType = items[ix];
     }
-#if 0
-    else if ((apiVersion == "v2") && (items[ix] == "circle"))  // Temporal - circle not supported any more in v2
-    {
-      if (areaType != "")
-      {
-        *errorString = "geometry-type present more than once";
-        return -1;
-      }
-
-      areaType = items[ix];
-    }
-#endif
     else if (strncmp(items[ix].c_str(), "radius", 6) == 0)
     {
       radius = atoi((char*) &items[ix].c_str()[7]);
