@@ -122,7 +122,7 @@ Date: REGEX(.*)
 04. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -130,7 +130,7 @@ Date: REGEX(.*)
     "attr1": {
         "metadata": {},
         "type": null,
-        "value": 3.0
+        "value": 3
     },
     "id": "E1",
     "type": null
@@ -148,7 +148,7 @@ Date: REGEX(.*)
 06. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -156,7 +156,7 @@ Date: REGEX(.*)
     "attr1": {
         "metadata": {},
         "type": null,
-        "value": 5.0
+        "value": 5
     },
     "id": "E1",
     "type": null

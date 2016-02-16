@@ -198,7 +198,7 @@ Date: REGEX(.*)
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 341
+Content-Length: 327
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -209,7 +209,7 @@ Date: REGEX(.*)
             "type": null,
             "value": {
                 "metadata": {
-                    "meta1": 24.0,
+                    "meta1": 24,
                     "meta2": false,
                     "meta3": "string"
                 },
@@ -225,7 +225,7 @@ Date: REGEX(.*)
             "metadata": {
                 "meta1": {
                     "type": null,
-                    "value": 24.0
+                    "value": 24
                 },
                 "meta2": {
                     "type": null,
@@ -248,7 +248,7 @@ Date: REGEX(.*)
 04. GET /v2/entities?options=keyValues
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -256,7 +256,7 @@ Date: REGEX(.*)
     {
         "a1": {
             "metadata": {
-                "meta1": 24.0,
+                "meta1": 24,
                 "meta2": false,
                 "meta3": "string"
             },

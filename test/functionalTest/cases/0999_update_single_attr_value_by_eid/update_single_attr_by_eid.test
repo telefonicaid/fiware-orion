@@ -180,7 +180,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1 to see A1==2
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 66
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -188,7 +188,7 @@ Date: REGEX(.*)
     "A1": {
         "metadata": {},
         "type": null,
-        "value": 2.0
+        "value": 2
     },
     "id": "E1",
     "type": "T1"
@@ -206,7 +206,7 @@ Date: REGEX(.*)
 05. GET /v2/entities/E1 to see A1==4
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 66
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -214,7 +214,7 @@ Date: REGEX(.*)
     "A1": {
         "metadata": {},
         "type": null,
-        "value": 4.0
+        "value": 4
     },
     "id": "E1",
     "type": "T1"
@@ -310,7 +310,7 @@ Date: REGEX(.*)
 13. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 93
+Content-Length: 72
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -319,9 +319,9 @@ Date: REGEX(.*)
         "metadata": {},
         "type": null,
         "value": [
-            1.0,
-            2.0,
-            3.0
+            1,
+            2,
+            3
         ]
     },
     "id": "E1",
@@ -340,7 +340,7 @@ Date: REGEX(.*)
 15. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 105
+Content-Length: 84
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -349,9 +349,9 @@ Date: REGEX(.*)
         "metadata": {},
         "type": null,
         "value": {
-            "a": 1.0,
-            "b": 2.0,
-            "c": 3.0
+            "a": 1,
+            "b": 2,
+            "c": 3
         }
     },
     "id": "E1",
