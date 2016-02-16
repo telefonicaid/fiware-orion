@@ -117,18 +117,16 @@ echo
 
 
 echo "05. To avoid a race condition in the order of notifications"
-echo "======================================================"
-sleep 0.5s
-valgrindSleep 4
-
-
+echo "==========================================================="
+sleep 4
+valgrindSleep 1
 # Subscribe for 5 seconds (6 if VALGRIND)
 duration=PT5S
 if [ "$VALGRIND" == 1 ]
 then
   duration=PT6S
 fi
-echo 
+echo
 echo
 
 
@@ -165,6 +163,7 @@ echo
 
 echo "10. Dump accumulator - see two notifications"
 echo "============================================"
+sleep 1
 accumulatorDump
 echo
 echo
