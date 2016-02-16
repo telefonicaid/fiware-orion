@@ -183,24 +183,27 @@ Line::Line()
 
 /* ****************************************************************************
 *
-* Line::Line - 
+* Line::pointAdd -
 */
-Line::Line(Point* startP, Point* endP)
+void Line::pointAdd(Point* p)
 {
-  start.fill(startP);
-  end.fill(endP);
+  pointList.push_back(p);
 }
 
 
 
 /* ****************************************************************************
 *
-* Line::fill - 
+* Line::release -
 */
-void Line::fill(Point* startP, Point* endP)
+void Line::release(void)
 {
-  start.fill(startP);
-  end.fill(endP);
+  for (unsigned int ix = 0; ix < pointList.size(); ++ix)
+  {
+    delete(pointList[ix]);
+  }
+
+  pointList.clear();
 }
 
 

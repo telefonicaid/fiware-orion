@@ -924,10 +924,14 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
   }
   else if (scoP->areaType == orion::LineType)
   {
-    // FIXME P10: LineString could have an arbitrary list of coordinates, not only start and end
-    BSONObj start = BSON_ARRAY(scoP->line.start.longitude() << scoP->line.start.latitude());
-    BSONObj end   = BSON_ARRAY(scoP->line.end.longitude()   << scoP->line.end.latitude());
-    geometry = BSON("type" << "LineString" << "coordinates" << BSON_ARRAY(start << end));
+    // Arbitrary number of points
+    BSONArrayBuilder ps;
+    for (unsigned int ix = 0; ix < scoP->line.pointList.size(); ++ix)
+    {
+      orion::Point* p = scoP->line.pointList[ix];
+      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+    }
+    geometry = BSON("type" << "LineString" << "coordinates" << ps.arr());
   }
   else if (scoP->areaType == orion::BoxType)
   {
@@ -989,8 +993,6 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
     LM_E(("Runtime Error (unknown georel type: '%s')", scoP->georel.type.c_str()));
     return false;
   }
-
-  LM_F(("FGM: %s", areaQuery.toString().c_str()));
 
   return true;
 }

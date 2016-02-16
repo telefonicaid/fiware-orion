@@ -86,15 +86,13 @@ class Point
 */
 class Line
 {
+
 public:
-  // FIXME P10: LineString could have an arbitrary list of coordinates, not only start and end
-  Point start;
-  Point end;
+  ::std::vector<Point*> pointList;
 
-  Line();
-  Line(Point* startP, Point* endP);
-
-  void fill(Point* startP, Point* endP);
+  Line();  
+  void pointAdd(Point* p);
+  void release(void);
 };
 
 

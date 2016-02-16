@@ -189,7 +189,6 @@ int Scope::fill
 
   if (geometry.areaType == "circle")
   {
-#if 0
     if (apiVersion == "v2")
     {
       *errorStringP = "circle geometry is not supported by Orion API v2";
@@ -198,7 +197,6 @@ int Scope::fill
       return -1;
     }
     else
-#endif
     {
       if (pointV.size() != 1)
       {
@@ -227,7 +225,7 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-#if 1  // for now ...
+#if 0  // for now ...
     if ((apiVersion == "v2") && (pointV.size() < 3))
     {
       *errorStringP = "Too few coordinates for polygon";
@@ -268,14 +266,18 @@ int Scope::fill
   {
     areaType = orion::LineType;
 
-    if (pointV.size() != 2)
+    if (pointV.size() >= 2)
     {
       *errorStringP = "invalid number of coordinates for /line/";
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
     }
-    line.fill(pointV[0], pointV[1]);
+
+    for (unsigned int ix = 0; ix < pointV.size(); ++ix)
+    {
+      line.pointAdd(pointV[ix]);
+    }
     pointV.clear();
   }
   else if (geometry.areaType == "box")
@@ -586,10 +588,13 @@ void Scope::present(const std::string& indent, int ix)
   else if (areaType == orion::LineType)
   {
     LM_T(LmtPresent, ("%s  FI-WARE Line:", indent.c_str()));
-    LM_T(LmtPresent, ("%s      start.longitude:   %s", indent.c_str(), line.start.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s      start.latitude:    %s", indent.c_str(), line.start.latitudeString().c_str()));
-    LM_T(LmtPresent, ("%s      end.longitude:     %s", indent.c_str(), line.end.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s      end.latitude:      %s", indent.c_str(), line.end.latitudeString().c_str()));
+    for (unsigned int ix = 0; ix < line.pointList.size(); ++ix)
+    {
+      LM_T(LmtPresent, ("%s    Point %d",        indent.c_str(), ix));
+      LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), line.pointList[ix]->longitudeString().c_str()));
+      LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(),
+      line.pointList[ix]->latitudeString().c_str()));
+    }
   }
   else
   {
