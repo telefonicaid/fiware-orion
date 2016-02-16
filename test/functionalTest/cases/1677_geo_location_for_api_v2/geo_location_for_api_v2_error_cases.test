@@ -78,9 +78,23 @@ echo
 echo
 
 
-echo "05. georel 'near' in non-point geometry - see error"
-echo "==================================================="
+echo "05a. georel 'near' in box geometry - see error"
+echo "=============================================="
 orionCurl --url '/v2/entities?geometry=box&coords=1,2;3,4&georel=near;maxDistance=12' --json
+echo
+echo
+
+
+echo "05b. georel 'near' in polygon geometry - see error"
+echo "=================================================="
+orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;3,4;3,0;1,0;1,2&georel=near;maxDistance=12' --json
+echo
+echo
+
+
+echo "05c. georel 'near' in line geometry - see error"
+echo "==============================================="
+orionCurl --url '/v2/entities?geometry=line&coords=1,2;3,4&georel=near;maxDistance=12' --json
 echo
 echo
 
@@ -201,15 +215,41 @@ Date: REGEX(.*)
 }
 
 
-05. georel 'near' in non-point geometry - see error
-===================================================
+05a. georel 'near' in box geometry - see error
+==============================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 107
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: georel /near/ used with geometry /box/",
+    "description": "Query not supported: georel /near/ used with geometry different than point",
+    "error": "InvalidModification"
+}
+
+
+05b. georel 'near' in polygon geometry - see error
+==================================================
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Query not supported: georel /near/ used with geometry different than point",
+    "error": "InvalidModification"
+}
+
+
+05c. georel 'near' in line geometry - see error
+===============================================
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Query not supported: georel /near/ used with geometry different than point",
     "error": "InvalidModification"
 }
 

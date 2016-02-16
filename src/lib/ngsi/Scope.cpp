@@ -334,6 +334,18 @@ int Scope::fill
     return -1;
   }
 
+  if ((geometry.areaType != "point") && (georel.type == "near"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue invalid point in geo near query $geometry argument:
+     *   { type: "Polygon", coordinates: [ [ [ 2.0, 1.0 ], [ 4.0, 3.0 ],...", code: 17287 }
+     */
+
+    *errorStringP = "georel /near/ used with geometry different than point";
+    return -1;
+  }
+
   return 0;
 }
 
