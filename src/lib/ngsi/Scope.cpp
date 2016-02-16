@@ -71,69 +71,240 @@ Scope::Scope(const std::string& _type, const std::string& _value, const std::str
 
 /* ****************************************************************************
 *
+* pointVectorRelease - 
+*/
+static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
+{
+  for (unsigned int ix = 0; ix < pointV.size(); ++ix)
+  {
+    delete(pointV[ix]);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * Scope::fill - 
 */
 int Scope::fill
 (
-  orion::Geometry*                 geometry,
-  const std::vector<std::string>&  coordsV,
-  std::string*                     errorString
+  const std::string&  apiVersion,
+  const std::string&  geometryString,
+  const std::string&  coordsString,
+  const std::string&  georelString,
+  std::string*        errorStringP
 )
 {
-  if (geometry->areaType == "circle")
+  Geometry                    geometry;
+  Georel                      georel;
+  std::vector<std::string>    pointStringV;
+  int                         points;
+  std::vector<orion::Point*>  pointV;
+
+  //
+  // parse geometry
+  //
+  std::string errorString;
+  if (geometry.parse(geometryString.c_str(), &errorString) != 0)
   {
-    areaType = orion::CircleType;
+    *errorStringP = std::string("error parsing geometry: ") + errorString;
+    return -1;
+  }
 
-    circle.radiusSet(geometry->radius);
-    circle.invertedSet(geometry->external);
 
-    std::vector<std::string>  coords;
+  //
+  // Split coordsString into a vector of points, or pairs of coordinates
+  //
+  if (coordsString == "")
+  {
+    *errorStringP = "no coordinates for geometry";
+    return -1;
+  }
+  points = stringSplit(coordsString, ';', pointStringV);
 
-    if (stringSplit(coordsV[0], ',', coords) == 2)
+  if (points == 0)
+  {
+    *errorStringP = "erroneous coordinates for geometry";
+    return -1;
+  }
+
+
+  //
+  // Parse georel?
+  //
+  if (georelString != "")
+  {
+    if (georel.parse(georelString.c_str(), errorStringP) != 0)
     {
-      std::string latitude  = coords[0];
-      std::string longitude = coords[1];
-
-      Point p(latitude, longitude);
-      circle.centerSet(&p);
-    }
-    else
-    {
-      *errorString = "invalid coordinate-set for circle";
       return -1;
     }
   }
-  else if (geometry->areaType == "polygon")
+
+
+  //
+  // Convert point-strings into instances of the orion::Point class
+  //
+  for (int ix = 0; ix < points; ++ix)
+  {
+    std::vector<std::string>  coordV;
+    int                       coords;
+    double                    latitude;
+    double                    longitude;
+
+    coords = stringSplit(pointStringV[ix], ',', coordV);
+
+    if (coords != 2)
+    {
+      *errorStringP = "invalid point in URI param /coords/";
+      return -1;
+    }
+
+    if (!str2double(coordV[0].c_str(), &latitude))
+    {
+      // *errorStringP = "non-numeric latitude-coordinate in URI param /coords/";
+      *errorStringP = "invalid coordinates";
+      return -1;
+    }
+
+    if (!str2double(coordV[1].c_str(), &longitude))
+    {
+      // *errorStringP = "non-numeric longitude-coordinate in URI param /coords/";
+      *errorStringP = "invalid coordinates";
+      return -1;
+    }
+
+    orion::Point* pointP = new Point(latitude, longitude);
+    pointV.push_back(pointP);
+  }
+
+
+  if (geometry.areaType == "circle")
+  {
+#if 0
+    if (apiVersion == "v2")
+    {
+      *errorStringP = "circle geometry is not supported by Orion API v2";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+    else
+#endif
+    {
+      if (pointV.size() != 1)
+      {
+        *errorStringP = "Too many coordinates for circle";
+        pointVectorRelease(pointV);
+        pointV.clear();
+        return -1;
+      }
+
+      areaType = orion::CircleType;
+
+      circle.radiusSet(geometry.radius);
+      circle.invertedSet(geometry.external);
+      circle.centerSet(pointV[0]);
+      pointV.clear();
+    }
+  }
+  else if (geometry.areaType == "polygon")
   {
     areaType = orion::PolygonType;
     
-    polygon.invertedSet(geometry->external);
-
-    for (unsigned int ix = 0; ix < coordsV.size(); ++ix)
+    if ((apiVersion == "v1") && (pointV.size() < 3))
     {
-      std::vector<std::string>  coords;
-
-      if (stringSplit(coordsV[ix], ',', coords) == 2)
-      {
-        std::string latitude  = coords[0];
-        std::string longitude = coords[1];
-
-        // FIXME P1:  we should check 'valid number' of coords[0] and coords[1]
-        Point* p = new Point(latitude, longitude);
-        polygon.vertexAdd(p);
-      }
-      else
-      {
-        *errorString = "invalid coordinate-set for polygon";
-        return -1;
-      }
+      *errorStringP = "Too few coordinates for polygon";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
     }
+#if 1  // for now ...
+    if ((apiVersion == "v2") && (pointV.size() < 3))
+    {
+      *errorStringP = "Too few coordinates for polygon";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+#else
+    else if ((apiVersion == "v2") && (pointV.size() < 4))
+    {
+      *errorStringP = "Too few coordinates for polygon";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+
+    //
+    // If v2, first and last point must be identical
+    //
+    if ((apiVersion == "v2") && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
+    {
+      *errorStringP = "First and last point in polygon not the same";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+#endif
+
+    polygon.invertedSet(geometry.external);
+
+    for (unsigned int ix = 0; ix < pointV.size(); ++ix)
+    {
+      polygon.vertexAdd(pointV[ix]);
+    }
+    pointV.clear();
+  }
+  else if (geometry.areaType == "line")
+  {
+    areaType = orion::LineType;
+
+    if (pointV.size() != 2)
+    {
+      *errorStringP = "invalid number of coordinates for /line/";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+    line.fill(pointV[0], pointV[1]);
+    pointV.clear();
+  }
+  else if (geometry.areaType == "box")
+  {
+    areaType = orion::BoxType;
+
+    if (pointV.size() != 2)
+    {
+      *errorStringP = "invalid number of coordinates for /box/";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+    box.fill(pointV[0], pointV[1]);
+    pointV.clear();
+  }
+  else if (geometry.areaType == "point")
+  {
+    areaType = orion::PointType;
+
+    if (pointV.size() != 1)
+    {
+      *errorStringP = "invalid number of coordinates for /point/";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+    point.fill(pointV[0]);
+    pointV.clear();
   }
   else
   {
     areaType = orion::NoArea;
     
-    *errorString = "invalid area-type";
+    *errorStringP = "invalid area-type";
+    pointVectorRelease(pointV);
+    pointV.clear();
     return -1;
   }
 
