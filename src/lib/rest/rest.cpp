@@ -243,7 +243,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     containsForbiddenChars = forbiddenChars(val, ";");
   }
-  else if ((key != "q") && (key != "idPattern"))
+  else if ((key != "q") && (key != "idPattern") && (key != "geometry") && (key != "georel"))
   {
     containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
   }
