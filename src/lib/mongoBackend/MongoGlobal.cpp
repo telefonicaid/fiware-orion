@@ -942,13 +942,6 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
     ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.upperRight.latitude()));
     ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude()));
     geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
-#if 0
-    BSONObj p1 = BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude());
-    BSONObj p2 = BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.lowerLeft.latitude());
-    BSONObj p3 = BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.upperRight.latitude());
-    BSONObj p4 = BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.upperRight.latitude());
-    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(BSON_ARRAY(p1 << p2 << p3 << p4 << p1)));
-#endif
   }
   else if (scoP->areaType == orion::PolygonType)
   {
