@@ -131,7 +131,7 @@ Date: REGEX(.*)
 04. Get accumulator dump (1 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 569
+Content-Length: 555
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -150,12 +150,12 @@ Content-Type: application/json; charset=utf-8
           {
             "name" : "B",
             "type" : "",
-            "value" : 30.000000
+            "value" : 30
           },
           {
             "name" : "C",
             "type" : "",
-            "value" : 40.000000
+            "value" : 40
           }
         ]
       },

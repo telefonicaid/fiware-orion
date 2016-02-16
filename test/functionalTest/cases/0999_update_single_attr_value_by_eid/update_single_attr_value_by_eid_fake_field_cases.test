@@ -114,7 +114,7 @@ Date: REGEX(.*)
 04. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 82
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -123,7 +123,7 @@ Date: REGEX(.*)
         "metadata": {},
         "type": null,
         "value": {
-            "type": 1.0
+            "type": 1
         }
     },
     "id": "E1",
@@ -142,7 +142,7 @@ Date: REGEX(.*)
 06. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 99
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -151,8 +151,8 @@ Date: REGEX(.*)
         "metadata": {},
         "type": null,
         "value": {
-            "type": 3.0,
-            "value": 3.0
+            "type": 3,
+            "value": 3
         }
     },
     "id": "E1",

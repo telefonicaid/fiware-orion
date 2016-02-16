@@ -91,7 +91,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 105
+Content-Length: 98
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -101,7 +101,7 @@ Date: REGEX(.*)
         "metadata": {
             "m1": {
                 "type": null,
-                "value": 2.0
+                "value": 2
             }
         },
         "type": null,

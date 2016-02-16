@@ -127,7 +127,7 @@ Date: REGEX(.*)
 03. GET all entities (2 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 146
+Content-Length: 139
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -145,7 +145,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 10.0
+            "value": 10
         },
         "id": "E2",
         "type": null
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 04. GET entities with q=A1==10 (1 hit)
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -165,7 +165,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 10.0
+            "value": 10
         },
         "id": "E2",
         "type": null
@@ -216,7 +216,7 @@ Date: REGEX(.*)
 07. GET entities with q=A1!='10' (1 hit)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -225,7 +225,7 @@ Date: REGEX(.*)
         "A1": {
             "metadata": {},
             "type": null,
-            "value": 10.0
+            "value": 10
         },
         "id": "E2",
         "type": null

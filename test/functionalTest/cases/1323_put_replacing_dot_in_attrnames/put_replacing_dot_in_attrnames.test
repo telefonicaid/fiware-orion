@@ -135,7 +135,7 @@ Date: REGEX(.*)
 02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -143,12 +143,12 @@ Date: REGEX(.*)
     "A1.X": {
         "metadata": {},
         "type": null,
-        "value": 1.0
+        "value": 1
     },
     "A2..y": {
         "metadata": {},
         "type": null,
-        "value": 2.0
+        "value": 2
     },
     "id": "E1",
     "type": null
@@ -158,13 +158,13 @@ Date: REGEX(.*)
 02b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 56
+Content-Length: 42
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1.X": 1.0,
-    "A2..y": 2.0,
+    "A1.X": 1,
+    "A2..y": 2,
     "id": "E1",
     "type": null
 }
@@ -181,7 +181,7 @@ Date: REGEX(.*)
 04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -189,12 +189,12 @@ Date: REGEX(.*)
     "A2..y": {
         "metadata": {},
         "type": null,
-        "value": 2.0
+        "value": 2
     },
     "A3.Z": {
         "metadata": {},
         "type": null,
-        "value": 3.0
+        "value": 3
     },
     "id": "E1",
     "type": null
@@ -204,13 +204,13 @@ Date: REGEX(.*)
 04b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 56
+Content-Length: 42
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A2..y": 2.0,
-    "A3.Z": 3.0,
+    "A2..y": 2,
+    "A3.Z": 3,
     "id": "E1",
     "type": null
 }
@@ -219,52 +219,52 @@ Date: REGEX(.*)
 05. GET attribute A2..y
 =======================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 37
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": 2.0
+    "value": 2
 }
 
 
 05b. GET attribute A2..y using options=keyValues
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 18
+Content-Length: 11
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A2..y": 2.0
+    "A2..y": 2
 }
 
 
 06. GET attribute A3.Z
 ======================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 37
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": null,
-    "value": 3.0
+    "value": 3
 }
 
 
 06b. GET attribute A3.Z using options=keyValues
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 10
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A3.Z": 3.0
+    "A3.Z": 3
 }
 
 
