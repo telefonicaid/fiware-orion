@@ -164,7 +164,7 @@ Date: REGEX(.*)
 06. Query: URI param q=temperature<60;humidity==61..83 => E1+E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 354
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -173,7 +173,7 @@ Date: REGEX(.*)
         "humidity": {
             "metadata": {},
             "type": null,
-            "value": 80.0
+            "value": 80
         },
         "id": "E1",
         "status": {
@@ -184,7 +184,7 @@ Date: REGEX(.*)
         "temperature": {
             "metadata": {},
             "type": null,
-            "value": 20.0
+            "value": 20
         },
         "type": "T"
     },
@@ -192,7 +192,7 @@ Date: REGEX(.*)
         "humidity": {
             "metadata": {},
             "type": null,
-            "value": 70.0
+            "value": 70
         },
         "id": "E2",
         "status": {
@@ -203,7 +203,7 @@ Date: REGEX(.*)
         "temperature": {
             "metadata": {},
             "type": null,
-            "value": 30.0
+            "value": 30
         },
         "type": "T"
     }

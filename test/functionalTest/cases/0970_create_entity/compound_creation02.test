@@ -80,7 +80,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 250
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -90,7 +90,7 @@ Date: REGEX(.*)
         "type": null,
         "value": {
             "a": "1",
-            "b": 2.0,
+            "b": 2,
             "c": true,
             "d": false,
             "e": {
@@ -101,18 +101,18 @@ Date: REGEX(.*)
                     false,
                     false
                 ],
-                "f": 5.0,
+                "f": 5,
                 "g": "6",
                 "h": true,
                 "ivec": [
-                    1.0,
-                    2.0,
-                    3.0,
-                    4.0,
-                    5.0
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
                 ],
                 "obj": {
-                    "oa": 1.0,
+                    "oa": 1,
                     "ob": false
                 },
                 "svec": [
