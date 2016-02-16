@@ -976,7 +976,7 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
   {
     areaQuery = BSON("$geoWithin" << BSON("$geometry" << geometry));
   }
-  else if (scoP->georel.type == "intersect")
+  else if (scoP->georel.type == "intersects")
   {
     areaQuery = BSON("$geoIntersects" << BSON("$geometry" << geometry));
   }

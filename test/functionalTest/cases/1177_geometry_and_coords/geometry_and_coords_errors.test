@@ -35,11 +35,10 @@ brokerStart CB
 # 03. GET /v2/entities with Geometry but no Coordinates - ERROR
 # 04. GET /v2/entities with Coordinates but no Geometry - ERROR
 # 05. GET /v2/entities with Polygon with only two vertices - ERROR
-# 06. GET /v2/entities with Circle with two vertices - ERROR
-# 07. GET /v2/entities with Circle but no radius - ERROR
-# 08. GET /v2/entities with Polygon with radius - ERROR
-# 09. GET /v2/entities with correct Circle but nothing found
-# 10. GET /v2/entities with correct Polygon but nothing found
+# 06. GET /v2/entities with Near with two vertices - ERROR
+# 07. GET /v2/entities with Near but no distances - ERROR
+# 08. GET /v2/entities with correct Near but nothing found
+# 09. GET /v2/entities with correct Polygon but nothing found
 #
 
 
@@ -53,7 +52,7 @@ echo
 
 echo "02. GET /v2/entities with erroneous areaType - ERROR"
 echo "===================================================="
-orionCurl --url '/v2/entities?geometry=noCirle&coords=-1,2' --json
+orionCurl --url '/v2/entities?georel=intersect&geometry=noCirle&coords=-1,2' --json
 echo
 echo
 
@@ -74,43 +73,35 @@ echo
 
 echo "05. GET /v2/entities with Polygon with only two vertices - ERROR"
 echo "================================================================"
-orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;2,2' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=polygon&coords=1,2;2,2' --json
 echo
 echo
 
 
-echo "06. GET /v2/entities with Circle with two vertices - ERROR"
-echo "=========================================================="
-orionCurl --url '/v2/entities?geometry=circle;radius:10&coords=1,2;2,2' --json
+echo "06. GET /v2/entities with Near with two vertices - ERROR"
+echo "========================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=1,2;2,2' --json
 echo
 echo
 
 
-echo "07. GET /v2/entities with Circle but no radius - ERROR"
+echo "07. GET /v2/entities with Near but no distance - ERROR"
 echo "======================================================"
-orionCurl --url '/v2/entities?geometry=circle&coords=1.0,2.0' --json
+orionCurl --url '/v2/entities?georel=near&geometry=point&coords=1.0,2.0' --json
 echo
 echo
 
 
-echo "08. GET /v2/entities with Polygon with radius - ERROR"
-echo "====================================================="
-orionCurl --url '/v2/entities?geometry=polygon;radius:10&coords=1.0,2.0' --json
+echo "08. GET /v2/entities with correct Near but nothing found"
+echo "========================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=1.0,2.0' --json
 echo
 echo
 
 
-
-echo "09. GET /v2/entities with correct Circle but nothing found"
-echo "=========================================================="
-orionCurl --url '/v2/entities?geometry=circle;radius:10&coords=1.0,2.0' --json
-echo
-echo
-
-
-echo "10. GET /v2/entities with correct Polygon but nothing found"
+echo "09. GET /v2/entities with correct Polygon but nothing found"
 echo "==========================================================="
-orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;2,2;2,1' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=polygon&coords=1,2;2,2;2,1;1,2' --json
 echo
 echo
 
@@ -177,47 +168,34 @@ Date: REGEX(.*)
 }
 
 
-06. GET /v2/entities with Circle with two vertices - ERROR
-==========================================================
+06. GET /v2/entities with Near with two vertices - ERROR
+========================================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 100
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: Too many coordinates for circle",
+    "description": "Query not supported: invalid number of coordinates for /point/",
     "error": "InvalidModification"
 }
 
 
-07. GET /v2/entities with Circle but no radius - ERROR
+07. GET /v2/entities with Near but no distance - ERROR
 ======================================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 113
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: error parsing geometry: no radius for circle",
+    "description": "Query not supported: georel /near/ without either minDistance nor maxDistance",
     "error": "InvalidModification"
 }
 
 
-08. GET /v2/entities with Polygon with radius - ERROR
-=====================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 115
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "Query not supported: error parsing geometry: radius set for polygon",
-    "error": "InvalidModification"
-}
-
-
-09. GET /v2/entities with correct Circle but nothing found
-==========================================================
+08. GET /v2/entities with correct Near but nothing found
+========================================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
@@ -226,7 +204,7 @@ Date: REGEX(.*)
 []
 
 
-10. GET /v2/entities with correct Polygon but nothing found
+09. GET /v2/entities with correct Polygon but nothing found
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 2

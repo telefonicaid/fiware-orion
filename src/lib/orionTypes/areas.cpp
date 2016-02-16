@@ -594,7 +594,7 @@ int Geometry::parse(const std::string& apiVersion, const char* in, std::string* 
 
       areaType = items[ix];
     }
-#if 1
+#if 0
     else if ((apiVersion == "v2") && (items[ix] == "circle"))  // Temporal - circle not supported any more in v2
     {
       if (areaType != "")
