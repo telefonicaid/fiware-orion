@@ -274,7 +274,7 @@ Generally speaking, user-defined attribute types are informative, they are proce
 an opaque way. Nonetheless, the types described below are used to convey an special meaning
 
 * `date`:  identifies dates, in ISO8601 format. These attributes can be used with the
-  greater than, lesser than, greater or equal, lesser or equal and range query operators. For instance
+  greater than, less than, greater or equal, lesser or equal and range query operators. For instance
   (only the referred entity attribute is shown) :
 
 ```
@@ -490,16 +490,16 @@ The list of operators (and the format of the values they use) is as follows:
   matches entities which attribute value is strictly greater than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser than**: `<`. The value is a single element, e.g. `temperature<40`. It
-  matches entities which attribute value is strictly lesser than that value. It only makes sense when
++ **Less than**: `<`. The value is a single element, e.g. `temperature<40`. It
+  matches entities which attribute value is strictly less than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
 + **Greater or equal than**: `>=`. The value is a single element, e.g. `temperature>=40`.
   It matches entities which attribute value is greater than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
-  matches entities which attribute value is lesser than or equal to that value. It only makes sense when
++ **Less or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
+  matches entities which attribute value is less than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
 

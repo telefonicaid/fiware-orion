@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Subscriptions V2 q expression (lesser than)
+POST Subscriptions V2 q expression (less than)
 
 --SHELL-INIT--
 dbInit CB
