@@ -79,7 +79,7 @@ HttpStatusCode mongoUpdateContext
         /* Process each ContextElement */
         for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
         {
-          processContextElement(requestP->contextElementVector.get(ix),
+          processContextElement(requestP->contextElementVector[ix],
                                 responseP,
                                 requestP->updateActionType.get(),
                                 tenant,

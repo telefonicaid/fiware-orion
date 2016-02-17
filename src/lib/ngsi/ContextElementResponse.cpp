@@ -110,7 +110,7 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 
   for (unsigned int ix = 0; ix < attrsV.size(); ++ix)
   {
-    if (attrsV.get(ix) == attr.name)
+    if (attrsV[ix] == attr.name)
     {
       return true;
     }

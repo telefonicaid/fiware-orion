@@ -127,13 +127,13 @@ TEST(ScopeVector, getAndSize)
 
   EXPECT_EQ(3, sV.size());
 
-  scopeP = sV.get(0);
+  scopeP = sV[0];
   EXPECT_STREQ("Value0", scopeP->value.c_str());
 
-  scopeP = sV.get(1);
+  scopeP = sV[1];
   EXPECT_STREQ("Value1", scopeP->value.c_str());
 
-  scopeP = sV.get(2);
+  scopeP = sV[2];
   EXPECT_STREQ("Value2", scopeP->value.c_str());
 
   utExit();

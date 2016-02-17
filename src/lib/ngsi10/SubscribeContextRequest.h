@@ -52,11 +52,12 @@ typedef struct SubscribeContextRequest
   Restriction            restriction;            // Optional
   NotifyConditionVector  notifyConditionVector;  // Optional
   Throttling             throttling;             // Optional
+  int64_t                expires;
 
   /* The number of restrictions */
   int                    restrictions;
 
-  SubscribeContextRequest();
+  SubscribeContextRequest(): expires(-1), restrictions(0) {}
   std::string  render(RequestType requestType, Format format, const std::string& indent);
   std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);

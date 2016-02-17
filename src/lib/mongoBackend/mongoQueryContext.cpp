@@ -51,7 +51,7 @@ bool someContextElementNotFound(ContextElementResponseVector& cerV)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if (someContextElementNotFound(*cerV.get(ix)))
+    if (someContextElementNotFound(*cerV[ix]))
     {
       return true;
     }
@@ -72,7 +72,7 @@ void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistratio
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    fillContextProviders(cerV.get(ix), crrV);
+    fillContextProviders(cerV[ix], crrV);
   }
 }
 
@@ -85,9 +85,9 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if (cerV.get(ix)->contextElement.entityId.id == enP->id && cerV.get(ix)->contextElement.entityId.type == enP->type)
+    if (cerV[ix]->contextElement.entityId.id == enP->id && cerV[ix]->contextElement.entityId.type == enP->type)
     {
-      cerV.get(ix)->contextElement.providingApplicationList.push_back(pa);
+      cerV[ix]->contextElement.providingApplicationList.push_back(pa);
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
   }
@@ -123,15 +123,15 @@ void addContextProviderAttribute
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV.get(ix)->contextElement.entityId.id != enP->id) ||
-        (cerV.get(ix)->contextElement.entityId.type != enP->type))
+    if ((cerV[ix]->contextElement.entityId.id != enP->id) ||
+        (cerV[ix]->contextElement.entityId.type != enP->type))
     {
      continue;
     }
 
-    for (unsigned int jx = 0; jx < cerV.get(ix)->contextElement.contextAttributeVector.size(); ++jx)
+    for (unsigned int jx = 0; jx < cerV[ix]->contextElement.contextAttributeVector.size(); ++jx)
     {
-      std::string attrName = cerV.get(ix)->contextElement.contextAttributeVector.get(jx)->name;
+      std::string attrName = cerV[ix]->contextElement.contextAttributeVector[jx]->name;
       if (attrName == craP->name)
       {
         /* In this case, the attribute has been already found in local database. CPr is unnecessary */
@@ -141,7 +141,7 @@ void addContextProviderAttribute
     /* Reached this point, no attribute was found, so adding it with corresponding CPr info */
     ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
     caP->providingApplication = pa;
-    cerV.get(ix)->contextElement.contextAttributeVector.push_back(caP);
+    cerV[ix]->contextElement.contextAttributeVector.push_back(caP);
     return;
 
   }
@@ -174,7 +174,7 @@ bool matchEntityInCrr(ContextRegistration& cr, const EntityId* enP)
 {
   for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix)
   {
-    EntityId* crEnP = cr.entityIdVector.get(ix);
+    EntityId* crEnP = cr.entityIdVector[ix];
     if (matchEntity(crEnP, enP))
     {
       return true;
@@ -204,7 +204,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 {
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
-    ContextRegistration cr = crrV.get(ix)->contextRegistration;
+    ContextRegistration cr = crrV[ix]->contextRegistration;
 
     /* In the case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP)) {
@@ -218,7 +218,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
         /* Registration without attributes */
         for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
         {
-          addContextProviderEntity(cerV, cr.entityIdVector.get(eIx), cr.providingApplication);
+          addContextProviderEntity(cerV, cr.entityIdVector[eIx], cr.providingApplication);
         }
       }
     }
@@ -229,7 +229,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
       {
         for (unsigned int aIx = 0; aIx < cr.contextRegistrationAttributeVector.size(); ++aIx)
         {
-          addContextProviderAttribute(cerV, cr.entityIdVector.get(eIx), cr.contextRegistrationAttributeVector.get(aIx), cr.providingApplication, limitReached);
+          addContextProviderAttribute(cerV, cr.entityIdVector[eIx], cr.contextRegistrationAttributeVector[aIx], cr.providingApplication, limitReached);
         }
       }
     }
@@ -251,7 +251,7 @@ void processGenericEntities(const EntityIdVector& enV, ContextElementResponseVec
 {
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    const EntityId* enP = enV.get(ix);
+    const EntityId* enP = enV[ix];
     if (enP->type == "" || isTrue(enP->isPattern))
     {
       addContextProviders(cerV, crrV, limitReached, enP);

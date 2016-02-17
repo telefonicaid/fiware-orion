@@ -15,7 +15,7 @@ Apart from processing updateContext and registerContext (usually issued
 by a client application) Orion Context Broker can process
 notifyContextRequest and notifyContextAvailabilityRequest with the same
 semantics. This opens the door to interesting federation scenarios (one
-example is the [FI-LAB context management platform](# "wikilink")).
+example is the [FIWARE Lab context management platform](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE_Lab_Context_Management_Platform)).
 
 ![](Federation.png "Federation.png")
 

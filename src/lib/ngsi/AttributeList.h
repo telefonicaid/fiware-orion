@@ -50,7 +50,6 @@ typedef struct AttributeList
   void         push_back(const std::string& attributeName);
   void         push_back_if_absent(const std::string& attributeName);
   unsigned int size(void) const;
-  std::string  get(int ix) const;
   void         clone(const AttributeList& aList);
 
   std::string  check(RequestType         requestType,
@@ -59,15 +58,11 @@ typedef struct AttributeList
                      const std::string&  predetectedError,
                      int                 counter);
 
-  std::string  operator[](unsigned int ix) const
+  std::string  operator[](unsigned int ix)  const
   {
-    if (ix < attributeV.size())
-    {
-      return attributeV[ix];
-    }
-
-    return "";
+  return attributeV[ix];
   }
+  
 } AttributeList;
 
 #endif  // SRC_LIB_NGSI_ATTRIBUTELIST_H_

@@ -45,7 +45,18 @@ unsigned int QueryContextResponseVector::size(void)
   return vec.size();
 }
 
-
+/* ****************************************************************************
+*
+* QueryContextResponseVector::operator[] -
+*/
+QueryContextResponse*  QueryContextResponseVector::operator[](unsigned int ix) const
+{
+   if (ix < vec.size())
+   {
+      return vec[ix];
+   }
+   return NULL;
+}
 
 /* ****************************************************************************
 *
@@ -55,8 +66,6 @@ void QueryContextResponseVector::push_back(QueryContextResponse* item)
 {
   vec.push_back(item);
 }
-
-
 
 /* ****************************************************************************
 *

@@ -20,7 +20,7 @@ The `-logLevel` option allows to choose which error messages are printed in the 
 
 - NONE: no log at all
 - ERROR: only ERROR messages are logged
-- WARNING: WARNING and ERROR messages are logged
+- WARNING (default): WARNING and ERROR messages are logged
 - INFO: INFO, WARNING and ERROR messages are logged
 - DEBUG: DEBUG, INFO, WARNING and ERROR messages are logged
 
@@ -174,7 +174,7 @@ exceeds 100MB (checked very 30 minutes by default):
         regular frecuency (default is 30 minutes)
 
 Depending on your expected load you would need to adjust the default
-settings. In this sense, take into account that every transaction can
+settings. In this sense, take into account that in INFO log level every transaction can
 consume around 1-2 KB (measured with Orion 0.14.1), e.g. if your
 expected load is around 200 TPS, then your log file will grow 200-400 KB
 per second.

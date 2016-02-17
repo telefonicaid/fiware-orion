@@ -74,9 +74,9 @@ to take into account:
         (the one specified by the -db option) and the authorization is
         done with `-dbuser` and `-dbpwd` in that database.
     -   If you run Orion in multi service/tenant mode (i.e.
-        with + -multiservice`) then the authorization is done at `admin`
+        with `-multiservice`) then the authorization is done at `admin`
         database using `-dbuser` and `-dbpwd`. As described [later in this
-        document](#Multiservice/multitenant_database_separation "wikilink"),
+        document](#multiservicemultitenant-database-separation),
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
         authorizing on `admin` DB ensures permissions in all of them.
@@ -97,12 +97,7 @@ the behaviour is different and the following databases are used (let
     database would be `orion-tenantA`.
 
 Per-service/tenant databases are created "on the fly" as the first
-request involving tenant data is processed by Orion. Note that there is
-a limitation in MongoDB current versions of 24,000 namespaces (each
-collection or index in a database consumes a namespace). Orion currently
-uses 5 collections per database, thus taking into account each
-collection involves also at least the `_id` index, that will end in a
-2,400 services/tenants limit (less if you have more indexes in place).
+request involving tenant data is processed by Orion.
 
 Finally, in the case of per-service/tenant databases, all collections
 and administrative procedures (backup, restore, etc.) are associated to

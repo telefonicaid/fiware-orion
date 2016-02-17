@@ -14,7 +14,7 @@
         "CB_PID_FILE": "/var/run/contextBroker/contextBroker.pid",
         "CB_LOG_OWNER": "orion",
         "CB_LOG_MOD": "777",
-        "CB_EXTRA_OPS": "\"-multiservice -t 0-255\"",
+        "CB_EXTRA_OPS": "\"-multiservice -t 0-255 -logLevel DEBUG\"",
         "CB_RETRIES": "30",
         "CB_DELAY_TO_RETRY" : "1"
     },

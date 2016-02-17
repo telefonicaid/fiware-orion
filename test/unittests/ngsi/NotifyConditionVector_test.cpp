@@ -143,13 +143,13 @@ TEST(NotifyConditionVector, get)
   ncV.push_back(&nc1);
   ncV.push_back(&nc2);
 
-  ncP = ncV.get(0);
+  ncP = ncV[0];
   EXPECT_STREQ("Type0", ncP->type.c_str());
 
-  ncP = ncV.get(1);
+  ncP = ncV[1];
   EXPECT_STREQ("Type1", ncP->type.c_str());
 
-  ncP = ncV.get(2);
+  ncP = ncV[2];
   EXPECT_STREQ("Type2", ncP->type.c_str());
 
   EXPECT_EQ(3, ncV.size());
