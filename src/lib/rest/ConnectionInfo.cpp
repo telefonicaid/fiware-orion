@@ -89,3 +89,139 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
   return 0;
 }
+
+static inline Verb strToVerb(const std::string &str)
+{
+  if (str == "POST")
+    return POST;
+  else if (str == "PUT")
+    return PUT;
+  else if (str == "GET")
+    return GET;
+  else if (str == "DELETE")
+    return DELETE;
+  else if (str == "PATCH")
+    return PATCH;
+  return NOVERB;
+}
+
+// ConnectionInfo class implementation
+
+ConnectionInfo::ConnectionInfo(const std::string &_api, Format _format, bool _ws):
+  connection             (NULL),
+  verb                   (NOVERB),
+  inFormat               (_format),
+  outFormat              (_format),
+  payload                (NULL),
+  payloadSize            (0),
+  callNo                 (1),
+  parseDataP             (NULL),
+  port                   (0),
+  apiVersion             (_api),
+  inCompoundValue        (false),
+  compoundValueP         (NULL),
+  compoundValueRoot      (NULL),
+  httpStatusCode         (SccOk)
+{
+  memset(payloadWord, 0, sizeof(payloadWord));
+
+  if (_ws)
+  {
+    version = "HTTP/1.1";
+    servicePath = "/";
+    httpHeaders.gotHeaders = true;
+    httpHeaders.userAgent = "orionWS/0.1";
+    httpHeaders.accept = "*/*";
+    httpHeaders.contentLength = 0;
+    httpHeaders.servicePath = "/";
+
+    uriParam["details"] = "off";
+    uriParam["limit"] = "20";
+    uriParam["notifyFormat"] = "JSON";
+    uriParam["offset"] = "0";
+  }
+
+}
+
+ConnectionInfo::ConnectionInfo(Format _outFormat):
+  connection             (NULL),
+  verb                   (NOVERB),
+  inFormat               (XML),
+  outFormat              (_outFormat),
+  payload                (NULL),
+  payloadSize            (0),
+  callNo                 (1),
+  parseDataP             (NULL),
+  port                   (0),
+  apiVersion             ("v1"),
+  inCompoundValue        (false),
+  compoundValueP         (NULL),
+  compoundValueRoot      (NULL),
+  httpStatusCode         (SccOk)
+{
+  memset(payloadWord, 0, sizeof(payloadWord));
+}
+
+ConnectionInfo::ConnectionInfo(const std::string &_url, const std::string &_method, const std::string &_version, MHD_Connection* _connection):
+  connection             (_connection),
+  verb                   (NOVERB),
+  inFormat               (XML),
+  outFormat              (XML),
+  url                    (_url),
+  method                 (_method),
+  version                (_version),
+  payload                (NULL),
+  payloadSize            (0),
+  callNo                 (1),
+  parseDataP             (NULL),
+  port                   (0),
+  apiVersion             ("v1"),
+  inCompoundValue        (false),
+  compoundValueP         (NULL),
+  compoundValueRoot      (NULL),
+  httpStatusCode         (SccOk)
+{
+
+  memset(payloadWord, 0, sizeof(payloadWord));
+  verb = strToVerb(_method);
+}
+
+ConnectionInfo::~ConnectionInfo()
+{
+  if (compoundValueRoot != NULL)
+    delete compoundValueRoot;
+
+  servicePathV.clear();
+}
+
+void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload)
+{
+  url = _url;
+  method = _verb;
+
+  verb = strToVerb(_verb);
+
+  if (payload)
+  {
+    free(payload);
+    payload = NULL;
+    payloadSize = 0;
+    httpHeaders.contentType.clear();
+    httpHeaders.contentLength = 0;
+  }
+
+  if (!_payload.empty())
+  {
+    payload = strdup(_payload.c_str());
+    payloadSize = _payload.size();
+    httpHeaders.contentType = "application/json";
+  }
+
+  uriParam["details"] = "off";
+  uriParam["limit"] = "20";
+  uriParam["notifyFormat"] = "JSON";
+  uriParam["offset"] = "0";
+
+  inFormat = outFormat = JSON;
+
+}
