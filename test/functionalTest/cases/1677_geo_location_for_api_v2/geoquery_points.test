@@ -30,27 +30,31 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create point A (5, 5)
-# 02. Create point B (9, 5)
-# 03. Create point C (15, 5)
-# 04. Create point D (15, 15)
-# 05. Create point E (-4, 10)
-# 06. Query coveredBy point (5, 5) -> not supported
-# 07. Query coveredBy line (5, 5) (9, 5) -> not supported
-# 08. Query coveredBy box (-5, 0) (6, 11) -> A, E
-# 09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
-# 10. Query intersects point (5, 5) -> A
-# 11. Query intersects line (5, 5) (9, 5) -> A, B
-# 12. Query intersects box (-5, 0) (6, 11) -> A, E
-# 13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
-# 14. Query disjoint point (5, 5) -> B, C, D, E
-# 15. Query disjoint line (5, 5) (9, 5) -> C, D, E
-# 16. Query disjoint box (-5, 0) (6, 11) -> B, C, D
-# 17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
-# 18. Query equals point (15, 15) -> D
-# 19. Query equals line (5, 5) (9, 5) -> none
-# 20. Query equals box (-5, 0) (6, 11) -> none
-# 21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none
+# 01.  Create point A (5, 5)
+# 02.  Create point B (9, 5)
+# 03.  Create point C (15, 5)
+# 04.  Create point D (15, 15)
+# 05.  Create point E (-4, 10)
+# 06.  Query coveredBy point (5, 5) -> not supported
+# 07.  Query coveredBy line (5, 5) (9, 5) -> not supported
+# 08.  Query coveredBy box (-5, 0) (6, 11) -> A, E
+# 08b. Query coveredBy (same) box (-5, 11) (6, 0) -> A, E
+# 09.  Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+# 10.  Query intersects point (5, 5) -> A
+# 11.  Query intersects line (5, 5) (9, 5) -> A, B
+# 12.  Query intersects box (-5, 0) (6, 11) -> A, E
+# 12b. Query intersects (same) box (-5, 11) (6, 0) -> A, E
+# 13.  Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+# 14.  Query disjoint point (5, 5) -> B, C, D, E
+# 15.  Query disjoint line (5, 5) (9, 5) -> C, D, E
+# 16.  Query disjoint box (-5, 0) (6, 11) -> B, C, D
+# 16b. Query disjoint (same) box (-5, 11) (6, 0) -> B, C, D
+# 17.  Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
+# 18.  Query equals point (15, 15) -> D
+# 19.  Query equals line (5, 5) (9, 5) -> none
+# 20.  Query equals box (-5, 0) (6, 11) -> none
+# 20b. Query equals (same) box (-5, 11) (6, 0) -> none
+# 21.  Query equals polygon (0, 0) (24, 0) (0, 20) -> none
 #
 
 echo "01. Create point A (5, 5)"
@@ -149,9 +153,16 @@ echo
 echo
 
 
+echo "08b. Query coveredBy (same) box (-5, 11) (6, 0) -> A, E"
+echo "======================================================="
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=-5,11;6,0' --json
+echo
+echo
+
+
 echo "09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
 echo "============================================================="
-orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=-0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
 echo
 echo
 
@@ -177,9 +188,16 @@ echo
 echo
 
 
+echo "12b. Query intersects (same) box (-5, 11) (6, 0) -> A, E"
+echo "========================================================"
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=-5,11;6,0' --json
+echo
+echo
+
+
 echo "13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
 echo "=============================================================="
-orionCurl --url '/v2/entities?georel=intersects&geometry=polygon&coords=-0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
 echo
 echo
 
@@ -205,9 +223,16 @@ echo
 echo
 
 
+echo "16b. Query disjoint (same) box (-5, 11) (6, 0) -> B, C, D"
+echo "========================================================="
+orionCurl --url '/v2/entities?georel=disjoint&geometry=box&coords=-5,11;6,0' --json
+echo
+echo
+
+
 echo "17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E"
 echo "========================================================="
-orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=-0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
 echo
 echo
 
@@ -233,11 +258,19 @@ echo
 echo
 
 
+echo "20b. Query equals (same) box (-5, 11) (6, 0) -> none"
+echo "===================================================="
+orionCurl --url '/v2/entities?georel=equals&geometry=box&coords=-5,11;6,0' --json
+echo
+echo
+
+
 echo "21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none"
 echo "======================================================="
-orionCurl --url '/v2/entities?georel=equals&geometry=polygon&coords=-0,0;24,0;0,20;0,0' --json
+orionCurl --url '/v2/entities?georel=equals&geometry=polygon&coords=0,0;24,0;0,20;0,0' --json
 echo
 echo
+
 
 --REGEXPECT--
 01. Create point A (5, 5)
@@ -313,6 +346,35 @@ Date: REGEX(.*)
 
 08. Query coveredBy box (-5, 0) (6, 11) -> A, E
 ===============================================
+HTTP/1.1 200 OK
+Content-Length: 169
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+08b. Query coveredBy (same) box (-5, 11) (6, 0) -> A, E
+=======================================================
 HTTP/1.1 200 OK
 Content-Length: 169
 Content-Type: application/json
@@ -429,6 +491,35 @@ Date: REGEX(.*)
 
 12. Query intersects box (-5, 0) (6, 11) -> A, E
 ================================================
+HTTP/1.1 200 OK
+Content-Length: 169
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "5, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "E",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "-4, 10"
+        },
+        "type": "T"
+    }
+]
+
+
+12b. Query intersects (same) box (-5, 11) (6, 0) -> A, E
+========================================================
 HTTP/1.1 200 OK
 Content-Length: 169
 Content-Type: application/json
@@ -617,6 +708,44 @@ Date: REGEX(.*)
 ]
 
 
+16b. Query disjoint (same) box (-5, 11) (6, 0) -> B, C, D
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "B",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "9, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "C",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 5"
+        },
+        "type": "T"
+    },
+    {
+        "id": "D",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "15, 15"
+        },
+        "type": "T"
+    }
+]
+
+
 17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
 =========================================================
 HTTP/1.1 200 OK
@@ -678,6 +807,16 @@ Date: REGEX(.*)
 
 20. Query equals box (-5, 0) (6, 11) -> none
 ============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+20b. Query equals (same) box (-5, 11) (6, 0) -> none
+====================================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json

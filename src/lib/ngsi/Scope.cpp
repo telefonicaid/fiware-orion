@@ -313,7 +313,7 @@ int Scope::fill
     // Check that points are different an not aligned (either horizontally or vertically)
     if ((pointV[0]->latitude() == pointV[1]->latitude())  || (pointV[0]->longitude() == pointV[1]->longitude()))
     {
-      *errorStringP = "invalid number of coordinates for /box/";
+      *errorStringP = "box coordiantes are not defining an actual box";
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;

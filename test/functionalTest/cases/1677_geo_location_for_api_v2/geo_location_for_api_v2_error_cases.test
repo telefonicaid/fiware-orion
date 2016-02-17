@@ -162,6 +162,27 @@ echo
 echo
 
 
+echo "15a. Degenerated box - see error"
+echo "================================"
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;3,2' --json
+echo
+echo
+
+
+echo "15b. Degenerated box - see error"
+echo "================================"
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;1,8' --json
+echo
+echo
+
+
+echo "15c. Degenerated box - see error"
+echo "================================"
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=box&coords=1,2;1,2' --json
+echo
+echo
+
+
 --REGEXPECT--
 01. geometry without coords - see error
 =======================================
@@ -367,6 +388,45 @@ Date: REGEX(.*)
 
 {
     "description": "Query not supported: Too few coordinates for polygon",
+    "error": "InvalidModification"
+}
+
+
+15a. Degenerated box - see error
+================================
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Query not supported: box coordiantes are not defining an actual box",
+    "error": "InvalidModification"
+}
+
+
+15b. Degenerated box - see error
+================================
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Query not supported: box coordiantes are not defining an actual box",
+    "error": "InvalidModification"
+}
+
+
+15c. Degenerated box - see error
+================================
+HTTP/1.1 422 Unprocessable Entity
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Query not supported: box coordiantes are not defining an actual box",
     "error": "InvalidModification"
 }
 
