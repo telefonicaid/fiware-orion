@@ -20,3 +20,4 @@
 - Add: detect forbidden chars in entity ids and attr names in URI (Issue #1793)
 - Add: dates support in attribute values (Issue #1038)
 - Add: implemented new operation: POST /v2/op/query (Issue #1080)
+- Fix: segfault caused by parameter without value in query string (Issue #1805)
