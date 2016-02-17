@@ -105,7 +105,7 @@ echo
 echo "03. Update Subscription"
 echo "======================="
 sleep 5
-valgrindSleep 1
+valgrindSleep 5
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>PT10M</duration>
@@ -130,7 +130,7 @@ echo
 echo "04. Update Subscription"
 echo "======================="
 sleep 9
-valgrindSleep 1
+valgrindSleep 5
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>PT10M</duration>
@@ -153,7 +153,7 @@ echo
 echo "05. Update Subscription"
 echo "======================="
 sleep 21
-valgrindSleep 1
+valgrindSleep 5
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>PT10M</duration>
@@ -178,7 +178,7 @@ echo
 echo "06. Update Subscription"
 echo "======================="
 sleep 5
-valgrindSleep 1
+valgrindSleep 5
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -201,7 +201,7 @@ echo
 echo "07. Update Subscription"
 echo "======================="
 sleep 26
-valgrindSleep 1
+valgrindSleep 5
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -219,7 +219,7 @@ echo
 echo "08. Notification count from mongo"
 echo "================================="
 sleep 4
-valgrindSleep 1
+valgrindSleep 5
 echo Notification count from mongo:
 mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 echo
@@ -239,6 +239,7 @@ echo
 # Get accumulated data (only the first notification and the notification number and times)
 echo "10. Get accumulated data"
 echo "========================"
+valgrindSleep 2
 accumulatorDump | head -n 32
 
 NUMBER=$(accumulatorCount)
