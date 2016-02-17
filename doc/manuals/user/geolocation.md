@@ -464,3 +464,63 @@ be Alcobendas.
 }
 EOF
 ```
+
+## Geo-located queries NGSIv2
+
+The [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/) defines a Geographical Queries
+languague (based on `georel`, `geometry` and `coords` fields) that can be also used in NGSIv1 with the
+FIWARE::Location::NGSIv2 scope, e.g.:
+
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+      "scopes": [
+        {
+          "type" : "FIWARE::Location::NGSIv2",
+          "value" : {
+            "georel": [ "near", "minDistance=13500" ],
+            "geometry": "point",
+            "coords": [ [40.418889,-3.691944] ]
+          }
+        }
+      ]
+    }
+}
+EOF
+```
+
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+    "scopes": [
+        {
+          "type" : "FIWARE::Location::NGSIv2",
+          "value" : {
+            "georel": [ "equals" ],
+            "geometry": "polygon",
+            "coords": [ [0, 0], [24, 0], [0, 20], [0, 0] ]
+          }
+        }
+      ]
+    }
+}
+EOF
+```
