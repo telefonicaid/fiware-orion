@@ -114,6 +114,7 @@ Date: REGEX(.*)
 02. Sleep 3 secs, awaiting a log summary report
 ===============================================
 
+
 03. grep SUMMARY in log-file (4 transactions, 1 bad input)
 ==========================================================
  Transactions: 4 (new: 4)
@@ -124,11 +125,11 @@ Date: REGEX(.*)
 
 04. grep BadInput in log-file (4 lines found)
 =============================================
- Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
- Repeated BadInput 0.0.0.0: JSON parse error
- Repeated BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'GETT'
- Repeated BadInput 0.0.0.0: {"error":"LengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
-
+ Raising alarm BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): service '/v2/noService' not found
+ Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): JSON parse error
+ Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): bad verb for url '/v2/entities', method 'GETT'
+ Repeated BadInput REGEX(\d+\.\d+\.\d+\.\d+.*): {"error":"LengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
+ 
 
 --TEARDOWN--
 brokerStop CB
