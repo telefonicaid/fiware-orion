@@ -400,7 +400,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: box coordiantes are not defining an actual box",
+    "description": "Query not supported: box coordinates are not defining an actual box",
     "error": "InvalidModification"
 }
 
@@ -413,7 +413,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: box coordiantes are not defining an actual box",
+    "description": "Query not supported: box coordinates are not defining an actual box",
     "error": "InvalidModification"
 }
 
@@ -426,7 +426,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Query not supported: box coordiantes are not defining an actual box",
+    "description": "Query not supported: box coordinates are not defining an actual box",
     "error": "InvalidModification"
 }
 

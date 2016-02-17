@@ -310,10 +310,10 @@ int Scope::fill
       return -1;
     }
 
-    // Check that points are different an not aligned (either horizontally or vertically)
+    // Check that points are different and not aligned (either horizontally or vertically)
     if ((pointV[0]->latitude() == pointV[1]->latitude())  || (pointV[0]->longitude() == pointV[1]->longitude()))
     {
-      *errorStringP = "box coordiantes are not defining an actual box";
+      *errorStringP = "box coordinates are not defining an actual box";
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
@@ -648,7 +648,7 @@ void Scope::present(const std::string& indent, int ix)
 */
 void Scope::release(void)
 {  
-  // note that georel, circle, box, point don't use dynamic memory, so they dont' need release methods
+  // note that georel, circle, box, point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
 }
