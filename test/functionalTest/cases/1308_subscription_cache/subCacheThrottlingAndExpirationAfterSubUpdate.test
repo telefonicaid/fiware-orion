@@ -72,6 +72,7 @@ echo
 
 echo "01. Update the subscription, setting duration to 10 secs and throttling 4 secs"
 echo "=============================================================================="
+sleep 2
 payload='{
   "subscriptionId": "'$SUB_ID'",
   "duration": "PT10S",
@@ -126,7 +127,6 @@ else
 fi
 echo
 echo
-
 
 echo "06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling"
 echo "================================================================================"

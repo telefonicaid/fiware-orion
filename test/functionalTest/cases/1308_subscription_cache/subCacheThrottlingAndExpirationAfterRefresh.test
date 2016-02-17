@@ -150,6 +150,7 @@ echo
 
 echo "11. Dump accumulator - see two notifications"
 echo "============================================"
+sleep 1
 accumulatorDump
 echo
 echo
