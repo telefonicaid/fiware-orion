@@ -101,14 +101,7 @@ int Scope::fill
   int                         points;
   std::vector<orion::Point*>  pointV;
 
-  if (apiVersion == "v1")
-  {
-    type = FIWARE_LOCATION;
-  }
-  else
-  {
-    type = FIWARE_LOCATION_V2;
-  }
+  type = (apiVersion == "v1")? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
   //
   // parse geometry
@@ -120,6 +113,54 @@ int Scope::fill
     return -1;
   }
 
+
+  //
+  // Parse georel?
+  //
+  if (georelString != "")
+  {
+    if (georel.parse(georelString.c_str(), errorStringP) != 0)
+    {
+      return -1;
+    }
+  }
+
+  // Check invalid combinations
+  if ((geometry.areaType == "line") && (georel.type == "coveredBy"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
+     *    { $geoWithin: { $geometry: { type: "LineString", coordinates: [ [ 5.0...", code: 17287 }
+     */
+
+    *errorStringP = "line geometry cannot be used with coveredBy georel";
+    return -1;
+  }
+
+  if ((geometry.areaType == "point") && (georel.type == "coveredBy"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
+     *    { $geoWithin: { $geometry: { type: "Point", coordinates: [ [ 5.0...", code: 17287 }
+     */
+
+    *errorStringP = "point geometry cannot be used with coveredBy georel";
+    return -1;
+  }
+
+  if ((geometry.areaType != "point") && (georel.type == "near"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue invalid point in geo near query $geometry argument:
+     *   { type: "Polygon", coordinates: [ [ [ 2.0, 1.0 ], [ 4.0, 3.0 ],...", code: 17287 }
+     */
+
+    *errorStringP = "georel /near/ used with geometry different than point";
+    return -1;
+  }
 
   //
   // Split coordsString into a vector of points, or pairs of coordinates
@@ -136,19 +177,6 @@ int Scope::fill
     *errorStringP = "erroneous coordinates for geometry";
     return -1;
   }
-
-
-  //
-  // Parse georel?
-  //
-  if (georelString != "")
-  {
-    if (georel.parse(georelString.c_str(), errorStringP) != 0)
-    {
-      return -1;
-    }
-  }
-
 
   //
   // Convert point-strings into instances of the orion::Point class
@@ -209,6 +237,8 @@ int Scope::fill
       circle.radiusSet(geometry.radius);
       circle.invertedSet(geometry.external);
       circle.centerSet(pointV[0]);
+
+      pointVectorRelease(pointV);
       pointV.clear();
     }
   }
@@ -279,7 +309,31 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-    box.fill(pointV[0], pointV[1]);
+
+    // Check that points are different an not aligned (either horizontally or vertically)
+    if ((pointV[0]->latitude() == pointV[1]->latitude())  || (pointV[0]->longitude() == pointV[1]->longitude()))
+    {
+      *errorStringP = "invalid number of coordinates for /box/";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+
+    double minLat = (pointV[0]->latitude()  < pointV[1]->latitude())?  pointV[0]->latitude()  : pointV[1]->latitude();
+    double maxLat = (pointV[0]->latitude()  > pointV[1]->latitude())?  pointV[0]->latitude()  : pointV[1]->latitude();
+    double minLon = (pointV[0]->longitude() < pointV[1]->longitude())? pointV[0]->longitude() : pointV[1]->longitude();
+    double maxLon = (pointV[0]->longitude() > pointV[1]->longitude())? pointV[0]->longitude() : pointV[1]->longitude();
+
+    // Lower left: smaller lat and long, upper right: greater lat and long
+    Point ll;
+    ll.latitudeSet(minLat);
+    ll.longitudeSet(minLon);
+    Point ur;
+    ur.latitudeSet(maxLat);
+    ur.longitudeSet(maxLon);
+    box.fill(&ll, &ur);
+
+    pointVectorRelease(pointV);
     pointV.clear();
   }
   else if (geometry.areaType == "point")
@@ -294,55 +348,17 @@ int Scope::fill
       return -1;
     }
     point.fill(pointV[0]);
+
+    pointVectorRelease(pointV);
     pointV.clear();
   }
   else
   {
-    areaType = orion::NoArea;
-    
+    areaType = orion::NoArea;    
     *errorStringP = "invalid area-type";
+
     pointVectorRelease(pointV);
     pointV.clear();
-    return -1;
-  }
-
-  //pointVectorRelease(pointV); ??
-  pointV.clear();
-
-  // Check invalid combinations
-  if ((geometry.areaType == "line") && (georel.type == "coveredBy"))
-  {
-    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
-     *
-     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
-     *    { $geoWithin: { $geometry: { type: "LineString", coordinates: [ [ 5.0...", code: 17287 }
-     */
-
-    *errorStringP = "line geometry cannot be used with coveredBy georel";
-    return -1;
-  }
-
-  if ((geometry.areaType == "point") && (georel.type == "coveredBy"))
-  {
-    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
-     *
-     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
-     *    { $geoWithin: { $geometry: { type: "Point", coordinates: [ [ 5.0...", code: 17287 }
-     */
-
-    *errorStringP = "point geometry cannot be used with coveredBy georel";
-    return -1;
-  }
-
-  if ((geometry.areaType != "point") && (georel.type == "near"))
-  {
-    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
-     *
-     *  { $err: "Can't canonicalize query: BadValue invalid point in geo near query $geometry argument:
-     *   { type: "Polygon", coordinates: [ [ [ 2.0, 1.0 ], [ 4.0, 3.0 ],...", code: 17287 }
-     */
-
-    *errorStringP = "georel /near/ used with geometry different than point";
     return -1;
   }
 
@@ -631,6 +647,8 @@ void Scope::present(const std::string& indent, int ix)
 * release -
 */
 void Scope::release(void)
-{
+{  
+  // note that georel, circle, box, point don't use dynamic memory, so they dont' need release methods
   polygon.release();
+  line.release();
 }

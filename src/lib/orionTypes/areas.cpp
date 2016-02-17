@@ -130,6 +130,28 @@ void Point::longitudeSet(::std::string longitude)
 
 /* ****************************************************************************
 *
+* Point::latitudeSet -
+*/
+void Point::latitudeSet(double latitude)
+{
+  lat = latitude;
+}
+
+
+
+/* ****************************************************************************
+*
+* Point::longitudeSet -
+*/
+void Point::longitudeSet(double longitude)
+{
+  lon = longitude;
+}
+
+
+
+/* ****************************************************************************
+*
 * Point::equals -
 */
 bool Point::equals(Point* p)
