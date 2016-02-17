@@ -48,7 +48,7 @@ are involved, anyway.
 
 ### Exceptions
 
-There are some exception cases in which the above restrictions are not checked. In particuler, in the following fields:
+There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
 
 * URL parameter `q` and the value of "FIWARE::StringQuery" scope allow the special characters needed by the Simple Query Language
 * URL parameter `georel` and `coords` and the corresponding fields in the "FIWARE::Location::NGSIv2" scope allow `;`
