@@ -86,14 +86,13 @@ class Point
 */
 class Line
 {
+
 public:
-  Point start;
-  Point end;
+  ::std::vector<Point*> pointList;
 
-  Line();
-  Line(Point* startP, Point* endP);
-
-  void fill(Point* startP, Point* endP);
+  Line();  
+  void pointAdd(Point* p);
+  void release(void);
 };
 
 
@@ -190,7 +189,7 @@ class Geometry
 {
 public:
   Geometry();
-  int          parse(const char* in, std::string* errorString);
+  int          parse(const std::string& apiVersion, const char* in, std::string* errorString);
 
   std::string  areaType;
   float        radius;

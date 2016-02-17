@@ -299,7 +299,7 @@ Fields used as identifiers in the NGSIv2 API follow special rules regarding allo
 
 The rules are:
 
-* Allowed characters are the ones in the plain ASCII set except the following ones: whitespace, `&`, ?`, `/` and `#`.
+* Allowed characters are the ones in the plain ASCII set except the following ones: whitespace, `&`, `?`, `/` and `#`.
 * Maximum field length is 256 characters.
 
 In addition to the above rules, given NGSIv2 server implementations could add additional syntactical restrictions in those
@@ -545,7 +545,7 @@ and the reference geometry must be exactly the same.
 + `geometry=polygon`, defines a polygon.
 + `geometry=box`, defines a bounding box.
 
-**coords** must be a string containing a comma separated list of pairs of geographical coordinates
+**coords** must be a string containing a semicolon separated list of pairs of geographical coordinates
 in accordance with the geometry specified and the rules mandated by the Simple Location Format:
 
 * `geometry=point`.   `coords` will contain a pair of WGS-84 geo-coordinates.
@@ -561,7 +561,7 @@ Matching entities will be located, at a maximum, 1000 meters far away from the r
 `georel=near;minDistance=5000&geometry=point&coords=-40.4,-3.5`.
 Matching entities will be at least 5000 meters far away from the reference point. 
 
-`georel=coveredBy&geometry=polygon&coords=25.774,-80.190,18.466,-66.118,32.321,-64.757,25.774,-80.190`
+`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
 Matching entities will be those located within the referred polygon.
 
 ### Query Resolution
@@ -651,7 +651,7 @@ Response code:
     + geometry: point (optional, string) - Geografical area to which the query is restricted.
     See [Geographical Queries](#geographical_queries).
     
-    + coords: 40.6391,-8.6533 (optional, string) - List of latitude-longitude pairs of coordinates separated by ','.
+    + coords: 40.6391,-8.6533 (optional, string) - List of latitude-longitude pairs of coordinates separated by ';'.
     See [Geographical Queries](#geographical_queries).
     
     + limit: 20 (optional, number) - Limits the number of entities to be retrieved
