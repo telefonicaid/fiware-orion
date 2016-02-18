@@ -30,9 +30,6 @@ brokerStart CB
 --SHELL--
 
 #
-# Note that we need to use curl directly in steps 2-5 to avoid
-# the field order done by the pretty printer
-#
 # 01. Create entity with attributes A, B, C, D
 # 02. Get values without attrs param -> A, B, C, D
 # 03. Get values in order B, D, C

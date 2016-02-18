@@ -30,9 +30,6 @@ brokerStart CB
 --SHELL--
 
 #
-# Note that we need to use curl directly in steps 2-5 to avoid
-# the field order done by the pretty printer
-#
 # 01. Create entity E1 with attributes A, B
 # 02. Create entity E2 with attributes A, B
 # 03. Get entities in values mode
