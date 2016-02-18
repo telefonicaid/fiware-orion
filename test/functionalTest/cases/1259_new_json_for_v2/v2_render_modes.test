@@ -290,30 +290,26 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1?options=values
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 93
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "attributeValues": [
-        false,
-        22.1,
-        21,
-        {
-            "a": 1,
-            "b": 2
-        },
-        "a1",
-        true,
-        [
-            "a",
-            "b"
-        ],
-        0
+[
+    false,
+    22.1,
+    21,
+    {
+        "a": 1,
+        "b": 2
+    },
+    "a1",
+    true,
+    [
+        "a",
+        "b"
     ],
-    "id": "E1",
-    "type": null
-}
+    0
+]
 
 
 05. GET /v2/entities
@@ -450,31 +446,27 @@ Date: REGEX(.*)
 07. GET /v2/entities?options=values
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 95
+Content-Length: 53
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-    {
-        "attributeValues": [
-            false,
-            22.1,
-            21,
-            {
-                "a": 1,
-                "b": 2
-            },
-            "a1",
-            true,
-            [
-                "a",
-                "b"
-            ],
-            0
+    [
+        false,
+        22.1,
+        21,
+        {
+            "a": 1,
+            "b": 2
+        },
+        "a1",
+        true,
+        [
+            "a",
+            "b"
         ],
-        "id": "E1",
-        "type": null
-    }
+        0
+    ]
 ]
 
 

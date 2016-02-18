@@ -32,6 +32,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
@@ -80,7 +81,7 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const std::string& renderMode)
+std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const std::string& renderMode, const std::string& attrsFilter)
 {
   if (vec.size() == 0)
   {
@@ -101,42 +102,64 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
   // number of valid attributes, then the comma must be rendered.
   //
   int validAttributes = 0;
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  if (attrsFilter == "")
   {
-    if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
+    for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      continue;
+      if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
+      {
+        continue;
+      }
+
+      ++validAttributes;
     }
-
-    ++validAttributes;
   }
-
+  else
+  {
+    std::vector<std::string> attrsV;
+    stringSplit(attrsFilter, ',', attrsV);
+    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    {
+      if (lookup(*it) != NULL)
+      {
+        ++validAttributes;
+      }
+    }
+  }
 
   //
   // Pass 2 - do the work, helped by the value of 'validAttributes'.
   //
   std::string  out;
   int          renderedAttributes = 0;
-
-  if (renderMode == "values")
-  {
-    out = JSON_STR("attributeValues") + ":" + "[";
-  }
   
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  if (attrsFilter == "")
   {
-    if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
+    for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      continue;
+      if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
+      {
+        continue;
+      }
+
+      ++renderedAttributes;
+      out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
     }
-
-    ++renderedAttributes;
-    out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
   }
-
-  if (renderMode == "values")
+  else
   {
-    out += "]";
+    std::vector<std::string> attrsV;
+
+    stringSplit(attrsFilter, ',', attrsV);
+    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    {
+      ContextAttribute* caP = lookup(*it);
+      if (caP != NULL)
+      {
+        ++renderedAttributes;
+        out += caP->toJson(renderedAttributes == validAttributes, types, renderMode);
+      }
+    }
   }
 
   return out;
@@ -371,4 +394,23 @@ void ContextAttributeVector::fill(ContextAttributeVector* cavP)
 
     push_back(caP);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* lookup -
+*/
+ContextAttribute* ContextAttributeVector::lookup(const std::string& attributeName)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->name == attributeName)
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
 }
