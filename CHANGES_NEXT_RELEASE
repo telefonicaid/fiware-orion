@@ -24,3 +24,4 @@
 - Add: scope FIWARE::Location::NGSIv2 to allow using NGSIv2 geo-queries also with NGSIv1 (Issue #1677)
 - Fix: segfault caused by parameter without value in query string (Issue #1805)
 - Add: options=values mode for entity queries in NGSIV2 (Issue #1049)
+- Fix: some of the operations reported an incorrect 'Allow' HTTP Header on Bad Verb, now fixed

@@ -135,7 +135,7 @@ Date: REGEX(.*)
 === 4. POST trace level
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
-Allow: POST, GET, PUT, DELETE
+Allow: PUT, DELETE
 Date: REGEX(.*)
 
 
