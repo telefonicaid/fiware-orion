@@ -58,12 +58,12 @@ echo
 01. Normal (but erroneous) v2 entity creation without keyValues (without crashing the broker)
 =============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "not a JSON object",
+    "description": "attribute must be a JSON object",
     "error": "BadRequest"
 }
 

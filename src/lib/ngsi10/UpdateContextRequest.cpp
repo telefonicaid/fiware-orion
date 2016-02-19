@@ -362,6 +362,40 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
+* UpdateContextRequest::fill - 
+*
+* Instead of copying the attributes, the created ContextElements will just point to
+* the already existing ContextAttributes and the original vector is then cleared to
+* avoid any double-free problems.
+*/
+void UpdateContextRequest::fill
+(
+  Entities*           entities,
+  const std::string&  _updateActionType
+)
+{
+  updateActionType.set(_updateActionType);
+
+  for (unsigned int eIx = 0; eIx < entities->vec.size(); ++eIx)
+  {
+    Entity*           eP  = entities->vec[eIx];
+    ContextElement*   ceP = new ContextElement(eP->id, eP->type, eP->isPattern);
+
+    for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
+    {
+      // NOT copying the attribute, just pointing to it - original vector is then cleared
+      ceP->contextAttributeVector.push_back(eP->attributeVector[aIx]);
+    }
+
+    eP->attributeVector.vec.clear();  // original vector is cleared
+    contextElementVector.push_back(ceP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * UpdateContextRequest::attributeLookup - 
 */
 ContextAttribute* UpdateContextRequest::attributeLookup(EntityId* eP, const std::string& attributeName)

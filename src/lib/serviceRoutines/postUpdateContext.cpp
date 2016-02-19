@@ -316,6 +316,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     int noOfFounds    = 0;
     int noOfNotFounds = 0;
+
     for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       if (cerP->contextElement.contextAttributeVector[aIx]->found == true)
@@ -527,7 +528,10 @@ std::string postUpdateContext
     ciP->httpStatusCode = httpStatusCode;
   }
 
-  foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
+  if (ciP->apiVersion == "v1") // FIXME PR: v2 has no forwaring yet - I imagine this function is not necessary for v2 ...
+  {
+    foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
+  }
 
 
 
@@ -536,7 +540,7 @@ std::string postUpdateContext
   //
   // If there is nothing to forward, just return the result
   //
-  bool forwarding = forwardsPending(upcrsP);
+  bool forwarding = (ciP->apiVersion == "v2")? false : forwardsPending(upcrsP);
   if (forwarding == false)
   {
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
@@ -544,6 +548,7 @@ std::string postUpdateContext
     upcrP->release();
     return answer;
   }
+
 
 
   //

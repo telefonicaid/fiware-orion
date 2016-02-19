@@ -42,6 +42,7 @@ postSubscriptions.cpp
 deleteSubscription.cpp
 patchSubscription.cpp
 postBatchQuery.cpp
+postBatchUpdate.cpp
 )
 
 SET (HEADERS
@@ -66,6 +67,7 @@ postSubscriptions.h
 deleteSubscription.h
 patchSubscription.h
 postBatchQuery.h
+postBatchUpdate.h
 )
 
 
