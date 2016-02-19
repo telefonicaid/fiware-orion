@@ -30,10 +30,19 @@
 #include "rapidjson/writer.h"
 
 #include "logMsg/logMsg.h"
+#include "rest/HttpHeaders.h"
 
-void ws_parser_parse(std::string &url, std::string &verb, std::string &payload, const char *msg)
+
+#include <map>
+
+
+void ws_parser_parse(const char *msg,
+                     std::string &url, std::string &verb,
+                     std::string &payload, HttpHeaders &head)
 {
   rapidjson::Document doc;
+
+
   doc.Parse(msg);
 
   if (!doc.IsObject())
@@ -56,4 +65,19 @@ void ws_parser_parse(std::string &url, std::string &verb, std::string &payload, 
   }
   else
     payload.clear();
+
+  if (doc.HasMember("headers"))
+  {
+    std::map<std::string, std::string *>::iterator it = head.supportedAttributes.begin();
+    while (it != head.supportedAttributes.end())
+    {
+      const char *value = doc["headers"][it->first.c_str()].GetString();
+      *(it->second) = value ? std::string(value) : std::string();
+      ++it;
+    }
+
+    head.gotHeaders = true;
+  }
+  else
+    head.gotHeaders = false;
 }

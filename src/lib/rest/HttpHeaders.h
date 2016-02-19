@@ -26,21 +26,16 @@
 * Author: Ken Zangelin
 */
 #include <string>
-
+#include <map>
 
 
 /* ****************************************************************************
 *
 * HttpHeaders - 
 */
-typedef struct HttpHeaders
+struct HttpHeaders
 {
-  HttpHeaders()
-  {
-    gotHeaders          = false;
-    servicePathReceived = false;
-    contentLength       = 0;
-  }
+  HttpHeaders();
 
   bool          gotHeaders;
   std::string   userAgent;
@@ -58,6 +53,8 @@ typedef struct HttpHeaders
 
   unsigned int  contentLength;
   std::string   connection;
-} HttpHeaders;
+
+  std::map<std::string, std::string *>supportedAttributes;
+};
 
 #endif

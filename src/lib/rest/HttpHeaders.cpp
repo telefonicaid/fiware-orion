@@ -1,6 +1,8 @@
+#include "HttpHeaders.h"
+
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,13 +25,19 @@
 * Author: Felipe Ortiz
 */
 
-#ifndef WS_PARSER_H
-#define WS_PARSER_H
-
-#include <vector>
-#include <string>
-
-class HttpHeaders;
-void ws_parser_parse(const char *msg, std::string &url, std::string &verb, std::string &payload, HttpHeaders &head);
-
-#endif
+HttpHeaders::HttpHeaders()
+  : gotHeaders(false)
+  , servicePathReceived(false)
+  , contentLength(0)
+{
+  supportedAttributes["userAgent"] = &userAgent;
+  supportedAttributes["host"] = &host;
+  supportedAttributes["accept"] = &accept;
+  supportedAttributes["expect"] = &expect;
+  supportedAttributes["contentType"] = &contentType;
+  supportedAttributes["origin"] = &origin;
+  supportedAttributes["tenant"] = &tenant;
+  supportedAttributes["servicePath"] = &servicePath;
+  supportedAttributes["xauthToken"] = &xauthToken;
+  supportedAttributes["xforwardedFor"] = &xforwardedFor;
+}
