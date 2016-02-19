@@ -2016,21 +2016,24 @@ bool entitiesQuery
     BSONObjBuilder sortOrder;
     for (int ix = 0; ix < components; ix++)
     {
-      std::string sortToken;
-      int sortDirection;
+      std::string  sortToken;
+      int          sortDirection;
+
       if (sortedV[ix][0] == '!')
       {
         // reverse
-        sortToken = sortedV[ix].substr(1);
+        sortToken     = sortedV[ix].substr(1);
         sortDirection = -1;
       }
       else
       {
-        sortToken = sortedV[ix];
+        sortToken     = sortedV[ix];
         sortDirection = 1;
       }
+
       sortOrder.append(std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE, sortDirection);
     }
+
     query.sort(sortOrder.obj());
   }
 
