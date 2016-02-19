@@ -62,7 +62,6 @@ std::string postBatchUpdate
 {
   BatchUpdate*           buP    = &parseDataP->bu.res;
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
-  UpdateContextResponse* upcrsP = &parseDataP->upcrs.res;
   Entities               entities;
   std::string            answer;
 
