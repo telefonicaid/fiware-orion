@@ -25,3 +25,4 @@
 - Fix: segfault caused by parameter without value in query string (Issue #1805)
 - Add: options=values mode for entity queries in NGSIV2 (Issue #1049)
 - Fix: some of the operations reported an incorrect 'Allow' HTTP Header on Bad Verb, now fixed
+- Add: sorted URI param in NGSIv2 queries to sort entities by attribute (Issue #1103)

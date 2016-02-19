@@ -269,7 +269,8 @@ extern bool entitiesQuery
   bool*                            limitReached = NULL,
   long long*                       countP       = NULL,
   bool*                            badInputP    = NULL,
-  const std::string                apiVersion   = "v1"
+  const std::string&               sorted       = "",
+  const std::string&               apiVersion   = "v1"
 );
 
 /* ****************************************************************************

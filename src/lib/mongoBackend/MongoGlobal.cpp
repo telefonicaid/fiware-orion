@@ -1882,7 +1882,8 @@ bool entitiesQuery
   bool*                            limitReached,
   long long*                       countP,
   bool*                            badInputP,
-  const std::string                apiVersion
+  const std::string&               sorted,
+  const std::string&               apiVersion
 )
 {
 
@@ -2004,7 +2005,34 @@ bool entitiesQuery
   auto_ptr<DBClientCursor>  cursor;
   Query                     query(finalQuery.obj());
 
-  query.sort(BSON(ENT_CREATION_DATE << 1));
+  if (sorted == "")
+  {
+    query.sort(BSON(ENT_CREATION_DATE << 1));
+  }
+  else
+  {
+    std::vector<std::string>  sortedV;
+    int components = stringSplit(sorted, ',', sortedV);
+    BSONObjBuilder sortOrder;
+    for (int ix = 0; ix < components; ix++)
+    {
+      std::string sortToken;
+      int sortDirection;
+      if (sortedV[ix][0] == '!')
+      {
+        // reverse
+        sortToken = sortedV[ix].substr(1);
+        sortDirection = -1;
+      }
+      else
+      {
+        sortToken = sortedV[ix];
+        sortDirection = 1;
+      }
+      sortOrder.append(std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE, sortDirection);
+    }
+    query.sort(sortOrder.obj());
+  }
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
