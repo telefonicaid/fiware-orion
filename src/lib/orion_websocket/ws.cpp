@@ -45,7 +45,7 @@ RestService *orionServices;
 struct _orion_websocket
 {
   volatile int end;
-  libwebsocket_context *ctx;
+  lws_context *ctx;
   pthread_t th;
 };
 
@@ -54,12 +54,15 @@ typedef struct
 {
   unsigned cid;
   char *message;
+  char *request;
+  int index;
 }data;
 
-static int wscllbck(libwebsocket_context *ctx,
-                    libwebsocket *ws,
-                    libwebsocket_callback_reasons reason,
-                    void *user, void *in, size_t len)
+static int wscllbck(lws * ws,
+                    enum lws_callback_reasons reason,
+                    void *user,
+                    void *in,
+                    size_t len)
 {
   data *dat = (data *) user;
   char *message = (char *)in;
@@ -77,6 +80,8 @@ static int wscllbck(libwebsocket_context *ctx,
       }
 
       dat->cid = cid;
+      dat->request = NULL;
+      dat->index = 0;
       LM_I(("Connecction id: %d", dat->cid));
       break;
     }
@@ -97,7 +102,7 @@ static int wscllbck(libwebsocket_context *ctx,
       unsigned char *p = &buff[LWS_SEND_BUFFER_PRE_PADDING];
 
       sprintf((char*)p, "%s", dat->message);
-      libwebsocket_write(ws, p, strlen(dat->message), LWS_WRITE_TEXT);
+      lws_write(ws, p, strlen(dat->message), LWS_WRITE_TEXT);
       free(buff);
       free(dat->message);
       break;
@@ -105,9 +110,26 @@ static int wscllbck(libwebsocket_context *ctx,
 
     case LWS_CALLBACK_RECEIVE:
     {
-      ConnectionInfo *ci = connection_manager_get(dat->cid, message);
-      dat->message = strdup((restService(ci, orionServices)).c_str());
-      libwebsocket_callback_on_writable(ctx, ws);
+      const size_t remaining = lws_remaining_packet_payload(ws);
+      const size_t msg_size = strlen(message);
+
+      if (!dat->request)
+        dat->request = (char *) malloc (msg_size + remaining);
+
+      memcpy(&dat->request[dat->index], message, msg_size);
+      dat->index += msg_size;
+
+      if (!remaining && lws_is_final_fragment(ws))
+      {
+        dat->request[dat->index] = 0;
+
+        ConnectionInfo *ci = connection_manager_get(dat->cid, dat->request);
+        dat->message = strdup((restService(ci, orionServices)).c_str());
+        free(dat->request);
+        dat->request = NULL;
+        dat->index = 0;
+        lws_callback_on_writable(ws);
+      }
       break;
     }
     default:
@@ -116,15 +138,17 @@ static int wscllbck(libwebsocket_context *ctx,
   return 0;
 }
 
-static struct libwebsocket_protocols protocols[] = {
+static struct lws_protocols protocols[] = {
     {
         "orion-ws",
         wscllbck,
         sizeof(data),
-        128
+        128,
+        1,
+        NULL
     },
     {
-        NULL, NULL, 0
+        NULL, NULL, 0, 0, 0, 0
     }
 };
 
@@ -147,7 +171,7 @@ void *runWS(void *ptr)
     pthread_mutex_unlock(&mtx);
 
     pthread_mutex_lock(&mtx);
-    libwebsocket_service(ws->ctx, 50);
+    lws_service(ws->ctx, 50);
     pthread_mutex_unlock(&mtx);
   }
   return 0;
@@ -159,13 +183,13 @@ orion_websocket *orion_websocket_new(RestService *serv)
     9010,
     NULL,
     protocols,
-    libwebsocket_get_internal_extensions(),
+    lws_get_internal_extensions(),
     0,0,0,0,0,0,0,0,0,0
   };
 
   orion_websocket *ws = (orion_websocket *) malloc(sizeof(orion_websocket));
   ws->end = 0;
-  ws->ctx = libwebsocket_create_context(&info);
+  ws->ctx = lws_create_context(&info);
 
   if (!ws->ctx)
   {
