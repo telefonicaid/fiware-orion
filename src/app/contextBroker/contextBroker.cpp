@@ -476,10 +476,6 @@ static const char* validLogLevels[] =
 #define BQR_COMPS_V2            3, { "v2", "op", "query" }
 #define BQR_COMPS_WORD          ""
 
-#define BUR                     BatchUpdateRequest
-#define BUR_COMPS_V2            3, { "v2", "op", "update" }
-#define BUR_COMPS_WORD          ""
-
 //
 // NGSI9
 //
