@@ -128,23 +128,26 @@ std::string getEntities
   //
   if ((coords != "") && (geometry == ""))
   {
-    OrionError   oe(SccBadRequest, "URI param /coords/ used without /geometry/");
+    OrionError   oe(SccInvalidModification, "Query not supported: URI param /coords/ used without /geometry/");
 
+    ciP->httpStatusCode = SccInvalidModification;
     TIMED_RENDER(out = oe.render(ciP, ""));
     return out;
   }
   else if ((geometry != "") && (coords == ""))
   {
-    OrionError oe(SccBadRequest, "URI param /geometry/ used without /coords/");
+    OrionError oe(SccInvalidModification, "Query not supported: URI param /geometry/ used without /coords/");
 
+    ciP->httpStatusCode = SccInvalidModification;
     TIMED_RENDER(out = oe.render(ciP, ""));
     return out;
   }
 
   if ((georel != "") && (geometry == ""))
   {
-    OrionError   oe(SccBadRequest, "URI param /georel/ used without /geometry/");
+    OrionError   oe(SccInvalidModification, "Query not supported: URI param /georel/ used without /geometry/");
 
+    ciP->httpStatusCode = SccInvalidModification;
     TIMED_RENDER(out = oe.render(ciP, ""));
     return out;
   }
@@ -164,8 +167,9 @@ std::string getEntities
 
     if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
     {
-      OrionError oe(SccBadRequest, errorString);
+      OrionError oe(SccInvalidModification, std::string("Query not supported: ") + errorString);
 
+      ciP->httpStatusCode = SccInvalidModification;;
       TIMED_RENDER(out = oe.render(ciP, ""));
 
       scopeP->release();

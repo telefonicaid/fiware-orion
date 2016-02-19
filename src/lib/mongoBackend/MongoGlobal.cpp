@@ -898,6 +898,108 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+/* *****************************************************************************
+*
+* processAreaScopeV2 -
+*
+* Returns true if areaQuery was filled, false otherwise
+*
+*/
+static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
+{
+  if (!mongoLocationCapable())
+  {
+    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+      "Please upgrade MongoDB server to 2.4 or newer)";
+
+    alarmMgr.badInput(clientIp, details);
+    return false;
+  }
+
+  // Fill BSON corresponding to geometry
+  BSONObj geometry;
+  if (scoP->areaType == orion::PointType)
+  {
+    geometry = BSON("type" << "Point" << "coordinates" << BSON_ARRAY(scoP->point.longitude() << scoP->point.latitude()));
+  }
+  else if (scoP->areaType == orion::LineType)
+  {
+    // Arbitrary number of points
+    BSONArrayBuilder ps;
+    for (unsigned int ix = 0; ix < scoP->line.pointList.size(); ++ix)
+    {
+      orion::Point* p = scoP->line.pointList[ix];
+      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+    }
+    geometry = BSON("type" << "LineString" << "coordinates" << ps.arr());
+  }
+  else if (scoP->areaType == orion::BoxType)
+  {
+    BSONArrayBuilder ps;
+    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.lowerLeft.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.upperRight.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.upperRight.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude()));
+    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
+  }
+  else if (scoP->areaType == orion::PolygonType)
+  {
+    // Arbitrary number of points
+    BSONArrayBuilder ps;
+    for (unsigned int ix = 0; ix < scoP->polygon.vertexList.size(); ++ix)
+    {
+      orion::Point* p = scoP->polygon.vertexList[ix];
+      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+    }
+    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown area type: %d)", scoP->areaType));
+    return false;
+  }
+
+  if (scoP->georel.type == "near")
+  {
+    BSONObjBuilder near;
+    near.append("$geometry", geometry);
+    if (scoP->georel.maxDistance >= 0)
+    {
+      near.append("$maxDistance", scoP->georel.maxDistance);
+    }
+    if (scoP->georel.minDistance >= 0)
+    {
+      near.append("$minDistance", scoP->georel.minDistance);
+    }
+    areaQuery = BSON("$near" << near.obj());
+  }
+  else if (scoP->georel.type == "coveredBy")
+  {
+    areaQuery = BSON("$geoWithin" << BSON("$geometry" << geometry));
+  }
+  else if (scoP->georel.type == "intersects")
+  {
+    areaQuery = BSON("$geoIntersects" << BSON("$geometry" << geometry));
+  }
+  else if (scoP->georel.type == "disjoint")
+  {
+    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoIntersects" << BSON("$geometry" << geometry)));
+  }
+  else if (scoP->georel.type == "equals")
+  {
+    areaQuery = geometry;
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown georel type: '%s')", scoP->georel.type.c_str()));
+    return false;
+  }
+
+  return true;
+}
+
+
 #define OPR_EXIST     "EXISTS"
 #define OPR_NOT_EXIST "NOT EXIST"
 
@@ -1842,7 +1944,7 @@ bool entitiesQuery
       // FIXME P5: NGSI "v1" filter, probably to be removed in the future
       addFilterScope(sco, filters);
     }
-    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED)
+    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED || sco->type == FIWARE_LOCATION_V2)
     {
       geoScopes++;
       if (geoScopes > 1)
@@ -1853,10 +1955,19 @@ bool entitiesQuery
       {
         BSONObj areaQuery;
 
-        if (processAreaScope(sco, areaQuery))
+        bool result;
+        if (sco->type == FIWARE_LOCATION_V2)
+        {
+          result = processAreaScopeV2(sco, areaQuery);
+        }
+        else // FIWARE Location NGSIv1 (legacy)
+        {
+          result = processAreaScope(sco, areaQuery);
+        }
+
+        if (result)
         {
           std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-
           finalQuery.append(locCoords, areaQuery);
         }
       }

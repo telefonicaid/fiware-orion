@@ -20,4 +20,8 @@
 - Add: detect forbidden chars in entity ids and attr names in URI (Issue #1793)
 - Add: dates support in attribute values (Issue #1038)
 - Add: implemented new operation: POST /v2/op/query (Issue #1080)
+- Fix: NGSIv2 URI param 'georel' (along with 'geometry' and 'coords') proper support (Issue #1677)
+- Add: scope FIWARE::Location::NGSIv2 to allow using NGSIv2 geo-queries also with NGSIv1 (Issue #1677)
+- Fix: segfault caused by parameter without value in query string (Issue #1805)
+- Add: options=values mode for entity queries in NGSIV2 (Issue #1049)
 - Add implemented new operation: POST /v2/op/update (Issue #1715)

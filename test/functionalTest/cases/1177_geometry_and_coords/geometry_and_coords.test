@@ -106,84 +106,84 @@ echo
 
 echo "05. GET /v2/entities, circle with wide radius capturing all three cities"
 echo "========================================================================"
-orionCurl --url '/v2/entities?geometry=circle;radius=15000&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance=15000&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "06. GET /v2/entities, circle with not so wide radius capturing only Madrid and Leganes"
 echo "======================================================================================"
-orionCurl --url '/v2/entities?geometry=circle;radius=13500&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance=13500&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "07. GET /v2/entities, circle with narrow radius capturing only Madrid"
 echo "====================================================================="
-orionCurl --url '/v2/entities?geometry=circle;radius=1000&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance=1000&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "08. GET /v2/entities, inverted circle with narrow radius capturing Leganes and Alcobendas"
 echo "========================================================================================="
-orionCurl --url '/v2/entities?geometry=circle;radius=1000;external&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;minDistance=1000&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "09. GET /v2/entities, polygon capturing only Leganes"
 echo "===================================================="
-orionCurl --url '/v2/entities?geometry=polygon&coords=40.316667,-3.65;40.216667,-3.85;40.416667,-3.85' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40.316667,-3.65;40.216667,-3.85;40.416667,-3.85;40.316667,-3.65' --json
 echo
 echo
 
 
 echo "10. GET /v2/entities, inverted polygon capturing all but Leganes"
 echo "================================================================"
-orionCurl --url '/v2/entities?geometry=polygon;external&coords=40.316667,-3.65;40.216667,-3.85;40.416667,-3.85' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40.316667,-3.65;40.216667,-3.85;40.416667,-3.85;40.316667,-3.65' --json
 echo
 echo
 
 
 echo "11. GET /v2/entities, polygon capturing only Alcobendas"
 echo "======================================================="
-orionCurl --url '/v2/entities?geometry=polygon&coords=40.533333,-3.533333;40.433333,-3.733333;40.633333,-3.733333' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40.533333,-3.533333;40.433333,-3.733333;40.633333,-3.733333;40.533333,-3.533333' --json
 echo
 echo
 
 
 echo "12. GET /v2/entities, inverted polygon capturing all but Alcobendas"
 echo "==================================================================="
-orionCurl --url '/v2/entities?geometry=polygon;external&coords=40.533333,-3.533333;40.433333,-3.733333;40.633333,-3.733333' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40.533333,-3.533333;40.433333,-3.733333;40.633333,-3.733333;40.533333,-3.533333' --json
 echo
 echo
 
 
 echo "13. GET /v2/entities, polygon capturing only Madrid"
 echo "==================================================="
-orionCurl --url '/v2/entities?geometry=polygon&coords=40.418889,-3.591944;40.318889,-3.791944;40.518889,-3.791944' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40.418889,-3.591944;40.318889,-3.791944;40.518889,-3.791944;40.418889,-3.591944' --json
 echo
 echo
 
 
 echo "14. GET /v2/entities, inverted polygon capturing all but Madrid"
 echo "==============================================================="
-orionCurl --url '/v2/entities?geometry=polygon;external&coords=40.418889,-3.591944;40.318889,-3.791944;40.518889,-3.791944' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40.418889,-3.591944;40.318889,-3.791944;40.518889,-3.791944;40.418889,-3.591944' --json
 echo
 echo
 
 
 echo "15. GET /v2/entities, polygon capturing all three cities"
 echo "========================================================"
-orionCurl --url '/v2/entities?geometry=polygon&coords=40,-3;36,-4;44,-4' --json
+orionCurl --url '/v2/entities?georel=coveredBy&geometry=polygon&coords=40,-3;36,-4;44,-4;40,-3' --json
 echo
 echo
 
 
 echo "16. GET /v2/entities, inverted polygon capturing no city"
 echo "========================================================"
-orionCurl --url '/v2/entities?geometry=polygon;external&coords=40,-3;36,-4;44,-4' --json
+orionCurl --url '/v2/entities?georel=disjoint&geometry=polygon&coords=40,-3;36,-4;44,-4;40,-3' --json
 echo
 echo
 

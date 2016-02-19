@@ -66,6 +66,7 @@ typedef struct Scope
   orion::Point        point;
   orion::Line         line;
   orion::Box          box;
+  orion::Georel       georel;
 
   Scope();
   Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
@@ -73,7 +74,7 @@ typedef struct Scope
   int          fill(const std::string&  apiVersion,
                     const std::string&  geometry,
                     const std::string&  coords,
-                    const std::string&  georel,
+                    const std::string&  georelString,
                     std::string*        errorString);
 
   std::string  render(Format format, const std::string& indent, bool notLastInVector);
