@@ -30,14 +30,14 @@ HttpHeaders::HttpHeaders()
   , servicePathReceived(false)
   , contentLength(0)
 {
-  supportedAttributes["userAgent"] = &userAgent;
-  supportedAttributes["host"] = &host;
-  supportedAttributes["accept"] = &accept;
-  supportedAttributes["expect"] = &expect;
-  supportedAttributes["contentType"] = &contentType;
-  supportedAttributes["origin"] = &origin;
-  supportedAttributes["tenant"] = &tenant;
-  supportedAttributes["servicePath"] = &servicePath;
-  supportedAttributes["xauthToken"] = &xauthToken;
-  supportedAttributes["xforwardedFor"] = &xforwardedFor;
+  supportedHeader["userAgent"] = &userAgent;
+  supportedHeader["host"] = &host;
+  supportedHeader["accept"] = &accept;
+  supportedHeader["expect"] = &expect;
+  supportedHeader["contentType"] = &contentType;
+  supportedHeader["origin"] = &origin;
+  supportedHeader["tenant"] = &tenant;
+  supportedHeader["servicePath"] = &servicePath;
+  supportedHeader["xauthToken"] = &xauthToken;
+  supportedHeader["xforwardedFor"] = &xforwardedFor;
 }
