@@ -58,11 +58,11 @@ typedef struct
   int index;
 }data;
 
-static int wscllbck(lws * ws,
-                    enum lws_callback_reasons reason,
-                    void *user,
-                    void *in,
-                    size_t len)
+static int wsCallback(lws * ws,
+                      enum lws_callback_reasons reason,
+                      void *user,
+                      void *in,
+                      size_t len)
 {
   data *dat = (data *) user;
   char *message = (char *)in;
@@ -141,7 +141,7 @@ static int wscllbck(lws * ws,
 static struct lws_protocols protocols[] = {
     {
         "orion-ws",
-        wscllbck,
+        wsCallback,
         sizeof(data),
         128,
         1,
