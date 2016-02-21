@@ -33,9 +33,14 @@
 #include "rest/HttpHeaders.h"
 #include "parser.h"
 
-void ws_parser_parse(const char *msg,
-                     std::string &url, std::string &verb,
-                     std::string &payload, HttpHeaders &head)
+void ws_parser_parse
+(
+    const char*   msg,
+    std::string&  url,
+    std::string&  verb,
+    std::string&  payload,
+    HttpHeaders&  head
+)
 {
   rapidjson::Document doc;
 
@@ -76,5 +81,7 @@ void ws_parser_parse(const char *msg,
     head.gotHeaders = true;
   }
   else
+  {
     head.gotHeaders = false;
+  }
 }
