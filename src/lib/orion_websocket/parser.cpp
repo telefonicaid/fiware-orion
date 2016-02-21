@@ -23,7 +23,7 @@
 * Author: Felipe Ortiz
 */
 
-#include "parser.h"
+#include <map>
 
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
@@ -31,10 +31,7 @@
 
 #include "logMsg/logMsg.h"
 #include "rest/HttpHeaders.h"
-
-
-#include <map>
-
+#include "parser.h"
 
 void ws_parser_parse(const char *msg,
                      std::string &url, std::string &verb,
