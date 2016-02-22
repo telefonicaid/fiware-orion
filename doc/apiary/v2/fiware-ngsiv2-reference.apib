@@ -660,8 +660,8 @@ Response code:
     + offset: 20 (optional, number) - Establishes the offset from which entities will be returned
     
     + attrs: seatNumber (optional, string) - Comma-separated list of attribute names which data will be included in the response.
-    The attributes are retreived in the same order as specified by this parameter. If this parameter is not included, all the attributes
-    are retrieved, in arbitrary order.
+    The attributes are retrieved in the order specified by this parameter. If this parameter is not included, all the attributes
+    are retrieved in arbitrary order.
 
     + orderBy: temperature,!speed (optional, string) - Comma-separated list of attribute names which will be used to order the entity list.
     The `!` before an attribute name means reverse ordering.
@@ -783,8 +783,8 @@ Response:
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
     entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
-    data will be included in the response. The attributes are retreived in the same order as specified by this parameter.
-    If this parameter is not included, all the attributes are retrieved, in arbitrary order.
+    data will be included in the response. The attributes are retrieved in the order specified by this parameter.
+    If this parameter is not included, all the attributes are retrieved in arbitrary order.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See 
