@@ -30,7 +30,7 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. POST /v2/entities/E1 A (and check 422 Unprocessable Entity)
+# 01. POST /v2/entities/E1 A (and check 404 Not Found)
 # 02. POST /v2/entities E1 A (and check 201 Created)
 # 03. POST /v2/entities/E1 A (and check 204 No Content)
 # 04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
@@ -38,8 +38,8 @@ brokerStart CB 0-255
 # 06. POST /v2/entities/E1?options=append C (and check 204 No Content)
 #
 
-echo "01. POST /v2/entities/E1 A (and check 422 Unprocessable Entity)"
-echo "==============================================================="
+echo "01. POST /v2/entities/E1 A (and check 404 Not Found)"
+echo "===================================================="
 payload='{
   "A": {
     "value": 10
@@ -110,16 +110,16 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities/E1 A (and check 422 Unprocessable Entity)
-===============================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 69
+01. POST /v2/entities/E1 A (and check 404 Not Found)
+====================================================
+HTTP/1.1 404 Not Found
+Content-Length: 58
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "description": "Entity does not exist",
-    "error": "InvalidModification"
+    "error": "NotFound"
 }
 
 
