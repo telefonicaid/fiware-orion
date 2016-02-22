@@ -618,7 +618,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs,orderBy}]
 
 Retrieves a list of entities which match different criteria (by id, idPattern, type or those which match
 a query or geographical query). A given entity have to match all the criteria to be retrieved
@@ -662,6 +662,9 @@ Response code:
     + attrs: seatNumber (optional, string) - Comma-separated list of attribute names which data will be included in the response.
     The attributes are retreived in the same order as specified by this parameter. If this parameter is not included, all the attributes
     are retrieved, in arbitrary order.
+
+    + orderBy: temperature,!speed (optional, string) - Comma-separated list of attribute names which will be used to order the entity list.
+    The `!` before an attribute name means reverse ordering.
     
     + options (optional, string) - Options dictionary
       + Members
