@@ -1882,7 +1882,7 @@ bool entitiesQuery
   bool*                            limitReached,
   long long*                       countP,
   bool*                            badInputP,
-  const std::string&               sorted,
+  const std::string&               sortOrderList,
   const std::string&               apiVersion
 )
 {
@@ -2005,14 +2005,14 @@ bool entitiesQuery
   auto_ptr<DBClientCursor>  cursor;
   Query                     query(finalQuery.obj());
 
-  if (sorted == "")
+  if (sortOrderList == "")
   {
     query.sort(BSON(ENT_CREATION_DATE << 1));
   }
   else
   {
     std::vector<std::string>  sortedV;
-    int components = stringSplit(sorted, ',', sortedV);
+    int components = stringSplit(sortOrderList, ',', sortedV);
     BSONObjBuilder sortOrder;
     for (int ix = 0; ix < components; ix++)
     {
