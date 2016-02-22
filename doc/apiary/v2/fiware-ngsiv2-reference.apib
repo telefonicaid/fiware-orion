@@ -242,7 +242,8 @@ There are two representation modes, which must be supported by implementations, 
 ```
 
 * *values mode*. This mode represents the entity only by a collection of attribute values conveyed by an Array. Id and type information are left out.
-  See example below.
+  See example below. The order of the attributes in the Array is specified by the `attrs` URI param (e.g. `attrs=branch,colour,engine`) or arbitrary
+  order in the case `attrs` is not used.
 
 ```
 [ 'Ford', 'black', 78.3 ]
@@ -659,7 +660,8 @@ Response code:
     + offset: 20 (optional, number) - Establishes the offset from which entities will be returned
     
     + attrs: seatNumber (optional, string) - Comma-separated list of attribute names which data will be included in the response.
-    If this parameter is not included, all the attributes are retrieved.
+    The attributes are retreived in the same order as specified by this parameter. If this parameter is not included, all the attributes
+    are retrieved, in arbitrary order.
     
     + options (optional, string) - Options dictionary
       + Members
@@ -778,7 +780,8 @@ Response:
     + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
     entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
-    data will be included in the response. If this parameter is not included, all the attributes are retrieved.
+    data will be included in the response. The attributes are retreived in the same order as specified by this parameter.
+    If this parameter is not included, all the attributes are retrieved, in arbitrary order.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See 
