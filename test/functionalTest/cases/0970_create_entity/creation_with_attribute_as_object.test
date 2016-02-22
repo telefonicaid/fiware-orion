@@ -39,21 +39,13 @@ echo "===================="
 payload='{
   "id": "E1",
   "type": "T1",
-  "attr01": "1",
-  "attr02": 2,
-  "attr03": 3.3,
-  "attr04": true,
-  "attr05": false,
-  "attr06": {
-    "value": "06"
-  },
-  "attr07": {
+  "attr01": {
     "value": 7
   },
-  "attr08": {
+  "attr02": {
     "value": true
   },
-  "attr09": {
+  "attr03": {
     "value": 9,
     "type": "number"
   }
@@ -83,24 +75,27 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 191
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr01": "1", 
-    "attr02": 2.0, 
-    "attr03": 3.3, 
-    "attr04": true, 
-    "attr05": false, 
-    "attr06": "06", 
-    "attr07": 7.0, 
-    "attr08": true, 
-    "attr09": {
-        "type": "number", 
-        "value": 9.0
-    }, 
-    "id": "E1", 
+    "attr01": {
+        "metadata": {},
+        "type": null,
+        "value": 7
+    },
+    "attr02": {
+        "metadata": {},
+        "type": null,
+        "value": true
+    },
+    "attr03": {
+        "metadata": {},
+        "type": "number",
+        "value": 9
+    },
+    "id": "E1",
     "type": "T1"
 }
 

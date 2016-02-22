@@ -27,13 +27,17 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
+#include "ngsi/ContextAttribute.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "parse/forbiddenChars.h"
+#include "rest/OrionError.h"
 
 
 
@@ -41,11 +45,14 @@
 *
 * getEntityAttributeValue -
 *
-* GET /v2/entities/:id:/attrs/:attrName:
+* GET /v2/entities/<id>/attrs/<attrName>
 *
 * Payload In:  None
 * Payload Out: Entity Attribute
 *
+* URI parameters:
+*   - options=keyValues,text
+* 
 */
 std::string getEntityAttributeValue
 (
@@ -55,12 +62,25 @@ std::string getEntityAttributeValue
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
   Attribute    attribute;
-  bool         text = (ciP->uriParam["options"] == "text" || ciP->outFormat == TEXT);
+  std::string  answer;
+  std::string  type       = ciP->uriParam["type"];
+  bool         text       = (ciP->uriParamOptions["options"] == true || ciP->outFormat == TEXT);
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
@@ -70,15 +90,18 @@ std::string getEntityAttributeValue
   // Render entity attribute response
   if (attribute.errorCode.error == "TooManyResults")
   {
+    ErrorCode ec("TooManyResults", MORE_MATCHING_ENT);
+
     ciP->httpStatusCode = SccConflict;
 
-    TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+    TIMED_RENDER(answer = ec.toJson(true));
   }
   else if (attribute.errorCode.error == "NotFound")
   {
+    ErrorCode ec("NotFound", "The requested entity has not been found. Check type and id");
     ciP->httpStatusCode = SccContextElementNotFound;
 
-    TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+    TIMED_RENDER(answer = ec.toJson(true));
   }
   else
   {
@@ -94,13 +117,14 @@ std::string getEntityAttributeValue
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
 
-      TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+      TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeValueRequest, false));
     }
     else
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
         TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, ""));
+
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {
           answer = "{" + answer + "}";
@@ -112,12 +136,12 @@ std::string getEntityAttributeValue
       }
       else
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->toStringValue());
+        TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
       }
 
       ciP->outFormat = TEXT;
     }
- }
+  }
 
   // Cleanup and return result
   parseDataP->qcr.res.release();

@@ -42,9 +42,11 @@ payload='{
   "attr01": {
     "value": "06",
     "type":  "AT",
-    "m1": "m1",
-    "m2":  2,
-    "m3":  false
+    "metadata": {
+      "m1": "m1",
+      "m2":  2,
+      "m3":  false
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -72,19 +74,30 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr01": {
-        "m1": "m1", 
-        "m2": 2.0, 
-        "m3": false, 
-        "type": "AT", 
+        "metadata": {
+            "m1": {
+                "type": null,
+                "value": "m1"
+            },
+            "m2": {
+                "type": null,
+                "value": 2
+            },
+            "m3": {
+                "type": null,
+                "value": false
+            }
+        },
+        "type": "AT",
         "value": "06"
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 

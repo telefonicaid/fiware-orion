@@ -46,7 +46,8 @@ typedef struct ContextRegistrationAttributeVector
   unsigned int                     size(void);
   void                             release();
 
-  std::string                      check(RequestType         requestType,
+  std::string                      check(ConnectionInfo*     ciP,
+                                         RequestType         requestType,
                                          Format              format,
                                          const std::string&  indent,
                                          const std::string&  predetectedError,

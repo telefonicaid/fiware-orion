@@ -277,13 +277,16 @@ HttpStatusCode mongoQueryContext
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  long long*                           countP
+  long long*                           countP,
+  const std::string&                   apiVersion
 )
 {
     int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
     int         limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
     std::string detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
     bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+
+    std::string sortOrderList  = uriParams[URI_PARAM_SORTED];
 
     LM_T(LmtMongo, ("QueryContext Request"));    
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
@@ -297,9 +300,11 @@ HttpStatusCode mongoQueryContext
     std::string err;
     bool        ok;
     bool        limitReached = false;
+    bool        badInput     = false;
     bool        reqSemTaken;
 
     ContextElementResponseVector rawCerV;    
+
     reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
@@ -312,7 +317,18 @@ HttpStatusCode mongoQueryContext
                        offset,
                        limit,
                        &limitReached,
-                       countP);
+                       countP,
+                       &badInput,
+                       sortOrderList,
+                       apiVersion);
+
+    if (badInput)
+    {
+      responseP->errorCode.fill(SccBadRequest, err);
+      rawCerV.release();
+      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+      return SccOk;      
+    }
 
     if (!ok)
     {

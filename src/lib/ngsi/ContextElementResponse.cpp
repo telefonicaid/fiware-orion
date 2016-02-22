@@ -130,7 +130,13 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 *
 * Note that statusCode is not touched by this constructor.
 */
-ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, const AttributeList& attrL, bool includeEmpty)
+ContextElementResponse::ContextElementResponse
+(
+  const mongo::BSONObj&  entityDoc,
+  const AttributeList&   attrL,
+  bool                   includeEmpty,
+  const std::string&     apiVersion
+)
 {
   prune = false;
 
@@ -207,6 +213,11 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 
+      case jstNULL:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->valueType = orion::ValueTypeNone;
+        break;
+
       case Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
@@ -215,7 +226,7 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);  // LEAK
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
         compoundVectorResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
         break;
 
@@ -231,11 +242,14 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
       caP->metadataVector.push_back(md);
     }
 
-    /* Setting location metatda (if found) */
-    if (locAttr == ca.name)
+    if (apiVersion == "v1")
     {
-      Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
-      caP->metadataVector.push_back(md);
+      /* Setting location metadata (if found) */
+      if (locAttr == ca.name)
+      {
+        Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
+        caP->metadataVector.push_back(md);
+      }
     }
 
     /* Setting custom metadata (if any) */
@@ -314,6 +328,7 @@ void ContextElementResponse::release(void)
 */
 std::string ContextElementResponse::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -323,7 +338,7 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = contextElement.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

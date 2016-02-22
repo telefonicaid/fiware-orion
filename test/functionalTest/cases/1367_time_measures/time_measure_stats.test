@@ -244,27 +244,27 @@ payload='{
   "A1": {
     "value": "1",
     "type": "string",
-    "ID": "ceiling"
+    "metadata": { "ID": "ceiling" }
   },
   "A2": {
     "value": "2",
     "type": "string",
-    "ID": "ceiling"
+    "metadata": { "ID": "ceiling" }
   },
   "A3": {
     "value": "3",
     "type": "string",
-    "ID": "ceiling"
+    "metadata": { "ID": "ceiling" }
   },
   "A4": {
     "value": "4",
     "type": "string",
-    "ID": "ceiling"
+    "metadata": { "ID": "ceiling" }
   },
   "A5": {
     "value": "5",
     "type": "string",
-    "ID": "ceiling"
+    "metadata": { "ID": "ceiling" }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json

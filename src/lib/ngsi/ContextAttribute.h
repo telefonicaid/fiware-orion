@@ -65,6 +65,7 @@ typedef struct ContextAttribute
   bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
+  bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
   ~ContextAttribute();
   ContextAttribute();
@@ -77,20 +78,22 @@ typedef struct ContextAttribute
 
   /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId() const;
-  std::string  getLocation() const;
+  std::string  getLocation(const std::string& apiValue ="v1") const;
 
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
   std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement, bool types);
+  std::string  toJson(bool isLastElement, bool types, const std::string& renderMode, RequestType requestType = NoRequest);
+  std::string  toJsonAsValue(ConnectionInfo* ciP);
   void         present(const std::string& indent, int ix);
   void         release(void);
-  std::string  toString(void);
+  std::string  getName(void);
 
   /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
-  std::string  toStringValue(void) const;
+  std::string  getValue(void) const;
 
-  std::string  check(RequestType         requestType,
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
                      Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,

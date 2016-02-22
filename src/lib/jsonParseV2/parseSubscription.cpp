@@ -34,10 +34,11 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
-
+#include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/parseSubscription.h"
 
 using namespace rapidjson;
+
 
 
 /* Prototypes */
@@ -45,7 +46,8 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification);
 static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject);
 static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities);
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditionVector* ncvP, const Value& condition);
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition);
+
 
 
 /* ****************************************************************************
@@ -53,26 +55,35 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditi
 * parseSubscription -
 *
 */
-std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
+std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDelayedRelease* releaseP, bool update)
 {
-  Document    document;
-  std::string r;
+  Document                  document;
+  SubscribeContextRequest*  destination;
 
   document.Parse(ciP->payload);
 
+  if (update)
+  {
+    destination     = &parseDataP->ucsr.res;
+    releaseP->ucsrP = &parseDataP->ucsr.res;
+  }
+  else
+  {
+    destination    = &parseDataP->scr.res;
+    releaseP->scrP = &parseDataP->scr.res;
+  }
+
   if (document.HasParseError())
   {
+    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
-    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
-
     return oe.render(ciP, "");
   }
 
   if (!document.IsObject())
   {
+    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer", ERROR_STRING_PARSERROR);
     alarmMgr.badInput(clientIp, "JSON parse error");
-    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
-
     return oe.render(ciP, "");
   }
 
@@ -83,67 +94,81 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
-    alarmMgr.badInput(clientIp, "empty payload");
     OrionError oe(SccBadRequest, "empty payload");
 
+    alarmMgr.badInput(clientIp, "empty payload");
     return oe.render(ciP, "");
   }
 
-  if (!document.HasMember("subject"))
+  // Subject field
+  if (document.HasMember("subject"))
   {
-    alarmMgr.badInput(clientIp, "no subject specified");
+    const Value&  subject = document["subject"];
+    std::string   r       = parseSubject(ciP, destination, subject);
+
+    if (r != "")
+    {
+      return r;
+    }
+  }
+  else if (!update)
+  {
     OrionError oe(SccBadRequest, "no subject for subscription specified");
 
+    alarmMgr.badInput(clientIp, "no subject specified");
     return oe.render(ciP, "");
   }
 
-  if (!document.HasMember("notification"))
+  // Notification field
+  if (document.HasMember("notification"))
   {
+    const Value&  notification = document["notification"];
+    std::string   r            = parseNotification(ciP, destination, notification);
+
+    if (r != "")
+    {
+      return r;
+    }
+  }
+  else if (!update)
+  {
+    OrionError oe(SccBadRequest, "no notification for subscription specified");
+
     alarmMgr.badInput(clientIp, "no notification specified");
-    OrionError oe(SccBadRequest, "no notitifcation for subscription specified");
-
     return oe.render(ciP, "");
   }
 
-  if (!document.HasMember("expires"))
+  // Expires field
+  if (document.HasMember("expires"))
   {
-    alarmMgr.badInput(clientIp, "no expires specified");
+    const Value& expires = document["expires"];
+
+    if (!expires.IsString())
+    {
+      OrionError oe(SccBadRequest, "expires is not a string");
+
+      alarmMgr.badInput(clientIp, "expires is not a string");
+      return oe.render(ciP, "");
+    }
+
+    int64_t eT = parse8601Time(expires.GetString());
+
+    if (eT == -1)
+    {
+      OrionError oe(SccBadRequest, "expires has an invalid format");
+
+      alarmMgr.badInput(clientIp, "expires has an invalid format");
+      return oe.render(ciP, "");
+    }
+
+    destination->expires = eT;
+  }
+  else if (!update)
+  {
     OrionError oe(SccBadRequest, "no expiration for subscription specified");
 
+    alarmMgr.badInput(clientIp, "no expires specified");
     return oe.render(ciP, "");
-  }
-
-  const Value& expires = document["expires"];
-
-  if (!expires.IsString())
-  {
-    alarmMgr.badInput(clientIp, "expires is not an string");
-    OrionError oe(SccBadRequest, "expires is not an string");
-
-    return oe.render(ciP, "");
-  }
-
-  int64_t eT= parse8601Time(expires.GetString());
-
-  if (eT == -1)
-  {
-    alarmMgr.badInput(clientIp, "expires has an invalid format");
-    OrionError oe(SccBadRequest, "expires has a invalid format");
-
-    return oe.render(ciP, "");
-  }
-  parseDataP->scr.res.expires = eT;
-
-  const Value& notification = document["notification"];
-  r = parseNotification(ciP, &parseDataP->scr.res, notification);
-  if (r != "") {
-    return r;
-  }
-
-  const Value& subject = document["subject"];
-  r = parseSubject(ciP, &parseDataP->scr.res, subject);
-  if (r != "") {
-    return r;
   }
 
   return "OK";
@@ -156,43 +181,44 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP)
 * parseSubject -
 *
 */
-
 static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& subject)
 {
-
   std::string r;
 
   // Entities
   if (!subject.HasMember("entities"))
   {
-    alarmMgr.badInput(clientIp, "no subject entities specified");
     OrionError oe(SccBadRequest, "no subject entities specified");
 
+    alarmMgr.badInput(clientIp, "no subject entities specified");
     return oe.render(ciP, "");
   }
   else
   {
     r = parseEntitiesVector(ciP, &scrP->entityIdVector, subject["entities"]);
-    if (r != "") {
+    if (r != "")
+    {
       return r;
     }
   }
 
-  //Condition
+  // Condition
   if (!subject.HasMember("condition"))
   {
-    alarmMgr.badInput(clientIp, "no subject condition specified");
     OrionError oe(SccBadRequest, "no subject condition specified");
 
+    alarmMgr.badInput(clientIp, "no subject condition specified");
     return oe.render(ciP, "");
   }
   else
   {
-    r = parseNotifyConditionVector(ciP, &scrP->notifyConditionVector, subject["condition"]);
-    if (r != "") {
+    r = parseNotifyConditionVector(ciP, scrP, subject["condition"]);
+    if (r != "")
+    {
       return r;
     }
   }
+
   return "";
 }
 
@@ -203,7 +229,6 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
 * parseEntitiesVector -
 *
 */
-
 static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP, const Value& entities)
 {
   if (!entities.IsArray())
@@ -213,6 +238,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
     return oe.render(ciP, "");
   }
+
   for (Value::ConstValueIterator iter = entities.Begin(); iter != entities.End(); ++iter)
   {
     if (!iter->IsObject())
@@ -237,9 +263,11 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
       return oe.render(ciP, "");
     }
-    EntityId* eiP         = new EntityId();
-    std::string isPattern = "false";
-    std::string id;
+
+
+    std::string  id;
+    std::string  type;
+    std::string  isPattern  = "false";
 
     if (iter->HasMember("id"))
     {
@@ -259,7 +287,7 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
     {
       if ((*iter)["idPattern"].IsString())
       {
-        id = (*iter)["id"].GetString();
+        id = (*iter)["idPattern"].GetString();
       }
       else
       {
@@ -268,21 +296,21 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
         return oe.render(ciP, "");
       }
+
       isPattern = "true";
     }
     if (id == "")  // Only type was provided
     {
-      id = ".*";
+      id        = ".*";
       isPattern = "true";
     }
-    eiP->id = id;
-    eiP->isPattern = isPattern;
+
 
     if (iter->HasMember("type"))
     {
       if ((*iter)["type"].IsString())
       {
-        id = (*iter)["type"].GetString();
+        type = (*iter)["type"].GetString();
       }
       else
       {
@@ -293,10 +321,12 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
       }
     }
 
+    EntityId*  eiP = new EntityId(id, type, isPattern);
+
     eivP->push_back_if_absent(eiP);
   }
-  return "";
 
+  return "";
 }
 
 
@@ -306,7 +336,6 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 * parseNotification -
 *
 */
-
 static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification)
 {
   // Callback
@@ -321,8 +350,18 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
       return oe.render(ciP, "");
     }
     scrP->reference.string = callback.GetString();
+
+    std::string refError = scrP->reference.check(SubscribeContext,JSON, "" ,"", 0);
+    if (refError != "OK")
+    {
+      alarmMgr.badInput(clientIp, refError);
+      OrionError oe(SccBadRequest, refError);
+
+      return oe.render(ciP, "");
+    }
+
   }
-  else // missing callback field
+  else  // missing callback field
   {
     alarmMgr.badInput(clientIp, "callback is missing");
     OrionError oe(SccBadRequest, "callback is missing");
@@ -342,7 +381,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
   {
     std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attributes"]);
 
-    if (r != "") {
+    if (r != "")
+    {
       return r;
     }
   }
@@ -360,6 +400,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     }
     scrP->throttling.seconds = throttling.GetInt64();
   }
+  else  // There is a notification field, but no throttling was set (update)
+  {
+    scrP->throttling.seconds = 0;
+  }
+
   return "";
 }
 
@@ -370,9 +415,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
 * parseNotifyConditionVector -
 *
 */
-
-static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditionVector* ncvP, const Value& condition)
+static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& condition)
 {
+  NotifyConditionVector* ncvP = &scrP->notifyConditionVector;
+
   // Attributes
   if (!condition.HasMember("attributes"))
   {
@@ -381,34 +427,37 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditi
 
     return oe.render(ciP, "");
   }
+
   NotifyCondition* nc = new NotifyCondition();
   nc->type = ON_CHANGE_CONDITION;
   ncvP->push_back(nc);
-
   std::string r = parseAttributeList(ciP, &nc->condValueList.vec, condition["attributes"]);
 
-  if (r != "") {
+  if (r != "")
+  {
     return r;
   }
 
   if (condition.HasMember("expression"))
   {
+    scrP->expression.isSet = true;
     const Value& expression = condition["expression"];
+
     if (expression.HasMember("q"))
     {
-      nc->expression.q = expression["q"].GetString();
+      scrP->expression.q = expression["q"].GetString();
     }
     if (expression.HasMember("geometry"))
     {
-      nc->expression.geometry = expression["geometry"].GetString();
+      scrP->expression.geometry = expression["geometry"].GetString();
     }
     if (expression.HasMember("coords"))
     {
-      nc->expression.coords = expression["coords"].GetString();
+      scrP->expression.coords = expression["coords"].GetString();
     }
     if (expression.HasMember("georel"))
     {
-      nc->expression.georel = expression["georel"].GetString();
+      scrP->expression.georel = expression["georel"].GetString();
     }
   }
 
@@ -422,7 +471,6 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, NotifyConditi
 * parseAttributeList -
 *
 */
-
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
 {
   std::set<std::string> s;
@@ -434,6 +482,7 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
 
     return oe.render(ciP, "");
   }
+
   for (Value::ConstValueIterator iter = attributes.Begin(); iter != attributes.End(); ++iter)
   {
     if (!iter->IsString())
@@ -445,6 +494,7 @@ static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::stri
     }
     s.insert(iter->GetString());
   }
+
   vec->resize(s.size());
   copy(s.begin(), s.end(),vec->begin());
   return "";

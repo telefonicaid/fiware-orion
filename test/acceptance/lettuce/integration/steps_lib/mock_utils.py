@@ -55,8 +55,9 @@ def get_mock_information(step):
 def the_path_in_the_last_request_contains(step, content):
     check_world_attribute_is_not_none(['mock_data'])
     mock_response = eval(world.mock_data.text)
-    path = mock_response['requests'].keys()[0]
+
     try:
+        path = mock_response['requests'].keys()[0]
         assert path.find(
             content) >= 0, 'The content "{content}" is not in the path of the last request in the mock "{path}"'.format(
             content=str(content), path=str(path))

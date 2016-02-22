@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -35,7 +36,7 @@
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "rest/OrionError.h"
-
+#include "parse/forbiddenChars.h"
 
 
 /* ****************************************************************************
@@ -67,7 +68,14 @@ std::string putEntity
   std::string answer = "";
   Entity*     eP     = &parseDataP->ent.res;
 
-  eP->id = compV[2];
+  eP->id   = compV[2];
+  eP->type = ciP->uriParam["type"];
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "REPLACE");
@@ -94,7 +102,7 @@ std::string putEntity
   }
   else if (ciP->httpStatusCode == SccConflict)
   {
-    OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
+    OrionError orionError(SccConflict, MORE_MATCHING_ENT);
 
     TIMED_RENDER(answer = orionError.render(ciP, ""));
   }

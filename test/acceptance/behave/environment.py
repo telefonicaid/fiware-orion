@@ -166,6 +166,8 @@ def after_all(context):
                           % (item["file_name"], status["passed"], status["failed"], status["skipped"], str(item["total"]),
                              item["duration"]), summary_color)
         print colored("-------------------------------------------------", summary_color)
+        print colored("  Date: %s" % str(time.strftime("%A, %B %d, %Y %H:%M:%S")), summary_color)
+        print colored("-------------------------------------------------", summary_color)
 
 
 def before_feature(context, feature):

@@ -36,6 +36,7 @@
 #include "ngsi10/QueryContextRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
+#include "apiTypesV2/BatchQuery.h"
 
 
 
@@ -127,7 +128,7 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
+  else if (((res = entityIdVector.check(ciP, QueryContext, ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
            ((res = attributeList.check(QueryContext,  ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
            ((res = restriction.check(QueryContext,    ciP->outFormat, indent, predetectedError, restrictions)) != "OK"))
   {
@@ -217,4 +218,33 @@ void QueryContextRequest::fill
   {
     attributeList.push_back(attributeName);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::fill - 
+*
+* NOTE
+* If the incoming bqP->entities.vec is empty, then one almighty entity::id is 
+* added to the QueryContextRequest::entityIdVector, namely, idPattern .* with empty type,
+* matching ALL entities.
+*
+*/
+void QueryContextRequest::fill(BatchQuery* bqP)
+{
+  if (bqP->entities.vec.size() != 0)
+  {
+    entityIdVector.fill(bqP->entities.vec);
+  }
+  else
+  {
+    EntityId* eP = new EntityId(".*", "", "true");
+    entityIdVector.push_back(eP);
+  }
+
+  attributeList.fill(bqP->attributeV.attributeV);
+  restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
+  bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP
 }

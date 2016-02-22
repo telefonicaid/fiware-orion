@@ -77,7 +77,7 @@ std::string ContextAttributeResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(ciP, requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK")
   {
     std::string details = std::string("contextAttributeVector: '") + res + "'";
     alarmMgr.badInput(clientIp, details);

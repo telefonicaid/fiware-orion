@@ -1,0 +1,259 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Log Summary
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -logSummary 3
+
+--SHELL--
+
+#
+# Provoke a few transactions and badInputs and check log summary
+#
+# 01. PUT /v2/noService
+# 02. POST /v2/entities with invalid JSON
+# 03. GETT /v2/entities - bad verb
+# 04. POST /v2/entities without payload
+# 05. Sleep 3 secs, awaiting a log summary report
+# 06. grep SUMMARY in log-file (4 transactions, 1 bad input)
+# 07. GET /v2/entities (just to clear out Bad Input)
+# 08. Sleep 3 secs, awaiting a second log summary
+# 09. grep SUMMARY in log-file (1 transaction and NO bad input since last time, also, Bad Input is no longer active)
+# 10. PUT /v2/noService
+# 11. Sleep 3 secs, awaiting a second log summary
+# 12. grep SUMMARY in log-file (1 transaction and one bad input since last time)
+#
+
+echo "01. PUT /v2/noService"
+echo "====================="
+orionCurl --url /v2/noService --json
+echo
+echo
+
+
+echo "02. POST /v2/entities with invalid JSON"
+echo "======================================="
+payload='abc'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. GETT /v2/entities - bad verb"
+echo "================================"
+orionCurl --url /v2/entities -X GETT --json
+echo
+echo
+
+
+echo "04. POST /v2/entities without payload"
+echo "====================================="
+orionCurl --url /v2/entities --json -X POST
+echo
+echo
+
+
+echo "05. Sleep 3 secs, awaiting a log summary report"
+echo "==============================================="
+sleep 3
+valgrindSleep 5
+echo
+echo
+
+
+echo "06. grep SUMMARY in log-file (4 transactions, 1 bad input)"
+echo "=========================================================="
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
+echo
+echo
+
+
+echo "07. GET /v2/entities (just to clear out Bad Input)"
+echo "=================================================="
+orionCurl --url /v2/entities --json
+echo
+echo
+
+
+echo "08. Sleep 3 secs, awaiting a second log summary"
+echo "==============================================="
+sleep 3
+valgrindSleep 5
+echo
+echo
+
+
+echo "09. grep SUMMARY in log-file (1 transaction and NO bad input since last time, also, Bad Input is no longer active)"
+echo "=================================================================================================================="
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
+echo
+echo
+
+
+echo "10. PUT /v2/noService"
+echo "====================="
+orionCurl --url /v2/noService --json
+echo
+echo
+
+
+echo "11. Sleep 3 secs, awaiting a second log summary"
+echo "==============================================="
+sleep 3
+valgrindSleep 5
+echo
+echo
+
+
+echo "12. grep SUMMARY in log-file (1 transaction and one bad input since last time)"
+echo "=============================================================================="
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
+echo
+echo
+
+
+--REGEXPECT--
+01. PUT /v2/noService
+=====================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+02. POST /v2/entities with invalid JSON
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer",
+    "error": "ParseError"
+}
+
+
+03. GETT /v2/entities - bad verb
+================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET
+Date: REGEX(.*)
+
+
+
+04. POST /v2/entities without payload
+=====================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+05. Sleep 3 secs, awaiting a log summary report
+===============================================
+
+
+06. grep SUMMARY in log-file (4 transactions, 1 bad input)
+==========================================================
+ Transactions: 4 (new: 4)
+ DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Bad input active alarms: 1, raised: (total: 1, new: 1), released: (total: 0, new: 0)
+
+
+07. GET /v2/entities (just to clear out Bad Input)
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+08. Sleep 3 secs, awaiting a second log summary
+===============================================
+
+
+09. grep SUMMARY in log-file (1 transaction and NO bad input since last time, also, Bad Input is no longer active)
+==================================================================================================================
+ Transactions: 4 (new: 4)
+ DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Bad input active alarms: 1, raised: (total: 1, new: 1), released: (total: 0, new: 0)
+ Transactions: 5 (new: 1)
+ DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Bad input active alarms: 0, raised: (total: 1, new: 0), released: (total: 1, new: 1)
+
+
+10. PUT /v2/noService
+=====================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "service not found",
+    "error": "BadRequest"
+}
+
+
+11. Sleep 3 secs, awaiting a second log summary
+===============================================
+
+
+12. grep SUMMARY in log-file (1 transaction and one bad input since last time)
+==============================================================================
+ Transactions: 4 (new: 4)
+ DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Bad input active alarms: 1, raised: (total: 1, new: 1), released: (total: 0, new: 0)
+ Transactions: 5 (new: 1)
+ DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Bad input active alarms: 0, raised: (total: 1, new: 0), released: (total: 1, new: 1)
+ Transactions: 6 (new: 1)
+ DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+ Bad input active alarms: 1, raised: (total: 2, new: 1), released: (total: 1, new: 0)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

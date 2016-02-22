@@ -236,6 +236,40 @@ echo
 echo
 
 
+echo "10. POST /v2/subscriptions (malformed URL)"
+echo "=========================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "type": "Room"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "localhost 1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2016-04-05T14:00:00.00Z"
+}
+
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /v2/subscriptions (without id/idpattern)
 =================================================
@@ -285,7 +319,7 @@ Date: REGEX(.*)
 
 {
     "description": "Error parsing incoming JSON buffer",
-    "error": "BadRequest"
+    "error": "ParseError"
 }
 
 
@@ -318,12 +352,12 @@ Date: REGEX(.*)
 07. POST /v2/subscriptions (missing notification)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
+Content-Length: 81
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "no notitifcation for subscription specified",
+    "description": "no notification for subscription specified",
     "error": "BadRequest"
 }
 
@@ -350,6 +384,19 @@ Date: REGEX(.*)
 
 {
     "description": "no subject condition specified",
+    "error": "BadRequest"
+}
+
+
+10. POST /v2/subscriptions (malformed URL)
+==========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 50
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Invalid URL",
     "error": "BadRequest"
 }
 

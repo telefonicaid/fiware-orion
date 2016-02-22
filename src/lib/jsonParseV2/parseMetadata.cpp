@@ -53,7 +53,8 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
         return "invalid JSON type for attribute metadata type";
       }
 
-      mP->type = iter->value.GetString();
+      mP->type      = iter->value.GetString();
+      mP->typeGiven = true;
     }
     else if (name == "value")
     {
@@ -76,6 +77,10 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
       {
         mP->valueType     = orion::ValueTypeBoolean;
         mP->boolValue     = false;
+      }
+      else if (type == "Null")
+      {
+        mP->valueType     = orion::ValueTypeNone;
       }
       else
       {
@@ -135,6 +140,10 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   {
     mP->valueType    = orion::ValueTypeBoolean;
     mP->boolValue    = false;
+  }
+  else if (type == "Null")
+  {
+    mP->valueType    = orion::ValueTypeNone;
   }
   else
   {

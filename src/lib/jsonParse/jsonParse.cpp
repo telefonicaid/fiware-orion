@@ -296,6 +296,11 @@ void eatCompound
       LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
       containerP->add(orion::ValueTypeString, "item", "");
     }
+    else if ((nodeName != "") && (nodeValue == "") && (noOfChildren == 0))  // Named Empty string
+    {
+      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      containerP = containerP->add(ValueTypeString, nodeName, "");
+    }
     else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));

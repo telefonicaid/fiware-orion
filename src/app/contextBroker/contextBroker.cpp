@@ -173,6 +173,7 @@
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutinesV2/badVerbGetPutOnly.h"
+#include "serviceRoutinesV2/badVerbGetDeletePatchOnly.h"
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
@@ -195,11 +196,15 @@
 #include "serviceRoutinesV2/getSubscription.h"
 #include "serviceRoutinesV2/postSubscriptions.h"
 #include "serviceRoutinesV2/deleteSubscription.h"
+#include "serviceRoutinesV2/patchSubscription.h"
+#include "serviceRoutinesV2/postBatchQuery.h"
 
 #include "orion_websocket/ws.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
+#include "alarmMgr/alarmMgr.h"
+#include "logSummary/logSummary.h"
 
 using namespace orion;
 
@@ -262,6 +267,10 @@ bool            statCounters;
 bool            statSemWait;
 bool            statTiming;
 bool            statNotifQueue;
+int             lsPeriod;
+bool            relogAlarms;
+bool            strictIdv1;
+
 
 
 
@@ -272,6 +281,7 @@ bool            statNotifQueue;
 #define PIDPATH             _i "/tmp/contextBroker.pid"
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
+#define ONE_MONTH_PERIOD    (3600 * 24 * 31)
 
 #define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
@@ -309,6 +319,10 @@ bool            statNotifQueue;
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
 #define STAT_TIMING            "enable request-time-measuring statistics"
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
+#define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
+#define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
+#define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
+
 
 
 
@@ -372,6 +386,11 @@ PaArgument paArgs[] =
   { "-statSemWait",    &statSemWait,    "STAT_SEM_WAIT",    PaBool, PaOpt, false, false, true, STAT_SEM_WAIT     },
   { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
   { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
+
+  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt,   0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
+  { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
+
+  { "-strictNgsiv1Ids",  &strictIdv1, "CHECK_ID_V1",  PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC  },
 
   PA_END_OF_ARGS
 };
@@ -454,6 +473,10 @@ static const char* validLogLevels[] =
 #define ISR                     IndividualSubscriptionRequest
 #define ISR_COMPS_V2            3, { "v2", "subscriptions", "*" }
 #define ISR_COMPS_WORD          ""
+
+#define BQR                     BatchQueryRequest
+#define BQR_COMPS_V2            3, { "v2", "op", "query" }
+#define BQR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -704,7 +727,7 @@ static const char* validLogLevels[] =
 
 #define API_V2                                                                                         \
   { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
-  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbAllFour           }, \
+  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
   { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
@@ -734,11 +757,15 @@ static const char* validLogLevels[] =
                                                                                                        \
   { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
   { "POST",   SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          postSubscriptions        }, \
-  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }, \
+  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
   { "DELETE", ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          deleteSubscription       }, \
-  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetOnly           }
+  { "PATCH",  ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          patchSubscription        }, \
+  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetDeletePatchOnly}, \
+                                                                                                       \
+  { "POST",   BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          postBatchQuery           }, \
+  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }
 
 
 
@@ -776,7 +803,7 @@ static const char* validLogLevels[] =
 
 
 #define STANDARD_REQUESTS_V0                                                                             \
-  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
   { "*",      UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -792,7 +819,7 @@ static const char* validLogLevels[] =
 
 
 #define STANDARD_REQUESTS_V1                                                                               \
-  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
   { "*",      UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -892,7 +919,7 @@ static const char* validLogLevels[] =
   { "PUT",    ICEAA, ICEAA_COMPS_V0,       ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
   { "POST",   ICEAA, ICEAA_COMPS_V0,       ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
   { "DELETE", ICEAA, ICEAA_COMPS_V0,       "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbGetPostDeleteOnly                  }, \
+  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbAllFour                            }, \
                                                                                                          \
   { "GET",    AVI,   AVI_COMPS_V0,         "",              getAttributeValueInstance                 }, \
   { "PUT",    AVI,   AVI_COMPS_V0,         AVI_PUT_WORD,    putAttributeValueInstance                 }, \
@@ -934,7 +961,7 @@ static const char* validLogLevels[] =
   { "PUT",    ICEAA, ICEAA_COMPS_V1,         ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
   { "POST",   ICEAA, ICEAA_COMPS_V1,         ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
   { "DELETE", ICEAA, ICEAA_COMPS_V1,         "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbGetPostDeleteOnly                  }, \
+  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbAllFour                            }, \
                                                                                                            \
   { "GET",    AVI,   AVI_COMPS_V1,           "",              getAttributeValueInstance                 }, \
   { "PUT",    AVI,   AVI_COMPS_V1,           AVI_PUT_WORD,    putAttributeValueInstance                 }, \
@@ -959,12 +986,13 @@ static const char* validLogLevels[] =
                                                                                                            \
   { "GET",    ET,    ET_COMPS_V1,            "",              getEntityTypes                            }, \
   { "*",      ET,    ET_COMPS_V1,            "",              badVerbGetOnly                            }, \
+                                                                                                           \
   { "GET",    AFET,  AFET_COMPS_V1,          "",              getAttributesForEntityType                }, \
   { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
   { "POST",   ACE,   ACE_COMPS_V1,           ACE_POST_WORD,   postIndividualContextEntity               }, \
-  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
+  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
                                                                                                            \
   { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
   { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
@@ -1003,30 +1031,30 @@ static const char* validLogLevels[] =
 #define LOG_REQUESTS_V0                                                              \
   { "GET",    LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbPutDeleteOnly                   }, \
   { "GET",    LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbAllFour                         }
+  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbPutDeleteOnly                   }
 
 #define LOG_REQUESTS_V1                                                              \
   { "GET",    LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbPutDeleteOnly                   }, \
   { "GET",    LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbAllFour                         }
+  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbPutDeleteOnly                   }
 
 #define STAT_REQUESTS_V0                                                             \
   { "GET",    STAT, STAT_COMPS_V0,    "",  statisticsTreat                        }, \
@@ -1729,10 +1757,12 @@ int main(int argC, char* argV[])
 
   pidFile();
   SemOpType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
+  alarmMgr.init(relogAlarms);
+  logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)
   {

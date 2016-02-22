@@ -30,6 +30,8 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "ngsi10/SubscribeContextRequest.h"
+#include "ngsi10/UpdateContextSubscriptionRequest.h"
 
 
 
@@ -39,13 +41,17 @@
 */
 typedef struct JsonDelayedRelease
 {
-  Entity*            entity;
-  ContextAttribute*  attribute;
+  Entity*                            entity;
+  ContextAttribute*                  attribute;
+  SubscribeContextRequest*           scrP;
+  UpdateContextSubscriptionRequest*  ucsrP;
 
   JsonDelayedRelease()
   {
-    entity    = NULL;
-    attribute = NULL;
+    entity     = NULL;
+    attribute  = NULL;
+    scrP       = NULL;
+    ucsrP      = NULL;
   }
 } JsonDelayedRelease;
 

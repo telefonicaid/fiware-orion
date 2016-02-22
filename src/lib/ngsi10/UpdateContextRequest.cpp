@@ -139,7 +139,7 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
     return response.render(ciP, UpdateContext, indent);
   }
 
-  if (((res = contextElementVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") || 
+  if (((res = contextElementVector.check(ciP, requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") ||
       ((res = updateActionType.check(requestType,     ciP->outFormat, indent, predetectedError, counter)) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
@@ -346,10 +346,11 @@ void UpdateContextRequest::fill
 (
   const std::string&   entityId,
   ContextAttribute*    attributeP,
-  const std::string&   _updateActionType
+  const std::string&   _updateActionType,
+  const std::string&   type
 )
 {
-  ContextElement*   ceP = new ContextElement(entityId, "", "false");
+  ContextElement*   ceP = new ContextElement(entityId, type, "false");
   ContextAttribute* aP  = new ContextAttribute(attributeP);
 
   ceP->contextAttributeVector.push_back(aP);

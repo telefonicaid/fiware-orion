@@ -40,21 +40,22 @@ TEST(ContextAttribute, checkOne)
 {
   ContextAttribute  ca;
   std::string       res;
+  ConnectionInfo    ci;
 
   utInit();
 
   ca.name = "";
-  res     = ca.check(RegisterContext, XML, "", "", 0);
+  res     = ca.check(&ci, RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "missing attribute name");
 
   ca.name  = "Algo, lo que sea!";
   ca.stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = ca.check(RegisterContext, XML, "", "", 0);
+  res     = ca.check(&ci, RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "OK");
   
   ca.stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-  res     = ca.check(RegisterContext, XML, "", "", 0);
+  res     = ca.check(&ci, RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -72,6 +73,7 @@ TEST(ContextAttribute, checkVector)
   ContextAttribute        ca0;
   ContextAttribute        ca1;
   std::string             res;
+  ConnectionInfo          ci;
 
   utInit();
 
@@ -83,7 +85,7 @@ TEST(ContextAttribute, checkVector)
   caVector.push_back(&ca0);
   caVector.push_back(&ca1);
 
-  res     = caVector.check(RegisterContext, XML, "", "", 0);
+  res     = caVector.check(&ci, RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "OK");
 
   utExit();

@@ -215,12 +215,16 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
 */
 int mongoSubCacheItemInsert
 (
-  const char*     tenant,
-  const BSONObj&  sub,
-  const char*     subscriptionId,
-  const char*     servicePath,
-  int             lastNotificationTime,
-  long long       expirationTime
+  const char*         tenant,
+  const BSONObj&      sub,
+  const char*         subscriptionId,
+  const char*         servicePath,
+  int                 lastNotificationTime,
+  long long           expirationTime,
+  const std::string&  q,
+  const std::string&  geometry,
+  const std::string&  coords,
+  const std::string&  georel
 )
 {
   //
@@ -311,6 +315,10 @@ int mongoSubCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
+  cSubP->expression.q          = q;
+  cSubP->expression.geometry   = geometry;
+  cSubP->expression.coords     = coords;
+  cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
@@ -402,7 +410,7 @@ void mongoSubCacheRefresh(const std::string& database)
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
     alarmMgr.dbError(errorString);
-    releaseMongoConnection(connection, &cursor);
+    releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
   }
@@ -427,7 +435,7 @@ void mongoSubCacheRefresh(const std::string& database)
       ++subNo;
     }
   }
-  releaseMongoConnection(connection, &cursor);
+  releaseMongoConnection(connection);
 
   LM_T(LmtSubCache, ("Added %d subscriptions for database '%s'", subNo, database.c_str()));
 }

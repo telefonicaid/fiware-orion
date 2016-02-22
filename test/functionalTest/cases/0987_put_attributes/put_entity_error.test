@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. Modify non-existing entity E1"
 echo "================================="
 payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -55,8 +55,8 @@ echo
 
 echo "03. Create E1"
 echo "============="
-payload='{ "attr1": 3 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+payload='{ "id": "E1", "attr1": 3 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -71,7 +71,7 @@ echo
 echo "05. Modify E1"
 echo "============="
 payload='{ "attr1": 5 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -105,7 +105,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "The requested entity has not been found. Check type and id", 
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 
@@ -122,13 +122,18 @@ Date: REGEX(.*)
 04. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 3.0, 
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 3
+    },
+    "id": "E1",
+    "type": null
 }
 
 
@@ -143,13 +148,18 @@ Date: REGEX(.*)
 06. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 5.0, 
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 5
+    },
+    "id": "E1",
+    "type": null
 }
 
 

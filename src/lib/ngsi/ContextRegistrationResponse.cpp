@@ -76,6 +76,7 @@ std::string ContextRegistrationResponse::render(Format format, const std::string
 */
 std::string ContextRegistrationResponse::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -83,7 +84,7 @@ std::string ContextRegistrationResponse::check
   int                 counter
 )
 {
-  return contextRegistration.check(requestType, format, indent, predetectedError, counter);
+  return contextRegistration.check(ciP, requestType, format, indent, predetectedError, counter);
 }
 
 

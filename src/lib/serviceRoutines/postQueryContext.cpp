@@ -42,6 +42,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
@@ -343,7 +344,23 @@ std::string postQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP));
+  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
+                                                      qcrsP,
+                                                      ciP->tenant,
+                                                      ciP->servicePathV,
+                                                      ciP->uriParam,
+                                                      countP,
+                                                      ciP->apiVersion));
+
+  if (qcrsP->errorCode.code == SccBadRequest)
+  {
+    // Bad Input detected by Mongo Backend - request ends here !
+    OrionError oe(qcrsP->errorCode);
+
+    TIMED_RENDER(answer = oe.render(ciP, ""));
+    qcrP->release();
+    return answer;
+  }
 
 
   //

@@ -39,7 +39,9 @@ static const char* validOptions[] =
   "count",
   "normalized",
   "values",
-  "text"
+  "keyValues",
+  "text",
+  "append"
 };
 
 
@@ -89,6 +91,8 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
   return 0;
 }
+
+
 
 static inline Verb strToVerb(const std::string &str)
 {
@@ -232,5 +236,23 @@ void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, c
   uriParam["offset"] = "0";
 
   inFormat = outFormat = JSON;
+
+}
+
+
+/* ****************************************************************************
+*
+* uriParamTypesParse - parse the URI param 'type' into uriParamTypes vector
+*/
+void uriParamTypesParse(ConnectionInfo* ciP, const char* value)
+{
+  std::vector<std::string> vec;
+
+  stringSplit(value, ',', vec);
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    ciP->uriParamTypes.push_back(vec[ix]);
+  }
 
 }

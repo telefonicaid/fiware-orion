@@ -29,7 +29,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/limits.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -38,6 +40,8 @@
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+
+#include "rest/ConnectionInfo.h"
 
 using namespace mongo;
 
@@ -53,6 +57,7 @@ Metadata::Metadata()
   type         = "";
   stringValue  = "";
   valueType    = orion::ValueTypeString;
+  typeGiven    = false;
 }
 
 
@@ -72,6 +77,7 @@ Metadata::Metadata(Metadata* mP)
   stringValue  = mP->stringValue;
   numberValue  = mP->numberValue;
   boolValue    = mP->boolValue;
+  typeGiven    = false;
 }
 
 
@@ -86,6 +92,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
   type         = _type;
   valueType    = orion::ValueTypeString;
   stringValue  = std::string(_value);
+  typeGiven    = false;
 }
 
 
@@ -100,6 +107,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
   type         = _type;
   valueType    = orion::ValueTypeString;
   stringValue  = _value;
+  typeGiven    = false;
 }
 
 
@@ -114,6 +122,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
   type         = _type;
   valueType    = orion::ValueTypeNumber;
   numberValue  = _value;
+  typeGiven    = false;
 }
 
 
@@ -124,10 +133,11 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, bool _value)
 {
-  name       = _name;
-  type       = _type;
-  valueType  = orion::ValueTypeBoolean;
-  boolValue  = _value;
+  name         = _name;
+  type         = _type;
+  valueType    = orion::ValueTypeBoolean;
+  boolValue    = _value;
+  typeGiven    = false;
 }
 
 /* ****************************************************************************
@@ -153,6 +163,10 @@ Metadata::Metadata(const BSONObj& mdB)
   case Bool:
     valueType = orion::ValueTypeBoolean;
     boolValue = getBoolField(mdB, ENT_ATTRS_MD_VALUE);
+    break;
+
+  case jstNULL:
+    valueType = orion::ValueTypeNone;
     break;
 
   default:
@@ -190,6 +204,7 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
 */
 std::string Metadata::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -197,19 +212,36 @@ std::string Metadata::check
   int                 counter
 )
 {
+  size_t len;
+  char   errorMsg[128];
+
   if (name == "")
   {
     alarmMgr.badInput(clientIp, "missing metadata name");
     return "missing metadata name";
   }
 
-  if (forbiddenChars(name.c_str()))
+  if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion , name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
   }
 
-  if (forbiddenChars(type.c_str()))
+  if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
     return "Invalid characters in metadata type";
@@ -321,57 +353,34 @@ std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
 
-  if (type == "")
+  out = JSON_STR(name) + ":{";
+
+  out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":null";
+  out += ",";
+
+  if (valueType == orion::ValueTypeString)
   {
-    if (valueType == orion::ValueTypeNumber)
-    {
-      char num[32];
-    
-      snprintf(num, sizeof(num), "%f", numberValue);
-      out = JSON_VALUE_NUMBER(name, num);
-    }
-    else if (valueType == orion::ValueTypeBoolean)
-    {
-      out = JSON_VALUE_BOOL(name, boolValue);
-    }
-    else if (valueType == orion::ValueTypeString)
-    {
-      out = JSON_VALUE(name, stringValue);
-    }
-    else
-    {
-      LM_E(("Runtime Error (invalid type for metadata %s)", name.c_str()));
-      out = JSON_VALUE(name, stringValue);
-    }
+    out += JSON_VALUE("value", stringValue);
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    out += JSON_VALUE_NUMBER("value", toString(numberValue));
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    out += JSON_VALUE_BOOL("value", boolValue);
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    out += JSON_STR("value") + ":null";
   }
   else
   {
-    out = JSON_STR(name) + ":{";
-    out += JSON_VALUE("type", type) + ",";
-
-    if (valueType == orion::ValueTypeString)
-    {
-      out += JSON_VALUE("value", stringValue);
-    }
-    else if (valueType == orion::ValueTypeNumber)
-    {
-      char num[32];
-
-      snprintf(num, sizeof(num), "%f", numberValue);
-      out += JSON_VALUE_NUMBER("value", num);
-    }
-    else if (valueType == orion::ValueTypeBoolean)
-    {
-      out += JSON_VALUE_BOOL("value", boolValue);
-    }
-    else
-    {
-      LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
-      out += JSON_VALUE("value", stringValue);
-    }
-
-    out += "}";
+    LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
+    out += JSON_VALUE("value", stringValue);
   }
+
+  out += "}";
 
   if (!isLastElement)
   {

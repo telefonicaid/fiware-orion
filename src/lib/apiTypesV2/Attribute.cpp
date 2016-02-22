@@ -26,8 +26,10 @@
 #include <vector>
 
 #include "common/tag.h"
+#include "common/errorMessages.h"
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
+
 
 
 /* ****************************************************************************
@@ -36,13 +38,24 @@
 */
 std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
+  bool         keyValues  = ciP->uriParamOptions["keyValues"];
+  std::string  renderMode = (keyValues == true)? "keyValues" : "normalized";
+
   if (pcontextAttribute)
   {
     std::string out;
 
-    out = "{";
-    out += pcontextAttribute->toJson(true, false);  // param 1 'true' as it is the last and only element
-    out += "}";
+    if (requestType == EntityAttributeValueRequest)
+    {
+      out = pcontextAttribute->toJsonAsValue(ciP);
+    }
+    else
+    {
+      out = "{";
+      out += pcontextAttribute->toJson(true, false, renderMode, requestType);  // param 1 'true' as it is the last and only element
+      out += "}";
+    }
+
 
     if (comma)
     {
@@ -51,6 +64,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 
     return out;
   }
+
   return errorCode.toJson(true);
 }
 
@@ -86,7 +100,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
     //
     // If there are more than one entity, we return an error
     //
-    errorCode.fill("TooManyResults", "There is more than one entity with that id. Refine your query.");
+    errorCode.fill("TooManyResults", MORE_MATCHING_ENT);
   }
   else
   {

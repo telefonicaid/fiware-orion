@@ -56,31 +56,6 @@
 
 /* ****************************************************************************
 *
-* IP - 
-*/
-#define  LOCAL_IP_V6  "::"
-#define  LOCAL_IP_V4  "0.0.0.0"
-
-
-
-/* ****************************************************************************
-*
-* PAYLOAD_MAX_SIZE - 
-*/
-#define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
-
-
-
-/* ****************************************************************************
-*
-* STATIC_BUFFER_SIZE - to avoid mallocs for "smaller" requests
-*/
-#define STATIC_BUFFER_SIZE (32 * 1024)
-
-
-
-/* ****************************************************************************
-*
 * Globals
 */
 static RestService*              restServiceV          = NULL;
@@ -92,7 +67,7 @@ static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
-unsigned short                   rushPort              = 0;
+unsigned short                   rushPort              = NO_PORT;
 char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
@@ -115,6 +90,14 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
+
+  if (val == NULL || *val == 0)
+  {
+    OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer         = error.render(ciP, "");
+    return MHD_YES;
+  }
 
   if (key == URI_PARAM_NOTIFY_FORMAT)
   {
@@ -216,6 +199,19 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->answer         = error.render(ciP, "");
     }
   }
+  else if (key == URI_PARAM_TYPE)
+  {
+    ciP->uriParam[URI_PARAM_TYPE] = value;
+
+    if (strstr(val, ","))  // More than ONE type?
+    {
+      uriParamTypesParse(ciP, val);
+    }
+    else
+    {
+      ciP->uriParamTypes.push_back(val);
+    }
+  }
   else
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 
@@ -239,7 +235,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   //
   bool containsForbiddenChars = false;
 
-  if (key == "geometry")
+  if ((key == "geometry") || (key == "georel"))
   {
     containsForbiddenChars = forbiddenChars(val, "=;");
   }
@@ -399,12 +395,12 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 
      std::string format = vec[ix].c_str();
      if (format == "*/*")              { xml  = true; json = true; text=true;}
-     if (format == "*/xml")            xml  = true;
+     if (format == "*/xml")            { xml  = true; }
      if (format == "application/*")    { xml  = true; json = true; }
-     if (format == "application/xml")  xml  = true;
-     if (format == "application/json") json = true;
-     if (format == "*/json")           json = true;
-     if (format == "text/plain")       text = true;
+     if (format == "application/xml")  { xml  = true; }
+     if (format == "application/json") { json = true; }
+     if (format == "*/json")           { json = true; }
+     if (format == "text/plain")       { text = true; }
      
      if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
 
@@ -735,7 +731,8 @@ int servicePathSplit(ConnectionInfo* ciP)
 *   so we don't want to use the default 200
 *
 * NOTE
-*   In version 2 of the protocol, we admit ONLY application/json
+*   In version 1 of the protocol, we admit ONLY application/json and application/xml
+*   In version 2 of the protocol, we admit ONLY application/json and text/plain
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
@@ -743,9 +740,9 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
-  //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
+  //   3. text/xml used and acceptTextXml is set to true (iotAgent only)
   //   4. Content-Type present but not supported
-  //   5. API version 2 and not 'application/json'
+  //   5. API version 2 and not 'application/json' || text/plain
   //
 
 
@@ -776,7 +773,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -787,7 +784,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 5
-  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -862,12 +859,14 @@ std::string defaultServicePath(const char* url, const char* method)
    * completeness
    */
 
+  //
   // FIXME P5: this strategy can be improved taking into account full URL. Otherwise, it is
-  // ambigous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
+  // ambiguous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
   // highly improbable that the user uses entities which id (or type) match the name of a
-  // standard operation
-
-  // FIXME P5: unhardwire literals
+  // standard operation.
+  // Also, if we wait (if we can) until we know what service it is, this whole string-search will come for free
+  // Don't think strcasestr is a 'simple' function ...
+  //
   if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
@@ -886,13 +885,12 @@ std::string defaultServicePath(const char* url, const char* method)
    */
   if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
   if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasecmp(method, "POST") == 0)                                  return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "PUT") == 0)                                   return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
 
-  std::string details = std::string("cannot find default service path for: (") + method + " " + url + ") - BAD VERB?";
-  alarmMgr.badInput(clientIp, details);
+  if (strcasecmp(method, "POST")   == 0)                                return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "PUT")    == 0)                                return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "GET")    == 0)                                return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasecmp(method, "PATCH")  == 0)                                return DEFAULT_SERVICE_PATH;
 
   return DEFAULT_SERVICE_PATH;
 }
@@ -954,6 +952,7 @@ static int connectionTreat
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
   static int             reqNo       = 1;
+
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -1133,7 +1132,6 @@ static int connectionTreat
   // URL and headers checks are delayed to the "third" MHD call, as no 
   // errors can be sent before all the request has been read
   //
-  
   if (urlCheck(ciP, ciP->url) == false)
   {
     alarmMgr.badInput(clientIp, "error in URI path");
@@ -1192,12 +1190,14 @@ static int connectionTreat
   }
 
   //
-  // Here, if the incoming request was too big, return error abouyt it
+  // Here, if the incoming request was too big, return error about it
   //
   if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
     char details[256];
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+    alarmMgr.badInput(clientIp, details);
 
     ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
@@ -1208,9 +1208,11 @@ static int connectionTreat
     std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg);
   }
   else if (ciP->answer != "")
   {
+    alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
   }
   else
@@ -1240,7 +1242,7 @@ static int connectionTreat
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   bool      mhdStartError  = true;
-  size_t    memoryLimit    = connMemory * 1024; // connMemory is expressed in kilobytes
+  size_t    memoryLimit    = connMemory * 1024; // Connection memory is expressed in kilobytes
   MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)

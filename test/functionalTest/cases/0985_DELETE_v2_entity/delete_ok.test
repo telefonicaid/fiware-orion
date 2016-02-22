@@ -42,9 +42,11 @@ payload='{
   "id": "E1",
   "type": "T1",
   "compattr": {
-    "string":  "1",
-    "number":  2,
-    "bool":    true
+    "value": {
+      "string":  "1",
+      "number":  2,
+      "bool":    true
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -61,7 +63,7 @@ echo
 
 echo "03. DELETE /v2/entities/E1"
 echo "=========================="
-orionCurl --url /v2/entities/E1 -X DELETE
+orionCurl --url /v2/entities/E1 -X DELETE --json
 echo
 echo
 
@@ -85,15 +87,19 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 79
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "compattr": {
-        "bool": true,
-        "number": 2.0,
-        "string": "1"
+        "metadata": {},
+        "type": null,
+        "value": {
+            "bool": true,
+            "number": 2,
+            "string": "1"
+        }
     },
     "id": "E1",
     "type": "T1"

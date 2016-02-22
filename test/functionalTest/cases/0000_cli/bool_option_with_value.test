@@ -80,5 +80,8 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-statSemWait' (enable semaphore waiting time statistics)]
                       [option '-statTiming' (enable request-time-measuring statistics)]
                       [option '-statNotifQueue' (enable thread pool notifications queue statistics)]
+                      [option '-logSummary' <log summary period in seconds (defaults to 0, meaning 'off')>]
+                      [option '-relogAlarms' (log messages for existing alarms beyond the raising alarm log message itself)]
+                      [option '-strictNgsiv1Ids' (additional checks for id fields in the NGSIv1 API)]
 
 --TEARDOWN--

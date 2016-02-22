@@ -38,6 +38,14 @@ using std::map;
 
 
 
+/* ****************************************************************************
+*
+* subCacheState - maintains the state of the subscription cache
+* 
+*/
+volatile SubCacheState subCacheState = ScsIdle;
+
+
 //
 // The subscription cache maintains in memory all subscriptions of type ONCHANGE.
 // The reason for this cache is to avoid a very slow mongo operation ... (Fermin)
@@ -213,6 +221,11 @@ static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::str
   {
     NotifyCondition* ncP = cSubP->notifyConditionVector[ncvIx];
 
+    if (ncP->condValueList.size() == 0)
+    {
+      return true;
+    }
+
     for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
     {
       for (unsigned int aIx = 0; aIx < attrV.size(); ++aIx)
@@ -349,6 +362,8 @@ static bool subMatch
   //
   // If ONCHANGE and one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
+  // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
+  // case of ONANYCHANGE subscriptions).
   //
   if (!attributeMatch(cSubP, attrV))
   {
@@ -648,7 +663,11 @@ void subCacheItemInsert
   int64_t                   throttling,
   Format                    notifyFormat,
   bool                      notificationDone,
-  int64_t                   lastNotificationTime
+  int64_t                   lastNotificationTime,
+  const std::string&        q,
+  const std::string&        geometry,
+  const std::string&        coords,
+  const std::string&        georel
 )
 {
   //
@@ -697,6 +716,10 @@ void subCacheItemInsert
   cSubP->notifyFormat          = notifyFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->expression.q          = q;
+  cSubP->expression.geometry   = geometry;
+  cSubP->expression.coords     = coords;
+  cSubP->expression.georel     = georel;
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
@@ -990,12 +1013,25 @@ typedef struct CachedSubSaved
 * 4. Update 'count' for each item in savedSubV where count != 0
 * 5. Update 'lastNotificationTime' foreach item in savedSubV where lastNotificationTime != 0
 * 6. Free the vector created in step 1 - savedSubV
+*
+* NOTE
+*   This function runs in a separate thread and it allocates temporal objects (in savedSubV).
+*   If the broker dies when this function is executing, all these temporal objects will be reported
+*   as memory leaks.
+*   We see this in our valgrind tests, where we force the broker to die.
+*   This is of course not a real leak, we only see this as a leak as the function hasn't finished to
+*   execute until the point where the temporal objects are deleted (See '6. Free the vector savedSubV').
+*   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
+*   the sub-cache synchronization is working.
+*   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a 
+*   sleep for a few seconds is performed beofre the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)
 {
   std::map<std::string, CachedSubSaved*> savedSubV;
 
   cacheSemTake(__FUNCTION__, "Synchronizing subscription cache");
+  subCacheState = ScsSynchronizing;
 
 
   //
@@ -1071,6 +1107,7 @@ void subCacheSync(void)
   savedSubV.clear();
 
 
+  subCacheState = ScsIdle;
   cacheSemGive(__FUNCTION__, "Synchronizing subscription cache");
 }
 

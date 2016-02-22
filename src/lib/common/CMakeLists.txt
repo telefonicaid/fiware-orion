@@ -46,6 +46,7 @@ SET (HEADERS
     clockFunctions.h
     JsonHelper.h
     SyncQOverflow.h
+    errorMessages.h
 )
 
 

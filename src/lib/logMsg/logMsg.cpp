@@ -971,10 +971,17 @@ static char* timeGet(int index, char* line, int lineSize)
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * timeStampGet -
+*
+* This function has been removed as the LM_S macro, formerly a 'timestamp macro'
+* has been removed for the Orion Context Broker implementation, to make room for
+* a new LM_S macro, the 'S' standing for 'Summary'.
+*
+* The function is kept in case the LM_S is taken back as a 'timestamp macro' for
+* some other project.
 */
 static char* timeStampGet(char* line, int len)
 {
@@ -986,7 +993,7 @@ static char* timeStampGet(char* line, int len)
 
   return line;
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -1011,6 +1018,7 @@ const char* longTypeName(char type)
   case 'M':  return "DEBUG";
   case 'F':  return "DEBUG";
   case 'I':  return "INFO";
+  case 'S':  return "SUMMARY";
   }
 
   return "N/A";
@@ -2275,11 +2283,6 @@ LmStatus lmOut
       {
         snprintf(line, LINE_MAX, "%s\n%c", text, 0);
       }
-    }
-    else if (type == 'S')
-    {
-      char stampStr[128];
-      snprintf(line, LINE_MAX, "%s:%s", text, timeStampGet(stampStr, 128));
     }
     else
     {

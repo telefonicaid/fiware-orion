@@ -48,7 +48,6 @@ typedef struct ErrorCode
 
   std::string  toJson(bool isLastElement);
   void         fill(const std::string& _error, const std::string& _description);
-  //void         fill(StatusCode* scP);
   void         fill(const StatusCode& sc);
   void         present(const std::string& indent);
   void         release(void);

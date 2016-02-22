@@ -46,7 +46,7 @@ status_codes = {'OK': 200,
                 'Bad Request': 400,
                 'unauthorized': 401,
                 'Not Found': 404,
-                'Bad Method': 405,
+                'Method not allowed': 405,
                 'Not Acceptable': 406,
                 'Conflict': 409,
                 'Length Required': 411,
@@ -288,3 +288,18 @@ def verify_error_message(context):
     for i in range(int(entities_context["entities_number"])):
         ngsi.verify_error_response(context, context.resp_list[i])
     __logger__.info("...Verified that error message is the expected in all entities ")
+
+
+@step(u'verify headers in response')
+def verify_headers_in_response(context):
+    """
+    verify headers in response
+    Ex:
+      | parameter      | value      |
+      | x-total-counts | <entities> |
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Verifying headers in response...")
+    ngsi = NGSI()
+    ngsi.verify_headers_response(context)
+    __logger__.info("...Verified headers in response")

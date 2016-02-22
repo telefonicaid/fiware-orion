@@ -76,11 +76,11 @@
 #define CSUB_CONDITIONS         "conditions"
 #define CSUB_CONDITIONS_TYPE    "type"
 #define CSUB_CONDITIONS_VALUE   "value"
-#define CSUB_CONDITIONS_EXPR   "expression"
-#define CSUB_CONDITIONS_Q       "q"
-#define CSUB_CONDITIONS_GEO     "geometry"
-#define CSUB_CONDITIONS_COORDS  "coords"
-#define CSUB_CONDITIONS_GEOREL  "georel"
+#define CSUB_EXPR               "expression"
+#define CSUB_EXPR_Q             "q"
+#define CSUB_EXPR_GEOM          "geometry"
+#define CSUB_EXPR_COORDS        "coords"
+#define CSUB_EXPR_GEOREL        "georel"
 
 #define CSUB_THROTTLING         "throttling"
 #define CSUB_ENTITIES           "entities"
@@ -102,11 +102,6 @@
 #define CASUB_LASTNOTIFICATION  "lastNotification"
 #define CASUB_COUNT             "count"
 #define CASUB_FORMAT            "format"
-
-#define EARTH_RADIUS_METERS     6371000
-
-#define LOCATION_WGS84          "WGS84"
-#define LOCATION_WGS84_LEGACY   "WSG84"    /* We fixed the right string at 0.17.0, but the old one needs to be mantained */
 
 
 #endif // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_

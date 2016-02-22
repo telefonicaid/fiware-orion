@@ -180,6 +180,9 @@ int noOfEntityAllTypesRequest                            = -1;
 int noOfSubscriptionsRequest                             = -1;
 int noOfIndividualSubscriptionRequest                    = -1;
 int noOfSimulatedNotifications                           = -1;
+int noOfBatchQueryRequest                                = -1;
+
+
 
 /* ****************************************************************************
 *
@@ -190,6 +193,8 @@ inline float timeSpecToFloat(const struct timespec& t)
 {
   return t.tv_sec + ((float) t.tv_nsec) / 1E9;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -319,6 +324,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
 
   switch (request)
   {
+  case NoRequest:                                        break;
   case RegisterContext:                                  ++noOfRegistrations; break;
   case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
   case SubscribeContextAvailability:                     ++noOfAvailabilitySubscriptions; break;
@@ -404,5 +410,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntityAllTypesRequest:                            ++noOfEntityAllTypesRequest; break;
   case SubscriptionsRequest:                             ++noOfSubscriptionsRequest; break;
   case IndividualSubscriptionRequest:                    ++noOfIndividualSubscriptionRequest; break;
+  case BatchQueryRequest:                                ++noOfBatchQueryRequest; break;
   }
 }

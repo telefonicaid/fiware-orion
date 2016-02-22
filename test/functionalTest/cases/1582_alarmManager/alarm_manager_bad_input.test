@@ -25,7 +25,7 @@ Bad Input for Alarm Manager
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4
+brokerStart CB 0 IPv4
 
 --SHELL--
 
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 ====================
  Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
  Releasing alarm BadInput 0.0.0.0
- Raising alarm BadInput 0.0.0.0: cannot find default service path for: (PROUST /v2/entities) - BAD VERB?
+ Raising alarm BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'PROUST'
 
 
 --TEARDOWN--

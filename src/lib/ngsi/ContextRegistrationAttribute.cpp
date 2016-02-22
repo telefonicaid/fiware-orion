@@ -100,6 +100,7 @@ std::string ContextRegistrationAttribute::render(Format format, const std::strin
 */
 std::string ContextRegistrationAttribute::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -124,7 +125,7 @@ std::string ContextRegistrationAttribute::check
   }
 
   std::string res;
-  if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = metadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

@@ -40,6 +40,8 @@ typedef struct NotifyConditionVector
 {
   std::vector<NotifyCondition*>  vec;
 
+  NotifyConditionVector();
+
   std::string       render(Format format, const std::string& indent, bool comma);
   void              present(const std::string& indent);
   void              push_back(NotifyCondition* item);

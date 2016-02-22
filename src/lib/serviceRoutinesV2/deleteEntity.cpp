@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -36,6 +37,8 @@
 #include "apiTypesV2/ErrorCode.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
+#include "parse/forbiddenChars.h"
+
 
 
 /* ****************************************************************************
@@ -65,7 +68,14 @@ std::string deleteEntity
   string  answer;
   Entity* eP    = new Entity();
 
-  eP->id = compV[2];
+  eP->id   = compV[2];
+  eP->type = ciP->uriParam["type"];
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   if (compV.size() == 5)  // Deleting an attribute
   {

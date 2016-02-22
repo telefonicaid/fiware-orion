@@ -33,8 +33,20 @@
 
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "apiTypesV2/SubscriptionExpression.h"
 
 using namespace mongo;
+
+
+/* ****************************************************************************
+*
+* SubCacheState - 
+*/
+typedef enum SubCacheState
+{
+  ScsIdle,
+  ScsSynchronizing
+} SubCacheState;
 
 
 
@@ -85,6 +97,7 @@ struct CachedSubscription
   int64_t                     count;
   Format                      notifyFormat;
   char*                       reference;
+  SubscriptionExpression      expression;
   struct CachedSubscription*  next;
 };
 
@@ -94,7 +107,8 @@ struct CachedSubscription
 *
 * subCacheActive - 
 */
-extern bool subCacheActive;
+extern bool                    subCacheActive;
+extern volatile SubCacheState  subCacheState;
 
 
 
@@ -160,7 +174,11 @@ extern void subCacheItemInsert
   int64_t                   throttling,
   Format                    notifyFormat,
   bool                      notificationDone,
-  int64_t                   lastNotificationTime
+  int64_t                   lastNotificationTime,
+  const std::string&        q,
+  const std::string&        geometry,
+  const std::string&        coords,
+  const std::string&        georel
 );
 
 

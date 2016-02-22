@@ -37,6 +37,7 @@ struct ConnectionInfo;
 */
 typedef enum RequestType
 {
+  NoRequest,
   RegisterContext = 1,
   DiscoverContextAvailability,
   SubscribeContextAvailability,
@@ -120,6 +121,7 @@ typedef enum RequestType
   EntityAllTypesRequest,
   SubscriptionsRequest,
   IndividualSubscriptionRequest,
+  BatchQueryRequest,
 
   InvalidRequest = 100
 } RequestType;

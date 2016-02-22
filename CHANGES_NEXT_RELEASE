@@ -1,12 +1,29 @@
-- Fix: avoid rendering invalid JSON characters in response payloads (Issue #1172)
-- Fix: avoid escaping / in callback field in GET /v2/subscriptions and GET /v2/subscriptions/<subId> operations
-- Add: srv=, subsrv= and from= fields to log (Issue #1593)
-- Fix: wrong accumulation in counter sentOK
-- Fix: more descriptive error messages for CPr update/query forward fail
-- Add: reset for notification counters in threadpool mode
-- Fix: avoid -g compiler flag in release build
-- Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
-- Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
-- Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
-- Add: POST /v2/subscriptions operation (without expression evaluation yet) (Issue #1316)
-- Add: DELETE /v2/subscriptions operation (Issue #1654)
+- Fix: error level traces ignoring -logLevel NONE
+- Fix: wrong over-logging at error level updating attributes having metadata without type 
+- Fix: '+' supported in entity ids and names in URLs (Issue #1675)
+- Fix: libmicrohttpd 0.9.48 included in contextBroker as static lib (previous Orion versions used 0.9.22 as dynamic library) (Issue #1675)
+- Fix: list of attribute names in URI param 'type' (Issue #1749)
+- Fix: long servicepath component in NGSIv2 (Issue #1423, #1764, #1774)
+- Fix: syntax change in string query 'q' for exist and not-exist (Issue #1751)
+- Fix: sanity check for string query 'q' - detect 'left-hand-side missing' (Issue #1754)
+- Fix: more sanity checks for string query 'q' (q empty, parts of 'q' empty - parts of 'q' are separated by ';')
+- Fix: error message when updating attribute value for two entities with same id (Issue #1387)
+- Hardening: sanity checks for numbers (Issue #1306)
+- Fix: bug causing false not-a-number when it really is a valid number (very very rarely)
+- Add: type param for GET entity in v2 (Issue #915, #972, #990, #998)
+- Add: type param for DELETE entity in v2 (Issue #986, #994)
+- Add: type param for PATCH entity in v2 (Issue #980)
+- Add: type param for POST entity in v2 (Issue #982, #984)
+- Add: support for geo:point type as a way of specifying location attribute in NGSIv2 (Issue #1038)
+- Add: type param for PUT entity in v2 (Issue #988, #992, #1000)
+- Fix: not detecting forbidden chars in entityID for PATCH v2 (Issue #1782)
+- Add: detect forbidden chars in entity ids and attr names in URI (Issue #1793)
+- Add: dates support in attribute values (Issue #1038)
+- Add: implemented new operation: POST /v2/op/query (Issue #1080)
+- Fix: NGSIv2 URI param 'georel' (along with 'geometry' and 'coords') proper support (Issue #1677)
+- Add: scope FIWARE::Location::NGSIv2 to allow using NGSIv2 geo-queries also with NGSIv1 (Issue #1677)
+- Fix: segfault caused by parameter without value in query string (Issue #1805)
+- Add: options=values mode for entity queries in NGSIV2 (Issue #1049)
+- Fix: some of the operations reported an incorrect 'Allow' HTTP Header on Bad Verb, now fixed
+- Add: sorted URI param in NGSIv2 queries to sort entities by attribute (Issue #1103)
+- Fix: Returning 422 InvalidModification instead of 404 NotFound when POSTing entity (Issue #1817)

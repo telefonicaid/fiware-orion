@@ -1,0 +1,94 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT Attribute Value
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. POST /v2/entities creating E1 A1=1
+# 02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
+# 03. GET /v2/entities/E1/attrs/A1/value as application/json: OK
+#
+
+echo '01. POST /v2/entities creating E1 A1=1'
+echo '======================================'
+payload='{ "id": "E1", "A1": 1 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo '02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload'
+echo '=================================================================='
+payload='{ "a": "1", "b": 2 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo '03. GET /v2/entities/E1/attrs/A1/value as application/json: OK'
+echo '=============================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities creating E1 A1=1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
+==================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities/E1/attrs/A1/value as application/json: OK
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 15
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "a": "1",
+    "b": 2
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

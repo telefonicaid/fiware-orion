@@ -115,7 +115,7 @@ extern DBClientBase* getMongoConnection(void);
 *
 * releaseMongoConnection - 
 */
-extern void releaseMongoConnection(DBClientBase* connection, std::auto_ptr<DBClientCursor>*  cursor = NULL);
+extern void releaseMongoConnection(DBClientBase* connection);
 
 /*****************************************************************************
 *
@@ -264,10 +264,13 @@ extern bool entitiesQuery
   bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
-  int                              offset       = DEFAULT_PAGINATION_OFFSET_INT,
-  int                              limit        = DEFAULT_PAGINATION_LIMIT_INT,
-  bool*                            limitReached = NULL,
-  long long*                       countP       = NULL
+  int                              offset        = DEFAULT_PAGINATION_OFFSET_INT,
+  int                              limit         = DEFAULT_PAGINATION_LIMIT_INT,
+  bool*                            limitReached  = NULL,
+  long long*                       countP        = NULL,
+  bool*                            badInputP     = NULL,
+  const std::string&               sortOrderList = "",
+  const std::string&               apiVersion    = "v1"
 );
 
 /* ****************************************************************************
@@ -295,6 +298,20 @@ extern bool registrationsQuery
   bool                                details      = false,
   long long*                          countP       = NULL
 );
+
+/* ****************************************************************************
+*
+* someEmptyCondValue -
+*
+*/
+extern bool someEmptyCondValue(const BSONObj& sub);
+
+/* ****************************************************************************
+*
+* condValueAttrMatch -
+*
+*/
+extern bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
 
 /* ****************************************************************************
 *
@@ -338,7 +355,8 @@ extern bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 );
 
 /* ****************************************************************************
@@ -357,7 +375,8 @@ extern BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               qFilter
 );
 
 /* ****************************************************************************
@@ -425,5 +444,12 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  Format*                            perEntPaFormat,
                                  std::string*                       perAttrPa,
                                  Format*                            perAttrPaFormat);
+
+
+/* ****************************************************************************
+*
+* qStringFilters -
+*/
+extern bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, ContextElementResponse* cerP = NULL);
 
 #endif

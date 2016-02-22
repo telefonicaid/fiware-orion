@@ -76,10 +76,11 @@ TEST(ContextRegistrationResponse, check)
   ContextRegistrationResponse  crr;
   std::string                  checked;
   std::string                  expected = "no providing application";
+  ConnectionInfo               ci;
 
   utInit();
 
-  checked = crr.check(RegisterContext, XML, "", "", 0);
+  checked = crr.check(&ci, RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
 
   utExit();

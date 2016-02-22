@@ -18,8 +18,9 @@ RUN \
       bzip2 \
       cmake \
       epel-release \
+      gnutls-devel \
+      libgcrypt-devel \
       libcurl-devel \
-      libmicrohttpd-devel \
       make \
       nc \
       git \
@@ -27,12 +28,20 @@ RUN \
       scons \
       tar \
       which && \
-    # Install mongodb driver from source
-    curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.2.tar.gz && \
-    tar xfz legacy-1.0.2.tar.gz && \
-    cd mongo-cxx-driver-legacy-1.0.2 && \
-    scons install --prefix=/usr/local && \
     cd /opt && \
+    # Install libmicrohttpd from source
+    curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz && \
+    tar xvf libmicrohttpd-0.9.48.tar.gz && \
+    cd libmicrohttpd-0.9.48 && \
+    ./configure --disable-messages --disable-postprocessor --disable-dauth && \
+    make && \
+    make install && \
+    ldconfig && \
+    # Install mongodb driver from source
+    curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.7.tar.gz && \
+    tar xfz legacy-1.0.7.tar.gz && \
+    cd mongo-cxx-driver-legacy-1.0.7 && \
+    scons install --prefix=/usr/local && \
     # Install rapidjson from source
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz && \
     tar xfz v1.0.2.tar.gz && \
@@ -62,8 +71,11 @@ RUN \
     cd /opt && \
     if [ ${CLEAN_DEV_TOOLS} -eq 0 ] ; then yum clean all && exit 0 ; fi && \
     # cleanup sources, dev tools, locales and yum cache to reduce the final image size
-    rm -rf /opt/legacy-1.0.2.tar.gz \
-           /opt/mongo-cxx-driver-legacy-1.0.2 \
+    rm -rf /opt/libmicrohttpd-0.9.48.tar.gz \
+           /usr/local/include/microhttpd.h \
+           /usr/local/lib/libmicrohttpd.* \
+           /opt/legacy-1.0.7.tar.gz \
+           /opt/mongo-cxx-driver-legacy-1.0.7 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /opt/rapidjson-1.0.2 \
@@ -84,7 +96,7 @@ RUN \
         cmake libarchive \
         gcc-c++ cloog-ppl cpp gcc glibc-devel glibc-headers \
         kernel-headers libgomp libstdc++-devel mpfr ppl \
-        scons libmicrohttpd-devel boost-devel libcurl-devel \
+        scons boost-devel libcurl-devel gnutls-devel libgcrypt-devel \
         clang llvm llvm-libs \
         CUnit-devel CUnit \
         autoconf automake m4 libidn-devel \

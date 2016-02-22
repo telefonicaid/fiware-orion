@@ -79,9 +79,9 @@ pip install --upgrade -r requirements.txt --allow-all-external
     configuration.json:                  initial configuration, before of execution
     environment.py                       (generic environment) may define code to run before and after certain events during your testing
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
-    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see properties.json.base)
+    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see [properties.json.base](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#propertiesjsonbase))
     README.md:                           this file, a brief explication about this framework to test
-    requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
+    requirement.txt:                     external library, necessary install before to execute test (see [Quick way](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#quick-way) section)
     behave_all.py                        execute all features in a given directory and its subdirectories
 
 *Note*: The `environment.py` file (optional), if present, must be in the same directory that contains the steps/ directory 
@@ -92,8 +92,7 @@ file in the same directory that contains the “steps” directory.
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
 - We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
-    - we can use several configurations, create a file (with ssh commands) to each configuration (this file can to have whatever name and extension), 
-      each configuration file is used in the initial configuration (see `BackgroundFeature` in *.feature). This option is valid with `UPDATE_PROPERTIES_JSON` equal to `true`
+    - we can use several configurations, create a file (with ssh commands) to each configuration (this file can to have whatever name and extension). This option is valid with `UPDATE_PROPERTIES_JSON` equal to `true`
       each file will be composed of lines with ssh commands, that will be executed.
          Example of configuration file into `PATH_TO_SETTING_FOLDER`:
          ```
@@ -125,7 +124,7 @@ file in the same directory that contains the “steps” directory.
            - RPM: CB is installed as RPM, so service tooling will be used to start and stop
            - CLI: plain CB command line interface will be used to start contextBroker, the contextBroker binary (compiled in DEBUG mode) 
              must be available in the system PATH.   
-- `properties.json` (MANDATORY) will be create/update in `root path` automatically from settings folder (see `configuration.json`) or manually.
+- `properties.json` (MANDATORY) will be create/update in `root path` automatically from settings folder (see `configuration.json` file) or manually.
 - Run behave (see available params with the -h option).
 ```
     Some examples:
@@ -143,9 +142,10 @@ file in the same directory that contains the “steps” directory.
 
 ## Scripts
 
- - **behave_all.sh**:  This script execute all .feature files in a given directory and its subdirectories.       
+ - **behave_all.py**:  This script execute all .feature files in a given directory and its subdirectories.     
+   ```
       usage:                                                                                   
-         ./python behave_all.sh [-u] [-only] [-path==directory_path] [-tags==tags_list] [-skip==folders] 
+         python behave_all.py [-u] [-only] [-path==directory_path] [-tags==tags_list] [-skip==folders_list] 
                                                                                                
       parameters:                                                                              
          -u: show the usage [optional].                                                       
@@ -155,12 +155,12 @@ file in the same directory that contains the “steps” directory.
          -only: The features are not executed only returns the command line. [optional].
                                                                                                
       example:                                                                                 
-          ./python behave_all.py -path==components/ngsi -tag==-t @skip -skip==types,entities -only       
-                                                                                               
-     Note: If the folder has not a file with .feature extension, this folder is skipped automatically.                                   
+          python  behave_all.py  -path==components/ngsiv2  -tags==-t=-skip  -skip==types,entities  -only       
+    ```                                                                                           
+    Note: If the folder has not a file with .feature extension, this folder is skipped automatically.                                   
 
 
-## Properties.json
+## Properties.json.base
 
  Properties used by Context Broker tests
 - context_broker_env
@@ -265,14 +265,14 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |  retrieve_api_resource                      |     19       | GET     | /version  /statistics  cache/statistics    /v2       | No        | No             |
 |                                                                                                                                                          |
 |**entities folder**                                                                                                                                       |
-| list_entities                               |    497       | GET     | /v2/entities/                                        | No        | Yes            |
-| create_entity                               |    583       | POST    | /v2/entities/                                        | Yes       | No             |    
+| list_entities                               |    510       | GET     | /v2/entities/                                        | No        | Yes            |
+| create_entity                               |    693       | POST    | /v2/entities/                                        | Yes       | Yes            |    
 |                                                                                                                                                          |
-| retrieve_entity                             |    212       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
-| update_or_append_entity_attributes          |    768       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
-| update_existing_entity_attributes           |    657       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | No             |
-| replace_all_entity_attributes               |    563       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | No             |  
-| remove_entity                               |     68       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
+| retrieve_entity                             |    220       | GET     | /v2/entities/`<entity_id>`                           | No        | Yes            |
+| update_or_append_entity_attributes          |    823       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| update_existing_entity_attributes           |    642       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | Yes            |
+| replace_all_entity_attributes               |    586       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
+| remove_entity                               |     73       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
 |                                                                                                                                                          |
 |**attributes folder**                                                                                                                                     |
 | get_attribute_data                          |    221       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |   
@@ -284,7 +284,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | update_attribute_value                      |    237       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
 |                                                                                                                                                          |
 |**types folder**                                                                                                                                          |
-| retrieve_entity_types                       |  (pending)   | GET     | /v2/types/                                           | No        | Yes            |   
+| retrieve_entity_types                       |     66       | GET     | /v2/types/                                           | No        | Yes            |   
 | retrieve_an_entity_type                     |  (pending)   | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
@@ -312,21 +312,42 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
       The number after "=" is the number of chars
         ex: | attr_name | random=10 |
-  - If entities number is "1", the entity id has not suffix, ex: `entity_id=room`
-    Else entities number is major than "1" the entities id are value plus a suffix (consecutive), ex:
+  - If entity id prefix is true, the entity id is value plus a suffix (consecutive), ex:
         `entity_id=room_0, entity_id=room_1, ..., entity_id=room_N`
-  - If attribute number is "1", the attribute name has not suffix, ex: `attributes_name=temperature`
-    Else attributes number is major than "1" the attributes name are value plus a suffix (consecutive), ex:
+  - If entity type prefix is true, the entity type is value plus a suffix (consecutive), ex:
+        `entity_type=room_0, entity_type=room_1, ..., entity_type=room_N`        
+  - The prefixes function (id or type) are used if entities_number is greater than 1.
+  - If attributes number is equal to "1", the attribute name has not suffix, ex: `attributes_name=temperature`
+    else attributes number is major than "1" the attributes name are value plus a suffix (consecutive), ex:
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
-  - If would like a wrong query parameter name, use `qp_` prefix   
+  - If metadatas number is equal to "1", the attribute name has not suffix, ex: `metadatas_name=alarm`
+    else metadatas number is major than "1" the metadatas name are value plus a suffix (consecutive), ex:
+        `metadatas_name=alarm_0, alarm_1, ..., alarm_N`
+  - If would like a query parameter name in POST, PUT or PATCH requests, use `qp_` prefix into `properties to entities` step   
   - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
-  - It is possible to use the same value of the previous request in another request using this string `the same value of the previous request`.
-     
+  - It is possible to use the same value of the previous request in another request using this string: 
+       `the same value of the previous request`.
+  - If we wanted an empty payload in a second request, use:
+      ```
+          | parameter          |
+          | without_properties |
+      ```
+  - If we wanted attributes in keyValues mode in create or update request, use `keyValues` else use `normalized ` value. ex:
+      ```
+          create entity group with "3" entities in "keyValues" mode
+          or
+          create entity group with "3" entities in "normalized" mode
+      ```
+  - If we need to use No-String values (boolean, null, json object, etc) use raw step appropriate.Ex:
+       ```
+       create an entity in raw and "normalized" modes
+       ```
+    
 
 ## Tags
 
 You can to use multiples tags in each scenario, possibles tags used:
 
-    - happy_path, skip, errors_40x, only_develop, ISSUE_XXX, BUG_XXX, etc
+    - happy_path, skip, errors_40x, only_develop, too_slow, ISSUE_XXX, BUG_XXX, etc
 
-and to filter scenarios by these tags: see Tests execution section.
+and to filter scenarios by these tags: see [Executing Tests](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#executing-tests) section.

@@ -241,7 +241,7 @@ void scarRelease(ParseData* reqDataP)
 */
 std::string scarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqDataP->errorString, 0);
+  return reqDataP->scar.res.check(ciP, SubscribeContextAvailability, ciP->outFormat, "", reqDataP->errorString, 0);
 }
 
 

@@ -880,6 +880,7 @@ function dbInsertEntity()
 #   --xauthToken  <token>          (X-Auth token value)
 #   --origin      <origin>         (Origin in HTTP header)
 #   --noPayloadCheck               (don't check the payload)
+#   --payloadCheck <format>        (force specific treatment of payload)
 #   --header      <HTTP header>    (more headers)
 #   -H            <HTTP header>    (more headers)
 #   --verbose                      (verbose output)
@@ -914,6 +915,7 @@ function orionCurl()
   _json=''
   _urlParams=''
   _xauthToken=''
+  _payloadCheck=''
 
   #
   # Parsing parameters
@@ -927,6 +929,7 @@ function orionCurl()
     elif [ "$1" == "-X" ]; then                _method="-X $2"; shift;
     elif [ "$1" == "--payload" ]; then         _payload=$2; shift;
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck='on';
+    elif [ "$1" == "--payloadCheck" ]; then    _payloadCheck=$2; _noPayloadCheck='off'; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
     elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
     elif [ "$1" == "--origin" ]; then          _origin='--header "Origin: '${2}'"'; shift;
@@ -974,6 +977,7 @@ function orionCurl()
   if   [ "$_in"   == "application/json" ]; then _in='json';  fi
   if   [ "$_out"  == "application/xml" ];  then _out='xml';  fi
   if   [ "$_out"  == "application/json" ]; then _out='json'; fi
+  if   [ "$_out"  == "text/plain" ];       then _out='text'; fi
 
   if   [ "$_in"  == "xml" ];   then _inFormat='--header "Content-Type: application/xml"'
   elif [ "$_in"  == "json" ];  then _inFormat='--header "Content-Type: application/json"'
@@ -988,6 +992,11 @@ function orionCurl()
   elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
   fi
 
+  if [ "$_payloadCheck" != "" ]
+  then
+    payloadCheckFormat=$_payloadCheck
+    _noPayloadCheck='off'
+  fi
 
   dMsg $_in: $_in
   dMsg _out: $_out
@@ -1024,11 +1033,12 @@ function orionCurl()
   #
   dMsg Executing the curl-command
   _response=$(eval $command 2> /dev/null)
-  _responseHeaders=$(cat /tmp/httpHeaders.out)
+
   if [ ! -f /tmp/httpHeaders.out ]
   then
     echo "Broker seems to have died ..."
   else
+    _responseHeaders=$(cat /tmp/httpHeaders.out)
     #
     # Remove "Connection: Keep-Alive" and "Connection: close" headers
     #

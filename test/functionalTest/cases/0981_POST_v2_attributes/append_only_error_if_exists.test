@@ -32,7 +32,7 @@ brokerStart CB
 #
 # 01. Create E1
 # 02. Make sure E1 exists
-# 03. Try to create E1 again, using POST /v2/entities/E1?op=append
+# 03. Try to create E1 again, using POST /v2/entities/E1?options=append
 # 04. Make sure it didn't work
 # 05. Now update E1, using POST /v2/entities/E1
 # 06. Make sure it worked
@@ -40,8 +40,8 @@ brokerStart CB
 
 echo "01. Create E1"
 echo "============="
-payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+payload='{ "id": "E1", "attr1": 1 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -53,10 +53,10 @@ echo
 echo
 
 
-echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append"
-echo "==================================================================="
+echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?options=append"
+echo "========================================================================"
 payload='{  "attr1": 2 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=append,keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -71,7 +71,7 @@ echo
 echo "05. Now update E1, using POST /v2/entities/E1"
 echo "============================================="
 payload='{  "attr1": 5 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -96,18 +96,23 @@ Date: REGEX(.*)
 02. Make sure E1 exists
 =======================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0, 
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 1
+    },
+    "id": "E1",
+    "type": null
 }
 
 
-03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append
-===================================================================
+03. Try to create E1/T1 again, using POST /v2/entities/E1?options=append
+========================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 108
 Content-Type: application/json
@@ -122,21 +127,25 @@ Date: REGEX(.*)
 04. Make sure it didn't work
 ============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0, 
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 1
+    },
+    "id": "E1",
+    "type": null
 }
 
 
 05. Now update E1, using POST /v2/entities/E1
 =============================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
@@ -144,13 +153,18 @@ Date: REGEX(.*)
 06. Make sure it worked
 =======================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 5.0, 
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": null,
+        "value": 5
+    },
+    "id": "E1",
+    "type": null
 }
 
 

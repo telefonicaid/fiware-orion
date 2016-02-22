@@ -70,7 +70,7 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -85,7 +85,7 @@ std::string RegisterContextRequest::check(RequestType requestType, Format format
     alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   }
-  else if (((res = contextRegistrationVector.check(RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
+  else if (((res = contextRegistrationVector.check(ciP, RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
   {

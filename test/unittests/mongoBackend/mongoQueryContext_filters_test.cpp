@@ -59,10 +59,10 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - greaterThan_d
 * - greaterThanOrEqual_n
 * - greaterThanOrEqual_d
-* - lesserThan_n
-* - lesserThan_d
-* - lesserThanOrEqual_n
-* - lesserThanOrEqual_d
+* - lessThan_n
+* - lessThan_d
+* - lessThanOrEqual_n
+* - lessThanOrEqual_d
 * - insideRange_n
 * - insideRange_d
 * - outsideRange_n
@@ -729,10 +729,10 @@ TEST(mongoQueryContextRequest_filters, DISABLED_greaterThanOrEqual_d)
 
 /* ****************************************************************************
 *
-* lesserThan_n -
+* lessThan_n -
 *
 */
-TEST(mongoQueryContextRequest_filters, lesserThan_n)
+TEST(mongoQueryContextRequest_filters, lessThan_n)
 {
   HttpStatusCode         ms;
   QueryContextRequest   req;
@@ -770,10 +770,10 @@ TEST(mongoQueryContextRequest_filters, lesserThan_n)
 
 /* ****************************************************************************
 *
-* lesserThan_d-
+* lessThan_d-
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_lesserThan_d)
+TEST(mongoQueryContextRequest_filters, DISABLED_lessThan_d)
 {
   // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
   EXPECT_EQ(1, 2);
@@ -781,10 +781,10 @@ TEST(mongoQueryContextRequest_filters, DISABLED_lesserThan_d)
 
 /* ****************************************************************************
 *
-* lesserThanOrEqual_n -
+* lessThanOrEqual_n -
 *
 */
-TEST(mongoQueryContextRequest_filters, lesserThanOrEqual_n)
+TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
 {
   HttpStatusCode         ms;
   QueryContextRequest   req;
@@ -821,10 +821,10 @@ TEST(mongoQueryContextRequest_filters, lesserThanOrEqual_n)
 
 /* ****************************************************************************
 *
-* lesserThanOrEqual_d -
+* lessThanOrEqual_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_lesserThanOrEqual_d)
+TEST(mongoQueryContextRequest_filters, DISABLED_lessThanOrEqual_d)
 {
   // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
   EXPECT_EQ(1, 2);
@@ -949,7 +949,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "+S");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -992,7 +992,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "-S");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "!S");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1036,7 +1036,7 @@ TEST(mongoQueryContextRequest_filters, withEntityType)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "+type");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "type");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1083,7 +1083,7 @@ TEST(mongoQueryContextRequest_filters, withoutEntityType)
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "-type");
+  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "!type");
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 

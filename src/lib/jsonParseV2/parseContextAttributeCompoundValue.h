@@ -46,4 +46,17 @@ extern std::string parseContextAttributeCompoundValue
   orion::CompoundValueNode*          parent
 );
 
+
+
+/* ****************************************************************************
+*
+* parseContextAttributeCompoundValueStandAlone - 
+*/
+extern std::string parseContextAttributeCompoundValueStandAlone
+(
+  Document&            document,
+  ContextAttribute*    caP,
+  orion::ValueType     valueType
+);
+
 #endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_

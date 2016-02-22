@@ -25,10 +25,17 @@ SET (SOURCES
     parseEntity.cpp
     parseContextAttribute.cpp
     parseContextAttributeCompoundValue.cpp
+    parseMetadataVector.cpp
     parseMetadata.cpp
     parseAttributeValue.cpp
     jsonParseTypeNames.cpp
     parseSubscription.cpp
+    parseBatchQuery.cpp
+    parseEntityVector.cpp
+    parseEntityObject.cpp
+    parseAttributeList.cpp
+    parseScopeVector.cpp
+    parseScope.cpp
 )
 
 SET (HEADERS
@@ -36,10 +43,17 @@ SET (HEADERS
     parseEntity.h
     parseContextAttribute.h
     parseContextAttributeCompoundValue.cpp
+    parseMetadataVector.h
     parseMetadata.h
     parseAttributeValue.h
     jsonParseTypeNames.h
     parseSubscription.h
+    parseBatchQuery.h
+    parseEntityVector.h
+    parseEntityObject.h
+    parseAttributeList.h
+    parseScopeVector.h
+    parseScope.h
 )
 
 

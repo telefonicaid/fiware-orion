@@ -26,6 +26,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "mongoBackend/compoundResponses.h"
+#include "mongoBackend/dbFieldEncoding.h"
 
 using namespace mongo;
 
@@ -36,14 +37,14 @@ using namespace mongo;
 */
 static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 {
-  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != Object) && (e.type() != Array))
+  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != jstNULL) && (e.type() != Object) && (e.type() != Array))
   {
-    LM_T(LmtSoftError, ("unknown BSON type"));
+    LM_E(("Runtime Error (unknown BSON type: %d)", e.type()));
     return;
   }
 
   orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
-  child->name = e.fieldName();
+  child->name = dbDotDecode(e.fieldName());
 
   switch (e.type())
   {
@@ -60,6 +61,10 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   case NumberDouble:
     child->valueType  = orion::ValueTypeNumber;
     child->numberValue = e.Number();
+    break;
+
+  case jstNULL:
+    child->valueType  = orion::ValueTypeNone;
     break;
 
   case Object:

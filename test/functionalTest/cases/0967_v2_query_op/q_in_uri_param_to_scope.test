@@ -47,7 +47,7 @@ payload='{
   "humidity": 80,
   "status": "OK"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -61,7 +61,7 @@ payload='{
   "humidity": 70,
   "status": "ERR"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -75,7 +75,7 @@ payload='{
   "humidity": 60,
   "status": "OK"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -89,7 +89,7 @@ payload='{
   "humidity": 50,
   "status": "ERR"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -103,7 +103,7 @@ payload='{
   "humidity": 40,
   "status": "OK"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -164,23 +164,47 @@ Date: REGEX(.*)
 06. Query: URI param q=temperature<60;humidity==61..83 => E1+E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 166
+Content-Length: 354
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "humidity": 80.0,
+        "humidity": {
+            "metadata": {},
+            "type": null,
+            "value": 80
+        },
         "id": "E1",
-        "status": "OK",
-        "temperature": 20.0,
+        "status": {
+            "metadata": {},
+            "type": null,
+            "value": "OK"
+        },
+        "temperature": {
+            "metadata": {},
+            "type": null,
+            "value": 20
+        },
         "type": "T"
     },
     {
-        "humidity": 70.0,
+        "humidity": {
+            "metadata": {},
+            "type": null,
+            "value": 70
+        },
         "id": "E2",
-        "status": "ERR",
-        "temperature": 30.0,
+        "status": {
+            "metadata": {},
+            "type": null,
+            "value": "ERR"
+        },
+        "temperature": {
+            "metadata": {},
+            "type": null,
+            "value": 30
+        },
         "type": "T"
     }
 ]

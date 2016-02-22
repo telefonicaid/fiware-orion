@@ -31,6 +31,8 @@
 #include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "alarmMgr/alarmMgr.h"
+
 
 
 /* ****************************************************************************
@@ -77,7 +79,7 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
 *
 * SubscribeContextRequest::check - 
 */
-std::string SubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -85,13 +87,15 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  if (((res = entityIdVector.check(SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
+  if (((res = entityIdVector.check(ciP, SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
       ((res = attributeList.check(SubscribeContext, format, indent, predetectedError, counter))         != "OK") ||      
+      ((res = reference.check(SubscribeContext, format, indent, predetectedError, counter))             != "OK") ||
       ((res = duration.check(SubscribeContext, format, indent, predetectedError, counter))              != "OK") ||
       ((res = restriction.check(SubscribeContext, format, indent, predetectedError, restrictions))      != "OK") ||
       ((res = notifyConditionVector.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK") ||
       ((res = throttling.check(SubscribeContext, format, indent, predetectedError, counter))            != "OK"))
   {
+    alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
     return response.render(SubscribeContext, format, indent);
   }

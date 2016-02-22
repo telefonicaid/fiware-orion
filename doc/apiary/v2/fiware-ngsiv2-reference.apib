@@ -24,7 +24,7 @@ context information including updates, queries, registrations and subscriptions.
 ## Acknowledgements
 
 The editors would like to express their gratitude to the following people who actively contributed to this specification:
-Juan José Hierro, Marcos Reyes, Ken Gunnar, Antonio López, ... 
+Juan José Hierro, Marcos Reyes, Ken Zangelin, Antonio López, ... 
   
 ## Status
 
@@ -274,7 +274,7 @@ Generally speaking, user-defined attribute types are informative, they are proce
 an opaque way. Nonetheless, the types described below are used to convey an special meaning
 
 * `date`:  identifies dates, in ISO8601 format. These attributes can be used with the
-  greater than, lesser than, greater or equal, lesser or equal and range query operators. For instance
+  greater than, less than, greater or equal, lesser or equal and range query operators. For instance
   (only the referred entity attribute is shown) :
 
 ```
@@ -285,6 +285,28 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
   }
 }
 ```
+
+## Field syntax restrictions
+
+Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax. These rules applies to:
+
+* Entity id
+* Entity type
+* Attribute name
+* Attribute type
+* Metadata name
+* Metadata type
+
+The rules are:
+
+* Allowed characters are the ones in the plain ASCII set except the following ones: whitespace, `&`, `?`, `/` and `#`.
+* Maximum field length is 256 characters.
+
+In addition to the above rules, given NGSIv2 server implementations could add additional syntactical restrictions in those
+or other fields, e.g. to avoid some cross script injection attacks.
+
+In the case a client attemps to use a field not valid from a syntax point of view, it shall get a "Bad Request" error
+explaining the cause.
 
 
 ## Error responses
@@ -419,7 +441,7 @@ can be useful in urderstanding the format.
     "value": {
       "type": "Point",
       "coordinates": [2.186447514, 41.3763726]
-    }
+    },
     "type": "application/vnd.geo+json"
   }
 }
@@ -468,28 +490,30 @@ The list of operators (and the format of the values they use) is as follows:
   matches entities which attribute value is strictly greater than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser than**: `<`. The value is a single element, e.g. `temperature<40`. It
-  matches entities which attribute value is strictly lesser than that value. It only makes sense when
++ **Less than**: `<`. The value is a single element, e.g. `temperature<40`. It
+  matches entities which attribute value is strictly less than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
 + **Greater or equal than**: `>=`. The value is a single element, e.g. `temperature>=40`.
   It matches entities which attribute value is greater than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
-  matches entities which attribute value is lesser than or equal to that value. It only makes sense when
++ **Less or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
+  matches entities which attribute value is less than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
 
 In the case of equal or unequal, if the value to match include a `,`, you can use simple quote
 (`'`), e.g: `color=='light,green','deep,blue'`.
 
-Unary statements are composed of a unary operator (either `+`or `-`) and are used in two situations:
+Unary negatory statements use the unary operator `!`, while affirmative unary statements use no operator at all.
+The unary statements are used in two situations:
 
-+ To check for attribute existence. E.g. `+temperature`matches entities which have
-  a temperature attribute (no matter its value), while `-temperature` matches entities which do not have
++ To check for attribute existence. E.g. `temperature` matches entities that have
+  an attribute called 'temperature' (no matter its value), while `!temperature` matches entities that do not have
   a temperature attribute.
-+ To check for entity type existence, with the `type`keyword. E.g, `-type`   matches entities which do not have a type.
++ To check for entity type existence, with the `type` keyword. E.g, `!type` matches entities which do not have a type,
+  while `type` matches entities having a type.
   
  
 ## Geographical Queries
@@ -521,7 +545,7 @@ and the reference geometry must be exactly the same.
 + `geometry=polygon`, defines a polygon.
 + `geometry=box`, defines a bounding box.
 
-**coords** must be a string containing a comma separated list of pairs of geographical coordinates
+**coords** must be a string containing a semicolon separated list of pairs of geographical coordinates
 in accordance with the geometry specified and the rules mandated by the Simple Location Format:
 
 * `geometry=point`.   `coords` will contain a pair of WGS-84 geo-coordinates.
@@ -537,7 +561,7 @@ Matching entities will be located, at a maximum, 1000 meters far away from the r
 `georel=near;minDistance=5000&geometry=point&coords=-40.4,-3.5`.
 Matching entities will be at least 5000 meters far away from the reference point. 
 
-`georel=coveredBy&geometry=polygon&coords=25.774,-80.190,18.466,-66.118,32.321,-64.757,25.774,-80.190`
+`georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
 Matching entities will be those located within the referred polygon.
 
 ### Query Resolution
@@ -627,7 +651,7 @@ Response code:
     + geometry: point (optional, string) - Geografical area to which the query is restricted.
     See [Geographical Queries](#geographical_queries).
     
-    + coords: 40.6391,-8.6533 (optional, string) - List of latitude-longitude pairs of coordinates separated by ','.
+    + coords: 40.6391,-8.6533 (optional, string) - List of latitude-longitude pairs of coordinates separated by ';'.
     See [Geographical Queries](#geographical_queries).
     
     + limit: 20 (optional, number) - Limits the number of entities to be retrieved
@@ -800,8 +824,6 @@ whether `append` operation option is used or not.
   existing in the entity are appended. In addition to that, in the case some of the attributes in the
   payload already exist in the entity, an error is returned.
 
-If the entity doesn't previously exist, it is created.
-
 Response:
 
 * Successful operation uses 204 No Content
@@ -931,7 +953,7 @@ Response:
 + Response 200 (application/json)
 
         {
-            "value": 21.7
+            "value": 21.7,
             "type": null,
             "metadata": {}
         }
@@ -1220,8 +1242,8 @@ Response:
                         }
                     ],
                     "condition": {
-                       "attrs:" [ "temperature " ],
-                       "expression:" {
+                       "attrs": [ "temperature " ],
+                       "expression": {
                           "q": "temperature>40"
                        }
                     }
@@ -1259,8 +1281,8 @@ Response:
                     }
                 ],
                 "condition": {
-                    "attributes:" [ "temperature " ],
-                    "expression:" {
+                    "attributes": [ "temperature " ],
+                    "expression": {
                        "q": "temperature>40"
                     }
                  }
@@ -1268,7 +1290,7 @@ Response:
             "notification": {
                 "callback": "http://localhost:1234",
                 "attributes": ["temperature", "humidity"],
-                "throttling": 5,
+                "throttling": 5
             },            
             "expires": "2016-04-05T14:00:00.00Z"
         }
@@ -1305,8 +1327,8 @@ Response:
                     }
                 ],
                 "condition": {
-                    "attributes:" [ "temperature " ],
-                    "expression:" {
+                    "attributes": [ "temperature " ],
+                    "expression": {
                        "q": "temperature>40"
                     }
                  }
@@ -1673,7 +1695,7 @@ Response:
 
         {
           "actionType": "CREATE",
-          "registrations: [
+          "registrations": [
              {
                "subject": {
                   "entities": [
@@ -1776,8 +1798,10 @@ Response code:
             "id": "abcde",
             "subject": {
               "entities": [
-                "id": "Foo",
-                "type": "myFooType"
+                {
+                  "id": "Foo",
+                  "type": "myFooType"
+                }
               ],
               "attributes": [
                 "humidity"
@@ -1790,8 +1814,10 @@ Response code:
             "id": "efgh",
             "subject": {
               "entities": [
-                "id": "myBar",
-                "type": "myBarType"
+                {
+                  "id": "myBar",
+                  "type": "myBarType"
+                }
               ],
               "attributes": [
                 "speed"

@@ -80,6 +80,7 @@ std::string ContextRegistration::render(Format format, const std::string& indent
 */
 std::string ContextRegistration::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
   Format              format,
   const std::string&  indent,
@@ -89,17 +90,17 @@ std::string ContextRegistration::check
 {
   std::string res;
 
-  if ((res = entityIdVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = entityIdVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = contextRegistrationAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextRegistrationAttributeVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = registrationMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = registrationMetadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

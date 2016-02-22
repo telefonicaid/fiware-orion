@@ -458,6 +458,13 @@ void CompoundValueNode::shortShow(const std::string& indent)
 				(boolValue == true)? "true" : "false"));
     return;
   }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValue,      ("%s%s (null)", 
+				indent.c_str(), 
+				name.c_str()));
+    return;
+  }
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValue,      ("%s%s (%f)", 
@@ -524,6 +531,11 @@ void CompoundValueNode::show(const std::string& indent)
     LM_T(LmtCompoundValueShow, ("%sNumber Value:     %f", 
 				indent.c_str(), 
 				numberValue));
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueShow, ("%sNull", 
+				indent.c_str()));
   }
   else if (childV.size() != 0)
   {
@@ -643,15 +655,17 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
-    char num[32];
-    snprintf(num, sizeof(num), "%f", numberValue);
-    std::string effectiveValue = num;
-    out = valueTag(indent, tagName, effectiveValue, format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag(indent, tagName, toString(numberValue), format, jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
     out = valueTag(indent, tagName, boolValue? "true" : "false", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
+    out = valueTag(indent, tagName, "null", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
@@ -742,18 +756,14 @@ std::string CompoundValueNode::toJson(bool isLastElement)
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    char  num[32];
-
     LM_T(LmtCompoundValueRender, ("I am a Number (%s)", name.c_str()));
-    snprintf(num, sizeof(num), "%f", numberValue);
-
     if (container->valueType == orion::ValueTypeVector)
     {
-      out = JSON_NUMBER(num);
+      out = JSON_NUMBER(toString(numberValue));
     }
     else
     {
-      out = JSON_STR(tagName) + ":" + JSON_NUMBER(num);
+      out = JSON_STR(tagName) + ":" + JSON_NUMBER(toString(numberValue));
     }
   }
   else if (valueType == orion::ValueTypeBoolean)
@@ -767,6 +777,19 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     else
     {
       out = JSON_STR(tagName) + ":" + JSON_BOOL(boolValue);
+    }
+  }
+  else if (valueType == orion::ValueTypeNone)
+  {
+    LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
+
+    if (container->valueType == orion::ValueTypeVector)
+    {
+      out = "null";
+    }
+    else
+    {
+      out = JSON_STR(tagName) + ":" + "null";
     }
   }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
@@ -875,6 +898,12 @@ CompoundValueNode* CompoundValueNode::clone(void)
     case orion::ValueTypeBoolean:
       me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
       break;
+
+    case orion::ValueTypeNone:
+      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
+      me->valueType = orion::ValueTypeNone;
+      break;
+
     default:
       me = NULL;
       LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));
