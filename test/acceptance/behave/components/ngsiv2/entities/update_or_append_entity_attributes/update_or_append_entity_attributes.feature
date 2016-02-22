@@ -763,7 +763,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | random=100 |
       | random=256 |
 
-  @entity_id_unknown @BUG_1206 @BUG_1817 @skip
+  @entity_id_unknown @BUG_1206 @BUG_1817
   Scenario:  try to append entity and attributes by entity ID using NGSI v2 with unknown entity
     Given  a definition of headers
       | parameter          | value                        |
@@ -776,10 +776,10 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | attributes_name  | humidity |
       | attributes_value | 80       |
     When update or append attributes by ID "trretre" and with "normalized" mode
-    Then verify that receive an "Unprocessable Entity" http code
+    Then verify that receive an "Not Found" http code
     And verify an error response
       | parameter   | value                 |
-      | error       | InvalidModification   |
+      | error       | NotFound              |
       | description | Entity does not exist |
 
   @entity_id_update_invalid
@@ -813,7 +813,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | house_&             |
       | my house            |
 
-  @entity_id_update_invalid @BUG_1782 @BUG_1817 @skip
+  @entity_id_update_invalid @BUG_1782 @BUG_1817
   Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
@@ -828,9 +828,9 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     When update or append attributes by ID "<entity_id>" and with "normalized" mode
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                 |
+      | error       | NotFound              |
+      | description | Entity does not exist |
     Examples:
       | entity_id |
       | house_?   |
