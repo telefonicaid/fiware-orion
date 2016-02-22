@@ -23,17 +23,28 @@
 * Author: Felipe Ortiz
 */
 
-#include "parser.h"
+#include <map>
 
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
 #include "logMsg/logMsg.h"
+#include "rest/HttpHeaders.h"
+#include "parser.h"
 
-void ws_parser_parse(std::string &url, std::string &verb, std::string &payload, const char *msg)
+void ws_parser_parse
+(
+    const char*   msg,
+    std::string&  url,
+    std::string&  verb,
+    std::string&  payload,
+    HttpHeaders&  head
+)
 {
   rapidjson::Document doc;
+
+
   doc.Parse(msg);
 
   if (!doc.IsObject())
@@ -56,4 +67,21 @@ void ws_parser_parse(std::string &url, std::string &verb, std::string &payload, 
   }
   else
     payload.clear();
+
+  if (doc.HasMember("headers"))
+  {
+    std::map<std::string, std::string *>::iterator it = head.headerMap.begin();
+    while (it != head.headerMap.end())
+    {
+      const char *value = doc["headers"][it->first.c_str()].GetString();
+      *(it->second) = value ? std::string(value) : std::string();
+      ++it;
+    }
+
+    head.gotHeaders = true;
+  }
+  else
+  {
+    head.gotHeaders = false;
+  }
 }

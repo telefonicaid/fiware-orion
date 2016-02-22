@@ -129,6 +129,7 @@ ConnectionInfo::ConnectionInfo(const std::string &_api, Format _format, bool _ws
   {
     version = "HTTP/1.1";
     servicePath = "/";
+
     httpHeaders.gotHeaders = true;
     httpHeaders.userAgent = "orionWS/0.1";
     httpHeaders.accept = "*/*";
@@ -194,12 +195,20 @@ ConnectionInfo::~ConnectionInfo()
   servicePathV.clear();
 }
 
-void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload)
+void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload, const HttpHeaders &head)
 {
   url = _url;
   method = _verb;
 
   verb = strToVerb(_verb);
+  servicePathV.clear();
+
+  if (head.gotHeaders)
+  {
+    httpHeaders = head;
+    servicePath = head.servicePath;
+    servicePathV.push_back(head.servicePath);
+  }
 
   if (payload)
   {

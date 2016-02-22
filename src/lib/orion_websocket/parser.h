@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 
-void ws_parser_parse(std::string &url, std::string &verb, std::string &payload, const char *msg);
+class HttpHeaders;
+void ws_parser_parse(const char *msg, std::string &url, std::string &verb, std::string &payload, HttpHeaders &head);
 
 #endif

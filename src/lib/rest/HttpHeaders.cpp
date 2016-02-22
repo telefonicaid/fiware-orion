@@ -1,9 +1,8 @@
-#ifndef HTTP_HEADERS_H
-#define HTTP_HEADERS_H
+#include "HttpHeaders.h"
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,38 +22,22 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Felipe Ortiz
 */
-#include <string>
-#include <map>
 
-
-/* ****************************************************************************
-*
-* HttpHeaders - 
-*/
-struct HttpHeaders
+HttpHeaders::HttpHeaders()
+  : gotHeaders(false)
+  , servicePathReceived(false)
+  , contentLength(0)
 {
-  HttpHeaders();
-
-  bool          gotHeaders;
-  std::string   userAgent;
-  std::string   host;
-  std::string   accept;
-  std::string   expect;
-  std::string   contentType;
-  std::string   origin;
-  std::string   tenant;
-  std::string   servicePath;
-  std::string   xauthToken;
-  std::string   xforwardedFor;
-
-  bool          servicePathReceived;
-
-  unsigned int  contentLength;
-  std::string   connection;
-
-  std::map<std::string, std::string *>headerMap;
-};
-
-#endif
+  headerMap["userAgent"] = &userAgent;
+  headerMap["host"] = &host;
+  headerMap["accept"] = &accept;
+  headerMap["expect"] = &expect;
+  headerMap["contentType"] = &contentType;
+  headerMap["origin"] = &origin;
+  headerMap["tenant"] = &tenant;
+  headerMap["servicePath"] = &servicePath;
+  headerMap["xauthToken"] = &xauthToken;
+  headerMap["xforwardedFor"] = &xforwardedFor;
+}

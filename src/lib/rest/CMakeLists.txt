@@ -25,6 +25,7 @@ SET (SOURCES
     restReply.cpp
     RestService.cpp
     Verb.cpp
+    HttpHeaders.cpp
     httpRequestSend.cpp
     orionReply.cpp
     OrionError.cpp
