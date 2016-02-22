@@ -54,7 +54,7 @@ struct HttpHeaders
   unsigned int  contentLength;
   std::string   connection;
 
-  std::map<std::string, std::string *>supportedHeader;
+  std::map<std::string, std::string *>headerMap;
 };
 
 #endif

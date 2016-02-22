@@ -70,8 +70,8 @@ void ws_parser_parse
 
   if (doc.HasMember("headers"))
   {
-    std::map<std::string, std::string *>::iterator it = head.supportedHeader.begin();
-    while (it != head.supportedHeader.end())
+    std::map<std::string, std::string *>::iterator it = head.headerMap.begin();
+    while (it != head.headerMap.end())
     {
       const char *value = doc["headers"][it->first.c_str()].GetString();
       *(it->second) = value ? std::string(value) : std::string();
