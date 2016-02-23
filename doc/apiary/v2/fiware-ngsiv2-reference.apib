@@ -289,11 +289,11 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 
 ## Virtual attributes
 
-There are entity properties that are not directly manipulable but NGSIv2 clients, but that can be render
+There are entity properties that are not directly manipulable by NGSIv2 clients, but that can be rendered
 by NGSIv2 servers to provide extra information. From a representation point of view, they are like
 regular attributes, with name, value and type.
 
-Virtual attributes are not render by default. In oder to render an specific attribute, add its name
+Virtual attributes are not rendered by default. In oder to render an specific attribute, add its name
 to the `options` URL parameter.
 
 The list of virtual attributes is the following:
@@ -301,7 +301,7 @@ The list of virtual attributes is the following:
 * `dateCreation` (type: `date`): entity creation date as ISO 8601 string.
 * `dateModification` (type: `date`): entity modification date as ISO 8601 string.
 
-As regular attributes, they can used in `attrs`, `q` filters and `orderBy`. However, they cannot be used
+As regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`. However, they cannot be used
 in resource URLs.
 
 

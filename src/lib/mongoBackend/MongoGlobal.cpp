@@ -2050,7 +2050,7 @@ bool entitiesQuery
       if (sortedV[ix][0] == '!')
       {
         // reverse
-        sortToken = sortedV[ix].substr(1);
+        sortToken     = sortedV[ix].substr(1);
         sortDirection = -1;
       }
       else
