@@ -231,7 +231,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
   }
   else if (reqDataP->qcr.scopeP->type == FIWARE_LOCATION_V2)
   {
-    // Mark the value of the scope to be of complex natuire, v2
+    // Mark the value of the scope to be of complex nature, v2
     reqDataP->qcr.scopeP->value = FIWARE_LOCATION_V2;
   }
   else
