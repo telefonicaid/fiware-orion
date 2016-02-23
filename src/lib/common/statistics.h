@@ -305,6 +305,8 @@ extern int noOfRtSubscribeResponse;
 extern int noOfRtSubscribeError;
 
 extern int noOfSimulatedNotifications;
+extern int noOfBatchQueryRequest;
+extern int noOfBatchUpdateRequest;
 
 
 

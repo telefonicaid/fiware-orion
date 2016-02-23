@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_SERVICEROUTINESV2_POSTBATCHUPDATE_H_
+#define SRC_LIB_SERVICEROUTINESv2_POSTBATCHUPDATE_H_
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,47 +26,22 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "rapidjson/document.h"
-
-#include "logMsg/logMsg.h"
-
-#include "ngsi/ContextAttribute.h"
-
-#include "apiTypesV2/Entities.h"
+#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseEntityObject.h"
-#include "jsonParseV2/parseEntityVector.h"
-
 
 
 /* ****************************************************************************
 *
-* parseEntityVector - 
+* postBatchUpdate -
 */
-std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, Entities* evP, bool attributesAllowed)
-{
-  std::string type = jsonParseTypeNames[iter->value.GetType()];
+extern std::string postBatchUpdate
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  if (type != "Array")
-  {
-    return "not a JSON array";
-  }
-
-  for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
-  {
-    std::string  r;
-    Entity*      eP = new Entity();
-
-    evP->vec.push_back(eP);
-
-    r = parseEntityObject(ciP, iter2, eP, attributesAllowed);
-    if (r != "OK")
-    {
-      return r;
-    }
-  }
-
-  return "OK";
-}
+#endif  // SRC_LIB_SERVICEROUTINESv2_POSTBATCHUPDATE_H_

@@ -198,6 +198,7 @@
 #include "serviceRoutinesV2/deleteSubscription.h"
 #include "serviceRoutinesV2/patchSubscription.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
+#include "serviceRoutinesV2/postBatchUpdate.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -475,6 +476,10 @@ static const char* validLogLevels[] =
 #define BQR                     BatchQueryRequest
 #define BQR_COMPS_V2            3, { "v2", "op", "query" }
 #define BQR_COMPS_WORD          ""
+
+#define BUR                     BatchUpdateRequest
+#define BUR_COMPS_V2            3, { "v2", "op", "update" }
+#define BUR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -763,7 +768,10 @@ static const char* validLogLevels[] =
   { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetDeletePatchOnly}, \
                                                                                                        \
   { "POST",   BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          postBatchQuery           }, \
-  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }
+  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }, \
+                                                                                                       \
+  { "POST",   BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          postBatchUpdate          }, \
+  { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
 
 
 

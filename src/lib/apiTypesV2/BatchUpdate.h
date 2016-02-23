@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_APITYPESV2_BATCHUPDATE_H_
+#define SRC_LIB_APITYPESV2_BATCHUPDATE_H_
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,47 +26,31 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "rapidjson/document.h"
-
-#include "logMsg/logMsg.h"
-
-#include "ngsi/ContextAttribute.h"
-
+#include "ngsi/UpdateActionType.h"
+#include "ngsi/Request.h"
 #include "apiTypesV2/Entities.h"
 #include "rest/ConnectionInfo.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseEntityObject.h"
-#include "jsonParseV2/parseEntityVector.h"
 
 
 
 /* ****************************************************************************
 *
-* parseEntityVector - 
+* BatchUpdate - 
 */
-std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, Entities* evP, bool attributesAllowed)
+class BatchUpdate
 {
-  std::string type = jsonParseTypeNames[iter->value.GetType()];
+public:
+  UpdateActionType  updateActionType;   // Mandatory
+  Entities          entities;           // Mandatory
 
-  if (type != "Array")
-  {
-    return "not a JSON array";
-  }
+  BatchUpdate();
+  ~BatchUpdate();
 
-  for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
-  {
-    std::string  r;
-    Entity*      eP = new Entity();
+  std::string    check(ConnectionInfo* ciP, RequestType requestType);
+  void           present(const std::string& indent);
+  void           release(void);
+};
 
-    evP->vec.push_back(eP);
-
-    r = parseEntityObject(ciP, iter2, eP, attributesAllowed);
-    if (r != "OK")
-    {
-      return r;
-    }
-  }
-
-  return "OK";
-}
+#endif  // SRC_LIB_APITYPESV2_BATCHUPDATE_H_
