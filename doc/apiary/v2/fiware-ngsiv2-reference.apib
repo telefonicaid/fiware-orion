@@ -309,6 +309,17 @@ or other fields, e.g. to avoid some cross script injection attacks.
 In the case a client attemps to use a field not valid from a syntax point of view, it shall get a "Bad Request" error
 explaining the cause.
 
+## Ordering results
+
+Those operations retrieving list of entities allow the `orderBy` URI parameter to specify the order, which
+value can be:
+
+* The keyword "geo:proximity" to order results by distance to the center point when combined with "near" geoqueries.
+  If "geo:proximity" is used without "near" geoqueries, the order is undefined.
+
+* A comma-separated list of attributes, e.g. `temperature,!humidity". Results are ordered by the first attribute. In the case of ties,
+  the results are ordered by the second attribute and so on. A "!" before the attribute name means that the order is reversed.
+
 
 ## Error responses
 
@@ -663,8 +674,7 @@ Response code:
     The attributes are retrieved in the order specified by this parameter. If this parameter is not included, all the attributes
     are retrieved in arbitrary order.
 
-    + orderBy: temperature,!speed (optional, string) - Comma-separated list of attribute names which will be used to order the entity list.
-    The `!` before an attribute name means reverse ordering.
+    + orderBy: temperature,!speed (optional, string) - Criteria for orderring results. See "Ordering results" section for details.
     
     + options (optional, string) - Options dictionary
       + Members
