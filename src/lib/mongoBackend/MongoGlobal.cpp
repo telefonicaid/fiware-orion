@@ -1851,6 +1851,26 @@ static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
   }
 }
 
+/* ****************************************************************************
+*
+* sortCriteria -
+*
+*/
+static std::string sortCriteria(const std::string& sortToken)
+{
+  if (sortToken == DATE_CREATED)
+  {
+    return std::string(ENT_CREATION_DATE);
+  }
+
+  if (sortToken == DATE_MODIFIED)
+  {
+    return std::string(ENT_MODIFICATION_DATE);
+  }
+
+  return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
+}
+
 
 
 /* ****************************************************************************
@@ -2030,7 +2050,7 @@ bool entitiesQuery
       if (sortedV[ix][0] == '!')
       {
         // reverse
-        sortToken     = sortedV[ix].substr(1);
+        sortToken = sortedV[ix].substr(1);
         sortDirection = -1;
       }
       else
@@ -2039,7 +2059,7 @@ bool entitiesQuery
         sortDirection = 1;
       }
 
-      sortOrder.append(std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE, sortDirection);
+      sortOrder.append(sortCriteria(sortToken), sortDirection);
     }
 
     query.sort(sortOrder.obj());
