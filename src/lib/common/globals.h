@@ -75,6 +75,14 @@
 
 /* ****************************************************************************
 *
+* virtual attributes
+*/
+#define DATE_CREATED   "dateCreated"
+#define DATE_MODIFIED  "dateModified"
+
+
+/* ****************************************************************************
+*
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -
 * 
 * It has been suggested to use RequestType enum (in Request.h) instead of this
