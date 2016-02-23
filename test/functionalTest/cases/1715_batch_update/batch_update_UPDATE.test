@@ -121,7 +121,7 @@ echo
 --REGEXPECT--
 01. Create E1/T1/A1=1,A2=1, using POST /v2/op/update with APPEND
 ================================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 

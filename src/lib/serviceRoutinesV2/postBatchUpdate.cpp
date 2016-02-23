@@ -109,19 +109,10 @@ std::string postBatchUpdate
   else
   {
     //
-    // If creation: 201  (what if it is an "Append" but the entity already existed?)
-    // If update:   204
-    // No payload
+    // NOTE
+    //   For simplicity, 204 is always returned, even if entities are created
     //
-    if ((buP->updateActionType.get() == "Append") || (buP->updateActionType.get() == "append") || (buP->updateActionType.get() == "APPEND"))
-    {
-      ciP->httpStatusCode = SccCreated;
-    }
-    else
-    {
-      ciP->httpStatusCode = SccNoContent;
-    }
-
+    ciP->httpStatusCode = SccNoContent;
     answer = "";
   }
 

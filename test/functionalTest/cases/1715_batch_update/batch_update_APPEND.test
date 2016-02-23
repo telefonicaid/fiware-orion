@@ -171,7 +171,7 @@ echo
 --REGEXPECT--
 01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND
 ===========================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
@@ -228,7 +228,7 @@ Date: REGEX(.*)
 
 05. 'Add' an attribute A1=5 using POST /v2/op/update with APPEND
 ================================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
@@ -254,7 +254,7 @@ Date: REGEX(.*)
 
 07. 'Add' an attribute A1=7 using POST /v2/update?options=keyValues with APPEND
 ===============================================================================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
