@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Sorted by atribute
+Order by atribute with batch query op
 
 --SHELL-INIT--
 dbInit CB
@@ -99,35 +99,70 @@ echo
 
 echo "05. Get sorted by age: User4, User3, User1, User2"
 echo "================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=age' --json
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=age' --payload "$payload" --json
 echo
 echo
 
 
 echo "06. Get sorted by age in reverse order: User2, User1, User3, User4"
 echo "=================================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=!age' --json
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=!age' --payload "$payload" --json
 echo
 echo
 
 
 echo "07. Get sorted by name, then age: User4, User3, User1, User2"
 echo "============================================================"
-orionCurl --url '/v2/entities?options=keyValues&orderBy=name,age' --json
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,age' --payload "$payload" --json
 echo
 echo
 
 
 echo "08. Get sorted by reverse name, then age: User1, User2, User4, User3"
 echo "===================================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=!name,age' --json
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=!name,age' --payload "$payload" --json
 echo
 echo
 
 
 echo "09. Get sorted by name, then reserve age: User3, User4, User2, User1"
 echo "===================================================================="
-orionCurl --url '/v2/entities?options=keyValues&orderBy=name,!age' --json
+payload='{
+  "entities": [
+    {
+      "idPattern": ".*"
+    }
+  ]
+}'
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age' --payload "$payload" --json
 echo
 echo
 

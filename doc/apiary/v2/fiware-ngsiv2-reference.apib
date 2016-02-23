@@ -1649,12 +1649,15 @@ Response code:
 + Parameters
     + limit: 10 (optional, number) - Limit the number of entities to be retrieved
     + offset: 20 (optional, number) - Skip a number of records
+    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering results" section for details.
     + options (optional, string) - Options dictionary
       + Members
           + count - the total number of entities is returned in the response as an
           HTTP header named `X-Total-Count`.
-          + canonical - when used, the response payload uses the "canonical form".
-          See JSON entity representation format section for details.
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding
+          section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See corresponding
+          section for details.
 
 
 + Request (application/json)
