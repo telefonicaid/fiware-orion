@@ -80,7 +80,7 @@ echo
 
 echo "06. GET /v2/entities with Near with two vertices - ERROR"
 echo "========================================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=1,2;2,2' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:10&geometry=point&coords=1,2;2,2' --json
 echo
 echo
 
@@ -94,7 +94,7 @@ echo
 
 echo "08. GET /v2/entities with correct Near but nothing found"
 echo "========================================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=1.0,2.0' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:10&geometry=point&coords=1.0,2.0' --json
 echo
 echo
 

@@ -54,7 +54,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -95,7 +95,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     }
@@ -171,7 +171,7 @@ payload='
                "q": "weight<140",
                "geometry": "rectangles",
                "coords": "-4.41,-31.51",
-               "georel": "far;maxDistance=2"
+               "georel": "far;maxDistance:2"
             }
          }
     }
@@ -204,7 +204,7 @@ payload='
                "q": "temperature>40",
                "geometry": "point",
                "coords": "-40.4,-3.5",
-               "georel": "near;minDistance=5000"
+               "georel": "near;minDistance:5000"
             }
          }
     },
@@ -265,7 +265,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
@@ -317,7 +317,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
@@ -369,7 +369,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
@@ -421,7 +421,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },
@@ -473,7 +473,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-4.41,-31.51",
                 "geometry": "rectangles",
-                "georel": "far;maxDistance=2",
+                "georel": "far;maxDistance:2",
                 "q": "weight<140"
             }
         },
@@ -523,7 +523,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "-40.4,-3.5",
                 "geometry": "point",
-                "georel": "near;minDistance=5000",
+                "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             }
         },

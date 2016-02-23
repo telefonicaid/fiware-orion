@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-NGSIv1 geo-queries based on points
+NGSIv2 geo-queries for entities located with geo:point
 
 --SHELL-INIT--
 dbInit CB
