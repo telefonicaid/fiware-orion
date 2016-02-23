@@ -3173,7 +3173,7 @@ void processContextElement
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPENDORUPDATE))
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Entity does not exist");
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
       return;
     }
 

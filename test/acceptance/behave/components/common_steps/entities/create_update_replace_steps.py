@@ -121,27 +121,29 @@ def create_an_entity_in_raw(context, mode):
 
 # ------------------------ update, append and replace -----------------------------------------------
 
-@step(u'update or append attributes by ID "([^"]*)"')
-def update_or_append_an_attribute_by_id(context, entity_id):
+@step(u'update or append attributes by ID "([^"]*)" and with "([^"]*)" mode')
+def update_or_append_an_attribute_by_id(context, entity_id, mode):
     """
     update or append attributes by ID
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized |behave keyValues)
     """
     __logger__.debug("updating or appending an attribute by id...")
-    context.resp = context.cb.update_or_append_an_attribute_by_id("POST", context, entity_id)
+    context.resp = context.cb.update_or_append_an_attribute_by_id("POST", context, entity_id, mode)
     __logger__.info("...updated or appended an attribute by id")
 
 
-@step(u'update or append attributes by ID "([^"]*)" in raw mode')
-def update_or_append_an_attribute_by_ID_in_raw_mode(context, entity_id):
+@step(u'update or append attributes by ID "([^"]*)" in raw and "([^"]*)" modes')
+def update_or_append_an_attribute_by_ID_in_raw_mode(context, entity_id, mode):
     """
     update or append attributes by ID in raw mode
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized |behave keyValues)
     """
     __logger__.debug("updating or appending an attribute by id in raw mode...")
-    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("POST", context, entity_id)
+    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("POST", context, entity_id, mode)
     __logger__.info("...updated or appended an attribute by id in raw mode")
 
 

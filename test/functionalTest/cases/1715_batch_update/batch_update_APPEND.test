@@ -33,7 +33,7 @@ brokerStart CB 0
 # 01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND
 # 02. GET /v2/entities/E1 to see E1/T1/A1=1
 # 03. Add an attribute A1=3 using POST /v2/op/update with APPEND_STRICT, see error
-# 04. GET /v2/entities/E1 to see E1/T1/A1=1 (part-test 03 did NOT modify A1)
+# 04. GET /v2/entities/E1 to see E1/T1/A1=1 (step 03 did NOT modify A1)
 # 05. 'Add' an attribute A1=5 using POST /v2/op/update with APPEND
 # 06. GET /v2/entities/E1 to see E1/T1/A1=5
 # 07. 'Add' an attribute A1=7 using POST /v2/update?options=keyValues with APPEND
@@ -87,8 +87,8 @@ echo
 echo
 
 
-echo "04. GET /v2/entities/E1 to see E1/T1/A1=1 (part-test 03 did NOT modify A1)"
-echo "=========================================================================="
+echo "04. GET /v2/entities/E1 to see E1/T1/A1=1 (step 03 did NOT modify A1)"
+echo "====================================================================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
@@ -208,8 +208,8 @@ Date: REGEX(.*)
 }
 
 
-04. GET /v2/entities/E1 to see E1/T1/A1=1 (part-test 03 did NOT modify A1)
-==========================================================================
+04. GET /v2/entities/E1 to see E1/T1/A1=1 (step 03 did NOT modify A1)
+=====================================================================
 HTTP/1.1 200 OK
 Content-Length: 66
 Content-Type: application/json

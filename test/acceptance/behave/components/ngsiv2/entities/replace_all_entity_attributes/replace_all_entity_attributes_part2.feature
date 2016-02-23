@@ -141,7 +141,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | error       | NotFound                 |
       | description | No context element found |
 
-  @entity_id_replace_invalid @BUG_1782 @skip
+  @entity_id_replace_invalid
   Scenario Outline:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -169,11 +169,32 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | house(flat)         |
       | {\'a\':34}          |
       | [\'34\', \'a\', 45] |
-      | house_?             |
       | house_&             |
-      | house_/             |
-      | house_#             |
       | my house            |
+
+  @entity_id_replace_invalid @BUG_1782
+  Scenario Outline:  try to replace attributes by entity ID using NGSI v2 with invalid entity id values
+    Given  a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_replace_entity_id |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    # These properties below are used in update request
+    And properties to entities
+      | parameter        | value    |
+      | attributes_name  | pressure |
+      | attributes_value | 80       |
+    When replace attributes by ID "<entity_id>" if it exists and with "normalized" mode
+    Then verify that receive an "Not Found" http code
+    And verify an error response
+      | parameter   | value                    |
+      | error       | NotFound                 |
+      | description | No context element found |
+    Examples:
+      | entity_id |
+      | house_?   |
+      | house_/   |
+      | house_#   |
 
   # --------------------- attribute name  ------------------------------------
 

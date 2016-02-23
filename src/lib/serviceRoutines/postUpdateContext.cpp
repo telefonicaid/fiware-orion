@@ -528,10 +528,7 @@ std::string postUpdateContext
     ciP->httpStatusCode = httpStatusCode;
   }
 
-  if (ciP->apiVersion == "v1") // FIXME PR: v2 has no forwaring yet - I imagine this function is not necessary for v2 ...
-  {
-    foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
-  }
+  foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
 
 
 
@@ -540,7 +537,7 @@ std::string postUpdateContext
   //
   // If there is nothing to forward, just return the result
   //
-  bool forwarding = (ciP->apiVersion == "v2")? false : forwardsPending(upcrsP);
+  bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
