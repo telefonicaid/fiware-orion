@@ -2853,7 +2853,14 @@ static void updateEntity
     // in only one place
     //
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-    responseP->contextElementResponseVector.push_back(cerP);
+
+    if (!(attributeAlreadyExistsError && (strcasecmp(action.c_str(), "append_strict") == 0)))
+    {
+      // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
+      // processContextElement() function so we need to skip this addition or we will get duplicated
+      // CER
+      responseP->contextElementResponseVector.push_back(cerP);
+    }
     releaseTriggeredSubscriptions(subsToNotify);
 
     notifyCerP->release();
@@ -3368,40 +3375,6 @@ void processContextElement
   if (attributeAlreadyExistsError == true)
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
-
-    // FIXME P10 - to be fixed before PR is merged
-    //   This is a temporal fix for the problem with *two* context element responses for a append_strict request giving 
-    //   'Attribute Already Exists'.
-    //   
-    //   I simply remove the last cerP - the one saying that this operation worked,
-    //
-    //   It works fine if the request was simple, with only *one attribute*, but what is the request has two attributes?
-    //   One attribute that is OK (and appended) and the other one is flagged with 'Attribute Already Exists' ... ?
-    //
-    //   In my opinion, a request should not be carried out, 'halfways' like this.
-    //   Nothing should be changed in the database and an error be returned. That's just an opinion.
-    //   I think that how it works currently is some kind of 'best effort'.
-    //   If only one attribute can be updated, it is, even though other attributes of the same request are invalid.
-    //   To me, this is a bit confusing.
-    //   Also, if the broker is to work this way, for the case of POST /v2/op/update, we will need complex responses, to be
-    //   able to tell the user which attributes were updated and which were not ...
-    //
-    //   This fix fixes part 5 of the functest v1_append_strict.test, while it destroys part 7 ...
-    //   A smarter solution is necessary (no db change and error returned? :-))
-    //
-    //   [ to mend part 7 of v1_append_strict.test, we could always remember if anything was mopdified in the db and in such case NOT
-    //     applying this new 'fix', deleting the last contextElementResponse ]
-    //
-
-    // START OF FIX
-    int ix = responseP->contextElementResponseVector.size() - 1;
-    if (ix >= 0)
-    {
-      delete(responseP->contextElementResponseVector[ix]);
-      responseP->contextElementResponseVector.vec.erase(responseP->contextElementResponseVector.vec.begin() + ix);
-    }
-    // END OF FIX
-
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
   }
 
