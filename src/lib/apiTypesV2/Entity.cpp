@@ -81,20 +81,32 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
-    std::string out = "{";
-
-    out += JSON_VALUE("id", id);
-    out += ",";
-    out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : "null");
-
-    if (attributeVector.size() != 0)
+    std::string out;
+    if (renderMode == "values")
     {
-      out += ",";
-
-      out += attributeVector.toJson(true, false, renderMode);
+      out = "[";
+      if (attributeVector.size() != 0)
+      {
+        out += attributeVector.toJson(true, false, renderMode, ciP->uriParam["attrs"]);
+      }
+      out += "]";        
     }
+    else
+    {
+      out = "{";
 
-    out += "}";
+      out += JSON_VALUE("id", id);
+      out += ",";
+      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : "null");
+
+      if (attributeVector.size() != 0)
+      {
+        out += ",";
+        out += attributeVector.toJson(true, false, renderMode, ciP->uriParam["attrs"]);
+      }
+
+      out += "}";
+    }
 
     if (comma)
     {

@@ -242,7 +242,8 @@ There are two representation modes, which must be supported by implementations, 
 ```
 
 * *values mode*. This mode represents the entity only by a collection of attribute values conveyed by an Array. Id and type information are left out.
-  See example below.
+  See example below. The order of the attributes in the Array is specified by the `attrs` URI param (e.g. `attrs=branch,colour,engine`) or arbitrary
+  order in the case `attrs` is not used.
 
 ```
 [ 'Ford', 'black', 78.3 ]
@@ -274,7 +275,7 @@ Generally speaking, user-defined attribute types are informative, they are proce
 an opaque way. Nonetheless, the types described below are used to convey an special meaning
 
 * `date`:  identifies dates, in ISO8601 format. These attributes can be used with the
-  greater than, lesser than, greater or equal, lesser or equal and range query operators. For instance
+  greater than, less than, greater or equal, lesser or equal and range query operators. For instance
   (only the referred entity attribute is shown) :
 
 ```
@@ -307,6 +308,17 @@ or other fields, e.g. to avoid some cross script injection attacks.
 
 In the case a client attemps to use a field not valid from a syntax point of view, it shall get a "Bad Request" error
 explaining the cause.
+
+## Ordering results
+
+Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify the order; its 
+value can be:
+
+* The keyword "geo:proximity" to order results by distance to the center point when combined with "near" geoqueries.
+  If "geo:proximity" is used without "near" geoqueries, the order is undefined.
+
+* A comma-separated list of attributes, e.g. `temperature,!humidity`. Results are ordered by the first attribute. On ties,
+  the results are ordered by the second attribute and so on. A "!" before the attribute name means that the order is reversed.
 
 
 ## Error responses
@@ -490,16 +502,16 @@ The list of operators (and the format of the values they use) is as follows:
   matches entities which attribute value is strictly greater than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser than**: `<`. The value is a single element, e.g. `temperature<40`. It
-  matches entities which attribute value is strictly lesser than that value. It only makes sense when
++ **Less than**: `<`. The value is a single element, e.g. `temperature<40`. It
+  matches entities which attribute value is strictly less than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
 + **Greater or equal than**: `>=`. The value is a single element, e.g. `temperature>=40`.
   It matches entities which attribute value is greater than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
-+ **Lesser or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
-  matches entities which attribute value is lesser than or equal to that value. It only makes sense when
++ **Less or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
+  matches entities which attribute value is less than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
   unexpected results).
 
@@ -617,7 +629,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs,orderBy}]
 
 Retrieves a list of entities which match different criteria (by id, idPattern, type or those which match
 a query or geographical query). A given entity have to match all the criteria to be retrieved
@@ -659,7 +671,10 @@ Response code:
     + offset: 20 (optional, number) - Establishes the offset from which entities will be returned
     
     + attrs: seatNumber (optional, string) - Comma-separated list of attribute names which data will be included in the response.
-    If this parameter is not included, all the attributes are retrieved.
+    The attributes are retrieved in the order specified by this parameter. If this parameter is not included, all the attributes
+    are retrieved in arbitrary order.
+
+    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering results" section for details.
     
     + options (optional, string) - Options dictionary
       + Members
@@ -756,9 +771,9 @@ Response:
             Location: /v2/entities/Bcn-Welt
 
 
-## Entity by ID [/v2/entities/{entityId}{?attrs,options}]
+## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?attrs,options}]
+### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in a section above).
@@ -775,8 +790,11 @@ Response:
 
 + Parameters
     + entityId (required, string) - Entity id to be retrieved
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
-    data will be included in the response. If this parameter is not included, all the attributes are retrieved.
+    data will be included in the response. The attributes are retrieved in the order specified by this parameter.
+    If this parameter is not included, all the attributes are retrieved in arbitrary order.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See 
@@ -809,7 +827,7 @@ Response:
             }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}?{options}]
+### Update or append entity attributes [POST /v2/entities/{entityId}{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -831,6 +849,8 @@ Response:
 
 + Parameters
     + entityId (required, string) - Entity id to be updated
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
             + append - Force an append operation
@@ -849,7 +869,7 @@ Response:
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}?{options}]
+### Update existing entity attributes [PATCH /v2/entities/{entityId}{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -865,6 +885,8 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id to be updated
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
             + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
@@ -883,7 +905,7 @@ Response:
 
 + Response 204
 
-### Replace all entity attributes [PUT /v2/entities/{entityId}?{options}]
+### Replace all entity attributes [PUT /v2/entities/{entityId}{?type,options}]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -899,6 +921,8 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
             + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
@@ -917,7 +941,7 @@ Response:
 
 + Response 204
 
-### Remove entity [DELETE /v2/entities/{entityId}]
+### Remove entity [DELETE /v2/entities/{entityId}{?type}]
 
 Delete the entity.
 
@@ -928,15 +952,17 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id to be deleted
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
 
 + Response 204
 
 
 # Group Attributes
 
-## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}]
+## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]
 
-### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
+### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON representation for attributes
 (described in a section above).
@@ -948,6 +974,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute to be retrieved.
 
 + Response 200 (application/json)
@@ -958,7 +986,7 @@ Response:
             "metadata": {}
         }
 
-### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}]
+### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 The request payload is an object representing the new attributes data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -971,6 +999,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name
 
 + Request (application/json)
@@ -987,7 +1017,7 @@ Response:
 + Response 200
 
 
-### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
+### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Removes an entity attribute.
 
@@ -998,6 +1028,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name
 
 + Response 204
@@ -1005,9 +1037,9 @@ Response:
 
 # Group Attribute Value
 
-## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value]
+## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
 
-### Get attribute value [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+### Get attribute value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 It returns the `value` property with the value of the attribute.
 
@@ -1029,6 +1061,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute to be retrieved.
 
 + Response 200 (application/json)
@@ -1040,7 +1074,7 @@ Response:
             "country": "Spain"
         }
 
-### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 The request payload is the new attribute value.
 
@@ -1063,6 +1097,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name
 
 + Request (application/json)
@@ -1561,7 +1597,7 @@ The payload is an object with two properties:
 
 Response:
 
-* Successful operation uses 200 OK.
+* Successful operation uses 204 No Content.
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Request (application/json)
@@ -1584,7 +1620,13 @@ Response:
             ]
         }
 
-+ Response 200
++ Parameters
+    + options (optional, string) - Options dictionary
+      + Members
+          + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See corresponding 
+          section for details.
+
++ Response 204
 
 
 ### Query [POST /v2/op/query{?limit,offset,options}]
@@ -1613,12 +1655,15 @@ Response code:
 + Parameters
     + limit: 10 (optional, number) - Limit the number of entities to be retrieved
     + offset: 20 (optional, number) - Skip a number of records
+    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering results" section for details.
     + options (optional, string) - Options dictionary
       + Members
           + count - the total number of entities is returned in the response as an
           HTTP header named `X-Total-Count`.
-          + canonical - when used, the response payload uses the "canonical form".
-          See JSON entity representation format section for details.
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding
+          section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See corresponding
+          section for details.
 
 
 + Request (application/json)

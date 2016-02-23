@@ -42,16 +42,16 @@ __logger__ = logging.getLogger("steps")
 
 # ------------------------- delete steps ----------------------------
 
-@step(u'delete entities with id "([^"]*)"')
-def delete_entities_by_id(context, entity_id):
+@step(u'delete an entity with id "([^"]*)"')
+def delete_an_entity_by_id(context, entity_id):
     """
-    delete entities
+    delete an entity by id
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity id name
     """
-    __logger__.debug("Deleting entities...")
-    context.resp_list = context.cb.delete_entities_by_id(context, entity_id)
-    __logger__.info("...Entities are deleted")
+    __logger__.debug("Deleting entity: %s..." % entity_id)
+    context.resp = context.cb.delete_entities_by_id(entity_id)
+    __logger__.info("...\"%s\" entity has been deleted" % entity_id)
 
 
 @step(u'delete an attribute "([^"]*)" in entities with id "([^"]*)"')
@@ -63,7 +63,7 @@ def delete_an_attribute_in_entities_with_id(context, attribute_name, entity_id):
     :param attribute_name: attribute name to delete
     """
     __logger__.debug("Deleting an attribute in entities...")
-     # if delete a single attribute in several entities a response list is returned, else only one response is returned.
+    # if delete a single attribute in several entities a response list is returned, else only one response is returned.
     resp_temp = context.cb.delete_entities_by_id(context, entity_id, attribute_name)
     if len(resp_temp) > 1:
         context.resp_list = resp_temp

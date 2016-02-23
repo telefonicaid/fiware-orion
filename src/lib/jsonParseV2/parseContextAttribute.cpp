@@ -234,7 +234,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
     if (type != "Object")
     {
-      std::string details = "not a JSON object";
+      std::string details = "attribute must be a JSON object, unless keyValues option is used";
       alarmMgr.badInput(clientIp, details);
       ciP->httpStatusCode = SccBadRequest;
       return details;

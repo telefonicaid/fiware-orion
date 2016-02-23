@@ -231,23 +231,12 @@ Date: REGEX(.*)
 05. v1 APPEND_STRICT with attr2 -> fails
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 342
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "contextResponses": [
-        {
-            "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
         {
             "contextElement": {
                 "id": "E1",

@@ -286,6 +286,8 @@ HttpStatusCode mongoQueryContext
     std::string detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
     bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
+    std::string sortOrderList  = uriParams[URI_PARAM_SORTED];
+
     LM_T(LmtMongo, ("QueryContext Request"));    
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
@@ -317,6 +319,7 @@ HttpStatusCode mongoQueryContext
                        &limitReached,
                        countP,
                        &badInput,
+                       sortOrderList,
                        apiVersion);
 
     if (badInput)
