@@ -258,12 +258,12 @@ Date: REGEX(.*)
 09. Batch Update with entity with unknown field (and no options=keyValues)
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "attribute must be a JSON object",
+    "description": "attribute must be a JSON object, unless keyValues option is used",
     "error": "BadRequest"
 }
 
