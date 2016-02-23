@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_JSONPARSEV2_PARSEBATCHUPDATE_H_
+#define SRC_LIB_JSONPARSEV2_PARSEBATCHUPDATE_H_
+
 /*
 *
 * Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
@@ -24,46 +27,15 @@
 */
 #include <string>
 
-#include "rapidjson/document.h"
-
-#include "logMsg/logMsg.h"
-
-#include "ngsi/ContextAttribute.h"
-
-#include "apiTypesV2/Entities.h"
 #include "rest/ConnectionInfo.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
-#include "jsonParseV2/parseEntityObject.h"
-#include "jsonParseV2/parseEntityVector.h"
+#include "apiTypesV2/BatchUpdate.h"
 
 
 
 /* ****************************************************************************
 *
-* parseEntityVector - 
+* parseBatchUpdate - 
 */
-std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, Entities* evP, bool attributesAllowed)
-{
-  std::string type = jsonParseTypeNames[iter->value.GetType()];
+extern std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* bqrP);
 
-  if (type != "Array")
-  {
-    return "not a JSON array";
-  }
-
-  for (Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
-  {
-    std::string  r;
-    Entity*      eP = new Entity();
-
-    evP->vec.push_back(eP);
-
-    r = parseEntityObject(ciP, iter2, eP, attributesAllowed);
-    if (r != "OK")
-    {
-      return r;
-    }
-  }
-
-  return "OK";
-}
+#endif  // SRC_LIB_JSONPARSEV2_PARSEBATCHUPDATE_H_

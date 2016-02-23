@@ -2853,7 +2853,14 @@ static void updateEntity
     // in only one place
     //
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-    responseP->contextElementResponseVector.push_back(cerP);
+
+    if (!(attributeAlreadyExistsError && (strcasecmp(action.c_str(), "append_strict") == 0)))
+    {
+      // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
+      // processContextElement() function so we need to skip this addition or we will get duplicated
+      // CER
+      responseP->contextElementResponseVector.push_back(cerP);
+    }
     releaseTriggeredSubscriptions(subsToNotify);
 
     notifyCerP->release();
@@ -3163,14 +3170,14 @@ void processContextElement
       return;
     }
 
-    // This is the cae of POST /v2/entities, in order to check that entity doesn't previously exist
+    // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
         return;
     }
 
-    // This is the cae of POST /v2/entities/<id>, in order to check that entity previously exist
+    // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPENDORUPDATE))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
@@ -3273,7 +3280,7 @@ void processContextElement
      * which sets the ServicePath for the entity.
      */
 
-    /* Creating the common par of the response that doesn't depend on the case */
+    /* Creating the common part of the response that doesn't depend on the case */
     ContextElementResponse* cerP = new ContextElementResponse();
 
     cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
@@ -3368,7 +3375,6 @@ void processContextElement
   if (attributeAlreadyExistsError == true)
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
-
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
   }
 

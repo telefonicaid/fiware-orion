@@ -181,6 +181,7 @@ int noOfSubscriptionsRequest                             = -1;
 int noOfIndividualSubscriptionRequest                    = -1;
 int noOfSimulatedNotifications                           = -1;
 int noOfBatchQueryRequest                                = -1;
+int noOfBatchUpdateRequest                               = -1;
 
 
 
@@ -411,5 +412,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case SubscriptionsRequest:                             ++noOfSubscriptionsRequest; break;
   case IndividualSubscriptionRequest:                    ++noOfIndividualSubscriptionRequest; break;
   case BatchQueryRequest:                                ++noOfBatchQueryRequest; break;
+  case BatchUpdateRequest:                               ++noOfBatchUpdateRequest; break;
   }
 }

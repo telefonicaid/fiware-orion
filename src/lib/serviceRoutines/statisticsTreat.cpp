@@ -124,6 +124,8 @@ static void resetStatistics(void)
   noOfRegisterResponses                           = -1;
 
   noOfSimulatedNotifications                      = -1;
+  noOfBatchQueryRequest                           = -1;
+  noOfBatchUpdateRequest                          = -1;
 
   QueueStatistics::reset();
 
@@ -199,6 +201,8 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "attributeValueInstanceWithTypeAndId",       noOfAttributeValueInstanceWithTypeAndId);
   renderUsedCounter(&js, "contextEntitiesByEntityIdAndType",          noOfContextEntitiesByEntityIdAndType);
   renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
+  renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
+  renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
   renderUsedCounter(&js, "logRequests", noOfLogRequests);
 
   //
@@ -333,8 +337,9 @@ std::string statisticsTreat
 
   ciP->httpStatusCode = SccOk;
   return js.str();
-
 }
+
+
 
 /* ****************************************************************************
 *
