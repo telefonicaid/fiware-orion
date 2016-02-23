@@ -525,4 +525,4 @@ EOF
 EOF
 ```
 
-Please note that the 'coords' field of the complex value of the scope needs to be put **after** the field 'geometry'.
+Please note that the `coords` field of the complex value of the scope needs to be put **after** the field `geometry`.
