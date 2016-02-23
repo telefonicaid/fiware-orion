@@ -30,7 +30,7 @@ However, take into account that some of the filters (e. g. greater/less, range, 
 for numeric values. Thus, in order to work properly, these filters (although using a 
 `POST /v1/queryContext`) needs that the attributes to which they refer were created using NGSIv2 operations.
 
-In addtiion, note that NGSIv2 geo-query filters can be also used in NGSIv1. See
+In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
 [the following section](geolocation.md#geo-located-queries-ngsiv2) for details
 
 # Checking ID fields
@@ -46,4 +46,3 @@ you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md
 The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryContext operation (see
 details in the [pagination documentation](pagination.md). However, note that the "geo:proximity"
 order can be used only in NGSIv2.
-

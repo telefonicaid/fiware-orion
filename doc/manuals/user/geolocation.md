@@ -467,8 +467,8 @@ EOF
 
 ## Geo-located queries NGSIv2
 
-The [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/) defines a Geographical Queries
-languague (based on `georel`, `geometry` and `coords` fields) that can be also used in NGSIv1 with the
+The [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/) defines a Geographical Query
+languague (based on `georel`, `geometry` and `coords` fields) that can be used also in NGSIv1 with the
 FIWARE::Location::NGSIv2 scope, e.g.:
 
 ```
@@ -487,7 +487,7 @@ FIWARE::Location::NGSIv2 scope, e.g.:
         {
           "type" : "FIWARE::Location::NGSIv2",
           "value" : {
-            "georel": [ "near", "minDistance=13500" ],
+            "georel": [ "near", "minDistance:13500" ],
             "geometry": "point",
             "coords": [ [40.418889,-3.691944] ]
           }
@@ -524,3 +524,5 @@ EOF
 }
 EOF
 ```
+
+Please note that the 'coords' field of the complex value of the scope needs to be put **after** the field 'geometry'.
