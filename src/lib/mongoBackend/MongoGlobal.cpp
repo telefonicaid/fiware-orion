@@ -2009,6 +2009,12 @@ bool entitiesQuery
   {
     query.sort(BSON(ENT_CREATION_DATE << 1));
   }
+  else if ((sortOrderList == ORDER_BY_PROXIMITY))
+  {
+    // In this case the solution is not setting any query.sort(), as the $near operator will do the
+    // sorting itself. Of course, using orderBy=geo:proximity without using georel=near will return
+    // unexpected ordering, but this is already warned in the documentation.
+  }
   else
   {
     std::vector<std::string>  sortedV;
