@@ -38,3 +38,9 @@ or metadata name/type) which are described in the "Field syntax restrictions" se
 keep backward compatibility, these restrictions are not used in the NGSIv1 API by default, but
 you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md).
 
+# `orderBy` parameter
+
+The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryContext operation (see
+details in the [pagination documentation](pagination.md). However, note that the "geo:proximity"
+order can be used only in NGSIv2.
+

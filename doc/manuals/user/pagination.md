@@ -28,10 +28,21 @@ allow pagination. The mechanism is based on three URI parameters:
     want to keep strict with NGSI, you can simply ignore the details
     parameter :)
 
-Result are returned ordered by increasing entity/registration creation
+By default, results are returned ordered by increasing entity/registration creation
 time. This is to ensure that if a new entity/registration is created
 while the client is going through all the results the new results are
 added at the end (thus avoiding duplication results).
+
+However, in the case of entities query, the `orderBy` URL parameter can be use to
+specify a different order. In particular, the value of `orderBy` is a comma-separated
+list of attributes and the results are ordered by the first attribute. On ties,
+the results are ordered by the second attribute and so on.
+A "!" before the attribute name means that the order is reversed. For example:
+
+    POST <orion_host>:1026/v1/queryContext?orderBy=temperature,!humidity
+
+orders first by temperature in ascending order, then by humidity in decreasing order
+in the case of temperature ties.
 
 Let’s illustrate with an example: a given client cannot process more
 than 100 results in a single response and the queryContext includes a
