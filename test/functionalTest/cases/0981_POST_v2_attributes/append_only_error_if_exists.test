@@ -96,18 +96,18 @@ Date: REGEX(.*)
 02. Make sure E1 exists
 =======================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -127,18 +127,18 @@ Date: REGEX(.*)
 04. Make sure it didn't work
 ============================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -153,18 +153,18 @@ Date: REGEX(.*)
 06. Make sure it worked
 =======================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 5
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 

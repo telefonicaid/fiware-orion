@@ -255,15 +255,14 @@ Some operations imply that only a partial representation of an entity will be pr
 
 * `id` and `type` are not allowed in update operations, as they are inmutable properties.
 
-* In the requests in which entity `type` is allowed, it may be omitted. When omitted, the default value `null` 
+* In the requests in which entity `type` is allowed, it may be omitted. When omitted, the default string value `none`
   is used for the type.
 
 * In some cases, not all the attributes of the entity are shown, e.g. a query which selects a subset of entity attributes.
 
 * Attribute/metadata `value` may be omitted in requests, meaning that the attribute/metadata has `null` value. It is always present in responses.
 
-* Attribute/metadata `type` may be ommitted in requests, meaning that the attribute/metadata doesn't have a NGSI type. In responses, this
-  property is set to `null` if the attribute doesn't have a type.
+* Attribute/metadata `type` may be ommitted in requests. When omitted, the default string value `none`.
 
 * Attribute `metadata` may be ommitted in requests, meaning that there are not metadata elements associated to the attribute. In responses, this property is set to
   `{}` if the attribute doesn't have metadata.
@@ -302,6 +301,7 @@ The rules are:
 
 * Allowed characters are the ones in the plain ASCII set except the following ones: whitespace, `&`, `?`, `/` and `#`.
 * Maximum field length is 256 characters.
+* Minimum field length is 1 character.
 
 In addition to the above rules, given NGSIv2 server implementations could add additional syntactical restrictions in those
 or other fields, e.g. to avoid some cross script injection attacks.
@@ -519,13 +519,9 @@ In the case of equal or unequal, if the value to match include a `,`, you can us
 (`'`), e.g: `color=='light,green','deep,blue'`.
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no operator at all.
-The unary statements are used in two situations:
-
-+ To check for attribute existence. E.g. `temperature` matches entities that have
-  an attribute called 'temperature' (no matter its value), while `!temperature` matches entities that do not have
-  a temperature attribute.
-+ To check for entity type existence, with the `type` keyword. E.g, `!type` matches entities which do not have a type,
-  while `type` matches entities having a type.
+The unary statements are used in two situations to check for attribute existence. E.g. `temperature` matches entities that have
+an attribute called 'temperature' (no matter its value), while `!temperature` matches entities that do not have
+a temperature attribute.
   
  
 ## Geographical Queries
@@ -692,7 +688,7 @@ Response code:
             "id": "DC_S1-D41",
             "temperature": {
                 "value": 35.6,
-                "type": null,
+                "type": "none",
                 "metadata": {}
             }
          },
@@ -701,7 +697,7 @@ Response code:
             "id": "Boe-Idearium",
             "temperature": {
                 "value": 22.5,
-                "type": null,
+                "type": "none",
                 "metadata": {}
             }
          },
@@ -714,7 +710,7 @@ Response code:
                 "metadata": {
                     "accuracy": {
                         "value": 2,
-                        "type": null
+                        "type": "none"
                     },
                     "timestamp": {
                         "value": "2015-06-04T07:20:27.378Z",
@@ -809,11 +805,11 @@ Response:
             "id": "Bcn_Welt",
             "temperature": {
                 "value": 21.7,
-                "type": null
+                "type": "none"
             },
             "humidity": {
                 "value": 60,
-                "type": null
+                "type": "none"
             },
             "location": {
                 "value": "41.3763726, 2.1864475",
@@ -821,7 +817,7 @@ Response:
                 "metadata": {
                     "crs": {
                         "value": "WGS84",
-                        "type": null
+                        "type": "none"
                     }
                 }
             }
@@ -982,7 +978,7 @@ Response:
 
         {
             "value": 21.7,
-            "type": null,
+            "type": "none",
             "metadata": {}
         }
 
@@ -1143,7 +1139,7 @@ Response code:
           "Car": {
             "attrs": {
               "speed": {
-                "type": null
+                "type": "none"
               },
               "fuel": {
                 "type": "gasoline"
@@ -1160,7 +1156,7 @@ Response code:
           "Room": {
             "attrs": {
               "pressure": {
-                "type": null
+                "type": "none"
               },
               "humidity": {
                 "type": "percentage"
@@ -1193,7 +1189,7 @@ Response code:
           {
             "attrs": {
               "pressure": {
-                "type": null
+                "type": "none"
               },
               "humidity": {
                 "type": "percentage"
@@ -1468,11 +1464,11 @@ Response:
                 "metadata": {
                     "providingService": {
                        "value": "weather.example.com",
-                       "type": null
+                       "type": "none"
                      },
                     "providingAuthority": {
                        "value": "AEMET - Spain",
-                       "type": null
+                       "type": "none"
                      }
                 },
                 "duration": "PT1M"

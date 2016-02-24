@@ -70,14 +70,14 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "compattr": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": {
             "bool": true,
             "number": 2,

@@ -159,14 +159,14 @@ Date: REGEX(.*)
 05. GET /v2/entities/8787GHY/attrs/A3
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 79
+Content-Length: 81
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {
         "m1": {
-            "type": null,
+            "type": "none",
             "value": "M1"
         }
     },

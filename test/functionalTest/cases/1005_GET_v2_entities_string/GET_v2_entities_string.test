@@ -84,7 +84,7 @@ Date: REGEX(.*)
 02. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 327
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -98,7 +98,7 @@ Date: REGEX(.*)
         "id": "8787GHY",
         "madeInCountry": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "DE"
         },
         "model": {
@@ -108,7 +108,7 @@ Date: REGEX(.*)
         },
         "plateCountry": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "ES"
         },
         "speed": {

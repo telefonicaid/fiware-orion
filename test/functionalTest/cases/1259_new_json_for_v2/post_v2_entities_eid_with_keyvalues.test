@@ -180,14 +180,14 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 66
+Content-Length: 68
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "id": "E1",

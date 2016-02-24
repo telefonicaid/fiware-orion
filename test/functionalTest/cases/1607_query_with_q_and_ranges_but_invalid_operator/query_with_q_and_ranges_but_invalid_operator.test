@@ -162,7 +162,7 @@ Date: REGEX(.*)
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 217
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -170,29 +170,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 30
         },
         "id": "E3",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -252,7 +252,7 @@ Date: REGEX(.*)
 09. Correct GET entities with q=A1==0..20 (2 hits)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -260,20 +260,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -281,7 +281,7 @@ Date: REGEX(.*)
 10. Correct GET entities with q=A1!=0..20 (1 hit)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -289,11 +289,11 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 30
         },
         "id": "E3",
-        "type": null
+        "type": "none"
     }
 ]
 

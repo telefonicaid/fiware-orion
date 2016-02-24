@@ -129,18 +129,18 @@ Date: REGEX(.*)
 02. Get E1 (only attr1)
 =======================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -155,23 +155,23 @@ Date: REGEX(.*)
 04. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 115
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 2
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -186,28 +186,28 @@ Date: REGEX(.*)
 06. Get E1 (attr1, attr2, attr3)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 161
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 2
     },
     "attr3": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 3
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -222,33 +222,33 @@ Date: REGEX(.*)
 08. Get E1 (attr1, attr2, attr3, att4)
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 208
+Content-Length: 218
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 2
     },
     "attr3": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 33
     },
     "attr4": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 4
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -268,38 +268,38 @@ Date: REGEX(.*)
 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 254
+Content-Length: 266
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 1
     },
     "attr2": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 2
     },
     "attr3": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 33
     },
     "attr4": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 4
     },
     "attr5": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 5
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 

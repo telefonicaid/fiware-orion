@@ -62,7 +62,7 @@ typedef struct ContextElementResponse
                          const AttributeList&   attrL,
                          bool                   includeEmpty = true,
                          const std::string&     apiVersion   = "v1");
-  ContextElementResponse(ContextElement* ceP);
+  ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
   std::string  render(ConnectionInfo*     ciP,
                       RequestType         requestType,

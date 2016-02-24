@@ -179,7 +179,7 @@ Date: REGEX(.*)
 06. GET /v2/entities?idPattern=E(1|2)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 161
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -196,7 +196,7 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": {
                 "i1": 1,
                 "s1": "s"
@@ -211,7 +211,7 @@ Date: REGEX(.*)
 07. GET /v2/entities?idPattern=E\[23\]
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 84
+Content-Length: 86
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -219,7 +219,7 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": {
                 "i1": 1,
                 "s1": "s"

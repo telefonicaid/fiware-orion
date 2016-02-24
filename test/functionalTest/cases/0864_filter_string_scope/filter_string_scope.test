@@ -178,7 +178,7 @@ Date: REGEX(.*)
 06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 602
+Content-Length: 614
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -189,17 +189,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "humidity",
-                        "type": "",
+                        "type": "none",
                         "value": 70
                     },
                     {
                         "name": "status",
-                        "type": "",
+                        "type": "none",
                         "value": "ERR"
                     },
                     {
                         "name": "temperature",
-                        "type": "",
+                        "type": "none",
                         "value": 30
                     }
                 ],

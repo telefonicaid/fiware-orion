@@ -129,7 +129,7 @@ Date: REGEX(.*)
 04. GET /v2/entities (updated attribute A1 in E1/T1, not updated in E1/T2)
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 219
+Content-Length: 225
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -137,7 +137,7 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "CHANGED A1 E1/T2"
         },
         "id": "E1",
@@ -146,12 +146,12 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "V1 A1 E1/T2"
         },
         "A2": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "V1 A2 E1/T2"
         },
         "id": "E1",

@@ -136,7 +136,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY?attrs=speed,brand,plateCountry,madeInCountry,model
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 321
+Content-Length: 325
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -149,7 +149,7 @@ Date: REGEX(.*)
     "id": "8787GHY",
     "madeInCountry": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "DE"
     },
     "model": {
@@ -159,7 +159,7 @@ Date: REGEX(.*)
     },
     "plateCountry": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "ES"
     },
     "speed": {

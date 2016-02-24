@@ -150,7 +150,7 @@ Date: REGEX(.*)
 05. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 555
+Content-Length: 563
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -168,12 +168,12 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
+            "type" : "none",
             "value" : 10
           },
           {
             "name" : "B",
-            "type" : "",
+            "type" : "none",
             "value" : 20
           }
         ]
@@ -187,7 +187,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 656
+Content-Length: 668
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -205,17 +205,17 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "B",
-            "type" : "",
+            "type" : "none",
             "value" : 30
           },
           {
             "name" : "C",
-            "type" : "",
+            "type" : "none",
             "value" : 40
           },
           {
             "name" : "A",
-            "type" : "",
+            "type" : "none",
             "value" : 50
           }
         ]

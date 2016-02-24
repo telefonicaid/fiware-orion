@@ -29,3 +29,4 @@
 - Add: orderBy URI param in NGSIv1 queries to sort entities by attribute (Issue #1103)
 - Fix: Returning 422 InvalidModification instead of 404 NotFound when POSTing entity (Issue #1817)
 - Add implemented new operation: POST /v2/op/update (Issue #1715)
+- Fix: using string "none" as default entity/attribute/metadata type in NGSIv2 (Issue #1830)

@@ -85,20 +85,20 @@ Date: REGEX(.*)
 03. GET E1/A1
 =============
 HTTP/1.1 200 OK
-Content-Length: 81
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": {
             "rt.ty": "5678"
         }
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 

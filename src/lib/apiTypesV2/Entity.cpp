@@ -97,7 +97,9 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 
       out += JSON_VALUE("id", id);
       out += ",";
-      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : "null");
+
+      /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+      out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : JSON_STR(DEFAULT_TYPE));
 
       if (attributeVector.size() != 0)
       {

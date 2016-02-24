@@ -180,14 +180,14 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1 to see A1==2
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 66
+Content-Length: 68
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 2
     },
     "id": "E1",
@@ -206,14 +206,14 @@ Date: REGEX(.*)
 05. GET /v2/entities/E1 to see A1==4
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 66
+Content-Length: 68
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 4
     },
     "id": "E1",
@@ -232,14 +232,14 @@ Date: REGEX(.*)
 07. GET /v2/entities/E1 to see A1==true
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 71
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": true
     },
     "id": "E1",
@@ -258,14 +258,14 @@ Date: REGEX(.*)
 09. GET /v2/entities/E1 to see A1==false
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 70
+Content-Length: 72
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": false
     },
     "id": "E1",
@@ -284,14 +284,14 @@ Date: REGEX(.*)
 11. GET /v2/entities/E1 to see A1=="STRING"
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "STRING"
     },
     "id": "E1",
@@ -310,14 +310,14 @@ Date: REGEX(.*)
 13. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 72
+Content-Length: 74
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": [
             1,
             2,
@@ -340,14 +340,14 @@ Date: REGEX(.*)
 15. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 84
+Content-Length: 86
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": {
             "a": 1,
             "b": 2,

@@ -238,11 +238,11 @@ void ContextElement::fill(const struct ContextElement& ce)
 *
 * ContextElement::fill - 
 */
-void ContextElement::fill(ContextElement* ceP)
+void ContextElement::fill(ContextElement* ceP, bool useDefaultType)
 {
-  entityId.fill(&ceP->entityId);
+  entityId.fill(&ceP->entityId, useDefaultType);
   attributeDomainName.fill(ceP->attributeDomainName);
-  contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
+  contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector, useDefaultType);
   domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
   /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
    * safe to copy vectors of std::string using '=' */

@@ -58,7 +58,7 @@ typedef struct ContextElement
   void         present(const std::string& indent, int ix);
   void         release(void);
   void         fill(const struct ContextElement& ce);
-  void         fill(ContextElement* ceP);
+  void         fill(ContextElement* ceP, bool useDefaultType = false);
 
   ContextAttribute* getAttribute(std::string attrName);
 
