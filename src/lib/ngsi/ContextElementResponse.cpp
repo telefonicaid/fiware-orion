@@ -135,6 +135,8 @@ ContextElementResponse::ContextElementResponse
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
   bool                   includeEmpty,
+  bool                   includeCreDate,
+  bool                   includeModDate,
   const std::string&     apiVersion
 )
 {
@@ -264,6 +266,20 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
+    contextElement.contextAttributeVector.push_back(caP);
+  }
+
+  /* creDate and modDate as "virtual" attributes. The entityDoc.hasField(...) part is a safety meassure to prevent entities created with
+   * very old Orion version which didn't implement creation/modification date */
+  if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_CREATION_DATE));
+    contextElement.contextAttributeVector.push_back(caP);
+  }
+
+  if (includeModDate && entityDoc.hasField(ENT_MODIFICATION_DATE))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_MODIFICATION_DATE));
     contextElement.contextAttributeVector.push_back(caP);
   }
 }

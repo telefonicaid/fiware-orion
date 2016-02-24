@@ -286,6 +286,24 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 }
 ```
 
+## Virtual attributes
+
+There are entity properties that are not directly modificable by NGSIv2 clients, but that can be rendered
+by NGSIv2 servers to provide extra information. From a representation point of view, they are like
+regular attributes, with name, value and type.
+
+Virtual attributes are not rendered by default. In oder to render an specific attribute, add its name
+to the `options` URL parameter.
+
+The list of virtual attributes is the following:
+
+* `dateCreation` (type: `date`): entity creation date as ISO 8601 string.
+* `dateModification` (type: `date`): entity modification date as ISO 8601 string.
+
+As regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`. However, they cannot be used
+in resource URLs.
+
+
 ## Field syntax restrictions
 
 Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax. These rules applies to:
@@ -309,6 +327,18 @@ or other fields, e.g. to avoid some cross script injection attacks.
 In the case a client attemps to use a field not valid from a syntax point of view, it shall get a "Bad Request" error
 explaining the cause.
 
+## Atrribute names restrictions
+
+The following strings must not be used as attribute names:
+
+* `id`, as it would conflict to the field used to represent entity id)
+
+* `type`, as it would conflict to the field used to represent entity type)
+
+* `geo:proximity`, as it would conflict with the string used in `orderBy` for proximity to center point.
+
+* Virtual attribute names (see specific section about virtual attributes)
+
 ## Ordering results
 
 Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify the order; its 
@@ -317,9 +347,9 @@ value can be:
 * The keyword "geo:proximity" to order results by distance to the center point when combined with "near" geoqueries.
   If "geo:proximity" is used without "near" geoqueries, the order is undefined.
 
-* A comma-separated list of attributes, e.g. `temperature,!humidity`. Results are ordered by the first attribute. On ties,
-  the results are ordered by the second attribute and so on. A "!" before the attribute name means that the order is reversed.
-
+* A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`. Results are ordered
+  by the first attribute. On ties, the results are ordered by the second attribute and so on. A "!" before the attribute
+  name means that the order is reversed.
 
 ## Error responses
 

@@ -349,6 +349,7 @@ std::string postQueryContext
                                                       ciP->tenant,
                                                       ciP->servicePathV,
                                                       ciP->uriParam,
+                                                      ciP->uriParamOptions,
                                                       countP,
                                                       ciP->apiVersion));
 

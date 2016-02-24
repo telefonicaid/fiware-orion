@@ -213,7 +213,9 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
   }
   else
+  {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
+  }
 
   if (val != NULL)
   {
