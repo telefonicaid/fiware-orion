@@ -1049,16 +1049,7 @@ static bool matchFilter
 {
   /* First, look for unary operators */
   if ((opr == OPR_EXIST) || (opr == OPR_NOT_EXIST))
-  {
-    /* Special case: entity type */
-    if (std::string(right) == ENT_ENTITY_TYPE)
-    {
-      // FIXME P7: how to check for not existing entity based on EntityID?
-      //cerP->contextElement.entityId.type = ??;
-      return true;
-    }
-
-    /* Regular attribute */
+  {   
     ContextAttribute* ca = cerP->contextElement.getAttribute(right);
     bool exist = (ca != NULL);
 
@@ -1317,7 +1308,19 @@ static bool addBsonFilter
   int64_t                    seconds
 )
 {
-  std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+  std::string    k;
+  if (left == std::string(DATE_CREATED))
+  {
+    k = ENT_CREATION_DATE;
+  }
+  else if (left == std::string(DATE_MODIFIED))
+  {
+    k = ENT_MODIFICATION_DATE;
+  }
+  else
+  {
+    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+  }
   BSONObjBuilder bob;
   BSONObjBuilder bb;
   BSONObjBuilder bb2;
@@ -1609,43 +1612,18 @@ static bool addBsonFilter
   }
   else if (opr == OPR_EXIST)
   {
-    if (std::string(right) == ENT_ENTITY_TYPE)
-    {
-      // Special case: entity type
-      k = std::string("_id.") + ENT_ENTITY_TYPE;
+    k = std::string(ENT_ATTRS) + "." + right;
 
-      bb.append("$exists", true).append("$ne", "");
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else
-    {
-      // Regular attribute
-      k = std::string(ENT_ATTRS) + "." + right;
-
-      bb.append("$exists", true);
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
+    bb.append("$exists", true);
+    bob.append(k, bb.obj());
+    f = bob.obj();
   }
   else if (opr == OPR_NOT_EXIST)
   {
-    if (std::string(right) == ENT_ENTITY_TYPE)
-    {
-      // Special case: entity type
-      k = std::string("_id.") + ENT_ENTITY_TYPE;
-      bb.append("$exists", false);
-      bb2.append(k, bb.obj());
-      f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
-    }
-    else
-    {
-      // Regular attribute
-      k = std::string(ENT_ATTRS) + "." + right;
-      bb.append("$exists", false);
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
+    k = std::string(ENT_ATTRS) + "." + right;
+    bb.append("$exists", false);
+    bob.append(k, bb.obj());
+    f = bob.obj();
   }
   else
   {
