@@ -69,8 +69,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - outsideRange_d
 * - withAttribute
 * - withoutAttribute
-* - withEntityType
-* - withoutEntityType
 *
 * Special test cases
 *
@@ -1020,92 +1018,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   res.contextElementResponseVector.release();
 }
 
-/* ****************************************************************************
-*
-* withoutType -
-*
-*/
-TEST(mongoQueryContextRequest_filters, withEntityType)
-{
-  HttpStatusCode         ms;
-  QueryContextRequest   req;
-  QueryContextResponse  res;
 
-  /* Prepare database */
-  prepareDatabase(true);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "type");
-  req.entityIdVector.push_back(&en);
-  req.restriction.scopeVector.push_back(&sc);
-
-  /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
-  EXPECT_EQ("", res.errorCode.details);
-
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
-  ASSERT_EQ(9, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
-  EXPECT_EQ("E4", RES_CER(3).entityId.id);
-  EXPECT_EQ("E5", RES_CER(4).entityId.id);
-  EXPECT_EQ("C1", RES_CER(5).entityId.id);
-  EXPECT_EQ("C2", RES_CER(6).entityId.id);
-  EXPECT_EQ("C3", RES_CER(7).entityId.id);
-  EXPECT_EQ("E6", RES_CER(8).entityId.id);
-
-  /* Release dynamic memory used by response (mongoBackend allocates it) */
-  res.contextElementResponseVector.release();
-}
-
-/* ****************************************************************************
-*
-* withoutEntityType -
-*
-*/
-TEST(mongoQueryContextRequest_filters, withoutEntityType)
-{
-  HttpStatusCode         ms;
-  QueryContextRequest   req;
-  QueryContextResponse  res;
-
-  /* Prepare database */
-  prepareDatabase(true);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "!type");
-  req.entityIdVector.push_back(&en);
-  req.restriction.scopeVector.push_back(&sc);
-
-  /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
-  EXPECT_EQ("", res.errorCode.details);
-
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
-  ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E7", RES_CER(0).entityId.id);
-  EXPECT_EQ("E8", RES_CER(1).entityId.id);
-
-  /* Release dynamic memory used by response (mongoBackend allocates it) */
-  res.contextElementResponseVector.release();
-}
 
 /* ****************************************************************************
 *
