@@ -335,7 +335,7 @@ The following strings must not be used as attribute names:
 
 * `type`, as it would conflict to the field used to represent entity type)
 
-* `geo:proximity`, as it would conflict with the string used in `orderBy` for proximity to center point.
+* `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to center point.
 
 * Virtual attribute names (see specific section about virtual attributes)
 
@@ -344,8 +344,8 @@ The following strings must not be used as attribute names:
 Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify the order; its 
 value can be:
 
-* The keyword "geo:proximity" to order results by distance to the center point when combined with "near" geoqueries.
-  If "geo:proximity" is used without "near" geoqueries, the order is undefined.
+* The keyword "geo:distance" to order results by distance to the center point when combined with "near" geoqueries.
+  If "geo:distance" is used without "near" geoqueries, the order is undefined.
 
 * A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`. Results are ordered
   by the first attribute. On ties, the results are ordered by the second attribute and so on. A "!" before the attribute

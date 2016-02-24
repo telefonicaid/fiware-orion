@@ -44,5 +44,5 @@ you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md
 # `orderBy` parameter
 
 The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryContext operation (see
-details in the [pagination documentation](pagination.md). However, note that the "geo:proximity"
+details in the [pagination documentation](pagination.md). However, note that the "geo:distance"
 order can be used only in NGSIv2.

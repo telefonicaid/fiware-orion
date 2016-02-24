@@ -116,7 +116,7 @@ echo
 
 echo "06. Get entities sorted by proximity to Spain center: Madrid, Guadalajara, Zaragora, Lleida, Barcelona"
 echo "======================================================================================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance:700000&geometry=point&coords=40.641944,-4.155278&orderBy=geo:proximity' -X GET --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:700000&geometry=point&coords=40.641944,-4.155278&orderBy=geo:distance' -X GET --json
 echo
 echo
 
@@ -124,7 +124,7 @@ echo
 # FIXME P8: it is not clear how to get reverse order. It is being investigated: http://stackoverflow.com/questions/35572755/reverse-distance-order-with-near-operator-in-mongodb
 #echo "07. Get entities reserved sorted by proximity to Spain center: Barcelona, Lleida, Zaragoza, Guadalajara, Madrid"
 #echo "==============================================================================================================="
-#orionCurl --url '/v2/entities?georel=near;maxDistance:700000&geometry=point&coords=40.641944,-4.155278&orderBy=!geo:proximity' -X GET --json
+#orionCurl --url '/v2/entities?georel=near;maxDistance:700000&geometry=point&coords=40.641944,-4.155278&orderBy=!geo:distance' -X GET --json
 #echo
 #echo
 

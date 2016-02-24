@@ -63,7 +63,7 @@
 *
 * Special orderBy keywords
 */
-#define ORDER_BY_PROXIMITY "geo:proximity"
+#define ORDER_BY_PROXIMITY "geo:distance"
 
 
 /* ****************************************************************************
