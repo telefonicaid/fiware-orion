@@ -25,8 +25,9 @@
 - Fix: segfault caused by parameter without value in query string (Issue #1805)
 - Add: options=values mode for entity queries in NGSIV2 (Issue #1049)
 - Fix: some of the operations reported an incorrect 'Allow' HTTP Header on Bad Verb, now fixed
-- Add: orderBy URI param in NGSIv2 queries to sort entities by attribute or proximity (Issue #1103)
-- Add: orderBy URI param in NGSIv1 queries to sort entities by attribute (Issue #1103)
+- Add: orderBy URI param in NGSIv2 queries to sort entities by attribute, entity dates or proximity (Issue #1103)
+- Add: orderBy URI param in NGSIv1 queries to sort entities by attribute or entity dates (Issue #1103)
 - Fix: Returning 422 InvalidModification instead of 404 NotFound when POSTing entity (Issue #1817)
+- Add: dateCreated and dateModified options to get entity creation and modification times as "virtual" attributes (Issue #876)
 - Add implemented new operation: POST /v2/op/update (Issue #1715)
 - Add: ?type URL parameter in Location header upon entity creation in NGSIv2 (Issue #1765)

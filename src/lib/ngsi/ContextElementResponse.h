@@ -60,8 +60,10 @@ typedef struct ContextElementResponse
   ContextElementResponse(ContextElementResponse* cerP);
   ContextElementResponse(const mongo::BSONObj&  entityDoc,
                          const AttributeList&   attrL,
-                         bool                   includeEmpty = true,
-                         const std::string&     apiVersion   = "v1");
+                         bool                   includeEmpty   = true,
+                         bool                   includeCreDate = false,
+                         bool                   includeModDate = false,
+                         const std::string&     apiVersion     = "v1");
   ContextElementResponse(ContextElement* ceP);
 
   std::string  render(ConnectionInfo*     ciP,

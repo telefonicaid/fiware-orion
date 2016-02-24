@@ -264,13 +264,15 @@ extern bool entitiesQuery
   bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
-  int                              offset        = DEFAULT_PAGINATION_OFFSET_INT,
-  int                              limit         = DEFAULT_PAGINATION_LIMIT_INT,
-  bool*                            limitReached  = NULL,
-  long long*                       countP        = NULL,
-  bool*                            badInputP     = NULL,
-  const std::string&               sortOrderList = "",
-  const std::string&               apiVersion    = "v1"
+  int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,
+  int                              limit          = DEFAULT_PAGINATION_LIMIT_INT,
+  bool*                            limitReached   = NULL,
+  long long*                       countP         = NULL,
+  bool*                            badInputP      = NULL,
+  const std::string&               sortOrderList  = "",
+  bool                             includeCreDate = false,
+  bool                             includeModDate = false,
+  const std::string&               apiVersion     = "v1"
 );
 
 /* ****************************************************************************
