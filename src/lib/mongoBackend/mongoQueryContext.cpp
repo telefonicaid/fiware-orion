@@ -277,7 +277,7 @@ HttpStatusCode mongoQueryContext
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-    std::map<std::string, bool>&       options,
+  std::map<std::string, bool>&         options,
   long long*                           countP,
   const std::string&                   apiVersion
 )

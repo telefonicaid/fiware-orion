@@ -1860,12 +1860,12 @@ static std::string sortCriteria(const std::string& sortToken)
 {
   if (sortToken == DATE_CREATED)
   {
-    return std::string(ENT_CREATION_DATE);
+    return ENT_CREATION_DATE;
   }
 
   if (sortToken == DATE_MODIFIED)
   {
-    return std::string(ENT_MODIFICATION_DATE);
+    return ENT_MODIFICATION_DATE;
   }
 
   return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
