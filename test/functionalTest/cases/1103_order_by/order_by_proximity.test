@@ -134,7 +134,7 @@ echo
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Barcelona
+Location: /v2/entities/Barcelona?type=City
 Date: REGEX(.*)
 
 
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 =============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Guadalajara
+Location: /v2/entities/Guadalajara?type=City
 Date: REGEX(.*)
 
 
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Lleida
+Location: /v2/entities/Lleida?type=City
 Date: REGEX(.*)
 
 
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Madrid
+Location: /v2/entities/Madrid?type=City
 Date: REGEX(.*)
 
 
@@ -170,7 +170,7 @@ Date: REGEX(.*)
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Zaragoza
+Location: /v2/entities/Zaragoza?type=City
 Date: REGEX(.*)
 
 

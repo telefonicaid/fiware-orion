@@ -30,3 +30,4 @@
 - Fix: Returning 422 InvalidModification instead of 404 NotFound when POSTing entity (Issue #1817)
 - Add: dateCreated and dateModified options to get entity creation and modification times as "virtual" attributes (Issue #876)
 - Add implemented new operation: POST /v2/op/update (Issue #1715)
+- Add: ?type URL parameter in Location header upon entity creation in NGSIv2 (Issue #1765)
