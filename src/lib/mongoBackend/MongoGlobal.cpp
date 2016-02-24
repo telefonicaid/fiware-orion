@@ -1018,6 +1018,7 @@ static bool rangeIsDates(char* rangeFrom, char* rangeTo, double* fromP, double* 
   {
     *fromP = fromSeconds;
     *toP   = toSeconds;
+
     return true;
   }
 
@@ -1106,7 +1107,8 @@ static bool matchFilter
       for (unsigned int ix = 0; ix < valVector.size(); ++ix)
       {
         double d;
-        if (str2double(valVector[ix], &d))
+
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
@@ -1181,7 +1183,7 @@ static bool matchFilter
       {
         double d;
 
-        if (str2double(valVector[ix], &d))
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
@@ -1365,7 +1367,8 @@ static bool addBsonFilter
       for (unsigned int ix = 0; ix < valVector.size(); ++ix)
       {
         double d;
-        if (str2double(valVector[ix], &d))
+
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           ba.append(d);
@@ -1466,7 +1469,7 @@ static bool addBsonFilter
       {
         double d;
 
-        if (str2double(valVector[ix], &d))
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           ba.append(d);

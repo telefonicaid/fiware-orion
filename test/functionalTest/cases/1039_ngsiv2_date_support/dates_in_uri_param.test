@@ -43,6 +43,11 @@ brokerStart CB
 # 07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)
 # 08. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23
 # 08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)
+# 09. GET entities with birthdate as a string, not a date: '2016-02-24T10:00:00.00Z', E24 NOT found
+#
+# 10. Create entity E25 with birthdate as a string '2016-02-25T10:00:00.00Z'
+# 11. GET entities with birthdate=2016-02-25T10:00:00.00Z, see nothing
+# 12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25
 #
 
 echo "01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z"
@@ -154,6 +159,41 @@ echo
 echo "08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)"
 echo "=============================================================================================="
 orionCurl --url '/v2/entities?q=birthdate<=2016-02-23T10:00:00.00Z' --json
+echo
+echo
+
+
+echo "09. GET entities with birthdate as a string, not a date: '2016-02-24T10:00:00.00Z', E24 NOT found"
+echo "================================================================================================="
+orionCurl --url "/v2/entities?q=birthdate=='2016-02-23T10:00:00.00Z'" --json
+echo
+echo
+
+
+echo "10. Create entity E25 with birthdate as a string '2016-02-25T10:00:00.00Z'"
+echo "=========================================================================="
+payload='{
+  "id": "E25",
+  "birthdate": {
+    "value": "2016-02-25T10:00:00.00Z",
+    "type": "string"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "11. GET entities with birthdate=2016-02-25T10:00:00.00Z, see nothing"
+echo "===================================================================="
+orionCurl --url "/v2/entities?q=birthdate==2016-02-25T10:00:00.00Z" --json
+echo
+echo
+
+
+echo "12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25"
+echo "================================================================"
+orionCurl --url "/v2/entities?q=birthdate=='2016-02-25T10:00:00.00Z'" --json
 echo
 echo
 
@@ -401,6 +441,55 @@ Date: REGEX(.*)
             "value": "2016-02-22T10:00:00.00Z"
         },
         "id": "E22",
+        "type": null
+    }
+]
+
+
+09. GET entities with birthdate as a string, not a date: '2016-02-24T10:00:00.00Z', E24 NOT found
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+10. Create entity E25 with birthdate as a string '2016-02-25T10:00:00.00Z'
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E25
+Date: REGEX(.*)
+
+
+
+11. GET entities with birthdate=2016-02-25T10:00:00.00Z, see nothing
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "string",
+            "value": "2016-02-25T10:00:00.00Z"
+        },
+        "id": "E25",
         "type": null
     }
 ]

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Dates as ranges in URI param
+Dates as lists in URI param
 
 --SHELL-INIT--
 dbInit CB
@@ -33,11 +33,12 @@ brokerStart CB
 # 01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z
 # 02. Create entity E23 with birthdate 2016-02-23T10:00:00.00Z
 # 03. Create entity E22 with birthdate 2016-02-22T10:00:00.00Z
-# 04. GET entities with birthdate FROM 2016-02-25T10:00:00.00Z TO 2016-02-26T10:00:00.00Z, see nothing
-# 05. GET entities with birthdate FROM 2016-02-20T10:00:00.00Z TO 2016-02-26T10:00:00.00Z, see all three
-# 06. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO 2016-02-24T10:00:00.00Z, see E23 and E24
-# 07. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO '2016-02-24T10:00:00.00Z', see error (as to-value is a string)
+# 04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z, see nothing
+# 05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z, see E22
+# 06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see E23 and E24
+# 07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see all three
 #
+
 
 echo "01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z"
 echo "============================================================"
@@ -82,30 +83,30 @@ echo
 
 
 
-echo "04. GET entities with birthdate FROM 2016-02-25T10:00:00.00Z TO 2016-02-26T10:00:00.00Z, see nothing"
+echo "04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z, see nothing"
 echo "===================================================================================================="
-orionCurl --url '/v2/entities?q=birthdate==2016-02-25T10:00:00.00Z..2016-02-26T10:00:00.00Z&options=keyValues' --json
+orionCurl --url '/v2/entities?q=birthdate==2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z&options=keyValues' --json
 echo
 echo
 
 
-echo "05. GET entities with birthdate FROM 2016-02-20T10:00:00.00Z TO 2016-02-26T10:00:00.00Z, see all three"
-echo "======================================================================================================"
-orionCurl --url '/v2/entities?q=birthdate==2016-02-20T10:00:00.00Z..2016-02-26T10:00:00.00Z&options=keyValues' --json
+echo "05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z, see E22"
+echo "================================================================================================"
+orionCurl --url '/v2/entities?q=birthdate==2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z&options=keyValues' --json
 echo
 echo
 
 
-echo "06. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO 2016-02-24T10:00:00.00Z, see E23 and E24"
+echo "06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see E23 and E24"
 echo "========================================================================================================"
-orionCurl --url '/v2/entities?q=birthdate==2016-02-23T10:00:00.00Z..2016-02-24T10:00:00.00Z&options=keyValues' --json
+orionCurl --url '/v2/entities?q=birthdate==2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z&options=keyValues' --json
 echo
 echo
 
 
-echo "07. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO '2016-02-24T10:00:00.00Z', see error (as to-value is a string)"
+echo "07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see all three"
 echo "=============================================================================================================================="
-orionCurl --url "/v2/entities?q=birthdate==2016-02-23T10:00:00.00Z..'2016-02-24T10:00:00.00Z'&options=keyValues" --json
+orionCurl --url '/v2/entities?q=birthdate==2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z&options=keyValues' --json
 echo
 echo
 
@@ -138,7 +139,7 @@ Date: REGEX(.*)
 
 
 
-04. GET entities with birthdate FROM 2016-02-25T10:00:00.00Z TO 2016-02-26T10:00:00.00Z, see nothing
+04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.00Z,2016-02-26T10:00:00.00Z, see nothing
 ====================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -148,8 +149,45 @@ Date: REGEX(.*)
 []
 
 
-05. GET entities with birthdate FROM 2016-02-20T10:00:00.00Z TO 2016-02-26T10:00:00.00Z, see all three
-======================================================================================================
+05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-26T10:00:00.00Z, see E22
+================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 64
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "birthdate": "2016-02-22T10:00:00.00Z",
+        "id": "E22",
+        "type": null
+    }
+]
+
+
+06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see E23 and E24
+========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "birthdate": "2016-02-24T10:00:00.00Z",
+        "id": "E24",
+        "type": null
+    },
+    {
+        "birthdate": "2016-02-23T10:00:00.00Z",
+        "id": "E23",
+        "type": null
+    }
+]
+
+
+07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.00Z,2016-02-23T10:00:00.00Z,2016-02-24T10:00:00.00Z, see all three
+==============================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 190
 Content-Type: application/json
@@ -172,40 +210,6 @@ Date: REGEX(.*)
         "type": null
     }
 ]
-
-
-06. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO 2016-02-24T10:00:00.00Z, see E23 and E24
-========================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 127
-Content-Type: application/json
-Date: REGEX(.*)
-
-[
-    {
-        "birthdate": "2016-02-24T10:00:00.00Z",
-        "id": "E24",
-        "type": null
-    },
-    {
-        "birthdate": "2016-02-23T10:00:00.00Z",
-        "id": "E23",
-        "type": null
-    }
-]
-
-
-07. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO '2016-02-24T10:00:00.00Z', see error (as to-value is a string)
-==============================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "invalid query expression",
-    "error": "BadRequest"
-}
 
 
 --TEARDOWN--
