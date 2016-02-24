@@ -66,7 +66,7 @@ echo
 ==============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/+34666666666
+Location: /v2/entities/+34666666666?type=thing
 Date: REGEX(.*)
 
 

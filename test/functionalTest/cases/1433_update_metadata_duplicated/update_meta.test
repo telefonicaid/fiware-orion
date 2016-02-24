@@ -107,7 +107,7 @@ echo
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Room10
+Location: /v2/entities/Room10?type=Room
 Date: REGEX(.*)
 
 

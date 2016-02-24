@@ -129,7 +129,7 @@ echo
 ==================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/A
+Location: /v2/entities/A?type=Point
 Date: REGEX(.*)
 
 
@@ -138,7 +138,7 @@ Date: REGEX(.*)
 ==================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/B
+Location: /v2/entities/B?type=Point
 Date: REGEX(.*)
 
 
@@ -147,7 +147,7 @@ Date: REGEX(.*)
 ==================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/C
+Location: /v2/entities/C?type=Point
 Date: REGEX(.*)
 
 

@@ -110,7 +110,7 @@ echo
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Madrid
+Location: /v2/entities/Madrid?type=City
 Date: REGEX(.*)
 
 
@@ -119,7 +119,7 @@ Date: REGEX(.*)
 =============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Alcobendas
+Location: /v2/entities/Alcobendas?type=City
 Date: REGEX(.*)
 
 
@@ -128,7 +128,7 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Leganes
+Location: /v2/entities/Leganes?type=City
 Date: REGEX(.*)
 
 

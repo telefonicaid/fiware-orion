@@ -581,7 +581,7 @@ echo
 =========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/A
+Location: /v2/entities/A?type=T
 Date: REGEX(.*)
 
 
@@ -590,7 +590,7 @@ Date: REGEX(.*)
 =========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/B
+Location: /v2/entities/B?type=T
 Date: REGEX(.*)
 
 
@@ -599,7 +599,7 @@ Date: REGEX(.*)
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/C
+Location: /v2/entities/C?type=T
 Date: REGEX(.*)
 
 
@@ -608,7 +608,7 @@ Date: REGEX(.*)
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/D
+Location: /v2/entities/D?type=T
 Date: REGEX(.*)
 
 
@@ -617,7 +617,7 @@ Date: REGEX(.*)
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T
 Date: REGEX(.*)
 
 
