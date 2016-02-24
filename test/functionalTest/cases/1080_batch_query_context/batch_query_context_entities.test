@@ -176,7 +176,7 @@ echo
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T
 Date: REGEX(.*)
 
 
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 ==============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T2
 Date: REGEX(.*)
 
 
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 ====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T
 Date: REGEX(.*)
 
 

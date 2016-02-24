@@ -97,7 +97,7 @@ echo
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/8787GHY
+Location: /v2/entities/8787GHY?type=Car
 Date: REGEX(.*)
 
 

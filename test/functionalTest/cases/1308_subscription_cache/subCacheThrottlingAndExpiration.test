@@ -166,7 +166,7 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/s01
+Location: /v2/entities/s01?type=none
 Date: REGEX(.*)
 
 
