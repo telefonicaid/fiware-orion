@@ -157,7 +157,7 @@ echo
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T
 Date: REGEX(.*)
 
 
