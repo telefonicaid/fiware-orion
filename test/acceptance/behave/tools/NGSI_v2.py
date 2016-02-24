@@ -703,8 +703,6 @@ class NGSI:
             }
         """
         attribute = convert_str_to_dict(resp.content, JSON)
-        #assert attribute_name_to_request in resp_json, 'ERROR - in attribute name "%s" ' % attribute_name_to_request
-        #attribute = resp_json[attribute_name_to_request]
         if entities_context["attributes_type"] is not None:
             assert entities_context["attributes_type"] == attribute["type"],\
                 'ERROR - in attribute type "%s"' % (entities_context["attributes_type"])
