@@ -123,6 +123,8 @@ struct QueryContextData
   EntityId*            entityIdP;
   Scope*               scopeP;
   orion::Point*        vertexP;
+  int                  pointNo;
+  int                  coords;
 };
 
 

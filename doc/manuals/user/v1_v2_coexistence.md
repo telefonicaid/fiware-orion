@@ -30,6 +30,9 @@ However, take into account that some of the filters (e. g. greater/less, range, 
 for numeric values. Thus, in order to work properly, these filters (although using a 
 `POST /v1/queryContext`) needs that the attributes to which they refer were created using NGSIv2 operations.
 
+In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
+[the following section](geolocation.md#geo-located-queries-ngsiv2) for details
+
 ## Checking ID fields
 
 NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
@@ -38,7 +41,7 @@ or metadata name/type) which are described in the "Field syntax restrictions" se
 keep backward compatibility, these restrictions are not used in the NGSIv1 API by default, but
 you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md).
 
-Related with this topic, none that NGSIv1 allows entities/attributes/metadatas without types
+Related with this topic, note that NGSIv1 allows entities/attributes/metadatas without types
 and with types equal to the empty string (`""`). However, NGSIv2 ID fields (including types) have
 a minimum length of 1 character. Thus, entities created with NGSIv1 but rendered using NGSIv2 operation
 will automatically replace these cases with the string value `none` (which is the default type in NGSIv2).
@@ -48,4 +51,3 @@ will automatically replace these cases with the string value `none` (which is th
 The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryContext operation (see
 details in the [pagination documentation](pagination.md). However, note that the "geo:proximity"
 order can be used only in NGSIv2.
-

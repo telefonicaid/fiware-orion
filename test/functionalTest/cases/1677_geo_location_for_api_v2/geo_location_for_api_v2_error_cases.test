@@ -41,8 +41,8 @@ brokerStart CB
 #   geometry=box
 #
 # Examples:
-#   georel=near;maxDistance=1000&geometry=point&coords=-40.4,-3.5
-#   georel=near;minDistance=5000&geometry=point&coords=-40.4,-3.5
+#   georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5
+#   georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5
 #   georel=coveredBy&geometry=polygon&coords=25.774,-80.190,18.466,-66.118,32.321,-64.757,25.774,-80.190
 #
 # On error in geo-query params:
@@ -80,21 +80,21 @@ echo
 
 echo "05a. georel 'near' in box geometry - see error"
 echo "=============================================="
-orionCurl --url '/v2/entities?geometry=box&coords=1,2;3,4&georel=near;maxDistance=12' --json
+orionCurl --url '/v2/entities?geometry=box&coords=1,2;3,4&georel=near;maxDistance:12' --json
 echo
 echo
 
 
 echo "05b. georel 'near' in polygon geometry - see error"
 echo "=================================================="
-orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;3,4;3,0;1,0;1,2&georel=near;maxDistance=12' --json
+orionCurl --url '/v2/entities?geometry=polygon&coords=1,2;3,4;3,0;1,0;1,2&georel=near;maxDistance:12' --json
 echo
 echo
 
 
 echo "05c. georel 'near' in line geometry - see error"
 echo "==============================================="
-orionCurl --url '/v2/entities?geometry=line&coords=1,2;3,4&georel=near;maxDistance=12' --json
+orionCurl --url '/v2/entities?geometry=line&coords=1,2;3,4&georel=near;maxDistance:12' --json
 echo
 echo
 

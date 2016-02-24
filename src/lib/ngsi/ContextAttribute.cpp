@@ -601,7 +601,7 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     {
       if (type == DATE_TYPE)
       {
-        out += isodate2str(numberValue);
+        out += JSON_STR(isodate2str(numberValue));
       }
       else // regular number
       {
