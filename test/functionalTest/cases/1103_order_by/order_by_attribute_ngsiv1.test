@@ -217,7 +217,7 @@ Date: REGEX(.*)
 05. Get sorted by age: User4, User3, User1, User2
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 2319
+Content-Length: 2367
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -228,17 +228,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Thompson"
                     }
                 ],
@@ -256,17 +256,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Simpson"
                     }
                 ],
@@ -284,17 +284,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Doe"
                     }
                 ],
@@ -312,17 +312,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Smith"
                     }
                 ],
@@ -342,7 +342,7 @@ Date: REGEX(.*)
 06. Get sorted by age in reverse order: User2, User1, User3, User4
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 2319
+Content-Length: 2367
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -353,17 +353,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Smith"
                     }
                 ],
@@ -381,17 +381,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Doe"
                     }
                 ],
@@ -409,17 +409,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Simpson"
                     }
                 ],
@@ -437,17 +437,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Thompson"
                     }
                 ],
@@ -467,7 +467,7 @@ Date: REGEX(.*)
 07. Get sorted by name, then age: User4, User3, User1, User2
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 2319
+Content-Length: 2367
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -478,17 +478,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Thompson"
                     }
                 ],
@@ -506,17 +506,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Simpson"
                     }
                 ],
@@ -534,17 +534,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Doe"
                     }
                 ],
@@ -562,17 +562,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Smith"
                     }
                 ],
@@ -592,7 +592,7 @@ Date: REGEX(.*)
 08. Get sorted by reverse name, then age: User1, User2, User4, User3
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2319
+Content-Length: 2367
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -603,17 +603,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Doe"
                     }
                 ],
@@ -631,17 +631,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Smith"
                     }
                 ],
@@ -659,17 +659,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Thompson"
                     }
                 ],
@@ -687,17 +687,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Simpson"
                     }
                 ],
@@ -717,7 +717,7 @@ Date: REGEX(.*)
 09. Get sorted by name, then reserve age: User3, User4, User2, User1
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2319
+Content-Length: 2367
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -728,17 +728,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 27
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Simpson"
                     }
                 ],
@@ -756,17 +756,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 18
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "Jane"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Thompson"
                     }
                 ],
@@ -784,17 +784,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 37
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Smith"
                     }
                 ],
@@ -812,17 +812,17 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "age",
-                        "type": "",
+                        "type": "none",
                         "value": 36
                     },
                     {
                         "name": "name",
-                        "type": "",
+                        "type": "none",
                         "value": "John"
                     },
                     {
                         "name": "surname",
-                        "type": "",
+                        "type": "none",
                         "value": "Doe"
                     }
                 ],

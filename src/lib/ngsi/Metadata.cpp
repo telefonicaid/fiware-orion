@@ -67,7 +67,7 @@ Metadata::Metadata()
 * Metadata::Metadata -
 *
 */
-Metadata::Metadata(Metadata* mP)
+Metadata::Metadata(Metadata* mP, bool useDefaultType)
 {
   LM_T(LmtClone, ("'cloning' a Metadata"));
 
@@ -78,6 +78,11 @@ Metadata::Metadata(Metadata* mP)
   numberValue  = mP->numberValue;
   boolValue    = mP->boolValue;
   typeGiven    = false;
+
+  if (useDefaultType && (type == ""))
+  {
+    type = DEFAULT_TYPE;
+  }
 }
 
 
@@ -355,7 +360,8 @@ std::string Metadata::toJson(bool isLastElement)
 
   out = JSON_STR(name) + ":{";
 
-  out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":null";
+  /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+  out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
   out += ",";
 
   if (valueType == orion::ValueTypeString)

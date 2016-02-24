@@ -259,7 +259,7 @@ Date: REGEX(.*)
 10. Dump accumulator - see two notifications
 ============================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 466
+Content-Length: 474
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -271,13 +271,13 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s01",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
+            "type" : "none",
             "value" : "03. Creation"
           }
         ]
@@ -291,7 +291,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 470
+Content-Length: 478
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -303,13 +303,13 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s01",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
+            "type" : "none",
             "value" : "07. Modification"
           }
         ]

@@ -271,7 +271,7 @@ Date: REGEX(.*)
 02b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -282,7 +282,7 @@ Date: REGEX(.*)
         "value": "10, 10"
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -297,7 +297,7 @@ Date: REGEX(.*)
 03b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -308,7 +308,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -328,7 +328,7 @@ Date: REGEX(.*)
 04b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -339,7 +339,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -354,13 +354,13 @@ Date: REGEX(.*)
 05b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 23
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -375,7 +375,7 @@ Date: REGEX(.*)
 06b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -386,7 +386,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -401,7 +401,7 @@ Date: REGEX(.*)
 07b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 85
+Content-Length: 87
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -412,7 +412,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -427,7 +427,7 @@ Date: REGEX(.*)
 08b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -443,7 +443,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -463,7 +463,7 @@ Date: REGEX(.*)
 09b. Check entity
 =================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -479,7 +479,7 @@ Date: REGEX(.*)
         "value": "20, 20"
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 

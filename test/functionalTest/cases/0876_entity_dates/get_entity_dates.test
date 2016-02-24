@@ -165,14 +165,14 @@ Date: REGEX(.*)
 02a. Get entity with dates
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 226
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "foo"
     },
     "dateCreated": {
@@ -237,14 +237,14 @@ Date: REGEX(.*)
 05a. Get entity with dates
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 224
+Content-Length: 226
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "bar"
     },
     "dateCreated": {

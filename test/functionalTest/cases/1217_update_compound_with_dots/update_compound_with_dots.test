@@ -88,7 +88,7 @@ Date: REGEX(.*)
 03. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 104
+Content-Length: 106
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -96,7 +96,7 @@ Date: REGEX(.*)
     "id": "apartment_3",
     "temperature_2": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": {
             "rt.ty": "5678"
         }

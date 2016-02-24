@@ -173,7 +173,7 @@ Date: REGEX(.*)
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 217
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -181,29 +181,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 30
         },
         "id": "E3",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -234,7 +234,7 @@ Date: REGEX(.*)
 07. GET all entities with attribute A1<=10 (1 hit)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -242,11 +242,11 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -254,7 +254,7 @@ Date: REGEX(.*)
 08. GET all entities with attribute A1<=11 (1 hit)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -262,11 +262,11 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -274,7 +274,7 @@ Date: REGEX(.*)
 09. GET all entities with attribute A1<=20 (2 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -282,20 +282,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -303,7 +303,7 @@ Date: REGEX(.*)
 10. GET all entities with attribute A1<=21 (2 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -311,20 +311,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -332,7 +332,7 @@ Date: REGEX(.*)
 11. GET all entities with attribute A1<=30 (3 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 217
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -340,29 +340,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 30
         },
         "id": "E3",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -370,7 +370,7 @@ Date: REGEX(.*)
 12. GET all entities with attribute A1<=31 (3 hits)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 217
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -378,29 +378,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 30
         },
         "id": "E3",
-        "type": null
+        "type": "none"
     }
 ]
 

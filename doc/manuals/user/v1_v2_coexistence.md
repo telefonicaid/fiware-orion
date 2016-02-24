@@ -8,7 +8,7 @@ this is a big work and both API versions will be coexisting during some time.
 
 This document explains some consideration to take into account regarding such coexistence.
 
-# Native JSON types
+## Native JSON types
 
 NGSIv2 allows to create/update attributes (and metadata) whose values use JSON native 
 types (number, boolean, string, etc.). However, NGSIv1 uses a JSON parser that converts 
@@ -20,7 +20,7 @@ non-string JSON native types correctly. Thus, if you set `A=2` using NGSIv2 and 
 attribute using NGSIv1 you will get `A=2`. Currently this work for attribute simple
 values, i.e. compound attribute values or metadata values always use string-based rendering.
 
-# Filtering
+## Filtering
 
 You can use the filtering capabilities developed for NGSIv2 (`GET /v2/entities?q=<query>`) also 
 in NGSIv1 using a Scope element in the payload of `POST /v1/queryContext`. See 
@@ -33,7 +33,7 @@ for numeric values. Thus, in order to work properly, these filters (although usi
 In addition, note that NGSIv2 geo-query filters can be used also in NGSIv1. See
 [the following section](geolocation.md#geo-located-queries-ngsiv2) for details
 
-# Checking ID fields
+## Checking ID fields
 
 NGSIv2 introduces syntax restrictions for ID fields (such as entity id/type, attribute name/type
 or metadata name/type) which are described in the "Field syntax restrictions" section in the
@@ -41,7 +41,12 @@ or metadata name/type) which are described in the "Field syntax restrictions" se
 keep backward compatibility, these restrictions are not used in the NGSIv1 API by default, but
 you can enable them using the `-strictNgsiv1Ids` [CLI parameter](../admin/cli.md).
 
-# `orderBy` parameter
+Related with this topic, note that NGSIv1 allows entities/attributes/metadatas without types
+and with types equal to the empty string (`""`). However, NGSIv2 ID fields (including types) have
+a minimum length of 1 character. Thus, entities created with NGSIv1 but rendered using NGSIv2 operation
+will automatically replace these cases with the string value `none` (which is the default type in NGSIv2).
+
+## `orderBy` parameter
 
 The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryContext operation (see
 details in the [pagination documentation](pagination.md). However, note that the "geo:proximity"

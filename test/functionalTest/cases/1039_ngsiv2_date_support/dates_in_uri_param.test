@@ -229,7 +229,7 @@ Date: REGEX(.*)
 04. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 64
+Content-Length: 66
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -237,7 +237,7 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-24T10:00:00.00Z",
         "id": "E24",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -245,7 +245,7 @@ Date: REGEX(.*)
 04b. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24 (without keyValues)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 102
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -257,7 +257,7 @@ Date: REGEX(.*)
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -285,7 +285,7 @@ Date: REGEX(.*)
 06. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 190
+Content-Length: 196
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -293,17 +293,17 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-24T10:00:00.00Z",
         "id": "E24",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": "2016-02-23T10:00:00.00Z",
         "id": "E23",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": "2016-02-22T10:00:00.00Z",
         "id": "E22",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -311,7 +311,7 @@ Date: REGEX(.*)
 06b. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three (without keyValues)
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 304
+Content-Length: 310
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -323,7 +323,7 @@ Date: REGEX(.*)
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": {
@@ -332,7 +332,7 @@ Date: REGEX(.*)
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": {
@@ -341,7 +341,7 @@ Date: REGEX(.*)
             "value": "2016-02-22T10:00:00.00Z"
         },
         "id": "E22",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -349,7 +349,7 @@ Date: REGEX(.*)
 07. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -357,12 +357,12 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-24T10:00:00.00Z",
         "id": "E24",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": "2016-02-23T10:00:00.00Z",
         "id": "E23",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -370,7 +370,7 @@ Date: REGEX(.*)
 07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 203
+Content-Length: 207
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -382,7 +382,7 @@ Date: REGEX(.*)
             "value": "2016-02-24T10:00:00.00Z"
         },
         "id": "E24",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": {
@@ -391,7 +391,7 @@ Date: REGEX(.*)
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -399,7 +399,7 @@ Date: REGEX(.*)
 08. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -407,12 +407,12 @@ Date: REGEX(.*)
     {
         "birthdate": "2016-02-23T10:00:00.00Z",
         "id": "E23",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": "2016-02-22T10:00:00.00Z",
         "id": "E22",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -420,7 +420,7 @@ Date: REGEX(.*)
 08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 203
+Content-Length: 207
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -432,7 +432,7 @@ Date: REGEX(.*)
             "value": "2016-02-23T10:00:00.00Z"
         },
         "id": "E23",
-        "type": null
+        "type": "none"
     },
     {
         "birthdate": {
@@ -441,7 +441,7 @@ Date: REGEX(.*)
             "value": "2016-02-22T10:00:00.00Z"
         },
         "id": "E22",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -478,7 +478,7 @@ Date: REGEX(.*)
 12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 104
+Content-Length: 106
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -490,7 +490,7 @@ Date: REGEX(.*)
             "value": "2016-02-25T10:00:00.00Z"
         },
         "id": "E25",
-        "type": null
+        "type": "none"
     }
 ]
 

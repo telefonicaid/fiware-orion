@@ -66,14 +66,14 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 74
+Content-Length: 76
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "cvec": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": [
             1,
             2,

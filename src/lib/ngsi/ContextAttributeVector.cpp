@@ -382,15 +382,17 @@ void ContextAttributeVector::release(void)
 *
 * ContextAttributeVector::fill - 
 */
-void ContextAttributeVector::fill(ContextAttributeVector* cavP)
+void ContextAttributeVector::fill(ContextAttributeVector* cavP, bool useDefaultType)
 {
   if (cavP == NULL)
+  {
     return;
+  }
 
   for (unsigned int ix = 0; ix < cavP->size(); ++ix)
   {
     ContextAttribute* from = (*cavP)[ix];
-    ContextAttribute* caP = new ContextAttribute(from);
+    ContextAttribute* caP = new ContextAttribute(from, useDefaultType);
 
     push_back(caP);
   }

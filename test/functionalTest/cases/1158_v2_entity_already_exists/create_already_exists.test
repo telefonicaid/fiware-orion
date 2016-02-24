@@ -108,7 +108,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/Room1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 78
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -116,7 +116,7 @@ Date: REGEX(.*)
     "id": "Room1",
     "temp": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "29"
     },
     "type": "Room"

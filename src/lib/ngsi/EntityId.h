@@ -56,7 +56,7 @@ class EntityId
 
   void         tagSet(const std::string& tagName);
   void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern);
-  void         fill(const struct EntityId* eidP);
+  void         fill(const struct EntityId* eidP, bool useDefaultType = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
