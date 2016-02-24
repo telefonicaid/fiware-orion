@@ -693,16 +693,16 @@ class NGSI:
                 timestamp: {
                     type: "date"
                     value: "017-06-17T07:21:24.238Z"
-                    very_hot: {
-                        type: "alarm"
-                        value: "false"
+                    "metadata": {
+                          very_hot: {
+                              type: "alarm"
+                              value: "false"
+                          }
                     }
                 }
             }
         """
-        resp_json = convert_str_to_dict(resp.content, JSON)
-        assert attribute_name_to_request in resp_json, 'ERROR - in attribute name "%s" ' % attribute_name_to_request
-        attribute = resp_json[attribute_name_to_request]
+        attribute = convert_str_to_dict(resp.content, JSON)
         if entities_context["attributes_type"] is not None:
             assert entities_context["attributes_type"] == attribute["type"],\
                 'ERROR - in attribute type "%s"' % (entities_context["attributes_type"])
@@ -713,16 +713,18 @@ class NGSI:
        # verify attribute metadatas
         if entities_context["metadatas_number"] > 0:
             for m in range(int(entities_context["metadatas_number"])):
-                assert "%s_%s" % (entities_context["metadatas_name"], str(m)) in attribute,\
-                    'ERROR - attribute metadata name "%s_%s" does not exist' % (entities_context["metadatas_name"], str(m))
-                metadata = attribute["%s_%s" % (entities_context["metadatas_name"], str(m))]
+                if int(entities_context["metadatas_number"]) > 1:
+                    meta_name = "%s_%s" % (entities_context["metadatas_name"], str(m))
+                else:
+                    meta_name = entities_context["metadatas_name"]
+                assert meta_name in attribute["metadata"], 'ERROR - attribute metadata name "%s" does not exist' % meta_name
+                metadata = attribute["metadata"][meta_name]
                 if entities_context["metadatas_type"] is not None:
                     assert entities_context["metadatas_type"] == metadata["type"], \
                         'ERROR - in attribute metadata type "%s"' % (entities_context["metadatas_type"])
                 if entities_context["metadatas_value"] is not None:
                     assert entities_context["metadatas_value"] == metadata["value"], \
                         'ERROR - in attribute metadata value "%s"' % (entities_context["metadatas_value"])
-
 
     def verify_an_attribute_by_id_in_raw_mode_http_response(self, entities_context, resp, attribute_name_to_request, field_type):
         """
@@ -734,30 +736,16 @@ class NGSI:
         :param field_type:
         """
         assert resp.text != "[]", "ERROR - It has not returned any entity"
-        entity = convert_str_to_dict(resp.text, JSON)   # in raw mode is used only one entity
-        # verify attribute
-        assert remove_quote(entities_context["attributes_name"]) in entity,   \
-            'ERROR - attribute name "%s" does not exist in raw mode' % entities_context["attributes_name"]
-        attribute = entity[remove_quote(entities_context["attributes_name"])]
+        attribute = convert_str_to_dict(resp.text, JSON)   # in raw mode is used only one entity
         __logger__.debug("attribute: %s" % str(attribute))
+
         if entities_context["attributes_type"] is not None:
             assert remove_quote(entities_context["attributes_type"]) == attribute["type"], \
                 'ERROR - in attribute type "%s" in raw mode' % (remove_quote(entities_context["attributes_type"]))
 
-            attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-            assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
-                'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
-        else:
-            if entities_context["metadatas_number"] > 0:
-                attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-
-                assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
-                    'ERROR - in attribute value "%s" with type "%s" does not match without attribute type but with metadatas' % (str(attribute["value"]), field_type)
-            else:
-                attribute = self.__verify_if_is_int_or_str(attribute)
-                assert str(type(attribute)) == "<type '%s'>" % field_type, \
-                    'ERROR - in attribute value "%s" with type "%s" does not match without attribute type and ' \
-                    'without metadatas' % (str(attribute), field_type)
+        attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
+        assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
+            'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
 
     def verify_an_attribute_value_by_id(self, entities_context, resp):
         """
