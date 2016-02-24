@@ -34,10 +34,15 @@ brokerStart CB
 # 02. Create entity E23 with birthdate 2016-02-23T10:00:00.00Z
 # 03. Create entity E22 with birthdate 2016-02-22T10:00:00.00Z
 # 04. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24
+# 04b. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24 (without keyValues)
 # 05. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing
+# 05b. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing (without keyValues)
 # 06. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three
+# 06b. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three (without keyValues)
 # 07. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24
+# 07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)
 # 08. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23
+# 08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)
 #
 
 echo "01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z"
@@ -90,9 +95,23 @@ echo
 echo
 
 
+echo "04b. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24 (without keyValues)"
+echo "====================================================================================="
+orionCurl --url '/v2/entities?q=birthdate==2016-02-24T10:00:00.00Z' --json
+echo
+echo
+
+
 echo "05. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing"
 echo "===================================================================="
 orionCurl --url '/v2/entities?q=birthdate>2016-02-24T10:00:00.00Z&options=keyValues' --json
+echo
+echo
+
+
+echo "05b. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing (without keyValues)"
+echo "========================================================================================="
+orionCurl --url '/v2/entities?q=birthdate>2016-02-24T10:00:00.00Z' --json
 echo
 echo
 
@@ -104,6 +123,13 @@ echo
 echo
 
 
+echo "06b. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three (without keyValues)"
+echo "==========================================================================================="
+orionCurl --url '/v2/entities?q=birthdate<2016-02-25T10:00:00.00Z' --json
+echo
+echo
+
+
 echo "07. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24"
 echo "========================================================================="
 orionCurl --url '/v2/entities?q=birthdate>=2016-02-23T10:00:00.00Z&options=keyValues' --json
@@ -111,9 +137,23 @@ echo
 echo
 
 
+echo "07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)"
+echo "=============================================================================================="
+orionCurl --url '/v2/entities?q=birthdate>=2016-02-23T10:00:00.00Z' --json
+echo
+echo
+
+
 echo "08. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23"
 echo "========================================================================="
 orionCurl --url '/v2/entities?q=birthdate<=2016-02-23T10:00:00.00Z&options=keyValues' --json
+echo
+echo
+
+
+echo "08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)"
+echo "=============================================================================================="
+orionCurl --url '/v2/entities?q=birthdate<=2016-02-23T10:00:00.00Z' --json
 echo
 echo
 
@@ -162,8 +202,38 @@ Date: REGEX(.*)
 ]
 
 
+04b. GET entities with birthdate=2016-02-24T10:00:00.00Z, see E24 (without keyValues)
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-24T10:00:00.00Z"
+        },
+        "id": "E24",
+        "type": null
+    }
+]
+
+
 05. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing
 ====================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+05b. GET entities with birthdate>2016-02-24T10:00:00.00Z, see nothing (without keyValues)
+=========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
@@ -198,6 +268,44 @@ Date: REGEX(.*)
 ]
 
 
+06b. GET entities with birthdate<2016-02-25T10:00:00.00Z, see all three (without keyValues)
+===========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 304
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-24T10:00:00.00Z"
+        },
+        "id": "E24",
+        "type": null
+    },
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-23T10:00:00.00Z"
+        },
+        "id": "E23",
+        "type": null
+    },
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-22T10:00:00.00Z"
+        },
+        "id": "E22",
+        "type": null
+    }
+]
+
+
 07. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24
 =========================================================================
 HTTP/1.1 200 OK
@@ -219,6 +327,35 @@ Date: REGEX(.*)
 ]
 
 
+07b. GET entities with birthdate>=2016-02-23T10:00:00.00Z, see E23 and E24 (without keyValues)
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-24T10:00:00.00Z"
+        },
+        "id": "E24",
+        "type": null
+    },
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-23T10:00:00.00Z"
+        },
+        "id": "E23",
+        "type": null
+    }
+]
+
+
 08. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23
 =========================================================================
 HTTP/1.1 200 OK
@@ -234,6 +371,35 @@ Date: REGEX(.*)
     },
     {
         "birthdate": "2016-02-22T10:00:00.00Z",
+        "id": "E22",
+        "type": null
+    }
+]
+
+
+08b. GET entities with birthdate<=2016-02-23T10:00:00.00Z, see E22 and E23 (without keyValues)
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-23T10:00:00.00Z"
+        },
+        "id": "E23",
+        "type": null
+    },
+    {
+        "birthdate": {
+            "metadata": {},
+            "type": "date",
+            "value": "2016-02-22T10:00:00.00Z"
+        },
         "id": "E22",
         "type": null
     }
