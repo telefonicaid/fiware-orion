@@ -118,14 +118,14 @@ echo
 
 echo "11. Not a number for circle center latitude"
 echo "==========================================="
-orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=B,5' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:10&geometry=point&coords=B,5' --json
 echo
 echo
 
 
 echo "12. Not a number for circle center longitude"
 echo "============================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance=10&geometry=point&coords=5,B' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:10&geometry=point&coords=5,B' --json
 echo
 echo
 

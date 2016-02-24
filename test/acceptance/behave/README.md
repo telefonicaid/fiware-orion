@@ -275,7 +275,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | remove_entity                               |     73       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
 |                                                                                                                                                          |
 |**attributes folder**                                                                                                                                     |
-| get_attribute_data                          |    221       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |   
+| get_attribute_data                          |    244       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |   
 | update_attribute_data                       |    610       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | No             |
 | remove_a_single_attribute                   |     98       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
 |                                                                                                                                                          |

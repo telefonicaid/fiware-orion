@@ -1004,6 +1004,29 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 #define OPR_NOT_EXIST "NOT EXIST"
 
 
+
+/* ****************************************************************************
+*
+* rangeIsDates - are both values in a range expressing dates?
+*/
+static bool rangeIsDates(char* rangeFrom, char* rangeTo, double* fromP, double* toP)
+{
+  double fromSeconds = 0;
+  double toSeconds   = 0;
+
+  if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
+  {
+    *fromP = fromSeconds;
+    *toP   = toSeconds;
+
+    return true;
+  }
+
+  return false;
+}
+
+
+
 /* *****************************************************************************
 *
 * matchFilter -
@@ -1020,7 +1043,8 @@ static bool matchFilter
   char*                      rangeFrom,
   char*                      rangeTo,
   const std::vector<char*>&  valVector,
-  ContextElementResponse*    cerP
+  ContextElementResponse*    cerP,
+  int64_t                    seconds
 )
 {
   /* First, look for unary operators */
@@ -1067,20 +1091,15 @@ static bool matchFilter
       double to;
 
       //
-      // Ranges can only be used on numbers
+      // Ranges can only be used on numbers and dates
       //
-      // FIXME P5: in the future, dates are to be supported as well.
-      //           There is a function 'parse8601Time' in common/globals.cpp that we
-      //           can use to verify that a string is a valid date.
-      //           NOTE: this FIXME is valid for ALL operators where Numbers are allowed
-      //
-      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      if ((rangeIsDates(rangeFrom, rangeTo, &from, &to) == false) && 
+          ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false)))
       {
         return false;
       }
 
       return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= from) && (ca->numberValue <= to));
-
     }
     else if (valVector.size() > 0)
     {
@@ -1088,7 +1107,8 @@ static bool matchFilter
       for (unsigned int ix = 0; ix < valVector.size(); ++ix)
       {
         double d;
-        if (str2double(valVector[ix], &d))
+
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
@@ -1110,9 +1130,16 @@ static bool matchFilter
     else
     {
       double d;
+      bool   isDate = false;
 
       // Single value
-      if (str2double(right, &d))
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
+
+      if (isDate || str2double(right, &d))
       {
         // number
         return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
@@ -1132,13 +1159,17 @@ static bool matchFilter
       double to;
 
       //
-      // Ranges can only be used on numbers
+      // Ranges can only be used on numbers and dates
       //
-      // FIXME P5: in the future, dates are to be supported as well.
-      //           There is a function 'parse8601Time' in common/globals.cpp that we
-      //           can use to verify that a string is a valid date
-      //
-      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      double fromSeconds;
+      double toSeconds;
+
+      if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
+      {
+        from = fromSeconds;
+        to   = toSeconds;
+      }
+      else if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
       {
         return false;
       }
@@ -1152,7 +1183,7 @@ static bool matchFilter
       {
         double d;
 
-        if (str2double(valVector[ix], &d))
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
@@ -1174,9 +1205,16 @@ static bool matchFilter
     else
     {
       double d;
+      bool   isDate = false;
 
       // Single value
-      if (str2double(right, &d))
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
+
+      if (isDate || str2double(right, &d))
       {
         // number
         return !((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
@@ -1191,8 +1229,15 @@ static bool matchFilter
   else if (opr == ">")
   {
     double d;
+    bool   isDate = false;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d      = seconds;
+      isDate = true;
+    }
+
+    if (isDate || str2double(right, &d) == false)
     {
       return false;
     }
@@ -1203,7 +1248,11 @@ static bool matchFilter
   {
     double d;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
@@ -1214,7 +1263,11 @@ static bool matchFilter
   {
     double d;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
@@ -1225,7 +1278,11 @@ static bool matchFilter
   {
     double d;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
@@ -1256,7 +1313,8 @@ static bool addBsonFilter
   char*                      rangeFrom,
   char*                      rangeTo,
   const std::vector<char*>&  valVector,
-  std::vector<BSONObj>&      filters
+  std::vector<BSONObj>&      filters,
+  int64_t                    seconds
 )
 {
   std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
@@ -1267,7 +1325,7 @@ static bool addBsonFilter
 
   //
   // The right-hand-side can enter in 3 different ways (params to this function):
-  //   - right                normal case)
+  //   - right                normal case
   //   - valVector            as a vector of values, in the case of 'X==a,b,c'
   //   - rangeFrom/rangeTo    as two values when '..' is used to denote a range
   //
@@ -1292,7 +1350,8 @@ static bool addBsonFilter
       double from;
       double to;
 
-      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      if ((rangeIsDates(rangeFrom, rangeTo, &from, &to) == false) && 
+          ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false)))
       {
         return false;
       }
@@ -1308,7 +1367,8 @@ static bool addBsonFilter
       for (unsigned int ix = 0; ix < valVector.size(); ++ix)
       {
         double d;
-        if (str2double(valVector[ix], &d))
+
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           ba.append(d);
@@ -1327,9 +1387,16 @@ static bool addBsonFilter
     else
     {
       double d;
+      bool   isDate = false;
+
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
 
       // Single value
-      if (str2double(right, &d))
+      if (isDate || str2double(right, &d))
       {
         // number
         bb.append("$in", BSON_ARRAY(d));
@@ -1376,8 +1443,15 @@ static bool addBsonFilter
     {
       double from;
       double to;
+      double fromSeconds = 0;
+      double toSeconds   = 0;
 
-      if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
+      {
+        from = fromSeconds;
+        to   = toSeconds;
+      }
+      else if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
       {
         return false;
       }
@@ -1395,7 +1469,7 @@ static bool addBsonFilter
       {
         double d;
 
-        if (str2double(valVector[ix], &d))
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           ba.append(d);
@@ -1414,9 +1488,16 @@ static bool addBsonFilter
     else
     {
       double d;
+      bool   isDate = false;
+
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
 
       // Single value
-      if (str2double(right, &d))
+      if (isDate || str2double(right, &d))
       {
         // number
         bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
@@ -1462,7 +1543,11 @@ static bool addBsonFilter
   {
     double d;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
@@ -1475,7 +1560,11 @@ static bool addBsonFilter
   {
     double d;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
@@ -1488,7 +1577,11 @@ static bool addBsonFilter
   {
     double d;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
@@ -1501,7 +1594,11 @@ static bool addBsonFilter
   {
     double d;
 
-    if (str2double(right, &d) == false)
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
@@ -1609,7 +1706,7 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
   {
     char*               left;
     char*               op;
-    char*               right;
+    char*               right     = NULL;
     char*               rangeFrom = (char*) "";
     char*               rangeTo   = (char*) "";
     std::vector<char*>  valVector;
@@ -1763,7 +1860,7 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
               // If not inside queotes, we are on a comma, so a new value is to be pushed onto the value vector.
               //
 
-              // 2. Remove beginning quote, if there
+              // 2. Remove beginning quote, if there is one
               if (*start == '\'')
               {
                 *start = 0;
@@ -1796,10 +1893,25 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
 
     str = NULL;  // So that strtok_r continues eating the initial string
 
+    //
+    // Is the right-hand-side a DATE?
+    // If so, convert it to unix seconds since epoch
+    //
+    int64_t seconds = -1;
+
+    if (right != NULL)
+    {
+      if ((seconds = parse8601Time(right)) != -1)
+      {
+        right = (char*) "DATE";  // value of the date is passed in 'seconds'
+      }
+    }
+
+
     /* Build the BSON filter (or evaluate on cerP) */
     if (cerP == NULL)
     {
-      if (addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters) == false)
+      if (addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters, seconds) == false)
       {
         retval = false;
         break;
@@ -1807,7 +1919,7 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
     }
     else
     {
-      if (!matchFilter(left, opr, right, rangeFrom, rangeTo, valVector, cerP))
+      if (!matchFilter(left, opr, right, rangeFrom, rangeTo, valVector, cerP, seconds))
       {
         retval = false;
         break;
