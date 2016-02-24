@@ -278,7 +278,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -318,7 +318,7 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -368,7 +368,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -409,7 +409,7 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -460,7 +460,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -501,7 +501,7 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -554,7 +554,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -594,7 +594,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -646,7 +646,7 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -698,7 +698,7 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -749,7 +749,7 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -801,7 +801,7 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -852,7 +852,7 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -903,7 +903,7 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -955,7 +955,7 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -998,7 +998,7 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1042,7 +1042,7 @@ TEST(mongoQueryContextRequest_filters, withEntityType)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1089,7 +1089,7 @@ TEST(mongoQueryContextRequest_filters, withoutEntityType)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1129,7 +1129,7 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1169,7 +1169,7 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1208,7 +1208,7 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1248,7 +1248,7 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

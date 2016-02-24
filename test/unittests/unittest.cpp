@@ -69,6 +69,14 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
+* options -
+*/
+std::map<std::string, bool> options;
+
+
+
+/* ****************************************************************************
+*
 * servicePathV - 
 */
 std::vector<std::string> servicePathV;
