@@ -344,8 +344,8 @@ The following strings must not be used as attribute names:
 Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify the order; its 
 value can be:
 
-* The keyword "geo:distance" to order results by distance to the center point when combined with "near" geoqueries.
-  If "geo:distance" is used without "near" geoqueries, the order is undefined.
+* The keyword geo:distance to order results by distance to a reference geometry when a "near" (`georel=near`) spatial 
+  relationship is used. 
 
 * A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`. Results are ordered
   by the first attribute. On ties, the results are ordered by the second attribute and so on. A "!" before the attribute
