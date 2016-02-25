@@ -2755,7 +2755,8 @@ static void updateEntity
   cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
-  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0) {
+  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0)
+  {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath);
     responseP->contextElementResponseVector.push_back(cerP);
@@ -2861,6 +2862,11 @@ static void updateEntity
       // CER
       responseP->contextElementResponseVector.push_back(cerP);
     }
+    else
+    {
+      delete cerP;
+    }
+
     releaseTriggeredSubscriptions(subsToNotify);
 
     notifyCerP->release();
@@ -3014,7 +3020,6 @@ static bool contextElementPreconditionsCheck
   const std::string&      apiVersion
 )
 {
-
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
 
