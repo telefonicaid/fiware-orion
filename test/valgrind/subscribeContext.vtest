@@ -26,9 +26,9 @@ echo Make a registration
 
 #FIXME P10: recover this
 #echo Make a subscription
-#../manual/cbTest.sh scr ../manual/ngsi10.subscribeContextRequest.ontimeinterval.valid.xml > /dev/null 2>&1
+#../manual/cbTest.sh scr ../manual/ngsi10.subscribeContextRequest.onchange.valid.xml > /dev/null 2>&1
 
-echo Wait some time for ONTIMEINTERVAL ...
+echo Wait some time ...
 sleep 11
 
 

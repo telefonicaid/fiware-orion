@@ -78,10 +78,6 @@ static void prepareDatabase(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 100
                                                        ))
                         );
 
@@ -94,10 +90,6 @@ static void prepareDatabase(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 200
                                                        ))
                         );
 
@@ -118,11 +110,7 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -162,11 +150,7 @@ TEST(mongoUnsubscribeContext, unsubscribe)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -215,11 +199,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -287,12 +267,8 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
+            .Times(0);   
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */

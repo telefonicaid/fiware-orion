@@ -209,7 +209,6 @@ SET (SOURCES
     apiTypesV2/EntityVector_test.cpp
 
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
-    mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
     mongoBackend/mongoQueryContext_filters_test.cpp
     mongoBackend/mongoQueryContextCompoundValues_test.cpp
