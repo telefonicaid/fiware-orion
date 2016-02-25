@@ -136,7 +136,7 @@ Date: REGEX(.*)
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -167,7 +167,7 @@ Date: REGEX(.*)
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T2
 Date: REGEX(.*)
 
 
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T3
 Date: REGEX(.*)
 
 
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4
+Location: /v2/entities/E4?type=T3
 Date: REGEX(.*)
 
 

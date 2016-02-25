@@ -283,7 +283,7 @@ echo
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T
 Date: REGEX(.*)
 
 
@@ -310,7 +310,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T
 Date: REGEX(.*)
 
 
@@ -345,7 +345,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T
 Date: REGEX(.*)
 
 
@@ -361,14 +361,14 @@ Date: REGEX(.*)
 08. Get E3/A3 (value of A3 has been replaced)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 68
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A3": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": null
     },
     "id": "E3",
@@ -380,7 +380,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4
+Location: /v2/entities/E4?type=T
 Date: REGEX(.*)
 
 
@@ -415,7 +415,7 @@ Date: REGEX(.*)
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5
+Location: /v2/entities/E5?type=T5
 Date: REGEX(.*)
 
 
@@ -438,7 +438,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E6
+Location: /v2/entities/E6?type=T6
 Date: REGEX(.*)
 
 
@@ -469,7 +469,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E7
+Location: /v2/entities/E7?type=T7
 Date: REGEX(.*)
 
 
@@ -500,7 +500,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E8
+Location: /v2/entities/E8?type=T8
 Date: REGEX(.*)
 
 

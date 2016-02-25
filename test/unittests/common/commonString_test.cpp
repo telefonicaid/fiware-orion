@@ -453,3 +453,64 @@ TEST(string, atoF)
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
 }
+
+
+
+/* ****************************************************************************
+*
+* str2double - 
+*/
+TEST(string, str2double)
+{
+  bool    b;
+  double  d;
+
+  b = str2double("a", &d);
+  EXPECT_FALSE(b);
+
+  b = str2double("99e99999999999999999999999999", &d);
+  EXPECT_FALSE(b);
+  
+  b = str2double("12.0a", &d);
+  EXPECT_FALSE(b);
+
+  //
+  // Different ways of ZERO
+  //
+  d = 14;
+  b = str2double("0.0000", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(0.0, d);
+
+  d = 14;
+  b = str2double("0", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(0.0, d);
+
+  d = 14;
+  b = str2double("0e23", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(0.0, d);
+
+  // OK to have spaces after number
+  d = 14;
+  b = str2double("12 ", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(12, d);
+
+  // But NOT OK to have spaces AND a number after the number
+  b = str2double("12 1", &d);
+  EXPECT_FALSE(b);
+
+  // Normal float
+  d = 14;
+  b = str2double("1.23", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(1.23, d);
+
+  // Normal integer
+  d = 14;
+  b = str2double("23", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(23, d);
+}

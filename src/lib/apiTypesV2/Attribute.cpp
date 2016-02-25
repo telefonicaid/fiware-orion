@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "common/tag.h"
+#include "common/errorMessages.h"
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -99,7 +100,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
     //
     // If there are more than one entity, we return an error
     //
-    errorCode.fill("TooManyResults", "There is more than one entity with that id. Refine your query.");
+    errorCode.fill("TooManyResults", MORE_MATCHING_ENT);
   }
   else
   {

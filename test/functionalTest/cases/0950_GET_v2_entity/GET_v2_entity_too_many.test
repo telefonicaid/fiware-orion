@@ -104,7 +104,7 @@ echo
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -113,7 +113,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T2
 Date: REGEX(.*)
 
 
@@ -122,7 +122,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T3
 Date: REGEX(.*)
 
 
@@ -131,7 +131,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T4
 Date: REGEX(.*)
 
 
@@ -140,7 +140,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T5
 Date: REGEX(.*)
 
 
@@ -148,12 +148,12 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 (too many entities error)
 =================================================
 HTTP/1.1 409 Conflict
-Content-Length: 105
+Content-Length: 98
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "There is more than one entity with that id. Refine your query.",
+    "description": "More than one matching entity. Please refine your query",
     "error": "TooManyResults"
 }
 

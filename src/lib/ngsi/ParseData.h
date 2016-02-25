@@ -54,6 +54,8 @@
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "apiTypesV2/Entity.h"
+#include "apiTypesV2/BatchQuery.h"
+#include "apiTypesV2/BatchUpdate.h"
 
 
 
@@ -121,6 +123,8 @@ struct QueryContextData
   EntityId*            entityIdP;
   Scope*               scopeP;
   orion::Point*        vertexP;
+  int                  pointNo;
+  int                  coords;
 };
 
 
@@ -380,6 +384,28 @@ typedef struct AttributeValueData
 
 /* ****************************************************************************
 *
+* BatchQueryData - 
+*/
+typedef struct BatchQueryData
+{
+  BatchQuery res;
+} BatchQueryData;
+
+
+
+/* ****************************************************************************
+*
+* BatchUpdateData - 
+*/
+typedef struct BatchUpdateData
+{
+  BatchUpdate res;
+} BatchUpdateData;
+
+
+
+/* ****************************************************************************
+*
 * ParseData -
 */
 typedef struct ParseData
@@ -415,6 +441,8 @@ typedef struct ParseData
   EntityData                                  ent;
   AttributeData                               attr;
   AttributeValueData                          av;
+  BatchQueryData                              bq;
+  BatchUpdateData                             bu;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_

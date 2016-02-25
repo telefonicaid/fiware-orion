@@ -132,8 +132,8 @@ static bool equalContextAttribute(ContextAttribute* caExpected, ContextAttribute
     return false;
   }
 
-  LM_M(("caArg '%s', '%s', '%s'", caArg->name.c_str(), caArg->type.c_str(), caArg->toStringValue().c_str()));
-  LM_M(("caExpected '%s', '%s', '%s'", caExpected->name.c_str(), caExpected->type.c_str(), caExpected->toStringValue().c_str()));
+  LM_M(("caArg '%s', '%s', '%s'", caArg->name.c_str(), caArg->type.c_str(), caArg->getValue().c_str()));
+  LM_M(("caExpected '%s', '%s', '%s'", caExpected->name.c_str(), caExpected->type.c_str(), caExpected->getValue().c_str()));
 
   return true;
 }

@@ -40,6 +40,7 @@ brokerStart CB
 # 08. Erroneous GET entities with q=A1<0..20
 # 09. Correct GET entities with q=A1==0..20 (2 hits)
 # 10. Correct GET entities with q=A1!=0..20 (1 hit)
+# 11. Erroneous GET entities with q=A1==a..b 
 #
 
 
@@ -123,12 +124,19 @@ echo
 echo
 
 
+echo "11. Erroneous GET entities with q=A1==a..b"
+echo "=========================================="
+orionCurl --url '/v2/entities?q=A1==a..b' --json
+echo
+echo
+
+
 --REGEXPECT--
 01. Create an entity E1 with attribute A1=10
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=none
 Date: REGEX(.*)
 
 
@@ -137,7 +145,7 @@ Date: REGEX(.*)
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=none
 Date: REGEX(.*)
 
 
@@ -146,7 +154,7 @@ Date: REGEX(.*)
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=none
 Date: REGEX(.*)
 
 
@@ -154,7 +162,7 @@ Date: REGEX(.*)
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 217
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -162,29 +170,29 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
-            "value": 10.0
+            "type": "none",
+            "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
-            "value": 20.0
+            "type": "none",
+            "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
-            "value": 30.0
+            "type": "none",
+            "value": 30
         },
         "id": "E3",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -244,7 +252,7 @@ Date: REGEX(.*)
 09. Correct GET entities with q=A1==0..20 (2 hits)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 151
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -252,20 +260,20 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
-            "value": 10.0
+            "type": "none",
+            "value": 10
         },
         "id": "E1",
-        "type": null
+        "type": "none"
     },
     {
         "A1": {
             "metadata": {},
-            "type": null,
-            "value": 20.0
+            "type": "none",
+            "value": 20
         },
         "id": "E2",
-        "type": null
+        "type": "none"
     }
 ]
 
@@ -273,7 +281,7 @@ Date: REGEX(.*)
 10. Correct GET entities with q=A1!=0..20 (1 hit)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -281,13 +289,26 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
-            "value": 30.0
+            "type": "none",
+            "value": 30
         },
         "id": "E3",
-        "type": null
+        "type": "none"
     }
 ]
+
+
+11. Erroneous GET entities with q=A1==a..b
+==========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid query expression",
+    "error": "BadRequest"
+}
 
 
 --TEARDOWN--

@@ -898,8 +898,133 @@ static bool processAreaScope(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
+/* *****************************************************************************
+*
+* processAreaScopeV2 -
+*
+* Returns true if areaQuery was filled, false otherwise
+*
+*/
+static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
+{
+  if (!mongoLocationCapable())
+  {
+    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+      "Please upgrade MongoDB server to 2.4 or newer)";
+
+    alarmMgr.badInput(clientIp, details);
+    return false;
+  }
+
+  // Fill BSON corresponding to geometry
+  BSONObj geometry;
+  if (scoP->areaType == orion::PointType)
+  {
+    geometry = BSON("type" << "Point" << "coordinates" << BSON_ARRAY(scoP->point.longitude() << scoP->point.latitude()));
+  }
+  else if (scoP->areaType == orion::LineType)
+  {
+    // Arbitrary number of points
+    BSONArrayBuilder ps;
+    for (unsigned int ix = 0; ix < scoP->line.pointList.size(); ++ix)
+    {
+      orion::Point* p = scoP->line.pointList[ix];
+      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+    }
+    geometry = BSON("type" << "LineString" << "coordinates" << ps.arr());
+  }
+  else if (scoP->areaType == orion::BoxType)
+  {
+    BSONArrayBuilder ps;
+    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.lowerLeft.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.upperRight.longitude() << scoP->box.upperRight.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.upperRight.latitude()));
+    ps.append(BSON_ARRAY(scoP->box.lowerLeft.longitude()  << scoP->box.lowerLeft.latitude()));
+    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
+  }
+  else if (scoP->areaType == orion::PolygonType)
+  {
+    // Arbitrary number of points
+    BSONArrayBuilder ps;
+    for (unsigned int ix = 0; ix < scoP->polygon.vertexList.size(); ++ix)
+    {
+      orion::Point* p = scoP->polygon.vertexList[ix];
+      ps.append(BSON_ARRAY(p->longitude() << p->latitude()));
+    }
+    geometry = BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(ps.arr()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown area type: %d)", scoP->areaType));
+    return false;
+  }
+
+  if (scoP->georel.type == "near")
+  {
+    BSONObjBuilder near;
+    near.append("$geometry", geometry);
+    if (scoP->georel.maxDistance >= 0)
+    {
+      near.append("$maxDistance", scoP->georel.maxDistance);
+    }
+    if (scoP->georel.minDistance >= 0)
+    {
+      near.append("$minDistance", scoP->georel.minDistance);
+    }
+    areaQuery = BSON("$near" << near.obj());
+  }
+  else if (scoP->georel.type == "coveredBy")
+  {
+    areaQuery = BSON("$geoWithin" << BSON("$geometry" << geometry));
+  }
+  else if (scoP->georel.type == "intersects")
+  {
+    areaQuery = BSON("$geoIntersects" << BSON("$geometry" << geometry));
+  }
+  else if (scoP->georel.type == "disjoint")
+  {
+    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoIntersects" << BSON("$geometry" << geometry)));
+  }
+  else if (scoP->georel.type == "equals")
+  {
+    areaQuery = geometry;
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown georel type: '%s')", scoP->georel.type.c_str()));
+    return false;
+  }
+
+  return true;
+}
+
+
 #define OPR_EXIST     "EXISTS"
 #define OPR_NOT_EXIST "NOT EXIST"
+
+
+
+/* ****************************************************************************
+*
+* rangeIsDates - are both values in a range expressing dates?
+*/
+static bool rangeIsDates(char* rangeFrom, char* rangeTo, double* fromP, double* toP)
+{
+  double fromSeconds = 0;
+  double toSeconds   = 0;
+
+  if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
+  {
+    *fromP = fromSeconds;
+    *toP   = toSeconds;
+
+    return true;
+  }
+
+  return false;
+}
+
 
 
 /* *****************************************************************************
@@ -918,21 +1043,13 @@ static bool matchFilter
   char*                      rangeFrom,
   char*                      rangeTo,
   const std::vector<char*>&  valVector,
-  ContextElementResponse*    cerP
+  ContextElementResponse*    cerP,
+  int64_t                    seconds
 )
 {
   /* First, look for unary operators */
   if ((opr == OPR_EXIST) || (opr == OPR_NOT_EXIST))
-  {
-    /* Special case: entity type */
-    if (std::string(right) == ENT_ENTITY_TYPE)
-    {
-      // FIXME P7: how to check for not existing entity based on EntityID?
-      //cerP->contextElement.entityId.type = ??;
-      return true;
-    }
-
-    /* Regular attribute */
+  {   
     ContextAttribute* ca = cerP->contextElement.getAttribute(right);
     bool exist = (ca != NULL);
 
@@ -961,10 +1078,19 @@ static bool matchFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      // ranges only can be used on numbers
-      return ((ca->valueType == orion::ValueTypeNumber) &&
-              (ca->numberValue >= atof(rangeFrom)) && (ca->numberValue <= atof(rangeTo)));
+      double from;
+      double to;
 
+      //
+      // Ranges can only be used on numbers and dates
+      //
+      if ((rangeIsDates(rangeFrom, rangeTo, &from, &to) == false) && 
+          ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false)))
+      {
+        return false;
+      }
+
+      return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= from) && (ca->numberValue <= to));
     }
     else if (valVector.size() > 0)
     {
@@ -972,7 +1098,8 @@ static bool matchFilter
       for (unsigned int ix = 0; ix < valVector.size(); ++ix)
       {
         double d;
-        if (str2double(valVector[ix], &d))
+
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
@@ -994,9 +1121,16 @@ static bool matchFilter
     else
     {
       double d;
+      bool   isDate = false;
 
       // Single value
-      if (str2double(right, &d))
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
+
+      if (isDate || str2double(right, &d))
       {
         // number
         return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
@@ -1012,9 +1146,26 @@ static bool matchFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      // ranges only can be used on number
-      return ((ca->valueType == orion::ValueTypeNumber) &&
-              ((ca->numberValue < atof(rangeFrom)) || (ca->numberValue > atof(rangeTo))));
+      double from;
+      double to;
+
+      //
+      // Ranges can only be used on numbers and dates
+      //
+      double fromSeconds;
+      double toSeconds;
+
+      if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
+      {
+        from = fromSeconds;
+        to   = toSeconds;
+      }
+      else if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      {
+        return false;
+      }
+
+      return ((ca->valueType == orion::ValueTypeNumber) && ((ca->numberValue < from) || (ca->numberValue > to)));
     }
     else if (valVector.size() > 0)
     {
@@ -1023,7 +1174,7 @@ static bool matchFilter
       {
         double d;
 
-        if (str2double(valVector[ix], &d))
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
@@ -1045,9 +1196,16 @@ static bool matchFilter
     else
     {
       double d;
+      bool   isDate = false;
 
       // Single value
-      if (str2double(right, &d))
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
+
+      if (isDate || str2double(right, &d))
       {
         // number
         return !((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
@@ -1061,19 +1219,66 @@ static bool matchFilter
   }
   else if (opr == ">")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue > atof(right)));
+    double d;
+    bool   isDate = false;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d      = seconds;
+      isDate = true;
+    }
+
+    if (isDate || str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue > d));
   }
   else if (opr == "<")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue < atof(right)));
+    double d;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue < d));
   }
   else if (opr == ">=")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= atof(right)));
+    double d;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= d));
   }
   else if (opr == "<=")
   {
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue <= atof(right)));
+    double d;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue <= d));
   }
   else
   {
@@ -1099,10 +1304,23 @@ static bool addBsonFilter
   char*                      rangeFrom,
   char*                      rangeTo,
   const std::vector<char*>&  valVector,
-  std::vector<BSONObj>&      filters
+  std::vector<BSONObj>&      filters,
+  int64_t                    seconds
 )
 {
-  std::string    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+  std::string    k;
+  if (left == std::string(DATE_CREATED))
+  {
+    k = ENT_CREATION_DATE;
+  }
+  else if (left == std::string(DATE_MODIFIED))
+  {
+    k = ENT_MODIFICATION_DATE;
+  }
+  else
+  {
+    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+  }
   BSONObjBuilder bob;
   BSONObjBuilder bb;
   BSONObjBuilder bb2;
@@ -1110,7 +1328,7 @@ static bool addBsonFilter
 
   //
   // The right-hand-side can enter in 3 different ways (params to this function):
-  //   - right                normal case)
+  //   - right                normal case
   //   - valVector            as a vector of values, in the case of 'X==a,b,c'
   //   - rangeFrom/rangeTo    as two values when '..' is used to denote a range
   //
@@ -1125,7 +1343,6 @@ static bool addBsonFilter
       ((rangeFrom == NULL) || (*rangeFrom == 0)) && 
       ((rangeTo == NULL) || (*rangeTo == 0)))
   {
-    alarmMgr.badInput(clientIp, "invalid expression - no right-hand-value in filter operation");
     return false;
   }
 
@@ -1133,7 +1350,16 @@ static bool addBsonFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      double from;
+      double to;
+
+      if ((rangeIsDates(rangeFrom, rangeTo, &from, &to) == false) && 
+          ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false)))
+      {
+        return false;
+      }
+
+      bb.append("$gte", from).append("$lte", to);
       bob.append(k, bb.obj());
       f = bob.obj();
     }
@@ -1144,7 +1370,8 @@ static bool addBsonFilter
       for (unsigned int ix = 0; ix < valVector.size(); ++ix)
       {
         double d;
-        if (str2double(valVector[ix], &d))
+
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           ba.append(d);
@@ -1163,9 +1390,16 @@ static bool addBsonFilter
     else
     {
       double d;
+      bool   isDate = false;
+
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
 
       // Single value
-      if (str2double(right, &d))
+      if (isDate || str2double(right, &d))
       {
         // number
         bb.append("$in", BSON_ARRAY(d));
@@ -1210,7 +1444,22 @@ static bool addBsonFilter
   {
     if (std::string(rangeFrom) != "")
     {
-      bb.append("$gte", atof(rangeFrom)).append("$lte", atof(rangeTo));
+      double from;
+      double to;
+      double fromSeconds = 0;
+      double toSeconds   = 0;
+
+      if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
+      {
+        from = fromSeconds;
+        to   = toSeconds;
+      }
+      else if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
+      {
+        return false;
+      }
+
+      bb.append("$gte", from).append("$lte", to);
       bb2.append("$exists", true).append("$not", bb.obj());
       bob.append(k, bb2.obj());
       f = bob.obj();
@@ -1223,7 +1472,7 @@ static bool addBsonFilter
       {
         double d;
 
-        if (str2double(valVector[ix], &d))
+        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
           ba.append(d);
@@ -1242,9 +1491,16 @@ static bool addBsonFilter
     else
     {
       double d;
+      bool   isDate = false;
+
+      if ((std::string(right) == "DATE") && (seconds != -1))
+      {
+        d      = seconds;
+        isDate = true;
+      }
 
       // Single value
-      if (str2double(right, &d))
+      if (isDate || str2double(right, &d))
       {
         // number
         bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
@@ -1288,67 +1544,86 @@ static bool addBsonFilter
   }
   else if (opr == ">")
   {
-    bb.append("$gt", atof(right));
+    double d;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+    
+    bb.append("$gt", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == "<")
   {
-    bb.append("$lt", atof(right));
+    double d;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+    
+    bb.append("$lt", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == ">=")
   {
-    bb.append("$gte", atof(right));
+    double d;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    bb.append("$gte", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == "<=")
   {
-    bb.append("$lte", atof(right));
+    double d;
+
+    if ((std::string(right) == "DATE") && (seconds != -1))
+    {
+      d = seconds;
+    }
+    else if (str2double(right, &d) == false)
+    {
+      return false;
+    }
+
+    bb.append("$lte", d);
     bob.append(k, bb.obj());
     f = bob.obj();
   }
   else if (opr == OPR_EXIST)
   {
-    if (std::string(right) == ENT_ENTITY_TYPE)
-    {
-      // Special case: entity type
-      k = std::string("_id.") + ENT_ENTITY_TYPE;
+    k = std::string(ENT_ATTRS) + "." + right;
 
-      bb.append("$exists", true).append("$ne", "");
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else
-    {
-      // Regular attribute
-      k = std::string(ENT_ATTRS) + "." + right;
-
-      bb.append("$exists", true);
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
+    bb.append("$exists", true);
+    bob.append(k, bb.obj());
+    f = bob.obj();
   }
   else if (opr == OPR_NOT_EXIST)
   {
-    if (std::string(right) == ENT_ENTITY_TYPE)
-    {
-      // Special case: entity type
-      k = std::string("_id.") + ENT_ENTITY_TYPE;
-      bb.append("$exists", false);
-      bb2.append(k, bb.obj());
-      f = BSON("$or" << BSON_ARRAY(BSON(k << "") << bb2.obj()));
-    }
-    else
-    {
-      // Regular attribute
-      k = std::string(ENT_ATTRS) + "." + right;
-      bb.append("$exists", false);
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
+    k = std::string(ENT_ATTRS) + "." + right;
+    bb.append("$exists", false);
+    bob.append(k, bb.obj());
+    f = bob.obj();
   }
   else
   {
@@ -1409,7 +1684,7 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
   {
     char*               left;
     char*               op;
-    char*               right;
+    char*               right     = NULL;
     char*               rangeFrom = (char*) "";
     char*               rangeTo   = (char*) "";
     std::vector<char*>  valVector;
@@ -1563,7 +1838,7 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
               // If not inside queotes, we are on a comma, so a new value is to be pushed onto the value vector.
               //
 
-              // 2. Remove beginning quote, if there
+              // 2. Remove beginning quote, if there is one
               if (*start == '\'')
               {
                 *start = 0;
@@ -1596,10 +1871,25 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
 
     str = NULL;  // So that strtok_r continues eating the initial string
 
+    //
+    // Is the right-hand-side a DATE?
+    // If so, convert it to unix seconds since epoch
+    //
+    int64_t seconds = -1;
+
+    if (right != NULL)
+    {
+      if ((seconds = parse8601Time(right)) != -1)
+      {
+        right = (char*) "DATE";  // value of the date is passed in 'seconds'
+      }
+    }
+
+
     /* Build the BSON filter (or evaluate on cerP) */
     if (cerP == NULL)
     {
-      if (addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters) == false)
+      if (addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters, seconds) == false)
       {
         retval = false;
         break;
@@ -1607,7 +1897,7 @@ bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, Contex
     }
     else
     {
-      if (!matchFilter(left, opr, right, rangeFrom, rangeTo, valVector, cerP))
+      if (!matchFilter(left, opr, right, rangeFrom, rangeTo, valVector, cerP, seconds))
       {
         retval = false;
         break;
@@ -1651,6 +1941,26 @@ static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
   }
 }
 
+/* ****************************************************************************
+*
+* sortCriteria -
+*
+*/
+static std::string sortCriteria(const std::string& sortToken)
+{
+  if (sortToken == DATE_CREATED)
+  {
+    return ENT_CREATION_DATE;
+  }
+
+  if (sortToken == DATE_MODIFIED)
+  {
+    return ENT_MODIFICATION_DATE;
+  }
+
+  return std::string(ENT_ATTRS) + "." + sortToken + "." + ENT_ATTRS_VALUE;
+}
+
 
 
 /* ****************************************************************************
@@ -1681,7 +1991,11 @@ bool entitiesQuery
   int                              limit,
   bool*                            limitReached,
   long long*                       countP,
-  bool*                            badInputP
+  bool*                            badInputP,
+  const std::string&               sortOrderList,
+  bool                             includeCreDate,
+  bool                             includeModDate,
+  const std::string&               apiVersion
 )
 {
 
@@ -1743,7 +2057,7 @@ bool entitiesQuery
       // FIXME P5: NGSI "v1" filter, probably to be removed in the future
       addFilterScope(sco, filters);
     }
-    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED)
+    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED || sco->type == FIWARE_LOCATION_V2)
     {
       geoScopes++;
       if (geoScopes > 1)
@@ -1754,10 +2068,19 @@ bool entitiesQuery
       {
         BSONObj areaQuery;
 
-        if (processAreaScope(sco, areaQuery))
+        bool result;
+        if (sco->type == FIWARE_LOCATION_V2)
+        {
+          result = processAreaScopeV2(sco, areaQuery);
+        }
+        else // FIWARE Location NGSIv1 (legacy)
+        {
+          result = processAreaScope(sco, areaQuery);
+        }
+
+        if (result)
         {
           std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-
           finalQuery.append(locCoords, areaQuery);
         }
       }
@@ -1767,7 +2090,7 @@ bool entitiesQuery
       // FIXME P4: Once issue #1705 is implemented, this check can be removed.
       if (qStringFilters(sco->value, filters) != true)
       {
-        if (badInputP)
+        if (badInputP)  // Bad Input reported by higher level
         {
           *badInputP = true;
           *err       = "invalid query expression";
@@ -1794,7 +2117,43 @@ bool entitiesQuery
   auto_ptr<DBClientCursor>  cursor;
   Query                     query(finalQuery.obj());
 
-  query.sort(BSON(ENT_CREATION_DATE << 1));
+  if (sortOrderList == "")
+  {
+    query.sort(BSON(ENT_CREATION_DATE << 1));
+  }
+  else if ((sortOrderList == ORDER_BY_PROXIMITY))
+  {
+    // In this case the solution is not setting any query.sort(), as the $near operator will do the
+    // sorting itself. Of course, using orderBy=geo:distance without using georel=near will return
+    // unexpected ordering, but this is already warned in the documentation.
+  }
+  else
+  {
+    std::vector<std::string>  sortedV;
+    int components = stringSplit(sortOrderList, ',', sortedV);
+    BSONObjBuilder sortOrder;
+    for (int ix = 0; ix < components; ix++)
+    {
+      std::string  sortToken;
+      int          sortDirection;
+
+      if (sortedV[ix][0] == '!')
+      {
+        // reverse
+        sortToken     = sortedV[ix].substr(1);
+        sortDirection = -1;
+      }
+      else
+      {
+        sortToken     = sortedV[ix];
+        sortDirection = 1;
+      }
+
+      sortOrder.append(sortCriteria(sortToken), sortDirection);
+    }
+
+    query.sort(sortOrder.obj());
+  }
 
   TIME_STAT_MONGO_READ_WAIT_START();
   DBClientBase* connection = getMongoConnection();
@@ -1879,7 +2238,7 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, includeCreDate, includeModDate, apiVersion);
     cer->statusCode.fill(SccOk);
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */

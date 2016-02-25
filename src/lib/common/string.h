@@ -153,21 +153,36 @@ extern std::string servicePathCheck(const char* servicePath);
 *
 * str2double - is the string a correct float (double)?
 */
-extern bool str2double(char* s, double* dP = NULL);
+extern bool str2double(const char* s, double* dP = NULL);
 
 
 
 /* ****************************************************************************
 *
 * toString -
+*
+* If the generic ostringstream-based implementation would have performance
+* problems in the future, a set of per-type specialized functions could be
+* used without changing the toString() usage interface from existing callers
+*
 */
 template <typename T> std::string toString(T t)
-{
+{      
   std::ostringstream ss;
 
   ss << t;
 
   return ss.str();
 }
+
+
+
+/*****************************************************************************
+*
+* isodate2str -
+*
+*/
+extern std::string isodate2str(long long timestamp);
+
 
 #endif  // SRC_LIB_COMMON_STRING_H_

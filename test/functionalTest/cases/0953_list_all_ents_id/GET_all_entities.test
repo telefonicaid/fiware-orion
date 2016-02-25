@@ -118,7 +118,7 @@ Date: REGEX(.*)
 ==================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -168,7 +168,7 @@ Date: REGEX(.*)
 =================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T1
 Date: REGEX(.*)
 
 
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 06. GET /v2/entities?id=E1,E2
 =============================
 HTTP/1.1 200 OK
-Content-Length: 168
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -193,9 +193,9 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": {
-                "i1": 1.0,
+                "i1": 1,
                 "s1": "s"
             }
         },
@@ -208,7 +208,7 @@ Date: REGEX(.*)
 07. GET /v2/entities?id=E2,E3
 =============================
 HTTP/1.1 200 OK
-Content-Length: 91
+Content-Length: 86
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -216,9 +216,9 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": {
-                "i1": 1.0,
+                "i1": 1,
                 "s1": "s"
             }
         },

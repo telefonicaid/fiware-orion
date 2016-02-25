@@ -125,7 +125,7 @@ Date: REGEX(.*)
 ===================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T
 Date: REGEX(.*)
 
 
@@ -134,7 +134,7 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T
 Date: REGEX(.*)
 
 
@@ -150,7 +150,7 @@ Date: REGEX(.*)
 05. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 569
+Content-Length: 563
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -168,13 +168,13 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 10.000000
+            "type" : "none",
+            "value" : 10
           },
           {
             "name" : "B",
-            "type" : "",
-            "value" : 20.000000
+            "type" : "none",
+            "value" : 20
           }
         ]
       },
@@ -187,7 +187,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 677
+Content-Length: 668
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -205,18 +205,18 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "B",
-            "type" : "",
-            "value" : 30.000000
+            "type" : "none",
+            "value" : 30
           },
           {
             "name" : "C",
-            "type" : "",
-            "value" : 40.000000
+            "type" : "none",
+            "value" : 40
           },
           {
             "name" : "A",
-            "type" : "",
-            "value" : 50.000000
+            "type" : "none",
+            "value" : 50
           }
         ]
       },

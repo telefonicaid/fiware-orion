@@ -1,0 +1,186 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Get entities by id parameter
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity E with A1 (without metadata) and A2 (with metadata M2)
+# 02. Get entity: E, A1, A2 and M2 types are "none"
+# 03. Append new attribute A3 (without metadata) and A4 (with metadata M4)
+# 04. Get entity: E, A1, A2, A4, A4, M2, M4 types are "none"
+#
+
+
+echo "01. Create entity E with A1 (without metadata) and A2 (with metadata M2)"
+echo "========================================================================"
+payload='{
+  "id": "E",
+  "A1": {
+    "value": "foo1"
+  },
+  "A2": {
+    "value": "foo2",
+    "metadata": {
+      "M2": {
+        "value": "bar2"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Get entity: E, A1, A2 and M2 types are none"
+echo "==============================================="
+orionCurl --url /v2/entities/E --json
+echo
+echo
+
+
+echo "03. Append new attribute A3 (without metadata) and A4 (with metadata M4)"
+echo "========================================================================"
+payload='{
+  "A3": {
+    "value": "foo3"
+  },
+  "A4": {
+    "value": "foo4",
+    "metadata": {
+      "M4": {
+        "value": "bar4"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Get entity: E, A1, A2, A4, A4, M2, M4 types are none"
+echo "========================================================"
+orionCurl --url /v2/entities/E --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with A1 (without metadata) and A2 (with metadata M2)
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=none
+Date: REGEX(.*)
+
+
+
+02. Get entity: E, A1, A2 and M2 types are none
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 159
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": "foo1"
+    },
+    "A2": {
+        "metadata": {
+            "M2": {
+                "type": "none",
+                "value": "bar2"
+            }
+        },
+        "type": "none",
+        "value": "foo2"
+    },
+    "id": "E",
+    "type": "none"
+}
+
+
+03. Append new attribute A3 (without metadata) and A4 (with metadata M4)
+========================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Get entity: E, A1, A2, A4, A4, M2, M4 types are none
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 294
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": "foo1"
+    },
+    "A2": {
+        "metadata": {
+            "M2": {
+                "type": "none",
+                "value": "bar2"
+            }
+        },
+        "type": "none",
+        "value": "foo2"
+    },
+    "A3": {
+        "metadata": {},
+        "type": "none",
+        "value": "foo3"
+    },
+    "A4": {
+        "metadata": {
+            "M4": {
+                "type": "none",
+                "value": "bar4"
+            }
+        },
+        "type": "none",
+        "value": "foo4"
+    },
+    "id": "E",
+    "type": "none"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -38,7 +38,6 @@ CONTEXT_BROKER_ENV = u'context_broker_env'
 MONGO_ENV = u'mongo_env'
 
 properties_class = Properties()
-props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
 
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
@@ -122,75 +121,81 @@ def create_an_entity_in_raw(context, mode):
 
 # ------------------------ update, append and replace -----------------------------------------------
 
-@step(u'update or append attributes by ID "([^"]*)"')
-def update_or_append_an_attribute_by_id(context, entity_id):
+@step(u'update or append attributes by ID "([^"]*)" and with "([^"]*)" mode')
+def update_or_append_an_attribute_by_id(context, entity_id, mode):
     """
     update or append attributes by ID
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized |behave keyValues)
     """
     __logger__.debug("updating or appending an attribute by id...")
-    context.resp = context.cb.update_or_append_an_attribute_by_id("POST", context, entity_id)
+    context.resp = context.cb.update_or_append_an_attribute_by_id("POST", context, entity_id, mode)
     __logger__.info("...updated or appended an attribute by id")
 
 
-@step(u'update or append attributes by ID "([^"]*)" in raw mode')
-def update_or_append_an_attribute_by_ID_in_raw_mode(context, entity_id):
+@step(u'update or append attributes by ID "([^"]*)" in raw and "([^"]*)" modes')
+def update_or_append_an_attribute_by_ID_in_raw_mode(context, entity_id, mode):
     """
     update or append attributes by ID in raw mode
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized |behave keyValues)
     """
     __logger__.debug("updating or appending an attribute by id in raw mode...")
-    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("POST", context, entity_id)
+    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("POST", context, entity_id, mode)
     __logger__.info("...updated or appended an attribute by id in raw mode")
 
 
-@step(u'update an attribute by ID "([^"]*)" if it exists')
-def update_an_attribute_by_id_if_it_exists(context, entity_id):
+@step(u'update attributes by ID "([^"]*)" if it exists and with "([^"]*)" mode')
+def update_attributes_by_id_if_it_exists(context, entity_id, mode):
     """
-    update an attribute by ID if it exists
+    update attributes by ID if it exists
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized |behave keyValues)
     """
-    __logger__.debug("updating or appending an attribute by id if it exists...")
-    context.resp = context.cb.update_or_append_an_attribute_by_id("PATCH", context, entity_id)
-    __logger__.info("...updated or appended an attribute by id if it exists")
+    __logger__.debug("updating attributes by id if it exists (PATCH)...")
+    context.resp = context.cb.update_or_append_an_attribute_by_id("PATCH", context, entity_id, mode)
+    __logger__.info("...updated attributes by id if it exists")
 
 
-@step(u'update an attribute by ID "([^"]*)" if it exists in raw mode')
-def update_an_attribute_by_id_if_it_exists_in_raw_mode(context, entity_id):
+@step(u'update attributes by ID "([^"]*)" if it exists in raw and "([^"]*)" modes')
+def update_attributse_by_id_if_it_exists_in_raw_mode(context, entity_id, mode):
     """
-    update or append attributes by ID in raw mode
+    update attributes by ID if it exists in raw mode
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized | keyValues)
     """
-    __logger__.debug("updating or appending an attribute by id in raw mode if it exists...")
-    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("PATCH", context, entity_id)
-    __logger__.info("...updated or appended an attribute by id in raw mode if it exists")
+    __logger__.debug("updating attributes by id in raw mode if it exists (PATCH)...")
+    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("PATCH", context, entity_id, mode)
+    __logger__.info("...updated attributes by id in raw mode if it exists")
 
 
-@step(u'replace attributes by ID "([^"]*)"')
-def replace_attributes_by_id(context, entity_id):
+@step(u'replace attributes by ID "([^"]*)" if it exists and with "([^"]*)" mode')
+def replace_attributes_by_id(context, entity_id, mode):
     """
     replace attributes by ID
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized | keyValues)
     """
     __logger__.debug("replacing attributes by id...")
-    context.resp = context.cb.update_or_append_an_attribute_by_id("PUT", context, entity_id)
+    context.resp = context.cb.update_or_append_an_attribute_by_id("PUT", context, entity_id, mode)
     __logger__.info("...replaced attributes by id")
 
 
-@step(u'replace attributes by ID "([^"]*)" in raw mode')
-def replace_attributes_by_idin_raw_mode(context, entity_id):
+@step(u'replace attributes by ID "([^"]*)" if it exists in raw and "([^"]*)" modes')
+def replace_attributes_by_idin_raw_mode(context, entity_id, mode):
     """
     replace attributes by ID
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param entity_id: entity ID
+    :param mode: mode in that will be created attributes in request ( normalized | keyValues)
     """
     __logger__.debug("replacing attributes by id in raw mode...")
-    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("PUT", context, entity_id)
+    context.resp = context.cb.update_or_append_an_attribute_in_raw_by_id("PUT", context, entity_id, mode)
     __logger__.info("...replaced attributes by id in raw mode")
 
 
@@ -255,6 +260,7 @@ def entities_are_stored_in_mongo(context):
     verify that entities are stored in mongo
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     __logger__.debug(" >> verifying entities are stored in mongo")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
@@ -269,6 +275,7 @@ def entities_are_not_stored_in_mongo(context):
     verify that entities are not stored in mongo
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     __logger__.debug(" >> verifying entities are not stored in mongo")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
@@ -283,6 +290,7 @@ def verify_that_an_entity_is_updated_in_mongo(context):
     verify that an entity is updated in mongo
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     __logger__.debug(" >> verifying that an entity is updating in mongo")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])

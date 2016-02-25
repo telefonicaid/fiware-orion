@@ -63,11 +63,20 @@ typedef struct Scope
   orion::AreaType     areaType;
   orion::Circle       circle;
   orion::Polygon      polygon;
+  orion::Point        point;
+  orion::Line         line;
+  orion::Box          box;
+  orion::Georel       georel;
 
   Scope();
   Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
 
-  int          fill(orion::Geometry* geometry,  const std::vector<std::string>& coordsV, std::string* errorString);
+  int          fill(const std::string&  apiVersion,
+                    const std::string&  geometry,
+                    const std::string&  coords,
+                    const std::string&  georelString,
+                    std::string*        errorString);
+
   std::string  render(Format format, const std::string& indent, bool notLastInVector);
   void         present(const std::string& indent, int ix);
   void         release(void);
@@ -77,6 +86,7 @@ typedef struct Scope
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+  void         areaTypeSet(const std::string& areaTypeString);
 } Scope;
 
 #endif  // SRC_LIB_NGSI_SCOPE_H_

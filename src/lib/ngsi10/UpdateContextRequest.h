@@ -33,6 +33,7 @@
 #include "ngsi/UpdateActionType.h"
 #include "rest/ConnectionInfo.h"
 #include "apiTypesV2/Entity.h"
+#include "apiTypesV2/Entities.h"
 
 
 
@@ -96,7 +97,10 @@ typedef struct UpdateContextRequest
   void         fill(const Entity* entP, const std::string& _updateActionType);
   void         fill(const std::string&   entityId,
                     ContextAttribute*    attributeP,
-                    const std::string&   _updateActionType);
+                    const std::string&   _updateActionType,
+                    const std::string&   type = "");
+
+  void         fill(Entities* entities, const std::string& _updateActionType);
 } UpdateContextRequest;
 
 #endif

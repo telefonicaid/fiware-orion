@@ -91,7 +91,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
-  if (*val == 0)
+  if (val == NULL || *val == 0)
   {
     OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
     ciP->httpStatusCode = SccBadRequest;
@@ -213,7 +213,9 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
   }
   else
+  {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
+  }
 
   if (val != NULL)
   {
@@ -235,7 +237,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   //
   bool containsForbiddenChars = false;
 
-  if (key == "geometry")
+  if ((key == "geometry") || (key == "georel"))
   {
     containsForbiddenChars = forbiddenChars(val, "=;");
   }

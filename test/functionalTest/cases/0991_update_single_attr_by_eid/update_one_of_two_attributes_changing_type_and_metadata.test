@@ -105,7 +105,7 @@ echo
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -113,20 +113,20 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 to see A1==1 and A2==1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 123
+Content-Length: 113
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
-        "value": 1.0
+        "type": "none",
+        "value": 1
     },
     "A2": {
         "metadata": {},
-        "type": null,
-        "value": 1.0
+        "type": "none",
+        "value": 1
     },
     "id": "E1",
     "type": "T1"
@@ -144,20 +144,20 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 to see A1==3 and A2==1 (A2 untouched)
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 123
+Content-Length: 113
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
-        "value": 3.0
+        "type": "none",
+        "value": 3
     },
     "A2": {
         "metadata": {},
-        "type": null,
-        "value": 1.0
+        "type": "none",
+        "value": 1
     },
     "id": "E1",
     "type": "T1"
@@ -175,7 +175,7 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 to see metadata m1 and m2
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 191
+Content-Length: 178
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -183,21 +183,21 @@ Date: REGEX(.*)
     "A1": {
         "metadata": {
             "m1": {
-                "type": null,
-                "value": 55.0
+                "type": "none",
+                "value": 55
             },
             "m2": {
-                "type": null,
+                "type": "none",
                 "value": "55"
             }
         },
-        "type": null,
-        "value": 5.0
+        "type": "none",
+        "value": 5
     },
     "A2": {
         "metadata": {},
-        "type": null,
-        "value": 1.0
+        "type": "none",
+        "value": 1
     },
     "id": "E1",
     "type": "T1"
@@ -215,7 +215,7 @@ Date: REGEX(.*)
 08. GET /v2/entities/E1 to see A2::type == 'newtype'
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 193
+Content-Length: 185
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -223,16 +223,16 @@ Date: REGEX(.*)
     "A1": {
         "metadata": {
             "m1": {
-                "type": null,
-                "value": 55.0
+                "type": "none",
+                "value": 55
             },
             "m2": {
-                "type": null,
+                "type": "none",
                 "value": "55"
             }
         },
-        "type": null,
-        "value": 5.0
+        "type": "none",
+        "value": 5
     },
     "A2": {
         "metadata": {},

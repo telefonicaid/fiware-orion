@@ -100,7 +100,7 @@ echo
 =================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -109,7 +109,7 @@ Date: REGEX(.*)
 =================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T1
 Date: REGEX(.*)
 
 
@@ -118,7 +118,7 @@ Date: REGEX(.*)
 ====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T1
 Date: REGEX(.*)
 
 
@@ -126,23 +126,23 @@ Date: REGEX(.*)
 04. GET entities that has A1 (see E1,E3)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 98
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A1": 1.0,
-        "A2": 2.0,
-        "A3": 3.0,
+        "A1": 1,
+        "A2": 2,
+        "A3": 3,
         "id": "E1",
         "type": "T1"
     },
     {
-        "A1": 1.0,
-        "A2": 2.0,
-        "A4": 4.0,
-        "A5": 5.0,
+        "A1": 1,
+        "A2": 2,
+        "A4": 4,
+        "A5": 5,
         "id": "E3",
         "type": "T1"
     }
@@ -152,15 +152,15 @@ Date: REGEX(.*)
 05. GET entities that does NOT have A1 (see E2)
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 67
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A2": 1.0,
-        "A3": 3.0,
-        "A4": 4.0,
+        "A2": 1,
+        "A3": 3,
+        "A4": 4,
         "id": "E2",
         "type": "T1"
     }

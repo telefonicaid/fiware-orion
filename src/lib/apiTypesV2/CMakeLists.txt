@@ -27,6 +27,8 @@ SET (SOURCES
     ErrorCode.cpp
     Attribute.cpp
     Subscription.cpp
+    BatchQuery.cpp
+    BatchUpdate.cpp
 )
 
 SET (HEADERS
@@ -36,6 +38,8 @@ SET (HEADERS
     ErrorCode.h
     Attribute.h
     Subscription.h
+    BatchQuery.h
+    BatchUpdate.h
 )
 
 

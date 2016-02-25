@@ -40,6 +40,46 @@
 */
 #define FIWARE_LOCATION             "FIWARE::Location"
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
+#define FIWARE_LOCATION_V2          "FIWARE::Location::NGSIv2"
+
+#define EARTH_RADIUS_METERS     6371000
+
+#define LOCATION_WGS84          "WGS84"
+#define LOCATION_WGS84_LEGACY   "WSG84"    /* We fixed the right string at 0.17.0, but the old one needs to be mantained */
+
+
+
+/* ****************************************************************************
+*
+* "geo:" types
+*/
+#define GEO_POINT    "geo:point"
+#define GEO_LINE     "geo:line"
+#define GEO_BOX      "geo:box"
+#define GEO_POLYGON  "geo:polygon"
+
+
+/* ****************************************************************************
+*
+* Special orderBy keywords
+*/
+#define ORDER_BY_PROXIMITY "geo:distance"
+
+
+/* ****************************************************************************
+*
+* other special types
+*/
+#define DATE_TYPE     "date"
+#define DEFAULT_TYPE  "none"
+
+
+/* ****************************************************************************
+*
+* virtual attributes
+*/
+#define DATE_CREATED   "dateCreated"
+#define DATE_MODIFIED  "dateModified"
 
 
 /* ****************************************************************************

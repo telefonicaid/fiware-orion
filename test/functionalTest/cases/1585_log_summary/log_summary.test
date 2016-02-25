@@ -41,7 +41,6 @@ brokerStart CB 0 IPv4 -logSummary 3
 # 07. GET /v2/entities (just to clear out Bad Input)
 # 08. Sleep 3 secs, awaiting a second log summary
 # 09. grep SUMMARY in log-file (1 transaction and NO bad input since last time, also, Bad Input is no longer active)
-
 # 10. PUT /v2/noService
 # 11. Sleep 3 secs, awaiting a second log summary
 # 12. grep SUMMARY in log-file (1 transaction and one bad input since last time)
@@ -79,6 +78,7 @@ echo
 echo "05. Sleep 3 secs, awaiting a log summary report"
 echo "==============================================="
 sleep 3
+valgrindSleep 5
 echo
 echo
 
@@ -100,6 +100,7 @@ echo
 echo "08. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
 sleep 3
+valgrindSleep 5
 echo
 echo
 
@@ -121,6 +122,7 @@ echo
 echo "11. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
 sleep 3
+valgrindSleep 5
 echo
 echo
 

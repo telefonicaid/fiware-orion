@@ -41,7 +41,9 @@ static const char* validOptions[] =
   "values",
   "keyValues",
   "text",
-  "append"
+  "append",
+  DATE_CREATED,
+  DATE_MODIFIED
 };
 
 

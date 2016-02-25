@@ -344,7 +344,14 @@ std::string postQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP));
+  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
+                                                      qcrsP,
+                                                      ciP->tenant,
+                                                      ciP->servicePathV,
+                                                      ciP->uriParam,
+                                                      ciP->uriParamOptions,
+                                                      countP,
+                                                      ciP->apiVersion));
 
   if (qcrsP->errorCode.code == SccBadRequest)
   {

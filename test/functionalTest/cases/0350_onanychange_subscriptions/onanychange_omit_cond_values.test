@@ -102,7 +102,7 @@ orionCurl --url /v1/contextEntities --payload "${payload}" --json
 echo
 echo
 
-
+valgrindSleep 10
 echo "04. Update A1 (notification)"
 echo "============================"
 payload='{
@@ -112,7 +112,7 @@ orionCurl --url /v1/contextEntities/E1/attributes/A1 --payload "$payload" --json
 echo
 echo
 
-
+valgrindSleep 10
 echo "05. Update A2 (notification)"
 echo "============================"
 payload='{
@@ -135,6 +135,7 @@ echo
 
 echo "Get accumulator dump (4 notifications)"
 echo "===================================="
+valgrindSleep 5
 accumulatorDump
 echo
 echo

@@ -73,7 +73,7 @@ def get_an_attribute_by_id(context, attribute_name, entity_id):
     :param entity_id: id of the entity
     """
     __logger__.debug("getting an attribute by id...")
-    context.resp = context.cb.list_an_attribute_by_id(attribute_name, entity_id)
+    context.resp = context.cb.list_an_attribute_by_id(context, attribute_name, entity_id)
     __logger__.info("...returned an attribute by id")
 
 
@@ -88,13 +88,13 @@ def initialize_the_entity_group_recorder(context):
 @step(u'record entity group')
 def accumulate_entity_group(context):
     """
-    accumulate context of entities for use with the returned lists
+    record context of entities for use with validation steps
     :param context:It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     entity = {}
     entity = context.cb.get_entity_context()
-    context.entities_accumulate.append(copy.deepcopy(entity))
-    __logger__.debug("accumulate after: %s" % str(context.entities_accumulate))
+    context.entities_accumulate.append(copy.copy(entity))
+    __logger__.debug("entity groups record after: %s" % str(context.entities_accumulate))
 
 
 @step(u'get an attribute value by ID "([^"]*)" and attribute name "([^"]*)" if it exists')
@@ -124,18 +124,17 @@ def get_entity_types(context):
 # ------------------------------------- validations ----------------------------------------------
 
 
-@step(u'verify that any entities are returned')
-@step(u'verify that all entities are returned')
-def verify_get_all_entities(context):
+@step(u'verify that "([^"]*)" entities are returned')
+def verify_get_all_entities(context, entities_returned):
     """
     verify get all entities
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
-    __logger__.debug("Verifying all entities are returned in get request...")
+    __logger__.debug("Verifying %s entities are returned in get request..." % entities_returned)
     queries_parameters = context.cb.get_entities_parameters()
     ngsi = NGSI()
-    ngsi.verify_get_all_entities(queries_parameters, context.entities_accumulate, context.resp)
-    __logger__.info("...Verified all entities are returned in get request...")
+    ngsi.verify_get_all_entities(queries_parameters, context.entities_accumulate, context.resp, entities_returned)
+    __logger__.info("...Verified %s entities are returned in get request" % entities_returned)
 
 
 @step(u'verify an entity in raw mode with type "([^"]*)" in attribute value from http response')

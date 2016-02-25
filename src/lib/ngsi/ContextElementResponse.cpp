@@ -130,7 +130,15 @@ static bool includedAttribute(const ContextAttribute& attr, const AttributeList&
 *
 * Note that statusCode is not touched by this constructor.
 */
-ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, const AttributeList& attrL, bool includeEmpty)
+ContextElementResponse::ContextElementResponse
+(
+  const mongo::BSONObj&  entityDoc,
+  const AttributeList&   attrL,
+  bool                   includeEmpty,
+  bool                   includeCreDate,
+  bool                   includeModDate,
+  const std::string&     apiVersion
+)
 {
   prune = false;
 
@@ -236,11 +244,14 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
       caP->metadataVector.push_back(md);
     }
 
-    /* Setting location metatda (if found) */
-    if (locAttr == ca.name)
+    if (apiVersion == "v1")
     {
-      Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
-      caP->metadataVector.push_back(md);
+      /* Setting location metadata (if found) */
+      if (locAttr == ca.name)
+      {
+        Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
+        caP->metadataVector.push_back(md);
+      }
     }
 
     /* Setting custom metadata (if any) */
@@ -257,6 +268,20 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
 
     contextElement.contextAttributeVector.push_back(caP);
   }
+
+  /* creDate and modDate as "virtual" attributes. The entityDoc.hasField(...) part is a safety meassure to prevent entities created with
+   * very old Orion version which didn't implement creation/modification date */
+  if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_CREATION_DATE));
+    contextElement.contextAttributeVector.push_back(caP);
+  }
+
+  if (includeModDate && entityDoc.hasField(ENT_MODIFICATION_DATE))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_MODIFICATION_DATE));
+    contextElement.contextAttributeVector.push_back(caP);
+  }
 }
 
 
@@ -267,9 +292,9 @@ ContextElementResponse::ContextElementResponse(const mongo::BSONObj& entityDoc, 
 *
 * This constructor builds the CER from a CEP. Note that statusCode is not touched.
 */
-ContextElementResponse::ContextElementResponse(ContextElement* ceP)
+ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefaultType)
 {
-  contextElement.fill(ceP);
+  contextElement.fill(ceP, useDefaultType);
 }
 
 

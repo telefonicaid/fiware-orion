@@ -121,6 +121,8 @@ typedef enum RequestType
   EntityAllTypesRequest,
   SubscriptionsRequest,
   IndividualSubscriptionRequest,
+  BatchQueryRequest,
+  BatchUpdateRequest,
 
   InvalidRequest = 100
 } RequestType;

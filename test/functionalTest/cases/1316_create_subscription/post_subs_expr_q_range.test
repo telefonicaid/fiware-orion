@@ -164,7 +164,7 @@ Date: REGEX(.*)
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T
 Date: REGEX(.*)
 
 
@@ -220,7 +220,7 @@ Date: REGEX(.*)
 09. Get accumulator dump (4 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 471
+Content-Length: 468
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -238,8 +238,8 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "temperature",
-            "type" : "",
-            "value" : 20.000000
+            "type" : "none",
+            "value" : 20
           }
         ]
       },
@@ -252,7 +252,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 471
+Content-Length: 468
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -270,8 +270,8 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "temperature",
-            "type" : "",
-            "value" : 25.000000
+            "type" : "none",
+            "value" : 25
           }
         ]
       },
@@ -284,7 +284,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 471
+Content-Length: 468
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -302,8 +302,8 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "temperature",
-            "type" : "",
-            "value" : 35.000000
+            "type" : "none",
+            "value" : 35
           }
         ]
       },
@@ -316,7 +316,7 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 471
+Content-Length: 468
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -334,8 +334,8 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "temperature",
-            "type" : "",
-            "value" : 40.000000
+            "type" : "none",
+            "value" : 40
           }
         ]
       },
