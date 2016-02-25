@@ -66,16 +66,17 @@ std::string deleteEntity
 )
 {
   string  answer;
-  Entity* eP    = new Entity();
-
-  eP->id   = compV[2];
-  eP->type = ciP->uriParam["type"];
+  Entity* eP;
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {
     OrionError oe(SccBadRequest, INVAL_CHAR_URI);
     return oe.render(ciP, "");
   }
+
+  eP       = new Entity();
+  eP->id   = compV[2];
+  eP->type = ciP->uriParam["type"];
 
   if (compV.size() == 5)  // Deleting an attribute
   {

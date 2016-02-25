@@ -199,18 +199,24 @@ int Scope::fill
     if (coords != 2)
     {
       *errorStringP = "invalid point in URI param /coords/";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
     if (!str2double(coordV[0].c_str(), &latitude))
     {      
       *errorStringP = "invalid coordinates";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
     if (!str2double(coordV[1].c_str(), &longitude))
     {
       *errorStringP = "invalid coordinates";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
