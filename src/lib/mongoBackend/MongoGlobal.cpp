@@ -1065,13 +1065,34 @@ static bool matchFilter
     }
   }
 
-  /* For binary operators, the left side is the name of the attribute to check */
-  ContextAttribute* ca = cerP->contextElement.getAttribute(left);
+  /* For binary operators, the left side is the name of the attribute to check or the dateCreated/dateModified special keywords */
+  orion::ValueType valueType;
+  double           numberValue;
+  std::string      stringValue;
 
-  /* If the attribute does't exist, no need to go further: filter fails */
-  if (ca == NULL)
+  if (left == std::string(DATE_CREATED))
   {
-    return false;
+    valueType   = orion::ValueTypeNumber;
+    numberValue = cerP->contextElement.creDate;
+  }
+  else if (left == std::string(DATE_MODIFIED))
+  {
+    valueType   = orion::ValueTypeNumber;
+    numberValue = cerP->contextElement.modDate;
+  }
+  else
+  {
+    ContextAttribute* caP = cerP->contextElement.getAttribute(left);
+
+    /* If the attribute does't exist, no need to go further: filter fails */
+    if (caP == NULL)
+    {
+      return false;
+    }
+
+    valueType   = caP->valueType;
+    numberValue = caP->numberValue;
+    stringValue = caP->stringValue;
   }
 
   if (opr == "==")
@@ -1090,7 +1111,7 @@ static bool matchFilter
         return false;
       }
 
-      return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= from) && (ca->numberValue <= to));
+      return ((valueType == orion::ValueTypeNumber) && (numberValue >= from) && (numberValue <= to));
     }
     else if (valVector.size() > 0)
     {
@@ -1102,7 +1123,7 @@ static bool matchFilter
         if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
-          if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
+          if ((valueType == orion::ValueTypeNumber) && (numberValue == d))
           {
             return true;
           }
@@ -1110,7 +1131,7 @@ static bool matchFilter
         else
         {
           // string
-          if ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == valVector[ix]))
+          if ((valueType == orion::ValueTypeString) && (stringValue == valVector[ix]))
           {
             return true;
           }
@@ -1133,12 +1154,12 @@ static bool matchFilter
       if (isDate || str2double(right, &d))
       {
         // number
-        return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
+        return ((valueType == orion::ValueTypeNumber) && (numberValue == d));
       }
       else
       {
         // string
-        return ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == right));
+        return ((valueType == orion::ValueTypeString) && (stringValue == right));
       }
     }
   }
@@ -1165,7 +1186,7 @@ static bool matchFilter
         return false;
       }
 
-      return ((ca->valueType == orion::ValueTypeNumber) && ((ca->numberValue < from) || (ca->numberValue > to)));
+      return ((valueType == orion::ValueTypeNumber) && ((numberValue < from) || (numberValue > to)));
     }
     else if (valVector.size() > 0)
     {
@@ -1177,7 +1198,7 @@ static bool matchFilter
         if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
         {
           // number
-          if ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d))
+          if ((valueType == orion::ValueTypeNumber) && (numberValue == d))
           {
             return false;
           }
@@ -1185,7 +1206,7 @@ static bool matchFilter
         else
         {
           // string
-          if ((ca->valueType == orion::ValueTypeString) && (ca->stringValue == valVector[ix]))
+          if ((valueType == orion::ValueTypeString) && (stringValue == valVector[ix]))
           {
             return false;
           }
@@ -1208,32 +1229,29 @@ static bool matchFilter
       if (isDate || str2double(right, &d))
       {
         // number
-        return !((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue == d));
+        return !((valueType == orion::ValueTypeNumber) && (numberValue == d));
       }
       else
       {
         // string
-        return !((ca->valueType == orion::ValueTypeString) && (ca->stringValue == right));
+        return !((valueType == orion::ValueTypeString) && (stringValue == right));
       }
     }
   }
   else if (opr == ">")
   {
-    double d;
-    bool   isDate = false;
+    double d;    
 
     if ((std::string(right) == "DATE") && (seconds != -1))
     {
-      d      = seconds;
-      isDate = true;
+      d      = seconds;     
     }
-
-    if (isDate || str2double(right, &d) == false)
+    else if (str2double(right, &d) == false)
     {
       return false;
     }
 
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue > d));
+    return ((valueType == orion::ValueTypeNumber) && (numberValue > d));
   }
   else if (opr == "<")
   {
@@ -1248,7 +1266,7 @@ static bool matchFilter
       return false;
     }
 
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue < d));
+    return ((valueType == orion::ValueTypeNumber) && (numberValue < d));
   }
   else if (opr == ">=")
   {
@@ -1263,7 +1281,7 @@ static bool matchFilter
       return false;
     }
 
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue >= d));
+    return ((valueType == orion::ValueTypeNumber) && (numberValue >= d));
   }
   else if (opr == "<=")
   {
@@ -1278,7 +1296,7 @@ static bool matchFilter
       return false;
     }
 
-    return ((ca->valueType == orion::ValueTypeNumber) && (ca->numberValue <= d));
+    return ((valueType == orion::ValueTypeNumber) && (numberValue <= d));
   }
   else
   {
