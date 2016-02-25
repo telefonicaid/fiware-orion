@@ -2868,7 +2868,7 @@ static void updateEntity
   AttributeList emptyAttrL;
   ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
-  // The hasField() check is needed as the entity could has been created with very old Orion version not
+  // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
   notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getLongField(r, ENT_CREATION_DATE)     : -1;
   notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getLongField(r, ENT_MODIFICATION_DATE) : -1;
