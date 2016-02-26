@@ -46,7 +46,14 @@
 *
 * jsonRequestTreat - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP, std::vector<std::string>& compV)
+std::string jsonRequestTreat
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RequestType                requestType,
+  JsonDelayedRelease*        releaseP,
+  std::vector<std::string>&  compV
+)
 {
   std::string      answer;
   struct timespec  start;

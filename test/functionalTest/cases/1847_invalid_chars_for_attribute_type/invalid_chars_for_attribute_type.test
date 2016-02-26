@@ -35,14 +35,14 @@ brokerStart CB
 # 03. Make sure step 2 DID NOT modify E/A1
 # 04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail
 # 05. Make sure step 4 DID NOT modify E/A1
-# 06. Try to change A1 type to a string that is longer than 256 chars
+# 06. Try to change A1 type to a string that is longer than 256 chars, see it fail
 # 07. Make sure step 5 DID NOT modify E/A1
-# 08. Try to change A1, adding a metadata with empty name
+# 08. Try to change A1, adding a metadata with empty name, see it fail
 # 09. Make sure step 7 DID NOT modify E/A1
 #
 
-echo "01. Create entity E with attr A1, attr-type 'house<flat>'"
-echo "========================================================="
+echo "01. Create entity E with attr A1, attr-type 'house:flat'"
+echo "========================================================"
 payload='{
   "id": "E",
   "A1": {
@@ -91,8 +91,8 @@ echo
 echo
 
 
-echo "06. Try to change A1 type to a string that is longer than 256 chars"
-echo "==================================================================="
+echo "06. Try to change A1 type to a string that is longer than 256 chars, see it fail"
+echo "================================================================================"
 payload='{
   "value": 4,
   "type": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF=256+6"
@@ -109,8 +109,8 @@ echo
 echo
 
 
-echo "08. Try to change A1, adding a metadata with empty name"
-echo "======================================================="
+echo "08. Try to change A1, adding a metadata with empty name, see it fail"
+echo "===================================================================="
 payload='{
   "": "5678"
 }'
@@ -127,8 +127,8 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E with attr A1, attr-type 'house<flat>'
-=========================================================
+01. Create entity E with attr A1, attr-type 'house:flat'
+========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=none
@@ -198,8 +198,8 @@ Date: REGEX(.*)
 }
 
 
-06. Try to change A1 type to a string that is longer than 256 chars
-===================================================================
+06. Try to change A1 type to a string that is longer than 256 chars, see it fail
+================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 92
 Content-Type: application/json
@@ -229,8 +229,8 @@ Date: REGEX(.*)
 }
 
 
-08. Try to change A1, adding a metadata with empty name
-=======================================================
+08. Try to change A1, adding a metadata with empty name, see it fail
+====================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 82
 Content-Type: application/json
