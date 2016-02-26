@@ -35,6 +35,8 @@ brokerStart CB
 # 03. Make sure step 2 DID NOT modify E/A1
 # 04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail
 # 05. Make sure step 4 DID NOT modify E/A1
+# 06. Try to change A1 type to a string that is longer than 256 chars
+# 07. Make sure step 5 DID NOT modify E/A1
 #
 
 echo "01. Create entity E with attr A1, attr-type 'house<flat>'"
@@ -85,6 +87,26 @@ echo "========================================"
 orionCurl --url /v2/entities/E --json
 echo
 echo
+
+
+echo "06. Try to change A1 type to a string that is longer than 256 chars"
+echo "==================================================================="
+payload='{
+  "value": 4,
+  "type": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF=256+6"
+}'
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "07. Make sure step 5 DID NOT modify E/A1"
+echo "========================================"
+orionCurl --url /v2/entities/E --json
+echo
+echo
+
+
 --REGEXPECT--
 01. Create entity E with attr A1, attr-type 'house<flat>'
 =========================================================
@@ -140,6 +162,37 @@ Date: REGEX(.*)
 
 
 05. Make sure step 4 DID NOT modify E/A1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "house:flat",
+        "value": 1
+    },
+    "id": "E",
+    "type": "none"
+}
+
+
+06. Try to change A1 type to a string that is longer than 256 chars
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 92
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "attribute type length: 262, max length supported: 256",
+    "error": "BadRequest"
+}
+
+
+07. Make sure step 5 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
 Content-Length: 75
