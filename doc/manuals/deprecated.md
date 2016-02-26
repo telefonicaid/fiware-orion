@@ -20,7 +20,7 @@ A list of deprecated features and the version in which they were deprecated foll
 * ONTIMEINTERVAL subscriptions are deprecated since Orion 0.26.0 (removed in Orion 1.0.0).
   ONTIMEINTERVAL subscriptions have several problems (introduce state in CB, thus making horizontal
   scaling configuration much harder, and makes it difficult to introduce pagination/filtering).
-  Actually, they aren't actually needed, as any use case based on ONTIMEINTERVAL notification can
+  Actually, they aren't really needed, as any use case based on ONTIMEINTERVAL notification can
   be converted to an equivalent use case in which the receptor runs queryContext at the same
   frequency (and taking advantage of the features of queryContext, such as pagination or filtering).
 * XML is deprecated since Orion 0.23.0.

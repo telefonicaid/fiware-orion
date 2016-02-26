@@ -2865,7 +2865,7 @@ BSONArray processConditionVector
     }
     else
     {
-      LM_E(("Runtime Error (unknown condition type: %s)", nc->type.c_str()));
+      LM_E(("Runtime Error (unknown condition type: '%s')", nc->type.c_str()));
     }
   }
 
