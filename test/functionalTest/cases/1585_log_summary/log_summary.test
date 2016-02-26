@@ -25,8 +25,16 @@ Log Summary
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -logSummary 3
-
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+ then
+  export BROKER_AWAIT_SLEEP_TIME=6
+  brokerStart CB 0 IPv4 -logSummary 3 
+  unset BROKER_AWAIT_SLEEP_TIME
+  sleep 7
+  valgrindSleep 8
+else 
+  brokerStart CB 0 IPv4 -logSummary 3 
+fi
 --SHELL--
 
 #
@@ -77,8 +85,14 @@ echo
 
 echo "05. Sleep 3 secs, awaiting a log summary report"
 echo "==============================================="
-sleep 3
-valgrindSleep 5
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+ then
+    sleep 1
+    valgrindSleep 1
+else 
+    sleep 3
+    valgrindSleep 5
+fi 
 echo
 echo
 
@@ -99,8 +113,14 @@ echo
 
 echo "08. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
-sleep 3
-valgrindSleep 5
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+ then
+    sleep 1
+    valgrindSleep 1
+else 
+    sleep 3
+    valgrindSleep 5
+fi 
 echo
 echo
 
@@ -121,8 +141,14 @@ echo
 
 echo "11. Sleep 3 secs, awaiting a second log summary"
 echo "==============================================="
-sleep 3
-valgrindSleep 5
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+ then
+    sleep 1
+    valgrindSleep 1
+else 
+    sleep 3
+    valgrindSleep 5
+fi 
 echo
 echo
 

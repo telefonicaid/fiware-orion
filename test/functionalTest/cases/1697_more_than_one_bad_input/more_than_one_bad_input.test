@@ -25,7 +25,17 @@ More than ONE Bad Input in a request
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+ then
+  export BROKER_AWAIT_SLEEP_TIME=6
+  brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
+  unset BROKER_AWAIT_SLEEP_TIME
+  sleep 5
+  valgrindSleep 6
+else 
+  brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
+fi
+
 
 --SHELL--
 
@@ -54,8 +64,14 @@ echo
 
 echo "02. Sleep 3 secs, awaiting a log summary report"
 echo "==============================================="
-sleep 3
-valgrindSleep 5
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+ then
+    sleep 2
+    valgrindSleep 1
+else 
+    sleep 2
+    valgrindSleep 1
+fi 
 echo
 echo
 
