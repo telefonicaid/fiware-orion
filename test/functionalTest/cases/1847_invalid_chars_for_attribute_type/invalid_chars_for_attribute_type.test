@@ -33,6 +33,8 @@ brokerStart CB
 # 01. Create entity E with attr A1, attr-type 'house:flat'
 # 02. Try to change A1 type to invalid 'house<flat>', with PUT /v2/entities/E/attrs/A1, see it fail
 # 03. Make sure step 2 DID NOT modify E/A1
+# 04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail
+# 05. Make sure step 4 DID NOT modify E/A1
 #
 
 echo "01. Create entity E with attr A1, attr-type 'house<flat>'"
@@ -67,6 +69,22 @@ echo
 echo
 
 
+echo "04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail"
+echo "========================================================================================================"
+payload='{
+  "value": 4,
+  "type": "habitación"
+}'
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "05. Make sure step 4 DID NOT modify E/A1"
+echo "========================================"
+orionCurl --url /v2/entities/E --json
+echo
+echo
 --REGEXPECT--
 01. Create entity E with attr A1, attr-type 'house<flat>'
 =========================================================
@@ -91,6 +109,37 @@ Date: REGEX(.*)
 
 
 03. Make sure step 2 DID NOT modify E/A1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "house:flat",
+        "value": 1
+    },
+    "id": "E",
+    "type": "none"
+}
+
+
+04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Invalid characters in attribute type",
+    "error": "BadRequest"
+}
+
+
+05. Make sure step 4 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
 Content-Length: 75
