@@ -37,6 +37,8 @@ brokerStart CB
 # 05. Make sure step 4 DID NOT modify E/A1
 # 06. Try to change A1 type to a string that is longer than 256 chars
 # 07. Make sure step 5 DID NOT modify E/A1
+# 08. Try to change A1, adding a metadata with empty name
+# 09. Make sure step 7 DID NOT modify E/A1
 #
 
 echo "01. Create entity E with attr A1, attr-type 'house<flat>'"
@@ -101,6 +103,23 @@ echo
 
 
 echo "07. Make sure step 5 DID NOT modify E/A1"
+echo "========================================"
+orionCurl --url /v2/entities/E --json
+echo
+echo
+
+
+echo "08. Try to change A1, adding a metadata with empty name"
+echo "======================================================="
+payload='{
+  "": "5678"
+}'
+orionCurl --url /v2/entities/E/attrs/A1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "09. Make sure step 7 DID NOT modify E/A1"
 echo "========================================"
 orionCurl --url /v2/entities/E --json
 echo
@@ -193,6 +212,37 @@ Date: REGEX(.*)
 
 
 07. Make sure step 5 DID NOT modify E/A1
+========================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "house:flat",
+        "value": 1
+    },
+    "id": "E",
+    "type": "none"
+}
+
+
+08. Try to change A1, adding a metadata with empty name
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "unrecognized property for context attribute",
+    "error": "BadRequest"
+}
+
+
+09. Make sure step 7 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
 Content-Length: 75
