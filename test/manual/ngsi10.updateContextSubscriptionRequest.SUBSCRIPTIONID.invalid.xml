@@ -17,9 +17,9 @@
   <subscriptionId>SUBSCRIPTIONID</subscriptionId>
   <notifyConditions>
 	<notifyCondition>
-	  <type>ONTIMEINTERVAL</type>
+	  <type>ONCHANGE</type>
 	  <condValueList>
-		<condValue>PT3S</condValue>
+		<condValue>temperature</condValue>
 	  </condValueList>
 	  <restriction>restriction</restriction>
 	</notifyCondition>

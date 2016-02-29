@@ -163,7 +163,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
     std::vector<BSONElement>  valueVec;
 
     condType = condition.getStringField(CSUB_CONDITIONS_TYPE);
-    if (condType != "ONCHANGE")
+    if (condType != ON_CHANGE_CONDITION)
     {
       continue;
     }
@@ -345,7 +345,7 @@ int mongoSubCacheItemInsert
     std::vector<BSONElement>  valueVec;
 
     condType = condition.getStringField(CSUB_CONDITIONS_TYPE);
-    if (condType != "ONCHANGE")
+    if (condType != ON_CHANGE_CONDITION)
     {
       continue;
     }
@@ -398,7 +398,7 @@ void mongoSubCacheRefresh(const std::string& database)
 {
   LM_T(LmtSubCache, ("Refreshing subscription cache for DB '%s'", database.c_str()));
 
-  BSONObj                   query       = BSON("conditions.type" << "ONCHANGE");
+  BSONObj                   query       = BSON("conditions.type" << ON_CHANGE_CONDITION);
   std::string               db          = database;
   std::string               tenant      = tenantFromDb(db);
   std::string               collection  = getSubscribeContextCollectionName(tenant);

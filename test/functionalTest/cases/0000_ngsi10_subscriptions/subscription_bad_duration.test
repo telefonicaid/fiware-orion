@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription sequence ONTIMEINTERVAL bad duration
+Subscription sequence bad duration
 
 --SHELL-INIT--
 dbInit CB
@@ -46,7 +46,7 @@ payload='<?xml version="1.0"?>
   <duration>PT99Y</duration>
   <notifyConditions>
     <notifyCondition>
-      <type>ONTIMEINTERVAL</type>
+      <type>ONCHANGE</type>
       <condValueList>
         <condValue>PT2S</condValue>
       </condValueList>          
@@ -73,7 +73,7 @@ payload='<?xml version="1.0"?>
   <duration>PY99</duration>
   <notifyConditions>
     <notifyCondition>
-      <type>ONTIMEINTERVAL</type>
+      <type>ONCHANGE</type>
       <condValueList>
         <condValue>PT2S</condValue>
       </condValueList>          

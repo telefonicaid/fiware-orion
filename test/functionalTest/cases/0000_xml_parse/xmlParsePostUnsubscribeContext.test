@@ -69,9 +69,9 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </restriction>
   <notifyConditions>
   <notifyCondition>
-    <type>ONTIMEINTERVAL</type>
+    <type>ONCHANGE</type>
     <condValueList>
-    <condValue>PT10S</condValue>
+    <condValue>A</condValue>
     </condValueList>
     <restriction>restriction</restriction>
   </notifyCondition>

@@ -106,18 +106,12 @@ std::string NotifyCondition::check
   {
     return "empty type for NotifyCondition";
   }
-  else if (strcasecmp(type.c_str(), "ONTIMEINTERVAL") == 0)
-  {
-  }
-  else if (strcasecmp(type.c_str(), "ONCHANGE") == 0)
-  {
-  }
-  else if (strcasecmp(type.c_str(), "ONVALUE") == 0)
+  else if (strcasecmp(type.c_str(), ON_CHANGE_CONDITION) == 0)
   {
   }
   else
   {
-    return std::string("invalid notify condition type: '") + type + "'";
+    return std::string("invalid notify condition type: /") + type + "/";
   }
 
   if ((res = condValueList.check(requestType, format, indent, predetectedError, counter)) != "OK")
