@@ -1248,7 +1248,7 @@ function coapCurl()
       then
         # FIXME P10: XML removal
         #echo $_response | xmllint --format -
-        echo $_response
+        echo $_response | python -mjson.tool
       elif [ "$_outFormat" == application/json ]
       then
         vMsg "JSON check for:" $_response
@@ -1256,7 +1256,7 @@ function coapCurl()
       else
         # FIXME P10: XML removal
         #echo $_response | xmllint --format -
-        echo $_response
+        echo $_response | python -mjson.tool
       fi
     fi
   fi
