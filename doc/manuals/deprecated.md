@@ -56,8 +56,8 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
-| XML API                                                                    | Not yet removed (planned: 0.28.0)         | February 29st, 2016 (expected)     |
-| ONTIMEINTERVAL subscription                                                | Not yet removed (planned: 0.28.0)         | February 29st, 2016 (expected)     |
-| CLI `--silent`                                                             | Not yet removed (planned: 0.28.0)         | February 29st, 2016 (expected)     |
-| Configuration Manager role (including `-ngsi9`, `-fwdHost` and `-fwdPort`) | 0.24.0                                    | September 14th, 2015            ||
+| XML API                                                                    | Not yet removed (planned: 0.28.0)         | February 29th, 2016             |
+| ONTIMEINTERVAL subscription                                                | 0.28.0                                    | February 29th, 2016             |
+| CLI `--silent`                                                             | Not yet removed (planned: 0.28.0)         | February 29th, 2016             |
+| Configuration Manager role (including `-ngsi9`, `-fwdHost` and `-fwdPort`) | 0.24.0                                    | September 14th, 2015            |
 | Associations                                                               | 0.24.0                                    | September 14th, 2015            |
