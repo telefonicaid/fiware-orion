@@ -1,1 +1,1 @@
-- Fix: Fixed issue #1852 - accepting backslash-slash in JSON v1 payload
+- Fix: accepting backslash-slash in JSON v1 payload (Issue #1852)
