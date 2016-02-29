@@ -31,9 +31,7 @@
 #include "ngsi/RestrictionString.h"
 #include "ngsi/ConditionValueList.h"
 
-#define ON_TIMEINTERVAL_CONDITION "ONTIMEINTERVAL"
-#define ON_CHANGE_CONDITION "ONCHANGE"
-#define ON_VALUE_CONDITION "ONVALUE"
+#define ON_CHANGE_CONDITION  "ONCHANGE"
 
 
 

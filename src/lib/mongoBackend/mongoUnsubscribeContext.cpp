@@ -109,10 +109,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
       return SccOk;
     }
 
-    /* Destroy any previous ONTIMEINTERVAL thread */
-    getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
-
-
     //
     // Removing subscription from mongo subscription cache
     //

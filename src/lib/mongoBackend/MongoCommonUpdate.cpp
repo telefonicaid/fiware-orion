@@ -1618,17 +1618,6 @@ static bool processOnChangeConditionForUpdateContext
 
 /* ****************************************************************************
 *
-* processOntimeIntervalCondition -
-*/
-void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant)
-{
-  getNotifier()->createIntervalThread(subId, interval, tenant);
-}
-
-
-
-/* ****************************************************************************
-*
 * matchExpression
 */
 static bool matchExpression(ContextElementResponse* cerP, const std::string& q)

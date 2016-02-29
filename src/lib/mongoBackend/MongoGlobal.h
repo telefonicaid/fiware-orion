@@ -218,20 +218,6 @@ extern void ensureLocationIndex(const std::string& tenant);
 
 /* ****************************************************************************
 *
-* recoverOntimeIntervalThreads -
-*/
-extern void recoverOntimeIntervalThreads(const std::string& tenant);
-
-/* ****************************************************************************
-*
-* destroyAllOntimeIntervalThreads -
-*
-* This function is only to be used under harakiri mode, not for real use
-*/
-extern void destroyAllOntimeIntervalThreads(const std::string& tenant);
-
-/* ****************************************************************************
-*
 * matchEntity -
 */
 extern bool matchEntity(const EntityId* en1, const EntityId* en2);
@@ -335,12 +321,6 @@ extern EntityIdVector subToEntityIdVector(const BSONObj& sub);
 */
 extern AttributeList subToAttributeList(const BSONObj& attrL);
 
-/* ****************************************************************************
-*
-* processOntimeIntervalCondition -
-*
-*/
-extern void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant);
 
 /* ****************************************************************************
 *

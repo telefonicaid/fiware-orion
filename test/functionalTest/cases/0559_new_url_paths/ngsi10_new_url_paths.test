@@ -121,9 +121,9 @@ payload='<?xml version="1.0"?>
   <subscriptionId>'$SUB_ID'</subscriptionId>
   <notifyConditions>
     <notifyCondition>
-      <type>ONTIMEINTERVAL</type>
+      <type>ONCHANGE</type>
       <condValueList>
-        <condValue>PT4S</condValue>
+        <condValue>A</condValue>
       </condValueList>
     </notifyCondition>
   </notifyConditions>
@@ -447,9 +447,9 @@ payload='<?xml version="1.0"?>
   <duration>PT5H</duration>
   <notifyConditions>
     <notifyCondition>
-      <type>ONTIMEINTERVAL</type>
+      <type>ONCHANGE</type>
       <condValueList>
-        <condValue>PT2S</condValue>
+        <condValue>A</condValue>
       </condValueList>
       <restriction>restriction</restriction>
     </notifyCondition>
@@ -478,9 +478,9 @@ payload='<?xml version="1.0"?>
   <subscriptionId>'$SUB_ID'</subscriptionId>
   <notifyConditions>
     <notifyCondition>
-      <type>ONTIMEINTERVAL</type>
+      <type>ONCHANGE</type>
       <condValueList>
-        <condValue>PT4S</condValue>
+        <condValue>A</condValue>
       </condValueList>
     </notifyCondition>
   </notifyConditions>
