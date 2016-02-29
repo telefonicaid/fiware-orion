@@ -77,9 +77,9 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   stringValue  = mP->stringValue;
   numberValue  = mP->numberValue;
   boolValue    = mP->boolValue;
-  typeGiven    = false;
+  typeGiven    = mP->typeGiven;
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && !typeGiven)
   {
     type = DEFAULT_TYPE;
   }

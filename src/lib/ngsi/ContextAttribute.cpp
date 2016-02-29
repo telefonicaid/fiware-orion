@@ -123,7 +123,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
     metadataVector.push_back(mP);
   }
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && !typeGiven)
   {
     type = DEFAULT_TYPE;
   }
