@@ -144,8 +144,8 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
   //
   // Pass 2 - do the work, helped by the value of 'validAttributes'.
   //
-  std::string                  out;
-  int                          renderedAttributes = 0;
+  std::string  out;
+  int          renderedAttributes = 0;
 
   uniqueMap.clear();
 
