@@ -81,11 +81,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answer != "")
   {
-    if (ciP->outFormat == XML)
-    {
-      MHD_add_response_header(response, "Content-Type", "application/xml");
-    }
-    else if (ciP->outFormat == JSON)
+    if (ciP->outFormat == JSON)
     {
       MHD_add_response_header(response, "Content-Type", "application/json");
     }

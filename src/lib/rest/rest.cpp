@@ -413,6 +413,10 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
         *charsetP = "";
   }
 
+  // FIXME P10: XML removal hack. This hack will eventually disapear in favour
+  // of a cleaner solution, as we progress removing XML from code
+  xml = false;
+
   //
   // API version 1 has XML as default format, v2 has JSON
   //
@@ -540,13 +544,13 @@ static int outFormatCheck(ConnectionInfo* ciP)
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
     ciP->httpStatusCode = SccNotAcceptable;
     ciP->answer = restErrorReplyGet(ciP,
-                                    XML,
+                                    JSON,
                                     "",
                                     "OrionError",
                                     SccNotAcceptable,
-                                    std::string("acceptable MIME types: application/xml, application/json. Accept header in request: ") + ciP->httpHeaders.accept);
+                                    std::string("acceptable MIME types: application/json. Accept header in request: ") + ciP->httpHeaders.accept);
 
-    ciP->outFormat      = XML; // We use XML as default format
+    ciP->outFormat      = JSON; // We use JSON as default format
     ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
@@ -767,7 +771,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
 
-  // Case 3
+  // Case 3  
   if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
   {
     return 0;
@@ -775,7 +779,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -1066,7 +1070,7 @@ static int connectionTreat
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
     {
-      ciP->outFormat = XML; // XML is default output format
+      ciP->outFormat = JSON; // JSON is default output format
     }
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
