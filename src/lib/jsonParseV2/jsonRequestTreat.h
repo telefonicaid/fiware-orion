@@ -60,6 +60,13 @@ typedef struct JsonDelayedRelease
 *
 * jsonRequestTreat - 
 */
-extern std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP);
+extern std::string jsonRequestTreat
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RequestType                requestType,
+  JsonDelayedRelease*        releaseP,
+  std::vector<std::string>&  compV
+);
 
 #endif  // SRC_LIB_JSONPARSEV2_JSONREQUESTTREAT_H_
