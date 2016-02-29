@@ -164,6 +164,42 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Feb 29 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.28.0-1
+- Add: implemented new operation: POST /v2/op/query (Issue #1080)
+- Add: implemented new operation: POST /v2/op/update (Issue #1715)
+- Add: orderBy URI param in NGSIv2 queries to sort entities by attribute, entity dates or proximity (Issue #1103)
+- Add: orderBy URI param in NGSIv1 queries to sort entities by attribute or entity dates (Issue #1103)
+- Add: options=values mode for entity queries in NGSIV2 (Issue #1049)
+- Add: NGSIv2 URI param 'georel' (along with 'geometry' and 'coords') proper support (Issue #1677)
+- Add: scope FIWARE::Location::NGSIv2 to allow using NGSIv2 geo-queries also with NGSIv1 (Issue #1677)
+- Add: support for geo:point type as a way of specifying location attribute in NGSIv2 (Issue #1038)
+- Add: date support in attribute values and q filters (Issue #1039)
+- Add: dateCreated and dateModified options to get entity creation and modification times as "virtual" attributes (Issue #876)
+- Add: ?type param for GET entity in v2 (Issue #915, #972, #990, #998)
+- Add: ?type param for DELETE entity in v2 (Issue #986, #994)
+- Add: ?type param for PATCH entity in v2 (Issue #980)
+- Add: ?type param for POST entity in v2 (Issue #982, #984)
+- Add: ?type param for PUT entity in v2 (Issue #988, #992, #1000)
+- Add: ?type URL parameter in Location header upon entity creation in NGSIv2 (Issue #1765)
+- Fix: error level traces ignoring -logLevel NONE
+- Fix: wrong over-logging at error level updating attributes having metadata without type 
+- Fix: '+' supported in entity ids and names in URLs (Issue #1675)
+- Fix: libmicrohttpd 0.9.48 included in contextBroker as static lib (previous Orion versions used 0.9.22 as dynamic library) (Issue #1675)
+- Fix: list of attribute names in URI param 'type' (Issue #1749)
+- Fix: long servicepath component in NGSIv2 (Issue #1423, #1764, #1774)
+- Fix: syntax change in string query 'q' for exist and not-exist (Issue #1751)
+- Fix: sanity check for string query 'q' - detect 'left-hand-side missing' (Issue #1754)
+- Fix: more sanity checks for string query 'q' (q empty, parts of 'q' empty - parts of 'q' are separated by ';')
+- Fix: error message when updating attribute value for two entities with same id (Issue #1387)
+- Fix: bug causing false not-a-number when it really is a valid number (very very rarely)
+- Fix: not detecting forbidden chars in entityID for PATCH v2 (Issue #1782)
+- Fix: detect forbidden chars in entity ids and attr names in URI (Issue #1793)
+- Fix: segfault caused by parameter without value in query string (Issue #1805)
+- Fix: some of the operations reported an incorrect 'Allow' HTTP Header on Bad Verb, now fixed
+- Fix: Returning 422 InvalidModification instead of 404 NotFound when POSTing entity (Issue #1817)
+- Fix: using string "none" as default entity/attribute/metadata type in NGSIv2 (Issue #1830)
+- Hardening: sanity checks for numbers (Issue #1306)
+
 * Mon Feb 01 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.27.0-1
 - Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
 - Add: Enable log summary traces using -logSummary CLI (Issue #1585)
