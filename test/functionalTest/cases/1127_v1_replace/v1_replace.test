@@ -90,7 +90,7 @@ echo
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -98,19 +98,19 @@ Date: REGEX(.*)
 02. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 119
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "1"
     },
     "attr2": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "2"
     },
     "id": "E1",
@@ -157,19 +157,19 @@ Date: REGEX(.*)
 04. Get E1 (attr3, attr4)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 119
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr3": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "3"
     },
     "attr4": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "4"
     },
     "id": "E1",

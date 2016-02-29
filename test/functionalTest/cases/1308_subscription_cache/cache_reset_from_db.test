@@ -285,7 +285,7 @@ Date: REGEX(.*)
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/s01
+Location: /v2/entities/s01?type=none
 Date: REGEX(.*)
 
 
@@ -294,7 +294,7 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/s11
+Location: /v2/entities/s11?type=none
 Date: REGEX(.*)
 
 
@@ -303,7 +303,7 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/s21
+Location: /v2/entities/s21?type=none
 Date: REGEX(.*)
 
 
@@ -311,7 +311,7 @@ Date: REGEX(.*)
 07. Dump accumulator1 - see s01/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -323,14 +323,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s01",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 4.000000
+            "type" : "none",
+            "value" : 4
           }
         ]
       },
@@ -347,7 +347,7 @@ Content-Type: application/json; charset=utf-8
 08. Dump accumulator2 - see s11/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -360,14 +360,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s11",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 5.000000
+            "type" : "none",
+            "value" : 5
           }
         ]
       },
@@ -384,7 +384,7 @@ Content-Type: application/json; charset=utf-8
 09. Dump accumulator3 - see s21/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -397,14 +397,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s21",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 6.000000
+            "type" : "none",
+            "value" : 6
           }
         ]
       },
@@ -449,38 +449,6 @@ Date: REGEX(.*)
 14. Dump accumulator1 - see s01/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/json; charset=utf-8
-
-{
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "",
-        "isPattern" : "false",
-        "id" : "s01",
-        "attributes" : [
-          {
-            "name" : "A",
-            "type" : "",
-            "value" : 4.000000
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -493,14 +461,46 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s01",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 11.000000
+            "type" : "none",
+            "value" : 4
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 462
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "s01",
+        "attributes" : [
+          {
+            "name" : "A",
+            "type" : "none",
+            "value" : 11
           }
         ]
       },
@@ -517,39 +517,6 @@ Content-Type: application/json; charset=utf-8
 15. Dump accumulator2 - see s11/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Fiware-Service: t1
-Content-Type: application/json; charset=utf-8
-
-{
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "",
-        "isPattern" : "false",
-        "id" : "s11",
-        "attributes" : [
-          {
-            "name" : "A",
-            "type" : "",
-            "value" : 5.000000
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -563,14 +530,47 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s11",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 12.000000
+            "type" : "none",
+            "value" : 5
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 462
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Fiware-Service: t1
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "s11",
+        "attributes" : [
+          {
+            "name" : "A",
+            "type" : "none",
+            "value" : 12
           }
         ]
       },
@@ -587,39 +587,6 @@ Content-Type: application/json; charset=utf-8
 16. Dump accumulator3 - see s21/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Fiware-Service: t2
-Content-Type: application/json; charset=utf-8
-
-{
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "",
-        "isPattern" : "false",
-        "id" : "s21",
-        "attributes" : [
-          {
-            "name" : "A",
-            "type" : "",
-            "value" : 6.000000
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
@@ -633,14 +600,47 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s21",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 13.000000
+            "type" : "none",
+            "value" : 6
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 462
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Fiware-Service: t2
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "s21",
+        "attributes" : [
+          {
+            "name" : "A",
+            "type" : "none",
+            "value" : 13
           }
         ]
       },

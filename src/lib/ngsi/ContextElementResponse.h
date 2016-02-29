@@ -58,10 +58,19 @@ typedef struct ContextElementResponse
   ContextElementResponse();
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP);
-  ContextElementResponse(const mongo::BSONObj& entityDoc, const AttributeList& attrL, bool includeEmpty = true);
-  ContextElementResponse(ContextElement* ceP);
+  ContextElementResponse(const mongo::BSONObj&  entityDoc,
+                         const AttributeList&   attrL,
+                         bool                   includeEmpty = true,
+                         bool                   includeCreDate = false,
+                         bool                   includeModDate = false,
+                         const std::string&     apiVersion   = "v1");
+  ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false, bool omitAttributeValues = false);
+  std::string  render(ConnectionInfo*     ciP,
+                      RequestType         requestType,
+                      const std::string&  indent,
+                      bool                comma               = false,
+                      bool                omitAttributeValues = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
 

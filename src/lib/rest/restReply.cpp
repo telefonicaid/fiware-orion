@@ -67,11 +67,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
   LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
 
-  if (answer == "")
-    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
-  else
-    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
-
+  response = MHD_create_response_from_buffer(answer.length(), (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)
   {
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
@@ -98,15 +94,15 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       MHD_add_response_header(response, "Content-Type", "text/plain");
     }
 
-    // At the present version, CORS is support only for GET requests
+    // At the present version, CORS is supported only for GET requests
     if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
     {
-      // If any origin is allowed the header is sent always with "any" as value
+      // If any origin is allowed, the header is sent always with "any" as value
       if (strcmp(restAllowedOrigin, "__ALL") == 0)
       {
         MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
       }
-      // If an specific origin is allowed the header is only sent if the origins match
+      // If a specific origin is allowed, the header is only sent if the origins match
       else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
       {
         MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
@@ -169,7 +165,7 @@ static std::string tagGet(const std::string& request)
 *
 * This function renders an error reply depending on the 'request' type.
 * Many responses have different syntax and especially the tag in the reply
-* differs (registerContextResponse, discoverContextAvailabilityResponse etc).
+* differs (registerContextResponse, discoverContextAvailabilityResponse, etc).
 *
 * Also, the function is called from more than one place, especially from 
 * restErrorReply, but also from where the payload type is matched against the request URL.

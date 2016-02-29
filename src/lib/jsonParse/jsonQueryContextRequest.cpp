@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/areas.h"
@@ -228,6 +229,11 @@ static std::string scopeValue(const std::string& path, const std::string& value,
     reqDataP->qcr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqDataP->qcr.scopeP->type.c_str()));
   }
+  else if (reqDataP->qcr.scopeP->type == FIWARE_LOCATION_V2)
+  {
+    // Mark the value of the scope to be of complex nature, v2
+    reqDataP->qcr.scopeP->value = FIWARE_LOCATION_V2;
+  }
   else
   {
     reqDataP->qcr.scopeP->value = value;
@@ -408,6 +414,244 @@ static std::string polygonVertexLongitude(const std::string& path, const std::st
 
 /* ****************************************************************************
 *
+* georel -
+*/
+static std::string georel(const std::string& path, const std::string& value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a georel"));
+  if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
+  {
+    return "georel in scope value used with non-api-v2 scope";
+  }
+
+  parseDataP->qcr.coords  = 0;
+  parseDataP->qcr.pointNo = 0;
+  
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* georelValue -
+*/
+static std::string georelValue(const std::string& path, const std::string& value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a georel value"));
+  if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
+  {
+    return "georel in scope value used with non-api-v2 scope";
+  }
+
+  if (strncmp(value.c_str(), "maxDistance:", strlen("maxDistance:")) == 0)
+  {
+    const char* maxDistanceP = &value.c_str()[strlen("maxDistance:")];
+    if (str2double(maxDistanceP, &parseDataP->qcr.scopeP->georel.maxDistance) != true)
+    {
+      return "georel with a maxDistance that is not a number";
+    }
+  }
+  else if (strncmp(value.c_str(), "minDistance:", strlen("minDistance:")) == 0)
+  {
+    const char* minDistanceP = &value.c_str()[strlen("minDistance:")];
+    if (str2double(minDistanceP, &parseDataP->qcr.scopeP->georel.minDistance) != true)
+    {
+      return "georel with a minDistance that is not a number";
+    }
+  }
+  else
+  {
+    // Check for valid georel.type comes later
+    parseDataP->qcr.scopeP->georel.type = value;
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* geometry -
+*/
+static std::string geometry(const std::string& path, const std::string& value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a geometry"));
+
+  if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
+  {
+    return "geometry in scope value used with non-api-v2 scope";
+  }
+
+  parseDataP->qcr.coords  = 0;
+  parseDataP->qcr.pointNo = 0;
+  parseDataP->qcr.scopeP->areaTypeSet(value);
+
+  return "OK";
+}
+
+
+/* ****************************************************************************
+*
+* coords -
+*/
+static std::string coords(const std::string& path, const std::string& value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a coords"));
+
+  if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
+  {
+    return "coords in scope value used with non-api-v2 scope";
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* coord -
+*/
+static std::string coord(const std::string& path, const std::string& value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a coord-pair"));
+
+  if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
+  {
+    return "coords in scope value used with non-api-v2 scope";
+  }
+
+  parseDataP->qcr.coords    = 0;
+  parseDataP->qcr.pointNo  += 1;
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* coordValue -
+*/
+static std::string coordValue(const std::string& path, const std::string& value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a coordinate"));
+
+  if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
+  {
+    return "coords in scope value used with non-api-v2 scope";
+  }
+
+
+  //
+  // Decide where to put the point ...
+  //
+  double coordVal;
+
+  if (str2double(value.c_str(), &coordVal) == false)
+  {
+    return "invalid coordinate";
+  }
+
+  switch (parseDataP->qcr.scopeP->areaType)
+  {
+  case orion::PointType:
+    if (parseDataP->qcr.coords == 0)
+    {
+      parseDataP->qcr.scopeP->point.latitudeSet(coordVal);
+    }
+    else if (parseDataP->qcr.coords == 1)
+    {
+      parseDataP->qcr.scopeP->point.longitudeSet(coordVal);
+    }
+    else
+    {
+      return "too many coordinates for a Point geometry";
+    }
+    break;
+
+  case orion::PolygonType:
+    if (parseDataP->qcr.coords == 0)
+    {
+      parseDataP->qcr.vertexP = new Point(coordVal, 0);
+      parseDataP->qcr.scopeP->polygon.vertexAdd(parseDataP->qcr.vertexP);
+    }
+    else if (parseDataP->qcr.coords == 1)
+    {
+      parseDataP->qcr.vertexP->longitudeSet(coordVal);
+    }
+    else
+    {
+      return "too many coordinates for a Point in Polygon geometry";
+    }
+    break;
+
+  case orion::LineType:
+    if (parseDataP->qcr.coords == 0)
+    {
+      parseDataP->qcr.vertexP = new Point(coordVal, 0);
+      parseDataP->qcr.scopeP->line.pointAdd(parseDataP->qcr.vertexP);
+    }
+    else if (parseDataP->qcr.coords == 1)
+    {
+      parseDataP->qcr.vertexP->longitudeSet(coordVal);
+    }
+    else
+    {
+      return "too many coordinates for a Point in Line geometry";
+    }
+    break;
+
+  case orion::BoxType:
+    if (parseDataP->qcr.pointNo > 2)
+    {
+      return "too many points for a Box geoetry";
+    }
+
+    if (parseDataP->qcr.coords == 0)
+    {
+      if (parseDataP->qcr.pointNo == 1)
+      {
+        parseDataP->qcr.scopeP->box.lowerLeft.latitudeSet(coordVal);
+      }
+      else
+      {
+        parseDataP->qcr.scopeP->box.upperRight.latitudeSet(coordVal);
+      }
+    }
+    else if (parseDataP->qcr.coords == 1)
+    {
+      if (parseDataP->qcr.pointNo == 1)
+      {
+        parseDataP->qcr.scopeP->box.lowerLeft.longitudeSet(coordVal);
+      }
+      else
+      {
+        parseDataP->qcr.scopeP->box.upperRight.longitudeSet(coordVal);
+      }
+    }
+    else
+    {
+      return "too many coordinates for a Point in Box geometry";
+    }
+    break;
+
+  case orion::NoArea:
+  case orion::CircleType:
+    return "received coordinates for invalid geometry";
+    break;
+  }
+
+  parseDataP->qcr.coords += 1;
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * qcrParseVector -
 */
 JsonNode jsonQcrParseVector[] =
@@ -440,6 +684,14 @@ JsonNode jsonQcrParseVector[] =
   { "/restriction/scopes/scope/value/polygon/vertices/vertice",            polygonVertex           },
   { "/restriction/scopes/scope/value/polygon/vertices/vertice/latitude",   polygonVertexLatitude   },
   { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude  },
+
+  // APIv2 geolocation in v1
+  { "/restriction/scopes/scope/value/geometry",                            geometry                },
+  { "/restriction/scopes/scope/value/georel",                              georel                  },
+  { "/restriction/scopes/scope/value/georel/geore",                        georelValue             },
+  { "/restriction/scopes/scope/value/coords",                              coords                  },
+  { "/restriction/scopes/scope/value/coords/coord",                        coord                   },
+  { "/restriction/scopes/scope/value/coords/coord/coor",                   coordValue              },
 
   { "LAST", NULL }
 };

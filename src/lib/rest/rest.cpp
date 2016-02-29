@@ -80,6 +80,7 @@ static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
 
 
+
 /* ****************************************************************************
 *
 * uriArgumentGet - 
@@ -89,6 +90,14 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
+
+  if (val == NULL || *val == 0)
+  {
+    OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer         = error.render(ciP, "");
+    return MHD_YES;
+  }
 
   if (key == URI_PARAM_NOTIFY_FORMAT)
   {
@@ -190,8 +199,23 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->answer         = error.render(ciP, "");
     }
   }
+  else if (key == URI_PARAM_TYPE)
+  {
+    ciP->uriParam[URI_PARAM_TYPE] = value;
+
+    if (strstr(val, ","))  // More than ONE type?
+    {
+      uriParamTypesParse(ciP, val);
+    }
+    else
+    {
+      ciP->uriParamTypes.push_back(val);
+    }
+  }
   else
+  {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
+  }
 
   if (val != NULL)
   {
@@ -213,7 +237,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   //
   bool containsForbiddenChars = false;
 
-  if (key == "geometry")
+  if ((key == "geometry") || (key == "georel"))
   {
     containsForbiddenChars = forbiddenChars(val, "=;");
   }

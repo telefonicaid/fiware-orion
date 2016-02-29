@@ -120,7 +120,7 @@ echo
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T
 Date: REGEX(.*)
 
 
@@ -129,7 +129,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T
 Date: REGEX(.*)
 
 
@@ -138,7 +138,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T
 Date: REGEX(.*)
 
 
@@ -147,7 +147,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4
+Location: /v2/entities/E4?type=T
 Date: REGEX(.*)
 
 
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5
+Location: /v2/entities/E5?type=T
 Date: REGEX(.*)
 
 
@@ -164,7 +164,7 @@ Date: REGEX(.*)
 06. Query: URI param q=temperature<60;humidity==61..83 => E1+E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 366
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -172,38 +172,38 @@ Date: REGEX(.*)
     {
         "humidity": {
             "metadata": {},
-            "type": null,
-            "value": 80.0
+            "type": "none",
+            "value": 80
         },
         "id": "E1",
         "status": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "OK"
         },
         "temperature": {
             "metadata": {},
-            "type": null,
-            "value": 20.0
+            "type": "none",
+            "value": 20
         },
         "type": "T"
     },
     {
         "humidity": {
             "metadata": {},
-            "type": null,
-            "value": 70.0
+            "type": "none",
+            "value": 70
         },
         "id": "E2",
         "status": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "ERR"
         },
         "temperature": {
             "metadata": {},
-            "type": null,
-            "value": 30.0
+            "type": "none",
+            "value": 30
         },
         "type": "T"
     }

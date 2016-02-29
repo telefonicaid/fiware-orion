@@ -156,7 +156,7 @@ dryrun=off
 leakTest=off
 dryLeaks=off
 fromIx=0
-ixLists=""
+ixList=""
 
 vMsg "parsing options"
 while [ "$#" != 0 ]

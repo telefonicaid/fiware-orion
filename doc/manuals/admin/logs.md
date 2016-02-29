@@ -161,7 +161,7 @@ that after fixing the problem with the JSON payload now has a new problem with t
 ## Summary traces
 
 You can enable log summary traces with the `-logSummary` [CLI parameter](cli.md) which value is the summary reporting period in seconds. For
-example `-logSummary 5` involves that summary traces will be print each 5 seconds.
+example `-logSummary 5` involves that summary traces will be print each 5 seconds (no matter which log level has been set with `-logLevel`).
 
 Four traces are printed each time, as follows (the lines have been abbreviated, omitting some fields, for the sake of clarity):
 

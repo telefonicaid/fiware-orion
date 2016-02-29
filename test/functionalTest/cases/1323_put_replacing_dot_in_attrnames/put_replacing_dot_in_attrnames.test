@@ -117,7 +117,7 @@ echo
 
 echo "07. Check attributes in DB"
 echo "=========================="
-echo 'db.entities.find({ "_id" : { "id" : "E1",  "servicePath" : "/" } }, {_id:0, attrNames: 1})'  | mongo $CB_DB_NAME --quiet
+echo 'db.entities.find({ "_id" : { "id" : "E1",  "type": "none", "servicePath" : "/" } }, {_id:0, attrNames: 1})'  | mongo $CB_DB_NAME --quiet
 echo
 echo
 
@@ -127,7 +127,7 @@ echo
 ===================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=none
 Date: REGEX(.*)
 
 
@@ -135,38 +135,38 @@ Date: REGEX(.*)
 02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1.X": {
         "metadata": {},
-        "type": null,
-        "value": 1.0
+        "type": "none",
+        "value": 1
     },
     "A2..y": {
         "metadata": {},
-        "type": null,
-        "value": 2.0
+        "type": "none",
+        "value": 2
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
 02b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 56
+Content-Length: 44
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A1.X": 1.0,
-    "A2..y": 2.0,
+    "A1.X": 1,
+    "A2..y": 2,
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -181,90 +181,90 @@ Date: REGEX(.*)
 04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A2..y": {
         "metadata": {},
-        "type": null,
-        "value": 2.0
+        "type": "none",
+        "value": 2
     },
     "A3.Z": {
         "metadata": {},
-        "type": null,
-        "value": 3.0
+        "type": "none",
+        "value": 3
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
 04b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 56
+Content-Length: 44
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A2..y": 2.0,
-    "A3.Z": 3.0,
+    "A2..y": 2,
+    "A3.Z": 3,
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
 05. GET attribute A2..y
 =======================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": null,
-    "value": 2.0
+    "type": "none",
+    "value": 2
 }
 
 
 05b. GET attribute A2..y using options=keyValues
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 18
+Content-Length: 11
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A2..y": 2.0
+    "A2..y": 2
 }
 
 
 06. GET attribute A3.Z
 ======================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": null,
-    "value": 3.0
+    "type": "none",
+    "value": 3
 }
 
 
 06b. GET attribute A3.Z using options=keyValues
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 10
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A3.Z": 3.0
+    "A3.Z": 3
 }
 
 

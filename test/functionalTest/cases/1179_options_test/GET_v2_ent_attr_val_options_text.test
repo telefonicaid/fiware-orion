@@ -98,7 +98,7 @@ echo
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -136,13 +136,13 @@ Date: REGEX(.*)
 05. GET /v2/entities/E1/attrs/a_compound/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 37
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "bool": true,
-    "number": 2.0,
+    "number": 2,
     "string": "1"
 }
 
@@ -150,15 +150,15 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1/attrs/a_vector/value
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 37
+Content-Length: 9
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-    1.0,
-    2.0,
-    3.0,
-    4.0
+    1,
+    2,
+    3,
+    4
 ]
 
 

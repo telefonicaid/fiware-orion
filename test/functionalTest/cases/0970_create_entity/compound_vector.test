@@ -58,7 +58,7 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -66,18 +66,18 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 95
+Content-Length: 76
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "cvec": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": [
-            1.0,
-            2.0,
-            3.0
+            1,
+            2,
+            3
         ]
     },
     "id": "E1",

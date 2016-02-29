@@ -69,7 +69,7 @@ typedef struct ContextAttribute
 
   ~ContextAttribute();
   ContextAttribute();
-  ContextAttribute(ContextAttribute* caP);
+  ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
   ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
@@ -78,7 +78,7 @@ typedef struct ContextAttribute
 
   /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId() const;
-  std::string  getLocation() const;
+  std::string  getLocation(const std::string& apiValue ="v1") const;
 
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
@@ -87,10 +87,10 @@ typedef struct ContextAttribute
   std::string  toJsonAsValue(ConnectionInfo* ciP);
   void         present(const std::string& indent, int ix);
   void         release(void);
-  std::string  toString(void);
+  std::string  getName(void);
 
   /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
-  std::string  toStringValue(void) const;
+  std::string  getValue(void) const;
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,

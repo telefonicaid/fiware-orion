@@ -71,7 +71,7 @@ echo
 ===================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=none
 Date: REGEX(.*)
 
 
@@ -79,23 +79,23 @@ Date: REGEX(.*)
 02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 123
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
-        "value": 1.0
+        "type": "none",
+        "value": 1
     },
     "A2": {
         "metadata": {},
-        "type": null,
-        "value": 2.0
+        "type": "none",
+        "value": 2
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 
@@ -110,23 +110,23 @@ Date: REGEX(.*)
 04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 123
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A2": {
         "metadata": {},
-        "type": null,
-        "value": 2.0
+        "type": "none",
+        "value": 2
     },
     "A3": {
         "metadata": {},
-        "type": null,
-        "value": 3.0
+        "type": "none",
+        "value": 3
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 

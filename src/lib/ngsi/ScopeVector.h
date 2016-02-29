@@ -45,15 +45,13 @@ typedef struct ScopeVector
   void         push_back(Scope* item);
   unsigned int size(void) const;
   void         release();
-
+  void         fill(const ScopeVector& scopeV, bool copy);
   std::string  check(RequestType         requestType,
                      Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
   Scope* operator[](unsigned int ix) const;
-
-
   
 } ScopeVector;
 

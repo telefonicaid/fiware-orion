@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
@@ -35,6 +36,8 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "parse/forbiddenChars.h"
+#include "rest/OrionError.h"
 
 
 
@@ -59,12 +62,25 @@ std::string getEntityAttributeValue
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
   Attribute    attribute;
+  std::string  answer;
+  std::string  type       = ciP->uriParam["type"];
   bool         text       = (ciP->uriParamOptions["options"] == true || ciP->outFormat == TEXT);
 
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
@@ -74,7 +90,7 @@ std::string getEntityAttributeValue
   // Render entity attribute response
   if (attribute.errorCode.error == "TooManyResults")
   {
-    ErrorCode ec("TooManyResults", "There is more than one entity with that id - please refine your query");
+    ErrorCode ec("TooManyResults", MORE_MATCHING_ENT);
 
     ciP->httpStatusCode = SccConflict;
 
@@ -120,7 +136,7 @@ std::string getEntityAttributeValue
       }
       else
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->toStringValue());
+        TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
       }
 
       ciP->outFormat = TEXT;

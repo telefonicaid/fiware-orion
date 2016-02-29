@@ -63,7 +63,7 @@ echo
 ===================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=none
 Date: REGEX(.*)
 
 
@@ -84,18 +84,18 @@ Date: REGEX(.*)
 03. Make sure E1 exists - and that attr1 == 1, not 2
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": {
         "metadata": {},
-        "type": null,
-        "value": 1.0
+        "type": "none",
+        "value": 1
     },
     "id": "E1",
-    "type": null
+    "type": "none"
 }
 
 

@@ -134,7 +134,7 @@ echo
 =======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T
 Date: REGEX(.*)
 
 
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T
 Date: REGEX(.*)
 
 
@@ -152,7 +152,7 @@ Date: REGEX(.*)
 =======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T
 Date: REGEX(.*)
 
 
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 ========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4
+Location: /v2/entities/E4?type=T
 Date: REGEX(.*)
 
 
@@ -170,7 +170,7 @@ Date: REGEX(.*)
 =======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5
+Location: /v2/entities/E5?type=T
 Date: REGEX(.*)
 
 
@@ -178,7 +178,7 @@ Date: REGEX(.*)
 06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 616
+Content-Length: 614
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -189,18 +189,18 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "humidity",
-                        "type": "",
-                        "value": 70.0
+                        "type": "none",
+                        "value": 70
                     },
                     {
                         "name": "status",
-                        "type": "",
+                        "type": "none",
                         "value": "ERR"
                     },
                     {
                         "name": "temperature",
-                        "type": "",
-                        "value": 30.0
+                        "type": "none",
+                        "value": 30
                     }
                 ],
                 "id": "E2",

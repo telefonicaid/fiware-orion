@@ -249,7 +249,7 @@ Date: REGEX(.*)
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -426,14 +426,14 @@ Date: REGEX(.*)
 17a. GET /v2/entities/E1/attrs/A1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": null,
-    "value": 0.0
+    "type": "none",
+    "value": 0
 }
 
 
@@ -448,14 +448,14 @@ Date: REGEX(.*)
 17c. GET /v2/entities/E1/attrs/A1 - A1 should be as in 17a
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 44
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": null,
-    "value": 0.0
+    "type": "none",
+    "value": 0
 }
 
 

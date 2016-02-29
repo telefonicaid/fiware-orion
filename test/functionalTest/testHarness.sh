@@ -92,6 +92,8 @@ function usage()
   echo "$empty [--keep (don't remove output files)]"
   echo "$empty [--dryrun (don't execute any tests)]"
   echo "$empty [--dir <directory>]"
+  echo "$empty [--fromIx <index of test where to start>]"
+  echo "$empty [--ixList <list of test indexes>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
   echo "$empty [--no-duration (removes duration mark on successful tests)]"
   echo "$empty [ <directory or file> ]*"
@@ -177,6 +179,7 @@ vMsg "$ME, in directory $SCRIPT_HOME"
 #
 # Argument parsing
 #
+typeset -i fromIx
 verbose=off
 dryrun=off
 keep=off
@@ -188,6 +191,8 @@ dirOrFile=""
 dirGiven=no
 filterGiven=no
 showDuration=on
+fromIx=0
+ixList=""
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
@@ -200,6 +205,8 @@ do
   elif [ "$1" == "--filter" ];      then testFilter="$2"; filterGiven=yes; shift;
   elif [ "$1" == "--match" ];       then match="$2"; shift;
   elif [ "$1" == "--dir" ];         then dir="$2"; dirGiven=yes; shift;
+  elif [ "$1" == "--fromIx" ];      then fromIx=$2; shift;
+  elif [ "$1" == "--ixList" ];      then ixList=$2; shift;
   elif [ "$1" == "--no-duration" ]; then showDuration=off;
   else
     if [ "$dirOrFile" == "" ]
@@ -765,6 +772,21 @@ do
   fi
 
   testNo=$testNo+1
+
+  if [ $fromIx != 0 ] && [ $testNo -lt $fromIx ]
+  then
+    continue;
+  fi
+
+  if [ "$ixList" != "" ]
+  then
+    hit=$(echo ' '$ixList' ' | grep ' '$testNo' ')
+    if [ "$hit" == "" ]
+    then
+      continue
+    fi
+  fi
+
   startDate=$(date)
   start=$(date --date="$startDate" +%s)
   endDate=""

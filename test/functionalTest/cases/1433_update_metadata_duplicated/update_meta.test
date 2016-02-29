@@ -107,7 +107,7 @@ echo
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Room10
+Location: /v2/entities/Room10?type=Room
 Date: REGEX(.*)
 
 
@@ -115,15 +115,15 @@ Date: REGEX(.*)
 02. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 237
+Content-Length: 232
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "humidity": {
         "metadata": {},
-        "type": null,
-        "value": 78.0
+        "type": "none",
+        "value": 78
     },
     "id": "Room10",
     "temperature": {
@@ -155,25 +155,25 @@ Date: REGEX(.*)
 04. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 233
+Content-Length: 232
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "humidity": {
         "metadata": {},
-        "type": null,
-        "value": 78.0
+        "type": "none",
+        "value": 78
     },
     "id": "Room10",
     "temperature": {
         "metadata": {
             "house_flat_0": {
-                "type": null,
+                "type": "none",
                 "value": "1234"
             },
             "house_flat_1": {
-                "type": null,
+                "type": "none",
                 "value": "5678"
             }
         },

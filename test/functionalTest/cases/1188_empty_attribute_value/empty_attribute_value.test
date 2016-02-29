@@ -104,7 +104,7 @@ echo
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -112,14 +112,14 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 to see A1==1
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 68
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "1"
     },
     "id": "E1",
@@ -138,14 +138,14 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 to see A1==""
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 67
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": ""
     },
     "id": "E1",
@@ -164,15 +164,15 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 to see A1==5
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 68
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
-        "value": 5.0
+        "type": "none",
+        "value": 5
     },
     "id": "E1",
     "type": "T1"
@@ -190,14 +190,14 @@ Date: REGEX(.*)
 08. GET /v2/entities/E1 to see A1==""
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 67
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A1": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": ""
     },
     "id": "E1",

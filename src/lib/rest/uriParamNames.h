@@ -44,6 +44,8 @@
 #define URI_PARAM_ATTRIBUTES_FORMAT       "attributesFormat"
 #define URI_PARAM_ATTRIBUTE_FORMAT        "attributeFormat"
 #define URI_PARAM_OPTIONS                 "options"
+#define URI_PARAM_TYPE                    "type"
+#define URI_PARAM_SORTED                  "orderBy"
 
 
 

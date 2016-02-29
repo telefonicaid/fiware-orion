@@ -316,6 +316,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     int noOfFounds    = 0;
     int noOfNotFounds = 0;
+
     for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       if (cerP->contextElement.contextAttributeVector[aIx]->found == true)
@@ -544,6 +545,7 @@ std::string postUpdateContext
     upcrP->release();
     return answer;
   }
+
 
 
   //

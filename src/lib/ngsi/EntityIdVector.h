@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "ngsi/EntityId.h"
+#include "apiTypesV2/EntityVector.h"
 
 
 
@@ -55,6 +56,7 @@ typedef struct EntityIdVector
   unsigned int size(void) const;
   EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
   void         release();
+  void         fill(EntityVector& _vec);
 
   EntityId* operator[](unsigned int ix) const;
 

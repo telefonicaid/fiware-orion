@@ -92,7 +92,7 @@ ContextAttribute::ContextAttribute()
 * in "cloned" from source CA to the CA being constructed.
 *
 */
-ContextAttribute::ContextAttribute(ContextAttribute* caP)
+ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
 {
   name                  = caP->name;
   type                  = caP->type;
@@ -119,8 +119,13 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
   {
     LM_T(LmtClone, ("Copying metadata %d", mIx));
-    Metadata* mP = new Metadata(caP->metadataVector[mIx]);
+    Metadata* mP = new Metadata(caP->metadataVector[mIx], useDefaultType);
     metadataVector.push_back(mP);
+  }
+
+  if (useDefaultType && (type == ""))
+  {
+    type = DEFAULT_TYPE;
   }
 }
 
@@ -306,13 +311,23 @@ std::string ContextAttribute::getId(void) const
 *
 * ContextAttribute::getLocation() -
 */
-std::string ContextAttribute::getLocation() const
+std::string ContextAttribute::getLocation(const std::string& apiVersion) const
 {
-  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+  if (apiVersion == "v1")
   {
-    if (metadataVector[ix]->name == NGSI_MD_LOCATION)
+    for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
     {
-      return metadataVector[ix]->stringValue;
+      if (metadataVector[ix]->name == NGSI_MD_LOCATION)
+      {
+        return metadataVector[ix]->stringValue;
+      }
+    }
+  }
+  else // v2
+  {
+    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON))
+    {
+      return LOCATION_WGS84;
     }
   }
 
@@ -361,10 +376,15 @@ std::string ContextAttribute::renderAsJsonObject
         break;
 
       case ValueTypeNumber:
-        char num[32];
-        snprintf(num, sizeof(num), "%f", numberValue);
-        effectiveValue      = std::string(num);
-        valueIsNumberOrBool = true;
+        if (type == DATE_TYPE)
+        {
+          effectiveValue = isodate2str(numberValue);
+        }
+        else // regular number
+        {
+          effectiveValue      = toString(numberValue);
+          valueIsNumberOrBool = true;
+        }
         break;
 
       case ValueTypeNone:
@@ -493,10 +513,15 @@ std::string ContextAttribute::render
         break;
 
       case ValueTypeNumber:
-        char num[32];
-        snprintf(num, sizeof(num), "%f", numberValue);
-        effectiveValue      = num;
-        valueIsNumberOrBool = true;
+        if (type == DATE_TYPE)
+        {
+          effectiveValue = isodate2str(numberValue);
+        }
+        else // regular number
+        {
+          effectiveValue      = toString(numberValue);
+          valueIsNumberOrBool = true;
+        }
         break;
 
       case ValueTypeNone:
@@ -574,9 +599,14 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      char num[32];
-      snprintf(num, sizeof(num), "%f", numberValue);
-      out += num;
+      if (type == DATE_TYPE)
+      {
+        out += JSON_STR(isodate2str(numberValue));
+      }
+      else // regular number
+      {
+        out += toString(numberValue);
+      }
     }
     else if (valueType == orion::ValueTypeString)
     {
@@ -601,7 +631,8 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     //
     // type
     //
-    out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":" + "null";
+    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
     out += ",";
 
 
@@ -621,11 +652,14 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     }
     else if (valueType == orion::ValueTypeNumber)
     {
-      char num[32];
-
-      snprintf(num, sizeof(num), "%f", numberValue);
-
-      out += JSON_VALUE_NUMBER("value", num);
+      if (type == DATE_TYPE)
+      {
+        out += JSON_VALUE("value", isodate2str(numberValue));;
+      }
+      else // regular number
+      {
+        out += JSON_VALUE_NUMBER("value", toString(numberValue));
+      }
     }
     else if (valueType == orion::ValueTypeString)
     {
@@ -719,8 +753,15 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
         break;
 
       case orion::ValueTypeNumber:
-        snprintf(buf, sizeof(buf), "%f", numberValue);
-        out = buf;
+        if (type == DATE_TYPE)
+        {
+          out = isodate2str(numberValue);
+        }
+        else // regular number
+        {
+          snprintf(buf, sizeof(buf), "%f", numberValue);
+          out = buf;
+        }
         break;
 
       case orion::ValueTypeBoolean:
@@ -896,18 +937,18 @@ void ContextAttribute::release(void)
 
 /* ****************************************************************************
 *
-* toString - 
+* ContextAttribute::getName -
 */
-std::string ContextAttribute::toString(void)
+std::string ContextAttribute::getName(void)
 {
   return name;
 }
 
 /* ****************************************************************************
 *
-* toStringValue -
+* ContextAttribute::getValue -
 */
-std::string ContextAttribute::toStringValue(void) const
+std::string ContextAttribute::getValue(void) const
 {
   char buffer[64];
 

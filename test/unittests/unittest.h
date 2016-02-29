@@ -50,6 +50,14 @@ using ::testing::MatchesRegex;
 */
 extern std::map<std::string, std::string> uriParams;
 
+
+
+/* ****************************************************************************
+*
+* options -
+*/
+extern std::map<std::string, bool> options;
+
  
 
 /* ****************************************************************************

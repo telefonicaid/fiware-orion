@@ -33,8 +33,8 @@
 #include "apiTypesV2/ErrorCode.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
-
 #include "serviceRoutinesV2/patchSubscription.h"
+
 
 
 /* ****************************************************************************
@@ -49,14 +49,12 @@
 * URI parameters:
 *   -
 */
-
-
 std::string patchSubscription
 (
-    ConnectionInfo*            ciP,
-    int                        components,
-    std::vector<std::string>&  compV,
-    ParseData*                 parseDataP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 )
 {
   std::string                        answer;
