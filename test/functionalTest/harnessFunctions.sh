@@ -1068,7 +1068,7 @@ function orionCurl()
         # FIXME P10: XML removal
         #vMsg Running xmllint tool for $_response
         #echo $_response | xmllint --format -
-        echo $_response
+        echo $_response | python -mjson.tool
       elif [ "$payloadCheckFormat" == json ]
       then
         vMsg Running python tool for $_response
@@ -1077,7 +1077,7 @@ function orionCurl()
         # FIXME P10: XML removal
         #vMsg Running xmllint tool for $_response
         #echo $_response | xmllint --format -
-        echo $_response
+        echo $_response | python -mjson.tool
       fi
     fi
   fi
