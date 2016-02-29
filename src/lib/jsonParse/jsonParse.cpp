@@ -429,6 +429,66 @@ static std::string jsonParse
 
 /* ****************************************************************************
 *
+* backslashFix - 
+*/
+static void backslashFix(char* content)
+{
+  char* newContent = strdup(content);
+  int   nIx        = 0;
+
+  for (unsigned int ix = 0; ix < strlen(content); ++ix)
+  {
+    if (content[ix] != '\\')
+    {
+      newContent[nIx] = content[ix];
+      ++nIx;
+    }
+    else  // Found a backslash!
+    {
+      //
+      // Valid chars after backslash, according to http://www.json.org/:
+      //   - "   Error in json v1 parse
+      //   - \   OK
+      //   - /   Error in json v1 parse
+      //   - b   OK
+      //   - f   OK
+      //   - n   OK
+      //   - r   OK
+      //   - t   OK
+      //   - u + four-hex-digits  OK
+      //
+      // What we will do here is to replace backslash+slash with 'just slash' as
+      // otherwise this JSON parser gives a parse error.
+      //
+      // Nothing can be done with with backslash+citation-mark, that would have to be 
+      // taken care of inside the parser, and that we will not do.
+      // We will just let it pass and provoke a JSON Parse Error.
+      //
+      char next =  content[ix + 1];
+
+      if (next == '/')
+      {
+        // Eat the backslash
+      }
+      else
+      {
+        // Keep the backslash
+        newContent[nIx] = content[ix];
+        ++nIx;
+      }
+    }
+  }
+
+  newContent[nIx] = 0;
+  strcpy(content, newContent);
+
+  free(newContent);
+}
+
+
+
+/* ****************************************************************************
+*
 * jsonParse -
 */
 std::string jsonParse
@@ -450,6 +510,15 @@ std::string jsonParse
   if (timingStatistics)
   {
     clock_gettime(CLOCK_REALTIME, &start);
+  }
+
+  //
+  // Does 'content' contain any '\/' (escaped slashes) ?
+  // If so, change all '\/' to '/'
+  //
+  if ((strstr(content, "\\/") != NULL))
+  {
+    backslashFix((char*) content);
   }
 
   ss << content;
