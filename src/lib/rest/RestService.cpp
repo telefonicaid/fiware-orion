@@ -120,7 +120,7 @@ std::string payloadParse
   {
     if (compV[0] == "v2")
     {
-      result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP);
+      result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
     }
     else
     {
