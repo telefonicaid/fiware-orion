@@ -77,7 +77,7 @@ TEST(NotifyConditionVector, check)
   NotifyCondition        nc;
   NotifyConditionVector  ncV;
   std::string            checked;
-  std::string            expected2 = "invalid notify condition type: 'Type'";
+  std::string            expected2 = "invalid notify condition type: /Type/";
   std::string            expected3 = "empty type for NotifyCondition";
   
   utInit();
