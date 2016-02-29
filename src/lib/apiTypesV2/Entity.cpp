@@ -74,15 +74,20 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
   {
     renderMode = "keyValues";
   }
-  else if (ciP->uriParamOptions["values"]== true)
+  else if (ciP->uriParamOptions["values"] == true)
   {
     renderMode = "values";
+  }
+  else if (ciP->uriParamOptions["unique"] == true)
+  {
+    renderMode = "unique";
   }
 
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out;
-    if (renderMode == "values")
+
+    if ((renderMode == "values") || (renderMode == "unique"))
     {
       out = "[";
       if (attributeVector.size() != 0)

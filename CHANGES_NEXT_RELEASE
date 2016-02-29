@@ -2,3 +2,4 @@
 - Fix: check for field too long in attribute type (Issue #1845)
 - Fix: check for metadatas with empty name (Issue #1438)
 - Fix: accepting backslash-slash in JSON v1 payload (Issue #1852)
+- Add: new value for URI param 'options': unique - like 'values', but avoiding duplicates (Issue #1050)

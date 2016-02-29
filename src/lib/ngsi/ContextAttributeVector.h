@@ -65,10 +65,14 @@ typedef struct ContextAttributeVector
   std::string        render(ConnectionInfo*     ciP,
                             RequestType         requestType,
                             const std::string&  indent,
-                            bool                comma     = false,
-                            bool                omitValue = false,
+                            bool                comma       = false,
+                            bool                omitValue   = false,
                             bool                attrsAsName = false);
-  std::string        toJson(bool isLastElement, bool types, const std::string& renderMode, const std::string& attrsFilter = "");
+
+  std::string        toJson(bool                isLastElement,
+                            bool                types,
+                            const std::string&  renderMode,
+                            const std::string& attrsFilter  = "");
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

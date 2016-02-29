@@ -42,6 +42,7 @@ static const char* validOptions[] =
   "keyValues",
   "text",
   "append",
+  "unique",
   DATE_CREATED,
   DATE_MODIFIED
 };
@@ -90,6 +91,13 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
     ciP->uriParamOptions[vec[ix]] = true;
   }
+
+  //
+  // Check of invalid combinations
+  //
+  if (ciP->uriParamOptions["keyValues"] && ciP->uriParamOptions["values"])   return -1;
+  if (ciP->uriParamOptions["keyValues"] && ciP->uriParamOptions["unique"])   return -1;
+  if (ciP->uriParamOptions["unique"]    && ciP->uriParamOptions["values"])   return -1;
 
   return 0;
 }
