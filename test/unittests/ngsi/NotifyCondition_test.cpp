@@ -109,7 +109,7 @@ TEST(NotifyCondition, check)
   
   nc.type = "XXX";
   checked = nc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ("invalid notify condition type: 'XXX'", checked.c_str());
+  EXPECT_STREQ("invalid notify condition type: /XXX/", checked.c_str());
 
   nc.release();
 
