@@ -110,8 +110,8 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
       return;
     }
 
-    /* Set Content-Type depending on the format */
-    std::string content_type = (format == XML)? "application/xml" : "application/json";
+    /* Set Content-Type */
+    std::string content_type = "application/json";
 
 #ifdef SEND_BLOCKING
     int r;
@@ -202,8 +202,8 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
       return;
     }
 
-    /* Set Content-Type depending on the format */
-    std::string content_type = (format == XML ? "application/xml" : "application/json");
+    /* Set Content-Type */
+    std::string content_type = "application/json";
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
 #ifdef SEND_BLOCKING
