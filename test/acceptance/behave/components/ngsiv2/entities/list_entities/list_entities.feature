@@ -76,17 +76,17 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter         | value        |
-      | entities_type     | house        |
-      | entities_id       | room2        |
-      | attributes_number | 2            |
-      | attributes_name   | temeperature |
-      | attributes_value  | 45           |
-      | attributes_type   | celsius      |
-      | metadatas_number  | 2            |
-      | metadatas_name    | very_hot     |
-      | metadatas_type    | alarm        |
-      | metadatas_value   | random=10    |
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room2       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 45          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
