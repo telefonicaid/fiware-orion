@@ -117,8 +117,8 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
     return;
   }
 
-  /* Set Content-Type depending on the format */
-  std::string content_type = (format == XML)? "application/xml" : "application/json";
+  /* Set Content-Type */
+  std::string content_type = "application/json";
 
   SenderThreadParams* params = new SenderThreadParams();
   params->ip            = host;
