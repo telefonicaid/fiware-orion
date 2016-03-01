@@ -1,0 +1,116 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check that ONTIMEINTERVAL subscriptions are rejected
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Subscribe ONTIMEINTERVAL
+# 02. Update subscription ONTIMEINTERVAL
+#
+
+echo "01. Subscribe ONTIMEINTERVAL"
+echo "============================"
+payload='{
+  "entities": [
+    {
+      "isPattern": "false",
+      "id": "S1"
+    }
+  ],
+  "reference": "http://localhost:1234/notify",
+  "duration": "P1M",
+  "throttling": "PT2S",
+  "notifyConditions": [
+    {
+      "type": "ONTIMEINTERVAL",
+      "condValues": [ "PT1S" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Update subscription ONTIMEINTERVAL"
+echo "======================================"
+payload='{
+  "subscriptionId": "123456789012345678901234",
+  "notifyConditions": [
+    {
+      "type": "ONTIMEINTERVAL",
+      "condValues": [ "PT1S" ]
+    }
+  ]
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+echo
+echo
+
+--REGEXPECT--
+01. Subscribe ONTIMEINTERVAL
+============================
+HTTP/1.1 200 OK
+Content-Length: 202
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "400",
+            "details": "invalid payload: invalid notify condition type: /ONTIMEINTERVAL/",
+            "reasonPhrase": "Bad Request"
+        }
+    }
+}
+
+
+02. Update subscription ONTIMEINTERVAL
+======================================
+HTTP/1.1 200 OK
+Content-Length: 236
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "400",
+            "details": "invalid notify condition type: /ONTIMEINTERVAL/",
+            "reasonPhrase": "Bad Request"
+        },
+        "subscriptionId": "123456789012345678901234"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

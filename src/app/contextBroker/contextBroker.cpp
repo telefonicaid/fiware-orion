@@ -76,7 +76,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
@@ -92,7 +91,6 @@
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
-#include "ngsiNotify/onTimeIntervalThread.h"
 #include "ngsiNotify/QueueNotifier.h"
 #include "ngsiNotify/QueueWorkers.h"
 #include "ngsiNotify/senderThread.h"
@@ -198,6 +196,7 @@
 #include "serviceRoutinesV2/deleteSubscription.h"
 #include "serviceRoutinesV2/patchSubscription.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
+#include "serviceRoutinesV2/postBatchUpdate.h"
 
 #include "orion_websocket/ws.h"
 
@@ -477,6 +476,10 @@ static const char* validLogLevels[] =
 #define BQR                     BatchQueryRequest
 #define BQR_COMPS_V2            3, { "v2", "op", "query" }
 #define BQR_COMPS_WORD          ""
+
+#define BUR                     BatchUpdateRequest
+#define BUR_COMPS_V2            3, { "v2", "op", "update" }
+#define BUR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -765,7 +768,10 @@ static const char* validLogLevels[] =
   { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetDeletePatchOnly}, \
                                                                                                        \
   { "POST",   BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          postBatchQuery           }, \
-  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }
+  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }, \
+                                                                                                       \
+  { "POST",   BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          postBatchUpdate          }, \
+  { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
 
 
 
@@ -1261,16 +1267,6 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
-  //
-  // Cancel all threads to avoid false leaks in valgrind
-  //
-  std::vector<std::string> dbs;
-  getOrionDatabases(dbs);
-  for (unsigned int ix = 0; ix < dbs.size(); ++ix)
-  {
-    destroyAllOntimeIntervalThreads(dbs[ix]);
-  }
-
   exit(code);
 }
 
@@ -1351,21 +1347,7 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
   /* Set notifier object (singleton) */
   setNotifier(pNotifier);
 
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
-  recoverOntimeIntervalThreads("");
-  if (multitenant)
-  {
-    /* We get tenant database names and recover ontime interval threads on each one */
-    std::vector<std::string> orionDbs;
-    getOrionDatabases(orionDbs);
-    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
-    {
-      std::string orionDb = orionDbs[ix];
-      std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-      recoverOntimeIntervalThreads(tenant);
-    }
-  }
-
+  /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
 }
 

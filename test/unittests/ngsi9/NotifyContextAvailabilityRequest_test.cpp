@@ -29,43 +29,8 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
-#include "xmlParse/xmlRequest.h"
 
 #include "unittest.h"
-
-
-
-/* ****************************************************************************
-*
-* ok_xml - 
-*/
-TEST(NotifyContextAvailabilityRequest, ok_xml)
-{
-  ParseData       parseData;
-  const char*     inFile  = "ngsi9.notifyContextAvailabilityRequest.ok.valid.xml";
-  const char*     outFile = "ngsi9.notifyContextAvailabilityRequestRendered.ok.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-  std::string     rendered;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result);
-  lmTraceLevelSet(LmtDump, false);
-
-  NotifyContextAvailabilityRequest* ncarP = &parseData.ncar.res;
-
-  rendered = ncarP->render(NotifyContext, XML, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-  ncarP->release();
-  
-  utExit();
-}
 
 
 
@@ -110,9 +75,12 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 /* ****************************************************************************
 *
 * badEntityAttribute_xml - 
+*
+* FIME P5 #1862: _json counterpart?
 */
-TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
+TEST(NotifyContextAvailabilityRequest, DISABLED_badEntityAttribute_xml)
 {
+#if 0
   ParseData       parseData;
   const char*     infile  = "ngsi9.notifyContextAvailabilityRequest.entityAttribute.invalid.xml";
   const char*     outfile = "ngsi9.notifyContextAvailabilityResponse.invalidEntityAttribute.valid.xml";
@@ -127,6 +95,7 @@ TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
   
   utExit();
+#endif
 }
 
 

@@ -67,7 +67,7 @@ typedef struct Metadata
   bool               typeGiven;    // Was 'type' part of the incoming payload?
 
   Metadata();
-  Metadata(Metadata* mP);
+  Metadata(Metadata* mP, bool useDefaultType = false);
   Metadata(const std::string& _name, const std::string& _type, const char* _value);
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
   Metadata(const std::string& _name, const std::string& _type, double _value);

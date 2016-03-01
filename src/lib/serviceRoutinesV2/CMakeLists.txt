@@ -43,6 +43,7 @@ deleteSubscription.cpp
 patchSubscription.cpp
 postBatchQuery.cpp
 badVerbGetDeletePatchOnly.cpp
+postBatchUpdate.cpp
 )
 
 SET (HEADERS
@@ -68,6 +69,7 @@ deleteSubscription.h
 patchSubscription.h
 postBatchQuery.h
 badVerbGetDeletePatchOnly.h
+postBatchUpdate.h
 )
 
 

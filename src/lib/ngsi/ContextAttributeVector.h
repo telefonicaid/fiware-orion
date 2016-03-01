@@ -49,7 +49,7 @@ typedef struct ContextAttributeVector
   void                     push_back(ContextAttributeVector* aVec);
   unsigned int             size(void) const;
   void                     release(void);
-  void                     fill(struct ContextAttributeVector* cavP);
+  void                     fill(struct ContextAttributeVector* cavP, bool useDefaultType = false);
   ContextAttribute*        lookup(const std::string& attributeName);
   
   ContextAttribute*  operator[](unsigned int ix) const;
@@ -65,10 +65,14 @@ typedef struct ContextAttributeVector
   std::string        render(ConnectionInfo*     ciP,
                             RequestType         requestType,
                             const std::string&  indent,
-                            bool                comma     = false,
-                            bool                omitValue = false,
+                            bool                comma       = false,
+                            bool                omitValue   = false,
                             bool                attrsAsName = false);
-  std::string        toJson(bool isLastElement, bool types, const std::string& renderMode, const std::string& attrsFilter = "");
+
+  std::string        toJson(bool                isLastElement,
+                            bool                types,
+                            const std::string&  renderMode,
+                            const std::string&  attrsFilter  = "");
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

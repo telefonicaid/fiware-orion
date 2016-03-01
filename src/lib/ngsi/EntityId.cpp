@@ -196,12 +196,17 @@ void EntityId::fill(const std::string& _id, const std::string& _type, const std:
 *
 * EntityId::fill -
 */
-void EntityId::fill(const struct EntityId* eidP)
+void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 {
   id          = eidP->id;
   type        = eidP->type;
   isPattern   = eidP->isPattern;
   servicePath = eidP->servicePath;
+
+  if (useDefaultType && (type == ""))
+  {
+    type = DEFAULT_TYPE;
+  }
 }
 
 

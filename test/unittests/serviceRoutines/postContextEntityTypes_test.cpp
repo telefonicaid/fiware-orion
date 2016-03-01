@@ -50,8 +50,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(postContextEntityTypes, ok)
+TEST(postContextEntityTypes, DISABLED_ok)
 {
   utInit();
 

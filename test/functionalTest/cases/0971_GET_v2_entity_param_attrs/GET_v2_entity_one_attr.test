@@ -161,7 +161,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/8787GHY?attrs=speed,plateCountry
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 139
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -169,7 +169,7 @@ Date: REGEX(.*)
     "id": "8787GHY",
     "plateCountry": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "ES"
     },
     "speed": {

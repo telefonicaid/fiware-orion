@@ -22,7 +22,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     Notifier.cpp
-    onTimeIntervalThread.cpp
     senderThread.cpp
     ContextSubscriptionInfo.cpp
     QueueWorkers.cpp
@@ -33,7 +32,6 @@ SET (SOURCES
 SET (HEADERS
     ContextSubscriptionInfo.h
     Notifier.h
-    onTimeIntervalThread.h
     senderThread.h
     ThreadData.h
     OnIntervalThreadParams.h

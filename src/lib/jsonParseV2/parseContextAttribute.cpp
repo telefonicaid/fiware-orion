@@ -170,7 +170,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
 {
   std::string name      = iter->name.GetString();
   std::string type      = jsonParseTypeNames[iter->value.GetType()];
-  bool        keyValues = ciP->uriParamOptions["keyValues"];
+  bool        keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
 
   caP->name = name;
 
@@ -234,7 +234,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
     if (type != "Object")
     {
-      std::string details = "not a JSON object";
+      std::string details = "attribute must be a JSON object, unless keyValues option is used";
       alarmMgr.badInput(clientIp, details);
       ciP->httpStatusCode = SccBadRequest;
       return details;

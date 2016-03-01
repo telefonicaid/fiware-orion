@@ -93,7 +93,7 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -101,14 +101,14 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 174
+Content-Length: 178
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "compattr": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": {
             "bool": true,
             "number": 2,
@@ -118,7 +118,7 @@ Date: REGEX(.*)
     "id": "E1",
     "simpleattr": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "a simple value"
     },
     "type": "T1"
@@ -136,7 +136,7 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 89
+Content-Length: 91
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -144,7 +144,7 @@ Date: REGEX(.*)
     "id": "E1",
     "simpleattr": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "a simple value"
     },
     "type": "T1"

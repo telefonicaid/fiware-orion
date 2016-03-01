@@ -29,6 +29,7 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityObject.h"
+#include "jsonParseV2/parseContextAttribute.h"
 
 using namespace rapidjson;
 
@@ -93,15 +94,24 @@ std::string parseEntityObject(ConnectionInfo* ciP, Value::ConstValueIterator val
     }
     else
     {
+      std::string r;
+
       if (!attrsAllowed)
       {
         return "no attributes allowed in Entity in this payload";
       }
-
-      //
-      // FIXME P2: Once/If ever this function is used to parse entities WITH attributes, 
-      //           the attribute parsing goes here
-      //
+      
+      ContextAttribute* caP = new ContextAttribute();
+      r = parseContextAttribute(ciP, iter, caP);
+      if (r == "OK")
+      {
+        eP->attributeVector.push_back(caP);
+      }
+      else
+      {
+        delete caP;
+        return r;
+      }
     }
   }
 

@@ -161,8 +161,8 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 
   if (format == NOFORMAT)
   {
-    // Default format is XML for "v1"
-    format = XML;
+    // Default format is JSON
+    format = JSON;
   }
 
 

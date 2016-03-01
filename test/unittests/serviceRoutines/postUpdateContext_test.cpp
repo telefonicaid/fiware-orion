@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * createEntity -
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(postUpdateContext, createEntity)
+TEST(postUpdateContext, DISABLED_createEntity)
 {
   ConnectionInfo ci("/ngsi10/updateContext",  "POST", "1.1");
   const char*    infile    = "ngsi10.updateContextRequest.idNotFound.valid.xml";

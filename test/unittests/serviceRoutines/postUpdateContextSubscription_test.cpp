@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(postUpdateContextSubscription, notFound)
+TEST(postUpdateContextSubscription, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/updateContextSubscription",  "POST", "1.1");
   const char*    infile    = "ngsi10.updateContextSubscriptionRequest.subscriptionNotFound.valid.xml";
