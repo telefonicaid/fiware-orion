@@ -72,7 +72,7 @@ typedef struct ContextAttributeVector
   std::string        toJson(bool                isLastElement,
                             bool                types,
                             const std::string&  renderMode,
-                            const std::string& attrsFilter  = "");
+                            const std::string&  attrsFilter  = "");
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

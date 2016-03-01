@@ -112,7 +112,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
         continue;
       }
 
-      if ((renderMode == "unique") && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -122,7 +122,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
 
       ++validAttributes;
 
-      if ((renderMode == "unique") && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }
@@ -160,7 +160,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
 
       ++renderedAttributes;
 
-      if ((renderMode == "unique") && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -170,7 +170,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
 
       out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
 
-      if ((renderMode == "unique") && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }

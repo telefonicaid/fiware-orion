@@ -26,6 +26,7 @@
 #include <map>
 
 #include "common/string.h"
+#include "common/globals.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -33,18 +34,20 @@
 /* ****************************************************************************
 *
 * validOptions - 
+*
+* Text definitions OPT_* found in common/globals.h
 */
 static const char* validOptions[] = 
 {
-  "count",
-  "normalized",
-  "values",
-  "keyValues",
-  "text",
-  "append",
-  "unique",
-  DATE_CREATED,
-  DATE_MODIFIED
+  OPT_COUNT,
+  OPT_NORMALIZED,
+  OPT_VALUES,
+  OPT_KEY_VALUES,
+  OPT_TEXT,
+  OPT_APPEND,
+  OPT_UNIQUE_VALUES,
+  OPT_DATE_CREATED,
+  OPT_DATE_MODIFIED
 };
 
 
@@ -95,9 +98,9 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
   //
   // Check of invalid combinations
   //
-  if (ciP->uriParamOptions["keyValues"] && ciP->uriParamOptions["values"])   return -1;
-  if (ciP->uriParamOptions["keyValues"] && ciP->uriParamOptions["unique"])   return -1;
-  if (ciP->uriParamOptions["unique"]    && ciP->uriParamOptions["values"])   return -1;
+  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_VALUES])        return -1;
+  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_UNIQUE_VALUES]) return -1;
+  if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] && ciP->uriParamOptions[OPT_VALUES])        return -1;
 
   return 0;
 }
