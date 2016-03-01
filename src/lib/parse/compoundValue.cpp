@@ -44,7 +44,6 @@ namespace orion
 *
 * compoundValueStart - 
 *
-* As commented in xmlParse.h
 * This function is called when the first compound node is encountered, so not
 * only must the root be created, but also the first node of the compound tree
 * must be taken care of. This is done by calling compoundValueMiddle.

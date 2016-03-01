@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(postSubscribeContext, ok)
+TEST(postSubscribeContext, DISABLED_ok)
 {
   ConnectionInfo ci("/ngsi10/subscribeContext",  "POST", "1.1");
   const char*    infile       = "ngsi10.subscribeContextRequest.ok.valid.xml";
