@@ -48,7 +48,6 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   //   The only doubt here if whether originator should end in a comma.
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
-  //out += startTag(indent, tag, ciP->outFormat, false);
   out += startTag1(indent, tag, false);
   out += subscriptionId.render(NotifyContext, ciP->outFormat, indent + "  ", true);
   out += originator.render(ciP->outFormat, indent  + "  ", contextElementResponseVectorRendered);

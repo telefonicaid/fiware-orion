@@ -39,7 +39,7 @@
 * UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse -
 */
 UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
-   subscribeError.errorCode.tagSet("errorCode");
+   subscribeError.errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -49,7 +49,7 @@ UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
 UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(StatusCode& errorCode) {
    subscribeError.subscriptionId.set("000000000000000000000000");
    subscribeError.errorCode.fill(&errorCode);
-   subscribeError.errorCode.tagSet("errorCode");
+   subscribeError.errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -69,13 +69,16 @@ std::string UpdateContextSubscriptionResponse::render(RequestType requestType, F
   std::string out  = "";
   std::string tag  = "updateContextSubscriptionResponse";
 
-  //out += startTag(indent, tag, format, false);
   out += startTag1(indent, tag, false);
 
   if (subscribeError.errorCode.code == SccNone)
-     out += subscribeResponse.render(format, indent + "  ", false);
+  {
+    out += subscribeResponse.render(format, indent + "  ", false);
+  }
   else
-     out += subscribeError.render(UpdateContextSubscription, format, indent + "  ", false);
+  {
+    out += subscribeError.render(UpdateContextSubscription, format, indent + "  ", false);
+  }
 
   out += endTag(indent);
 

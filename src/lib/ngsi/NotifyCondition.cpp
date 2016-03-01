@@ -74,9 +74,7 @@ std::string NotifyCondition::render(Format format, const std::string& indent, bo
   bool commaAfterCondValueList = restrictionRendered;
   bool commaAfterType          = condValueListRendered || restrictionRendered;
 
-  //out += startTag(indent, tag, tag, format, false, false);
   out += startTag2(indent, tag, false, false);
-  //out += valueTag(indent + "  ", "type", type, format, commaAfterType);
   out += valueTag1(indent + "  ", "type", type, commaAfterType);
   out += condValueList.render(format, indent + "  ",   commaAfterCondValueList);
   out += restriction.render(format,   indent + "  ",   commaAfterRestriction);

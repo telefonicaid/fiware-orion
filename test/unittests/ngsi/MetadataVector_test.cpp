@@ -55,7 +55,7 @@ TEST(MetadataVector, render)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  mV.tagSet("metadata");
+  mV.keyNameSet("metadata");
   out = mV.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());

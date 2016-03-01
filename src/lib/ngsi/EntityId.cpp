@@ -38,7 +38,7 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId() : tag("entityId")
+EntityId::EntityId() : keyName("entityId")
 {
 }
 
@@ -48,7 +48,7 @@ EntityId::EntityId() : tag("entityId")
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(EntityId* eP) : tag("entityId")
+EntityId::EntityId(EntityId* eP) : keyName("entityId")
 {
   fill(eP);
 }
@@ -63,11 +63,11 @@ EntityId::EntityId
   const std::string&  _id,
   const std::string&  _type,
   const std::string&  _isPattern,
-  const std::string&  _tag
+  const std::string&  _keyName
 ) : id(_id),
     type(_type),
     isPattern(_isPattern),
-    tag(_tag)
+    keyName(_keyName)
 {
 }
 
@@ -75,11 +75,11 @@ EntityId::EntityId
 
 /* ****************************************************************************
 *
-* tagSet -
+* keyNameSet -
 */
-void EntityId::tagSet(const std::string& tagName)
+void EntityId::keyNameSet(const std::string& _keyName)
 {
-  tag = tagName;
+  keyName = _keyName;
 }
 
 
@@ -88,8 +88,6 @@ void EntityId::tagSet(const std::string& tagName)
 *
 * EntityId::render -
 *
-* FIXME P1: startTag() is not enough for the XML case of entityId - XML attributes ...
-*           Perhaps add a vector of attributes to startTag() ?
 */
 std::string EntityId::render
 (

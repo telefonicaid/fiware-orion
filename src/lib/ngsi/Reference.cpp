@@ -136,7 +136,6 @@ std::string Reference::render(Format format, const std::string& indent, bool com
     return "";
   }
 
-  //return valueTag(indent, "reference", string, format, comma);
   return valueTag1(indent, "reference", string, comma);
 }
 

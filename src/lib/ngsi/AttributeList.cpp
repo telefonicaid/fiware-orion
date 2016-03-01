@@ -55,19 +55,18 @@ void AttributeList::fill(const std::vector<std::string>& aVec)
 */
 std::string AttributeList::render(Format format, const std::string& indent, bool comma)
 {
-  std::string  out     = "";
-  std::string  xmlTag  = "attributeList";
-  std::string  jsonTag = "attributes";
+  std::string  out = "";
+  std::string  key = "attributes";
 
   if (attributeV.size() == 0)
+  {
     return "";
+  }
 
-  //out += startTag(indent, xmlTag, jsonTag, format, true, true, false);
-  out += startTag2(indent, jsonTag, true, true);
+  out += startTag2(indent, key, true, true);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    //out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, true);
     out += valueTag1(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
   }
 

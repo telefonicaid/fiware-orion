@@ -61,7 +61,6 @@ RegisterProviderRequest::RegisterProviderRequest()
 std::string RegisterProviderRequest::render(Format format, std::string indent)
 {
   std::string  out                            = "";
-  std::string  xmlTag                         = "registerProviderRequest";
   bool         durationRendered               = duration.get() != "";
   bool         providingApplicationRendered   = providingApplication.get() != "";
   bool         registrationIdRendered         = registrationId.get() != "";
@@ -70,7 +69,6 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
   bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
   bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
 
-  //out += startTag(indent, xmlTag, "", format, false, false);
   out += startTag2(indent, "", false, false);
   out += metadataVector.render(format,       indent + "  ", commaAfterMetadataVector);
   out += duration.render(format,             indent + "  ", commaAfterDuration);

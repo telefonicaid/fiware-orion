@@ -43,7 +43,7 @@
 */
 QueryContextResponse::QueryContextResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -55,7 +55,7 @@ QueryContextResponse::QueryContextResponse()
 QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -126,7 +126,6 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   //
   // 02. render 
   //
-  //out += startTag(indent, tag, ciP->outFormat, false);
   out += startTag1(indent, tag, false);
 
   if (contextElementResponseVector.size() > 0)

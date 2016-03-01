@@ -175,7 +175,6 @@ std::string Duration::render(Format format, const std::string& indent, bool comm
     return "";
   }
 
-  //return valueTag(indent, "duration", string, format, comma);
   return valueTag1(indent, "duration", string, comma);
 }
 

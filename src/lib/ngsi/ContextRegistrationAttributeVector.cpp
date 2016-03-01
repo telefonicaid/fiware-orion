@@ -41,17 +41,20 @@
 */
 std::string ContextRegistrationAttributeVector::render(Format format, const std::string& indent, bool comma)
 {
-  std::string xmlTag   = "contextRegistrationAttributeList";
-  std::string jsonTag  = "attributes";
-  std::string out      = "";
+
+  std::string key = "attributes";
+  std::string out = "";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
-  //out += startTag(indent, xmlTag, jsonTag, format, true, true);
-  out += startTag2(indent, jsonTag, true, true);
+  out += startTag2(indent, key, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+  }
   out += endTag(indent, comma, true);
 
   return out;

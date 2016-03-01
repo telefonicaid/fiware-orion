@@ -45,7 +45,6 @@ std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType
   std::string tag = "updateContextElementRequest";
   std::string out = "";
 
-  //out += startTag(indent, tag, ciP->outFormat, false);
   out += startTag1(indent, tag, false);
   out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
   out += contextAttributeVector.render(ciP, requestType, indent + "  ");

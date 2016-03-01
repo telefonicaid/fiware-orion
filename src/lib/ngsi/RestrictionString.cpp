@@ -116,7 +116,6 @@ std::string RestrictionString::render(Format format, const std::string& indent, 
     return "";
   }
 
-  //return valueTag(indent, "restriction", string, format, comma);
   return valueTag1(indent, "restriction", string, comma);
 }
 

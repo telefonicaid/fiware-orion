@@ -51,7 +51,7 @@ StatusCode::StatusCode()
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = "statusCode";
+  keyName      = "statusCode";
 }
 
 
@@ -60,12 +60,12 @@ StatusCode::StatusCode()
 *
 * StatusCode::StatusCode -
 */
-StatusCode::StatusCode(const std::string& _tag)
+StatusCode::StatusCode(const std::string& _keyName)
 {
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = _tag;
+  keyName      = _keyName;
 }
 
 
@@ -74,12 +74,12 @@ StatusCode::StatusCode(const std::string& _tag)
 *
 * StatusCode::StatusCode -
 */
-StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag)
+StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName)
 {
   code          = _code;
   reasonPhrase  = httpStatusCodeString(code);
   details       = _details;
-  tag           = _tag;
+  keyName       = _keyName;
 }
 
 
@@ -88,7 +88,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 *
 * StatusCode::render -
 */
-std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showTag)
+std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showKey)
 {
   std::string  out  = "";
 
@@ -108,15 +108,12 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
     details += " - ZERO code set to 500";
   }
 
-  //out += startTag(indent, tag, format, showTag);
-  out += startTag1(indent, tag, showTag);
+  out += startTag1(indent, keyName, showKey);
   out += valueTag(indent + "  ", "code", code, true);
-  //out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
   out += valueTag1(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
 
   if (details != "")
   {
-    //out += valueTag(indent + "  ", "details", details, format, false);
     out += valueTag1(indent + "  ", "details", details, false);
   }
 
@@ -272,7 +269,7 @@ void StatusCode::present(const std::string& indent)
 {
   LM_T(LmtPresent, ("%s%s:", 
 		    indent.c_str(), 
-		    tag.c_str()));
+        keyName.c_str()));
   LM_T(LmtPresent, ("%s  Code:            %d",   
 		    indent.c_str(), 
 		    code));
@@ -295,16 +292,16 @@ void StatusCode::release(void)
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = "statusCode";
+  keyName      = "statusCode";
 }
 
 
 
 /* ****************************************************************************
 *
-* tagSet -
+* keyNameSet -
 */
-void StatusCode::tagSet(const std::string& _tag)
+void StatusCode::keyNameSet(const std::string& _keyName)
 {
-  tag = _tag;
+  keyName = _keyName;
 }

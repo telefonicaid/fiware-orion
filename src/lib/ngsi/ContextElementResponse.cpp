@@ -312,12 +312,10 @@ std::string ContextElementResponse::render
   bool                omitAttributeValues
 )
 {
-  std::string xmlTag   = "contextElementResponse";
-  std::string jsonTag  = "contextElement";
-  std::string out      = "";
+  std::string key = "contextElement";
+  std::string out = "";
 
-  //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  out += startTag2(indent, jsonTag, false, false);
+  out += startTag2(indent, key, false, false);
   out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(ciP->outFormat, indent + "  ", false);
   out += endTag(indent, comma, false);

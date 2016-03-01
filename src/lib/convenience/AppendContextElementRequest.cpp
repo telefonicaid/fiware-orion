@@ -55,7 +55,6 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
   std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  //out += startTag(indent, tag, ciP->outFormat, false);
   out += startTag1(indent, tag, false);
 
   if (entity.id != "")

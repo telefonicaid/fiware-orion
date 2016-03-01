@@ -140,6 +140,5 @@ std::string Throttling::render(Format format, const std::string& indent, bool co
     return "";
   }
 
-  //return valueTag(indent, "throttling", string, format, comma);
   return valueTag1(indent, "throttling", string, comma);
 }

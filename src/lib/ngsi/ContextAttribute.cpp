@@ -350,13 +350,11 @@ std::string ContextAttribute::renderAsJsonObject
 )
 {
   std::string  out                    = "";
-  std::string  jsonTag                = name;
+  std::string  key                    = name;
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
-  //out += startTag(indent, "", jsonTag, ciP->outFormat, false, true);
-  //out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, commaAfterType);
-  out += startTag2(indent, jsonTag, false, true);
+  out += startTag2(indent, key, false, true);
   out += valueTag1(indent + "  ", "type",         type,  commaAfterType);
 
   if (compoundValueP == NULL)
@@ -402,9 +400,6 @@ std::string ContextAttribute::renderAsJsonObject
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue nor numberValue)      
       //
-      /*out += valueTag(indent + "  ", "value",
-                      (request != RtUpdateContextResponse)? effectiveValue : "",
-                      ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);*/
       out += valueTag1(indent + "  ", "value",
                             (request != RtUpdateContextResponse)? effectiveValue : "",
                             commaAfterContextValue, valueIsNumberOrBool);
@@ -419,7 +414,6 @@ std::string ContextAttribute::renderAsJsonObject
       isCompoundVector = true;
     }
 
-    //out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(ciP, ciP->outFormat, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
@@ -476,28 +470,21 @@ std::string ContextAttribute::render
 )
 {
   std::string  out                    = "";
-  std::string  xmlTag                 = "contextAttribute";
-  std::string  jsonTag                = "attribute";
+  std::string  key                    = "attribute";
   bool         valueRendered          = (compoundValueP != NULL) || (omitValue == false) || (request == RtUpdateContextResponse);
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = valueRendered;
 
-  metadataVector.tagSet("metadata");
+  metadataVector.keyNameSet("metadata");
 
   if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outFormat == JSON))
   {
     return renderAsJsonObject(ciP, request, indent, comma, omitValue);
   }
 
-#if 0
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, true);  // attribute.type is always rendered
-  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, commaAfterType);
-#else
-  out += startTag2(indent, jsonTag, false, false);
-  out += valueTag1(indent + "  ", "name",         name,  true);  // attribute.type is always rendered
-  out += valueTag1(indent + "  ", "type",         type,  commaAfterType);
-#endif
+  out += startTag2(indent, key, false, false);
+  out += valueTag1(indent + "  ", "name", name,  true);  // attribute.type is always rendered
+  out += valueTag1(indent + "  ", "type", type,  commaAfterType);
 
   if (compoundValueP == NULL)
   {
@@ -537,9 +524,6 @@ std::string ContextAttribute::render
         LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
 
-      /*out += valueTag(indent + "  ", "value", "value",
-                        (request != RtUpdateContextResponse)? effectiveValue : "",
-                        ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);*/
       out += valueTag2(indent + "  ", "value",
                               (request != RtUpdateContextResponse)? effectiveValue : "",
                               commaAfterContextValue, valueIsNumberOrBool);
@@ -547,7 +531,6 @@ std::string ContextAttribute::render
     }
     else if (request == RtUpdateContextResponse)
     {
-      //out += valueTag(indent + "  ", "value", "", ciP->outFormat, commaAfterContextValue);
       out += valueTag1(indent + "  ", "value", "", commaAfterContextValue);
     }
   }
@@ -560,7 +543,6 @@ std::string ContextAttribute::render
       isCompoundVector = true;
     }
 
-    //out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(ciP, ciP->outFormat, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);

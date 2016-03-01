@@ -46,14 +46,12 @@
 std::string RegisterContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out                                 = "";
-  std::string  xmlTag                              = "registerContextRequest";
   bool         durationRendered                    = duration.get() != "";
   bool         registrationIdRendered              = registrationId.get() != "";
   bool         commaAfterRegistrationId            = false; // Last element
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  //out += startTag(indent, xmlTag, "", format, false, false);
   out += startTag2(indent, "", false, false);
 
   out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);

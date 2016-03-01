@@ -40,11 +40,11 @@ typedef struct MetadataVector
 {
   std::vector<Metadata*>  vec;
 
-  std::string             tag;        // Help variable for the 'render' method
+  std::string             keyName;        // Help variable for the 'render' method
 
-  MetadataVector(const std::string& _tag = "registrationMetadata");
+  MetadataVector(const std::string& _keyName = "registrationMetadata");
 
-  void            tagSet(const std::string& tagName);
+  void            keyNameSet(const std::string& key);
   std::string     render(Format format, const std::string& indent, bool comma = false);
   std::string     toJson(bool isLastElement);
   std::string     check(ConnectionInfo* ciP,

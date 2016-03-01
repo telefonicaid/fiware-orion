@@ -41,7 +41,7 @@
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -62,7 +62,7 @@ DiscoverContextAvailabilityResponse::~DiscoverContextAvailabilityResponse()
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -81,7 +81,6 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
   // Exactly ONE of responseVector|errorCode is included in the discovery response so,
   // no JSON commas necessary
   //
-  //out += startTag(indent, tag, format, false);
   out += startTag1(indent, tag, false);
   
   if (responseVector.size() > 0)
@@ -117,5 +116,5 @@ void DiscoverContextAvailabilityResponse::release(void)
 {
   responseVector.release();
   errorCode.release();
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }

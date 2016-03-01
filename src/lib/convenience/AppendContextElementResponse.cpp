@@ -58,7 +58,6 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
   std::string tag = "appendContextElementResponse";
   std::string out = "";
 
-  //out += startTag(indent, tag, ciP->outFormat, false);
   out += startTag1(indent, tag, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))

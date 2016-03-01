@@ -149,7 +149,6 @@ std::string ProvidingApplication::render(Format format, const std::string& inden
     return "";
   }
 
-  //return valueTag(indent, "providingApplication", string, format, comma);
   return valueTag1(indent, "providingApplication", string, comma);
 }
 

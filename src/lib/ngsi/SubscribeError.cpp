@@ -38,7 +38,7 @@
 */
 SubscribeError::SubscribeError()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -52,7 +52,6 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
   std::string out = "";
   std::string tag = "subscribeError";
 
-  //out += startTag(indent, tag, format, true);
   out += startTag1(indent, tag, true);
 
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse

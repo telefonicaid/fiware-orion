@@ -166,16 +166,12 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
   out     = initialIndent + "{\n";
   indent += "  ";
 
-  //out += startTag(indent, tag);
   out += startTag1(indent, tag);
-  //out += valueTag(indent + "  ", "code",          code,         format, true);
   out += valueTag(indent + "  ", "code",          code,         true);
-  //out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, format, details != "");
   out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")
   {
-    //out += valueTag(indent + "  ", "details",       details,      format);
     out += valueTag1(indent + "  ", "details",       details);
   }
 

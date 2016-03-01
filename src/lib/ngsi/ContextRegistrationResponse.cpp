@@ -38,7 +38,7 @@
 */
 ContextRegistrationResponse::ContextRegistrationResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -49,13 +49,11 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 */
 std::string ContextRegistrationResponse::render(Format format, const std::string& indent, bool comma)
 {
-  std::string  xmlTag            = "contextRegistrationResponse";
-  std::string  jsonTag           = "contextRegistration";
+  std::string  key               = "contextRegistration";
   std::string  out               = "";
   bool         errorCodeRendered = errorCode.code != SccNone;
 
-  //out += startTag(indent, xmlTag, jsonTag, format, false, false);
-  out += startTag2(indent, jsonTag, false, false);
+  out += startTag2(indent, key, false, false);
 
   out += contextRegistration.render(format, indent + "  ", errorCodeRendered, false);
 

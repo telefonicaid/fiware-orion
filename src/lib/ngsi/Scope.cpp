@@ -390,15 +390,9 @@ std::string Scope::render(Format format, const std::string& indent, bool notLast
   const char* tTag     = "type";
   const char* vTag     = "value";
 
-#if 0
-  out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", tTag, type, format, true);
-  out += valueTag(indent + "  ", vTag, value, format);
-#else
   out += startTag2(indent, tag, false, false);
   out += valueTag1(indent + "  ", tTag, type, true);
   out += valueTag1(indent + "  ", vTag, value);
-#endif
   out += endTag(indent, notLastInVector);
 
   return out;

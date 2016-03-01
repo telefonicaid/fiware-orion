@@ -58,17 +58,15 @@ std::string ContextElementVector::render
   bool                comma
 )
 {
-  std::string  out     = "";
-  std::string  xmlTag  = "contextElementList";
-  std::string  jsonTag = "contextElements";
+  std::string  out = "";
+  std::string  key = "contextElements";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
-  out += startTag2(indent, jsonTag, true, true);
+  out += startTag2(indent, key, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

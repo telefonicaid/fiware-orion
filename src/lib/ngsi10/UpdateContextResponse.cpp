@@ -47,7 +47,7 @@
 */
 UpdateContextResponse::UpdateContextResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -59,7 +59,7 @@ UpdateContextResponse::UpdateContextResponse()
 UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
   LM_T(LmtDestructor, ("destroyed"));
 }
 
@@ -72,7 +72,7 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 UpdateContextResponse::~UpdateContextResponse()
 {
   errorCode.release();
-//  errorCode.tagSet("errorCode");
+//  errorCode.keyNameSet("errorCode");
   contextElementResponseVector.release();
   LM_T(LmtDestructor, ("destroyed"));
 }
@@ -88,7 +88,6 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
   std::string out = "";
   std::string tag = "updateContextResponse";
 
-  //out += startTag(indent, tag, ciP->outFormat, false);
   out += startTag1(indent, tag, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))

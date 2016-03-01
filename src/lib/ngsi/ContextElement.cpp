@@ -78,8 +78,7 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
-  std::string  xmlTag                           = "contextElement";
-  std::string  jsonTag                          = "contextElement";
+  std::string  key                              = "contextElement";
   bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
   bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
@@ -91,13 +90,11 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
   if (requestType == UpdateContext)
   {
-    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-    out += startTag2(indent, jsonTag, false, false);
+    out += startTag2(indent, key, false, false);
   }
   else
   {
-    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
-    out += startTag2(indent, jsonTag, false, true);
+    out += startTag2(indent, key, false, true);
   }
 
   out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);

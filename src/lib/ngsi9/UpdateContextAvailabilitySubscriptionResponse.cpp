@@ -41,7 +41,7 @@
 */
 UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -51,7 +51,7 @@ UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscrip
 UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -80,7 +80,6 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  //out += startTag(indent, tag, format, false);
   out += startTag1(indent, tag, false);
 
   out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, format, indent + "  ", errorCodeRendered || durationRendered);

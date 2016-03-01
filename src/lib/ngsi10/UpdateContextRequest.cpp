@@ -77,7 +77,6 @@ std::string UpdateContextRequest::render(ConnectionInfo* ciP, RequestType reques
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //
-  //out += startTag(indent, tag, ciP->outFormat, false);
   out += startTag1(indent, tag, false);
   out += contextElementVector.render(ciP, UpdateContext, indent + "  ", true);
   out += updateActionType.render(ciP->outFormat, indent + "  ", false);

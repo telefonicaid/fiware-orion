@@ -181,9 +181,8 @@ std::string ContextAttributeVector::render
   bool                attrsAsName
 )
 {
-  std::string out      = "";
-  std::string xmlTag   = "contextAttributeList";
-  std::string jsonTag  = "attributes";
+  std::string out = "";
+  std::string key = "attributes";
 
   if (vec.size() == 0)
   {
@@ -222,8 +221,7 @@ std::string ContextAttributeVector::render
     // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
-    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, attrsAsName, true);
-    out += startTag2(indent, jsonTag, attrsAsName, true);
+    out += startTag2(indent, key, attrsAsName, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
@@ -239,8 +237,7 @@ std::string ContextAttributeVector::render
   }
   else
   {
-    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
-    out += startTag2(indent, jsonTag, true, true);
+    out += startTag2(indent, key, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)

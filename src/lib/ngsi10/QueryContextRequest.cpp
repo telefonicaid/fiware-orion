@@ -104,7 +104,6 @@ std::string QueryContextRequest::render(RequestType requestType, Format format, 
   bool          commaAfterAttributeList  = restrictionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
-  //out += startTag(indent, tag, format, false);
   out += startTag1(indent, tag, false);
   out += entityIdVector.render(format, indent + "  ", commaAfterEntityIdVector);
   out += attributeList.render(format,  indent + "  ", commaAfterAttributeList);

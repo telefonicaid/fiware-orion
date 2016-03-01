@@ -38,15 +38,9 @@ std::string orionReply(ConnectionInfo* ciP, const std::string& what, const std::
 {
    std::string out = "";
 
-#if 0
-   out += startTag("",     "orion", ciP->outFormat);
-   out += startTag("  ",   "log",   ciP->outFormat);
-   out += valueTag("    ",  what,   value, ciP->outFormat);
-#else
    out += startTag1("",     "orion");
    out += startTag1("  ",   "log");
    out += valueTag1("    ",  what, value);
-#endif
    out += endTag("  ");
    out += endTag("");
 

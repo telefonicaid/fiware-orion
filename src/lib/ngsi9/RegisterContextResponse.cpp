@@ -44,7 +44,7 @@ RegisterContextResponse::RegisterContextResponse()
 {
   registrationId.set("");
   duration.set("");
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -65,7 +65,7 @@ RegisterContextResponse::RegisterContextResponse(RegisterContextRequest* rcrP)
 {
   registrationId.set(rcrP->registrationId.get());
   duration.set(rcrP->duration.get());
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -78,7 +78,7 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 {
   registrationId.set(_registrationId);
   duration.set(_duration);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -91,7 +91,7 @@ RegisterContextResponse::RegisterContextResponse(const std::string& _registratio
 {
   registrationId.set(_registrationId);
   errorCode     = _errorCode;
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -106,7 +106,6 @@ std::string RegisterContextResponse::render(RequestType requestType, Format form
   std::string  tag = "registerContextResponse";
   bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
 
-  //out += startTag(indent, tag, format, false);
   out += startTag1(indent, tag, false);
 
   out += duration.render(format, indent + "  ", true);

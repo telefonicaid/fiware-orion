@@ -49,17 +49,15 @@ std::string ContextElementResponseVector::render
   bool                omitAttributeValues
 )
 {
-  std::string xmlTag   = "contextResponseList";
-  std::string jsonTag  = "contextResponses";
-  std::string out      = "";
+  std::string key = "contextResponses";
+  std::string out = "";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
-  out += startTag2(indent, jsonTag, true, true);
+  out += startTag2(indent, key, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

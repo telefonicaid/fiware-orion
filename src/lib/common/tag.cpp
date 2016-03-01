@@ -211,32 +211,32 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
 std::string startTag1
 (
   const std::string&  indent,
-  const std::string&  keyName,
-  bool                showTag,
+  const std::string&  key,
+  bool                showKey,
   bool                isToplevel
 )
 {
 
   if (isToplevel)
   {
-    if (showTag == false)
+    if (showKey == false)
     {
       return indent + "{\n" + indent + "  {\n";
     }
     else
     {
-      return indent + "{\n" + indent + "  " + "\"" + keyName + "\" : {\n";
+      return indent + "{\n" + indent + "  " + "\"" + key + "\" : {\n";
     }
   }
   else
   {
-    if (showTag == false)
+    if (showKey == false)
     {
       return indent + "{\n";
     }
     else
     {
-      return indent + "\"" + keyName + "\" : {\n";
+      return indent + "\"" + key + "\" : {\n";
     }
   }
 
@@ -252,24 +252,24 @@ std::string startTag1
 std::string startTag2
 (
   const std::string&  indent,
-  const std::string&  keyName,
+  const std::string&  key,
   bool                isVector,
-  bool                showTag
+  bool                showKey
 )
 {
-  if (isVector && showTag)
+  if (isVector && showKey)
   {
-    return indent + "\"" + keyName + "\" : [\n";
+    return indent + "\"" + key + "\" : [\n";
   }
-  else if (isVector && !showTag)
+  else if (isVector && !showKey)
   {
     return indent + "[\n";
   }
-  else if (!isVector && showTag)
+  else if (!isVector && showKey)
   {
-    return indent + "\"" + keyName + "\" : {\n";
+    return indent + "\"" + key + "\" : {\n";
   }
-  else if (!isVector && !showTag)
+  else if (!isVector && !showKey)
   {
     return indent + "{\n";
   }
@@ -318,7 +318,7 @@ std::string endTag
 std::string valueTag1
 (
   const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   const std::string&  unescapedValue,
   bool                showComma,
   bool                isVectorElement,
@@ -358,7 +358,7 @@ std::string valueTag1
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + ",\n";
+      std::string out = indent + "\"" + key + "\" : " + effectiveValue + ",\n";
       return out;
     }
   }
@@ -371,7 +371,7 @@ std::string valueTag1
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + "\n";
+      std::string out = indent + "\"" + key + "\" : " + effectiveValue + "\n";
       return out;
     }
   }
@@ -385,7 +385,7 @@ std::string valueTag1
 std::string valueTag
 (
   const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   int                 value,
   bool                showComma
 )
@@ -396,10 +396,10 @@ std::string valueTag
 
   if (showComma == true)
   {
-    return indent + "\"" + tagName + "\" : \"" + val + "\",\n";
+    return indent + "\"" + key + "\" : \"" + val + "\",\n";
   }
 
-  return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
+  return indent + "\"" + key + "\" : \"" + val + "\"\n";
 }
 
 

@@ -51,7 +51,6 @@ std::string ScopeVector::render(Format format, const std::string& indent, bool c
     return "";
   }
 
-  //out += startTag(indent, tag, tag, format, true, true);
   out += startTag2(indent, tag, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

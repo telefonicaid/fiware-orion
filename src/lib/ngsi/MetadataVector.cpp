@@ -39,21 +39,21 @@
 *
 * MetadataVector::MetadataVector -
 */
-MetadataVector::MetadataVector(const std::string& _tag)
+MetadataVector::MetadataVector(const std::string& _keyName)
 {
   vec.clear();
-  tagSet(_tag);
+  keyNameSet(_keyName);
 }
 
 
 
 /* ****************************************************************************
 *
-* MetadataVector::tagSet -
+* MetadataVector::keyNameSet -
 */
-void MetadataVector::tagSet(const std::string& tagName)
+void MetadataVector::keyNameSet(const std::string& _keyName)
 {
-  tag = tagName;
+  keyName = _keyName;
 }
 
 
@@ -64,16 +64,15 @@ void MetadataVector::tagSet(const std::string& tagName)
 */
 std::string MetadataVector::render(Format format, const std::string& indent, bool comma)
 {
-  std::string out     = "";
-  std::string jsonTag = "metadatas";
+  std::string out = "";
+  std::string key = "metadatas";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  //out += startTag(indent, tag, jsonTag, format, true);
-  out += startTag2(indent, jsonTag, true);
+  out += startTag2(indent, key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);

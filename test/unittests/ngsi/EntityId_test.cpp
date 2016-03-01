@@ -41,8 +41,8 @@ TEST(EntityId, render)
 
   utInit();
 
-  eId.tagSet("eId");
-  EXPECT_STREQ("eId", eId.tag.c_str());
+  eId.keyNameSet("eId");
+  EXPECT_STREQ("eId", eId.keyName.c_str());
 
   out = eId.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
@@ -67,7 +67,7 @@ TEST(EntityId, present)
 
   utInit();
 
-  eId.tagSet("entityId");
+  eId.keyNameSet("entityId");
   eId.present("", -1);
   eId.present("", 0);
 

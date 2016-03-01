@@ -116,7 +116,6 @@ std::string Originator::render(Format format, const std::string& indent, bool co
     return "";
   }
 
-  //return valueTag(indent, "originator", string, format, comma);
   return valueTag1(indent, "originator", string, comma);
 }
 
