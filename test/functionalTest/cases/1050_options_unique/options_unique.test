@@ -34,11 +34,6 @@ brokerStart CB 0-255
 # 02. Get all values of entity CarPool
 # 03. Get all UNIQUE values of entity CarPool
 #
-# Error Handling
-# 04. URI param options with both 'keyValues' and 'values', see error
-# 05. URI param options with both 'keyValues' and 'unique', see error
-# 06. URI param options with both 'values' and 'unique', see error
-#
 
 
 echo "01. Create an entity CarPool with 6 attributes with values that are car brands"
@@ -83,28 +78,6 @@ echo
 echo
 
 
-echo "04. URI param options with both 'keyValues' and 'values', see error"
-echo "==================================================================="
-orionCurl --url '/v2/entities/CarPool?options=keyValues,values' --json
-echo
-echo
-
-
-echo "05. URI param options with both 'keyValues' and 'unique', see error"
-echo "==================================================================="
-orionCurl --url '/v2/entities/CarPool?options=keyValues,unique' --json
-echo
-echo
-
-
-echo "06. URI param options with both 'values' and 'unique', see error"
-echo "================================================================"
-orionCurl --url '/v2/entities/CarPool?options=values,unique' --json
-echo
-echo
-
-
-
 --REGEXPECT--
 01. Create an entity CarPool with 6 attributes with values that are car brands
 ==============================================================================
@@ -144,45 +117,6 @@ Date: REGEX(.*)
     "BMW",
     "Audi"
 ]
-
-
-04. URI param options with both 'keyValues' and 'values', see error
-===================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "Invalid value for URI param /options/",
-    "error": "BadRequest"
-}
-
-
-05. URI param options with both 'keyValues' and 'unique', see error
-===================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "Invalid value for URI param /options/",
-    "error": "BadRequest"
-}
-
-
-06. URI param options with both 'values' and 'unique', see error
-================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "Invalid value for URI param /options/",
-    "error": "BadRequest"
-}
 
 
 --TEARDOWN--
