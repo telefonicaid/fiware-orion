@@ -44,7 +44,6 @@
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
 #include "serviceRoutines/postQueryContext.h"
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 
 
@@ -215,14 +214,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   ciP->verb   = POST;
   ciP->method = "POST";
 
-  if (format == XML)
-  {
-    s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
-  }
-  else
-  {
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
-  }
+  s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
 
   if (s != "OK")
   {

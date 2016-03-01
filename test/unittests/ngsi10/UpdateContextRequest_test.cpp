@@ -28,9 +28,7 @@
 #include "testDataFromFile.h"
 #include "common/globals.h"
 #include "rest/ConnectionInfo.h"
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
-#include "xmlParse/xmlParse.h"
 #include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
@@ -40,62 +38,9 @@
 /* ****************************************************************************
 *
 * Tests
-* - ok_xml
 * - ok_json
 * - badIsPattern_json
 */
-
-
-
-/* ****************************************************************************
-*
-* ok_xml - 
-*/
-TEST(UpdateContextRequest, ok_xml)
-{
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.updateContext.valid.xml";
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
-  lmTraceLevelSet(LmtDump, false);
-
-  EXPECT_EQ("OK", result);
-
-  //
-  // With the data obtained, render, present and release methods are exercised
-  //
-  UpdateContextRequest*  upcrP = &reqData.upcr.res;
-  
-  upcrP->present(""); // No output
-
-  std::string out;
-  const char* outfile1 = "ngsi10.updateContextRequest.rendered1.valid.xml";
-  const char* outfile2 = "ngsi10.updateContextRequest.checked.valid.xml";
-  const char* outfile3 = "ngsi10.updateContextRequest.badUpdateActionType.invalid.xml";
-
-  out = upcrP->render(&ci, UpdateContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1;
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out  = upcrP->check(&ci, UpdateContext, "", "FORCED ERROR", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2;
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  upcrP->updateActionType.set("invalid");
-  out  = upcrP->check(&ci, RegisterContext, "", "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3;
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  upcrP->release();
-
-  utExit();
-}
 
 
 

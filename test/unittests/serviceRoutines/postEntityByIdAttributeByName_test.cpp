@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1832: _json counterpart?
 */
-TEST(postEntityByIdAttributeByName, ok)
+TEST(postEntityByIdAttributeByName, DISABLED_ok)
 {
   ConnectionInfo ci("/ngsi9/contextEntities/entity01/attributes/temperature",  "POST", "1.1");
   const char*    infile      = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";

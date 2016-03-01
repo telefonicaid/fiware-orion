@@ -55,8 +55,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * put - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(putSubscriptionConvOp, put)
+TEST(putSubscriptionConvOp, DISABLED_put)
 {
   ConnectionInfo ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "DELETE", "1.1");
   ConnectionInfo ci2("/ngsi10/contextSubscriptions/111222333444555666777888",  "PUT",    "1.1");

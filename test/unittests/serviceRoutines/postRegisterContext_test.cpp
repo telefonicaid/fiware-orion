@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(postRegisterContext, ok)
+TEST(postRegisterContext, DISABLED_ok)
 {
   ConnectionInfo ci("/ngsi9/registerContext",  "POST", "1.1");
   ConnectionInfo ci2("/ngsi9/registerContext",  "POST", "1.1");

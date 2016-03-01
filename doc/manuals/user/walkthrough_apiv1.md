@@ -1057,7 +1057,7 @@ POST http://localhost:1028/accumulate
 Content-Length: 492
 User-Agent: orion/0.9.0
 Host: localhost:1028
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json
 
 {
@@ -2518,7 +2518,7 @@ POST http://localhost:1028/accumulate
 Content-Length: 638
 User-Agent: orion/0.9.0
 Host: localhost:1028
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json
                                                                                         
 {
@@ -2624,7 +2624,7 @@ POST http://localhost:1028/accumulate
 Content-Length: 522
 User-Agent: orion/0.9.0
 Host: localhost:1028
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json
 
 {
@@ -2793,7 +2793,7 @@ POST http://localhost:1028/accumulate
 Content-Length: 529
 User-Agent: orion/0.9.0
 Host: localhost:1028
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json
 
 {
@@ -2827,7 +2827,7 @@ POST http://localhost:1028/accumulate
 Content-Length: 535
 User-Agent: orion/0.9.0
 Host: localhost:1028
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json
 
 {

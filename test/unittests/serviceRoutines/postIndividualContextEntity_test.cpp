@@ -50,8 +50,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1832: _json counterpart?
 */
-TEST(postIndividualContextEntity, ok)
+TEST(postIndividualContextEntity, DISABLED_ok)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11",  "POST", "1.1");  
   const char*    outfile = "ngsi10.appendContextElementResponse.postIndividualContextEntity.valid.xml";

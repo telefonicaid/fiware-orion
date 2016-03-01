@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1832: _json counterpart?
 */
-TEST(postDiscoverContextAvailability, notFound)
+TEST(postDiscoverContextAvailability, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
   const char*    infile    = "ngsi9.discoverContextAvailabilityRequest.entityIdIdNotFound.valid.xml";

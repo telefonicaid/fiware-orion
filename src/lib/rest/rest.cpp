@@ -524,7 +524,6 @@ static void requestCompleted
     clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
     clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
     clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
-    clock_addtime(&accTimeStat.xmlParseTime,          &threadLastTimeStat.xmlParseTime);
 
     timeStatSemGive(__FUNCTION__, "updating statistics");
   }
