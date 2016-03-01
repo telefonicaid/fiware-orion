@@ -68,7 +68,7 @@ std::string postNotifyContextAvailability
     ncar.responseCode.fill(SccBadRequest, "more than one service path for notification");
     alarmMgr.badInput(clientIp, "more than one service path for a notification");
 
-    TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ciP->outFormat, ""));
+    TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ""));
 
     return answer;
   }
@@ -82,13 +82,13 @@ std::string postNotifyContextAvailability
   {
     ncar.responseCode.fill(SccBadRequest, res);
 
-    TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ciP->outFormat, ""));
+    TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ""));
 
     return answer;
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]));
-  TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ciP->outFormat, ""));
+  TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ""));
 
   return answer;
 }

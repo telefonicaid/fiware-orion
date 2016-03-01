@@ -45,11 +45,10 @@ typedef struct MetadataVector
   MetadataVector(const std::string& _keyName = "registrationMetadata");
 
   void            keyNameSet(const std::string& key);
-  std::string     render(Format format, const std::string& indent, bool comma = false);
+  std::string     render(const std::string& indent, bool comma = false);
   std::string     toJson(bool isLastElement);
   std::string     check(ConnectionInfo* ciP,
                       RequestType requestType,
-                      Format format,
                       const std::string& indent,
                       const std::string& predetectedError,
                       int counter);

@@ -53,7 +53,7 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 *
 * SubscribeContextAvailabilityRequest::render - 
 */
-std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, const std::string& indent)
 {
   std::string out                      = "";
   std::string tag                      = "subscribeContextAvailabilityRequest";
@@ -64,11 +64,11 @@ std::string SubscribeContextAvailabilityRequest::render(RequestType requestType,
   bool        commaAfterDuration       = restrictions > 0;
 
   out += startTag1(indent, tag, false);
-  out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
-  out += attributeList.render(format, indent2, commaAfterAttributeList);
-  out += reference.render(format, indent2, commaAfterReference);
-  out += duration.render(format, indent2, commaAfterDuration);
-  out += restriction.render(format, indent2);
+  out += entityIdVector.render(indent2, commaAfterEntityIdVector);
+  out += attributeList.render(indent2, commaAfterAttributeList);
+  out += reference.render(indent2, commaAfterReference);
+  out += duration.render(indent2, commaAfterDuration);
+  out += restriction.render(indent2);
   out += endTag(indent);
 
   return out;
@@ -80,7 +80,7 @@ std::string SubscribeContextAvailabilityRequest::render(RequestType requestType,
 *
 * SubscribeContextAvailabilityRequest::check - 
 */
-std::string SubscribeContextAvailabilityRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextAvailabilityRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextAvailabilityResponse response;
   std::string                          res;
@@ -89,18 +89,18 @@ std::string SubscribeContextAvailabilityRequest::check(ConnectionInfo* ciP, Requ
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(ciP, SubscribeContextAvailability, format, indent, predetectedError, counter))   != "OK") ||
-           ((res = attributeList.check(SubscribeContextAvailability, format, indent, predetectedError, counter))    != "OK") ||
-           ((res = reference.check(SubscribeContextAvailability, format, indent, predetectedError, counter))        != "OK") ||
-           ((res = duration.check(SubscribeContextAvailability, format, indent, predetectedError, counter))         != "OK") ||
-           ((res = restriction.check(SubscribeContextAvailability, format, indent, predetectedError, restrictions)) != "OK"))
+  else if (((res = entityIdVector.check(ciP, SubscribeContextAvailability, indent, predetectedError, counter))   != "OK") ||
+           ((res = attributeList.check(SubscribeContextAvailability, indent, predetectedError, counter))    != "OK") ||
+           ((res = reference.check(SubscribeContextAvailability, indent, predetectedError, counter))        != "OK") ||
+           ((res = duration.check(SubscribeContextAvailability, indent, predetectedError, counter))         != "OK") ||
+           ((res = restriction.check(SubscribeContextAvailability, indent, predetectedError, restrictions)) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(SubscribeContextAvailability, format, indent);
+  return response.render(SubscribeContextAvailability, indent);
 }
 
 

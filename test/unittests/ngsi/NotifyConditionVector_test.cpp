@@ -82,17 +82,17 @@ TEST(NotifyConditionVector, check)
   
   utInit();
 
-  checked = ncV.check(RegisterContext, JSON, "", "", 0);
+  checked = ncV.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   nc.type = "Type";
   ncV.push_back(&nc);
 
-  checked = ncV.check(RegisterContext, JSON, "", "", 0);
+  checked = ncV.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   nc.type = "";
-  checked = ncV.check(RegisterContext, JSON, "", "", 0);
+  checked = ncV.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
 
   utExit();

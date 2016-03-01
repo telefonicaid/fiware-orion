@@ -88,7 +88,7 @@ void jsonUcarRelease(ParseData* parseDataP)
 */
 std::string jsonUcarCheck(ParseData* parseData, ConnectionInfo* ciP)
 {
-  return parseData->ucar.res.check(UnsubscribeContext, ciP->outFormat, "", parseData->errorString, 0);
+  return parseData->ucar.res.check(UnsubscribeContext, "", parseData->errorString, 0);
 }
 
 

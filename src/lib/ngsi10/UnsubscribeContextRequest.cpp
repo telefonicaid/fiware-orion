@@ -36,13 +36,13 @@
 *
 * UnsubscribeContextRequest::render - 
 */
-std::string UnsubscribeContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string UnsubscribeContextRequest::render(RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "unsubscribeContextRequest";
 
   out += startTag1(indent, tag, false);
-  out += subscriptionId.render(UnsubscribeContext, format, indent + "  ");
+  out += subscriptionId.render(UnsubscribeContext, indent + "  ");
   out += endTag(indent);
 
   return out;
@@ -54,15 +54,15 @@ std::string UnsubscribeContextRequest::render(RequestType requestType, Format fo
 *
 * UnsubscribeContextRequest::check - 
 */
-std::string UnsubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UnsubscribeContextRequest::check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   UnsubscribeContextResponse  response;
   std::string                 res;
 
-  if ((res = subscriptionId.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK")
+  if ((res = subscriptionId.check(SubscribeContext, indent, predetectedError, counter)) != "OK")
   {
      response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
-     return response.render(UnsubscribeContext, format, indent);
+     return response.render(UnsubscribeContext, indent);
   }
 
   return "OK";

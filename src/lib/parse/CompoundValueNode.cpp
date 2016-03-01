@@ -636,7 +636,7 @@ void CompoundValueNode::check(void)
 *
 * render -
 */
-std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const std::string& indent)
+std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
@@ -673,7 +673,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
     out += startTag2(indent, key, true, container->valueType == orion::ValueTypeObject);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, format, indent + "  ");
+      out += childV[ix]->render(ciP, indent + "  ");
     }
 
     out += endTag(indent, jsonComma, true, true);
@@ -683,7 +683,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, format, indent);
+      out += childV[ix]->render(ciP, indent);
     }
   }
   else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
@@ -692,7 +692,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
     out += startTag2(indent, "", false, false);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, format, indent + "  ");
+      out += childV[ix]->render(ciP, indent + "  ");
     }
 
     out += endTag(indent, jsonComma, false, true);
@@ -706,7 +706,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, format, indent + "  ");
+        out += childV[ix]->render(ciP, indent + "  ");
       }
 
       out += endTag(indent, jsonComma, false, true);
@@ -716,7 +716,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
       LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, format, indent);
+        out += childV[ix]->render(ciP, indent);
       }
     }
   }

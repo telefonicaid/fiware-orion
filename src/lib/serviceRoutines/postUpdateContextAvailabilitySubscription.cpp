@@ -57,7 +57,7 @@ std::string postUpdateContextAvailabilitySubscription
                                                                                &ucas,                                                                               
                                                                                ciP->tenant));
 
-  TIMED_RENDER(answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0));
+  TIMED_RENDER(answer = ucas.render(UpdateContextAvailabilitySubscription, "", 0));
 
   return answer;
 }

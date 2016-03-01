@@ -102,13 +102,13 @@ TEST(Metadata, check)
 
   utInit();
 
-  checked = m1.check(&ci, RegisterContext, JSON, "", "", 0);
+  checked = m1.check(&ci, RegisterContext, "", "", 0);
   EXPECT_STREQ("missing metadata name", checked.c_str());
 
-  checked = m2.check(&ci, RegisterContext, JSON, "", "", 0);
+  checked = m2.check(&ci, RegisterContext, "", "", 0);
   EXPECT_STREQ("missing metadata value", checked.c_str());
   
-  checked = m3.check(&ci, RegisterContext, JSON, "", "", 0);
+  checked = m3.check(&ci, RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

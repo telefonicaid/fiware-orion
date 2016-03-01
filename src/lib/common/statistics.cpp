@@ -33,7 +33,7 @@
 *
 * STAT_ADD - 
 */
-#define STAT_ADD(out, format, indent, buf, tag, comma)                        \
+#define STAT_ADD(out, indent, buf, tag, comma)                        \
 do                                                                            \
 {                                                                             \
   if (format == JSON)                                                         \

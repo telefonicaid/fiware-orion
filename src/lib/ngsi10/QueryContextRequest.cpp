@@ -95,7 +95,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::render - 
 */
-std::string QueryContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string QueryContextRequest::render(RequestType requestType, const std::string& indent)
 {
   std::string   out                      = "";
   std::string   tag                      = "queryContextRequest";
@@ -105,9 +105,9 @@ std::string QueryContextRequest::render(RequestType requestType, Format format, 
   bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
   out += startTag1(indent, tag, false);
-  out += entityIdVector.render(format, indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render(format,  indent + "  ", commaAfterAttributeList);
-  out += restriction.render(format,    indent + "  ", restrictions, false);
+  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
+  out += attributeList.render( indent + "  ", commaAfterAttributeList);
+  out += restriction.render(   indent + "  ", restrictions, false);
   out += endTag(indent);
 
   return out;
@@ -128,9 +128,9 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(ciP, QueryContext, ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
-           ((res = attributeList.check(QueryContext,  ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
-           ((res = restriction.check(QueryContext,    ciP->outFormat, indent, predetectedError, restrictions)) != "OK"))
+  else if (((res = entityIdVector.check(ciP, QueryContext, indent, predetectedError, 0))            != "OK") ||
+           ((res = attributeList.check(QueryContext,  indent, predetectedError, 0))            != "OK") ||
+           ((res = restriction.check(QueryContext,    indent, predetectedError, restrictions)) != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);

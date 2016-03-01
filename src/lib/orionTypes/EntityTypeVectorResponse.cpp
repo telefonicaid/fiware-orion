@@ -56,7 +56,7 @@ std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::str
     out += entityTypeVector.render(ciP, indent + "  ", true);
   }
 
-  out += statusCode.render(ciP->outFormat, indent + "  ");
+  out += statusCode.render(indent + "  ");
 
   out += endTag(indent);
 

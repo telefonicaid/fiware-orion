@@ -126,7 +126,7 @@ std::string EntityType::check
     return "Empty Type";
   }
 
-  return contextAttributeVector.check(ciP, EntityTypes, ciP->outFormat, indent, "", 0);
+  return contextAttributeVector.check(ciP, EntityTypes, indent, "", 0);
 
 }
 

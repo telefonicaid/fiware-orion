@@ -57,7 +57,7 @@ typedef struct StatusCode
   StatusCode(const std::string& _keyName);
   StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName = "statusCode");
 
-  std::string  render(Format format, const std::string& indent, bool comma = false, bool showKey = true);
+  std::string  render(const std::string& indent, bool comma = false, bool showKey = true);
   std::string  toJson(bool isLastElement);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
@@ -68,7 +68,6 @@ typedef struct StatusCode
   void         keyNameSet(const std::string& _tag);
 
   std::string  check(RequestType         requestType,
-                     Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);

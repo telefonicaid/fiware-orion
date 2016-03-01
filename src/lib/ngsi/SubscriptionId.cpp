@@ -64,7 +64,6 @@ SubscriptionId::SubscriptionId(const std::string& subId)
 std::string SubscriptionId::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -139,7 +138,7 @@ void SubscriptionId::present(const std::string& indent)
 *
 * SubscriptionId::render -
 */
-std::string SubscriptionId::render(RequestType container, Format format, const std::string& indent, bool comma)
+std::string SubscriptionId::render(RequestType container, const std::string& indent, bool comma)
 {
   std::string xString = string;
 

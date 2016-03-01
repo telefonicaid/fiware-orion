@@ -65,7 +65,7 @@ std::string UpdateContextElementResponse::render
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
   else
   {

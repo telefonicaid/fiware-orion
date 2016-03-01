@@ -41,7 +41,6 @@
 std::string AttributeDomainName::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -113,7 +112,7 @@ void AttributeDomainName::present(const std::string& indent)
 *
 * AttributeDomainName::render - 
 */
-std::string AttributeDomainName::render(Format format, const std::string& indent, bool comma)
+std::string AttributeDomainName::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {

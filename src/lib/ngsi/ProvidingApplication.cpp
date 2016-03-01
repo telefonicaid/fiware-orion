@@ -51,7 +51,6 @@ ProvidingApplication::ProvidingApplication()
 std::string ProvidingApplication::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -142,7 +141,7 @@ void ProvidingApplication::present(const std::string& indent)
 *
 * ProvidingApplication::render -
 */
-std::string ProvidingApplication::render(Format format, const std::string& indent, bool comma)
+std::string ProvidingApplication::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {

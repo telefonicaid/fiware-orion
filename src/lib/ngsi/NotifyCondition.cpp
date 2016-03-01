@@ -63,7 +63,7 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 *
 * NotifyCondition::render -
 */
-std::string NotifyCondition::render(Format format, const std::string& indent, bool notLastInVector)
+std::string NotifyCondition::render(const std::string& indent, bool notLastInVector)
 {
   std::string out = "";
   std::string tag = "notifyCondition";
@@ -76,8 +76,8 @@ std::string NotifyCondition::render(Format format, const std::string& indent, bo
 
   out += startTag2(indent, tag, false, false);
   out += valueTag1(indent + "  ", "type", type, commaAfterType);
-  out += condValueList.render(format, indent + "  ",   commaAfterCondValueList);
-  out += restriction.render(format,   indent + "  ",   commaAfterRestriction);
+  out += condValueList.render(indent + "  ",   commaAfterCondValueList);
+  out += restriction.render(  indent + "  ",   commaAfterRestriction);
   out += endTag(indent);
 
   return out;
@@ -94,7 +94,6 @@ std::string NotifyCondition::render(Format format, const std::string& indent, bo
 std::string NotifyCondition::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -114,12 +113,12 @@ std::string NotifyCondition::check
     return std::string("invalid notify condition type: /") + type + "/";
   }
 
-  if ((res = condValueList.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = condValueList.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = restriction.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = restriction.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

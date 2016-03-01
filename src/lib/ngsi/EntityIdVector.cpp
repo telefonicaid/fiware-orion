@@ -43,7 +43,7 @@
 *
 * EntityIdVector::render -
 */
-std::string EntityIdVector::render(Format format, const std::string& indent, bool comma)
+std::string EntityIdVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string key = "entities";
@@ -56,7 +56,7 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
   out += startTag2(indent, key, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
+    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1, true);
   }
 
   out += endTag(indent, comma, true);
@@ -73,8 +73,7 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
 std::string EntityIdVector::check
 (
   ConnectionInfo*     ciP,
-  RequestType         requestType,
-  Format              format,
+  RequestType         requestType,  
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -98,7 +97,7 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;

@@ -161,7 +161,6 @@ extern std::string startArray
 (
   const std::string&  indent,
   const std::string&  key,
-  Format              format,
   bool                showKey = true
 );
 
@@ -171,6 +170,6 @@ extern std::string startArray
 *
 * endArray -
 */
-extern std::string endArray(const std::string& indent, const std::string& key, Format format);
+extern std::string endArray(const std::string& indent, const std::string& key);
 
 #endif  // SRC_LIB_COMMON_TAG_H_

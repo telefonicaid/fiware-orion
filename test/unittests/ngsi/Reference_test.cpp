@@ -44,7 +44,7 @@ TEST(Reference, check)
   utInit();
 
   reference.string = "http://ip:12";
-  checked = reference.check(RegisterContext, JSON, "", "", 0);
+  checked = reference.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

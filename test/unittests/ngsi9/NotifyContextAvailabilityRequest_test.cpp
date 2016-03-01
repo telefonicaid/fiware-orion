@@ -114,7 +114,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   utInit();
 
-  out = ncr.check(&ci, NotifyContextAvailability, JSON, "", "", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, "", "", 0);
   EXPECT_EQ("OK", out);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
@@ -122,7 +122,7 @@ TEST(NotifyContextAvailabilityRequest, check)
   EXPECT_STREQ(expectedBuf, out.c_str());
  
   ncr.subscriptionId.set("12345");
-  out = ncr.check(&ci, NotifyContextAvailability, JSON, "", "", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   

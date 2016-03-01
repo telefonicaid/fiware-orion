@@ -415,13 +415,13 @@ std::string ContextAttribute::renderAsJsonObject
     }
 
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, ciP->outFormat, indent + "    ");
+    out += compoundValueP->render(ciP, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
   if (omitValue == false)
   {
-    out += metadataVector.render(ciP->outFormat, indent + "  ", false);
+    out += metadataVector.render(indent + "  ", false);
   }
 
   out += endTag(indent, comma);
@@ -544,11 +544,11 @@ std::string ContextAttribute::render
     }
 
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, ciP->outFormat, indent + "    ");
+    out += compoundValueP->render(ciP, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(ciP->outFormat, indent + "  ", false);
+  out += metadataVector.render(indent + "  ", false);
   out += endTag(indent, comma);
 
   return out;
@@ -779,7 +779,6 @@ std::string ContextAttribute::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -835,7 +834,7 @@ std::string ContextAttribute::check
     }
   }
 
-  return metadataVector.check(ciP, requestType, format, indent + "  ", predetectedError, counter);
+  return metadataVector.check(ciP, requestType, indent + "  ", predetectedError, counter);
 }
 
 

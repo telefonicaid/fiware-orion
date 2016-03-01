@@ -66,15 +66,15 @@ TEST(Throttling, check)
   utInit();
 
   t.set("");
-  checked = t.check(RegisterContext, JSON, "", "", 0);
+  checked = t.check(RegisterContext, "", "", 0);
   EXPECT_EQ("OK", checked);
 
   t.set("PT5S");
-  checked = t.check(RegisterContext, JSON, "", "", 0);
+  checked = t.check(RegisterContext, "", "", 0);
   EXPECT_EQ("OK", checked);
 
   t.set("xxxPT5S");
-  checked = t.check(RegisterContext, JSON, "", "", 0);
+  checked = t.check(RegisterContext, "", "", 0);
   EXPECT_EQ("syntax error in throttling string", checked);
 
   utExit();

@@ -73,7 +73,7 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 *
 * UpdateContextAvailabilitySubscriptionResponse::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType requestType, Format format, const std::string& indent, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType requestType, const std::string& indent, int counter)
 {
   std::string  out                = "";
   std::string  tag                = "updateContextAvailabilitySubscriptionResponse";
@@ -82,11 +82,11 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
 
   out += startTag1(indent, tag, false);
 
-  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, format, indent + "  ", errorCodeRendered || durationRendered);
-  out += duration.render(format,       indent + "  ", errorCodeRendered);
+  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, indent + "  ", errorCodeRendered || durationRendered);
+  out += duration.render(      indent + "  ", errorCodeRendered);
 
   if (errorCodeRendered)
-     out += errorCode.render(format, indent + "  ", false);
+     out += errorCode.render(indent + "  ", false);
 
   out += endTag(indent);
 
@@ -97,7 +97,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
 *
 * UpdateContextAvailabilitySubscriptionResponse::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string  res;
 
@@ -105,13 +105,13 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType req
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter)) != "OK") ||
-           ((res = duration.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))       != "OK"))
+  else if (((res = subscriptionId.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter)) != "OK") ||
+           ((res = duration.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))       != "OK"))
   {
     errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return render(UpdateContextAvailabilitySubscription, format, indent, counter);
+  return render(UpdateContextAvailabilitySubscription, indent, counter);
 }

@@ -104,11 +104,11 @@ TEST(NotifyCondition, check)
 
   utInit();
 
-  checked = nc.check(RegisterContext, JSON, "", "", 0);
+  checked = nc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("empty type for NotifyCondition", checked.c_str());
   
   nc.type = "XXX";
-  checked = nc.check(RegisterContext, JSON, "", "", 0);
+  checked = nc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("invalid notify condition type: /XXX/", checked.c_str());
 
   nc.release();

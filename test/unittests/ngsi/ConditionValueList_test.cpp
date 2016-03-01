@@ -59,11 +59,11 @@ TEST(ConditionValueList, ok)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = cvList.check(SubscribeContext, JSON, "", "", 0);
+  out = cvList.check(SubscribeContext, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   cvList.push_back("");
-  out = cvList.check(SubscribeContext, JSON, "", "", 0);
+  out = cvList.check(SubscribeContext, "", "", 0);
   EXPECT_STREQ("empty condValue name", out.c_str());
 
   // Just to exercise the code

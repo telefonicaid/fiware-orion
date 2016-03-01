@@ -135,7 +135,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 
   if (errorCodeRendered == true)
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
 
 
@@ -149,7 +149,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
 
   out += endTag(indent);
@@ -171,7 +171,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType request
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(ciP, QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);

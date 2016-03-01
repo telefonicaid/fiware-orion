@@ -92,14 +92,14 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.render(ciP->outFormat, indent + "  ");
+      out += errorCode.render(indent + "  ");
     }
     else
       out += contextElementResponseVector.render(ciP, RtUpdateContextResponse, indent + "  ", false);
@@ -131,7 +131,7 @@ std::string UpdateContextResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (contextElementResponseVector.check(ciP, UpdateContext, ciP->outFormat, indent, predetectedError, 0) != "OK")
+  else if (contextElementResponseVector.check(ciP, UpdateContext, indent, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);

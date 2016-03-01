@@ -44,18 +44,18 @@ TEST(ContextElementResponse, check)
    
    utInit();
 
-   out = cer.check(&ci, UpdateContext, JSON, "", "", 0);
+   out = cer.check(&ci, UpdateContext, "", "", 0);
    EXPECT_STREQ("empty entityId:id", out.c_str());
 
    cer.contextElement.entityId.id         = "ID";
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   out = cer.check(&ci, UpdateContext, JSON, "", "", 0);
+   out = cer.check(&ci, UpdateContext, "", "", 0);
    EXPECT_STREQ("no code", out.c_str());
 
    cer.statusCode.fill(SccOk, "details");
-   out = cer.check(&ci, UpdateContext, JSON, "", "", 0);
+   out = cer.check(&ci, UpdateContext, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
    utExit();

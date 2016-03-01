@@ -42,15 +42,15 @@ TEST(Originator, check)
 
   utInit();
 
-  checked = originator.check(RegisterContext, JSON, "", "", 0);
+  checked = originator.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   originator.string = "String";
 
-  checked = originator.check(RegisterContext, JSON, "", "", 0);
+  checked = originator.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
-  checked = originator.check(RegisterContext, JSON, "", "", 0);
+  checked = originator.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

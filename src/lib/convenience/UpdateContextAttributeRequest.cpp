@@ -55,7 +55,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format format, std::string indent)
+std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::string indent)
 {
   std::string tag = "updateContextAttributeRequest";
   std::string out = "";
@@ -67,7 +67,7 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
 
   if (compoundValueP == NULL)
   {
-    out += valueTag1(indent2, "contextValue", contextValue, format, true);
+    out += valueTag1(indent2, "contextValue", contextValue, true);
   }
   else
   {
@@ -79,11 +79,11 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
     }
 
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
-    out += compoundValueP->render(ciP, format, indent + "    ");
+    out += compoundValueP->render(ciP, indent + "    ");
     out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(format, indent2);
+  out += metadataVector.render(indent2);
   out += endTag(indent);
 
   return out;
@@ -99,7 +99,6 @@ std::string UpdateContextAttributeRequest::check
 (
   ConnectionInfo* ciP,
   RequestType     requestType,
-  Format          format,
   std::string     indent,
   std::string     predetectedError,
   int             counter
@@ -114,7 +113,7 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = metadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  else if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }
@@ -123,12 +122,9 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(format, indent);
+  std::string out = response.render(indent);
 
-  if (format == JSON)
-  {
-    out = "{\n" + out + "}\n";
-  }
+  out = "{\n" + out + "}\n";
 
   return out;
 }

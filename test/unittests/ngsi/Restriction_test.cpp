@@ -46,7 +46,7 @@ TEST(Restriction, check)
   std::string  expected3 = "OK";
   Scope*       scopeP    = new Scope("", "Value");
 
-  checked = restriction.check(RegisterContext, JSON, "", "", 0);
+  checked = restriction.check(RegisterContext, "", "", 0);
   EXPECT_EQ(expected0, checked);
 
   checked = restriction.check(RegisterContext, JSON, "", "", 1);

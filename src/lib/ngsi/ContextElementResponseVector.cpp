@@ -79,7 +79,6 @@ std::string ContextElementResponseVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -89,7 +88,7 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

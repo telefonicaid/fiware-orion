@@ -47,7 +47,7 @@ SubscribeError::SubscribeError()
 *
 * SubscribeError::render -
 */
-std::string SubscribeError::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string SubscribeError::render(RequestType requestType, const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "subscribeError";
@@ -66,16 +66,16 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
     {
       subscriptionId.set("000000000000000000000000");
     }
-    out += subscriptionId.render(requestType, format, indent + "  ", true);
+    out += subscriptionId.render(requestType, indent + "  ", true);
   }
   else if ((requestType          == SubscribeContext)           &&
            (subscriptionId.get() != "000000000000000000000000") &&
            (subscriptionId.get() != ""))
   {
-    out += subscriptionId.render(requestType, format, indent + "  ", true);
+    out += subscriptionId.render(requestType, indent + "  ", true);
   }
 
-  out += errorCode.render(format, indent + "  ");
+  out += errorCode.render(indent + "  ");
 
   out += endTag(indent, comma);
 
@@ -91,7 +91,6 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
 std::string SubscribeError::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

@@ -62,7 +62,7 @@ NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode&
 *
 * NotifyContextAvailabilityResponse::render -
 */
-std::string NotifyContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string NotifyContextAvailabilityResponse::render(RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextAvailabilityResponse";
@@ -70,7 +70,7 @@ std::string NotifyContextAvailabilityResponse::render(RequestType requestType, F
   responseCode.keyNameSet("responseCode");
 
   out += startTag1(indent, tag, false);
-  out += responseCode.render(format, indent + "  ");
+  out += responseCode.render(indent + "  ");
   out += endTag(indent);
 
   return out;

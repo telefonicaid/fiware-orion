@@ -41,15 +41,15 @@ TEST(RestrictionString, check)
 
   utInit();
 
-  checked = restrictionString.check(RegisterContext, JSON, "", "", 0);
+  checked = restrictionString.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   restrictionString.string = "String";
 
-  checked = restrictionString.check(RegisterContext, JSON, "", "", 0);
+  checked = restrictionString.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
-  checked = restrictionString.check(RegisterContext, JSON, "", "", 0);
+  checked = restrictionString.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

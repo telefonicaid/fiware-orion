@@ -123,7 +123,7 @@ std::string getEntityAttributeValue
     {
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, ""));
+        TIMED_RENDER(answer = attribute.pcontextAttribute->compoundValueP->render(ciP, ""));
 
         if (attribute.pcontextAttribute->compoundValueP->isObject())
         {

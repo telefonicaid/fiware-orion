@@ -91,7 +91,6 @@ void EntityId::keyNameSet(const std::string& _keyName)
 */
 std::string EntityId::render
 (
-  Format              format,
   const std::string&  indent,
   bool                comma,
   bool                isInVector
@@ -143,7 +142,6 @@ std::string EntityId::check
 (
   ConnectionInfo* ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

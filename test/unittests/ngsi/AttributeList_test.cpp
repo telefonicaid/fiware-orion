@@ -58,7 +58,7 @@ TEST(AttributeList, ok)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   al.push_back("");
-  out = al.check(RegisterContext, JSON, "", "", 0);
+  out = al.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("empty attribute name", out.c_str());
 
   utExit();

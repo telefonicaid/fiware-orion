@@ -67,7 +67,7 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 *
 * ContextRegistrationAttribute::render -
 */
-std::string ContextRegistrationAttribute::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationAttribute::render(const std::string& indent, bool comma)
 {
   std::string key = "registrationAttribute";
   std::string out = "";
@@ -85,7 +85,7 @@ std::string ContextRegistrationAttribute::render(Format format, const std::strin
   out += valueTag1(indent + "  ", "name",     name, true);
   out += valueTag1(indent + "  ", "type",     type, true);
   out += valueTag1(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
-  out += metadataVector.render(format, indent + "  ");
+  out += metadataVector.render(indent + "  ");
   out += endTag(indent, comma);
 
   return out;
@@ -101,7 +101,6 @@ std::string ContextRegistrationAttribute::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -124,7 +123,7 @@ std::string ContextRegistrationAttribute::check
   }
 
   std::string res;
-  if ((res = metadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

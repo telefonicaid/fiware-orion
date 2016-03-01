@@ -186,7 +186,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
 void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, Format format)
 {
     /* Render NotifyContextAvailabilityRequest */
-    std::string payload = ncar->render(NotifyContextAvailability, format, "");
+    std::string payload = ncar->render(NotifyContextAvailability, "");
 
     /* Parse URL */
     std::string  host;

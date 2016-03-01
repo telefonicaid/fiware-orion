@@ -53,7 +53,7 @@ std::string EntityTypeResponse::render(ConnectionInfo* ciP, const std::string& i
   out += startTag1(indent, tag, false);
 
   out += entityType.render(ciP, indent + "  ", true, true);
-  out += statusCode.render(ciP->outFormat, indent + "  ");
+  out += statusCode.render(indent + "  ");
 
   out += endTag(indent);
 

@@ -43,7 +43,7 @@
 *
 * RegisterContextRequest::render - 
 */
-std::string RegisterContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string RegisterContextRequest::render(RequestType requestType, const std::string& indent)
 {
   std::string  out                                 = "";
   bool         durationRendered                    = duration.get() != "";
@@ -54,9 +54,9 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 
   out += startTag2(indent, "", false, false);
 
-  out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(format,                        indent + "  ", commaAfterDuration);
-  out += registrationId.render(RegisterContext, format, indent + "  ", commaAfterRegistrationId);
+  out += contextRegistrationVector.render(      indent + "  ", commaAfterContextRegistrationVector);
+  out += duration.render(                       indent + "  ", commaAfterDuration);
+  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
 
   out += endTag(indent, false);
 
@@ -69,7 +69,7 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -84,9 +84,9 @@ std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType reque
     alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   }
-  else if (((res = contextRegistrationVector.check(ciP, RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
-           ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
-           ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
+  else if (((res = contextRegistrationVector.check(ciP, RegisterContext, indent, predetectedError, counter)) != "OK") ||
+           ((res = duration.check(RegisterContext, indent, predetectedError, counter))                  != "OK") ||
+           ((res = registrationId.check(RegisterContext, indent, predetectedError, counter))            != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
@@ -96,7 +96,7 @@ std::string RegisterContextRequest::check(ConnectionInfo* ciP, RequestType reque
     return "OK";
   }
 
-  return response.render(RegisterContext, format, indent);
+  return response.render(RegisterContext, indent);
 }
 
 

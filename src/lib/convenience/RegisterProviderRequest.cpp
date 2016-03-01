@@ -58,7 +58,7 @@ RegisterProviderRequest::RegisterProviderRequest()
 *
 * RegisterProviderRequest::render - 
 */
-std::string RegisterProviderRequest::render(Format format, std::string indent)
+std::string RegisterProviderRequest::render(std::string indent)
 {
   std::string  out                            = "";
   bool         durationRendered               = duration.get() != "";
@@ -70,10 +70,10 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
   bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
 
   out += startTag2(indent, "", false, false);
-  out += metadataVector.render(format,       indent + "  ", commaAfterMetadataVector);
-  out += duration.render(format,             indent + "  ", commaAfterDuration);
-  out += providingApplication.render(format, indent + "  ", commaAfterProvidingApplication);
-  out += registrationId.render(RegisterContext, format,       indent + "  ", commaAfterRegistrationId);
+  out += metadataVector.render(      indent + "  ", commaAfterMetadataVector);
+  out += duration.render(            indent + "  ", commaAfterDuration);
+  out += providingApplication.render(indent + "  ", commaAfterProvidingApplication);
+  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
   out += endTag(indent, false);
 
   return out;
@@ -88,8 +88,7 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
 std::string RegisterProviderRequest::check
 (
   ConnectionInfo* ciP,
-  RequestType     requestType,
-  Format          format,
+  RequestType     requestType,  
   std::string     indent,
   std::string     predetectedError,
   int             counter
@@ -102,10 +101,10 @@ std::string RegisterProviderRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = metadataVector.check(ciP, requestType, format, indent, "", counter))  != "OK") ||
-           ((res = duration.check(requestType, format, indent, "", 0))              != "OK") ||
-           ((res = providingApplication.check(requestType, format, indent, "", 0))  != "OK") ||
-           ((res = registrationId.check(requestType, format, indent, "", 0))        != "OK"))
+  else if (((res = metadataVector.check(ciP, requestType, indent, "", counter))  != "OK") ||
+           ((res = duration.check(requestType, indent, "", 0))              != "OK") ||
+           ((res = providingApplication.check(requestType, indent, "", 0))  != "OK") ||
+           ((res = registrationId.check(requestType, indent, "", 0))        != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -117,7 +116,7 @@ std::string RegisterProviderRequest::check
   std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
   alarmMgr.badInput(clientIp, details);
 
-  return response.render(DiscoverContextAvailability, format, indent);
+  return response.render(DiscoverContextAvailability, indent);
 }
 
 

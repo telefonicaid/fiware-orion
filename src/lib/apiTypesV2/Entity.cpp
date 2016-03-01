@@ -169,7 +169,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return "Invalid characters in entity isPattern";
   }
 
-  return attributeVector.check(ciP, requestType, JSON, "", "", 0);
+  return attributeVector.check(ciP, requestType, "", "", 0);
 }
 
 

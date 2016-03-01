@@ -41,7 +41,6 @@
 std::string Originator::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -109,7 +108,7 @@ void Originator::present(const std::string& indent)
 *
 * Originator::render -
 */
-std::string Originator::render(Format format, const std::string& indent, bool comma)
+std::string Originator::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {

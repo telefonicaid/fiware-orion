@@ -75,15 +75,15 @@ UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse(
 *
 * UnsubscribeContextAvailabilityResponse::render - 
 */
-std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "unsubscribeContextAvailabilityResponse";
 
   out += startTag1(indent, tag, false);
 
-  out += subscriptionId.render(RtUnsubscribeContextAvailabilityResponse, format, indent + "  ", true);  // always json comma - statusCode is mandatory
-  out += statusCode.render(format, indent + "  ");
+  out += subscriptionId.render(RtUnsubscribeContextAvailabilityResponse, indent + "  ", true);  // always json comma - statusCode is mandatory
+  out += statusCode.render(indent + "  ");
 
   out += endTag(indent);
 

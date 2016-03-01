@@ -265,7 +265,6 @@ std::string ContextAttributeVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -275,7 +274,7 @@ std::string ContextAttributeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, 0)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, 0)) != "OK")
       return res;
   }
 

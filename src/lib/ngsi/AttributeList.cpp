@@ -53,7 +53,7 @@ void AttributeList::fill(const std::vector<std::string>& aVec)
 *
 * render - 
 */
-std::string AttributeList::render(Format format, const std::string& indent, bool comma)
+std::string AttributeList::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
   std::string  key = "attributes";
@@ -84,7 +84,6 @@ std::string AttributeList::render(Format format, const std::string& indent, bool
 std::string AttributeList::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

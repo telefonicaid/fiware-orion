@@ -62,13 +62,13 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
   else
   {
     if (entity.id != "")
     {
-      out += entity.render(ciP->outFormat, indent + "  ", true);
+      out += entity.render(indent + "  ", true);
     }
 
     out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");

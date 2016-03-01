@@ -62,15 +62,15 @@ TEST(SubscriptionId, check)
   utInit();
 
   sId.set("SUB_123");
-  checked = sId.check(RegisterContext, JSON, "", "", 0);
+  checked = sId.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("bad length - 24 chars expected", checked.c_str());
 
   sId.set("SUB_12345678901234567890");
-  checked = sId.check(RegisterContext, JSON, "", "", 0);
+  checked = sId.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("invalid char in ID string", checked.c_str());
 
   sId.set("012345678901234567890123");
-  checked = sId.check(RegisterContext, JSON, "", "", 0);
+  checked = sId.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

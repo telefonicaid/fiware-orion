@@ -97,10 +97,10 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
     out += startTag2(indent, key, false, true);
   }
 
-  out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
+  out += entityId.render(indent + "  ", commaAfterEntityId, false);
+  out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
   out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
-  out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
+  out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, comma, false);
 
@@ -136,7 +136,6 @@ std::string ContextElement::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -144,22 +143,22 @@ std::string ContextElement::check
 {
   std::string res;
 
-  if ((res = entityId.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = entityId.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = attributeDomainName.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = attributeDomainName.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = contextAttributeVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = domainMetadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = domainMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

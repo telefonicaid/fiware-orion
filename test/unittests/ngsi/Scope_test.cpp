@@ -77,16 +77,16 @@ TEST(Scope, check)
   
   utInit();
 
-  checked = scope.check(RegisterContext, JSON, "", "", 0);
+  checked = scope.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(checked.c_str(), expected.c_str());
 
-  checked = scope1.check(RegisterContext, JSON, "", "", 0);
+  checked = scope1.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(checked.c_str(), expected1.c_str());
 
-  checked = scope2.check(RegisterContext, JSON, "", "", 0);
+  checked = scope2.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(checked.c_str(), expected2.c_str());
 
-  checked = scope3.check(RegisterContext, JSON, "", "", 0);
+  checked = scope3.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(checked.c_str(), expected3.c_str());
 
   utExit();

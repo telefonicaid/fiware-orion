@@ -116,15 +116,15 @@ TEST(StatusCode, check)
 
   utInit();
 
-  out = sc.check(RegisterContext, JSON, "", "", 0);
+  out = sc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   sc.fill(SccNone, "YYY");
-  out = sc.check(RegisterContext, JSON, "", "", 0);
+  out = sc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("no code", out.c_str());
 
   sc.fill(SccOk, "YYY");
-  out = sc.check(RegisterContext, JSON, "", "", 0);
+  out = sc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();

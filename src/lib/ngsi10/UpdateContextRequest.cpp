@@ -79,7 +79,7 @@ std::string UpdateContextRequest::render(ConnectionInfo* ciP, RequestType reques
   //
   out += startTag1(indent, tag, false);
   out += contextElementVector.render(ciP, UpdateContext, indent + "  ", true);
-  out += updateActionType.render(ciP->outFormat, indent + "  ", false);
+  out += updateActionType.render(indent + "  ", false);
   out += endTag(indent, false);
 
   return out;
@@ -102,8 +102,8 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
     return response.render(ciP, UpdateContext, indent);
   }
 
-  if (((res = contextElementVector.check(ciP, requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") ||
-      ((res = updateActionType.check(requestType,     ciP->outFormat, indent, predetectedError, counter)) != "OK"))
+  if (((res = contextElementVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK") ||
+      ((res = updateActionType.check(requestType,     indent, predetectedError, counter)) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
     return response.render(ciP, UpdateContext, indent);

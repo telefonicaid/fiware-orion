@@ -53,7 +53,7 @@ std::string postSubscribeContextAvailability
   std::string                           answer;  
 
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->uriParam, ciP->tenant));
-  TIMED_RENDER(answer = scar.render(SubscribeContextAvailability, ciP->outFormat, ""));
+  TIMED_RENDER(answer = scar.render(SubscribeContextAvailability, ""));
 
   return answer;
 }

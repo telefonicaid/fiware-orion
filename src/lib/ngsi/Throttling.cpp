@@ -52,7 +52,6 @@ int64_t Throttling::parse(void)
 std::string Throttling::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -133,7 +132,7 @@ void Throttling::present(const std::string& indent)
 *
 * Throttling::render -
 */
-std::string Throttling::render(Format format, const std::string& indent, bool comma)
+std::string Throttling::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {

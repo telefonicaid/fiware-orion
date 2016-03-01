@@ -41,7 +41,7 @@
 *
 * ScopeVector::render -
 */
-std::string ScopeVector::render(Format format, const std::string& indent, bool comma)
+std::string ScopeVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "scope";
@@ -54,7 +54,7 @@ std::string ScopeVector::render(Format format, const std::string& indent, bool c
   out += startTag2(indent, tag, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+     out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
   }
   out += endTag(indent, comma, true);
 
@@ -70,7 +70,6 @@ std::string ScopeVector::render(Format format, const std::string& indent, bool c
 std::string ScopeVector::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -80,7 +79,7 @@ std::string ScopeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(requestType, indent, predetectedError, counter)) != "OK")
     {
       char ixV[STRING_SIZE_FOR_INT];
       snprintf(ixV, sizeof(ixV), "%d", ix);

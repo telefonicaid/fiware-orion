@@ -41,7 +41,6 @@
 std::string UpdateActionType::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -123,7 +122,7 @@ void UpdateActionType::present(const std::string& indent)
 *
 * UpdateActionType::render - 
 */
-std::string UpdateActionType::render(Format format, const std::string& indent, bool comma)
+std::string UpdateActionType::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {

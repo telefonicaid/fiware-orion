@@ -76,13 +76,13 @@ TEST(ErrorCode, check)
 
   utInit();
 
-  rendered = e1.check(RegisterContext, JSON, "", "", 0);
+  rendered = e1.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
-  rendered = e2.check(RegisterContext, JSON, "", "", 0);
+  rendered = e2.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
-  rendered = e3.check(RegisterContext, JSON, "", "", 0);
+  rendered = e3.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 
   utExit();

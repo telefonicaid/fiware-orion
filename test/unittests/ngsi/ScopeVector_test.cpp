@@ -76,11 +76,11 @@ TEST(ScopeVector, check)
   utInit();
 
   sV.push_back(s1);
-  rendered = sV.check(RegisterContext, JSON, "", "", 0);
+  rendered = sV.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   sV.push_back(s2);
-  rendered = sV.check(RegisterContext, JSON, "", "", 0);
+  rendered = sV.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());  
 
   utExit();

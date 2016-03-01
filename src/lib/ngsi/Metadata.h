@@ -74,7 +74,7 @@ typedef struct Metadata
   Metadata(const std::string& _name, const std::string& _type, bool _value);
   Metadata(const mongo::BSONObj& mdB);
 
-  std::string  render(Format format, const std::string& indent, bool comma = false);
+  std::string  render(const std::string& indent, bool comma = false);
   std::string  toJson(bool isLastElement);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
@@ -83,7 +83,6 @@ typedef struct Metadata
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,
-                     Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);

@@ -39,7 +39,7 @@
 *
 * render - 
 */
-std::string ConditionValueList::render(Format format, const std::string& indent, bool comma)
+std::string ConditionValueList::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
   std::string  tag = "condValueList";
@@ -70,7 +70,6 @@ std::string ConditionValueList::render(Format format, const std::string& indent,
 std::string ConditionValueList::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

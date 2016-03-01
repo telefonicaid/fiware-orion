@@ -47,7 +47,7 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 *
 * ContextRegistrationResponse::render -
 */
-std::string ContextRegistrationResponse::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationResponse::render(const std::string& indent, bool comma)
 {
   std::string  key               = "contextRegistration";
   std::string  out               = "";
@@ -55,11 +55,11 @@ std::string ContextRegistrationResponse::render(Format format, const std::string
 
   out += startTag2(indent, key, false, false);
 
-  out += contextRegistration.render(format, indent + "  ", errorCodeRendered, false);
+  out += contextRegistration.render(indent + "  ", errorCodeRendered, false);
 
   if (errorCodeRendered)
   {
-    out += errorCode.render(format, indent + "  ", false);
+    out += errorCode.render(indent + "  ", false);
   }
 
   out += endTag(indent, comma);
@@ -77,13 +77,12 @@ std::string ContextRegistrationResponse::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
-  return contextRegistration.check(ciP, requestType, format, indent, predetectedError, counter);
+  return contextRegistration.check(ciP, requestType, indent, predetectedError, counter);
 }
 
 

@@ -63,7 +63,7 @@ SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 *
 * SubscribeContextResponse::render - 
 */
-std::string SubscribeContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string SubscribeContextResponse::render(RequestType requestType, const std::string& indent)
 {
   std::string out     = "";
   std::string tag     = "subscribeContextResponse";
@@ -72,11 +72,11 @@ std::string SubscribeContextResponse::render(RequestType requestType, Format for
 
   if (subscribeError.errorCode.code == SccNone)
   {
-    out += subscribeResponse.render(format, indent + "  ", false);
+    out += subscribeResponse.render(indent + "  ", false);
   }
   else
   {
-    out += subscribeError.render(SubscribeContext, format, indent + "  ", false);
+    out += subscribeError.render(SubscribeContext, indent + "  ", false);
   }
 
   out += endTag(indent, false);

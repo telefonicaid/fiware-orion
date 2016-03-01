@@ -71,7 +71,7 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusC
 *
 * DiscoverContextAvailabilityResponse::render - 
 */
-std::string DiscoverContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string DiscoverContextAvailabilityResponse::render(RequestType requestType, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "discoverContextAvailabilityResponse";
@@ -86,19 +86,19 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
   if (responseVector.size() > 0)
   {
     bool commaNeeded = (errorCode.code != SccNone);
-    out += responseVector.render(format, indent + "  ", commaNeeded);
+    out += responseVector.render(indent + "  ", commaNeeded);
   }
 
   if (errorCode.code != SccNone)
   {
-    out += errorCode.render(format, indent + "  ", false);
+    out += errorCode.render(indent + "  ", false);
   }
 
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if (errorCode.code == SccNone && responseVector.size() == 0)
   {
       errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-      out += errorCode.render(format, indent + "  ");
+      out += errorCode.render(indent + "  ");
   }
 
   out += endTag(indent);

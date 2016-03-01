@@ -88,7 +88,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 *
 * StatusCode::render -
 */
-std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showKey)
+std::string StatusCode::render(const std::string& indent, bool comma, bool showKey)
 {
   std::string  out  = "";
 
@@ -240,7 +240,6 @@ void StatusCode::fill(const struct UpdateContextResponse& ucrs)
 std::string StatusCode::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

@@ -54,7 +54,7 @@ TEST(UpdateContextAttributeRequest, render_xml)
   ucar.contextValue = "Context Value";
 
   ucar.metadataVector.push_back(&mdata);
-  out = ucar.render(ciP, JSON, "");
+  out = ucar.render(ciP, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -83,7 +83,7 @@ TEST(UpdateContextAttributeRequest, render_json)
   ucar.contextValue = "Context Value";
 
   ucar.metadataVector.push_back(&mdata);
-  out = ucar.render(ciP, JSON, "");
+  out = ucar.render(ciP, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -116,18 +116,18 @@ TEST(UpdateContextAttributeRequest, check_xml)
 
   
   // 2. empty contextValue  
-  out = ucar.check(&ci, UpdateContextAttribute, JSON, "", "", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   // 3. OK
   ucar.contextValue = "CValue";
-  out = ucar.check(&ci, UpdateContextAttribute, JSON, "", "", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   // 4. bad metadata
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ucar.metadataVector.push_back(&mdata2);
-  out = ucar.check(&ci, UpdateContextAttribute, JSON, "", "", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -160,18 +160,18 @@ TEST(UpdateContextAttributeRequest, check_json)
 
   
   // 2. empty contextValue
-  out = ucar.check(&ci, UpdateContextAttribute, JSON, "", "", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   // 3. OK
   ucar.contextValue = "CValue";
-  out = ucar.check(&ci, UpdateContextAttribute, JSON, "", "", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   // 4. bad metadata
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ucar.metadataVector.push_back(&mdata2);
-  out = ucar.check(&ci, UpdateContextAttribute, JSON, "", "", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

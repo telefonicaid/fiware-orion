@@ -62,7 +62,7 @@ void MetadataVector::keyNameSet(const std::string& _keyName)
 *
 * MetadataVector::render -
 */
-std::string MetadataVector::render(Format format, const std::string& indent, bool comma)
+std::string MetadataVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string key = "metadatas";
@@ -75,7 +75,7 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
   out += startTag2(indent, key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
   }
   out += endTag(indent, comma, true);
 
@@ -162,7 +162,6 @@ std::string MetadataVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -172,7 +171,7 @@ std::string MetadataVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

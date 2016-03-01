@@ -70,7 +70,7 @@ TEST(RegisterContextResponse, constructors)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
   rcr2.registrationId.set("12345");
-  out = rcr2.check(RegisterContext, JSON, "", "", 0);
+  out = rcr2.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
@@ -79,10 +79,10 @@ TEST(RegisterContextResponse, constructors)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
   rcr2.duration.set("dddd");
-  out = rcr2.check(RegisterContext, JSON, "", "", 0);
+  out = rcr2.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
   
-  out = rcr5.check(RegisterContext, JSON, "", "", 0);
+  out = rcr5.check(RegisterContext, "", "", 0);
   EXPECT_EQ(expected5, out);
 
   rcr2.present("");

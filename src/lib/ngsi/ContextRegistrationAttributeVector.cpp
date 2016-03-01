@@ -39,7 +39,7 @@
 *
 * ContextRegistrationAttributeVector::render -
 */
-std::string ContextRegistrationAttributeVector::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationAttributeVector::render(const std::string& indent, bool comma)
 {
 
   std::string key = "attributes";
@@ -53,7 +53,7 @@ std::string ContextRegistrationAttributeVector::render(Format format, const std:
   out += startTag2(indent, key, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
   }
   out += endTag(indent, comma, true);
 
@@ -70,7 +70,6 @@ std::string ContextRegistrationAttributeVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -80,7 +79,7 @@ std::string ContextRegistrationAttributeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

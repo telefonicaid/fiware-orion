@@ -80,7 +80,7 @@ TEST(ContextRegistrationResponse, check)
 
   utInit();
 
-  checked = crr.check(&ci, RegisterContext, JSON, "", "", 0);
+  checked = crr.check(&ci, RegisterContext, "", "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
 
   utExit();

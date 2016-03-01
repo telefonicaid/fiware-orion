@@ -383,7 +383,7 @@ int Scope::fill
 *
 * Scope::render -
 */
-std::string Scope::render(Format format, const std::string& indent, bool notLastInVector)
+std::string Scope::render(const std::string& indent, bool notLastInVector)
 {
   std::string out      = "";
   std::string tag      = "operationScope";
@@ -407,7 +407,6 @@ std::string Scope::render(Format format, const std::string& indent, bool notLast
 std::string Scope::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

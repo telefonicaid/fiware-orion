@@ -82,7 +82,7 @@ TEST(SubscribeError, check)
 
   utInit();
 
-  checked = se.check(SubscribeContext, JSON, "", "", 0);
+  checked = se.check(SubscribeContext, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
