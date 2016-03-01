@@ -3,4 +3,4 @@
 - Fix: check for metadatas with empty name (Issue #1438)
 - Fix: accepting backslash-slash in JSON v1 payload (Issue #1852)
 - Remove: deprecated functionality related with ONTIMEINTERVAL subscriptions
-- Remove: XML support (deprecated functionality)
+- Remove: XML support (deprecated functionality) (Issue #1862)

@@ -56,8 +56,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(putAttributeValueInstance, notFound)
+TEST(putAttributeValueInstance, DISABLED_notFound)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/right",  "PUT", "1.1");
@@ -106,8 +108,10 @@ TEST(putAttributeValueInstance, notFound)
 /* ****************************************************************************
 *
 * found - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(putAttributeValueInstance, found)
+TEST(putAttributeValueInstance, DISABLED_found)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes",          "POST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");

@@ -108,16 +108,14 @@ Provides timing information, i.e. the time that CB passes executing in different
       "mongoWriteWait": 259.347915990,
       "mongoCommandWait": 0.514811318,
       "render": 108.162782114,
-      "total": 6476.593504743,
-      "xmlParse": 44.490766332
+      "total": 6476.593504743
      },
     "last": {
       "mongoBackend": 0.014752309,
       "mongoReadWait": 0.012018445,
       "mongoWriteWait": 0.000574611,
       "render": 0.000019136,
-      "total": 0.015148915,
-      "xmlParse": 0.000153878
+      "total": 0.015148915
      }
   }
   ...
@@ -136,7 +134,6 @@ The particular counters are as follows:
   takes for request/response dispatching (pseudo end-to-end time)
 * `jsonV1Parse`: time passed in NGSIv1 JSON parsing module (pseudo self-time)
 * `jsonV2Parse`: time passed in NGSIv2 JSON parsing module (pseudo self-time)
-* `xmlParser`: time passed in NGSIv1 XML module (pseudo self-time)
 * `mongoBackend`: time passed in mongoBackend module (pseduo self-time)
 * `render`: time passed in rendering module (pseudo self-time)
 * `mongo*Wait`: time passed waiting for MongoDB for `Read`, `Write` or `Cmd` operations. Note that if

@@ -58,7 +58,6 @@
 static void resetStatistics(void)
 {
   noOfJsonRequests                                = -1;
-  noOfXmlRequests                                 = -1;
   noOfRegistrations                               = -1;
   noOfRegistrationErrors                          = -1;
   noOfRegistrationUpdates                         = -1;
@@ -159,8 +158,7 @@ std::string renderCounterStats(void)
 {
   JsonHelper js;
 
-  // FIXME: try to chose names closer to the ones used in API URLs
-  renderUsedCounter(&js, "xmlRequests",                               noOfXmlRequests);
+  // FIXME: try to chose names closer to the ones used in API URLs  
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
   renderUsedCounter(&js, "registrations",                             noOfRegistrations);
   renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);

@@ -238,12 +238,6 @@ SET (SOURCES
     parse/nullTreat_test.cpp
     jsonParse/jsonRequest_test.cpp
 
-    xmlParse/xmlAppendContextElementRequest_test.cpp
-    xmlParse/xmlRegisterContextResponse_test.cpp
-    xmlParse/xmlRequest_test.cpp
-    xmlParse/xmlUpdateContextElementRequest_test.cpp
-    xmlParse/xmlUpdateContextRequest_test.cpp
-
     rest/OrionError_test.cpp
     rest/Verb_test.cpp
     rest/restReply_test.cpp
@@ -264,7 +258,6 @@ SET (STATIC_LIBS
     rest
     jsonParse
     jsonParseV2
-    xmlParse
     apiTypesV2
     convenience
     serviceRoutines

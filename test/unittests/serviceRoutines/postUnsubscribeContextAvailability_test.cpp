@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * badSubscriptionId - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(postUnsubscribeContextAvailability, badSubscriptionId)
+TEST(postUnsubscribeContextAvailability, DISABLED_badSubscriptionId)
 {
   ConnectionInfo ci("/ngsi9/unsubscribeContextAvailability",  "POST", "1.1");
   const char*    infile    = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionIdNotFound.valid.xml";

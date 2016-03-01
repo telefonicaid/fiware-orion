@@ -50,8 +50,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(putIndividualContextEntity, notFound)
+TEST(putIndividualContextEntity, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity011",  "PUT", "1.1");  
   const char*    infile    = "ngsi10.updateContextElementRequest.valid.xml";
