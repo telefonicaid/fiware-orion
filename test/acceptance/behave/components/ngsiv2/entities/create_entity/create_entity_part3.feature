@@ -1105,9 +1105,9 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     When create an entity in raw and "keyValues" modes
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | not a JSON object |
+      | parameter   | value                                                            |
+      | error       | BadRequest                                                       |
+      | description | attribute must be a JSON object, unless keyValues option is used |
     Examples:
       | entity_id | attribute_value                                                               |
       | "room0"   | "34"                                                                          |
