@@ -102,6 +102,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
   // number of valid attributes, then the comma must be rendered.
   //
   int validAttributes = 0;
+  std::map<std::string, bool>  uniqueMap;
   if (attrsFilter == "")
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
@@ -111,7 +112,20 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
         continue;
       }
 
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        if (uniqueMap[vec[ix]->stringValue] == true)
+        {
+          continue;
+        }
+      }
+
       ++validAttributes;
+
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        uniqueMap[vec[ix]->stringValue] = true;
+      }
     }
   }
   else
@@ -132,7 +146,9 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
   //
   std::string  out;
   int          renderedAttributes = 0;
-  
+
+  uniqueMap.clear();
+
   if (attrsFilter == "")
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
@@ -143,7 +159,21 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
       }
 
       ++renderedAttributes;
+
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        if (uniqueMap[vec[ix]->stringValue] == true)
+        {
+          continue;
+        }
+      }
+
       out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
+
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        uniqueMap[vec[ix]->stringValue] = true;
+      }
     }
   }
   else

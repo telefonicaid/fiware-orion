@@ -572,9 +572,9 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
   {
     out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
   }
-  else if ((renderMode == "values") || (renderMode == "keyValues"))
+  else if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_KEY_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
   {
-    out = (renderMode == "keyValues")? JSON_STR(name) + ":" : "";
+    out = (renderMode == RENDER_MODE_KEY_VALUES)? JSON_STR(name) + ":" : "";
 
     if (compoundValueP != NULL)
     {

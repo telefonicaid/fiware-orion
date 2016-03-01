@@ -51,7 +51,7 @@
 * Payload Out: Entity Attribute
 *
 * URI parameters:
-*   - options=keyValues,text
+*   - options=keyValues
 * 
 */
 std::string getEntityAttributeValue
@@ -65,7 +65,7 @@ std::string getEntityAttributeValue
   Attribute    attribute;
   std::string  answer;
   std::string  type       = ciP->uriParam["type"];
-  bool         text       = (ciP->uriParamOptions["options"] == true || ciP->outFormat == TEXT);
+  bool         text       = (ciP->outFormat == TEXT);
 
   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
   {

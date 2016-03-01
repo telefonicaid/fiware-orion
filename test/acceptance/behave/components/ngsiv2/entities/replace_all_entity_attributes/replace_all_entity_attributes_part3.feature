@@ -529,9 +529,9 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
     When replace attributes by ID "room_1" if it exists and with "keyValues" mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | not a JSON object |
+      | parameter   | value                                                            |
+      | error       | BadRequest                                                       |
+      | description | attribute must be a JSON object, unless keyValues option is used |
 
   @qp_options_key_value_attr_names_duplicated @BUG_1433
   Scenario:  replace attributes by entity ID if it exists using NGSI v2 with options=keyvalues query parameter and keyValues format
