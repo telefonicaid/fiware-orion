@@ -563,7 +563,7 @@ std::string ContextAttribute::render
     //out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
     out += startTag2(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(ciP, ciP->outFormat, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", ciP->outFormat, commaAfterContextValue, isCompoundVector);
+    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
   out += metadataVector.render(ciP->outFormat, indent + "  ", false);
