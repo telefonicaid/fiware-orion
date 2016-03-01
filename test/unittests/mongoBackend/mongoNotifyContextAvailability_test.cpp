@@ -144,8 +144,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_XML)
   crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
-  /* Invoke the function in mongoBackend library */
-  uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
+  /* Invoke the function in mongoBackend library */  
   ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
@@ -205,8 +204,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_JSON)
   crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
-  /* Invoke the function in mongoBackend library */
-  uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+  /* Invoke the function in mongoBackend library */  
   ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */

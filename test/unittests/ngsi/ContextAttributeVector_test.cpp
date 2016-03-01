@@ -42,7 +42,7 @@ TEST(ContextAttributeVector, render)
   ContextAttribute        ca("Name", "Type", "Value");
   std::string             out;
   const char*             outfile = "ngsi.contextAttributeList.render.middle.xml";
-  ConnectionInfo          ci(XML);
+  ConnectionInfo          ci(JSON);
 
   utInit();
 

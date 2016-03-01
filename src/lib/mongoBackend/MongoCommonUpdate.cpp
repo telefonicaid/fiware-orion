@@ -1492,7 +1492,7 @@ static bool addTriggeredSubscriptions_noCache
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : JSON,
           getStringField(sub, CSUB_REFERENCE),          
           subToAttributeList(sub), "", "");
 

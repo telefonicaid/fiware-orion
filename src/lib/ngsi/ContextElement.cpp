@@ -91,11 +91,13 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
   if (requestType == UpdateContext)
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+    out += startTag2(indent, jsonTag, false, false);
   }
   else
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    out += startTag2(indent, jsonTag, false, true);
   }
 
   out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
@@ -103,7 +105,7 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
   out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
   out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+  out += endTag(indent, comma, false);
 
   return out;
 }

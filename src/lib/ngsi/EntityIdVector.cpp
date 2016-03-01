@@ -52,11 +52,12 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
   if (vec.size() == 0)
     return "";
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  //out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag2(indent, jsonTag, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
 
-  out += endTag(indent, xmlTag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }

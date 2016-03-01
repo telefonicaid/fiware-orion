@@ -316,10 +316,11 @@ std::string ContextElementResponse::render
   std::string jsonTag  = "contextElement";
   std::string out      = "";
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  out += startTag2(indent, jsonTag, false, false);
   out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(ciP->outFormat, indent + "  ", false);
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+  out += endTag(indent, comma, false);
 
   return out;
 }

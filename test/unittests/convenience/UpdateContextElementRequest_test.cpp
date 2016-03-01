@@ -46,7 +46,7 @@ TEST(UpdateContextElementRequest, render_xml)
   ContextAttribute                ca("caName", "caType", "caValue");
   std::string                     out;
   const char*                     outfile = "ngsi10.updateContextElementRequest.render.valid.xml";
-  ConnectionInfo                  ci(XML);
+  ConnectionInfo                  ci(JSON);
 
   utInit();
 
@@ -103,7 +103,7 @@ TEST(UpdateContextElementRequest, check_xml)
   std::string                     out;
   const char*                     outfile1  = "ngsi10.updateContextElementRequest.check1.valid.xml";
   const char*                     outfile2  = "ngsi10.updateContextElementRequest.check2.valid.xml";
-  ConnectionInfo                  ci(XML);
+  ConnectionInfo                  ci(JSON);
 
   utInit();
 

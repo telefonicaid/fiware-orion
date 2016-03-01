@@ -42,7 +42,7 @@ TEST(QueryContextResponse, ok_xml)
   QueryContextResponse  qcr(ec);
   std::string           out;
   const char*           outfile  = "ngsi10.queryContextResponse.ok.valid.xml";
-  ConnectionInfo        ci(XML);
+  ConnectionInfo        ci(JSON);
 
   utInit();
 

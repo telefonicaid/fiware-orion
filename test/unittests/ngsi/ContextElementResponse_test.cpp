@@ -44,18 +44,18 @@ TEST(ContextElementResponse, check)
    
    utInit();
 
-   out = cer.check(&ci, UpdateContext, XML, "", "", 0);
+   out = cer.check(&ci, UpdateContext, JSON, "", "", 0);
    EXPECT_STREQ("empty entityId:id", out.c_str());
 
    cer.contextElement.entityId.id         = "ID";
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   out = cer.check(&ci, UpdateContext, XML, "", "", 0);
+   out = cer.check(&ci, UpdateContext, JSON, "", "", 0);
    EXPECT_STREQ("no code", out.c_str());
 
    cer.statusCode.fill(SccOk, "details");
-   out = cer.check(&ci, UpdateContext, XML, "", "", 0);
+   out = cer.check(&ci, UpdateContext, JSON, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
    utExit();
@@ -73,7 +73,7 @@ TEST(ContextElementResponse, render)
   const char*             outfile1 = "ngsi.contextElementResponse.render.middle.xml";
   const char*             outfile2 = "ngsi.contextElementResponse.render.middle.json";
   std::string             out;
-  ConnectionInfo          ciX(XML);
+  ConnectionInfo          ciX(JSON);
   ConnectionInfo          ciJ(JSON);
 
    utInit();

@@ -60,7 +60,8 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
   bool         commaAfterAttributeList         = referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
   bool         commaAfterEntityIdVector        = attributeListRendered || referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
 
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
   out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
   out += attributeList.render(format, indent2, commaAfterAttributeList);
   out += reference.render(format, indent2, commaAfterReference);
@@ -68,7 +69,7 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
   out += restriction.render(format, indent2, restrictions, commaAfterRestriction);
   out += notifyConditionVector.render(format, indent2, commaAfterNotifyConditionVector);
   out += throttling.render(format, indent2, commaAfterThrottling);
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
   return out;
 }

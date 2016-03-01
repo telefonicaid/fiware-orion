@@ -52,7 +52,8 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
   std::string out = "";
   std::string tag = "subscribeError";
 
-  out += startTag(indent, tag, format, true);
+  //out += startTag(indent, tag, format, true);
+  out += startTag1(indent, tag, true);
 
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
   // errorCode is Mandatory so, the JSON comma is always TRUE
@@ -77,7 +78,7 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
 
   out += errorCode.render(format, indent + "  ");
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, comma);
 
   return out;
 }

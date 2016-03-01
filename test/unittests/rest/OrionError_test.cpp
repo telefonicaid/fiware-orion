@@ -50,7 +50,7 @@ TEST(OrionError, all)
   const char*   outfile8 = "orion.orionError.all4.valid.json";
   ConnectionInfo ci;
 
-  ci.outFormat = XML;
+  ci.outFormat = JSON;
 
   EXPECT_EQ(SccNone, e0.code);
   EXPECT_EQ("",      e0.reasonPhrase);

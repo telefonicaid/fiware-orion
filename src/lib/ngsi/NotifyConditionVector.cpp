@@ -59,12 +59,13 @@ std::string NotifyConditionVector::render(Format format, const std::string& inde
     return "";
   }
 
-  out += startTag(indent, tag, tag, format, true, true);
+  //out += startTag(indent, tag, tag, format, true, true);
+  out += startTag2(indent, tag, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
   }
-  out += endTag(indent, tag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }

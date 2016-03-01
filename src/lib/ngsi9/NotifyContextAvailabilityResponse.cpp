@@ -69,9 +69,10 @@ std::string NotifyContextAvailabilityResponse::render(RequestType requestType, F
 
   responseCode.tagSet("responseCode");
 
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
   out += responseCode.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
   return out;
 }

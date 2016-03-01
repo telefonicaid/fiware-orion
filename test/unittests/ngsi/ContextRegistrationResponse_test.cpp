@@ -47,7 +47,7 @@ TEST(ContextRegistrationResponse, render)
   utInit();
 
   crr.errorCode.fill(SccNone);
-  rendered = crr.render(XML, "");
+  rendered = crr.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   rendered = crr.render(JSON, "");
@@ -55,7 +55,7 @@ TEST(ContextRegistrationResponse, render)
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   crr.errorCode.fill(SccBadRequest);
-  rendered = crr.render(XML, "");
+  rendered = crr.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   rendered = crr.render(JSON, "");
@@ -80,7 +80,7 @@ TEST(ContextRegistrationResponse, check)
 
   utInit();
 
-  checked = crr.check(&ci, RegisterContext, XML, "", "", 0);
+  checked = crr.check(&ci, RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
 
   utExit();

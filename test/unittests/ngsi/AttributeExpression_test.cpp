@@ -48,10 +48,10 @@ TEST(AttributeExpression, ok)
    EXPECT_STREQ("AE", ae.get().c_str());
 
    ae.set("");
-   EXPECT_STREQ("", ae.render(XML, "", false).c_str());
+   EXPECT_STREQ("", ae.render(JSON, "", false).c_str());
 
    ae.set("AE");
-   out = ae.render(XML, "", false);
+   out = ae.render(JSON, "", false);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

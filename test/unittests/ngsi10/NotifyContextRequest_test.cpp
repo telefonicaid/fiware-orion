@@ -143,7 +143,7 @@ TEST(NotifyContextRequest, predetectedError)
   NotifyContextRequest ncr;
   const char*          outfile = "ngsi10.notifyContextResponse.predetectedError.valid.xml";
   std::string          out;
-  ConnectionInfo       ci(XML);
+  ConnectionInfo       ci(JSON);
 
   utInit();
 

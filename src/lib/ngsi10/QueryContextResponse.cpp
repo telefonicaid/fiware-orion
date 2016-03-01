@@ -126,7 +126,8 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   //
   // 02. render 
   //
-  out += startTag(indent, tag, ciP->outFormat, false);
+  //out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if (contextElementResponseVector.size() > 0)
   {
@@ -152,7 +153,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
     out += errorCode.render(ciP->outFormat, indent + "  ");
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

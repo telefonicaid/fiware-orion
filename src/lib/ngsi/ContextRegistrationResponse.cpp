@@ -54,7 +54,8 @@ std::string ContextRegistrationResponse::render(Format format, const std::string
   std::string  out               = "";
   bool         errorCodeRendered = errorCode.code != SccNone;
 
-  out += startTag(indent, xmlTag, jsonTag, format, false, false);
+  //out += startTag(indent, xmlTag, jsonTag, format, false, false);
+  out += startTag2(indent, jsonTag, false, false);
 
   out += contextRegistration.render(format, indent + "  ", errorCodeRendered, false);
 
@@ -63,7 +64,7 @@ std::string ContextRegistrationResponse::render(Format format, const std::string
     out += errorCode.render(format, indent + "  ", false);
   }
 
-  out += endTag(indent, xmlTag, format, comma);
+  out += endTag(indent, comma);
 
   return out;
 }

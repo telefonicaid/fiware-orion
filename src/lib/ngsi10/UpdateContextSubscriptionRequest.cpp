@@ -64,13 +64,14 @@ std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Fo
   bool        commaAfterRestriction           = subscriptionIdRendered || notifyConditionVectorRendered || throttlingRendered;
   bool        commaAfterDuration              = restrictionRendered || subscriptionIdRendered || notifyConditionVectorRendered || throttlingRendered;
   
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
   out += duration.render(format, indent + "  ", commaAfterDuration);
   out += restriction.render(format, indent + "  ", restrictions, commaAfterRestriction);
   out += subscriptionId.render(UpdateContextSubscription, format, indent + "  ", commaAfterSubscriptionId);
   out += notifyConditionVector.render(format, indent + "  ", commaAfterNotifyConditionVector);
   out += throttling.render(format, indent + "  ", commaAfterThrottling);
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
   return out;
 }

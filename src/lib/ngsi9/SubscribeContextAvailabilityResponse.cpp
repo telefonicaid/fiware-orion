@@ -90,7 +90,8 @@ std::string SubscribeContextAvailabilityResponse::render(RequestType requestType
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
 
   out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, format, indent + "  ", durationRendered || errorCodeRendered);
   out += duration.render(format, indent + "  ", errorCodeRendered);
@@ -98,7 +99,7 @@ std::string SubscribeContextAvailabilityResponse::render(RequestType requestType
   if (errorCodeRendered)
      out += errorCode.render(format, indent + "  ", false);
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
   
   return out;
 }  

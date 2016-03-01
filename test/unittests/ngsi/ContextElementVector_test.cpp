@@ -43,7 +43,7 @@ TEST(ContextElementVector, render)
   std::string           rendered;
   ContextElementVector  ceV;
   const char*           outfile = "ngsi.contextElementVector.render.middle.xml";
-  ConnectionInfo        ci(XML);
+  ConnectionInfo        ci(JSON);
 
   rendered = ceV.render(&ci, UpdateContextElement, "", false);
   EXPECT_STREQ("", rendered.c_str());

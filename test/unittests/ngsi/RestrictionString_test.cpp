@@ -41,12 +41,12 @@ TEST(RestrictionString, check)
 
   utInit();
 
-  checked = restrictionString.check(RegisterContext, XML, "", "", 0);
+  checked = restrictionString.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   restrictionString.string = "String";
 
-  checked = restrictionString.check(RegisterContext, XML, "", "", 0);
+  checked = restrictionString.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   checked = restrictionString.check(RegisterContext, JSON, "", "", 0);
@@ -93,12 +93,12 @@ TEST(RestrictionString, render)
 
   utInit();
 
-  out = restrictionString.render(XML, "", false);
+  out = restrictionString.render(JSON, "", false);
   EXPECT_STREQ("", out.c_str());
 
   restrictionString.string = "String";
 
-  out = restrictionString.render(XML, "", false);
+  out = restrictionString.render(JSON, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -62,15 +62,15 @@ TEST(SubscriptionId, check)
   utInit();
 
   sId.set("SUB_123");
-  checked = sId.check(RegisterContext, XML, "", "", 0);
+  checked = sId.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("bad length - 24 chars expected", checked.c_str());
 
   sId.set("SUB_12345678901234567890");
-  checked = sId.check(RegisterContext, XML, "", "", 0);
+  checked = sId.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("invalid char in ID string", checked.c_str());
 
   sId.set("012345678901234567890123");
-  checked = sId.check(RegisterContext, XML, "", "", 0);
+  checked = sId.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
@@ -138,12 +138,12 @@ TEST(SubscriptionId, render)
   utInit();
 
   sId.set("");
-  out = sId.render(UnsubscribeContext, XML, ""); // subscriptionId is MANDATORY for RegisterContext 
+  out = sId.render(UnsubscribeContext, JSON, ""); // subscriptionId is MANDATORY for RegisterContext 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   sId.set("012345012345012345012345");
-  out = sId.render(UnsubscribeContext, XML, "");
+  out = sId.render(UnsubscribeContext, JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   

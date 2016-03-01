@@ -108,16 +108,19 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, tag, format, showTag);
-  out += valueTag(indent + "  ", "code", code, format, true);
-  out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
+  //out += startTag(indent, tag, format, showTag);
+  out += startTag1(indent, tag, showTag);
+  out += valueTag(indent + "  ", "code", code, true);
+  //out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
+  out += valueTag1(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details", details, format, false);
+    //out += valueTag(indent + "  ", "details", details, format, false);
+    out += valueTag1(indent + "  ", "details", details, false);
   }
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, comma);
 
   return out;
 }

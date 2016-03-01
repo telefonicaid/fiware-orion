@@ -130,7 +130,8 @@ std::string UpdateActionType::render(Format format, const std::string& indent, b
     return "";
   }
 
-  return valueTag(indent, "updateAction", string, format, comma);
+  //return valueTag(indent, "updateAction", string, format, comma);
+  return valueTag1(indent, "updateAction", string, comma);
 }
 
 

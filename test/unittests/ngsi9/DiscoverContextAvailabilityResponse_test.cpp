@@ -56,12 +56,12 @@ TEST(DiscoverContextAvailabilityResponse, render)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = dcar1.render(DiscoverContextAvailability, XML, "");
+  out = dcar1.render(DiscoverContextAvailability, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
   EXPECT_EQ(SccReceiverInternalError, dcar1.errorCode.code);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = dcar2.render(DiscoverContextAvailability, XML, "");
+  out = dcar2.render(DiscoverContextAvailability, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
   EXPECT_EQ(SccBadRequest, dcar2.errorCode.code);
 

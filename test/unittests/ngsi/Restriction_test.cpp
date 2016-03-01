@@ -46,18 +46,18 @@ TEST(Restriction, check)
   std::string  expected3 = "OK";
   Scope*       scopeP    = new Scope("", "Value");
 
-  checked = restriction.check(RegisterContext, XML, "", "", 0);
+  checked = restriction.check(RegisterContext, JSON, "", "", 0);
   EXPECT_EQ(expected0, checked);
 
-  checked = restriction.check(RegisterContext, XML, "", "", 1);
+  checked = restriction.check(RegisterContext, JSON, "", "", 1);
   EXPECT_EQ(expected1, checked);
 
   restriction.scopeVector.push_back(scopeP);
-  checked = restriction.check(RegisterContext, XML, "", "", 1);
+  checked = restriction.check(RegisterContext, JSON, "", "", 1);
   EXPECT_EQ(expected2, checked);
 
   scopeP->type = "Type";
-  checked = restriction.check(RegisterContext, XML, "", "", 1);
+  checked = restriction.check(RegisterContext, JSON, "", "", 1);
   EXPECT_EQ(expected3, checked);
 }
 
@@ -86,6 +86,6 @@ TEST(Restriction, render)
   std::string  rendered;
   std::string  expected = "";
 
-  rendered = restriction.render(XML, "", 0, false);
+  rendered = restriction.render(JSON, "", 0, false);
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 }

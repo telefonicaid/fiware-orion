@@ -49,7 +49,7 @@ TEST(SubscribeError, render)
   se.subscriptionId.set("SUB_123");
   se.errorCode.fill(SccBadRequest, "detail");
 
-  out = se.render(RegisterContext, XML, "");
+  out = se.render(RegisterContext, JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -58,7 +58,7 @@ TEST(SubscribeError, render)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
-  out = se.render(SubscribeContext, XML, "");
+  out = se.render(SubscribeContext, JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -82,7 +82,7 @@ TEST(SubscribeError, check)
 
   utInit();
 
-  checked = se.check(SubscribeContext, XML, "", "", 0);
+  checked = se.check(SubscribeContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

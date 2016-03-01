@@ -68,7 +68,7 @@ TEST(Metadata, render)
 
   utInit();
 
-  out = m1.render(XML, "");
+  out = m1.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   out = m1.render(JSON, "");
@@ -76,7 +76,7 @@ TEST(Metadata, render)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
-  out = m2.render(XML, "");
+  out = m2.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   out = m2.render(JSON, "");
@@ -102,13 +102,13 @@ TEST(Metadata, check)
 
   utInit();
 
-  checked = m1.check(&ci, RegisterContext, XML, "", "", 0);
+  checked = m1.check(&ci, RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("missing metadata name", checked.c_str());
 
   checked = m2.check(&ci, RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("missing metadata value", checked.c_str());
   
-  checked = m3.check(&ci, RegisterContext, XML, "", "", 0);
+  checked = m3.check(&ci, RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

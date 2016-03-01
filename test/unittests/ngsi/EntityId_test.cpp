@@ -44,7 +44,7 @@ TEST(EntityId, render)
   eId.tagSet("eId");
   EXPECT_STREQ("eId", eId.tag.c_str());
 
-  out = eId.render(XML, "");
+  out = eId.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

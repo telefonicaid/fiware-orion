@@ -47,11 +47,11 @@ TEST(UpdateContextSubscriptionResponse, constructors)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucsr1.render(UpdateContextSubscription, XML, "");
+  out = ucsr1.render(UpdateContextSubscription, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucsr2.render(UpdateContextSubscription, XML, "");
+  out = ucsr2.render(UpdateContextSubscription, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

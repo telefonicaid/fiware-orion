@@ -69,27 +69,27 @@ TEST(UpdateActionType, check)
   utInit();
 
   uat.set("Append");
-  checked = uat.check(UpdateContext, XML, "", "", 0);
+  checked = uat.check(UpdateContext, JSON, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), checked.c_str());
 
   uat.set("Update");
-  checked = uat.check(RegisterContext, XML, "", "", 0);
+  checked = uat.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   uat.set("APPEND");
-  checked = uat.check(RegisterContext, XML, "", "", 0);
+  checked = uat.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   uat.set("Delete");
-  checked = uat.check(RegisterContext, XML, "", "", 0);
+  checked = uat.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   uat.set("APPEND2");
-  checked = uat.check(RegisterContext, XML, "", "", 0);
+  checked = uat.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
 
   uat.set("");
-  checked = uat.check(RegisterContext, XML, "", "", 0);
+  checked = uat.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected4.c_str(), checked.c_str());
 
   utExit();
@@ -111,11 +111,11 @@ TEST(UpdateActionType, render)
   utInit();
 
   uat.set("");
-  out = uat.render(XML, "");
+  out = uat.render(JSON, "");
   EXPECT_STREQ("", out.c_str());
 
   uat.set("Update");
-  out = uat.render(XML, "");
+  out = uat.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -63,13 +63,14 @@ std::string SubscribeContextAvailabilityRequest::render(RequestType requestType,
   bool        commaAfterReference      = (restrictions > 0) || !duration.isEmpty();
   bool        commaAfterDuration       = restrictions > 0;
 
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
   out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
   out += attributeList.render(format, indent2, commaAfterAttributeList);
   out += reference.render(format, indent2, commaAfterReference);
   out += duration.render(format, indent2, commaAfterDuration);
   out += restriction.render(format, indent2);
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
   return out;
 }

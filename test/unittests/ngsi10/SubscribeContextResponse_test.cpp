@@ -46,7 +46,7 @@ TEST(SubscribeContextResponse, constructorsAndRender)
   EXPECT_STREQ("000000000000000000000000", scr2.subscribeError.subscriptionId.get().c_str());
   EXPECT_STREQ("OK", scr2.subscribeError.errorCode.reasonPhrase.c_str());
 
-  out = scr2.render(SubscribeContext, XML, "");
+  out = scr2.render(SubscribeContext, JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

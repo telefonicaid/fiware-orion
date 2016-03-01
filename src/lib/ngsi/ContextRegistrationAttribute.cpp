@@ -82,12 +82,19 @@ std::string ContextRegistrationAttribute::render(Format format, const std::strin
   // The only doubt here is whether isDomain should have the comma or not,
   // that depends on whether the metadataVector is empty or not.
   //
+#if 0
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",     name, format, true);
   out += valueTag(indent + "  ", "type",     type, format, true);
   out += valueTag(indent + "  ", "isDomain", isDomain, format, metadataVector.size() != 0);
+#else
+  out += startTag2(indent, jsonTag, false, false);
+  out += valueTag1(indent + "  ", "name",     name, true);
+  out += valueTag1(indent + "  ", "type",     type, true);
+  out += valueTag1(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
+#endif
   out += metadataVector.render(format, indent + "  ");
-  out += endTag(indent, xmlTag, format, comma);
+  out += endTag(indent, comma);
 
   return out;
 }

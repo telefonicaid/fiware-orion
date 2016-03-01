@@ -105,10 +105,11 @@ std::string Restriction::render(Format format, const std::string& indent, int re
     return "";
   }
 
-  out += startTag(indent, tag, format);
+  //out += startTag(indent, tag, format);
+  out += startTag1(indent, tag);
   out += attributeExpression.render(format, indent + "  ", scopeVectorRendered);
   out += scopeVector.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, comma);
 
   return out;
 }

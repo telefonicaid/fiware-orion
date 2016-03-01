@@ -47,7 +47,7 @@ TEST(UpdateContextElementResponse, render_xml)
   ContextAttribute                ca("caName", "caType", "caValue");
   std::string                     out;
   const char*                     outfile = "ngsi10.updateContextElementResponse.ok.postponed.xml";
-  ConnectionInfo                  ci(XML);
+  ConnectionInfo                  ci(JSON);
 
   // Just the normal case
   ucer.contextAttributeResponseVector.push_back(&car);
@@ -98,7 +98,7 @@ TEST(UpdateContextElementResponse, check_xml)
   std::string                   out;
   const char*                   outfile1 = "ngsi10.updateContextElementResponse.check1.postponed.xml";
   const char*                   outfile2 = "ngsi10.updateContextElementResponse.check2.postponed.xml";
-  ConnectionInfo                ci(XML);
+  ConnectionInfo                ci(JSON);
 
   // 1. predetected error
   out = ucer.check(&ci, IndividualContextEntity, "", "PRE ERR", 0);

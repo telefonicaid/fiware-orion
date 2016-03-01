@@ -45,13 +45,13 @@ TEST(NotifyConditionVector, render)
   
   utInit();
 
-  out = ncV.render(XML, "", false);
+  out = ncV.render(JSON, "", false);
   EXPECT_STREQ("", out.c_str());
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  out = ncV.render(XML, "", false);
+  out = ncV.render(JSON, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   out = ncV.render(JSON, "", false);
@@ -60,7 +60,7 @@ TEST(NotifyConditionVector, render)
 
   ncV.release();
 
-  out = ncV.render(XML, "", false);
+  out = ncV.render(JSON, "", false);
   EXPECT_STREQ("", out.c_str());
 
   utExit();
@@ -82,17 +82,17 @@ TEST(NotifyConditionVector, check)
   
   utInit();
 
-  checked = ncV.check(RegisterContext, XML, "", "", 0);
+  checked = ncV.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   nc.type = "Type";
   ncV.push_back(&nc);
 
-  checked = ncV.check(RegisterContext, XML, "", "", 0);
+  checked = ncV.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), checked.c_str());
 
   nc.type = "";
-  checked = ncV.check(RegisterContext, XML, "", "", 0);
+  checked = ncV.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
 
   utExit();

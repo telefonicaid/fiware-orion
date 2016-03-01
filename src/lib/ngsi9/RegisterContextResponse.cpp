@@ -106,7 +106,8 @@ std::string RegisterContextResponse::render(RequestType requestType, Format form
   std::string  tag = "registerContextResponse";
   bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
 
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
 
   out += duration.render(format, indent + "  ", true);
   out += registrationId.render(RegisterResponse, format, indent + "  ", errorCodeRendered);
@@ -114,7 +115,7 @@ std::string RegisterContextResponse::render(RequestType requestType, Format form
   if (errorCodeRendered)
     out += errorCode.render(format, indent + "  ");
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
   return out;
 }

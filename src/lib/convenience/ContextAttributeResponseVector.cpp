@@ -52,10 +52,11 @@ std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestT
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true);
+  //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true);
+  out += startTag2(indent, jsonTag, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
     out += vec[ix]->render(ciP, request, indent + "  ");
-  out += endTag(indent, xmlTag, ciP->outFormat, false, true);
+  out += endTag(indent, false, true);
 
   return out;
 }

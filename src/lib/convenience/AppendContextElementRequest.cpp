@@ -55,7 +55,8 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
   std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  //out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if (entity.id != "")
   {
@@ -65,7 +66,7 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
   out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
   out += contextAttributeVector.render(ciP, requestType, indent + "  ");
   out += domainMetadataVector.render(ciP->outFormat, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

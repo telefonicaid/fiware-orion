@@ -66,24 +66,24 @@ extern std::string jsonInvalidCharsTransformation(const std::string& input);
 *
 * startTag -  
 */
-extern std::string startTag
+extern std::string startTag1
 (
   const std::string&  indent,
   const std::string&  tagName,
-  Format              format,
+  //Format              format,
   bool                showTag    = true,
   bool                isToplevel = false
 );
 
-extern std::string startTag
+extern std::string startTag2
 (
   const std::string&  indent,
-  const std::string&  xmlTag,
+  //const std::string&  xmlTag,
   const std::string&  jsonTag,
-  Format              format,
+  //Format              format,
   bool                isVector         = false,
-  bool                showTag          = true,
-  bool                isCompoundVector = false
+  bool                showTag          = true
+  //bool                isCompoundVector = false
 );
 
 
@@ -95,8 +95,6 @@ extern std::string startTag
 extern std::string endTag
 (
   const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
   bool                comma      = false,
   bool                isVector   = false,
   bool                nl         = true,
@@ -109,12 +107,12 @@ extern std::string endTag
 *
 * valueTag -  
 */
-extern std::string valueTag
+extern std::string valueTag1
 (
   const std::string&  indent,
   const std::string&  tagName,
   const std::string&  value,
-  Format              format,
+  //Format              format,
   bool                showComma           = false,
   bool                isVectorElement     = false,
   bool                valueIsNumberOrBool = false
@@ -125,17 +123,17 @@ extern std::string valueTag
   const std::string&  indent,
   const std::string&  tagName,
   int                 value,
-  Format              format,
+  //Format              format,
   bool                showComma     = false
 );
 
-extern std::string valueTag
+extern std::string valueTag2
 (
   const std::string&  indent,
-  const std::string&  xmlTag,
+  //const std::string&  xmlTag,
   const std::string&  jsonTag,
   const std::string&  value,
-  Format              format,
+  //Format              format,
   bool                showComma           = false,
   bool                valueIsNumberOrBool = false
 );

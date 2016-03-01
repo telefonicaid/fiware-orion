@@ -44,7 +44,7 @@ TEST(Reference, check)
   utInit();
 
   reference.string = "http://ip:12";
-  checked = reference.check(RegisterContext, XML, "", "", 0);
+  checked = reference.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
@@ -109,11 +109,11 @@ TEST(Reference, render)
   utInit();
 
   reference .set("");
-  out = reference.render(XML, "", false);
+  out = reference.render(JSON, "", false);
   EXPECT_STREQ("", out.c_str());
 
   reference .set("REF");
-  out = reference.render(XML, "", false);
+  out = reference.render(JSON, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -72,12 +72,13 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
     return "";
   }
 
-  out += startTag(indent, tag, jsonTag, format, true);
+  //out += startTag(indent, tag, jsonTag, format, true);
+  out += startTag2(indent, jsonTag, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
   }
-  out += endTag(indent, tag, format, comma, true);
+  out += endTag(indent, comma, true);
 
 
   return out;

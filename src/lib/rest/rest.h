@@ -96,8 +96,7 @@ extern void restInit
    const char*         _allowedOrigin     = NULL,
    const char*         _httpsKey          = NULL,
    const char*         _httpsCert         = NULL,
-   RestServeFunction   _serveFunction     = NULL,
-   bool                _acceptTextXml     = false
+   RestServeFunction   _serveFunction     = NULL
 );
 
 #endif

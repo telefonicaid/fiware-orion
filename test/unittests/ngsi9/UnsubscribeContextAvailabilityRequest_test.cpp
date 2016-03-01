@@ -57,16 +57,16 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
   const char*   outfile1 = "ngsi9.unsubscribeContextAvailabilityResponse.forcedError.valid.xml";
   const char*   outfile2 = "ngsi9.unsubscribeContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
 
-  out = ucar1.check(UnsubscribeContextAvailability, XML, "", "Forced Error", 0);
+  out = ucar1.check(UnsubscribeContextAvailability, JSON, "", "Forced Error", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucar1.subscriptionId.set("1");
-  out = ucar1.check(UnsubscribeContextAvailability, XML, "", "", 0);
+  out = ucar1.check(UnsubscribeContextAvailability, JSON, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = ucar2.check(UnsubscribeContextAvailability, XML, "", "", 0);
+  out = ucar2.check(UnsubscribeContextAvailability, JSON, "", "", 0);
   EXPECT_EQ("OK", out);
 
   utExit();

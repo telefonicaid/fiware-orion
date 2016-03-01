@@ -52,7 +52,7 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
   EXPECT_EQ(subscriptionId.get(), ucar2.subscriptionId.get());
   EXPECT_EQ(SccBadRequest,        ucar3.statusCode.code);
 
-  out = ucar3.render(UnsubscribeContext, XML, "");
+  out = ucar3.render(UnsubscribeContext, JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

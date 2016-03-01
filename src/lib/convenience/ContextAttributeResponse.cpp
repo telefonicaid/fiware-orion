@@ -48,10 +48,11 @@ std::string ContextAttributeResponse::render(ConnectionInfo* ciP, RequestType re
   std::string tag = "contextAttributeResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  //out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
   out += contextAttributeVector.render(ciP, request, indent + "  ", true);
   out += statusCode.render(ciP->outFormat, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

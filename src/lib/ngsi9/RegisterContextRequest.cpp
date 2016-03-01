@@ -53,13 +53,14 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  out += startTag(indent, xmlTag, "", format, false, false);
+  //out += startTag(indent, xmlTag, "", format, false, false);
+  out += startTag2(indent, "", false, false);
 
   out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);
   out += duration.render(format,                        indent + "  ", commaAfterDuration);
   out += registrationId.render(RegisterContext, format, indent + "  ", commaAfterRegistrationId);
 
-  out += endTag(indent, xmlTag, format, false);
+  out += endTag(indent, false);
 
   return out;
 }

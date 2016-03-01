@@ -192,11 +192,18 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
   std::string tag     = "contextMetadata";
   std::string xValue  = stringValue;
 
+#if 0
   out += startTag(indent, tag, tag, format, false, false);
   out += valueTag(indent + "  ", "name", name, format, true);
   out += valueTag(indent + "  ", "type", type, format, true);
   out += valueTag(indent + "  ", "value", xValue, format, false);
-  out += endTag(indent, tag, format, comma);
+#else
+  out += startTag2(indent, tag, false, false);
+  out += valueTag1(indent + "  ", "name", name, true);
+  out += valueTag1(indent + "  ", "type", type, true);
+  out += valueTag1(indent + "  ", "value", xValue, false);
+#endif
+  out += endTag(indent, comma);
 
   return out;
 }

@@ -60,14 +60,15 @@ std::string ContextRegistrationVector::render(Format format, const std::string& 
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  //out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag2(indent, jsonTag, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
   }
 
-  out += endTag(indent, xmlTag, format, comma, comma);
+  out += endTag(indent, comma, comma);
 
   return out;
 }

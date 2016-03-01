@@ -187,16 +187,6 @@ std::string ContextAttributeVector::render
 
   if (vec.size() == 0)
   {
-    if (ciP->outFormat == XML)
-    {
-      if (((request == IndividualContextEntityAttribute)    ||
-           (request == AttributeValueInstance)              ||
-           (request == IndividualContextEntityAttributes)))
-      {
-        return indent + "<contextAttributeList></contextAttributeList>\n";
-      }
-    }
-
     return "";
   }
 
@@ -232,7 +222,8 @@ std::string ContextAttributeVector::render
     // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, attrsAsName, true);
+    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, attrsAsName, true);
+    out += startTag2(indent, jsonTag, attrsAsName, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
@@ -244,11 +235,12 @@ std::string ContextAttributeVector::render
         out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, attrsAsName);
+    out += endTag(indent, comma, attrsAsName);
   }
   else
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+    //out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+    out += startTag2(indent, jsonTag, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
@@ -260,7 +252,7 @@ std::string ContextAttributeVector::render
         out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
+    out += endTag(indent, comma, true);
   }
 
   return out;

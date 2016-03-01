@@ -62,14 +62,16 @@ std::string AttributeList::render(Format format, const std::string& indent, bool
   if (attributeV.size() == 0)
     return "";
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true, false);
+  //out += startTag(indent, xmlTag, jsonTag, format, true, true, false);
+  out += startTag2(indent, jsonTag, true, true);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, true);
+    //out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, true);
+    out += valueTag1(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
   }
 
-  out += endTag(indent, xmlTag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }

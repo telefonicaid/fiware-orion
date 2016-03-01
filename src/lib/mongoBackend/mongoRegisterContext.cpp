@@ -61,11 +61,8 @@ HttpStatusCode mongoRegisterContext
   const std::string&                   servicePath
 )
 {
-    std::string        sPath         = servicePath;
-    const std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    bool               reqSemTaken;
-
-    LM_T(LmtMongo, ("Register Context Request: '%s' format", notifyFormat.c_str()));
+    std::string        sPath         = servicePath;    
+    bool               reqSemTaken;    
 
     reqSemTake(__FUNCTION__, "ngsi9 register request", SemWriteOp, &reqSemTaken);
 
@@ -78,7 +75,7 @@ HttpStatusCode mongoRegisterContext
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, notifyFormat);
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, "JSON");
       reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
       return result;
     }
@@ -123,7 +120,7 @@ HttpStatusCode mongoRegisterContext
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, notifyFormat);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, "JSON");
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     return result;
 }

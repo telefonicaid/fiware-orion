@@ -118,7 +118,8 @@ std::string AttributeExpression::render(Format format, const std::string& indent
     return "";
   }
 
-  return valueTag(indent, "attributeExpression", string, format, comma);
+  //return valueTag(indent, "attributeExpression", string, format, comma);
+  return valueTag1(indent, "attributeExpression", string, comma);
 }
 
 

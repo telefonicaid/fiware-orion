@@ -66,15 +66,15 @@ TEST(Throttling, check)
   utInit();
 
   t.set("");
-  checked = t.check(RegisterContext, XML, "", "", 0);
+  checked = t.check(RegisterContext, JSON, "", "", 0);
   EXPECT_EQ("OK", checked);
 
   t.set("PT5S");
-  checked = t.check(RegisterContext, XML, "", "", 0);
+  checked = t.check(RegisterContext, JSON, "", "", 0);
   EXPECT_EQ("OK", checked);
 
   t.set("xxxPT5S");
-  checked = t.check(RegisterContext, XML, "", "", 0);
+  checked = t.check(RegisterContext, JSON, "", "", 0);
   EXPECT_EQ("syntax error in throttling string", checked);
 
   utExit();
@@ -97,14 +97,14 @@ TEST(Throttling, render)
   utInit();
 
   t.set("");
-  out = t.render(XML, "", false);
+  out = t.render(JSON, "", false);
   EXPECT_STREQ("", out.c_str());
 
   out = t.render(JSON, "", false);
   EXPECT_STREQ("", out.c_str());
 
   t.set("PT1S");
-  out = t.render(XML, "", false);
+  out = t.render(JSON, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

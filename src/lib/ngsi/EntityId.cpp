@@ -104,36 +104,28 @@ std::string EntityId::render
   char*        typeEscaped      = htmlEscape(type.c_str());
   char*        idEscaped        = htmlEscape(id.c_str());
 
-  if (format == XML)
+
+  std::string indent2 = indent;
+
+  if (isInVector)
   {
-    out += indent + "<"  + tag + " type=\"" + typeEscaped + "\" isPattern=\"" + isPatternEscaped + "\">\n";
-    out += indent + "  " + "<id>"           + idEscaped   + "</id>"           + "\n";
-    out += indent + "</" + tag + ">\n";
+    indent2 += "  ";
+  }
+
+  out += (isInVector? indent + "{\n" : "");
+  out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
+  out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
+  out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
+
+  if ((comma == true) && (isInVector == false))
+  {
+    out += ",\n";
   }
   else
-  {    
-    std::string indent2 = indent;
-
-    if (isInVector)
-    {
-       indent2 += "  ";
-    }
-
-    out += (isInVector? indent + "{\n" : "");
-    out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
-    out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
-    out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
-
-    if ((comma == true) && (isInVector == false))
-    {
-       out += ",\n";
-    }
-    else
-    {
-      out += "\n";
-      out += (isInVector? indent + "}" : "");
-      out += (comma == true)? ",\n" : (isInVector? "\n" : "");
-    }
+  {
+    out += "\n";
+    out += (isInVector? indent + "}" : "");
+    out += (comma == true)? ",\n" : (isInVector? "\n" : "");
   }
 
   free(typeEscaped);

@@ -44,12 +44,12 @@ TEST(AttributeList, ok)
   
   utInit();
 
-  out = al.render(XML, "");
+  out = al.render(JSON, "");
   EXPECT_STREQ("", out.c_str());
 
   al.push_back("a1");
   al.push_back("a2");
-  out = al.render(XML, "");
+  out = al.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
@@ -58,7 +58,7 @@ TEST(AttributeList, ok)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   al.push_back("");
-  out = al.check(RegisterContext, XML, "", "", 0);
+  out = al.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("empty attribute name", out.c_str());
 
   utExit();

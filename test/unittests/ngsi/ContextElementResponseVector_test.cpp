@@ -45,7 +45,7 @@ TEST(ContextElementResponseVector, check)
 
   utInit();
 
-  out = cerv.check(&ci, UpdateContext, XML, "", "", 0);
+  out = cerv.check(&ci, UpdateContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";
@@ -54,7 +54,7 @@ TEST(ContextElementResponseVector, check)
   cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
-  out = cerv.check(&ci, UpdateContext, XML, "", "", 0);
+  out = cerv.check(&ci, UpdateContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
   utExit();
@@ -72,7 +72,7 @@ TEST(ContextElementResponseVector, render)
   ContextElementResponse        cer;
   std::string                   out;
   const char*                   outfile = "ngsi.contextElementResponseVector.render.middle.xml";
-  ConnectionInfo                ci(XML);
+  ConnectionInfo                ci(JSON);
 
   utInit();
 

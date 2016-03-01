@@ -55,7 +55,7 @@ TEST(getIndividualContextEntity, notFound)
   const char*    outfile = "ngsi10.contextElementResponse.getIndividualContextEntity.valid.xml";
   std::string    out;
 
-  ci.outFormat = XML;
+  ci.outFormat = JSON;
   out          = restService(&ci, rs);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

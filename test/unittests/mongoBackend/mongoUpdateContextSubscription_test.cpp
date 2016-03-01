@@ -496,7 +496,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -541,7 +541,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     /* Invoke the function in mongoBackend library */
     std::string tenant      = "";
     std::string servicePath = "";
-    ms = mongoUpdateContextSubscription(&req, &res, XML, tenant, servicePath, emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, tenant, servicePath, emptyServicePathV);
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
@@ -632,7 +632,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -708,7 +708,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -791,7 +791,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -874,7 +874,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -961,7 +961,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1051,7 +1051,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1139,7 +1139,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1231,7 +1231,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1319,7 +1319,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1406,7 +1406,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1498,7 +1498,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1588,7 +1588,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1677,7 +1677,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1770,7 +1770,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1856,7 +1856,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1871,7 +1871,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1965,7 +1965,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, JSON, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2041,7 +2041,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2056,7 +2056,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2133,7 +2133,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2148,7 +2148,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2240,7 +2240,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2255,7 +2255,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2346,7 +2346,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2361,7 +2361,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2446,7 +2446,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2461,7 +2461,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2546,7 +2546,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2561,7 +2561,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2658,7 +2658,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2673,7 +2673,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2770,7 +2770,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2785,7 +2785,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2865,7 +2865,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2883,7 +2883,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2967,7 +2967,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2985,7 +2985,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3070,7 +3070,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3086,7 +3086,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3163,7 +3163,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3181,7 +3181,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3265,7 +3265,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3283,7 +3283,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3367,7 +3367,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3385,7 +3385,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3469,7 +3469,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3485,7 +3485,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3566,7 +3566,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3584,7 +3584,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3680,7 +3680,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3695,7 +3695,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3781,7 +3781,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3796,7 +3796,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3888,7 +3888,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3906,7 +3906,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4002,7 +4002,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4018,7 +4018,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4105,7 +4105,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -4123,7 +4123,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4215,7 +4215,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4231,7 +4231,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4321,7 +4321,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4404,7 +4404,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4470,7 +4470,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

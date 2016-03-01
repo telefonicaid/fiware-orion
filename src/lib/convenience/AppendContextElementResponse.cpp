@@ -58,7 +58,8 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
   std::string tag = "appendContextElementResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  //out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
@@ -74,7 +75,7 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
     out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

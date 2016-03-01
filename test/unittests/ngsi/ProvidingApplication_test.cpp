@@ -44,12 +44,12 @@ TEST(ProvidingApplication, render)
 
   utInit();
 
-  out = pa.render(XML, "", false);
+  out = pa.render(JSON, "", false);
   EXPECT_STREQ("", out.c_str());
 
   pa.set("PA");
 
-  out = pa.render(XML, "", false);
+  out = pa.render(JSON, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

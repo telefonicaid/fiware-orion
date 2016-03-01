@@ -68,14 +68,15 @@ std::string SubscribeContextResponse::render(RequestType requestType, Format for
   std::string out     = "";
   std::string tag     = "subscribeContextResponse";
 
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
 
   if (subscribeError.errorCode.code == SccNone)
      out += subscribeResponse.render(format, indent + "  ", false);
   else
      out += subscribeError.render(SubscribeContext, format, indent + "  ", false);
 
-  out += endTag(indent, tag, format, false);
+  out += endTag(indent, false);
 
   return out;
 }

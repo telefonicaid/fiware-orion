@@ -51,7 +51,7 @@ TEST(AttributeDomainName, ok)
   EXPECT_STREQ("ADN", adn.get().c_str());
   EXPECT_STREQ("ADN", adn.c_str());
 
-  out = adn.render(XML, "");
+  out = adn.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -42,12 +42,12 @@ TEST(Originator, check)
 
   utInit();
 
-  checked = originator.check(RegisterContext, XML, "", "", 0);
+  checked = originator.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   originator.string = "String";
 
-  checked = originator.check(RegisterContext, XML, "", "", 0);
+  checked = originator.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   checked = originator.check(RegisterContext, JSON, "", "", 0);
@@ -94,12 +94,12 @@ TEST(Originator, render)
 
   utInit();
 
-  out = originator.render(XML, "");
+  out = originator.render(JSON, "");
   EXPECT_STREQ("", out.c_str());
 
   originator.string = "String";
 
-  out = originator.render(XML, "");
+  out = originator.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

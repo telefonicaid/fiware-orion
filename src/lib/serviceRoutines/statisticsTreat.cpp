@@ -264,20 +264,6 @@ std::string renderNotifQueueStats(void)
   return jh.str();
 }
 
-/* ****************************************************************************
-*
-* xmlUseError -
-*/
-static std::string xmlUseError(void)
-{
-  std::string out = "";
-
-  out += startTag("", "orion", "", XML, false, false, false);
-  out += valueTag("  ", "message", "XML not supported in statistics operations, use JSON", XML);
-  out += endTag("", "orion", XML, false, false, true, false);
-
-  return out;
-}
 
 /* ****************************************************************************
 *
@@ -291,10 +277,6 @@ std::string statisticsTreat
   ParseData*                 parseDataP
 )
 {
-  if (ciP->outFormat == XML)
-  {
-    return xmlUseError();
-  }
 
   JsonHelper js;
 
@@ -352,10 +334,6 @@ std::string statisticsCacheTreat
   ParseData*                 parseDataP
 )
 {
-  if (ciP->outFormat == XML)
-  {
-    return xmlUseError();
-  }
 
   JsonHelper js;
 

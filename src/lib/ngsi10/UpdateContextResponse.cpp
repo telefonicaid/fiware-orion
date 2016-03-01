@@ -88,7 +88,8 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
   std::string out = "";
   std::string tag = "updateContextResponse";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  //out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
@@ -105,7 +106,7 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
       out += contextElementResponseVector.render(ciP, RtUpdateContextResponse, indent + "  ", false);
   }
   
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

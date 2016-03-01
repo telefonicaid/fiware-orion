@@ -62,12 +62,15 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
   std::string indent2 = indent + "  ";
   bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag(indent, tag, format, false);
-  out += valueTag(indent2, "type", type, format, true);
+  //out += startTag(indent, tag, format, false);
+  //out += valueTag(indent2, "type", type, format, true);
+  out += startTag1(indent, tag, false);
+  out += valueTag1(indent2, "type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, format, true);
+    //out += valueTag(indent2, "contextValue", contextValue, format, true);
+    out += valueTag1(indent2, "contextValue", contextValue, format, true);
   }
   else
   {
@@ -78,13 +81,14 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
+    //out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
+    out += startTag2(indent + "  ", "value", isCompoundVector, true);
     out += compoundValueP->render(ciP, format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
+    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
   out += metadataVector.render(format, indent2);
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
   return out;
 }
@@ -108,15 +112,7 @@ std::string UpdateContextAttributeRequest::check
   StatusCode       response;
   std::string      res;
 
-  if (format == (Format) 0)
-  {
-    format = XML;
-  }
-
-  if (format == JSON)
-  {
-    indent = "  ";
-  }
+  indent = "  ";
 
   if (predetectedError != "")
   {

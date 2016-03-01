@@ -81,7 +81,8 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
   // Exactly ONE of responseVector|errorCode is included in the discovery response so,
   // no JSON commas necessary
   //
-  out += startTag(indent, tag, format, false);
+  //out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
   
   if (responseVector.size() > 0)
   {
@@ -101,7 +102,7 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
       out += errorCode.render(format, indent + "  ");
   }
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
   return out;
 }

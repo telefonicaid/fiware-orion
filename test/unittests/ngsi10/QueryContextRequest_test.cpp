@@ -622,13 +622,13 @@ TEST(QueryContextRequest, fill)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   q0.fill("", "", "");
   q0.restrictions = 0;
-  out = q0.render(QueryContext, XML, "");
+  out = q0.render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   q1.fill("EID", "ETYPE", "Attribute");
   q1.restrictions = 0;
-  out = q1.render(QueryContext, XML, "");
+  out = q1.render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
