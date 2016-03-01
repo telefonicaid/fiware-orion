@@ -97,7 +97,7 @@ echo
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/8787GHY
+Location: /v2/entities/8787GHY?type=Car
 Date: REGEX(.*)
 
 
@@ -105,7 +105,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY
 ============================
 HTTP/1.1 200 OK
-Content-Length: 321
+Content-Length: 325
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -118,7 +118,7 @@ Date: REGEX(.*)
     "id": "8787GHY",
     "madeInCountry": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "DE"
     },
     "model": {
@@ -128,7 +128,7 @@ Date: REGEX(.*)
     },
     "plateCountry": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": "ES"
     },
     "speed": {

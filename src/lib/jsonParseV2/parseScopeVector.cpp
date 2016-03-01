@@ -59,6 +59,7 @@ std::string parseScopeVector
     r = parseScope(ciP, iter2, scopeP);
     if (r != "OK")
     {
+      svP->release();
       return r;
     }
   }

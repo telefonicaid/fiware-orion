@@ -583,7 +583,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -654,7 +654,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   req.attributeList.push_back("A4");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -719,7 +719,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   req.attributeList.push_back("A1");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -779,7 +779,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   req.attributeList.push_back("A2");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -846,7 +846,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -925,7 +925,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -994,7 +994,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1033,7 +1033,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   req.attributeList.push_back("A5");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1082,7 +1082,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   req.entityIdVector.push_back(&en2);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1190,7 +1190,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   req.attributeList.push_back("A5");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1263,7 +1263,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   req.attributeList.push_back("A5");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1353,7 +1353,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   req.attributeList.push_back("A1");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1451,7 +1451,7 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1546,7 +1546,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   req.attributeList.push_back("A4");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1608,7 +1608,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   req.attributeList.push_back("A1");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1688,7 +1688,7 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   req.attributeList.push_back("A2");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1774,7 +1774,7 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1821,7 +1821,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   req.attributeList.push_back("A2");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1937,7 +1937,7 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   req.entityIdVector.push_back(&en2);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2085,7 +2085,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   req.attributeList.push_back("A6");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2182,7 +2182,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   req.attributeList.push_back("A6");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2263,7 +2263,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2337,7 +2337,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprsFormat)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

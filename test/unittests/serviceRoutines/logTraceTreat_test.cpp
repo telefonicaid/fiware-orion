@@ -51,8 +51,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * get - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(logTraceTreat, get)
+TEST(logTraceTreat, DISABLED_get)
 {
   ConnectionInfo ci("/log/traceLevel",  "GET", "1.1");
   const char*    outfile = "orion.logTrace.empty.valid.xml";
@@ -75,8 +77,10 @@ TEST(logTraceTreat, get)
 /* ****************************************************************************
 *
 * put - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(logTraceTreat, put)
+TEST(logTraceTreat, DISABLED_put)
 {
   ConnectionInfo  ci1("/log/traceLevel/0-19,21-200",  "PUT", "1.1");
   ConnectionInfo  ci2("/log/traceLevel/aaa",  "PUT", "1.1");
@@ -111,8 +115,10 @@ TEST(logTraceTreat, put)
 /* ****************************************************************************
 *
 * post - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(logTraceTreat, post)
+TEST(logTraceTreat, DISABLED_post)
 {
   ConnectionInfo  ci("/log/traceLevel/20",  "POST", "1.1");
   const char*     outfile = "orion.logTrace.post20.valid.xml";
@@ -134,8 +140,10 @@ TEST(logTraceTreat, post)
 /* ****************************************************************************
 *
 * deleteIndividual - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(logTraceTreat, deleteIndividual)
+TEST(logTraceTreat, DISABLED_deleteIndividual)
 {
   ConnectionInfo  ci0("/log/traceLevel/0-255",  "PUT",  "1.1");
   ConnectionInfo  ci1("/log/traceLevel/161",  "DELETE", "1.1");
@@ -181,8 +189,10 @@ TEST(logTraceTreat, deleteIndividual)
 /* ****************************************************************************
 *
 * deleteAll - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(logTraceTreat, deleteAll)
+TEST(logTraceTreat, DISABLED_deleteAll)
 {
   ConnectionInfo ci1("/log/traceLevel",  "DELETE", "1.1");
   ConnectionInfo ci2("/log/traceLevel",  "GET", "1.1");

@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(postUpdateContextAvailabilitySubscription, notFound)
+TEST(postUpdateContextAvailabilitySubscription, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi9/updateContextAvailabilitySubscription",  "POST", "1.1");
   const char*    infile    = "ngsi9.updateContextAvailabilitySubscriptionRequest.subscriptionIdNotFound.valid.xml";

@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(postIndividualContextEntityAttribute, notFound)
+TEST(postIndividualContextEntityAttribute, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes/temperature",  "POST", "1.1");
   const char*    infile      = "ngsi10.updateContextAttributeRequest.ok.valid.xml";

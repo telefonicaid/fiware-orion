@@ -29,6 +29,7 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoSubscribeContext.h"

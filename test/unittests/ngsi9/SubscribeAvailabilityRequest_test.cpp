@@ -29,7 +29,6 @@
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "xmlParse/xmlRequest.h"
 
 #include "unittest.h"
 
@@ -59,38 +58,6 @@
 
 /* ****************************************************************************
 *
-* xml_ok - 
-*/
-TEST(SubscribeContextAvailabilityRequest, xml_ok)
-{
-  ParseData       reqData;
-  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml";
-  const char*     outfile = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars2.invalid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-  
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  lmTraceLevelSet(LmtDump, false);
-  EXPECT_EQ("OK", result) << "this test should be OK";
-
-  SubscribeContextAvailabilityRequest*  scarP = &reqData.scar.res;
-  std::string                           out;
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = scarP->render(SubscribeContextAvailability, XML, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * json_ok - 
 */
 TEST(SubscribeContextAvailabilityRequest, json_ok)
@@ -110,30 +77,6 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
   std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", result) << "this test should be OK";
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* xml_badIsPattern - 
-*/
-TEST(SubscribeContextAvailabilityRequest, xml_badIsPattern)
-{
-  ParseData       reqData;
-  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.isPattern.invalid.xml";
-  const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.invalidIsPattern.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-  
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -168,9 +111,12 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 /* ****************************************************************************
 *
 * xml_badEntityId - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
+TEST(SubscribeContextAvailabilityRequest, DISABLED_xml_badEntityId)
 {
+#if 0
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.entityId.invalid.xml";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.unsupportedEntityAttribute.valid.xml";
@@ -185,33 +131,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* xml_noEntityId - 
-*/
-TEST(SubscribeContextAvailabilityRequest, xml_noEntityId)
-{
-  ParseData       reqData;
-  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.noEntity.invalid.xml";
-  const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.noEntity.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  utInit();
-
-  ci.inFormat      = XML;
-  ci.outFormat     = XML;
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
+#endif
 }
 
 
@@ -246,9 +166,12 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 /* ****************************************************************************
 *
 * xml_entityIdTypeAsBothFieldAndAttribute - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribute)
+TEST(SubscribeContextAvailabilityRequest, DISABLED_xml_entityIdTypeAsBothFieldAndAttribute)
 {
+#if 0
   ParseData       reqData;
   const char*     inFile  = "ngsi9.subscribeContextAvailabilityRequest.entityIdTypeAsBothFieldAndAttribute.invalid.xml";
   const char*     outFile = "ngsi9.subscribeContextAvailabilityResponse.entityIdTypeAsBothFieldAndAttribute.valid.xml";
@@ -263,6 +186,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribut
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -270,9 +194,12 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribut
 /* ****************************************************************************
 *
 * xml_entityIdIsPatternAsBothFieldAndAttribute - 
+*
+* FIME P5 #1862: _json counterpart?
 */
-TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAttribute)
+TEST(SubscribeContextAvailabilityRequest, DISABLED_xml_entityIdIsPatternAsBothFieldAndAttribute)
 {
+#if 0
   ParseData       reqData;
   const char*     inFile  = "ngsi9.subscribeContextAvailabilityRequest.entityIdIsPatternAsBothFieldAndAttribute.invalid.xml";
   const char*     outFile = "ngsi9.subscribeContextAvailabilityResponse.entityIdIsPatternAsBothFieldAndAttribute.valid.xml";
@@ -287,6 +214,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAtt
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -294,9 +222,12 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAtt
 /* ****************************************************************************
 *
 * xml_noReference - 
+*
+* FIME P5 #1862: _json counterpart?
 */
-TEST(SubscribeContextAvailabilityRequest, xml_noReference)
+TEST(SubscribeContextAvailabilityRequest, DISABLD_xml_noReference)
 {
+#if 0
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.noReference.invalid.xml";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.noReference.valid.xml";
@@ -314,6 +245,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_noReference)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 

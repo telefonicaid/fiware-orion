@@ -74,8 +74,10 @@ TEST(getContextEntityTypeAttributeContainer, nothingFound)
 /* ****************************************************************************
 *
 * somethingFound - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(getContextEntityTypeAttributeContainer, somethingFound)
+TEST(getContextEntityTypeAttributeContainer, DISABLED_somethingFound)
 {
   ConnectionInfo ci1("/ngsi9/registerContext",                     "POST", "1.1");
   ConnectionInfo ci2("/ngsi9/contextEntityTypes/Room/attributes",  "GET",  "1.1");

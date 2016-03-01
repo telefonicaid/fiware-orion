@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(postQueryContext, notFound)
+TEST(postQueryContext, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/queryContext",  "POST", "1.1");
   const char*    infile      = "ngsi10.queryContextRequest.entityIdNotFound.valid.xml";

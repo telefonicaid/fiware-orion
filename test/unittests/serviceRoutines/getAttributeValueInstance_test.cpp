@@ -56,8 +56,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(getAttributeValueInstance, notFound)
+TEST(getAttributeValueInstance, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/E1/attributes/A1/left",  "GET", "1.1");
   const char*    outfile = "ngsi10.contextAttributeResponse.notFound.valid.xml";
@@ -78,8 +80,10 @@ TEST(getAttributeValueInstance, notFound)
 /* ****************************************************************************
 *
 * found - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(getAttributeValueInstance, found)
+TEST(getAttributeValueInstance, DISABLED_found)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes",          "POST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/left",  "GET", "1.1");

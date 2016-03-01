@@ -92,7 +92,7 @@ ContextAttribute::ContextAttribute()
 * in "cloned" from source CA to the CA being constructed.
 *
 */
-ContextAttribute::ContextAttribute(ContextAttribute* caP)
+ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
 {
   name                  = caP->name;
   type                  = caP->type;
@@ -119,8 +119,13 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
   {
     LM_T(LmtClone, ("Copying metadata %d", mIx));
-    Metadata* mP = new Metadata(caP->metadataVector[mIx]);
+    Metadata* mP = new Metadata(caP->metadataVector[mIx], useDefaultType);
     metadataVector.push_back(mP);
+  }
+
+  if (useDefaultType && (type == ""))
+  {
+    type = DEFAULT_TYPE;
   }
 }
 
@@ -596,7 +601,7 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     {
       if (type == DATE_TYPE)
       {
-        out += isodate2str(numberValue);
+        out += JSON_STR(isodate2str(numberValue));
       }
       else // regular number
       {
@@ -626,7 +631,8 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     //
     // type
     //
-    out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":" + "null";
+    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+    out += (type != "")? JSON_VALUE("type", type) : JSON_VALUE("type", DEFAULT_TYPE);
     out += ",";
 
 

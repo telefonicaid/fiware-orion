@@ -238,8 +238,6 @@ HttpStatusCode mongoUpdateContextSubscription
     newSub.appendArray(CSUB_CONDITIONS, getField(sub, CSUB_CONDITIONS).embeddedObject());
   }
   else {
-      /* Destroy any previous ONTIMEINTERVAL thread */
-      getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
       /* Build conditions array (including side-effect notifications and threads creation)
        * In order to do so, we have to create and EntityIdVector and AttributeList from sub

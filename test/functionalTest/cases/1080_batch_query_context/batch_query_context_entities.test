@@ -176,7 +176,7 @@ echo
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T
 Date: REGEX(.*)
 
 
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 ==============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T2
 Date: REGEX(.*)
 
 
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 ====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T
 Date: REGEX(.*)
 
 
@@ -202,7 +202,7 @@ Date: REGEX(.*)
 04. POST /v2/op/query, with only E in payload, see 2 entities
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 266
+Content-Length: 276
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -210,17 +210,17 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 11
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 14
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 15
         },
         "id": "E",
@@ -229,12 +229,12 @@ Date: REGEX(.*)
     {
         "A2": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 22
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 25
         },
         "id": "E",
@@ -246,7 +246,7 @@ Date: REGEX(.*)
 05. POST /v2/op/query, with only E3 in payload, see 1 entity
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 162
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -254,17 +254,17 @@ Date: REGEX(.*)
     {
         "A3": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 33
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 34
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 35
         },
         "id": "E3",
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 06. POST /v2/op/query, with E and E3 in payload, see 3 entities
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 437
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -284,17 +284,17 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 11
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 14
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 15
         },
         "id": "E",
@@ -303,12 +303,12 @@ Date: REGEX(.*)
     {
         "A2": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 22
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 25
         },
         "id": "E",
@@ -317,17 +317,17 @@ Date: REGEX(.*)
     {
         "A3": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 33
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 34
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 35
         },
         "id": "E3",
@@ -339,7 +339,7 @@ Date: REGEX(.*)
 07. POST /v2/op/query, with E.* in payload, see 3 entities
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 437
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -347,17 +347,17 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 11
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 14
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 15
         },
         "id": "E",
@@ -366,12 +366,12 @@ Date: REGEX(.*)
     {
         "A2": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 22
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 25
         },
         "id": "E",
@@ -380,17 +380,17 @@ Date: REGEX(.*)
     {
         "A3": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 33
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 34
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 35
         },
         "id": "E3",
@@ -402,7 +402,7 @@ Date: REGEX(.*)
 08. POST /v2/op/query, with E3.* in payload, see 1 entity
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 162
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -410,17 +410,17 @@ Date: REGEX(.*)
     {
         "A3": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 33
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 34
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 35
         },
         "id": "E3",

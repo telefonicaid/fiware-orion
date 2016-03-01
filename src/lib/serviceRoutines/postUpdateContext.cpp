@@ -43,18 +43,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "serviceRoutines/postUpdateContext.h"
-#include "xmlParse/xmlRequest.h"
-
-
-
-/* ****************************************************************************
-*
-* xmlPayloadClean -
-*/
-static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
-{
-  return (char*) strstr(payload, payloadWord);
-}
 
 
 
@@ -158,17 +146,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   ciP->outFormat  = outFormat;
   cleanPayload    = (char*) payload.c_str();
 
-  if (format == XML)
-  {
-    if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<updateContextRequest>")) == NULL)
-    {
-      LM_E(("Runtime Error (error rendering forward-request)"));
-      upcrsP->errorCode.fill(SccContextElementNotFound, "");
-      return;
-    }
-  }
-
-
   //
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
@@ -214,14 +191,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string  s;
   std::string  errorMsg;
 
-  if (format == XML)
-  {
-    cleanPayload = xmlPayloadClean(out.c_str(), "<updateContextResponse>");
-  }
-  else
-  {
-    cleanPayload = jsonPayloadClean(out.c_str());
-  }
+  cleanPayload = jsonPayloadClean(out.c_str());
 
   if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
   {
@@ -248,14 +218,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   parseData.upcrs.res.errorCode.fill(SccOk);
 
-  if (format == XML)
-  {
-    s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
-  }
-  else
-  {
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL);
-  }
+  s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL);
 
   if (s != "OK")
   {
@@ -316,6 +279,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     int noOfFounds    = 0;
     int noOfNotFounds = 0;
+
     for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       if (cerP->contextElement.contextAttributeVector[aIx]->found == true)
@@ -544,6 +508,7 @@ std::string postUpdateContext
     upcrP->release();
     return answer;
   }
+
 
 
   //

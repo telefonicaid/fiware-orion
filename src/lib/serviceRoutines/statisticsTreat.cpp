@@ -58,7 +58,6 @@
 static void resetStatistics(void)
 {
   noOfJsonRequests                                = -1;
-  noOfXmlRequests                                 = -1;
   noOfRegistrations                               = -1;
   noOfRegistrationErrors                          = -1;
   noOfRegistrationUpdates                         = -1;
@@ -124,6 +123,8 @@ static void resetStatistics(void)
   noOfRegisterResponses                           = -1;
 
   noOfSimulatedNotifications                      = -1;
+  noOfBatchQueryRequest                           = -1;
+  noOfBatchUpdateRequest                          = -1;
 
   QueueStatistics::reset();
 
@@ -157,8 +158,7 @@ std::string renderCounterStats(void)
 {
   JsonHelper js;
 
-  // FIXME: try to chose names closer to the ones used in API URLs
-  renderUsedCounter(&js, "xmlRequests",                               noOfXmlRequests);
+  // FIXME: try to chose names closer to the ones used in API URLs  
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
   renderUsedCounter(&js, "registrations",                             noOfRegistrations);
   renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
@@ -199,6 +199,8 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "attributeValueInstanceWithTypeAndId",       noOfAttributeValueInstanceWithTypeAndId);
   renderUsedCounter(&js, "contextEntitiesByEntityIdAndType",          noOfContextEntitiesByEntityIdAndType);
   renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
+  renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
+  renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
   renderUsedCounter(&js, "logRequests", noOfLogRequests);
 
   //
@@ -333,8 +335,9 @@ std::string statisticsTreat
 
   ciP->httpStatusCode = SccOk;
   return js.str();
-
 }
+
+
 
 /* ****************************************************************************
 *

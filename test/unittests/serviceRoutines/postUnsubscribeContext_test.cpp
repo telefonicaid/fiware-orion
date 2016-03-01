@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * badSubscriptionId - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(postUnsubscribeContext, badSubscriptionId)
+TEST(postUnsubscribeContext, DISABLED_badSubscriptionId)
 {
   ConnectionInfo ci("/ngsi10/unsubscribeContext",  "POST", "1.1");
   const char*    infile    = "ngsi10.unsubscribeContextRequest.subscriptionId.invalid.xml";
@@ -77,8 +79,10 @@ TEST(postUnsubscribeContext, badSubscriptionId)
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(postUnsubscribeContext, notFound)
+TEST(postUnsubscribeContext, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/unsubscribeContext",  "POST", "1.1");
   const char*    infile    = "ngsi10.unsubscribeContextRequest.subscriptionId.valid.xml";

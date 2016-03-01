@@ -108,6 +108,14 @@ std::string postEntities
   if (rhttpcode == SccOk || rhttpcode == SccNone)
   {
     std::string location = "/v2/entities/" + eP->id;
+    if (eP->type != "" )
+    {
+      location += "?type=" + eP->type;
+    }
+    else
+    {
+      location += "?type=none";
+    }
 
     ciP->httpHeader.push_back("Location");
     ciP->httpHeaderValue.push_back(location);

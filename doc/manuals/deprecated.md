@@ -17,12 +17,12 @@ A list of deprecated features and the version in which they were deprecated foll
 
 * Deprecated command line argument in Orion 0.26.1:
   * **--silent**. Suppress all log output except errors (Please use *-logLevel ERROR* instead)
-* ONTIMEINTERVAL subscriptions are deprecated since Orion 0.26.0. ONTIMEINTERVAL subscriptions have
-  several problems (introduce state in CB, thus making horizontal scaling configuration much harder,
-  and makes it difficult to introduce pagination/filtering). Actually, they aren't actually needed,
-  as any use case based on ONTIMEINTERVAL notification can be converted to an equivalent use case
-  in which the receptor runs queryContext at the same frequency (and taking advantage of the
-  features of queryContext, such as pagination or filtering).
+* ONTIMEINTERVAL subscriptions are deprecated since Orion 0.26.0 (removed in Orion 1.0.0).
+  ONTIMEINTERVAL subscriptions have several problems (introduce state in CB, thus making horizontal
+  scaling configuration much harder, and makes it difficult to introduce pagination/filtering).
+  Actually, they aren't really needed, as any use case based on ONTIMEINTERVAL notification can
+  be converted to an equivalent use case in which the receptor runs queryContext at the same
+  frequency (and taking advantage of the features of queryContext, such as pagination or filtering).
 * XML is deprecated since Orion 0.23.0.
 * Deprecated command line arguments in Orion 0.21.0 (removed in 0.25.0):
 	* **-ngsi9**. The broker runs only NGSI9 (NGSI10 is not used).
@@ -38,7 +38,7 @@ A list of deprecated features and the version in which they were deprecated foll
 Although you are encouraged to use always the newest Orion version, take into account the following
 information in the case you want to use old versions:
 
-* Old RPMs (since Orion 0.1.1) are available at the [FIWARE yum repository](http://repositories.testbed.fiware.org/repo/rpm/x86_64).
+* Old RPMs (since Orion 0.1.1) are available at the [FIWARE yum repository](http://repositories.lab.fiware.org/repo/rpm/x86_64).
 * Code correponding to old releases (since Orion 0.8.1, the first one available as open source) is
   available at the [Orion github repository](http://github.com/telefonicaid/fiware-orion). Each release number
   (e.g. 0.23.0) has associated the following:
@@ -56,8 +56,8 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
-| XML API                                                                    | Not yet removed (planned: 0.28.0)         | February 29st, 2016 (expected)     |
-| ONTIMEINTERVAL subscription                                                | Not yet removed (planned: 0.28.0)         | February 29st, 2016 (expected)     |
-| CLI `--silent`                                                             | Not yet removed (planned: 0.28.0)         | February 29st, 2016 (expected)     |
-| Configuration Manager role (including `-ngsi9`, `-fwdHost` and `-fwdPort`) | 0.24.0                                    | September 14th, 2015            ||
+| XML API                                                                    | Not yet removed (planned: 0.28.0)         | February 29th, 2016             |
+| ONTIMEINTERVAL subscription                                                | 0.28.0                                    | February 29th, 2016             |
+| CLI `--silent`                                                             | Not yet removed (planned: 0.28.0)         | February 29th, 2016             |
+| Configuration Manager role (including `-ngsi9`, `-fwdHost` and `-fwdPort`) | 0.24.0                                    | September 14th, 2015            |
 | Associations                                                               | 0.24.0                                    | September 14th, 2015            |

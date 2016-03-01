@@ -40,6 +40,7 @@
 */
 #define FIWARE_LOCATION             "FIWARE::Location"
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
+#define FIWARE_LOCATION_V2          "FIWARE::Location::NGSIv2"
 
 #define EARTH_RADIUS_METERS     6371000
 
@@ -58,12 +59,27 @@
 #define GEO_POLYGON  "geo:polygon"
 
 
+/* ****************************************************************************
+*
+* Special orderBy keywords
+*/
+#define ORDER_BY_PROXIMITY "geo:distance"
+
 
 /* ****************************************************************************
 *
 * other special types
 */
-#define DATE_TYPE  "date"
+#define DATE_TYPE     "date"
+#define DEFAULT_TYPE  "none"
+
+
+/* ****************************************************************************
+*
+* virtual attributes
+*/
+#define DATE_CREATED   "dateCreated"
+#define DATE_MODIFIED  "dateModified"
 
 
 /* ****************************************************************************

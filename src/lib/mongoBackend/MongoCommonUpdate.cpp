@@ -38,6 +38,7 @@
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
+#include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -549,26 +550,28 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 *
 * appendMetadata -
 */
-void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
+void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP, bool useDefaultType)
 {
-  if (mdP->type != "")
+  if ((mdP->type != "") || useDefaultType)
   {
+    std::string type = (mdP->type == "") ? DEFAULT_TYPE : mdP->type;
+
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
 
     case orion::ValueTypeNumber:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
       return;
 
     case orion::ValueTypeBoolean:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
     case orion::ValueTypeNone:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << BSONNULL));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
     default:
@@ -682,7 +685,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
       continue;
     }
 
-    appendMetadata(&mdVBuilder, mdP);
+    appendMetadata(&mdVBuilder, mdP, apiVersion == "v2");
   }
 
   /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
@@ -701,7 +704,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
       if (!hasMetadata(md.name, md.type, caP))
       {
-        appendMetadata(&mdVBuilder, &md);
+        appendMetadata(&mdVBuilder, &md, apiVersion == "v2");
       }
     }
   }
@@ -775,7 +778,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 * If there is no custom metadata, then it returns false (true otherwise).
 *
 */
-static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttribute* ca)
+static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttribute* ca, bool useDefaultType)
 {
   BSONArrayBuilder  mdToAdd;
 
@@ -785,7 +788,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttr
 
     if (!isNotCustomMetadata(md->name))
     {
-      appendMetadata(&mdToAdd, md);
+      appendMetadata(&mdToAdd, md, useDefaultType);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                       md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
     }
@@ -850,14 +853,23 @@ static bool updateAttribute
     BSONObjBuilder newAttr;
 
     int now = getCurrentTime();
-    newAttr.appendElements(BSON(ENT_ATTRS_TYPE << caP->type <<
-                                ENT_ATTRS_CREATION_DATE << now <<
-                                ENT_ATTRS_MODIFICATION_DATE << now));
+
+    if ((caP->type == "") && (apiVersion == "v2"))
+    {
+      newAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+    }
+    else
+    {
+      newAttr.append(ENT_ATTRS_TYPE, caP->type);
+    }
+    newAttr.append(ENT_ATTRS_CREATION_DATE, now);
+    newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
+
     valueBson(caP, newAttr);
 
     /* Custom metadata */
     BSONObj mdV;
-    if (contextAttributeCustomMetadataToBson(mdV, caP));
+    if (contextAttributeCustomMetadataToBson(mdV, caP, apiVersion == "v2"));
     {
       newAttr.appendArray(ENT_ATTRS_MD, mdV);
     }
@@ -933,12 +945,19 @@ static bool appendAttribute
   valueBson(caP, ab);
 
   /* 2. Type */
-  ab.append(ENT_ATTRS_TYPE, caP->type);
+  if ((apiVersion == "v2") && (caP->type == ""))
+  {
+    ab.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+  }
+  else
+  {
+    ab.append(ENT_ATTRS_TYPE, caP->type);
+  }
 
   /* 3. Metadata */
   BSONObj mdV;
 
-  if (contextAttributeCustomMetadataToBson(mdV, caP))
+  if (contextAttributeCustomMetadataToBson(mdV, caP, apiVersion == "v2"))
   {
       ab.appendArray(ENT_ATTRS_MD, mdV);
   }
@@ -1599,17 +1618,6 @@ static bool processOnChangeConditionForUpdateContext
 
 /* ****************************************************************************
 *
-* processOntimeIntervalCondition -
-*/
-void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant)
-{
-  getNotifier()->createIntervalThread(subId, interval, tenant);
-}
-
-
-
-/* ****************************************************************************
-*
 * matchExpression
 */
 static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
@@ -1841,7 +1849,8 @@ static unsigned int howManyAttrs(BSONObj& attrs, std::string& attrName)
 static void updateAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
-  ContextAttribute*       targetAttr
+  ContextAttribute*       targetAttr,
+  bool                    useDefaultType
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -1897,7 +1906,7 @@ static void updateAttrInNotifyCer
         /* If the attribute in target attr was not found, then it has to be added*/
         if (!matchMd)
         {
-          Metadata* newMdP = new Metadata(targetMdP);
+          Metadata* newMdP = new Metadata(targetMdP, useDefaultType);
           caP->metadataVector.push_back(newMdP);
         }
       }
@@ -1907,7 +1916,7 @@ static void updateAttrInNotifyCer
   }
 
   /* Reached this point, it means that it is a new attribute (APPEND case) */
-  ContextAttribute* caP = new ContextAttribute(targetAttr);
+  ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
   notifyCerP->contextElement.contextAttributeVector.push_back(caP);
 }
 
@@ -1962,7 +1971,7 @@ static bool updateContextAttributeItem
   {
     // Attribute was found
     entityModified = actualUpdate || entityModified;
-    updateAttrInNotifyCer(notifyCerP, targetAttr);
+    updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
   }
   else
   {
@@ -2108,7 +2117,7 @@ static bool appendContextAttributeItem
 
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
   entityModified = actualUpdate || entityModified;
-  updateAttrInNotifyCer(notifyCerP, targetAttr);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   /* Check aspects related with location */
   std::string locationString = targetAttr->getLocation(apiVersion);
@@ -2458,6 +2467,7 @@ static bool createEntity
 (
   EntityId*                        eP,
   const ContextAttributeVector&    attrsV,
+  int                              now,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
@@ -2490,7 +2500,6 @@ static bool createEntity
     return false;
   }
 
-  int               now = getCurrentTime();
   BSONObjBuilder    attrsToAdd;
   BSONArrayBuilder  attrNamesToAdd;
 
@@ -2499,9 +2508,17 @@ static bool createEntity
     std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
-    bsonAttr.appendElements(BSON(ENT_ATTRS_TYPE << attrsV[ix]->type <<
-                                 ENT_ATTRS_CREATION_DATE << now <<
-                                 ENT_ATTRS_MODIFICATION_DATE << now));
+    if ((attrsV[ix]->type == "") && (apiVersion == "v2"))
+    {
+      bsonAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+    }
+    else
+    {
+      bsonAttr.append(ENT_ATTRS_TYPE, attrsV[ix]->type);
+    }
+
+    bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
+    bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
     valueBson(attrsV[ix], bsonAttr);
 
@@ -2518,7 +2535,7 @@ static bool createEntity
 
     /* Custom metadata */
     BSONObj mdV;
-    if (contextAttributeCustomMetadataToBson(mdV, attrsV[ix]))
+    if (contextAttributeCustomMetadataToBson(mdV, attrsV[ix], apiVersion == "v2"))
     {
       bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
     }
@@ -2527,26 +2544,37 @@ static bool createEntity
     attrNamesToAdd.append(attrsV[ix]->name);
   }
 
-  BSONObj bsonId;
+  BSONObjBuilder bsonId;
 
-  if (servicePathV.size() == 0)
+  bsonId.append(ENT_ENTITY_ID, eP->id);
+
+  if (eP->type == "")
   {
-    LM_T(LmtServicePath, ("Empty service path"));
-    bsonId = (eP->type == "")? BSON(ENT_ENTITY_ID << eP->id) :
-      BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
+    if (apiVersion == "v2")
+    {
+      // NGSIv2 uses default entity type
+      bsonId.append(ENT_ENTITY_TYPE, DEFAULT_TYPE);
+    }
   }
   else
   {
-    LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
+    bsonId.append(ENT_ENTITY_TYPE, eP->type);
+  }
 
-    bsonId = (eP->type == "")?
-      BSON(ENT_ENTITY_ID << eP->id << ENT_SERVICE_PATH << servicePathV[0]) :
-      BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
+  if (servicePathV.size() > 0)
+  {
+    LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
+    bsonId.append(ENT_SERVICE_PATH, servicePathV[0]);
+  }
+  else
+  {
+    LM_T(LmtServicePath, ("Empty service path string, using default servicepath"));
+    bsonId.append(ENT_SERVICE_PATH, DEFAULT_SERVICE_PATH);
   }
 
   BSONObjBuilder insertedDoc;
 
-  insertedDoc.append("_id", bsonId);
+  insertedDoc.append("_id", bsonId.obj());
   insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
   insertedDoc.append(ENT_CREATION_DATE, now);
@@ -2755,7 +2783,8 @@ static void updateEntity
   cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
-  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0) {
+  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0)
+  {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath);
     responseP->contextElementResponseVector.push_back(cerP);
@@ -2829,6 +2858,11 @@ static void updateEntity
   AttributeList emptyAttrL;
   ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
+  // The hasField() check is needed as the entity could have been created with very old Orion version not
+  // supporting modification/creation dates
+  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getLongField(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getLongField(r, ENT_MODIFICATION_DATE) : -1;
+
   if (!processContextAttributeVector(ceP,
                                      action,
                                      subsToNotify,
@@ -2853,7 +2887,19 @@ static void updateEntity
     // in only one place
     //
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-    responseP->contextElementResponseVector.push_back(cerP);
+
+    if (!(attributeAlreadyExistsError && (strcasecmp(action.c_str(), "append_strict") == 0)))
+    {
+      // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
+      // processContextElement() function so we need to skip this addition or we will get duplicated
+      // CER
+      responseP->contextElementResponseVector.push_back(cerP);
+    }
+    else
+    {
+      delete cerP;
+    }
+
     releaseTriggeredSubscriptions(subsToNotify);
 
     notifyCerP->release();
@@ -2867,7 +2913,9 @@ static void updateEntity
 
   if (strcasecmp(action.c_str(), "replace") != 0)
   {
-    toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+    int now = getCurrentTime();
+    toSet.append(ENT_MODIFICATION_DATE, now);
+    notifyCerP->contextElement.modDate = now;
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
@@ -2895,7 +2943,10 @@ static void updateEntity
   if (strcasecmp(action.c_str(), "replace") == 0)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << getCurrentTime()));
+    int now = getCurrentTime();
+    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << now));
+
+    notifyCerP->contextElement.modDate = now;
   }
   else
   {
@@ -3007,7 +3058,6 @@ static bool contextElementPreconditionsCheck
   const std::string&      apiVersion
 )
 {
-
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
 
@@ -3095,7 +3145,7 @@ void processContextElement
   if (!contextElementPreconditionsCheck(ceP, responseP, action, apiVersion))
   {
     return; // Error already in responseP
-  }
+  } 
 
   /* Find entities (could be several, in the case of no type or isPattern=true) */
   const std::string  idString          = "_id." ENT_ENTITY_ID;
@@ -3163,17 +3213,17 @@ void processContextElement
       return;
     }
 
-    // This is the cae of POST /v2/entities, in order to check that entity doesn't previously exist
+    // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
         return;
     }
 
-    // This is the cae of POST /v2/entities/<id>, in order to check that entity previously exist
+    // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPENDORUPDATE))
     {
-      buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Entity does not exist");
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
       return;
     }
 
@@ -3273,7 +3323,7 @@ void processContextElement
      * which sets the ServicePath for the entity.
      */
 
-    /* Creating the common par of the response that doesn't depend on the case */
+    /* Creating the common part of the response that doesn't depend on the case */
     ContextElementResponse* cerP = new ContextElementResponse();
 
     cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
@@ -3314,9 +3364,11 @@ void processContextElement
     }
     else   /* APPEND or APPEND_STRICT */
     {
-      std::string errReason, errDetail;
+      std::string  errReason;
+      std::string  errDetail;
+      int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV, apiVersion))
+      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
       }
@@ -3351,7 +3403,10 @@ void processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP);
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");
+
+        notifyCerP->contextElement.creDate = now;
+        notifyCerP->contextElement.modDate = now;
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
@@ -3368,7 +3423,6 @@ void processContextElement
   if (attributeAlreadyExistsError == true)
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
-
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
   }
 

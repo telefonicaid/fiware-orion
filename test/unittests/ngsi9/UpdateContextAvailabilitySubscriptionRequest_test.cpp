@@ -29,7 +29,6 @@
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "xmlParse/xmlRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
 #include "unittest.h"
@@ -38,34 +37,13 @@
 
 /* ****************************************************************************
 *
-* xml_ok - 
-*/
-TEST(UpdateContextAvailabilitySubscriptionRequest, xml_ok)
-{
-  ParseData       reqData;
-  const char*     infile = "ngsi9.updateContextAvailabilitySubscriptionRequest.ok2.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");  
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string out = xmlTreat(testBuf, &ci, &reqData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
-  lmTraceLevelSet(LmtDump, false);
-  EXPECT_EQ("OK", out) << "this test should be OK";
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * xml_invalidEntityAttribute - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(UpdateContextAvailabilitySubscriptionRequest, xml_invalidEntityAttribute)
+TEST(UpdateContextAvailabilitySubscriptionRequest, DISABLED_xml_invalidEntityAttribute)
 {
+#if 0
   ParseData       reqData;
   const char*     infile  = "ngsi9.updateContextAvailabilitySubscriptionRequest.entityIdAttribute.invalid.xml";
   const char*     outfile = "ngsi9.updateContextAvailabilitySubscriptionResponse.entityIdAttribute.valid.xml";
@@ -82,6 +60,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, xml_invalidEntityAttribute)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 

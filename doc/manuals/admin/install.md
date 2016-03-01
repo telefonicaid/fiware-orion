@@ -25,7 +25,7 @@ but it should work also in any later CentOS/RedHat 6.x version.
     * Note that the officially supported MongoDB version is 2.6. In the case of using MongoDB 3.0 with its new authentication mechanism
       (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver. See [this issue](https://github.com/telefonicaid/fiware-orion/issues/1061) for details.
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
-    * The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, libmicrohttpd, logrotate, libcurl and boost-regex.
+    * The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, gnutls, libgcrypt, logrotate and libcurl.
     * The contextBroker-test package (optional) depends on the following packages: python, python-flask, python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
 
 ## Installation

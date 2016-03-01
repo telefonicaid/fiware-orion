@@ -146,7 +146,7 @@ Date: REGEX(.*)
 =====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -154,7 +154,7 @@ Date: REGEX(.*)
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: 428
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -167,7 +167,7 @@ Date: REGEX(.*)
         },
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "E1/T1/A1"
         },
         "A2": {
@@ -178,7 +178,7 @@ Date: REGEX(.*)
         "A3": {
             "metadata": {
                 "m1": {
-                    "type": null,
+                    "type": "none",
                     "value": "M1"
                 }
             },
@@ -188,7 +188,7 @@ Date: REGEX(.*)
         "A4": {
             "metadata": {
                 "m1": {
-                    "type": null,
+                    "type": "none",
                     "value": "M1"
                 },
                 "m2": {
@@ -234,7 +234,7 @@ Date: REGEX(.*)
 ===================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T1
 Date: REGEX(.*)
 
 
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 06. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 507
+Content-Length: 515
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -255,7 +255,7 @@ Date: REGEX(.*)
         },
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": "E1/T1/A1"
         },
         "A2": {
@@ -266,7 +266,7 @@ Date: REGEX(.*)
         "A3": {
             "metadata": {
                 "m1": {
-                    "type": null,
+                    "type": "none",
                     "value": "M1"
                 }
             },
@@ -276,7 +276,7 @@ Date: REGEX(.*)
         "A4": {
             "metadata": {
                 "m1": {
-                    "type": null,
+                    "type": "none",
                     "value": "M1"
                 },
                 "m2": {
@@ -297,7 +297,7 @@ Date: REGEX(.*)
     {
         "A0": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": {
                 "i1": "1",
                 "s1": "s"

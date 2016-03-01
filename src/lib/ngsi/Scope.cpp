@@ -51,6 +51,9 @@ Scope::Scope()
   value    = "";
   oper     = "";
   areaType = orion::NoArea;
+
+  georel.maxDistance = -1;
+  georel.minDistance = -1;
 }
 
 
@@ -65,6 +68,9 @@ Scope::Scope(const std::string& _type, const std::string& _value, const std::str
   value    = _value;
   oper     = _oper;
   areaType = orion::NoArea;
+
+  georel.maxDistance = -1;
+  georel.minDistance = -1;
 }
 
 
@@ -97,21 +103,70 @@ int Scope::fill
 )
 {
   Geometry                    geometry;
-  Georel                      georel;
   std::vector<std::string>    pointStringV;
   int                         points;
   std::vector<orion::Point*>  pointV;
+
+  type = (apiVersion == "v1")? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
   //
   // parse geometry
   //
   std::string errorString;
-  if (geometry.parse(geometryString.c_str(), &errorString) != 0)
+  if (geometry.parse(apiVersion, geometryString.c_str(), &errorString) != 0)
   {
     *errorStringP = std::string("error parsing geometry: ") + errorString;
     return -1;
   }
 
+
+  //
+  // Parse georel?
+  //
+  if (georelString != "")
+  {
+    if (georel.parse(georelString.c_str(), errorStringP) != 0)
+    {
+      return -1;
+    }
+  }
+
+  // Check invalid combinations
+  if ((geometry.areaType == "line") && (georel.type == "coveredBy"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
+     *    { $geoWithin: { $geometry: { type: "LineString", coordinates: [ [ 5.0...", code: 17287 }
+     */
+
+    *errorStringP = "line geometry cannot be used with coveredBy georel";
+    return -1;
+  }
+
+  if ((geometry.areaType == "point") && (georel.type == "coveredBy"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue $within not supported with provided geometry:
+     *    { $geoWithin: { $geometry: { type: "Point", coordinates: [ [ 5.0...", code: 17287 }
+     */
+
+    *errorStringP = "point geometry cannot be used with coveredBy georel";
+    return -1;
+  }
+
+  if ((geometry.areaType != "point") && (georel.type == "near"))
+  {
+    /* It seems that MongoDB 3.2 doesn't support this kind of queries, we get this error:
+     *
+     *  { $err: "Can't canonicalize query: BadValue invalid point in geo near query $geometry argument:
+     *   { type: "Polygon", coordinates: [ [ [ 2.0, 1.0 ], [ 4.0, 3.0 ],...", code: 17287 }
+     */
+
+    *errorStringP = "georel /near/ used with geometry different than point";
+    return -1;
+  }
 
   //
   // Split coordsString into a vector of points, or pairs of coordinates
@@ -129,19 +184,6 @@ int Scope::fill
     return -1;
   }
 
-
-  //
-  // Parse georel?
-  //
-  if (georelString != "")
-  {
-    if (georel.parse(georelString.c_str(), errorStringP) != 0)
-    {
-      return -1;
-    }
-  }
-
-
   //
   // Convert point-strings into instances of the orion::Point class
   //
@@ -157,20 +199,24 @@ int Scope::fill
     if (coords != 2)
     {
       *errorStringP = "invalid point in URI param /coords/";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
     if (!str2double(coordV[0].c_str(), &latitude))
-    {
-      // *errorStringP = "non-numeric latitude-coordinate in URI param /coords/";
+    {      
       *errorStringP = "invalid coordinates";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
     if (!str2double(coordV[1].c_str(), &longitude))
     {
-      // *errorStringP = "non-numeric longitude-coordinate in URI param /coords/";
       *errorStringP = "invalid coordinates";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
@@ -181,7 +227,6 @@ int Scope::fill
 
   if (geometry.areaType == "circle")
   {
-#if 0
     if (apiVersion == "v2")
     {
       *errorStringP = "circle geometry is not supported by Orion API v2";
@@ -190,7 +235,6 @@ int Scope::fill
       return -1;
     }
     else
-#endif
     {
       if (pointV.size() != 1)
       {
@@ -205,6 +249,8 @@ int Scope::fill
       circle.radiusSet(geometry.radius);
       circle.invertedSet(geometry.external);
       circle.centerSet(pointV[0]);
+
+      pointVectorRelease(pointV);
       pointV.clear();
     }
   }
@@ -219,15 +265,6 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-#if 1  // for now ...
-    if ((apiVersion == "v2") && (pointV.size() < 3))
-    {
-      *errorStringP = "Too few coordinates for polygon";
-      pointVectorRelease(pointV);
-      pointV.clear();
-      return -1;
-    }
-#else
     else if ((apiVersion == "v2") && (pointV.size() < 4))
     {
       *errorStringP = "Too few coordinates for polygon";
@@ -246,7 +283,6 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-#endif
 
     polygon.invertedSet(geometry.external);
 
@@ -260,14 +296,18 @@ int Scope::fill
   {
     areaType = orion::LineType;
 
-    if (pointV.size() != 2)
+    if (pointV.size() < 2)
     {
       *errorStringP = "invalid number of coordinates for /line/";
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
     }
-    line.fill(pointV[0], pointV[1]);
+
+    for (unsigned int ix = 0; ix < pointV.size(); ++ix)
+    {
+      line.pointAdd(pointV[ix]);
+    }
     pointV.clear();
   }
   else if (geometry.areaType == "box")
@@ -281,7 +321,31 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-    box.fill(pointV[0], pointV[1]);
+
+    // Check that points are different and not aligned (either horizontally or vertically)
+    if ((pointV[0]->latitude() == pointV[1]->latitude())  || (pointV[0]->longitude() == pointV[1]->longitude()))
+    {
+      *errorStringP = "box coordinates are not defining an actual box";
+      pointVectorRelease(pointV);
+      pointV.clear();
+      return -1;
+    }
+
+    double minLat = (pointV[0]->latitude()  < pointV[1]->latitude())?  pointV[0]->latitude()  : pointV[1]->latitude();
+    double maxLat = (pointV[0]->latitude()  > pointV[1]->latitude())?  pointV[0]->latitude()  : pointV[1]->latitude();
+    double minLon = (pointV[0]->longitude() < pointV[1]->longitude())? pointV[0]->longitude() : pointV[1]->longitude();
+    double maxLon = (pointV[0]->longitude() > pointV[1]->longitude())? pointV[0]->longitude() : pointV[1]->longitude();
+
+    // Lower left: smaller lat and long, upper right: greater lat and long
+    Point ll;
+    ll.latitudeSet(minLat);
+    ll.longitudeSet(minLon);
+    Point ur;
+    ur.latitudeSet(maxLat);
+    ur.longitudeSet(maxLon);
+    box.fill(&ll, &ur);
+
+    pointVectorRelease(pointV);
     pointV.clear();
   }
   else if (geometry.areaType == "point")
@@ -296,13 +360,15 @@ int Scope::fill
       return -1;
     }
     point.fill(pointV[0]);
+
+    pointVectorRelease(pointV);
     pointV.clear();
   }
   else
   {
-    areaType = orion::NoArea;
-    
+    areaType = orion::NoArea;    
     *errorStringP = "invalid area-type";
+
     pointVectorRelease(pointV);
     pointV.clear();
     return -1;
@@ -494,6 +560,30 @@ std::string Scope::check
     }
   }
 
+  if (type == FIWARE_LOCATION_V2)
+  {
+    if ((areaType == orion::PointType) && (georel.type == "coveredBy"))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: point geometry cannot be used with coveredBy georel");
+      return "Query not supported: point geometry cannot be used with coveredBy georel";
+    }
+    else if ((areaType == orion::LineType) && (georel.type == "coveredBy"))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: line  geometry cannot be used with coveredBy georel");
+      return "Query not supported: line geometry cannot be used with coveredBy georel";
+    }
+    else if ((areaType == orion::LineType) && (line.pointList.size() < 2))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: not enough points for a line");
+      return "Query not supported: not enough points for a line";
+    }
+    else if ((areaType == orion::PolygonType) && (polygon.vertexList.size() < 4))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: not enough vertices for a polygon");
+      return "Query not supported: not enough vertices for a polygon";
+    }
+  }
+
   return "OK";
 }
 
@@ -511,63 +601,78 @@ void Scope::present(const std::string& indent, int ix)
   }
   else
   {
-    LM_T(LmtPresent, ("%sScope %d:",    
-		      indent.c_str(),
-		      ix));
+    LM_T(LmtPresent, ("%sScope %d:",    indent.c_str(), ix));
   }
 
-  LM_T(LmtPresent, ("%s  Type:     '%s'", 
-		    indent.c_str(), 
-		    type.c_str()));
+  LM_T(LmtPresent, ("%s  Type:     '%s'", indent.c_str(), type.c_str()));
   
   if (oper != "")
-    LM_T(LmtPresent, ("%s  Operator: '%s'", 
-		      indent.c_str(), 
-		      oper.c_str()));
+    LM_T(LmtPresent, ("%s  Operator: '%s'", indent.c_str(), oper.c_str()));
 
   if (areaType == orion::NoArea)
   {
-    LM_T(LmtPresent, ("%s  Value:    %s", 
-		      indent.c_str(), 
-		      value.c_str()));
+    LM_T(LmtPresent, ("%s  Value:    %s", indent.c_str(), value.c_str()));
   }
   else if (areaType == orion::CircleType)
   {
     LM_T(LmtPresent, ("%s  FI-WARE Circle Area:", indent.c_str()));
-    LM_T(LmtPresent, ("%s    Radius:     %s", 
-	  indent.c_str(), 
-	  circle.radiusString().c_str()));
-    LM_T(LmtPresent, ("%s    Longitude:  %s", 
-	  indent.c_str(), 
-	  circle.center.longitudeString().c_str()));
-    LM_T(LmtPresent, ("%s    Latitude:   %s", 
-	  indent.c_str(), 
-	  circle.center.latitudeString().c_str()));
-    LM_T(LmtPresent, ("%s    Inverted:   %s", 
-	  indent.c_str(), 
-	  circle.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s    Radius:     %s",     indent.c_str(), circle.radiusString().c_str()));
+    LM_T(LmtPresent, ("%s    Longitude:  %s",     indent.c_str(), circle.center.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Latitude:   %s", 	  indent.c_str(), circle.center.latitudeString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", 	  indent.c_str(), circle.invertedString().c_str()));
   }
   else if (areaType == orion::PolygonType)
   {
-    LM_T(LmtPresent, ("%s  FI-WARE Polygon Area (%lu vertices):", 
-		      indent.c_str(), 
-		      polygon.vertexList.size()));
+    LM_T(LmtPresent, ("%s  FI-WARE Polygon Area (%lu vertices):", indent.c_str(), polygon.vertexList.size()));
 
-    LM_T(LmtPresent, ("%s    Inverted:   %s", 
-		      indent.c_str(), 
-		      polygon.invertedString().c_str()));
+    LM_T(LmtPresent, ("%s    Inverted:   %s", indent.c_str(), polygon.invertedString().c_str()));
     for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
     {
-      LM_T(LmtPresent, ("%s    Vertex %d", 
-			indent.c_str(), 
-			ix));
-      LM_T(LmtPresent, ("%s      Longitude:  %s", 
-			indent.c_str(), 
-			polygon.vertexList[ix]->longitudeString().c_str()));
-      LM_T(LmtPresent, ("%s      Latitude:   %s", 
-			indent.c_str(), 
+      LM_T(LmtPresent, ("%s    Vertex %d",        indent.c_str(), ix));
+      LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), polygon.vertexList[ix]->longitudeString().c_str()));
+      LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(), 
 			polygon.vertexList[ix]->latitudeString().c_str()));
     }
+  }
+  else if (areaType == orion::PointType)
+  {
+    LM_T(LmtPresent, ("%s  FI-WARE Point:", indent.c_str()));
+    LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), point.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(), point.latitudeString().c_str()));
+  }
+  else if (areaType == orion::BoxType)
+  {
+    LM_T(LmtPresent, ("%s  FI-WARE Box:", indent.c_str()));
+    LM_T(LmtPresent, ("%s      lowerLeft.longitude:   %s", indent.c_str(), box.lowerLeft.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      lowerLeft.latitude:    %s", indent.c_str(), box.lowerLeft.latitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      upperRight.longitude:  %s", indent.c_str(), box.upperRight.longitudeString().c_str()));
+    LM_T(LmtPresent, ("%s      upperRight.latitude:   %s", indent.c_str(), box.upperRight.latitudeString().c_str()));
+  }
+  else if (areaType == orion::LineType)
+  {
+    LM_T(LmtPresent, ("%s  FI-WARE Line:", indent.c_str()));
+    for (unsigned int ix = 0; ix < line.pointList.size(); ++ix)
+    {
+      LM_T(LmtPresent, ("%s    Point %d",        indent.c_str(), ix));
+      LM_T(LmtPresent, ("%s      Longitude:  %s", indent.c_str(), line.pointList[ix]->longitudeString().c_str()));
+      LM_T(LmtPresent, ("%s      Latitude:   %s", indent.c_str(),
+      line.pointList[ix]->latitudeString().c_str()));
+    }
+  }
+  else
+  {
+    LM_T(LmtPresent, ("%s  Unknown areaType '%d'", indent.c_str(), areaType));
+  }
+
+  if (georel.type == "near")
+  {
+    LM_T(LmtPresent, ("%s  Georel: 'near'", indent.c_str()));
+    LM_T(LmtPresent, ("%s    maxDistance:  %f", georel.maxDistance));
+    LM_T(LmtPresent, ("%s    minDistance:  %f", georel.minDistance));
+  }
+  else if ((georel.type == "coveredBy") || (georel.type == "intersects") || (georel.type == "equals") || (georel.type == "disjoint"))
+  {
+    LM_T(LmtPresent, ("%s  Georel: '%s'", indent.c_str(), georel.type.c_str()));
   }
 }
 
@@ -578,6 +683,24 @@ void Scope::present(const std::string& indent, int ix)
 * release -
 */
 void Scope::release(void)
-{
+{  
+  // note that georel, circle, box, point don't use dynamic memory, so they don't need release methods
   polygon.release();
+  line.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* Scope::areaTypeSet -
+*/
+void Scope::areaTypeSet(const std::string& areaTypeString)
+{
+  if      (areaTypeString == "line")    areaType = orion::LineType;
+  else if (areaTypeString == "polygon") areaType = orion::PolygonType;
+  else if (areaTypeString == "circle")  areaType = orion::CircleType;
+  else if (areaTypeString == "point")   areaType = orion::PointType;
+  else if (areaTypeString == "box")     areaType = orion::BoxType;
+  else                                  areaType = orion::NoArea;       
 }
