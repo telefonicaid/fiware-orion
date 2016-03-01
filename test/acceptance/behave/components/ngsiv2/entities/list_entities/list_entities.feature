@@ -32,7 +32,7 @@
 Feature: list all entities with get request and queries parameters using NGSI v2. "GET" - /v2/entities/
   Queries parameters
   tested : limit, offset, id, idPattern, type, q and option=count,keyValues
-  pending: georel, geometry, coords and option=values,distinct
+  pending: georel, geometry, coords and option=values,unique
   As a context broker user
   I would like to list all entities with get request and queries parameter using NGSI v2
   So that I can manage and use them in my scripts
