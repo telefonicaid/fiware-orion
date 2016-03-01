@@ -109,15 +109,15 @@ TEST(Reference, render)
   utInit();
 
   reference .set("");
-  out = reference.render(JSON, "", false);
+  out = reference.render("", false);
   EXPECT_STREQ("", out.c_str());
 
   reference .set("REF");
-  out = reference.render(JSON, "", false);
+  out = reference.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = reference.render(JSON, "", false);
+  out = reference.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

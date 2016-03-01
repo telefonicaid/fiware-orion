@@ -47,18 +47,18 @@ TEST(ContextRegistrationResponse, render)
   utInit();
 
   crr.errorCode.fill(SccNone);
-  rendered = crr.render(JSON, "");
+  rendered = crr.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render(JSON, "");
+  rendered = crr.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   crr.errorCode.fill(SccBadRequest);
-  rendered = crr.render(JSON, "");
+  rendered = crr.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render(JSON, "");
+  rendered = crr.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 

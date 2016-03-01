@@ -44,11 +44,11 @@ TEST(ContextRegistrationVector, render)
 
   utInit();
 
-  out = crv.render(JSON, "", false);
+  out = crv.render("", false);
   EXPECT_STREQ("", out.c_str());
 
   crv.push_back(&cr);
-  out = crv.render(JSON, "", false);
+  out = crv.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

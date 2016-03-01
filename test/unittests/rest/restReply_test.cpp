@@ -179,255 +179,255 @@ TEST(restReply, restErrorReplyGet)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), rcrOutfile01)) << "Error getting test data from '" << rcrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", rcr1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", rcr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", rcr2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", rcr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", rcr3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", rcr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", rcr4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", rcr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), rcrOutfile02)) << "Error getting test data from '" << rcrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", rcr1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", rcr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", rcr2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", rcr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", rcr3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", rcr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", rcr4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", rcr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), dcarOutfile01)) << "Error getting test data from '" << dcarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", dcar1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", dcar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", dcar2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", dcar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", dcar3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", dcar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", dcar4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", dcar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), dcarOutfile02)) << "Error getting test data from '" << dcarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", dcar1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", dcar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", dcar2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", dcar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", dcar3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", dcar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", dcar4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", dcar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scarOutfile01)) << "Error getting test data from '" << scarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", scar1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scar2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scar3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scar4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scarOutfile02)) << "Error getting test data from '" << scarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", scar1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scar2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scar3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scar4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucasOutfile01)) << "Error getting test data from '" << ucasOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucas1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucas1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucas2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucas2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucas3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucas3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucas4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucas4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucasOutfile02)) << "Error getting test data from '" << ucasOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucas1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucas1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucas2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucas2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucas3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucas3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucas4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucas4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucarOutfile01)) << "Error getting test data from '" << ucarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucar1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucar2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucar3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucar4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucarOutfile02)) << "Error getting test data from '" << ucarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucar1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucar2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucar3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucar4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncarOutfile01)) << "Error getting test data from '" << ncarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ncar1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncar2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncar3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncar4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncarOutfile02)) << "Error getting test data from '" << ncarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ncar1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncar2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncar3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncar4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), qcrOutfile01)) << "Error getting test data from '" << qcrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", qcr1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", qcr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", qcr2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", qcr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", qcr3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", qcr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", qcr4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", qcr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), qcrOutfile02)) << "Error getting test data from '" << qcrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", qcr1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", qcr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", qcr2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", qcr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", qcr3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", qcr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", qcr4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", qcr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scrOutfile01)) << "Error getting test data from '" << scrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", scr1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scr2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scr3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scr4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", scr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scrOutfile02)) << "Error getting test data from '" << scrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", scr1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scr2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scr3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", scr4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", scr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucsOutfile01)) << "Error getting test data from '" << ucsOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucs1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucs1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucs2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucs2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucs3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucs3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucs4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucs4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucsOutfile02)) << "Error getting test data from '" << ucsOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucs1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucs1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucs2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucs2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucs3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucs3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucs4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucs4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), uscrOutfile01)) << "Error getting test data from '" << uscrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", uscr1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", uscr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", uscr2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", uscr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", uscr3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", uscr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", uscr4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", uscr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), uscrOutfile02)) << "Error getting test data from '" << uscrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", uscr1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", uscr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", uscr2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", uscr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", uscr3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", uscr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", uscr4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", uscr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile01)) << "Error getting test data from '" << ucrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucr1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = restErrorReplyGet(&ci, JSON, "", ucr2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucr3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucr4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ucr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile02)) << "Error getting test data from '" << ucrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ucr1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucr2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucr3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ucr4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ucr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncrOutfile01)) << "Error getting test data from '" << ncrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ncr1, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncr2, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncr3, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncr4, SccOk, "detail");
+  out = restErrorReplyGet(&ci, "", ncr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncrOutfile02)) << "Error getting test data from '" << ncrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, JSON, "", ncr1, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncr2, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncr3, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, JSON, "", ncr4, SccBadRequest, "detail");
+  out = restErrorReplyGet(&ci, "", ncr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

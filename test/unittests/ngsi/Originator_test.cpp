@@ -94,16 +94,16 @@ TEST(Originator, render)
 
   utInit();
 
-  out = originator.render(JSON, "");
+  out = originator.render("");
   EXPECT_STREQ("", out.c_str());
 
   originator.string = "String";
 
-  out = originator.render(JSON, "");
+  out = originator.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = originator.render(JSON, "");
+  out = originator.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

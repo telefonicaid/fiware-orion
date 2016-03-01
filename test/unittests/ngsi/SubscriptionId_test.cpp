@@ -138,16 +138,16 @@ TEST(SubscriptionId, render)
   utInit();
 
   sId.set("");
-  out = sId.render(UnsubscribeContext, JSON, ""); // subscriptionId is MANDATORY for RegisterContext 
+  out = sId.render(UnsubscribeContext, ""); // subscriptionId is MANDATORY for RegisterContext 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   sId.set("012345012345012345012345");
-  out = sId.render(UnsubscribeContext, JSON, "");
+  out = sId.render(UnsubscribeContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
-  out = sId.render(UnsubscribeContext, JSON, "");
+  out = sId.render(UnsubscribeContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

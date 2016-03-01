@@ -42,20 +42,20 @@ TEST(ConditionValueList, ok)
   const char*        outfile2 = "ngsi.conditionValueList.ok2.middle.json";
   const char*        outfile3 = "ngsi.conditionValueList.ok3.middle.json";
 
-  out = cvList.render(JSON, "", false);
+  out = cvList.render("", false);
   EXPECT_STREQ("", out.c_str());
 
   cvList.push_back("cv1");
-  out = cvList.render(JSON, "", false);
+  out = cvList.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = cvList.render(JSON, "", false);
+  out = cvList.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   cvList.push_back("cv2");
-  out = cvList.render(JSON, "", false);
+  out = cvList.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

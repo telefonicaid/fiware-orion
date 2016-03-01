@@ -47,7 +47,7 @@ TEST(ContextRegistrationResponseVector, all)
   crr.contextRegistration.providingApplication.set("10.1.1.1://nada");
 
   // Empty vector gives empty rendered result
-  rendered = crrV.render(JSON, "");
+  rendered = crrV.render("");
   EXPECT_EQ("", rendered);
 
   crrV.push_back(&crr);

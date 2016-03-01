@@ -111,7 +111,7 @@ TEST(UpdateContextAttributeRequest, check_xml)
 
   // 1. predetectedError + Format ZERO => XML
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucar.check(&ci, UpdateContextAttribute, (Format) 0, "", "PRE Error", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "PRE Error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   
@@ -155,7 +155,7 @@ TEST(UpdateContextAttributeRequest, check_json)
 
   // 1. predetectedError
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucar.check(&ci, UpdateContextAttribute, JSON, "", "PRE Error", 0);
+  out = ucar.check(&ci, UpdateContextAttribute, "", "PRE Error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   

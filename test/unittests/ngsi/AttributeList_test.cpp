@@ -44,16 +44,16 @@ TEST(AttributeList, ok)
   
   utInit();
 
-  out = al.render(JSON, "");
+  out = al.render("");
   EXPECT_STREQ("", out.c_str());
 
   al.push_back("a1");
   al.push_back("a2");
-  out = al.render(JSON, "");
+  out = al.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
-  out = al.render(JSON, "");
+  out = al.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

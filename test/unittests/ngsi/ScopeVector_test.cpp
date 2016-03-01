@@ -42,12 +42,12 @@ TEST(ScopeVector, renderAndRelease)
 
   utInit();
 
-  out = sV.render(JSON, "", false);
+  out = sV.render("", false);
   EXPECT_STREQ("", out.c_str());
 
   sV.push_back(s);
 
-  out = sV.render(JSON, "", false);
+  out = sV.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

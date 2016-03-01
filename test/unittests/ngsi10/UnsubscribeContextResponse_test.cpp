@@ -49,7 +49,7 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
   EXPECT_EQ(SccOk,         uncr2.statusCode.code);
   EXPECT_EQ(SccBadRequest, uncr3.statusCode.code);
 
-  out = uncr3.render(UnsubscribeContext, JSON, "");
+  out = uncr3.render(UnsubscribeContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -81,7 +81,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
   uncrP->statusCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
-  out = uncrP->render(QueryContext, JSON, "");
+  out = uncrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -90,7 +90,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
   uncrP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
-  out = uncrP->render(QueryContext, JSON, "");
+  out = uncrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   delete uncrP;

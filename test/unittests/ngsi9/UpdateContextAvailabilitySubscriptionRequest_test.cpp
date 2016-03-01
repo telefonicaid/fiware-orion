@@ -94,11 +94,11 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
+  out = ucasP->render(UpdateContextAvailabilitySubscription, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, JSON, "", "predetected error", 0);
+  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, "", "predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
@@ -162,12 +162,12 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
   out = ucas.check(UpdateContextAvailabilitySubscription, "", "", 0);
   EXPECT_EQ("OK", out);
   
-  out = ucas.render(UpdateContextAvailabilitySubscription, JSON, "", 0);
+  out = ucas.render(UpdateContextAvailabilitySubscription, "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucas.errorCode.fill(SccBadRequest, "Detail");
-  out = ucas.render(UpdateContextAvailabilitySubscription, JSON, "", 0);
+  out = ucas.render(UpdateContextAvailabilitySubscription, "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
@@ -177,7 +177,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = ucas.check(UpdateContextAvailabilitySubscription, JSON, "", "predetected error", 0);
+  out = ucas.check(UpdateContextAvailabilitySubscription, "", "predetected error", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

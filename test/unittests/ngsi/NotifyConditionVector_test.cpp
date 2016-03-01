@@ -45,22 +45,22 @@ TEST(NotifyConditionVector, render)
   
   utInit();
 
-  out = ncV.render(JSON, "", false);
+  out = ncV.render("", false);
   EXPECT_STREQ("", out.c_str());
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  out = ncV.render(JSON, "", false);
+  out = ncV.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = ncV.render(JSON, "", false);
+  out = ncV.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncV.release();
 
-  out = ncV.render(JSON, "", false);
+  out = ncV.render("", false);
   EXPECT_STREQ("", out.c_str());
 
   utExit();

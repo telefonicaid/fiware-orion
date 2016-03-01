@@ -47,11 +47,11 @@ TEST(UpdateContextSubscriptionResponse, constructors)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucsr1.render(UpdateContextSubscription, JSON, "");
+  out = ucsr1.render(UpdateContextSubscription, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucsr2.render(UpdateContextSubscription, JSON, "");
+  out = ucsr2.render(UpdateContextSubscription, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -90,7 +90,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeError.errorCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  out = ucsrP->render(QueryContext, JSON, "");
+  out = ucsrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -100,7 +100,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeError.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  out = ucsrP->render(QueryContext, JSON, "");
+  out = ucsrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->subscribeError.errorCode.fill(SccNone);
@@ -111,7 +111,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  out = ucsrP->render(QueryContext, JSON, "");
+  out = ucsrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -120,7 +120,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.throttling.set("PT1M");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  out = ucsrP->render(QueryContext, JSON, "");
+  out = ucsrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -130,7 +130,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.duration.set("PT1H");
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  out = ucsrP->render(QueryContext, JSON, "");
+  out = ucsrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -139,7 +139,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.throttling.set("PT1M");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
-  out = ucsrP->render(QueryContext, JSON, "");
+  out = ucsrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

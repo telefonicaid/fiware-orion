@@ -65,7 +65,7 @@ TEST(RegisterProviderRequest, json_ok)
   result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  rendered = reqData.rpr.res.render(JSON, "");
+  rendered = reqData.rpr.res.render("");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -80,7 +80,7 @@ TEST(RegisterProviderRequest, json_ok)
   // 3. sending a 'predetected error' to the check function
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
 
-  checked   = reqData.rpr.res.check(&ci, DiscoverContextAvailability, JSON, "", "forced predetectedError", 0);
+  checked   = reqData.rpr.res.check(&ci, DiscoverContextAvailability, "", "forced predetectedError", 0);
   EXPECT_STREQ(expectedBuf, checked.c_str());
 
   // Just for coverage
@@ -92,6 +92,6 @@ TEST(RegisterProviderRequest, json_ok)
 
   result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result);
-  rendered = reqData.rpr.res.render(JSON, "");
+  rendered = reqData.rpr.res.render("");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 }

@@ -48,23 +48,23 @@ TEST(MetadataVector, render)
 
   mV.push_back(&m);
 
-  out = mV.render(JSON, "");
+  out = mV.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = mV.render(JSON, "");
+  out = mV.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   mV.keyNameSet("metadata");
-  out = mV.render(JSON, "");
+  out = mV.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   mV.push_back(&m2);
-  out = mV.render(JSON, "");
+  out = mV.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = mV.render(JSON, "");
+  out = mV.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

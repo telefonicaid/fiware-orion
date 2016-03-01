@@ -66,7 +66,7 @@ TEST(SubscribeContextRequest, ok_json)
   scrP->present(""); // No output
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  std::string out = scrP->render(SubscribeContext, JSON, "");
+  std::string out = scrP->render(SubscribeContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   scrP->release();
