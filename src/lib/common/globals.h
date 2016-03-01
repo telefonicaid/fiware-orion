@@ -102,7 +102,6 @@
 * Values for the URI param 'options'
 */
 #define OPT_COUNT           "count"
-#define OPT_TEXT            "text"
 #define OPT_APPEND          "append"
 #define OPT_NORMALIZED      RENDER_MODE_NORMALIZED
 #define OPT_VALUES          RENDER_MODE_VALUES

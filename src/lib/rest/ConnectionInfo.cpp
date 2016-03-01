@@ -43,7 +43,6 @@ static const char* validOptions[] =
   OPT_NORMALIZED,
   OPT_VALUES,
   OPT_KEY_VALUES,
-  OPT_TEXT,
   OPT_APPEND,
   OPT_UNIQUE_VALUES,
   OPT_DATE_CREATED,
