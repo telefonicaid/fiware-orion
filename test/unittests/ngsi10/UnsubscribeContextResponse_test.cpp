@@ -32,8 +32,10 @@
 /* ****************************************************************************
 *
 * constructorsAndRender - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(UnsubscribeContextResponse, constructorsAndRender)
+TEST(UnsubscribeContextResponse, DISABLED_constructorsAndRender)
 {
   UnsubscribeContextResponse  uncr1;
   StatusCode                  sc(SccOk, "D");

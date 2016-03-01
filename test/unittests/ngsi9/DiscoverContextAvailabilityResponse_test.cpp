@@ -43,8 +43,10 @@
 /* ****************************************************************************
 *
 * render - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(DiscoverContextAvailabilityResponse, render)
+TEST(DiscoverContextAvailabilityResponse, DISABLED_render)
 {
   DiscoverContextAvailabilityResponse  dcar1;
   std::string                          out;

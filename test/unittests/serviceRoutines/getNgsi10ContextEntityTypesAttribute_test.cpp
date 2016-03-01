@@ -50,8 +50,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(getNgsi10ContextEntityTypesAttribute, notFound)
+TEST(getNgsi10ContextEntityTypesAttribute, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntityTypes/entity11/attributes/Attribute11",  "GET", "1.1");
   const char*    outfile = "ngsi10.queryContextResponse.getNgsi10ContextEntityTypesAttribute.valid.xml";

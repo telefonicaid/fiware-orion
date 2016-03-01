@@ -38,8 +38,7 @@
 TEST(AttributeExpression, ok)
 {
    AttributeExpression ae;
-   const char*         outfile1 = "ngsi10.attributeExpression.ok.middle.xml";
-   const char*         outfile2 = "ngsi10.attributeExpression.ok.middle.json";
+   const char*         outfile1 = "ngsi10.attributeExpression.ok.middle.json";
    std::string         out;
 
    utInit();
@@ -51,12 +50,9 @@ TEST(AttributeExpression, ok)
    EXPECT_STREQ("", ae.render("", false).c_str());
 
    ae.set("AE");
-   out = ae.render("", false);
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
 
    out = ae.render("", false);
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 
    EXPECT_STREQ("AE", ae.c_str());

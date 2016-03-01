@@ -39,10 +39,8 @@ TEST(ContextRegistrationResponse, render)
 {
   ContextRegistrationResponse  crr;
   std::string                  rendered;
-  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.xml";
-  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
-  const char*                  outfile3 = "ngsi.contextRegistrationResponse.renderError.middle.xml";
-  const char*                  outfile4 = "ngsi.contextRegistrationResponse.renderError.middle.json";
+  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
+  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderError.middle.json";
 
   utInit();
 
@@ -50,16 +48,10 @@ TEST(ContextRegistrationResponse, render)
   rendered = crr.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   crr.errorCode.fill(SccBadRequest);
   rendered = crr.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

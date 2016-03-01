@@ -32,8 +32,10 @@
 /* ****************************************************************************
 *
 * renderAndRelease - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(ScopeVector, renderAndRelease)
+TEST(ScopeVector, DISABLED_renderAndRelease)
 {
   Scope*         s = new Scope("Type", "Value");
   ScopeVector    sV;

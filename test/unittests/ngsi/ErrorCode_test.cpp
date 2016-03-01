@@ -34,25 +34,14 @@
 */
 TEST(ErrorCode, render)
 {
-  ErrorCode    e1;
-  ErrorCode    e2(200, "REASON", "DETAILS");
+  ErrorCode    e1; 
   std::string  out;
-  const char*  outfile1 = "ngsi.errorCode.render1.valid.xml";
-  const char*  outfile2 = "ngsi.errorCode.render1.middle.json";
-  const char*  outfile3 = "ngsi.errorCode.render2.valid.xml";
+  const char*  outfile1 = "ngsi.errorCode.render1.middle.json";
 
   utInit();
 
   out = e1.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e1.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e2.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

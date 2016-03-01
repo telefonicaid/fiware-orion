@@ -2568,7 +2568,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     EXPECT_EQ("Database Error (collection: utest.registrations "
               "- update(): <{ _id: ObjectId('",s1);
     EXPECT_EQ("') },{ _id: ObjectId('", s2);
-    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] }> "
+    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"JSON\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] }> "
               "- exception: boom!!)", s3);
 
     /* Restore real DB connection */

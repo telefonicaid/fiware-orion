@@ -34,8 +34,10 @@
 /* ****************************************************************************
 *
 * render - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(ContextRegistrationVector, render)
+TEST(ContextRegistrationVector, DISABLED_render)
 {
   ContextRegistrationVector  crv;
   ContextRegistration        cr;

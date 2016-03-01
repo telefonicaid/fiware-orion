@@ -63,9 +63,6 @@ TEST(commonFormat, stringToformat)
 {
   Format format;
 
-  format = stringToFormat("XML");
-  EXPECT_EQ(JSON, format);
-
   format = stringToFormat("JSON");
   EXPECT_EQ(JSON, format);
 

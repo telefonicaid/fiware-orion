@@ -608,8 +608,10 @@ TEST(QueryContextRequest, DISABLED_noRestriction_xml)
 /* ****************************************************************************
 *
 * fill - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(QueryContextRequest, fill)
+TEST(QueryContextRequest, DISABLED_fill)
 {
   QueryContextRequest q0;
   QueryContextRequest q1;

@@ -39,8 +39,7 @@ TEST(ProvidingApplication, render)
 {
   ProvidingApplication  pa;
   std::string           out;
-  const char*           outfile1 = "ngsi.providingApplication.render.middle.xml";
-  const char*           outfile2 = "ngsi.providingApplication.render.middle.json";
+  const char*           outfile1 = "ngsi.providingApplication.render.middle.json";
 
   utInit();
 
@@ -51,10 +50,6 @@ TEST(ProvidingApplication, render)
 
   out = pa.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = pa.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

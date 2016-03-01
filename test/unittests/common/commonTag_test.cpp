@@ -41,9 +41,6 @@ TEST(commonTag, startTag)
    std::string      json2  = "  \"TAG\" : {\n";
    std::string      out;
 
-   out = startTag1(indent, tag);
-   EXPECT_EQ(json, out);
-
    out = startTag1(indent, tag, false);
    EXPECT_EQ(json, out);
 

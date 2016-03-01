@@ -70,11 +70,9 @@ TEST(ContextElementResponse, check)
 TEST(ContextElementResponse, render)
 {
   ContextElementResponse  cer;
-  const char*             outfile1 = "ngsi.contextElementResponse.render.middle.xml";
-  const char*             outfile2 = "ngsi.contextElementResponse.render.middle.json";
+  const char*             outfile = "ngsi.contextElementResponse.render.middle.json";
   std::string             out;
-  ConnectionInfo          ciX(JSON);
-  ConnectionInfo          ciJ(JSON);
+  ConnectionInfo          ci(JSON);
 
    utInit();
 
@@ -84,12 +82,8 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(&ciX, UpdateContextElement, "");
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
-
-   out = cer.render(&ciJ, UpdateContextElement, "");
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+   out = cer.render(&ci, UpdateContextElement, "");
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 
    utExit();

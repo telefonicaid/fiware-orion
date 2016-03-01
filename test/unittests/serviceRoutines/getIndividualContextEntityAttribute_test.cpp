@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(getIndividualContextEntityAttribute, notFound)
+TEST(getIndividualContextEntityAttribute, DISABLED_notFound)
 {
   setupDatabase();
 

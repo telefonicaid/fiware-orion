@@ -88,9 +88,8 @@ TEST(Originator, isEmptySetAndGet)
 TEST(Originator, render)
 {
   Originator   originator;
-  std::string  out;
-  const char*  outfile1 = "ngsi.originator.render.middle.xml";
-  const char*  outfile2 = "ngsi.originator.render.middle.json";
+  std::string  out;  
+  const char*  outfile1 = "ngsi.originator.render.middle.json";
 
   utInit();
 
@@ -101,10 +100,6 @@ TEST(Originator, render)
 
   out = originator.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = originator.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

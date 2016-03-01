@@ -85,8 +85,10 @@ TEST(restReply, json)
 /* ****************************************************************************
 *
 * restErrorReplyGet - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(restReply, restErrorReplyGet)
+TEST(restReply, DISABLED_restErrorReplyGet)
 {
   const char* rcrOutfile01   = "ngsi9.restReply.registerContext01.ok.valid.xml";
   const char* rcrOutfile02   = "ngsi9.restReply.registerContext02.ok.valid.xml";

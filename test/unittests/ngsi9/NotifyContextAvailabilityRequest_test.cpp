@@ -103,8 +103,10 @@ TEST(NotifyContextAvailabilityRequest, DISABLED_badEntityAttribute_xml)
 /* ****************************************************************************
 *
 * check - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(NotifyContextAvailabilityRequest, check)
+TEST(NotifyContextAvailabilityRequest, DISABLED_check)
 {
   NotifyContextAvailabilityRequest  ncr;
   std::string                       out;

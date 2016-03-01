@@ -212,14 +212,14 @@ static void prepareDatabase(void) {
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
                         "expiration" << 1879048191 <<
                         "reference" << "http://notify1.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T7" << "isPattern" << "false")) <<
                         "attrs" << BSONArray());
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
                         "expiration" << 1879048191 <<
                         "reference" << "http://notify2.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T8" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A4"));
 
@@ -343,14 +343,14 @@ static void prepareDatabasePatternTrue(void) {
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
                       "expiration" << 1879048191 <<
                       "reference" << "http://notify1.me" <<
-                      "format" << "XML" <<
+                      "format" << "JSON" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T7" << "isPattern" << "false")) <<
                       "attrs" << BSONArray());
 
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
                       "expiration" << 1879048191 <<
                       "reference" << "http://notify2.me" <<
-                      "format" << "XML" <<
+                      "format" << "JSON" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T8" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A4"));
 
@@ -2737,7 +2737,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.casubs "
-              "- update(): <{ _id: ObjectId('51307b66f481db11bf860010') },{ entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], expiration: 1360250700, reference: \"http://notify1.me\", format: \"XML\" }> "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860010') },{ entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], expiration: 1360250700, reference: \"http://notify1.me\", format: \"JSON\" }> "
               "- exception: boom!!)", res.errorCode.details);
 
     /* Restore real DB connection */

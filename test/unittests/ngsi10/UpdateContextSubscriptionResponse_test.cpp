@@ -34,8 +34,10 @@
 /* ****************************************************************************
 *
 * constructors - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(UpdateContextSubscriptionResponse, constructors)
+TEST(UpdateContextSubscriptionResponse, DISABLED_constructors)
 {
   UpdateContextSubscriptionResponse  ucsr1;
   StatusCode                         ec(SccBadRequest, "D");

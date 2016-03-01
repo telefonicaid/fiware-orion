@@ -4153,7 +4153,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], "
-              "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"XML\" } "
+              "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */

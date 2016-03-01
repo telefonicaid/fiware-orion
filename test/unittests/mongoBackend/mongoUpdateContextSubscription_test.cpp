@@ -225,7 +225,7 @@ static void prepareDatabase(void) {
                         "expiration" << 20000000 <<
                         "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
@@ -239,7 +239,7 @@ static void prepareDatabase(void) {
                         "expiration" << 20000000 <<
                         "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
@@ -252,7 +252,7 @@ static void prepareDatabase(void) {
                         "expiration" << 30000000 <<
                         "lastNotification" << 35000000 <<
                         "reference" << "http://notify3.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
@@ -266,7 +266,7 @@ static void prepareDatabase(void) {
                         "expiration" << 40000000 <<
                         "lastNotification" << 45000000 <<
                         "reference" << "http://notify4.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
@@ -280,7 +280,7 @@ static void prepareDatabase(void) {
                         "lastNotification" << 55000000 <<
                         "throttling" << 10 <<
                         "reference" << "http://notify5.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
                         "conditions" << BSON_ARRAY(BSON(
@@ -4478,7 +4478,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
-              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"\", conditions: [], lastNotification: 15000000, format: \"XML\" }> "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"\", conditions: [], lastNotification: 15000000, format: \"JSON\" }> "
               "- exception: boom!!)", res.subscribeError.errorCode.details);
 
     /* Restore real DB connection */

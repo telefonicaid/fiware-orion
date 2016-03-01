@@ -34,8 +34,10 @@
 /* ****************************************************************************
 *
 * ok_xml - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(QueryContextResponse, ok_xml)
+TEST(QueryContextResponse, DISABLED_ok_xml)
 {
   StatusCode*           ecP = new StatusCode(SccOk, "Detail");
   StatusCode            ec(SccOk, "Detail2");

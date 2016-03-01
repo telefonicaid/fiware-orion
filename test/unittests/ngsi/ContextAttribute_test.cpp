@@ -101,19 +101,14 @@ TEST(ContextAttribute, render)
 {
   ContextAttribute  ca("NAME", "TYPE", "VALUE");
   std::string       out;
-  const char*       outfile1 = "ngsi.contextAttribute.render.middle.xml";
-  const char*       outfile2 = "ngsi.contextAttribute.render.middle.json";
+  const char*       outfile1 = "ngsi.contextAttribute.render.middle.json";
   ConnectionInfo    ci(JSON);
 
   utInit();
 
-  out = ca.render(&ci, UpdateContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   ci.outFormat = JSON;
   out = ca.render(&ci, UpdateContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

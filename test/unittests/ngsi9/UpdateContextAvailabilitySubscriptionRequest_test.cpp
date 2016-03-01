@@ -141,8 +141,10 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 /* ****************************************************************************
 *
 * response - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(UpdateContextAvailabilitySubscriptionRequest, response)
+TEST(UpdateContextAvailabilitySubscriptionRequest, DISABLED_response)
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   StatusCode                                     ec(SccBadRequest, "Detail");

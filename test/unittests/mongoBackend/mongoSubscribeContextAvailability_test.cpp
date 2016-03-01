@@ -2526,7 +2526,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     std::string s2 = res.errorCode.details.substr(70+24, res.errorCode.details.size()-70-24);
     EXPECT_EQ("Database Error (collection: utest.casubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], format: \"XML\" } "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], format: \"JSON\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */

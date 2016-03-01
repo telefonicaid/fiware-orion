@@ -105,8 +105,7 @@ TEST(UpdateActionType, render)
 {
   UpdateActionType  uat;
   std::string       out;
-  const char*       outfile1 = "ngsi.updateActionType.render.middle.xml";
-  const char*       outfile2 = "ngsi.updateActionType.render.middle.json";
+  const char*       outfile1 = "ngsi.updateActionType.render.middle.json";
 
   utInit();
 
@@ -117,10 +116,6 @@ TEST(UpdateActionType, render)
   uat.set("Update");
   out = uat.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = uat.render("");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

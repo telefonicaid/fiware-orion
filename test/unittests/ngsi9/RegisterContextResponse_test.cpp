@@ -36,8 +36,10 @@
 /* ****************************************************************************
 *
 * constructors - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(RegisterContextResponse, constructors)
+TEST(RegisterContextResponse, DISABLED_constructors)
 {
   RegisterContextResponse* rcr1 = new RegisterContextResponse();
   RegisterContextResponse  rcr2("012301230123012301230123", "PT1S");

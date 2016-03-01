@@ -41,8 +41,10 @@
 /* ****************************************************************************
 *
 * constructorsAndCheck -
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
+TEST(UnsubscribeContextAvailabilityRequest, DISABLED_constructorAndCheck)
 {
   UnsubscribeContextAvailabilityRequest ucar1;
   SubscriptionId                        subId("012345678901234567890123");

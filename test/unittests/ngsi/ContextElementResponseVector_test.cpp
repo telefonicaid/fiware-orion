@@ -65,8 +65,10 @@ TEST(ContextElementResponseVector, check)
 /* ****************************************************************************
 *
 * render - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(ContextElementResponseVector, render)
+TEST(ContextElementResponseVector, DISABLED_render)
 {
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;

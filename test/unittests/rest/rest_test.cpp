@@ -135,6 +135,6 @@ TEST(rest, servicePathSplit)
   ci5.apiVersion = "v1";
   r = servicePathSplit(&ci5);
   EXPECT_EQ(-1, r);
-  EXPECT_EQ(177, ci5.answer.size());
+  EXPECT_EQ(168, ci5.answer.size());
   LM_M(("---- 5 -----"));
 }

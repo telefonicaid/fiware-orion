@@ -131,24 +131,14 @@ TEST(SubscriptionId, render)
 {
   SubscriptionId  sId;
   std::string     out;
-  const char*     outfile1 = "ngsi.subscriptionId.render1.middle.xml";
-  const char*     outfile2 = "ngsi.subscriptionId.render2.middle.xml";
-  const char*     outfile3 = "ngsi.subscriptionId.render2.middle.json";
+  const char*     outfile1 = "ngsi.subscriptionId.render2.middle.json";
 
   utInit();
 
-  sId.set("");
-  out = sId.render(UnsubscribeContext, ""); // subscriptionId is MANDATORY for RegisterContext 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   sId.set("012345012345012345012345");
-  out = sId.render(UnsubscribeContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
   
   out = sId.render(UnsubscribeContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   sId.release(); // just to exercise the code

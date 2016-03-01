@@ -35,8 +35,10 @@
 /* ****************************************************************************
 *
 * render - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(ContextElementVector, render)
+TEST(ContextElementVector, DISABLED_render)
 {
   ContextElement*       ceP = new ContextElement();
   EntityId              eId("E_ID", "E_TYPE");

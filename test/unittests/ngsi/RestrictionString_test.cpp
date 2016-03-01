@@ -87,9 +87,8 @@ TEST(RestrictionString, isEmptySetAndGet)
 TEST(RestrictionString, render)
 {
   RestrictionString   restrictionString;
-  std::string         out;
-  const char*         outfile1 = "ngsi.restrictionString.render.middle.xml";
-  const char*         outfile2 = "ngsi.restrictionString.render.middle.json";
+  std::string         out;  
+  const char*         outfile1 = "ngsi.restrictionString.render.middle.json";
 
   utInit();
 
@@ -100,10 +99,6 @@ TEST(RestrictionString, render)
 
   out = restrictionString.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = restrictionString.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

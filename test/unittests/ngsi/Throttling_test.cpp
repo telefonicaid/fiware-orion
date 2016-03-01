@@ -90,9 +90,7 @@ TEST(Throttling, render)
 {
   Throttling   t;
   std::string  out;
-  std::string  expected1 = "";
-  const char*  outfile1 = "ngsi.throttling.render.middle.xml";
-  const char*  outfile2 = "ngsi.throttling.render.middle.json";
+  const char*  outfile1 = "ngsi.throttling.render.middle.json";
 
   utInit();
 
@@ -104,12 +102,9 @@ TEST(Throttling, render)
   EXPECT_STREQ("", out.c_str());
 
   t.set("PT1S");
-  out = t.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = t.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

@@ -40,8 +40,7 @@ TEST(NotifyConditionVector, render)
   NotifyCondition*       ncP = new NotifyCondition();
   NotifyConditionVector  ncV;
   std::string            out;
-  const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.xml";
-  const char*            outfile2 = "ngsi.notifyConditionVector.render.middle.json";
+  const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.json";
   
   utInit();
 
@@ -53,9 +52,6 @@ TEST(NotifyConditionVector, render)
 
   out = ncV.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  out = ncV.render("", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncV.release();

@@ -35,7 +35,7 @@
 *
 * Check - 
 */
-TEST(ContextElement, Check)
+TEST(ContextElement, check)
 {
   ContextElement ce;
   ConnectionInfo               ci;
@@ -75,19 +75,14 @@ TEST(ContextElement, Check)
   EXPECT_EQ(ceVector.check(&ci, UpdateContext, "", "", 0), "OK");
 
   // render
-  const char*     outfile1 = "ngsi.contextelement.check.middle.xml";
-  const char*     outfile2 = "ngsi.contextelement.check.middle.json";
+  const char*     outfile1 = "ngsi.contextelement.check.middle.json";
   std::string     out;
 
   ci = ConnectionInfo(JSON);
 
-  out = ce2.render(&ci, UpdateContextElement, "", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   ci.outFormat = JSON;
   out = ce2.render(&ci, UpdateContextElement, "", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // present
