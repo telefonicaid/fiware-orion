@@ -170,7 +170,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
 {
   std::string name      = iter->name.GetString();
   std::string type      = jsonParseTypeNames[iter->value.GetType()];
-  bool        keyValues = ciP->uriParamOptions["keyValues"];
+  bool        keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
 
   caP->name = name;
 
