@@ -31,8 +31,8 @@
 
 Feature: list all entities with get request and queries parameters using NGSI v2. "GET" - /v2/entities/
   Queries parameters
-     tested : limit, offset, id, idPattern, type, q and option=count,keyValues
-     pending: georel, geometry, coords and option=values,distinct
+  tested : limit, offset, id, idPattern, type, q and option=count,keyValues
+  pending: georel, geometry, coords and option=values,distinct
   As a context broker user
   I would like to list all entities with get request and queries parameter using NGSI v2
   So that I can manage and use them in my scripts
@@ -76,32 +76,32 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | home                    |
-      | entities_id      | room4l2                 |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room4l2     |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "3" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -141,7 +141,8 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | type         | 13       |
       | !type        | 6        |
 
-  @only_q_attribute @BUG_1589 @ISSUE_1751 @skip
+  @only_q_attribute.row<row.id>
+  @only_q_attribute @BUG_1589 @ISSUE_1751
   Scenario Outline:  list entities using NGSI v2 with only q=attribute query parameter
     Given  a definition of headers
       | parameter          | value            |
@@ -165,32 +166,32 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | home                    |
-      | entities_id      | room4l2                 |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | home        |
+      | entities_id      | room4l2     |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "3" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -223,6 +224,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     When get all entities
       | parameter | value          |
       | q         | <q_expression> |
+      | options   | count          |
     Then verify that receive an "OK" http code
     And verify that "<returned>" entities are returned
     Examples:
@@ -230,7 +232,8 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | myAttr            | 0        |
       | !myAttr           | 19       |
       | roses             | 1        |
-      | !speed;!timestamp | 11       |
+      | !speed;!timestamp | 14       |
+      | temperature       | 13       |
 
   @only_q_parse_error.row<row.id>
   @only_q_parse_error @BUG_1592 @BUG_1754 @ISSUE_1751 @skip
@@ -314,16 +317,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value     |
-      | entities_type    | house     |
-      | entities_id      | room2     |
-      | attributes_name  | timestamp |
-      | attributes_value | true      |
-      | attributes_type  | date      |
-      | metadatas_number | 2         |
-      | metadatas_name   | very_hot  |
-      | metadatas_type   | alarm     |
-      | metadatas_value  | random=10 |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -374,16 +377,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value     |
-      | entities_type    | house     |
-      | entities_id      | room2     |
-      | attributes_name  | timestamp |
-      | attributes_value | true      |
-      | attributes_type  | date      |
-      | metadatas_number | 2         |
-      | metadatas_name   | very_hot  |
-      | metadatas_type   | alarm     |
-      | metadatas_value  | random=10 |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -432,16 +435,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value     |
-      | entities_type    | house     |
-      | entities_id      | room2     |
-      | attributes_name  | timestamp |
-      | attributes_value | true      |
-      | attributes_type  | date      |
-      | metadatas_number | 2         |
-      | metadatas_name   | very_hot  |
-      | metadatas_type   | alarm     |
-      | metadatas_value  | random=10 |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -497,16 +500,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -675,16 +678,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "3" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -759,16 +762,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -843,16 +846,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -928,16 +931,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -1014,16 +1017,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -1108,16 +1111,16 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -1203,32 +1206,32 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter        | value                   |
-      | entities_type    | house                   |
-      | entities_id      | room3                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | attributes_type  | date                    |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room3       |
+      | attributes_name  | temperature |
+      | attributes_value | 78          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |

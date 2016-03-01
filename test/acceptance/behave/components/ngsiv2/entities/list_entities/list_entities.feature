@@ -31,8 +31,8 @@
 
 Feature: list all entities with get request and queries parameters using NGSI v2. "GET" - /v2/entities/
   Queries parameters
-     tested : limit, offset, id, idPattern, type, q and option=count,keyValues
-     pending: georel, geometry, coords and option=values,distinct
+  tested : limit, offset, id, idPattern, type, q and option=count,keyValues
+  pending: georel, geometry, coords and option=values,distinct
   As a context broker user
   I would like to list all entities with get request and queries parameter using NGSI v2
   So that I can manage and use them in my scripts
@@ -76,17 +76,17 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter         | value                   |
-      | entities_type     | house                   |
-      | entities_id       | room2                   |
-      | attributes_number | 2                       |
-      | attributes_name   | timestamp               |
-      | attributes_value  | 017-06-17T07:21:24.238Z |
-      | attributes_type   | date                    |
-      | metadatas_number  | 2                       |
-      | metadatas_name    | very_hot                |
-      | metadatas_type    | alarm                   |
-      | metadatas_value   | random=10               |
+      | parameter         | value        |
+      | entities_type     | house        |
+      | entities_id       | room2        |
+      | attributes_number | 2            |
+      | attributes_name   | temeperature |
+      | attributes_value  | 45           |
+      | attributes_type   | celsius      |
+      | metadatas_number  | 2            |
+      | metadatas_name    | very_hot     |
+      | metadatas_type    | alarm        |
+      | metadatas_value   | random=10    |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -145,17 +145,17 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     And verify that receive several "Created" http code
     And record entity group
     And properties to entities
-      | parameter         | value                   |
-      | entities_type     | house                   |
-      | entities_id       | room2                   |
-      | attributes_number | 2                       |
-      | attributes_name   | timestamp               |
-      | attributes_value  | 017-06-17T07:21:24.238Z |
-      | attributes_type   | date                    |
-      | metadatas_number  | 2                       |
-      | metadatas_name    | very_hot                |
-      | metadatas_type    | alarm                   |
-      | metadatas_value   | random=10               |
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room2       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 56          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | random=10   |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
