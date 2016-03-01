@@ -42,12 +42,9 @@ TEST(OrionError, all)
   OrionError    e3(sc);
   OrionError    e4(SccOk, "Good Request");
   std::string   out;
-  const char*   outfile1 = "orion.orionError.all1.valid.xml";
-  const char*   outfile2 = "orion.orionError.all1.valid.json";
-  const char*   outfile5 = "orion.orionError.all3.valid.xml";
-  const char*   outfile6 = "orion.orionError.all3.valid.json";
-  const char*   outfile7 = "orion.orionError.all4.valid.xml";
-  const char*   outfile8 = "orion.orionError.all4.valid.json";
+  const char*   outfile1 = "orion.orionError.all1.valid.json";
+  const char*   outfile2 = "orion.orionError.all3.valid.json";
+  const char*   outfile3 = "orion.orionError.all4.valid.json";
   ConnectionInfo ci;
 
   ci.outFormat = JSON;
@@ -68,30 +65,17 @@ TEST(OrionError, all)
   EXPECT_EQ("OK",           e4.reasonPhrase);
   EXPECT_EQ("Good Request", e4.details);
 
-  ci.apiVersion = "v1";
+  ci.outFormat = JSON;
+
   out = e1.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e3.render(&ci, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e4.render(&ci, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile7)) << "Error getting test data from '" << outfile7 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  ci.outFormat = JSON;
-
-  out = e1.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e3.render(&ci, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile6)) << "Error getting test data from '" << outfile6 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   out = e4.render(&ci, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile8)) << "Error getting test data from '" << outfile8 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

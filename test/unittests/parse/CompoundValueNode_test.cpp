@@ -101,8 +101,10 @@ TEST(CompoundValueNode, typeName)
 /* ****************************************************************************
 *
 * vectorInvalidAndOk -
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(CompoundValueNode, vectorInvalidAndOk)
+TEST(CompoundValueNode, DISABLED_vectorInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
@@ -154,8 +156,10 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
 /* ****************************************************************************
 *
 * structInvalidAndOk -
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(CompoundValueNode, structInvalidAndOk)
+TEST(CompoundValueNode, DISABLED_structInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 

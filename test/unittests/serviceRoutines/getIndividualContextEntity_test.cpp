@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(getIndividualContextEntity, notFound)
+TEST(getIndividualContextEntity, DISABLED_notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity0a",  "GET", "1.1");
   const char*    outfile = "ngsi10.contextElementResponse.getIndividualContextEntity.valid.xml";

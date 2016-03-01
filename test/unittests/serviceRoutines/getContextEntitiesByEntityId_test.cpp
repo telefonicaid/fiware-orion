@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(getContextEntitiesByEntityId, ok)
+TEST(getContextEntitiesByEntityId, DISABLED_ok)
 {
   ConnectionInfo ci("/ngsi9/contextEntities/entity501",  "GET", "1.1");
   const char*    outfile = "ngsi9.discoverContextAvailabilityResponse.notFound.valid.xml";

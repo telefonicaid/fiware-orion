@@ -123,65 +123,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   utExit();
 }
 
-/* ****************************************************************************
-*
-* ce1_En1_At0_Ok_XML -
-*/
-TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_XML)
-{
-  HttpStatusCode           ms;
-  NotifyContextAvailabilityRequest   req;
-  NotifyContextAvailabilityResponse  res;
 
-  utInit();
-
-  /* Forge the request */
-  req.subscriptionId.set("51307b66f481db11bf860001");
-  EntityId en("E1", "T1");
-  ContextRegistrationResponse crr;
-  crr.contextRegistration.entityIdVector.push_back(&en);
-  crr.contextRegistration.providingApplication.set("http://dummy.com");
-  crr.errorCode.fill(SccOk);
-  req.contextRegistrationResponseVector.push_back(&crr);
-
-  /* Invoke the function in mongoBackend library */  
-  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().toString();
-  EXPECT_EQ(1360319100, reg.getIntField("expiration"));
-  EXPECT_STREQ("XML", reg.getStringField("format"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-
-  std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
-  EXPECT_EQ(0, attrs.size());
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(SccOk, res.responseCode.code);
-  EXPECT_EQ("OK", res.responseCode.reasonPhrase);
-  EXPECT_EQ(0, res.responseCode.details.size());
-
-  utExit();
-}
 
 /* ****************************************************************************
 *
