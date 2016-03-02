@@ -134,7 +134,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 */
 std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 {
-  size_t len;
+  ssize_t len;
   char errorMsg[128];
 
   if ((requestType == EntitiesRequest) && (id == ""))
