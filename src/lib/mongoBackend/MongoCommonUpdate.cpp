@@ -1282,6 +1282,7 @@ static bool addTriggeredSubscriptions_withCache
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
+    cSubP->notifyFormat = JSON;
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1492,7 +1493,7 @@ static bool addTriggeredSubscriptions_noCache
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : JSON,
           getStringField(sub, CSUB_REFERENCE),          
           subToAttributeList(sub), "", "");
 
@@ -1612,17 +1613,6 @@ static bool processOnChangeConditionForUpdateContext
 
   getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* processOntimeIntervalCondition -
-*/
-void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant)
-{
-  getNotifier()->createIntervalThread(subId, interval, tenant);
 }
 
 
@@ -2478,6 +2468,7 @@ static bool createEntity
 (
   EntityId*                        eP,
   const ContextAttributeVector&    attrsV,
+  int                              now,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
@@ -2510,7 +2501,6 @@ static bool createEntity
     return false;
   }
 
-  int               now = getCurrentTime();
   BSONObjBuilder    attrsToAdd;
   BSONArrayBuilder  attrNamesToAdd;
 
@@ -2869,6 +2859,11 @@ static void updateEntity
   AttributeList emptyAttrL;
   ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
+  // The hasField() check is needed as the entity could have been created with very old Orion version not
+  // supporting modification/creation dates
+  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getLongField(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getLongField(r, ENT_MODIFICATION_DATE) : -1;
+
   if (!processContextAttributeVector(ceP,
                                      action,
                                      subsToNotify,
@@ -2919,7 +2914,9 @@ static void updateEntity
 
   if (strcasecmp(action.c_str(), "replace") != 0)
   {
-    toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+    int now = getCurrentTime();
+    toSet.append(ENT_MODIFICATION_DATE, now);
+    notifyCerP->contextElement.modDate = now;
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
@@ -2947,7 +2944,10 @@ static void updateEntity
   if (strcasecmp(action.c_str(), "replace") == 0)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << getCurrentTime()));
+    int now = getCurrentTime();
+    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << now));
+
+    notifyCerP->contextElement.modDate = now;
   }
   else
   {
@@ -3365,9 +3365,11 @@ void processContextElement
     }
     else   /* APPEND or APPEND_STRICT */
     {
-      std::string errReason, errDetail;
+      std::string  errReason;
+      std::string  errDetail;
+      int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV, apiVersion))
+      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
       }
@@ -3403,6 +3405,9 @@ void processContextElement
         // one item, so it should be safe to get item 0
         //
         ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");
+
+        notifyCerP->contextElement.creDate = now;
+        notifyCerP->contextElement.modDate = now;
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);

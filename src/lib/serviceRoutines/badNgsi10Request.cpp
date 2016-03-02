@@ -53,7 +53,6 @@ std::string badNgsi10Request
 
   alarmMgr.badInput(clientIp, details);
   answer = restErrorReplyGet(ciP,
-                             ciP->outFormat,
                              "",
                              ciP->payloadWord,
                              SccBadRequest,

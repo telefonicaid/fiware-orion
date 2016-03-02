@@ -42,7 +42,6 @@
 std::string RegistrationId::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -117,7 +116,7 @@ void RegistrationId::present(const std::string& indent)
 *
 * RegistrationId::render -
 */
-std::string RegistrationId::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string RegistrationId::render(RequestType requestType, const std::string& indent, bool comma)
 {
   if (string == "")
   {
@@ -132,7 +131,7 @@ std::string RegistrationId::render(RequestType requestType, Format format, const
     }
   }
 
-  return valueTag(indent, "registrationId", string, format, comma);
+  return valueTag1(indent, "registrationId", string, comma);
 }
 
 

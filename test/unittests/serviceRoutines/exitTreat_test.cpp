@@ -53,8 +53,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * error - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(exitTreat, error)
+TEST(exitTreat, DISABLED_error)
 {
   ConnectionInfo ci1("/exit",  "GET", "1.1");
   ConnectionInfo ci2("/exit/nadadenada",  "GET", "1.1");

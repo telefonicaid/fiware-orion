@@ -50,15 +50,14 @@
 *
 * TAG_ADD - 
 */
-#define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, true)
-#define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outFormat, true)
+#define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outtrue)
+#define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outtrue)
 #define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outFormat, comma)
 
 
 static void resetStatistics(void)
 {
   noOfJsonRequests                                = -1;
-  noOfXmlRequests                                 = -1;
   noOfRegistrations                               = -1;
   noOfRegistrationErrors                          = -1;
   noOfRegistrationUpdates                         = -1;
@@ -159,8 +158,7 @@ std::string renderCounterStats(void)
 {
   JsonHelper js;
 
-  // FIXME: try to chose names closer to the ones used in API URLs
-  renderUsedCounter(&js, "xmlRequests",                               noOfXmlRequests);
+  // FIXME: try to chose names closer to the ones used in API URLs  
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
   renderUsedCounter(&js, "registrations",                             noOfRegistrations);
   renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
@@ -266,20 +264,6 @@ std::string renderNotifQueueStats(void)
   return jh.str();
 }
 
-/* ****************************************************************************
-*
-* xmlUseError -
-*/
-static std::string xmlUseError(void)
-{
-  std::string out = "";
-
-  out += startTag("", "orion", "", XML, false, false, false);
-  out += valueTag("  ", "message", "XML not supported in statistics operations, use JSON", XML);
-  out += endTag("", "orion", XML, false, false, true, false);
-
-  return out;
-}
 
 /* ****************************************************************************
 *
@@ -293,10 +277,6 @@ std::string statisticsTreat
   ParseData*                 parseDataP
 )
 {
-  if (ciP->outFormat == XML)
-  {
-    return xmlUseError();
-  }
 
   JsonHelper js;
 
@@ -354,10 +334,6 @@ std::string statisticsCacheTreat
   ParseData*                 parseDataP
 )
 {
-  if (ciP->outFormat == XML)
-  {
-    return xmlUseError();
-  }
 
   JsonHelper js;
 

@@ -62,16 +62,16 @@ NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
 *
 * NotifyContextResponse::render -
 */
-std::string NotifyContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string NotifyContextResponse::render(RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextResponse";
 
-  responseCode.tagSet("responseCode");
+  responseCode.keyNameSet("responseCode");
 
-  out += startTag(indent, tag, format, false);
-  out += responseCode.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += startTag1(indent, tag, false);
+  out += responseCode.render(indent + "  ");
+  out += endTag(indent);
 
   return out;
 }

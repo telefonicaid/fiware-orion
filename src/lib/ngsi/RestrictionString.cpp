@@ -41,7 +41,6 @@
 std::string RestrictionString::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -109,14 +108,14 @@ void RestrictionString::present(const std::string& indent)
 *
 * RestrictionString::render -
 */
-std::string RestrictionString::render(Format format, const std::string& indent, bool comma)
+std::string RestrictionString::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "restriction", string, format, comma);
+  return valueTag1(indent, "restriction", string, comma);
 }
 
 

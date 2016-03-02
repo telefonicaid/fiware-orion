@@ -29,8 +29,6 @@
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "xmlParse/xmlRequest.h"
-#include "xmlParse/xmlParse.h"
 #include "jsonParse/jsonRequest.h"
 
 #include "ngsi/SubscriptionId.h"
@@ -43,8 +41,10 @@
 /* ****************************************************************************
 *
 * constructorsAndCheck -
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
+TEST(UnsubscribeContextAvailabilityRequest, DISABLED_constructorAndCheck)
 {
   UnsubscribeContextAvailabilityRequest ucar1;
   SubscriptionId                        subId("012345678901234567890123");
@@ -59,48 +59,17 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
   const char*   outfile1 = "ngsi9.unsubscribeContextAvailabilityResponse.forcedError.valid.xml";
   const char*   outfile2 = "ngsi9.unsubscribeContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
 
-  out = ucar1.check(UnsubscribeContextAvailability, XML, "", "Forced Error", 0);
+  out = ucar1.check(UnsubscribeContextAvailability, "", "Forced Error", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucar1.subscriptionId.set("1");
-  out = ucar1.check(UnsubscribeContextAvailability, XML, "", "", 0);
+  out = ucar1.check(UnsubscribeContextAvailability, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = ucar2.check(UnsubscribeContextAvailability, XML, "", "", 0);
+  out = ucar2.check(UnsubscribeContextAvailability, "", "", 0);
   EXPECT_EQ("OK", out);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* badSubscriptionId_xml - 
-*/
-TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_xml)
-{
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile  = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionId.invalid.xml";
-  const char*     outfile = "ngsi9.unsubscribeContextAvailabilityResponse.invalidSubscriptionId2.valid.xml";
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  out = xmlTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, "unsubscribeContextAvailabilityRequest", NULL);
-  lmTraceLevelSet(LmtDump, false);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  UnsubscribeContextAvailabilityRequest*  ucarP = &reqData.ucar.res;
-  
-  ucarP->release();
 
   utExit();
 }

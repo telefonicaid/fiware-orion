@@ -61,76 +61,55 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * The rest of the tests are for updates in NotifyConditions and mirror the ones used in
 * mongoSubscribeContext_test.
 *
-* - Ent1_Attr0_T1_C0
-* - Ent1_Attr0_T1_C0_JSON
-* - Ent1_AttrN_T1_C0
-* - Ent1_Attr0_TN_C0
-* - Ent1_AttrN_TN_C0
-* - Ent1_Attr0_T0_C1
-* - Ent1_AttrN_T0_C1
-* - Ent1_Attr0_T0_CN
-* - Ent1_Attr0_T0_CNbis
-* - Ent1_AttrN_T0_CN
-* - Ent1_AttrN_T0_CNbis
-* - Ent1_Attr0_TN_CN
-* - Ent1_Attr0_TN_CNbis
-* - Ent1_AttrN_TN_CN
-* - Ent1_AttrN_TN_CNbis
-* - EntN_Attr0_T1_C0
-* - EntN_AttrN_T1_C0
-* - EntN_Attr0_TN_C0
-* - EntN_AttrN_TN_C0
-* - EntN_Attr0_T0_C1
-* - EntN_AttrN_T0_C1
-* - EntN_Attr0_T0_CN
-* - EntN_Attr0_T0_CNbis
-* - EntN_AttrN_T0_CN
-* - EntN_AttrN_T0_CNbis
-* - EntN_AttrN_T0_CN
-* - EntN_AttrN_T0_CNbis
-* - EntN_AttrN_TN_CN
-* - EntN_AttrN_TN_CNbis
+* - Ent1_Attr0_C1
+* - Ent1_AttrN_C1
+* - Ent1_Attr0_CN
+* - Ent1_Attr0_CNbis
+* - Ent1_AttrN_CN
+* - Ent1_AttrN_CNbis
+* - EntN_Attr0_C0
+* - EntN_AttrN_C0
+* - EntN_Attr0_C0
+* - EntN_AttrN_C0
+* - EntN_Attr0_C1
+* - EntN_AttrN_C1
+* - EntN_Attr0_CN
+* - EntN_Attr0_CNbis
+* - EntN_AttrN_CN
+* - EntN_AttrN_CNbis
 *
-* (T: ONTIMEINTERVAL)
 * (C: ONCHANGE)
 *
-* Test matching entities/attributes (with 1 condition, both ONCHANGE and ONINTERVAL). Some
+* Test matching entities/attributes (with 1 condition). Some
 * of this tests take into account type. The _partial tests are variant of _CN in which
 * only one of the condValues match the attributes in the entity. The _disjoint tests are
 * valiants of _AttrN_ in which the attribute in the condValue belong to the entity, but
 * it is not include in the N attributes to be returned.
 *
-* - matchEnt1_Attr0_T0_C1
-* - matchEnt1_Attr0_T0_C1_JSON
-* - matchEnt1_AttrN_T0_C1
-* - matchEnt1_AttrN_T0_C1_disjoint
-* - matchEnt1NoType_AttrN_T0_C1
-* - matchEnt1NoType_AttrN_T0_C1_disjoint
-* - matchEnt1Pattern_AttrN_T0_C1
-* - matchEnt1Pattern_AttrN_T0_C1_disjoint
-* - matchEnt1PatternNoType_AttrN_T0_C1
-* - matchEnt1PatternNoType_AttrN_T0_C1_disjoint
-* - matchEnt1_Attr0_T0_CN
-* - matchEnt1_Attr0_T0_CN_partial
-* - matchEnt1_Attr0_T0_CNbis
-* - matchEnt1_AttrN_T0_CN_disjoint
-* - matchEnt1_AttrN_T0_CN_partial
-* - matchEnt1_AttrN_T0_CN_partial_disjoint
-* - matchEnt1_AttrN_T0_CNbis
-* - matchEnt1_Attr0_TN_CN
-* - matchEnt1_Attr0_TN_CNbis
-* - matchEnt1_AttrN_TN_CN
-* - matchEnt1_AttrN_TN_CNbis
-* - matchEntN_Attr0_T0_C1
-* - matchEntN_AttrN_T0_C1
-* - matchEntN_Attr0_T0_CN
-* - matchEntN_Attr0_T0_CNbis
-* - matchEntN_AttrN_T0_CN
-* - matchEntN_AttrN_T0_CNbis
-* - matchEntN_Attr0_TN_CN
-* - matchEntN_Attr0_TN_CNbis
-* - matchEntN_AttrN_TN_CN
-* - matchEntN_AttrN_TN_CNbis
+* - matchEnt1_Attr0_C1
+* - matchEnt1_Attr0_C1_JSON
+* - matchEnt1_AttrN_C1
+* - matchEnt1_AttrN_C1_disjoint
+* - matchEnt1NoType_AttrN_C1
+* - matchEnt1NoType_AttrN_C1_disjoint
+* - matchEnt1Pattern_AttrN_C1
+* - matchEnt1Pattern_AttrN_C1_disjoint
+* - matchEnt1PatternNoType_AttrN_C1
+* - matchEnt1PatternNoType_AttrN_C1_disjoint
+* - matchEnt1_Attr0_CN
+* - matchEnt1_Attr0_CN_partial
+* - matchEnt1_Attr0_CNbis
+* - matchEnt1_AttrN_CN_disjoint
+* - matchEnt1_AttrN_CN_partial
+* - matchEnt1_AttrN_CN_partial_disjoint
+* - matchEnt1_AttrN_CNbis
+* - matchEnt1_AttrN_CN
+* - matchEntN_Attr0_C1
+* - matchEntN_AttrN_C1
+* - matchEntN_Attr0_CN
+* - matchEntN_Attr0_CNbis
+* - matchEntN_AttrN_CN
+* - matchEntN_AttrN_CNbis
 *
 * Next we have tests that mix updates in several fields in the same request:
 *
@@ -152,12 +131,8 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 * - NotifyCondtions MUST not be 0 (OMA spec cardinallity allows this, but for us is an error)
 * - Duration MUST be included (our policy is so)
-* - ONTIMEINTERVAL condValues MUST be exactly 1
 * - ONCHANGE condValues MUST be 1 or more
-* - ONVALUE condValues MUST be 0
-* - Restiction MUST be ommited in ONTIMEINTERVAL and ONCHANGE case
-*
-* FIXME: we are not taking into account ONVALUE by the moment
+* - Restiction MUST be ommited
 *
 */
 
@@ -243,10 +218,6 @@ static void prepareDatabase(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 100
                                                        ))
                         );
 
@@ -254,16 +225,12 @@ static void prepareDatabase(void) {
                         "expiration" << 20000000 <<
                         "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 200
                                                        ))
                         );
 
@@ -272,16 +239,12 @@ static void prepareDatabase(void) {
                         "expiration" << 20000000 <<
                         "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 200
                                                        ))
                         );
 
@@ -289,17 +252,13 @@ static void prepareDatabase(void) {
                         "expiration" << 30000000 <<
                         "lastNotification" << 35000000 <<
                         "reference" << "http://notify3.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX3" << "AY3")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 300
                                                        ))
                         );
 
@@ -307,17 +266,13 @@ static void prepareDatabase(void) {
                         "expiration" << 40000000 <<
                         "lastNotification" << 45000000 <<
                         "reference" << "http://notify4.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX4" << "AY4")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 400
                                                        ))
                         );
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
@@ -325,16 +280,12 @@ static void prepareDatabase(void) {
                         "lastNotification" << 55000000 <<
                         "throttling" << 10 <<
                         "reference" << "http://notify5.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX5" << "AY5")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 500
                                                        ))
                         );
 
@@ -440,10 +391,6 @@ static void prepareDatabasePatternTrue(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 100
                                                        ))
                         );
 
@@ -456,10 +403,6 @@ static void prepareDatabasePatternTrue(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 200
                                                        ))
                         );
 
@@ -473,10 +416,6 @@ static void prepareDatabasePatternTrue(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 200
                                                        ))
                         );
 
@@ -490,10 +429,6 @@ static void prepareDatabasePatternTrue(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX3" << "AY3")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 300
                                                        ))
                         );
 
@@ -507,10 +442,6 @@ static void prepareDatabasePatternTrue(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX4" << "AY4")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 400
                                                        ))
                         );
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
@@ -523,10 +454,6 @@ static void prepareDatabasePatternTrue(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX5" << "AY5")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 500
                                                        ))
                         );
 
@@ -557,11 +484,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -573,7 +496,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -600,11 +523,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -622,7 +541,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     /* Invoke the function in mongoBackend library */
     std::string tenant      = "";
     std::string servicePath = "";
-    ms = mongoUpdateContextSubscription(&req, &res, XML, tenant, servicePath, emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, tenant, servicePath, emptyServicePathV);
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
@@ -648,7 +567,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
 
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -661,17 +580,14 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
+    ASSERT_EQ(1, conds.size());
+    BSONObj cond = conds[0].embeddedObject();
+    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond, "type"));
 
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
+    std::vector<BSONElement> condValues = cond.getField("value").Array();
     ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("AX1", condValues[0].String());
     EXPECT_EQ("AY1", condValues[1].String());
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(100, cond1.getIntField("value"));
 
     /* Release mock */
     delete notifierMock;
@@ -704,11 +620,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);    
 
@@ -720,7 +632,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -745,7 +657,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     EXPECT_EQ(55000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(4, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -758,16 +670,13 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     EXPECT_EQ(0, attrs.size());
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
+    ASSERT_EQ(1, conds.size());
+    BSONObj cond = conds[0].embeddedObject();
+    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond, "type"));
+    std::vector<BSONElement> condValues = cond.getField("value").Array();
     ASSERT_EQ(2, condValues.size());
     EXPECT_EQ("AX5", condValues[0].String());
     EXPECT_EQ("AY5", condValues[1].String());
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(500, cond1.getIntField("value"));
 
     /* Release mock */
     delete notifierMock;
@@ -787,11 +696,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -803,7 +708,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -828,92 +733,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     EXPECT_EQ(55000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
-    std::vector<BSONElement> condValues = cond0.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("AX5", condValues[0].String());
-    EXPECT_EQ("AY5", condValues[1].String());
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(500, cond1.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_Attr0_T1_C0 -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860001");
-    NotifyCondition nc;
-    nc.type = "ONTIMEINTERVAL";
-    nc.condValueList.push_back("PT1M");
-    req.notifyConditionVector.push_back(&nc);
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-
-    EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
-    EXPECT_EQ(60, sub.getIntField("throttling"));
-    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -927,47 +747,51 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
+    BSONObj cond = conds[0].embeddedObject();
+    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond, "type"));
+    std::vector<BSONElement> condValues = cond.getField("value").Array();
+    ASSERT_EQ(2, condValues.size());
+    EXPECT_EQ("AX5", condValues[0].String());
+    EXPECT_EQ("AY5", condValues[1].String());
 
     /* Release mock */
     delete notifierMock;
 }
 
+
+
 /* ****************************************************************************
 *
-* Ent1_Attr0_T1_C0_JSON -
+* Ent1_Attr0_C1 -
 */
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
+TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
 {
-
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
     setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
+    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
     NotifyCondition nc;
-    nc.type = "ONTIMEINTERVAL";
-    nc.condValueList.push_back("PT1M");
-    req.notifyConditionVector.push_back(&nc);
+    nc.type = "ONCHANGE";
+    nc.condValueList.push_back("A10");
+    req.notifyConditionVector.push_back(&nc);    
 
     /* Prepare database */
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, JSON, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -993,345 +817,6 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_AttrN_T1_C0 -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_AttrN_T1_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860002");
-    NotifyCondition nc;
-    nc.type = "ONTIMEINTERVAL";
-    nc.condValueList.push_back("PT1M");
-    req.notifyConditionVector.push_back(&nc);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
-    EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_Attr0_TN_C0 -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860001");
-    NotifyCondition nc1, nc2;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-
-    EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
-    EXPECT_EQ(60, sub.getIntField("throttling"));
-    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_AttrN_TN_C0 -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860002");
-    NotifyCondition nc1, nc2;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
-    EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));    
-
-    /* Release mock */
-    delete notifierMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_Attr0_T0_C1 -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
-{
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860001");
-    NotifyCondition nc;
-    nc.type = "ONCHANGE";
-    nc.condValueList.push_back("A10");
-    req.notifyConditionVector.push_back(&nc);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-
-    EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
-    EXPECT_EQ(60, sub.getIntField("throttling"));
-    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1358,9 +843,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
 
 /* ****************************************************************************
 *
-* Ent1_AttrN_T0_C1 -
+* Ent1_AttrN_C1 -
 */
-TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
+TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
 {
 
     HttpStatusCode                    ms;
@@ -1369,11 +854,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1393,7 +874,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1418,7 +899,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1447,9 +928,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
 
 /* ****************************************************************************
 *
-* Ent1_Attr0_T0_CN -
+* Ent1_Attr0_CN -
 */
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
+TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
@@ -1457,11 +938,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1484,7 +961,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1509,7 +986,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     EXPECT_EQ(15000000, sub.getField("lastNotification").Long());  // No notification attempt should have been made
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1542,9 +1019,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
 
 /* ****************************************************************************
 *
-* Ent1_Attr0_T0_CNbis -
+* Ent1_Attr0_CNbis -
 */
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
+TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
 {
 
     HttpStatusCode                    ms;
@@ -1553,11 +1030,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1578,7 +1051,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1603,7 +1076,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1631,9 +1104,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
 
 /* ****************************************************************************
 *
-*  Ent1_AttrN_T0_CN -
+*  Ent1_AttrN_CN -
 */
-TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
+TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
 {
 
     HttpStatusCode                    ms;
@@ -1642,11 +1115,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1670,7 +1139,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1695,7 +1164,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1730,9 +1199,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
 
 /* ****************************************************************************
 *
-* Ent1_AttrN_T0_CNbis -
+* Ent1_AttrN_CNbis -
 */
-TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
+TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
 {
 
     HttpStatusCode                    ms;
@@ -1741,11 +1210,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1766,7 +1231,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1791,7 +1256,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1819,11 +1284,13 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     delete timerMock;
 }
 
+
+
 /* ****************************************************************************
 *
-*  Ent1_Attr0_TN_CN -
+* EntN_Attr0_C1 -
 */
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
+TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
 {
 
     HttpStatusCode                    ms;
@@ -1832,817 +1299,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860001");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc4.type = "ONCHANGE";
-    nc4.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);   
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-
-    EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
-    EXPECT_EQ(60, sub.getIntField("throttling"));
-    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_Attr0_TN_CNbis -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860001");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc3.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-
-    EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
-    EXPECT_EQ(60, sub.getIntField("throttling"));
-    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_AttrN_TN_CN -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860002");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc4.type = "ONCHANGE";
-    nc4.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
-    EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* Ent1_AttrN_TN_CNbis -
-*/
-TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860002");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc3.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
-    EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* EntN_Attr0_T1_C0 -
-*/
-TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860003");
-    NotifyCondition nc;
-    nc.type = "ONTIMEINTERVAL";
-    nc.condValueList.push_back("PT1M");
-    req.notifyConditionVector.push_back(&nc);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
-
-    EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
-    EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* EntN_AttrN_T1_C0 -
-*/
-TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860004");
-    NotifyCondition nc;
-    nc.type = "ONTIMEINTERVAL";
-    nc.condValueList.push_back("PT1M");
-    req.notifyConditionVector.push_back(&nc);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
-
-    EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
-    EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(1, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* EntN_Attr0_TN_C0 -
-*/
-TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860003");
-    NotifyCondition nc1, nc2;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
-
-    EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
-    EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* EntN_AttrN_TN_C0 -
-*/
-TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860004");
-    NotifyCondition nc1, nc2;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
-
-    EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
-    EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(2, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-
-    /* Release mock */
-    delete notifierMock;
-    delete timerMock;
-}
-
-/* ****************************************************************************
-*
-* EntN_Attr0_T0_C1 -
-*/
-TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2662,7 +1319,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2687,7 +1344,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
     EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -2718,9 +1375,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
 
 /* ****************************************************************************
 *
-* EntN_AttrN_T0_C1 -
+* EntN_AttrN_C1 -
 */
-TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
+TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
 {
 
     HttpStatusCode                    ms;
@@ -2729,11 +1386,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2753,7 +1406,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2778,7 +1431,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
     EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -2811,9 +1464,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
 
 /* ****************************************************************************
 *
-* EntN_Attr0_T0_CN -
+* EntN_Attr0_CN -
 */
-TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
+TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
 {
 
     HttpStatusCode                    ms;
@@ -2822,11 +1475,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2849,7 +1498,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2874,7 +1523,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
     EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -2911,9 +1560,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
 
 /* ****************************************************************************
 *
-* EntN_Attr0_T0_CNbis -
+* EntN_Attr0_CNbis -
 */
-TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
+TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
@@ -2923,11 +1572,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2943,7 +1588,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2968,7 +1613,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3001,9 +1646,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
 
 /* ****************************************************************************
 *
-* EntN_AttrN_T0_CN -
+* EntN_AttrN_CN -
 */
-TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
+TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
 {
 
     HttpStatusCode                    ms;
@@ -3014,11 +1659,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3036,7 +1677,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3061,7 +1702,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3101,9 +1742,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
 
 /* ****************************************************************************
 *
-* EntN_AttrN_T0_CNbis -
+* EntN_AttrN_CNbis -
 */
-TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
+TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
@@ -3113,11 +1754,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3133,7 +1770,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3158,7 +1795,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3191,451 +1828,13 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     utExit();
 }
 
-/* ****************************************************************************
-*
-*  EntN_Attr0_TN_CN -
-*/
-TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
-{
 
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860003");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc4.type = "ONCHANGE";
-    nc4.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
-
-    EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
-    EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
 
 /* ****************************************************************************
 *
-* EntN_Attr0_TN_CNbis -
+* matchEnt1_Attr0_C1 -
 */
-TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860003");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc3.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
-
-    EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
-    EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();    
-}
-
-/* ****************************************************************************
-*
-* EntN_AttrN_TN_CN -
-*/
-TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860004");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc4.type = "ONCHANGE";
-    nc4.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
-
-    EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
-    EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A20", condValues[0].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* EntN_AttrN_TN_CNbis -
-*/
-TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860004");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A10");
-    nc3.condValueList.push_back("A20");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
-
-    EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
-    EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A10", condValues[0].String());
-    EXPECT_EQ("A20", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* matchEnt1_Attr0_T0_C1 -
-*/
-TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
+TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
 {  
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
@@ -3657,12 +1856,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3676,7 +1871,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3701,7 +1896,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3730,9 +1925,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
 
 /* ****************************************************************************
 *
-* matchEnt1_Attr0_T0_C1_JSON -
+* matchEnt1_Attr0_C1_JSON -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
+TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
 {
 
     HttpStatusCode                    ms;
@@ -3755,12 +1950,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3774,7 +1965,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, JSON, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3827,9 +2018,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
 
 /* ****************************************************************************
 *
-* matchEnt1_AttrN_T0_C1 -
+* matchEnt1_AttrN_C1 -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
+TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
 {
 
     HttpStatusCode                    ms;
@@ -3850,12 +2041,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3869,7 +2056,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3894,7 +2081,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3924,9 +2111,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
 
 /* ****************************************************************************
 *
-* matchEnt1_AttrN_T0_C1_disjoint -
+* matchEnt1_AttrN_C1_disjoint -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
+TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
@@ -3946,12 +2133,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -3965,7 +2148,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3990,7 +2173,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4020,9 +2203,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
 
 /* ****************************************************************************
 *
-* matchEnt1NoType_AttrN_T0_C1 -
+* matchEnt1NoType_AttrN_C1 -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
+TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
 {
 
     HttpStatusCode                    ms;
@@ -4057,12 +2240,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4076,7 +2255,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4101,7 +2280,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4131,9 +2310,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
 
 /* ****************************************************************************
 *
-* matchEnt1NoType_AttrN_T0_C1_disjoint -
+* matchEnt1NoType_AttrN_C1_disjoint -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
+TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
 {
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
@@ -4167,12 +2346,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4186,7 +2361,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4211,7 +2386,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4241,9 +2416,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
 
 /* ****************************************************************************
 *
-* matchEnt1Pattern_AttrN_T0_C1 -
+* matchEnt1Pattern_AttrN_C1 -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
+TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
 {
 
     HttpStatusCode                    ms;
@@ -4271,12 +2446,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4290,7 +2461,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4315,7 +2486,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4345,9 +2516,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
 
 /* ****************************************************************************
 *
-* matchEnt1Pattern_AttrN_T0_C1_disjoint -
+* matchEnt1Pattern_AttrN_C1_disjoint -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
+TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
 {
 
     HttpStatusCode                    ms;
@@ -4375,12 +2546,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4394,7 +2561,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4419,7 +2586,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4449,9 +2616,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
 
 /* ****************************************************************************
 *
-* matchEnt1PatternNoType_AttrN_T0_C1 -
+* matchEnt1PatternNoType_AttrN_C1 -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
+TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
 {
 
     HttpStatusCode                    ms;
@@ -4491,12 +2658,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4510,7 +2673,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4535,7 +2698,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4565,9 +2728,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
 
 /* ****************************************************************************
 *
-* matchEnt1PatternNoType_AttrN_T0_C1_disjoint -
+* matchEnt1PatternNoType_AttrN_C1_disjoint -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint)
+TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
 {
 
     HttpStatusCode                    ms;
@@ -4607,12 +2770,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4626,7 +2785,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4651,7 +2810,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4681,9 +2840,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
 
 /* ****************************************************************************
 *
-* matchEnt1_Attr0_T0_CN -
+* matchEnt1_Attr0_CN -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
+TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
 {
 
     HttpStatusCode                    ms;
@@ -4706,12 +2865,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4728,7 +2883,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4753,7 +2908,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4787,9 +2942,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
 
 /* ****************************************************************************
 *
-* matchEnt1_Attr0_T0_CN_partial -
+* matchEnt1_Attr0_CN_partial -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
+TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
 {
 
     HttpStatusCode                    ms;
@@ -4812,12 +2967,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4834,7 +2985,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4859,7 +3010,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4894,9 +3045,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
 
 /* ****************************************************************************
 *
-* matchEnt1_Attr0_T0_CNbis -
+* matchEnt1_Attr0_CNbis -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
+TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
 {
 
     HttpStatusCode                    ms;
@@ -4919,12 +3070,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -4939,7 +3086,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4964,7 +3111,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4993,9 +3140,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
 
 /* ****************************************************************************
 *
-*  matchEnt1_AttrN_T0_CN_disjoint -
+*  matchEnt1_AttrN_CN_disjoint -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
+TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
 {
 
     HttpStatusCode                    ms;
@@ -5016,12 +3163,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -5038,7 +3181,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5063,7 +3206,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -5099,9 +3242,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
 
 /* ****************************************************************************
 *
-*  matchEnt1_AttrN_T0_CN_partial -
+*  matchEnt1_AttrN_CN_partial -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
+TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
 {
 
     HttpStatusCode                    ms;
@@ -5122,12 +3265,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -5144,7 +3283,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5169,7 +3308,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -5205,9 +3344,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
 
 /* ****************************************************************************
 *
-*  matchEnt1_AttrN_T0_CN_partial_disjoint -
+*  matchEnt1_AttrN_CN_partial_disjoint -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
+TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
 {
 
     HttpStatusCode                    ms;
@@ -5228,12 +3367,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -5250,7 +3385,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5275,7 +3410,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -5311,9 +3446,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
 
 /* ****************************************************************************
 *
-* matchEnt1_AttrN_T0_CNbis -
+* matchEnt1_AttrN_CNbis -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
+TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
 {
 
     HttpStatusCode                    ms;
@@ -5334,12 +3469,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -5354,7 +3485,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5379,7 +3510,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -5408,244 +3539,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     utExit();
 }
 
-/* ****************************************************************************
-*
-*  matchEnt1_Attr0_TN_CN -
-*/
-TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
-{
 
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifyContextRequest expectedNcr;
-    expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
-
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
-            .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860001");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A1");
-    nc4.type = "ONCHANGE";
-    nc4.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-
-    EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
-    EXPECT_EQ(60, sub.getIntField("throttling"));
-    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
 
 /* ****************************************************************************
 *
-* matchEnt1_Attr0_TN_CNbis -
+* matchEnt1_AttrN_CN -
 */
-TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifyContextRequest expectedNcr;
-    expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
-
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860001");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A1");
-    nc3.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-
-    EXPECT_EQ("51307b66f481db11bf860001", sub.getField("_id").OID().toString());
-    EXPECT_EQ(10000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
-    EXPECT_EQ(60, sub.getIntField("throttling"));
-    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* matchEnt1_AttrN_TN_CN -
-*/
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
+TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
 {
 
     HttpStatusCode                    ms;
@@ -5666,29 +3566,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
-            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
+    NotifyCondition nc3, nc4;
     nc3.type = "ONCHANGE";
     nc3.condValueList.push_back("A1");
     nc4.type = "ONCHANGE";
     nc4.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
     req.notifyConditionVector.push_back(&nc3);
     req.notifyConditionVector.push_back(&nc4);    
 
@@ -5696,7 +3584,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5721,7 +3609,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -5737,21 +3625,15 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
 
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
+    ASSERT_EQ(2, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
     BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
+    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
+    condValues = cond0.getField("value").Array();
     ASSERT_EQ(1, condValues.size());
     EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
+    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond1, "type"));
+    condValues = cond1.getField("value").Array();
     ASSERT_EQ(1, condValues.size());
     EXPECT_EQ("A2", condValues[0].String());
 
@@ -5761,124 +3643,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     utExit();
 }
 
-/* ****************************************************************************
-*
-* matchEnt1_AttrN_TN_CNbis -
-*/
-TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
-{
 
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifyContextRequest expectedNcr;
-    expectedNcr.originator.set("localhost");
-    ContextElementResponse cer;
-    cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer);
-
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860002");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A1");
-    nc3.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
-    EXPECT_EQ(20000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(1, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
 
 /* ****************************************************************************
 *
-* matchEntN_Attr0_T0_C1 -
+* matchEntN_Attr0_C1 -
 */
-TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
+TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
 {
 
     HttpStatusCode                    ms;
@@ -5909,12 +3680,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -5928,7 +3695,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5953,7 +3720,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -5985,9 +3752,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
 
 /* ****************************************************************************
 *
-* matchEntN_AttrN_T0_C1 -
+* matchEntN_AttrN_C1 -
 */
-TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
+TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
 {
 
     HttpStatusCode                    ms;
@@ -6014,12 +3781,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -6033,7 +3796,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6058,7 +3821,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -6092,9 +3855,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
 
 /* ****************************************************************************
 *
-* matchEntN_Attr0_T0_CN -
+* matchEntN_Attr0_CN -
 */
-TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
+TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
 {
 
     HttpStatusCode                    ms;
@@ -6125,12 +3888,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -6147,7 +3906,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6172,7 +3931,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -6210,9 +3969,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
 
 /* ****************************************************************************
 *
-* matchEntN_Attr0_T0_CNbis -
+* matchEntN_Attr0_CNbis -
 */
-TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
+TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
 {
 
     HttpStatusCode                    ms;
@@ -6243,12 +4002,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -6263,7 +4018,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6288,7 +4043,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -6321,9 +4076,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
 
 /* ****************************************************************************
 *
-* matchEntN_AttrN_T0_CN -
+* matchEntN_AttrN_CN -
 */
-TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
+TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
 {
 
     HttpStatusCode                    ms;
@@ -6350,12 +4105,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -6372,7 +4123,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6397,7 +4148,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -6437,9 +4188,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
 
 /* ****************************************************************************
 *
-* matchEntN_AttrN_T0_CNbis -
+* matchEntN_AttrN_CNbis -
 */
-TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
+TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
 {
 
     HttpStatusCode                    ms;
@@ -6464,12 +4215,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -6484,7 +4231,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6509,7 +4256,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -6542,507 +4289,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     utExit();
 }
 
-/* ****************************************************************************
-*
-*  matchEntN_Attr0_TN_CN -
-*/
-TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
-{
 
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifyContextRequest expectedNcr;
-    expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    ContextAttribute ca5("A3", "TA3", "S");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
-            .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860003");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A1");
-    nc4.type = "ONCHANGE";
-    nc4.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
-
-    EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
-    EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* matchEntN_Attr0_TN_CNbis -
-*/
-TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifyContextRequest expectedNcr;
-    expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    ContextAttribute ca3("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    ContextAttribute ca5("A3", "TA3", "S");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860003");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A1");
-    nc3.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
-
-    EXPECT_EQ("51307b66f481db11bf860003", sub.getField("_id").OID().toString());
-    EXPECT_EQ(30000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    EXPECT_EQ(0, attrs.size());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* matchEntN_AttrN_TN_CN -
-*/
-TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifyContextRequest expectedNcr;
-    expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
-            .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860004");
-    NotifyCondition nc1, nc2, nc3, nc4;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A1");
-    nc4.type = "ONCHANGE";
-    nc4.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);
-    req.notifyConditionVector.push_back(&nc4);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
-
-    EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
-    EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    std::vector<BSONElement> condValues;
-    ASSERT_EQ(4, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    BSONObj cond3 = conds[3].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    condValues = cond2.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond3, "type"));
-    condValues = cond3.getField("value").Array();
-    ASSERT_EQ(1, condValues.size());
-    EXPECT_EQ("A2", condValues[0].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
-
-/* ****************************************************************************
-*
-* matcnEntN_AttrN_TN_CNbis -
-*/
-TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
-{
-
-    HttpStatusCode                    ms;
-    UpdateContextSubscriptionRequest  req;
-    UpdateContextSubscriptionResponse res;
-
-    utInit();
-
-    /* Prepare mock */
-    NotifyContextRequest expectedNcr;
-    expectedNcr.originator.set("localhost");
-    ContextElementResponse cer1, cer2;
-    cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");    
-    ContextAttribute ca2("A2", "TA2", "Z");
-    cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);    
-    expectedNcr.contextElementResponseVector.push_back(&cer1);
-    cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca3);
-    expectedNcr.contextElementResponseVector.push_back(&cer2);
-
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
-            .Times(1);
-    setNotifier(notifierMock);
-
-    /* Forge the request (from "inside" to "outside") */
-    req.subscriptionId.set("51307b66f481db11bf860004");
-    NotifyCondition nc1, nc2, nc3;
-    nc1.type = "ONTIMEINTERVAL";
-    nc1.condValueList.push_back("PT1M");
-    nc2.type = "ONTIMEINTERVAL";
-    nc2.condValueList.push_back("PT2M");
-    nc3.type = "ONCHANGE";
-    nc3.condValueList.push_back("A1");
-    nc3.condValueList.push_back("A2");
-    req.notifyConditionVector.push_back(&nc1);
-    req.notifyConditionVector.push_back(&nc2);
-    req.notifyConditionVector.push_back(&nc3);    
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-    EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
-    EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
-    EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
-    EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
-
-    /* Check database is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
-
-    EXPECT_EQ("51307b66f481db11bf860004", sub.getField("_id").OID().toString());
-    EXPECT_EQ(40000000, sub.getIntField("expiration"));
-    EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
-    EXPECT_FALSE(sub.hasField("throttling"));
-    EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
-
-    std::vector<BSONElement> entities = sub.getField("entities").Array();
-    ASSERT_EQ(2, entities.size());
-    BSONObj ent0 = entities[0].embeddedObject();
-    BSONObj ent1 = entities[1].embeddedObject();
-    EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent1, "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent1, "type"));
-    EXPECT_STREQ("false", C_STR_FIELD(ent1, "isPattern"));
-
-    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    EXPECT_EQ("A1", attrs[0].String());
-    EXPECT_EQ("A2", attrs[1].String());
-
-    std::vector<BSONElement> conds = sub.getField("conditions").Array();
-    ASSERT_EQ(3, conds.size());
-    BSONObj cond0 = conds[0].embeddedObject();
-    BSONObj cond1 = conds[1].embeddedObject();
-    BSONObj cond2 = conds[2].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond1, "type"));
-    EXPECT_EQ(120, cond1.getIntField("value"));
-    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond2, "type"));
-    std::vector<BSONElement> condValues = cond2.getField("value").Array();
-    ASSERT_EQ(2, condValues.size());
-    EXPECT_EQ("A1", condValues[0].String());
-    EXPECT_EQ("A2", condValues[1].String());
-
-    /* Release mock */
-    delete notifierMock;
-
-    utExit();
-}
 
 /* ****************************************************************************
 *
@@ -7058,19 +4305,15 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
-            .Times(1);
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
     NotifyCondition nc;
-    nc.type = "ONTIMEINTERVAL";
-    nc.condValueList.push_back("PT1M");
+    nc.type = "ONCHANGE";
+    nc.condValueList.push_back("A");
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT5H");
 
@@ -7078,7 +4321,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7103,7 +4346,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -7118,8 +4361,10 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     std::vector<BSONElement> conds = sub.getField("conditions").Array();
     ASSERT_EQ(1, conds.size());
     BSONObj cond0 = conds[0].embeddedObject();
-    EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
-    EXPECT_EQ(60, cond0.getIntField("value"));
+    EXPECT_STREQ("ONCHANGE", C_STR_FIELD(cond0, "type"));
+    std::vector<BSONElement> condValues = cond0.getField("value").Array();
+    ASSERT_EQ(1, condValues.size());
+    EXPECT_EQ("A", condValues[0].String());
 
     /* Release mock */
     delete notifierMock;
@@ -7145,13 +4390,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -7165,7 +4404,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7212,13 +4451,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
             .WillByDefault(Return(fakeSub));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);    
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -7237,7 +4470,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7245,7 +4478,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
-              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"\", conditions: [], lastNotification: 15000000, format: \"XML\" }> "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"\", conditions: [], lastNotification: 15000000, format: \"JSON\" }> "
               "- exception: boom!!)", res.subscribeError.errorCode.details);
 
     /* Restore real DB connection */

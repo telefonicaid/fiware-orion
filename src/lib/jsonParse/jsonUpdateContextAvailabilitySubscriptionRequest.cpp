@@ -295,7 +295,7 @@ void jsonUcasRelease(ParseData* reqDataP)
 std::string jsonUcasCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   std::string s;
-  s = reqData->ucas.res.check(ciP, SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
+  s = reqData->ucas.res.check(ciP, SubscribeContextAvailability, "", reqData->errorString, 0);
   return s;
 }
 

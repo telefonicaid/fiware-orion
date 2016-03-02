@@ -126,7 +126,7 @@ above. Similarly to attributes, each piece of metadata has
  * a **metadata type**, describing the NGSI value type of the metadata value
  * a **metadata value** containing the actual metadata
 
-Note that in NGSI it is not forseen that metadata values can
+Note that in NGSI it is not foreseen that metadata values can
 themselves have metadata.
 
 #### Restrictions and Operation Scopes
@@ -248,6 +248,8 @@ There are two representation modes, which must be supported by implementations, 
 ```
 [ 'Ford', 'black', 78.3 ]
 ```
+
+* *unique mode*. This mode is just like *values mode*, with the only difference that values are not repeated.
 
 ## Partial Representations
 
@@ -549,7 +551,7 @@ In the case of equal or unequal, if the value to match include a `,`, you can us
 (`'`), e.g: `color=='light,green','deep,blue'`.
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no operator at all.
-The unary statements are used in two situations to check for attribute existence. E.g. `temperature` matches entities that have
+The unary statements are used to check for attribute existence. E.g. `temperature` matches entities that have
 an attribute called 'temperature' (no matter its value), while `!temperature` matches entities that do not have
 a temperature attribute.
   
@@ -862,6 +864,8 @@ Response code:
           section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 + Response 200 (application/json)
 
@@ -980,6 +984,8 @@ Response:
           corresponding section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 + Response 200 (application/json)
 
@@ -1856,6 +1862,8 @@ Response code:
           section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 
 + Request (application/json)

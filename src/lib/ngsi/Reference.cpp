@@ -42,7 +42,6 @@
 std::string Reference::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -129,14 +128,14 @@ void Reference::present(const std::string& indent)
 *
 * Reference::render -
 */
-std::string Reference::render(Format format, const std::string& indent, bool comma)
+std::string Reference::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "reference", string, format, comma);
+  return valueTag1(indent, "reference", string, comma);
 }
 
 

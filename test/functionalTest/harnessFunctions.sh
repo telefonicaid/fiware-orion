@@ -1065,15 +1065,19 @@ function orionCurl()
 
       if [ "$payloadCheckFormat" == xml ] || [ "$payloadCheckFormat" == "" ]
       then
-        vMsg Running xmllint tool for $_response
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #vMsg Running xmllint tool for $_response
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       elif [ "$payloadCheckFormat" == json ]
       then
         vMsg Running python tool for $_response
         echo $_response | python -mjson.tool
       else
-        vMsg Running xmllint tool for $_response
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #vMsg Running xmllint tool for $_response
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       fi
     fi
   fi
@@ -1242,13 +1246,17 @@ function coapCurl()
     then
       if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
       then
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       elif [ "$_outFormat" == application/json ]
       then
         vMsg "JSON check for:" $_response
         echo $_response | python -mjson.tool
       else
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       fi
     fi
   fi

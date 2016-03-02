@@ -68,21 +68,26 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  std::string renderMode = "normalized";
+  std::string renderMode = RENDER_MODE_NORMALIZED;
 
-  if (ciP->uriParamOptions["keyValues"] == true)
+  if (ciP->uriParamOptions[OPT_KEY_VALUES] == true)
   {
-    renderMode = "keyValues";
+    renderMode = RENDER_MODE_KEY_VALUES;
   }
-  else if (ciP->uriParamOptions["values"]== true)
+  else if (ciP->uriParamOptions[OPT_VALUES] == true)
   {
-    renderMode = "values";
+    renderMode = RENDER_MODE_VALUES;
+  }
+  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)
+  {
+    renderMode = RENDER_MODE_UNIQUE_VALUES;
   }
 
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out;
-    if (renderMode == "values")
+
+    if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
     {
       out = "[";
       if (attributeVector.size() != 0)
@@ -169,7 +174,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
     return "Invalid characters in entity isPattern";
   }
 
-  return attributeVector.check(ciP, requestType, JSON, "", "", 0);
+  return attributeVector.check(ciP, requestType, "", "", 0);
 }
 
 

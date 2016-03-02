@@ -206,44 +206,37 @@ std::string jsonInvalidCharsTransformation(const std::string& input)
 
 /* ****************************************************************************
 *
-* startTag -  
+* startTag1 -
 */
-std::string startTag
+std::string startTag1
 (
   const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
-  bool                showTag,
+  const std::string&  key,
+  bool                showKey,
   bool                isToplevel
 )
 {
-  if (format == XML)
+
+  if (isToplevel)
   {
-    return indent + "<" + tagName + ">\n";
-  }
-  else if (format == JSON)
-  {
-    if (isToplevel)
+    if (showKey == false)
     {
-      if (showTag == false)
-      {
-        return indent + "{\n" + indent + "  {\n";
-      }
-      else
-      {
-        return indent + "{\n" + indent + "  " + "\"" + tagName + "\" : {\n";
-      }
+      return indent + "{\n" + indent + "  {\n";
     }
     else
     {
-      if (showTag == false)
-      {
-        return indent + "{\n";
-      }
-      else
-      {
-        return indent + "\"" + tagName + "\" : {\n";
-      }
+      return indent + "{\n" + indent + "  " + "\"" + key + "\" : {\n";
+    }
+  }
+  else
+  {
+    if (showKey == false)
+    {
+      return indent + "{\n";
+    }
+    else
+    {
+      return indent + "\"" + key + "\" : {\n";
     }
   }
 
@@ -254,46 +247,31 @@ std::string startTag
 
 /* ****************************************************************************
 *
-* startTag -  
+* startTag2 -
 */
-std::string startTag
+std::string startTag2
 (
   const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
-  Format              format,
+  const std::string&  key,
   bool                isVector,
-  bool                showTag,
-  bool                isCompoundVector
+  bool                showKey
 )
 {
-  if (format == XML)
+  if (isVector && showKey)
   {
-    if (isCompoundVector)
-    {
-      return indent + "<" + xmlTag + " type=\"vector\">\n";
-    }
-
-    return indent + "<" + xmlTag + ">\n";
+    return indent + "\"" + key + "\" : [\n";
   }
-  else if (format == JSON)
+  else if (isVector && !showKey)
   {
-    if (isVector && showTag)
-    {
-       return indent + "\"" + jsonTag + "\" : [\n";
-    }
-    else if (isVector && !showTag)
-    {
-      return indent + "[\n";
-    }
-    else if (!isVector && showTag)
-    {
-      return indent + "\"" + jsonTag + "\" : {\n";
-    }
-    else if (!isVector && !showTag)
-    {
-      return indent + "{\n";
-    }
+    return indent + "[\n";
+  }
+  else if (!isVector && showKey)
+  {
+    return indent + "\"" + key + "\" : {\n";
+  }
+  else if (!isVector && !showKey)
+  {
+    return indent + "{\n";
   }
 
   return "Format not supported";
@@ -308,18 +286,12 @@ std::string startTag
 std::string endTag
 (
   const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
   bool                comma,
   bool                isVector,
   bool                nl,
   bool                isToplevel
 )
 {
-  if (format == XML)
-  {
-    return indent + "</" + tagName + ">\n";
-  }
 
   if (isToplevel)
   {
@@ -343,12 +315,11 @@ std::string endTag
 * valueTag -  
 *
 */
-std::string valueTag
+std::string valueTag1
 (
   const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   const std::string&  unescapedValue,
-  Format              format,
   bool                showComma,
   bool                isVectorElement,
   bool                valueIsNumberOrBool
@@ -373,14 +344,6 @@ std::string valueTag
     return "ERROR: no memory";
   }
 
-  if (format == XML)
-  {
-    std::string out = indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
-
-    free(value);
-    return out;
-  }
-
   std::string effectiveValue = jsonInvalidCharsTransformation(value);
   free(value);
 
@@ -395,7 +358,7 @@ std::string valueTag
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + ",\n";
+      std::string out = indent + "\"" + key + "\" : " + effectiveValue + ",\n";
       return out;
     }
   }
@@ -408,7 +371,7 @@ std::string valueTag
     }
     else
     {
-      std::string out = indent + "\"" + tagName + "\" : " + effectiveValue + "\n";
+      std::string out = indent + "\"" + key + "\" : " + effectiveValue + "\n";
       return out;
     }
   }
@@ -422,9 +385,8 @@ std::string valueTag
 std::string valueTag
 (
   const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   int                 value,
-  Format              format,
   bool                showComma
 )
 {
@@ -432,17 +394,12 @@ std::string valueTag
 
   snprintf(val, sizeof(val), "%d", value);
 
-  if (format == XML)
-  {
-    return indent + "<" + tagName + ">" + val + "</" + tagName + ">" + "\n";
-  }
-
   if (showComma == true)
   {
-    return indent + "\"" + tagName + "\" : \"" + val + "\",\n";
+    return indent + "\"" + key + "\" : \"" + val + "\",\n";
   }
 
-  return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
+  return indent + "\"" + key + "\" : \"" + val + "\"\n";
 }
 
 
@@ -451,27 +408,20 @@ std::string valueTag
 *
 * valueTag -  
 */
-std::string valueTag
+std::string valueTag2
 (
   const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
+  const std::string&  key,
   const std::string&  value,
-  Format              format,
   bool                showComma,
   bool                valueIsNumberOrBool
 )
 {
-  if (format == XML)
-  {
-    return indent + "<" + xmlTag + ">" + value + "</" + xmlTag + ">" + "\n";
-  }
-
   std::string eValue = jsonInvalidCharsTransformation(value);
 
   eValue = valueIsNumberOrBool? eValue : JSON_STR(eValue);
 
-  if (jsonTag == "")
+  if (key == "")
   {
     if (showComma == true)
     {
@@ -485,8 +435,8 @@ std::string valueTag
 
   if (showComma == true)
   {
-    return indent + "\"" + jsonTag + "\" : " + eValue + ",\n";
+    return indent + "\"" + key + "\" : " + eValue + ",\n";
   }
 
-  return indent + "\"" + jsonTag + "\" : " + eValue + "\n";
+  return indent + "\"" + key + "\" : " + eValue + "\n";
 }

@@ -47,7 +47,7 @@ typedef struct UpdateContextSubscriptionResponse
   UpdateContextSubscriptionResponse(StatusCode& errorCode);
   ~UpdateContextSubscriptionResponse();
 
-  std::string render(RequestType requestType, Format format, const std::string& indent);
+  std::string render(RequestType requestType, const std::string& indent);
 } UpdateContextSubscriptionResponse;
 
 #endif
