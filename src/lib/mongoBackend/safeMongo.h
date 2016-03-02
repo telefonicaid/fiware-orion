@@ -36,43 +36,43 @@
 *
 * getObjectField -
 */
-extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
+extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>");
 
 /* ****************************************************************************
 *
 * getStringField -
 */
-extern std::string getStringField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
+extern std::string getStringField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>");
 
 /* ****************************************************************************
 *
 * getIntField -
 */
-extern int getIntField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
+extern int getIntField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>");
 
 /* ****************************************************************************
 *
 * getLongField -
 */
-extern long long getLongField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
+extern long long getLongField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>");
 
 /* ****************************************************************************
 *
 * getIntOrLongFieldAsLong -
 */
-extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
+extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>");
 
 /* ****************************************************************************
 *
 * getBoolField -
 */
-extern bool getBoolField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
+extern bool getBoolField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>");
 
 /* ****************************************************************************
 *
 * getField -
 */
-extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
+extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>");
 
 /* ****************************************************************************
 *
