@@ -343,7 +343,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @service_replace_error
+  @service_replace_error @BUG_1873 @skip
   Scenario Outline:  try to replace attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value            |

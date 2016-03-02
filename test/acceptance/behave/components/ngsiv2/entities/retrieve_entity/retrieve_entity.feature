@@ -153,7 +153,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
 
-  @service_error
+  @service_error @BUG_1873 @skip
   Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value     |

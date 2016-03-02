@@ -243,7 +243,7 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @service_update_error
+  @service_update_error @BUG_1873 @skip
   Scenario Outline:  try to update attributes by entity ID and attribute name using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value            |
