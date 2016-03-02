@@ -636,23 +636,15 @@ must be sent.
 
 ## Notifications formats
 
-Notifications include two fields: `subscriptionId` (which value is the one of the subscription triggering
-the notification) and `data` (which holds the actual data corresponding to entities and attributes).
+Notifications include two fields:
 
-The `data` field can use different representation depending on two properties (especified as part of the
-corresponding subscription, see subscriptions operations section for details).
+* `subscriptionId` which represents the concerned subscription that originates the notification
+* `data` an array with the notification data itself which includes the entity and attributes concerned. Each
+  element in the array corresponds to a different entity. The way of representing each entity depends on
+  the `attrsAs` parameter associated to the subscription, as shown below.
 
-* attrsFormat ("full", "keyValues", "values"; default is "full") to specify how the attributes are
-  represented. See " Simplified Entity Representation" for details.
-* dataFormat ("array", "object"; default is "array"): to specify if the `data` field holding the information
-  is an array or an object.
-  * In "array" case, "data" is an array which elements are objects, each one representing an entity.
-  * In "object" case, "data" in an object which keys are entity types and which values are object which keys, in sequence,
-    are entity ids and which values is an object representing the entity.
 
-Combining both, there are 6 possibilities:
-
-* attrsFormat is "full" and "dataFormat" is "array":
+If `attrsAs` is `normalized` then default entity representation is used:
 
 ```
 {
@@ -684,39 +676,7 @@ Combining both, there are 6 possibilities:
 }
 ```
 
-* attrsFormat is "full" and "dataFormat" is "object":
-
-```
-{
-   "subscriptionId": "12345",
-   "data": {
-     "Room": {
-       "Room1": {
-         "temperature": {
-           "value": 23,
-           "type": null,
-           "metadata": {}
-         },
-         "humidity": {
-           "value": 70,
-           "type": "percentage",
-           "metadata": {}
-         }
-       },
-       "Room2": {
-         "temperature": {
-           "value": 24,
-           "type": null,
-           "metadata": {}
-         }
-       }
-     }
-   }
-}
-
-```
-
-* attrsFormat is "keyValues" and "dataFormat" is "array":
+If `attrsAs` is `kevValues` then keyValues entity partial representation mode is used:
 
 ```
 {
@@ -738,27 +698,8 @@ Combining both, there are 6 possibilities:
 }
 ```
 
-* attrsFormat is "keyValues" and "dataFormat" is "object":
 
-```
-{
-   "subscriptionId": "12345",
-   "data": {
-     "Room": {
-       "Room1": {
-         "temperature": 23,
-         "humidity": 70
-       },
-       "Room2": {
-         "temperature": 24
-       }
-     }
-   }
-}
-
-```
-
-* attrsFormat is "values" and "dataFormat" is "array":
+If `attrsAs` is `values` then values entity partial representation mode is used:
 
 ```
 {
@@ -767,20 +708,8 @@ Combining both, there are 6 possibilities:
 }
 ```
 
-* attrsFormat is "values" and "dataFormat" is "object":
-
-```
-{
-   "subscriptionId": "12345",
-   "data": {
-     "Room": {
-       "Room1": [23, 70],
-       "Room2": [24]
-     }
-   }
-}
-
-```
+Notifications must include a `X-Ngsiv2-AttrsAs` header with the value of `attrsAs` of the associated subscription,
+so notification receiver can know the format used without needing processing notification payload.
 
 ### Notification templates
 
@@ -1421,8 +1350,7 @@ A `notification` object contains the following subfields:
   compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
 + `headers`: a key-map of HTTP headers that will be included in the notification messages.
 + `query`: a key-map of URL query parameters that will be included in the notification message.
-+ `attrsFormat`: specifies how the attributes will be represented in notification. See detail in "Notifications format section".
-+ `dataFormat`: specifies how data will be represented in notifications. See detail in "Notifications format" section.
++ `attrsAs`: specifies how the entities will be represented in notification. See detail in "Notifications format section".
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive notifications. It
   is optional.
 + `timesSent` (not editable, only in GET operations): Number of notifications sent due to this subscription.
@@ -1482,8 +1410,7 @@ Response:
                     "query": {
                       "authToken": "bar"
                     },
-                    "attrsFormat": "keyValues",
-                    "dataFormat": "object",
+                    "attrsAs": "keyValues",
                     "attributes": ["temperature", "humidity"],
                     "throttling": 5,
                     "count": 12,
