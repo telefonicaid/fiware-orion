@@ -54,8 +54,8 @@ order can be used only in NGSIv2.
 
 ## NGSIv1 notification with NGSIv2 subscriptions
 
-NGSIv2 allows several notification modes depending on the `attrsAs` field associated to the
-subscription. Appart of the values described in the NGSIv2 specification, Orion also support
+NGSIv2 allows several notification modes depending on the `attrsFormat` field associated to the
+subscription. Apart from the values described in the NGSIv2 specification, Orion also support
 `legacy` value in order to send notifications in NGSIv1 format. This way, users can have the
-enhancements in NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notifications receivers.
+enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notifications receivers.
 

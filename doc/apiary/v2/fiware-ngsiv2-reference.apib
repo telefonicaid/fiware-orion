@@ -640,11 +640,10 @@ Notifications include two fields:
 
 * `subscriptionId` which represents the concerned subscription that originates the notification
 * `data` an array with the notification data itself which includes the entity and attributes concerned. Each
-  element in the array corresponds to a different entity. The way of representing each entity depends on
-  the `attrsAs` parameter associated to the subscription, as shown below.
+  element in the array corresponds to a different entity. By default each entity will be represented in
+  normalized mode. However by using the `attrsFormat` modifier it can be requested a simplified representation.
 
-
-If `attrsAs` is `normalized` then default entity representation is used:
+If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation is used:
 
 ```
 {
@@ -655,7 +654,7 @@ If `attrsAs` is `normalized` then default entity representation is used:
        "type": "Room",
        "temperature": {
          "value": 23,
-         "type": null,
+         "type": "none",
          "metadata": {}
        },
        "humidity": {
@@ -669,14 +668,14 @@ If `attrsAs` is `normalized` then default entity representation is used:
      "type": "Room",
      "temperature": {
        "value": 24,
-       "type": null,
+       "type": "none",
        "metadata": {}
      }
    ]
 }
 ```
 
-If `attrsAs` is `kevValues` then keyValues entity partial representation mode is used:
+If `attrsFormat` is `keyValues` then keyValues entity partial representation mode is used:
 
 ```
 {
@@ -699,7 +698,7 @@ If `attrsAs` is `kevValues` then keyValues entity partial representation mode is
 ```
 
 
-If `attrsAs` is `values` then values entity partial representation mode is used:
+If `attrsFormat` is `values` then values entity partial representation mode is used:
 
 ```
 {
@@ -708,7 +707,7 @@ If `attrsAs` is `values` then values entity partial representation mode is used:
 }
 ```
 
-Notifications must include a `X-Ngsiv2-AttrsAs` header with the value of `attrsAs` of the associated subscription,
+Notifications must include a `X-Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
 so notification receiver can know the format used without needing processing notification payload.
 
 ### Notification templates
@@ -1344,13 +1343,16 @@ A `subject` contains the following subfields:
 A `notification` object contains the following subfields:
 
 + `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
-  in the notification. It also defines the order in which attributes will appear in notifications when `attrsAs` "value" is used
+  in the notification. It also defines the order in which attributes will appear in notifications when `attrsFormat` "value" is used
   (see "Notification messages" section).
 + `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
-+ `headers`: a key-map of HTTP headers that will be included in the notification messages.
-+ `query`: a key-map of URL query parameters that will be included in the notification message.
-+ `attrsAs`: specifies how the entities will be represented in notification. See detail in "Notification messages" section.
++ `headers` (optional): a key-map of HTTP headers that will be included in the notification messages. Note that this cannot be used
+  to override headers that make the notification inconsistent (e.g. "Content-Type: application/json").
++ `query` (optional): a key-map of URL query parameters that will be included in the notification message.
++ `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
+  "normalized" (the one used if the field is omitted), "keyValues" or "values". If `attrsFormat` takes any value different
+  than those an error will be raised. See detail in "Notification messages" section.
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive notifications. It
   is optional.
 + `timesSent` (not editable, only in GET operations): Number of notifications sent due to this subscription.
@@ -1410,7 +1412,7 @@ Response:
                     "query": {
                       "authToken": "bar"
                     },
-                    "attrsAs": "keyValues",
+                    "attrsFormat": "keyValues",
                     "attributes": ["temperature", "humidity"],
                     "throttling": 5,
                     "count": 12,
