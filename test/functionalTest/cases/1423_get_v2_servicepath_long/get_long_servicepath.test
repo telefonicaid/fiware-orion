@@ -53,8 +53,7 @@ payload='{
     "value" : "ES"
   },
   "madeInCountry": {
-    "value" : "DE",
-    "type" : ""
+    "value" : "DE"
   },
   "model" : {
     "type": "myString",

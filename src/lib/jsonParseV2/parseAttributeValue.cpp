@@ -43,6 +43,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 {
   Document    document;
   OrionError  oe;
+  LM_W((">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><    en parseAttributeValue"));
 
   document.Parse(ciP->payload);
 
@@ -67,6 +68,12 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   caP->valueType  = (document.IsObject())? orion::ValueTypeObject : orion::ValueTypeVector;
   parseContextAttributeCompoundValueStandAlone(document, caP, caP->valueType);
+
+  // ESTO NO DEBE SER ASI
+  if (!caP->typeGiven) {
+    LM_W((">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  poniendo default type in parseAttributeValue"));
+    caP->type = DEFAULT_TYPE;
+  }
 
   return "OK";
 }
