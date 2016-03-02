@@ -143,15 +143,15 @@ ContextElementResponse::ContextElementResponse
   prune = false;
 
   // Entity
-  BSONObj id = getField(entityDoc, "_id").embeddedObject();
-  contextElement.entityId.fill(getStringField(id, ENT_ENTITY_ID), getStringField(id, ENT_ENTITY_TYPE), "false");
-  contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringField(id, ENT_SERVICE_PATH) : "";
+  BSONObj id = getField(entityDoc, "_id", __FUNCTION__).embeddedObject();
+  contextElement.entityId.fill(getStringField(id, ENT_ENTITY_ID, __FUNCTION__), getStringField(id, ENT_ENTITY_TYPE, __FUNCTION__), "false");
+  contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringField(id, ENT_SERVICE_PATH, __FUNCTION__) : "";
 
   /* Get the location attribute (if it exists) */
   std::string locAttr;
   if (entityDoc.hasElement(ENT_LOCATION))
   {
-    locAttr = getStringField(getObjectField(entityDoc, ENT_LOCATION), ENT_LOCATION_ATTRNAME);
+    locAttr = getStringField(getObjectField(entityDoc, ENT_LOCATION, __FUNCTION__), ENT_LOCATION_ATTRNAME, __FUNCTION__);
   }
 
 
@@ -159,21 +159,21 @@ ContextElementResponse::ContextElementResponse
   // Attribute vector
   // FIXME P5: constructor for BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  BSONObj                attrs = getField(entityDoc, ENT_ATTRS).embeddedObject();
+  BSONObj                attrs = getField(entityDoc, ENT_ATTRS, __FUNCTION__).embeddedObject();
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(attrNames);
   for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
     std::string        attrName = *i;
-    BSONObj            attr     = getField(attrs, attrName).embeddedObject();
+    BSONObj            attr     = getField(attrs, attrName, __FUNCTION__).embeddedObject();
     ContextAttribute*  caP      = NULL;
     ContextAttribute   ca;
 
     // Name and type
     ca.name           = dbDotDecode(basePart(attrName));
     std::string mdId  = idPart(attrName);
-    ca.type           = getStringField(attr, ENT_ATTRS_TYPE);
+    ca.type           = getStringField(attr, ENT_ATTRS_TYPE, __FUNCTION__);
 
     // Skip attribute if the attribute is in the list (or attrL is empty)
     if (!includedAttribute(ca, attrL))
@@ -189,10 +189,10 @@ ContextElementResponse::ContextElementResponse
     }
     else
     {
-      switch(getField(attr, ENT_ATTRS_VALUE).type())
+      switch(getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).type())
       {
       case String:
-        ca.stringValue = getStringField(attr, ENT_ATTRS_VALUE);
+        ca.stringValue = getStringField(attr, ENT_ATTRS_VALUE, __FUNCTION__);
         if (!includeEmpty && ca.stringValue.length() == 0)
         {
           continue;
@@ -201,17 +201,17 @@ ContextElementResponse::ContextElementResponse
         break;
 
       case NumberDouble:
-        ca.numberValue = getField(attr, ENT_ATTRS_VALUE).Number();
+        ca.numberValue = getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).Number();
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
       case NumberInt:
-        ca.numberValue = (double) getIntField(attr, ENT_ATTRS_VALUE);
+        ca.numberValue = (double) getIntField(attr, ENT_ATTRS_VALUE, __FUNCTION__);
         caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
         break;
 
       case Bool:
-        ca.boolValue = getBoolField(attr, ENT_ATTRS_VALUE);
+        ca.boolValue = getBoolField(attr, ENT_ATTRS_VALUE, __FUNCTION__);
         caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
         break;
 
@@ -223,17 +223,17 @@ ContextElementResponse::ContextElementResponse
       case Object:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
-        compoundObjectResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
+        compoundObjectResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE, __FUNCTION__));
         break;
 
       case Array:
         caP = new ContextAttribute(ca.name, ca.type, "");
         caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
-        compoundVectorResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE));
+        compoundVectorResponse(caP->compoundValueP, getField(attr, ENT_ATTRS_VALUE, __FUNCTION__));
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).type()));
       }
     }
 
@@ -257,7 +257,7 @@ ContextElementResponse::ContextElementResponse
     /* Setting custom metadata (if any) */
     if (attr.hasField(ENT_ATTRS_MD))
     {
-      std::vector<BSONElement> metadataV = getField(attr, ENT_ATTRS_MD).Array();
+      std::vector<BSONElement> metadataV = getField(attr, ENT_ATTRS_MD, __FUNCTION__).Array();
 
       for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
       {
@@ -273,13 +273,13 @@ ContextElementResponse::ContextElementResponse
    * very old Orion version which didn't implement creation/modification date */
   if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_CREATION_DATE));
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_CREATION_DATE, __FUNCTION__));
     contextElement.contextAttributeVector.push_back(caP);
   }
 
   if (includeModDate && entityDoc.hasField(ENT_MODIFICATION_DATE))
   {
-    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_MODIFICATION_DATE));
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_MODIFICATION_DATE, __FUNCTION__));
     contextElement.contextAttributeVector.push_back(caP);
   }
 }

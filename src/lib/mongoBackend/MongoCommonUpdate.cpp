@@ -311,7 +311,7 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
 {
 
   // Metadata is identified by name, type is not part of identity any more
-  return  getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
+  return  getStringField(md1, ENT_ATTRS_MD_NAME, __FUNCTION__) == getStringField(md2, ENT_ATTRS_MD_NAME, __FUNCTION__);
 
 }
 
@@ -336,11 +336,11 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
   // If type exists in both metadata elments, check if they are the same
   if (md1TypeExist && md2TypeExist)
   {
-    if (getField(md1, ENT_ATTRS_MD_TYPE).type() != getField(md2, ENT_ATTRS_MD_TYPE).type())
+    if (getField(md1, ENT_ATTRS_MD_TYPE, __FUNCTION__).type() != getField(md2, ENT_ATTRS_MD_TYPE, __FUNCTION__).type())
     {
       return false;
     }
-    switch (getField(md1, ENT_ATTRS_MD_TYPE).type())
+    switch (getField(md1, ENT_ATTRS_MD_TYPE, __FUNCTION__).type())
     {
       /* FIXME not yet, issue #1068 Support array and object in metadata value
       case Object:
@@ -353,21 +353,21 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       */
 
     case NumberDouble:
-      if (getField(md1, ENT_ATTRS_MD_TYPE).Number() != getField(md2, ENT_ATTRS_MD_TYPE).Number())
+      if (getField(md1, ENT_ATTRS_MD_TYPE, __FUNCTION__).Number() != getField(md2, ENT_ATTRS_MD_TYPE, __FUNCTION__).Number())
       {
         return false;
       }
       break;
 
     case Bool:
-      if (getBoolField(md1, ENT_ATTRS_MD_TYPE) != getBoolField(md2, ENT_ATTRS_MD_TYPE))
+      if (getBoolField(md1, ENT_ATTRS_MD_TYPE, __FUNCTION__) != getBoolField(md2, ENT_ATTRS_MD_TYPE, __FUNCTION__))
       {
         return false;
       }
       break;
 
     case String:
-      if (getStringField(md1, ENT_ATTRS_MD_TYPE) != getStringField(md2, ENT_ATTRS_MD_TYPE))
+      if (getStringField(md1, ENT_ATTRS_MD_TYPE, __FUNCTION__) != getStringField(md2, ENT_ATTRS_MD_TYPE, __FUNCTION__))
       {
         return false;
       }
@@ -381,19 +381,19 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       break;
 
     default:
-      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getField(md1, ENT_ATTRS_MD_TYPE).type()));
+      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getField(md1, ENT_ATTRS_MD_TYPE, __FUNCTION__).type()));
       return false;
       break;
     }
   }
 
   // declared types are equal. Same value ?
-  if (getField(md1, ENT_ATTRS_MD_VALUE).type() != getField(md2, ENT_ATTRS_MD_VALUE).type())
+  if (getField(md1, ENT_ATTRS_MD_VALUE, __FUNCTION__).type() != getField(md2, ENT_ATTRS_MD_VALUE, __FUNCTION__).type())
   {
     return false;
   }
 
-  switch (getField(md1, ENT_ATTRS_MD_VALUE).type())
+  switch (getField(md1, ENT_ATTRS_MD_VALUE, __FUNCTION__).type())
   {
     /* FIXME not yet
     case Object:
@@ -406,19 +406,19 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     */
 
     case NumberDouble:
-      return getField(md1, ENT_ATTRS_MD_VALUE).Number() == getField(md2, ENT_ATTRS_MD_VALUE).Number();
+      return getField(md1, ENT_ATTRS_MD_VALUE, __FUNCTION__).Number() == getField(md2, ENT_ATTRS_MD_VALUE, __FUNCTION__).Number();
 
     case Bool:
-      return getBoolField(md1, ENT_ATTRS_MD_VALUE) == getBoolField(md2, ENT_ATTRS_MD_VALUE);
+      return getBoolField(md1, ENT_ATTRS_MD_VALUE, __FUNCTION__) == getBoolField(md2, ENT_ATTRS_MD_VALUE, __FUNCTION__);
 
     case String:
-      return getStringField(md1, ENT_ATTRS_MD_VALUE) == getStringField(md2, ENT_ATTRS_MD_VALUE);
+      return getStringField(md1, ENT_ATTRS_MD_VALUE, __FUNCTION__) == getStringField(md2, ENT_ATTRS_MD_VALUE, __FUNCTION__);
 
     case jstNULL:
-      return md2.getField(ENT_ATTRS_MD_VALUE).isNull();
+      return getField(md2, ENT_ATTRS_MD_VALUE, __FUNCTION__).isNull();
 
     default:
-      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getField(md1, ENT_ATTRS_MD_VALUE).type()));
+      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getField(md1, ENT_ATTRS_MD_VALUE, __FUNCTION__).type()));
       return false;
   }
 
@@ -520,7 +520,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
     return false;
   }
 
-  switch (getField(attr, ENT_ATTRS_VALUE).type())
+  switch (getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).type())
   {
     case Object:
     case Array:
@@ -529,19 +529,19 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       return true;
 
     case NumberDouble:
-      return caP->valueType != ValueTypeNumber || caP->numberValue != getField(attr, ENT_ATTRS_VALUE).Number();
+      return caP->valueType != ValueTypeNumber || caP->numberValue != getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).Number();
 
     case Bool:
-      return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolField(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolField(attr, ENT_ATTRS_VALUE, __FUNCTION__);
 
     case String:
-      return caP->valueType != ValueTypeString || caP->stringValue != getStringField(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeString || caP->stringValue != getStringField(attr, ENT_ATTRS_VALUE, __FUNCTION__);
 
     case jstNULL:
       return caP->valueType != ValueTypeNone;
 
     default:
-      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).type()));
       return false;
   }
 }
@@ -627,26 +627,26 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   else
   {
     /* Slightly different treatment, depending on attribute value type in DB (string, number, boolean, vector or object) */
-    switch (getField(attr, ENT_ATTRS_VALUE).type())
+    switch (getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).type())
     {
       case Object:
-        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).embeddedObject());
         break;
 
       case Array:
-        ab.appendArray(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.appendArray(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).embeddedObject());
         break;
 
       case NumberDouble:
-        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).Number());
+        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).Number());
         break;
 
       case Bool:
-        ab.append(ENT_ATTRS_VALUE, getBoolField(attr, ENT_ATTRS_VALUE));
+        ab.append(ENT_ATTRS_VALUE, getBoolField(attr, ENT_ATTRS_VALUE, __FUNCTION__));
         break;
 
       case String:
-        ab.append(ENT_ATTRS_VALUE, getStringField(attr, ENT_ATTRS_VALUE));
+        ab.append(ENT_ATTRS_VALUE, getStringField(attr, ENT_ATTRS_VALUE, __FUNCTION__));
         break;
 
       case jstNULL:
@@ -654,7 +654,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE, __FUNCTION__).type()));
     }
   }
 
@@ -667,7 +667,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   {
     if (attr.hasField(ENT_ATTRS_TYPE))
     {
-      ab.append(ENT_ATTRS_TYPE, getStringField(attr, ENT_ATTRS_TYPE));
+      ab.append(ENT_ATTRS_TYPE, getStringField(attr, ENT_ATTRS_TYPE, __FUNCTION__));
     }
   }
 
@@ -694,7 +694,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
   if (attr.hasField(ENT_ATTRS_MD))
   {
-    mdV = getField(attr, ENT_ATTRS_MD).embeddedObject();
+    mdV = getField(attr, ENT_ATTRS_MD, __FUNCTION__).embeddedObject();
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
@@ -720,7 +720,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getIntField(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getIntField(attr, ENT_ATTRS_CREATION_DATE, __FUNCTION__));
   }
 
   /* It was an actual update? */
@@ -738,7 +738,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      */
       actualUpdate = (attrValueChanges(attr, caP) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
-                                             getStringField(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
+                                             getStringField(attr, ENT_ATTRS_TYPE, __FUNCTION__) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
   }
   else
@@ -760,7 +760,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntField(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntField(attr, ENT_ATTRS_MODIFICATION_DATE, __FUNCTION__));
     }
   }
 
@@ -885,7 +885,7 @@ static bool updateAttribute
     }
 
     BSONObj newAttr;
-    BSONObj attr = getField(attrs, effectiveName).embeddedObject();
+    BSONObj attr = getField(attrs, effectiveName, __FUNCTION__).embeddedObject();
     actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
 
     if (actualUpdate)
@@ -1485,25 +1485,25 @@ static bool addTriggeredSubscriptions_noCache
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
+      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING,       __FUNCTION__) : -1;
+      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION, __FUNCTION__) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
-          getStringField(sub, CSUB_REFERENCE),          
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT, __FUNCTION__)) : XML,
+          getStringField(sub, CSUB_REFERENCE, __FUNCTION__),
           subToAttributeList(sub), "", "");
 
       if (sub.hasField(CSUB_EXPR))
       {
-        BSONObj expr = getObjectField(sub, CSUB_EXPR);
+        BSONObj expr = getObjectField(sub, CSUB_EXPR, __FUNCTION__);
 
-        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringField(expr, CSUB_EXPR_Q)      : "";
-        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringField(expr, CSUB_EXPR_GEOREL) : "";
-        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringField(expr, CSUB_EXPR_GEOM)   : "";
-        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringField(expr, CSUB_EXPR_COORDS) : "";
+        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringField(expr, CSUB_EXPR_Q,      __FUNCTION__) : "";
+        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringField(expr, CSUB_EXPR_GEOREL, __FUNCTION__) : "";
+        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringField(expr, CSUB_EXPR_GEOM,   __FUNCTION__) : "";
+        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringField(expr, CSUB_EXPR_COORDS, __FUNCTION__) : "";
 
         trigs->fillExpression(q, georel, geometry, coords);
       }
@@ -2782,11 +2782,11 @@ static void updateEntity
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONElement        idField           = getField(r, "_id");
+  BSONElement        idField           = getField(r, "_id", __FUNCTION__);
 
-  std::string        entityId          = getStringField(idField.embeddedObject(), ENT_ENTITY_ID);
-  std::string        entityType        = getStringField(idField.embeddedObject(), ENT_ENTITY_TYPE);
-  std::string        entitySPath       = getStringField(idField.embeddedObject(), ENT_SERVICE_PATH);
+  std::string        entityId          = getStringField(idField.embeddedObject(), ENT_ENTITY_ID,    __FUNCTION__);
+  std::string        entityType        = getStringField(idField.embeddedObject(), ENT_ENTITY_TYPE,  __FUNCTION__);
+  std::string        entitySPath       = getStringField(idField.embeddedObject(), ENT_SERVICE_PATH, __FUNCTION__);
 
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
@@ -2807,7 +2807,7 @@ static void updateEntity
    * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-  BSONObj           attrs     = getField(r, ENT_ATTRS).embeddedObject();
+  BSONObj           attrs     = getField(r, ENT_ATTRS, __FUNCTION__).embeddedObject();
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
   BSONArrayBuilder  toPush;
@@ -2826,13 +2826,13 @@ static void updateEntity
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc = getObjectField(r, ENT_LOCATION);
+    BSONObj loc = getObjectField(r, ENT_LOCATION, __FUNCTION__);
 
-    locAttr     = getStringField(loc, ENT_LOCATION_ATTRNAME);
+    locAttr     = getStringField(loc, ENT_LOCATION_ATTRNAME, __FUNCTION__);
 
     // FIXME P10: this only works for "Point" locations. NGSIv2 allows other types.
-    coordLong   = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[0].Double();
-    coordLat    = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[1].Double();
+    coordLong   = getField(getObjectField(loc, ENT_LOCATION_COORDS, __FUNCTION__), "coordinates", __FUNCTION__).Array()[0].Double();
+    coordLat    = getField(getObjectField(loc, ENT_LOCATION_COORDS, __FUNCTION__), "coordinates", __FUNCTION__).Array()[1].Double();
   }
 
   //
@@ -2871,8 +2871,8 @@ static void updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLong(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLong(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLong(r, ENT_CREATION_DATE,     __FUNCTION__) : -1;
+  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLong(r, ENT_MODIFICATION_DATE, __FUNCTION__) : -1;
 
   if (!processContextAttributeVector(ceP,
                                      action,
@@ -3283,7 +3283,7 @@ void processContextElement
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    BSONElement idField = getField(r, "_id");
+    BSONElement idField = getField(r, "_id", __FUNCTION__);
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'

@@ -36,43 +36,43 @@
 *
 * getObjectField -
 */
-extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field);
+extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
 
 /* ****************************************************************************
 *
 * getStringField -
 */
-extern std::string getStringField(const mongo::BSONObj& b, const std::string& field);
+extern std::string getStringField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
 
 /* ****************************************************************************
 *
 * getIntField -
 */
-extern int getIntField(const mongo::BSONObj& b, const std::string& field);
+extern int getIntField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
 
 /* ****************************************************************************
 *
 * getLongField -
 */
-extern long long getLongField(const mongo::BSONObj& b, const std::string& field);
+extern long long getLongField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
 
 /* ****************************************************************************
 *
 * getIntOrLongFieldAsLong -
 */
-extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field);
+extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
 
 /* ****************************************************************************
 *
 * getBoolField -
 */
-extern bool getBoolField(const mongo::BSONObj& b, const std::string& field);
+extern bool getBoolField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
 
 /* ****************************************************************************
 *
 * getField -
 */
-extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field);
+extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field, const std::string& caller);
 
 /* ****************************************************************************
 *

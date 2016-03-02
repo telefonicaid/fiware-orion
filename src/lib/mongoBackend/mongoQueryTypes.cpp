@@ -87,9 +87,9 @@ static std::string attributeType
     /* It could happen that different entities within the same entity type may have attributes with the same name
      * but different types. In that case, one type (at random) is returned. A list could be returned but the
      * NGSIv2 operations only allow to set one type */
-    BSONObj attrs = getField(r, ENT_ATTRS).embeddedObject();
-    BSONObj attr = getField(attrs, attrName).embeddedObject();
-    ret = getStringField(attr, ENT_ATTRS_TYPE);
+    BSONObj attrs = getField(r, ENT_ATTRS, __FUNCTION__).embeddedObject();
+    BSONObj attr  = getField(attrs, attrName, __FUNCTION__).embeddedObject();
+    ret           = getStringField(attr, ENT_ATTRS_TYPE, __FUNCTION__);
     break;
   }
   releaseMongoConnection(connection);
@@ -218,7 +218,7 @@ HttpStatusCode mongoEntityTypes
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getField(result, "result").Array();
+  std::vector<BSONElement> resultsArray = getField(result, "result", __FUNCTION__).Array();
 
   if (resultsArray.size() == 0)
   {
@@ -240,8 +240,8 @@ HttpStatusCode mongoEntityTypes
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    EntityType*               entityType  = new EntityType(getStringField(resultItem, "_id"));
-    std::vector<BSONElement>  attrsArray  = getField(resultItem, "attrs").Array();
+    EntityType*               entityType  = new EntityType(getStringField(resultItem, "_id", __FUNCTION__));
+    std::vector<BSONElement>  attrsArray  = getField(resultItem, "attrs", __FUNCTION__).Array();
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
@@ -367,7 +367,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getField(result, "result").Array();
+  std::vector<BSONElement> resultsArray = getField(result, "result", __FUNCTION__).Array();
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
 

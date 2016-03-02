@@ -247,7 +247,7 @@ static bool addTriggeredSubscriptions
       LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
       continue;
     }
-    BSONElement idField = getField(sub, "_id");
+    BSONElement idField = getField(sub, "_id", __FUNCTION__);
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -270,8 +270,8 @@ static bool addTriggeredSubscriptions
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringField(sub, CASUB_FORMAT)) : XML,
-        getStringField(sub, CASUB_REFERENCE),
+        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringField(sub, CASUB_FORMAT, __FUNCTION__)) : XML,
+        getStringField(sub, CASUB_REFERENCE, __FUNCTION__),
         subToAttributeList(sub));
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));

@@ -151,23 +151,23 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 */
 Metadata::Metadata(const BSONObj& mdB)
 {
-  name = getStringField(mdB, ENT_ATTRS_MD_NAME);
-  type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE) : "";
-  switch (getField(mdB, ENT_ATTRS_MD_VALUE).type())
+  name = getStringField(mdB, ENT_ATTRS_MD_NAME, __FUNCTION__);
+  type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringField(mdB, ENT_ATTRS_MD_TYPE, __FUNCTION__) : "";
+  switch (getField(mdB, ENT_ATTRS_MD_VALUE, __FUNCTION__).type())
   {
   case String:
     valueType   = orion::ValueTypeString;
-    stringValue = getStringField(mdB, ENT_ATTRS_MD_VALUE);
+    stringValue = getStringField(mdB, ENT_ATTRS_MD_VALUE, __FUNCTION__);
     break;
 
   case NumberDouble:
     valueType   = orion::ValueTypeNumber;
-    numberValue = getField(mdB, ENT_ATTRS_MD_VALUE).Number();
+    numberValue = getField(mdB, ENT_ATTRS_MD_VALUE, __FUNCTION__).Number();
     break;
 
   case Bool:
     valueType = orion::ValueTypeBoolean;
-    boolValue = getBoolField(mdB, ENT_ATTRS_MD_VALUE);
+    boolValue = getBoolField(mdB, ENT_ATTRS_MD_VALUE, __FUNCTION__);
     break;
 
   case jstNULL:
@@ -176,7 +176,7 @@ Metadata::Metadata(const BSONObj& mdB)
 
   default:
     valueType = orion::ValueTypeUnknown;
-    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE).type()));
+    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", getField(mdB, ENT_ATTRS_MD_VALUE, __FUNCTION__).type()));
     break;
   }
 }

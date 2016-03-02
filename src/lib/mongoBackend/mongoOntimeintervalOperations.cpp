@@ -71,31 +71,31 @@ HttpStatusCode mongoGetContextSubscriptionInfo
     }
 
     /* Build the ContextSubcriptionInfo object */
-    std::vector<BSONElement> entities = getField(sub, CSUB_ENTITIES).Array();
+    std::vector<BSONElement> entities = getField(sub, CSUB_ENTITIES, __FUNCTION__).Array();
     for (unsigned int ix = 0; ix < entities.size(); ++ix) {
         BSONObj entity = entities[ix].embeddedObject();
         EntityId* enP = new EntityId;
-        enP->id = getStringField(entity, CSUB_ENTITY_ID);
-        enP->type = entity.hasField(CSUB_ENTITY_TYPE) ? getStringField(entity, CSUB_ENTITY_TYPE) : "";
-        enP->isPattern = getStringField(entity, CSUB_ENTITY_ISPATTERN);
+        enP->id = getStringField(entity, CSUB_ENTITY_ID, __FUNCTION__);
+        enP->type = entity.hasField(CSUB_ENTITY_TYPE) ? getStringField(entity, CSUB_ENTITY_TYPE, __FUNCTION__) : "";
+        enP->isPattern = getStringField(entity, CSUB_ENTITY_ISPATTERN, __FUNCTION__);
         csiP->entityIdVector.push_back(enP);
 
     }
 
-    std::vector<BSONElement> attrs = getField(sub, CSUB_ATTRS).Array();
+    std::vector<BSONElement> attrs = getField(sub, CSUB_ATTRS, __FUNCTION__).Array();
     for (unsigned int ix = 0; ix < attrs.size(); ++ix)
     {
       csiP->attributeList.push_back(attrs[ix].String());
     }
 
-    csiP->url              = getStringField(sub, CSUB_REFERENCE);
-    csiP->expiration       = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION)       : -1;
-    csiP->lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
-    csiP->throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
+    csiP->url              = getStringField(sub, CSUB_REFERENCE, __FUNCTION__);
+    csiP->expiration       = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION,       __FUNCTION__) : -1;
+    csiP->lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION, __FUNCTION__) : -1;
+    csiP->throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING,       __FUNCTION__) : -1;
 
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-    std::string fmt = getStringField(sub, CSUB_FORMAT);
+    std::string fmt = getStringField(sub, CSUB_FORMAT, __FUNCTION__);
     csiP->format = sub.hasField(CSUB_FORMAT)? stringToFormat(fmt) : XML;
 
     reqSemGive(__FUNCTION__, "get info on subscriptions", reqSemTaken);
