@@ -2871,8 +2871,8 @@ static void updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getLongField(r, ENT_CREATION_DATE)     : -1;
-  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getLongField(r, ENT_MODIFICATION_DATE) : -1;
+  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLong(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLong(r, ENT_MODIFICATION_DATE) : -1;
 
   if (!processContextAttributeVector(ceP,
                                      action,
