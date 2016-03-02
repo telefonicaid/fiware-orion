@@ -30,9 +30,9 @@
 #include "common/Format.h"
 
 /* FIXME P2: this file (along with some other places around all the code) uses
- * the old term "tag", comming from the XML days. Now we only support JSON and
+ * the old term "tag", coming from the XML days. Now we only support JSON and
  * all the terminology should use "key" or "keyName". We have changed terminology
- * in many places, but there are yet some remains (not so imporant, anyway).
+ * in many places, but there are yet some remains (not so important, anyway).
  */
 
 
@@ -71,7 +71,7 @@ extern std::string jsonInvalidCharsTransformation(const std::string& input);
 *
 * startTag -  
 *
-* FIXME P3: in the part, all this family of functions was named just startTag().
+* FIXME P3: in the past, this entire family of functions was named just startTag().
 * However, changes in the function signature due to XML format removal have caused
 * that different startTag() instances end with the same (or conflicting, due to
 * optional parameters) signatures. Thus, we use startTag1() and startTag2() to
@@ -116,7 +116,7 @@ extern std::string endTag
 *
 * valueTag -  
 *
-* FIXME P3: in the part, all this family of functions was named just valueTag().
+* FIXME P3: in the past, this entire family of functions was named just valueTag().
 * However, changes in the function signature due to XML format removal have caused
 * that different valueTag() instances end with the same (or conflicting, due to
 * optional parameters) signatures. Thus, we use valueTag() and valueTag() to
