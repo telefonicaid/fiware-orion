@@ -1282,6 +1282,7 @@ static bool addTriggeredSubscriptions_withCache
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
+    cSubP->notifyFormat = JSON;
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1492,7 +1493,7 @@ static bool addTriggeredSubscriptions_noCache
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : JSON,
           getStringField(sub, CSUB_REFERENCE),          
           subToAttributeList(sub), "", "");
 

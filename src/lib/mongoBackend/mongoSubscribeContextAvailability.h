@@ -42,8 +42,7 @@ extern HttpStatusCode mongoSubscribeContextAvailability
 (
   SubscribeContextAvailabilityRequest*   requestP,
   SubscribeContextAvailabilityResponse*  responseP,
-  std::map<std::string, std::string>&    uriParam,
-  Format                                 notifyFormat = XML,
+  std::map<std::string, std::string>&    uriParam,  
   const std::string&                     tenant       = ""
 );
 

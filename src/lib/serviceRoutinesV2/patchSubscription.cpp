@@ -67,7 +67,6 @@ std::string patchSubscription
 
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                                    &ucsr,
-                                                                   ciP->outFormat,
                                                                    ciP->tenant,
                                                                    ciP->httpHeaders.xauthToken,
                                                                    ciP->servicePathV,

@@ -186,17 +186,17 @@ Metadata::Metadata(const BSONObj& mdB)
 *
 * Metadata::render -
 */
-std::string Metadata::render(Format format, const std::string& indent, bool comma)
+std::string Metadata::render(const std::string& indent, bool comma)
 {
   std::string out     = "";
   std::string tag     = "contextMetadata";
   std::string xValue  = stringValue;
 
-  out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", "name", name, format, true);
-  out += valueTag(indent + "  ", "type", type, format, true);
-  out += valueTag(indent + "  ", "value", xValue, format, false);
-  out += endTag(indent, tag, format, comma);
+  out += startTag2(indent, tag, false, false);
+  out += valueTag1(indent + "  ", "name", name, true);
+  out += valueTag1(indent + "  ", "type", type, true);
+  out += valueTag1(indent + "  ", "value", xValue, false);
+  out += endTag(indent, comma);
 
   return out;
 }
@@ -211,7 +211,6 @@ std::string Metadata::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

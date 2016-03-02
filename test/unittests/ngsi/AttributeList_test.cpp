@@ -39,26 +39,22 @@ TEST(AttributeList, ok)
 {
   AttributeList  al;
   std::string    out;
-  const char*    outfile1 = "ngsi.attributeList.ok.middle.xml";
-  const char*    outfile2 = "ngsi.attributeList.ok.middle.json";
+  const char*    outfile1 = "ngsi.attributeList.ok.middle.json";
   
   utInit();
 
-  out = al.render(XML, "");
+  out = al.render("");
   EXPECT_STREQ("", out.c_str());
 
   al.push_back("a1");
   al.push_back("a2");
-  out = al.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
   
-  out = al.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  out = al.render("");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   al.push_back("");
-  out = al.check(RegisterContext, XML, "", "", 0);
+  out = al.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("empty attribute name", out.c_str());
 
   utExit();

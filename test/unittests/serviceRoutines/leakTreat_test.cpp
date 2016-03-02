@@ -45,9 +45,11 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * error - 
+*
+* FIXME P5 #1862: _json countepart?
 */
 extern bool harakiri;
-TEST(leakTreat, error)
+TEST(leakTreat, DISABLED_error)
 {
   ConnectionInfo ci1("/leak",  "GET", "1.1");
   ConnectionInfo ci2("/leak/nadadenada",  "GET", "1.1");

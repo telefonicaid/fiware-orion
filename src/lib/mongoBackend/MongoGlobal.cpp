@@ -2527,11 +2527,7 @@ bool registrationsQuery
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    //
-    // Default format is XML, in the case the field is not found in the
-    // registrations document (for pre-0.21.0 versions)
-    //
-    Format                    format = r.hasField(REG_FORMAT)? stringToFormat(getStringField(r, REG_FORMAT)) : XML;
+    Format                    format = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getField(r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)

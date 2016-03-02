@@ -48,10 +48,10 @@ std::string ContextAttributeResponse::render(ConnectionInfo* ciP, RequestType re
   std::string tag = "contextAttributeResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
   out += contextAttributeVector.render(ciP, request, indent + "  ", true);
-  out += statusCode.render(ciP->outFormat, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  out += statusCode.render(indent + "  ");
+  out += endTag(indent);
 
   return out;
 }
@@ -77,7 +77,7 @@ std::string ContextAttributeResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(ciP, requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     std::string details = std::string("contextAttributeVector: '") + res + "'";
     alarmMgr.badInput(clientIp, details);

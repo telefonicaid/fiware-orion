@@ -58,23 +58,22 @@ std::string ContextElementVector::render
   bool                comma
 )
 {
-  std::string  out     = "";
-  std::string  xmlTag  = "contextElementList";
-  std::string  jsonTag = "contextElements";
+  std::string  out = "";
+  std::string  key = "contextElements";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+  out += startTag2(indent, key, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(ciP, requestType, indent + "  ", ix != vec.size() - 1);
   }
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -147,7 +146,6 @@ std::string ContextElementVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -165,7 +163,7 @@ std::string ContextElementVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

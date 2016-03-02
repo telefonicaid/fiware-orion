@@ -76,8 +76,10 @@ TEST(Convenience, emptyPath)
 /* ****************************************************************************
 *
 * shortPath - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(Convenience, shortPath)
+TEST(Convenience, DISABLED_shortPath)
 {
   ConnectionInfo  ci1("ngsi9", "GET", "1.1");
   ConnectionInfo  ci2("ngsi10", "GET", "1.1");
@@ -119,8 +121,10 @@ TEST(Convenience, shortPath)
 /* ****************************************************************************
 *
 * badPathNgsi9 - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(Convenience, badPathNgsi9)
+TEST(Convenience, DISABLED_badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
@@ -142,8 +146,10 @@ TEST(Convenience, badPathNgsi9)
 /* ****************************************************************************
 *
 * badPathNgsi10 - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(Convenience, badPathNgsi10)
+TEST(Convenience, DISABLED_badPathNgsi10)
 {
   ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
   std::string               out;

@@ -60,21 +60,18 @@ std::string EntityTypeVector::render
   bool                comma
 )
 {
-  std::string out      = "";
-  std::string xmlTag   = "typeEntities";
-  std::string jsonTag  = "types";
-
+  std::string out  = "";
+  std::string key  = "types";
 
   if (vec.size() > 0)
   {
-
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+    out += startTag2(indent, key, true, true);
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
     }
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
+    out += endTag(indent, comma, true);
   }
 
   return out;

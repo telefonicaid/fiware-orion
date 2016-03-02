@@ -157,40 +157,27 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
   std::string  tag           = "orionError";
   std::string  initialIndent = _indent;
   std::string  indent        = _indent;
-  Format       format        = ciP->outFormat;
-
-  if (format == NOFORMAT)
-  {
-    // Default format is JSON
-    format = JSON;
-  }
-
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
 
-  if (format == JSON)
-  {
-    out     = initialIndent + "{\n";
-    indent += "  ";
-  }
 
-  out += startTag(indent, tag, format);
-  out += valueTag(indent + "  ", "code",          code,         format, true);
-  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, format, details != "");
+  out     = initialIndent + "{\n";
+  indent += "  ";
+
+  out += startTag1(indent, tag);
+  out += valueTag(indent + "  ", "code",          code,         true);
+  out += valueTag1(indent + "  ", "reasonPhrase",  reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details",       details,      format);
+    out += valueTag1(indent + "  ", "details",       details);
   }
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
 
-  if (format == JSON)
-  {
-    out += initialIndent + "}\n";
-  }
+  out += initialIndent + "}\n";
 
   return out;
 }
