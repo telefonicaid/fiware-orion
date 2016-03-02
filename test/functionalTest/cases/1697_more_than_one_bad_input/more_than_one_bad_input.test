@@ -25,16 +25,7 @@ More than ONE Bad Input in a request
 
 --SHELL-INIT--
 dbInit CB
-if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
- then
-  export BROKER_AWAIT_SLEEP_TIME=6
-  brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
-  unset BROKER_AWAIT_SLEEP_TIME
-  sleep 5
-  valgrindSleep 6
-else 
-  brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
-fi
+brokerStart CB 0 IPv4 -logSummary 3 -relogAlarms
 
 
 --SHELL--
@@ -47,7 +38,7 @@ fi
 # 03. grep SUMMARY in log-file (4 transactions, 1 bad input)
 # 04. grep BadInput in log-file (4 lines found)
 #
-# Request that give only ONE BadInput:
+# Request that gives only ONE BadInput:
 #   - PUT /v2/noService
 #
 
@@ -64,21 +55,14 @@ echo
 
 echo "02. Sleep 3 secs, awaiting a log summary report"
 echo "==============================================="
-if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
- then
-    sleep 2
-    valgrindSleep 1
-else 
-    sleep 2
-    valgrindSleep 1
-fi 
+sleep 3
 echo
 echo
 
 
 echo "03. grep SUMMARY in log-file (4 transactions, 1 bad input)"
 echo "=========================================================="
-egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
+egrep 'SUMMARY' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }' | sed 's/(/_/g' | sed 's/)/_/g'
 echo
 echo
 
@@ -133,10 +117,10 @@ Date: REGEX(.*)
 
 03. grep SUMMARY in log-file (4 transactions, 1 bad input)
 ==========================================================
- Transactions: 4 (new: 4)
- DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
- Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
- Bad input active alarms: 1, raised: (total: 1, new: 1), released: (total: 0, new: 0)
+ Transactions: REGEX((4 _new: 4_|5 _new: 5_))
+ DB status: ok, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+ Notification failure active alarms: 0, raised: _total: 0, new: 0_, released: _total: 0, new: 0_
+ Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new: 0_
 
 
 04. grep BadInput in log-file (4 lines found)
