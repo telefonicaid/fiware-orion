@@ -312,7 +312,7 @@ HttpStatusCode mongoUpdateContextSubscription
     newSub.append(CSUB_EXPR, getFieldF(sub, CSUB_EXPR).Obj());
   }
 
-  int count = sub.hasField(CSUB_COUNT) ? getIntFieldF(sub, CSUB_COUNT) : 0;
+  long long count = sub.hasField(CSUB_COUNT) ? getIntOrLongFieldAsLong(sub, CSUB_COUNT) : 0;
 
   //
   // Update from cached value, if applicable
@@ -341,7 +341,7 @@ HttpStatusCode mongoUpdateContextSubscription
     }
 
     newSub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
-    newSub.append(CSUB_COUNT, count + 1);
+    newSub.append(CSUB_COUNT, (long long) count + 1);
     LM_T(LmtSubCache, ("notificationDone => lastNotification set to %lu", lastNotificationTime));
   }
   else
@@ -371,7 +371,7 @@ HttpStatusCode mongoUpdateContextSubscription
 
     if (sub.hasField(CSUB_COUNT))
     {
-      newSub.append(CSUB_COUNT, count);
+      newSub.append(CSUB_COUNT, (long long) count);
     }
   }
 

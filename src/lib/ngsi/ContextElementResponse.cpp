@@ -144,7 +144,11 @@ ContextElementResponse::ContextElementResponse
 
   // Entity
   BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
-  contextElement.entityId.fill(getStringFieldF(id, ENT_ENTITY_ID), getStringFieldF(id, ENT_ENTITY_TYPE), "false");
+
+  std::string entityId   = getStringFieldF(id, ENT_ENTITY_ID);
+  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(id, ENT_ENTITY_TYPE) : "";
+
+  contextElement.entityId.fill(entityId, entityType, "false");
   contextElement.entityId.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(id, ENT_SERVICE_PATH) : "";
 
   /* Get the location attribute (if it exists) */

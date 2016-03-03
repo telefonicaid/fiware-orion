@@ -1717,7 +1717,7 @@ static bool processSubscriptions
         BSONObj query  = BSON("_id" << OID(mapSubId));
         BSONObj update = BSON("$set" <<
                               BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                              "$inc" << BSON(CSUB_COUNT << 1));
+                              "$inc" << BSON(CSUB_COUNT << (long long) 1));
         
         ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
@@ -2782,11 +2782,11 @@ static void updateEntity
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONElement        idField           = getFieldF(r, "_id");
+  BSONObj            idField           = getFieldF(r, "_id").embeddedObject();
 
-  std::string        entityId          = getStringFieldF(idField.embeddedObject(), ENT_ENTITY_ID);
-  std::string        entityType        = getStringFieldF(idField.embeddedObject(), ENT_ENTITY_TYPE);
-  std::string        entitySPath       = getStringFieldF(idField.embeddedObject(), ENT_SERVICE_PATH);
+  std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
+  std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
+  std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 

@@ -2413,7 +2413,7 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
   EntityId en;
 
   en.id = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type = getStringFieldF(entity, REG_ENTITY_TYPE);
+  en.type = entity.hasField(REG_ENTITY_TYPE) ? getStringFieldF(entity, REG_ENTITY_TYPE) : "";
 
   /* isPattern = true is not allowed in registrations so it is not in the
    * document retrieved with the query; however we will set it to be formally correct

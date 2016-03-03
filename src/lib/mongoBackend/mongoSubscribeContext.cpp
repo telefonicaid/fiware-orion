@@ -171,7 +171,7 @@ HttpStatusCode mongoSubscribeContext
       lastNotificationTime = (long long) getCurrentTime();
 
       sub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
-      sub.append(CSUB_COUNT, 1);
+      sub.append(CSUB_COUNT, (long long) 1);
     }
 
     /* Adding format to use in notifications */

@@ -1,0 +1,2 @@
+- Fix: some over-logging at error level due not checking field existente BSON objects
+- Hardening: use safeMongo get*Field() methods in places not previously using them (mainly in cache library)
