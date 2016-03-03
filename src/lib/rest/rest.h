@@ -77,9 +77,9 @@ typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 
 /* ****************************************************************************
 *
-* uriParamGet -
+* uriParamPush -
 */
-int uriParamGet(ConnectionInfo *ciP, const char* ckey, const char* val);
+int uriParamPush(ConnectionInfo *ciP, const char* ckey, const char* val);
 
 /* ****************************************************************************
 *

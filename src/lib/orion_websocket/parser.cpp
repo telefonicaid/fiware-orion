@@ -93,7 +93,7 @@ void ws_parser_parse
     rapidjson::Value::ConstMemberIterator it = doc["params"].MemberBegin();
     while (it != doc["params"].MemberEnd())
     {
-      uriParamGet(ciP, it->name.GetString(), it->value.GetString());
+      uriParamPush(ciP, it->name.GetString(), it->value.GetString());
       ++it;
     }
   }

@@ -267,9 +267,9 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
 /* ****************************************************************************
 *
-* uriParamGet -
+* uriParamPush -
 */
-int uriParamGet(ConnectionInfo *ciP, const char* ckey, const char* val)
+int uriParamPush(ConnectionInfo *ciP, const char* ckey, const char* val)
 {
   return uriArgumentGet((void *) ciP, (MHD_ValueKind)0, ckey, val);
 }
