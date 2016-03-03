@@ -51,3 +51,11 @@ will automatically replace these cases with the string value `none` (which is th
 The `orderBy` parameter defined for NGSIv2 can be used also in NGSIv1 queryContext operation (see
 details in the [pagination documentation](pagination.md). However, note that the "geo:distance"
 order can be used only in NGSIv2.
+
+## NGSIv1 notification with NGSIv2 subscriptions
+
+NGSIv2 allows several notification modes depending on the `attrsFormat` field associated to the
+subscription. Apart from the values described in the NGSIv2 specification, Orion also support
+`legacy` value in order to send notifications in NGSIv1 format. This way, users can have the
+enhancements of NGSIv2 subscriptions (e.g. filtering) with NGSIv1 legacy notifications receivers.
+
