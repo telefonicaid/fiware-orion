@@ -43,32 +43,32 @@
 MOTD=$(mktemp)
 cat > $MOTD <<EOF
 
-               OOOOOOOOO
-           OOOOOOO    OOOOO
-        OOOOOOOO  OOO     OOO
-     OOOOOOOO   OOOO  OO   OOO
-  OOOOOO    OOO     OOOO   OOOO
- OOOOOO   OOOO       OOOO    OOOO
- OOOO     OOOOO       OO       OOO
-OOOOO      OOO         O        OOO
+               OOOOOOOOO
+           OOOOOOO    OOOOO
+        OOOOOOOO  OOO     OOO
+     OOOOOOOO   OOOO  OO   OOO
+  OOOOOO    OOO     OOOO   OOOO
+ OOOOOO   OOOO       OOOO    OOOO
+ OOOO     OOOOO       OO       OOO
+OOOOO      OOO         O        OOO
 OOOOO         OO       O         OOOO
-OOOOO           O      OOOO        OOO
-OO OO            O     OOOO         OOO
-OO OOO            O   OOOO           OOO
- OO OOOO          OOOOO   O          OOO
-  OO OOOO         OOOOO    OO        OOO
-   OOO OOOO        OOO       O      OOOO
-     OO  OOO        O         OOOO OOOO
+OOOOO           O      OOOO        OOO
+OO OO            O     OOOO         OOO
+OO OOO            O   OOOO           OOO
+ OO OOOO          OOOOO   O          OOO
+  OO OOOO         OOOOO    OO        OOO
+   OOO OOOO        OOO       O      OOOO
+     OO  OOO        O         OOOO OOOO
       OOO  OOO      O         OOOOOOOO
-       OOO  OOO     OO    OOOO OOOOOO
-         OOO  OOO  OOOO OOO      OOO
+       OOO  OOO     OO    OOOO OOOOOO
+         OOO  OOO  OOOO OOO      OOO
            OO   OO OOOOO        OOOO
             OOO  OOOOOO        OOOO
-              OO  OOOO        OOOO
-               OOO OOOOOO  OOOOOO
-                 OOO OOOOOOOOOOO
-                   OOOOOOOOOOO
-                      OOOOO
+              OO  OOOO        OOOO
+               OOO OOOOOO  OOOOOO
+                 OOO OOOOOOOOOOO
+                   OOOOOOOOOOO
+                      OOOOO
 
 
 
@@ -131,7 +131,7 @@ sudo /etc/init.d/mongod start
 # Set FIWARE repository
 FIWARE_REPO=$(mktemp)
 cat > $FIWARE_REPO <<EOF
-[testbed-fi-ware]
+[testbed-fiware]
 name=Fiware Repository
 baseurl=http://repositories.lab.fiware.org/repo/rpm/x86_64/
 gpgcheck=0
