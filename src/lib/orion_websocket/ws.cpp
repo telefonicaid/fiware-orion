@@ -25,6 +25,7 @@
 
 #include "ws.h"
 #include "connection_manager.h"
+#include "parser.h"
 
 #include "rest/RestService.h"
 
@@ -124,7 +125,7 @@ static int wsCallback(lws * ws,
         dat->request[dat->index] = 0;
 
         ConnectionInfo *ci = connection_manager_get(dat->cid, dat->request);
-        dat->message = strdup((restService(ci, orionServices)).c_str());
+        dat->message = strdup(ws_parser_message(restService(ci, orionServices).c_str(), ci->httpHeaders, (int)ci->httpStatusCode));
         free(dat->request);
         dat->request = NULL;
         dat->index = 0;

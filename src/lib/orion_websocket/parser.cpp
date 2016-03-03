@@ -31,15 +31,18 @@
 
 #include "logMsg/logMsg.h"
 #include "rest/HttpHeaders.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/rest.h"
 #include "parser.h"
 
 void ws_parser_parse
 (
-    const char*   msg,
-    std::string&  url,
-    std::string&  verb,
-    std::string&  payload,
-    HttpHeaders&  head
+  const char*     msg,
+  ConnectionInfo* ciP,
+  std::string&    url,
+  std::string&    verb,
+  std::string&    payload,
+  HttpHeaders&    head
 )
 {
   rapidjson::Document doc;
@@ -84,4 +87,32 @@ void ws_parser_parse
   {
     head.gotHeaders = false;
   }
+}
+
+const char *ws_parser_message
+(
+ const std::string&  msg,
+ const HttpHeaders&  head,
+ int                 statusCode
+)
+{
+  const char *tmpl = "{\"headers\": %s, \"message\": %s, \"status\": \"%d\"}";
+
+  rapidjson::StringBuffer buff;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buff);
+  writer.StartObject();
+  std::map<std::string, std::string *>::const_iterator it = head.headerMap.begin();
+  while (it != head.headerMap.end())
+  {
+    writer.Key(it->first.c_str());
+    writer.String(it->second->c_str());
+    ++it;
+  }
+  writer.EndObject();
+
+  const char *headers = buff.GetString();
+  char *json = (char *) malloc(strlen(tmpl) + strlen(headers) + msg.size() + 1);
+  sprintf(json, tmpl, headers, msg.c_str(), statusCode);
+
+  return json;
 }
