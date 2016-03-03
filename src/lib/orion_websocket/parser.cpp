@@ -87,6 +87,16 @@ void ws_parser_parse
   {
     head.gotHeaders = false;
   }
+
+  if (doc.HasMember("params") && doc["params"].IsObject())
+  {
+    rapidjson::Value::ConstMemberIterator it = doc["params"].MemberBegin();
+    while (it != doc["params"].MemberEnd())
+    {
+      uriParamGet(ciP, it->name.GetString(), it->value.GetString());
+      ++it;
+    }
+  }
 }
 
 const char *ws_parser_message

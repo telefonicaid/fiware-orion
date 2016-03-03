@@ -71,15 +71,15 @@ ConnectionInfo *connection_manager_get(int cid, const char *message)
   {
     pthread_mutex_unlock(&mtx_conn);
 
-    ws_parser_parse(message, url, verb, payload, head);
+    ws_parser_parse(message, it->second, url, verb, payload, head);
     it->second->modify(url, verb, payload, head);
     return it->second;
   }
 
   pthread_mutex_unlock(&mtx_conn);
 
-  ws_parser_parse(message, url, verb, payload, head);
   ConnectionInfo *ci = new ConnectionInfo("v2", JSON, true);
+  ws_parser_parse(message, ci, url, verb, payload, head);
   ci->modify(url, verb, payload, head);
 
   pthread_mutex_lock(&mtx_conn);
