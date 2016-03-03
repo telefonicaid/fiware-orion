@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Min lenght for IDs in V2
+Min length for IDs in V2
 
 --SHELL-INIT--
 dbInit CB
