@@ -92,6 +92,8 @@ static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute
     return oe.render(ciP, "");
   }
 
+  caP->type = DEFAULT_TYPE;
+
   return "OK";
 }
 

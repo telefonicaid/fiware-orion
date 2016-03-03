@@ -123,7 +123,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
     metadataVector.push_back(mP);
   }
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && !typeGiven)
   {
     type = DEFAULT_TYPE;
   }
@@ -808,6 +808,14 @@ std::string ContextAttribute::check
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+
+  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }

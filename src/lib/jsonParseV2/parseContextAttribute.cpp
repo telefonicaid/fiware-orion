@@ -266,6 +266,11 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     return "no 'name' for ContextAttribute";
   }
 
+  if (!caP->typeGiven)
+  {
+    caP->type = DEFAULT_TYPE;
+  }
+
   return "OK";
 }
 
@@ -309,6 +314,10 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
     ciP->httpStatusCode = SccBadRequest;
     return oe.render(ciP, "");
+  }
+  if (!caP->typeGiven)
+  {
+    caP->type = DEFAULT_TYPE;
   }
 
   return r;
