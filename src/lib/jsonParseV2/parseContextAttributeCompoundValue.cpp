@@ -487,7 +487,6 @@ std::string parseContextAttributeCompoundValueStandAlone
 
   if (!caP->typeGiven)
   {
-    LM_W((">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><  poniendo default type en parseContextAttributeCompoundValueStandAlone"));
     caP->type = DEFAULT_TYPE;
   }
 
