@@ -68,7 +68,6 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
   caP->valueType  = (document.IsObject())? orion::ValueTypeObject : orion::ValueTypeVector;
   parseContextAttributeCompoundValueStandAlone(document, caP, caP->valueType);
 
-  // ESTO NO DEBE SER ASI
   if (!caP->typeGiven) {
     caP->type = DEFAULT_TYPE;
   }
