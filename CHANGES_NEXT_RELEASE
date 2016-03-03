@@ -5,3 +5,5 @@
 - Remove: deprecated functionality related with ONTIMEINTERVAL subscriptions
 - Remove: XML support (deprecated functionality) (Issue #1862)
 - Add: new value for URI param 'options': unique - like 'values', but avoiding duplicates (Issue #1050)
+- Add: check min length for IDs in v2 (Issue #1836)
+
