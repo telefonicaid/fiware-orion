@@ -112,9 +112,9 @@ HttpStatusCode mongoUpdateContextSubscription
 
   if (version != "v2") {
     /* Entities, attribute list and reference are not updatable, so they are appended directly */
-    newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES, __FUNCTION__).Obj());
-    newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS, __FUNCTION__).Obj());
-    newSub.append(CSUB_REFERENCE, getStringField(sub, CSUB_REFERENCE, __FUNCTION__));
+    newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
+    newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
+    newSub.append(CSUB_REFERENCE, getStringFieldF(sub, CSUB_REFERENCE));
   }
   else // v2
   {
@@ -126,7 +126,7 @@ HttpStatusCode mongoUpdateContextSubscription
     }
     else
     {
-      ref = getStringField(sub, CSUB_REFERENCE, __FUNCTION__);
+      ref = getStringFieldF(sub, CSUB_REFERENCE);
     }
     newSub.append(CSUB_REFERENCE, ref);
 
@@ -155,7 +155,7 @@ HttpStatusCode mongoUpdateContextSubscription
     }
     else
     {
-      newSub.appendArray(CSUB_ENTITIES, getField(sub, CSUB_ENTITIES, __FUNCTION__).Obj());
+      newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
     }
 
     //Attributes
@@ -170,7 +170,7 @@ HttpStatusCode mongoUpdateContextSubscription
     }
     else
     {
-      newSub.appendArray(CSUB_ATTRS, getField(sub, CSUB_ATTRS, __FUNCTION__).Obj());
+      newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
     }
 
   }
@@ -192,7 +192,7 @@ HttpStatusCode mongoUpdateContextSubscription
     //
     // No duration in incoming request => "inherit" expirationDate from 'old' subscription
     //
-    long long expirationTime = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLong(sub, CSUB_EXPIRATION, __FUNCTION__) : -1;
+    long long expirationTime = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION) : -1;
 
     newSub.append(CSUB_EXPIRATION, expirationTime);
   }
@@ -228,14 +228,14 @@ HttpStatusCode mongoUpdateContextSubscription
     //
     if (sub.hasField(CSUB_THROTTLING))
     {
-      newSub.append(CSUB_THROTTLING, getIntOrLongFieldAsLong(sub, CSUB_THROTTLING, __FUNCTION__));
+      newSub.append(CSUB_THROTTLING, getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING));
     }
   }
 
   /* Notify conditions */
   bool notificationDone = false;
   if (requestP->notifyConditionVector.size() == 0) {
-    newSub.appendArray(CSUB_CONDITIONS, getField(sub, CSUB_CONDITIONS, __FUNCTION__).embeddedObject());
+    newSub.appendArray(CSUB_CONDITIONS, getFieldF(sub, CSUB_CONDITIONS).embeddedObject());
   }
   else {
       /* Destroy any previous ONTIMEINTERVAL thread */
@@ -279,7 +279,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 enV,
                                                 attrL,
                                                 requestP->subscriptionId.get(),
-                                                getStringField(sub, CSUB_REFERENCE, __FUNCTION__).c_str(),
+                                                getStringFieldF(sub, CSUB_REFERENCE).c_str(),
                                                 &notificationDone,
                                                 notifyFormat,
                                                 tenant,
@@ -309,10 +309,10 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   else if (sub.hasField(CSUB_EXPR))
   {
-    newSub.append(CSUB_EXPR, getField(sub, CSUB_EXPR, __FUNCTION__).Obj());
+    newSub.append(CSUB_EXPR, getFieldF(sub, CSUB_EXPR).Obj());
   }
 
-  int count = sub.hasField(CSUB_COUNT) ? getIntField(sub, CSUB_COUNT, __FUNCTION__) : 0;
+  int count = sub.hasField(CSUB_COUNT) ? getIntFieldF(sub, CSUB_COUNT) : 0;
 
   //
   // Update from cached value, if applicable
@@ -356,7 +356,7 @@ HttpStatusCode mongoUpdateContextSubscription
     /* The hasField checks are needed as lastNotification/count might not be present in the original doc */
     if (sub.hasField(CSUB_LASTNOTIFICATION))
     {
-      long long lastNotification = getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION, __FUNCTION__);
+      long long lastNotification = getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION);
 
       //
       // Compare with 'lastNotificationTime', that might come from the sub-cache.

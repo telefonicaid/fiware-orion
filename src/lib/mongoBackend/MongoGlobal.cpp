@@ -293,11 +293,11 @@ extern bool getOrionDatabases(std::vector<std::string>& dbs)
     return false;
   }
 
-  std::vector<BSONElement> databases = getField(result, "databases", __FUNCTION__).Array();
+  std::vector<BSONElement> databases = getFieldF(result, "databases").Array();
   for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
   {
     BSONObj      db      = (*i).Obj();
-    std::string  dbName  = getStringField(db, "name", __FUNCTION__);
+    std::string  dbName  = getStringFieldF(db, "name");
     std::string  prefix  = dbPrefix + "-";
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
@@ -538,7 +538,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
 */
 static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
-  BSONElement  idField = getField(sub, "_id", __FUNCTION__);
+  BSONElement  idField = getFieldF(sub, "_id");
 
   // Paranoia check:  _id exists?
   if (idField.eoo() == true)
@@ -552,7 +552,7 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   std::string  subId   = idField.OID().toString();
 
   // Paranoia check II:  'conditions' exists?
-  BSONElement conditionsField = getField(sub, CSUB_CONDITIONS, __FUNCTION__);
+  BSONElement conditionsField = getFieldF(sub, CSUB_CONDITIONS);
   if (conditionsField.eoo() == true)
   {
     std::string details = std::string("error retrieving 'conditions' field for subscription '") + subId + "'";
@@ -561,14 +561,14 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   }
   alarmMgr.dbErrorReset();
 
-  std::vector<BSONElement> condV = getField(sub, CSUB_CONDITIONS, __FUNCTION__).Array();
+  std::vector<BSONElement> condV = getFieldF(sub, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < condV.size(); ++ix)
   {
     BSONObj condition = condV[ix].embeddedObject();
 
-    if (strcmp(getStringField(condition, CSUB_CONDITIONS_TYPE, __FUNCTION__).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
+    if (strcmp(getStringFieldF(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
-      int interval = getField(condition, CSUB_CONDITIONS_VALUE, __FUNCTION__).numberLong();
+      int interval = getFieldF(condition, CSUB_CONDITIONS_VALUE).numberLong();
 
       LM_T(LmtNotifier, ("creating ONTIMEINTERVAL thread for subscription '%s' with interval %d (tenant '%s')",
                          subId.c_str(),
@@ -596,7 +596,7 @@ void recoverOntimeIntervalThreads(const std::string& tenant)
 */
 static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
-  BSONElement  idField = getField(sub, "_id", __FUNCTION__);
+  BSONElement  idField = getFieldF(sub, "_id");
 
   if (idField.eoo() == true)
   {
@@ -2412,8 +2412,8 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 {
   EntityId en;
 
-  en.id = getStringField(entity, REG_ENTITY_ID, __FUNCTION__);
-  en.type = getStringField(entity, REG_ENTITY_TYPE, __FUNCTION__);
+  en.id = getStringFieldF(entity, REG_ENTITY_ID);
+  en.type = getStringFieldF(entity, REG_ENTITY_TYPE);
 
   /* isPattern = true is not allowed in registrations so it is not in the
    * document retrieved with the query; however we will set it to be formally correct
@@ -2437,9 +2437,9 @@ static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector
 static void processAttribute(ContextRegistrationResponse* crr, const AttributeList& attrL, const BSONObj& attribute)
 {
   ContextRegistrationAttribute attr(
-    getStringField(attribute, REG_ATTRS_NAME, __FUNCTION__),
-    getStringField(attribute, REG_ATTRS_TYPE, __FUNCTION__),
-    getStringField(attribute, REG_ATTRS_ISDOMAIN, __FUNCTION__));
+    getStringFieldF(attribute, REG_ATTRS_NAME),
+    getStringFieldF(attribute, REG_ATTRS_TYPE),
+    getStringFieldF(attribute, REG_ATTRS_ISDOMAIN));
 
   // FIXME: we don't take metadata into account at the moment
   // attr.metadataV = ..
@@ -2467,10 +2467,10 @@ static void processContextRegistrationElement
 {
   ContextRegistrationResponse crr;
 
-  crr.contextRegistration.providingApplication.set(getStringField(cr, REG_PROVIDING_APPLICATION, __FUNCTION__));
+  crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
   crr.contextRegistration.providingApplication.setFormat(format);
 
-  std::vector<BSONElement> queryEntityV = getField(cr, REG_ENTITIES, __FUNCTION__).Array();
+  std::vector<BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
   {
@@ -2482,7 +2482,7 @@ static void processContextRegistrationElement
   {
     if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
     {
-      std::vector<BSONElement> queryAttrV = getField(cr, REG_ATTRS, __FUNCTION__).Array();
+      std::vector<BSONElement> queryAttrV = getFieldF(cr, REG_ATTRS).Array();
 
       for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
       {
@@ -2660,8 +2660,8 @@ bool registrationsQuery
     // Default format is XML, in the case the field is not found in the
     // registrations document (for pre-0.21.0 versions)
     //
-    Format                    format = r.hasField(REG_FORMAT)? stringToFormat(getStringField(r, REG_FORMAT, __FUNCTION__)) : XML;
-    std::vector<BSONElement>  queryContextRegistrationV = getField(r, REG_CONTEXT_REGISTRATION, __FUNCTION__).Array();
+    Format                    format = r.hasField(REG_FORMAT)? stringToFormat(getStringFieldF(r, REG_FORMAT)) : XML;
+    std::vector<BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
@@ -2722,12 +2722,12 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 */
 bool someEmptyCondValue(const BSONObj& sub)
 {
-  std::vector<BSONElement>  conds = getField(sub, CSUB_CONDITIONS, __FUNCTION__).Array();
+  std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
 
   for (unsigned int ix = 0; ix < conds.size() ; ++ix)
   {
     BSONObj cond = conds[ix].embeddedObject();
-    if (getField(cond, CSUB_CONDITIONS_VALUE, __FUNCTION__).Array().size() == 0)
+    if (getFieldF(cond, CSUB_CONDITIONS_VALUE).Array().size() == 0)
     {
       return true;
     }
@@ -2746,12 +2746,12 @@ bool someEmptyCondValue(const BSONObj& sub)
 */
 bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
-  std::vector<BSONElement>  conds = getField(sub, CSUB_CONDITIONS, __FUNCTION__).Array();
+  std::vector<BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
 
   for (unsigned int ix = 0; ix < conds.size() ; ++ix)
   {
     BSONObj cond = conds[ix].embeddedObject();
-    std::vector<BSONElement>  condValues = getField(cond, CSUB_CONDITIONS_VALUE, __FUNCTION__).Array();
+    std::vector<BSONElement>  condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
     for (unsigned int jx = 0; jx < condValues.size() ; ++jx)
     {
       std::string condValue = condValues[jx].String();
@@ -2781,14 +2781,14 @@ bool condValueAttrMatch(const BSONObj& sub, const std::vector<std::string>& modi
 EntityIdVector subToEntityIdVector(const BSONObj& sub)
 {
   EntityIdVector            enV;
-  std::vector<BSONElement>  subEnts = getField(sub, CSUB_ENTITIES, __FUNCTION__).Array();
+  std::vector<BSONElement>  subEnts = getFieldF(sub, CSUB_ENTITIES).Array();
 
   for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
   {
     BSONObj    subEnt = subEnts[ix].embeddedObject();
-    EntityId*  en     = new EntityId(getStringField(subEnt, CSUB_ENTITY_ID, __FUNCTION__),
-                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringField(subEnt, CSUB_ENTITY_TYPE, __FUNCTION__) : "",
-                                     getStringField(subEnt, CSUB_ENTITY_ISPATTERN, __FUNCTION__));
+    EntityId*  en     = new EntityId(getStringFieldF(subEnt, CSUB_ENTITY_ID),
+                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(subEnt, CSUB_ENTITY_TYPE) : "",
+                                     getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
     enV.push_back(en);
   }
 
@@ -2808,7 +2808,7 @@ EntityIdVector subToEntityIdVector(const BSONObj& sub)
 AttributeList subToAttributeList(const BSONObj& sub)
 {
   AttributeList             attrL;
-  std::vector<BSONElement>  subAttrs = getField(sub, CSUB_ATTRS, __FUNCTION__).Array();
+  std::vector<BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
 
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {

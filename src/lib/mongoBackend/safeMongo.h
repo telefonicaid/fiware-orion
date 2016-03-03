@@ -32,6 +32,15 @@
 
 #include "mongo/client/dbclient.h"
 
+/* Some macros to make the usage of these function prettier */
+#define getObjectFieldF(b, field)           getObjectField(b, field, __FUNCTION__)
+#define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__)
+#define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__)
+#define getLongFieldF(b, field)             getLongField(b, field, __FUNCTION__)
+#define getIntOrLongFieldAsLongF(b, field)  getIntOrLongFieldAsLong(b, field, __FUNCTION__)
+#define getBoolFieldF(b, field)             getBoolField(b, field, __FUNCTION__)
+#define getFieldF(b, field)                 getField(b, field, __FUNCTION__)
+
 /* ****************************************************************************
 *
 * getObjectField -

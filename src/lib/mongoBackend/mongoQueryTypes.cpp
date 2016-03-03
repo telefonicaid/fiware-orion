@@ -87,9 +87,9 @@ static std::string attributeType
     /* It could happen that different entities within the same entity type may have attributes with the same name
      * but different types. In that case, one type (at random) is returned. A list could be returned but the
      * NGSIv2 operations only allow to set one type */
-    BSONObj attrs = getField(r, ENT_ATTRS, __FUNCTION__).embeddedObject();
-    BSONObj attr  = getField(attrs, attrName, __FUNCTION__).embeddedObject();
-    ret           = getStringField(attr, ENT_ATTRS_TYPE, __FUNCTION__);
+    BSONObj attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
+    BSONObj attr  = getFieldF(attrs, attrName).embeddedObject();
+    ret           = getStringFieldF(attr, ENT_ATTRS_TYPE);
     break;
   }
   releaseMongoConnection(connection);
@@ -218,7 +218,7 @@ HttpStatusCode mongoEntityTypes
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getField(result, "result", __FUNCTION__).Array();
+  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
 
   if (resultsArray.size() == 0)
   {
@@ -240,8 +240,8 @@ HttpStatusCode mongoEntityTypes
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    EntityType*               entityType  = new EntityType(getStringField(resultItem, "_id", __FUNCTION__));
-    std::vector<BSONElement>  attrsArray  = getField(resultItem, "attrs", __FUNCTION__).Array();
+    EntityType*               entityType  = new EntityType(getStringFieldF(resultItem, "_id"));
+    std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
@@ -367,7 +367,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getField(result, "result", __FUNCTION__).Array();
+  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
 
@@ -381,12 +381,12 @@ HttpStatusCode mongoAttributesForEntityType
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONElement  idField    = resultsArray[ix].embeddedObject().getField("_id");
+    BSONElement  idField    = getFieldF(resultsArray[ix].embeddedObject(), "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'resultsArray[ix].embeddedObject().getField("_id")' is not found, if we continue,
+    // Now, if 'getFieldF(resultsArray[ix].embeddedObject(), "_id")' is not found, if we continue,
     // calling embeddedObject() on it, then we get an exception and the broker crashes.
     //
     if (idField.eoo() == true)
