@@ -250,7 +250,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
     Then verify that receive an "OK" http code
     And verify that "3" entities are returned
 
-  @service_error @BUG_1873 @skip
+  @service_error @BUG_1873
   Scenario Outline:  try to list all entities using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value     |

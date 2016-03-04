@@ -126,7 +126,7 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
 
-  @service_error @BUG_1873 @skip
+  @service_error @BUG_1873
   Scenario Outline:  try to get an attribute by entity ID using NGSI v2 with wrong several services
     Given  a definition of headers
       | parameter          | value            |

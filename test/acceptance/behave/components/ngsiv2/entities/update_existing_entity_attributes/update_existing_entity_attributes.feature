@@ -282,7 +282,7 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
     Then verify that receive an "No Content" http code
     And verify that entities are stored in mongo
 
-  @service_update_error @BUG_1873 @skip
+  @service_update_error @BUG_1873
   Scenario Outline:  try to update attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value            |

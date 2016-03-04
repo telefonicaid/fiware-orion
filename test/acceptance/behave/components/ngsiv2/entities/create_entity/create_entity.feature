@@ -291,8 +291,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | SERVICE            |
       | max length allowed |
 
-  @service_error.row<row.id>
-  @service_error @BUG_1087 @BUG_1873 @skip
+  @service_error @BUG_1087 @BUG_1873
   Scenario Outline:  try to create entities using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value            |
@@ -311,7 +310,6 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | parameter   | value                                                                                  |
       | error       | BadRequest                                                                             |
       | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
-    And verify that entities are not stored in mongo
     Examples:
       | service       |
       | servicedot.sr |
@@ -343,7 +341,6 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | parameter   | value                                                    |
       | error       | BadRequest                                               |
       | description | bad length - a tenant name can be max 50 characters long |
-    And verify that entities are not stored in mongo
 
   # ---------- Services path --------------------------------
 

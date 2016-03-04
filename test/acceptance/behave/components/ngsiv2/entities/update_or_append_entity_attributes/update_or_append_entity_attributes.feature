@@ -338,7 +338,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @service_update_append_error @BUG_1873 @skip
+  @service_update_append_error @BUG_1873
   Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value            |
