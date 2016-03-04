@@ -120,8 +120,15 @@ const char *ws_parser_message
   }
   writer.EndObject();
 
+  if (statusCode < 100 || statusCode > 599) // Code is not a valid HTTP status code
+    statusCode = 0;
+
   const char *headers = buff.GetString();
-  char *json = (char *) malloc(strlen(tmpl) + strlen(headers) + msg.size() + 1);
+
+  /* Sum all lengths, discard string format specifier (-6)
+   * and add status code (3) and the final null character
+   */
+  char *json = (char *) malloc(strlen(tmpl) - 6 + strlen(headers) + msg.size() + 3 + 1);
   sprintf(json, tmpl, headers, msg.c_str(), statusCode);
 
   return json;
