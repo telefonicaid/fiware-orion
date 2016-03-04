@@ -121,7 +121,7 @@ const char *ws_parser_message
   writer.EndObject();
 
   if (statusCode < 100 || statusCode > 599) // Code is not a valid HTTP status code
-    statusCode = 0;
+    statusCode = 500;
 
   const char *headers = buff.GetString();
 
