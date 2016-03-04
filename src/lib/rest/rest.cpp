@@ -83,9 +83,9 @@ static unsigned int              threadPoolSize;
 
 /* ****************************************************************************
 *
-* uriArgumentGet - 
+* uriArgumentReceive - 
 */
-static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
+static int uriArgumentReceive(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
   std::string      key   = ckey;
@@ -271,7 +271,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 */
 int uriParamPush(ConnectionInfo *ciP, const char* ckey, const char* val)
 {
-  return uriArgumentGet((void *) ciP, (MHD_ValueKind)0, ckey, val);
+  return uriArgumentReceive((void *) ciP, (MHD_ValueKind)0, ckey, val);
 }
 
 
@@ -1081,7 +1081,7 @@ static int connectionTreat
       ciP->outFormat = JSON; // JSON is default output format
     }
 
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentReceive, ciP);
 
     return MHD_YES;
   }
