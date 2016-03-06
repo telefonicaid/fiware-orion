@@ -1443,7 +1443,8 @@ static bool addTriggeredSubscriptions_noCache
     std::string err;
     if (!nextSafeOrError(cursor, &sub, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      LM_E(("Runtime Error (exception in nextSafe() at %s: <%s>, query: <%s>)",
+            __FUNCTION__, err.c_str(), query.toString().c_str()));
       continue;
     }
     BSONElement  idField  = getFieldF(sub, "_id");
@@ -3277,7 +3278,8 @@ void processContextElement
     BSONObj r;
     if (!nextSafeOrError(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      LM_E(("Runtime Error (exception in nextSafe() at %s: <%s>, query: <%s>)",
+            __FUNCTION__, err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;

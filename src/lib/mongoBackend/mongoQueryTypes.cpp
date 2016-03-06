@@ -78,7 +78,8 @@ static std::string attributeType
     BSONObj r;
     if (!nextSafeOrError(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      LM_E(("Runtime Error (exception in nextSafe() at %s: <%s>, query: <%s>)",
+            __FUNCTION__, err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
