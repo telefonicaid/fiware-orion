@@ -270,7 +270,7 @@ function brokerStartAwait
   typeset -i loopNo
   typeset -i loops
   loopNo=0
-  loops=50
+  loops=100
 
   while [ $loopNo -lt $loops ]
   do
@@ -278,6 +278,7 @@ function brokerStartAwait
     if [ "$?" == "0" ]
     then
       vMsg The orion context broker has started, listening on port $port
+      echo "Broker started after $loopNo checks" >> /tmp/brokerStart
       sleep 1
       break;
     fi
@@ -289,9 +290,10 @@ function brokerStartAwait
 
   sleep .5
 
-  # Check that CB started fine
-  curl -s localhost:${port}/version | grep version > /dev/null
+  # Check that CB started
+  curl -s localhost:${port}/version | grep version >> /tmp/brokerStart
   result=$?
+  echo "result: $result" >> /tmp/brokerStart 
 }
 
 
