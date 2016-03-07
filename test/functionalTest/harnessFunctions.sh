@@ -257,7 +257,7 @@ function brokerStopAwait
 # brokerStartAwait
 #
 # For some really strange reason, all functests fail under valgrind when executed by Jenkins
-# with out the line:
+# without the line:
 #
 #   echo "Broker started after $loopNo checks" >> /tmp/brokerStartCounter
 #
