@@ -203,8 +203,8 @@ echo
 echo
 
 
-echo "15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)"
-echo "==============================================================="
+echo "15. Modify E6/A6=null (PATCH), with keyValues (A6 is null)"
+echo "=========================================================="
 payload='{
   "A6": null
 }'
@@ -213,8 +213,8 @@ echo
 echo
 
 
-echo "16. Get E6/A6 (see that A6 is still 14)"
-echo "======================================="
+echo "16. Get E6/A6 (see that A6 is null)"
+echo "==================================="
 orionCurl --url /v2/entities/E6?options=keyValues --json
 echo
 echo
@@ -271,8 +271,8 @@ echo
 echo
 
 
-echo "22. GET E8/A8 (see A8 unchanged)"
-echo "================================"
+echo "22. GET E8/A8 (see A8 null)"
+echo "==========================="
 orionCurl --url /v2/entities/E8?options=keyValues --json
 echo
 echo
@@ -443,23 +443,23 @@ Date: REGEX(.*)
 
 
 
-15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)
-===============================================================
+15. Modify E6/A6=null (PATCH), with keyValues (A6 is null)
+==========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-16. Get E6/A6 (see that A6 is still 14)
-=======================================
+16. Get E6/A6 (see that A6 is null)
+===================================
 HTTP/1.1 200 OK
 Content-Length: 33
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A6": "14",
+    "A6": null,
     "id": "E6",
     "type": "T6"
 }
@@ -513,15 +513,15 @@ Date: REGEX(.*)
 
 
 
-22. GET E8/A8 (see A8 unchanged)
-================================
+22. GET E8/A8 (see A8 null)
+===========================
 HTTP/1.1 200 OK
 Content-Length: 33
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A8": "20",
+    "A8": null,
     "id": "E8",
     "type": "T8"
 }

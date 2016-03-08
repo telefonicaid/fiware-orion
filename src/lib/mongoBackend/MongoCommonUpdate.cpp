@@ -505,7 +505,7 @@ bool attributeTypeAbsent(ContextAttribute* caP)
 *
 * changedAttr -
 */
-bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
+bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersion)
 {
   /* Not finding the attribute field at MongoDB is consideres as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -515,7 +515,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 
   /* No value in the request means that the value stays as it was before, so it is not
    * a change */
-  if (caP->valueType == ValueTypeNone)
+  if (caP->valueType == ValueTypeNone && apiVersion !="v2")
   {
     return false;
   }
@@ -740,7 +740,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-      actualUpdate = (attrValueChanges(attr, caP) ||
+      actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
                                              getStringField(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
@@ -891,7 +891,6 @@ static bool updateAttribute
     BSONObj newAttr;
     BSONObj attr = getField(attrs, effectiveName).embeddedObject();
     actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
-
     if (actualUpdate)
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
@@ -2912,7 +2911,6 @@ static void updateEntity
 
     return;
   }
-
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
