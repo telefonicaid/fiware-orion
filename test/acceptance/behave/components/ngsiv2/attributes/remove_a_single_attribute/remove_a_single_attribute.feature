@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -27,6 +27,8 @@
 #
 
 Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/<entity_id>/attrs/<attr_name>
+  Queries parameters:
+  tested: type
   As a context broker user
   I would like to delete an attribute request using NGSI v2 API
   So that I can manage and use them in my scripts
@@ -51,24 +53,26 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_delete_happy_path |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
-    And create "3" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 45          |
-      | attributes_type  | date        |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
     And verify that receive several "Created" http code
-    And verify that entities are stored in mongo
-    When delete an attribute "temperature_0" in entities with id "room"
-      | parameter       | value                                  |
-      | entities_number | the same value of the previous request |
-    Then verify that receive several "No Content" http code
-    And verify that the attribute is deleted into mongo in the several entities
+    When delete an attribute "temperature_0" in the entity with id "room_1"
+    Then verify that receive an "No Content" http code
+    And verify that the attribute is deleted into mongo in the defined entity
 
   # ------------------------ Service ----------------------------------------------
 
@@ -79,20 +83,24 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | <service>        |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celcius     |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
     And verify that receive several "Created" http code
-    And verify that entities are stored in mongo
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
@@ -110,31 +118,35 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    And create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celcius     |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
     And verify that receive several "Created" http code
-    And verify that entities are stored in mongo
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
 
-  @service_delete_error
+  @service_delete_error @BUG_1873
   Scenario Outline: Try to delete an attribute by entity ID using NGSI v2 with wrong service header values
     Given a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                                                                                  |
@@ -142,7 +154,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
     Examples:
       | service     |
-       | service.sr  |
+      | service.sr  |
       | Service-sr  |
       | Service(sr) |
       | Service=sr  |
@@ -159,7 +171,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | greater than max length allowed |
       | Fiware-ServicePath | /test                           |
       | Content-Type       | application/json                |
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                                                    |
@@ -168,27 +180,31 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
 
   # ------------------------ Service path ----------------------------------------------
 
-  @service_path_delete @BUG_1423 @skip
+  @service_path_delete @BUG_1423
   Scenario Outline: Delete an attribute by entity ID using NGSI v2 with several service path header values
     Given a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_delete_service_path |
       | Fiware-ServicePath | <service_path>           |
       | Content-Type       | application/json         |
-    And create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celcius     |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
     And verify that receive several "Created" http code
-    And verify that entities are stored in mongo
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
@@ -209,20 +225,24 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | parameter      | value                    |
       | Fiware-Service | test_delete_service_path |
       | Content-Type   | application/json         |
-    And create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celcius     |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
     And verify that receive several "Created" http code
-    And verify that entities are stored in mongo
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
 
@@ -233,7 +253,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_delete_service_path_error |
       | Fiware-ServicePath | <service_path>                 |
       | Content-Type       | application/json               |
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                                                    |
@@ -255,7 +275,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_delete_service_path_error |
       | Fiware-ServicePath | <service_path>                 |
       | Content-Type       | application/json               |
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                                                                    |
@@ -267,13 +287,13 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | /service,sr  |
 
   @service_path_delete_error
-  Scenario Outline: Try to delete an attribute by entity ID using NGSI v2 with wrong service path header values
+  Scenario Outline: Try to delete an attribute by entity ID using NGSI v2 with service path header values max length allowed exceed
     Given a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_replace_service_path_error |
       | Fiware-ServicePath | <service_path>                  |
       | Content-Type       | application/json                |
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                                  |
@@ -285,13 +305,13 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | greater than max length allowed and ten levels |
 
   @service_path_delete_error
-  Scenario: Try to delete an attribute by entity ID using NGSI v2 with wrong service path header values
+  Scenario: Try to delete an attribute by entity ID using NGSI v2 with too many components in service path header values
     Given a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_replace_service_path_error      |
       | Fiware-ServicePath | max length allowed and eleven levels |
       | Content-Type       | application/json                     |
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room_1"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                              |
@@ -307,20 +327,22 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_delete_entity_id |
       | Fiware-ServicePath | /test                 |
       | Content-Type       | application/json      |
-    And create "1" entities with "3" attributes
-      | parameter        | value         |
-      | entities_type    | <entity_type> |
-      | entities_id      | <entity_id>   |
-      | attributes_name  | temperature   |
-      | attributes_value | 34            |
-      | attributes_type  | celcius       |
-      | metadatas_number | 2             |
-      | metadatas_name   | very_hot      |
-      | metadatas_type   | alarm         |
-      | metadatas_value  | hot           |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter         | value         |
+      | entities_type     | <entity_type> |
+      | entities_id       | <entity_id>   |
+      | attributes_number | 3             |
+      | attributes_name   | temperature   |
+      | attributes_value  | 34            |
+      | attributes_type   | celsius       |
+      | metadatas_number  | 2             |
+      | metadatas_name    | very_hot      |
+      | metadatas_type    | alarm         |
+      | metadatas_value   | hot           |
+    And create entity group with "1" entities in "normalized" mode
     And verify that receive several "Created" http code
-    And verify that entities are stored in mongo
-    When delete an attribute "temperature_0" in entities with id "the same value of the previous request"
+    When delete an attribute "temperature_0" in the entity with id "the same value of the previous request"
     Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
@@ -338,12 +360,28 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | room_11     | house.flat |
       | room_12     | house-flat |
       | room_13     | house@flat |
-      | room_14     | habitación |
-      | room_15     | españa     |
-      | room_16     | barça      |
       | room_17     | random=10  |
       | room_18     | random=100 |
-      | room_19     | random=960 |
+      | room_19     | random=256 |
+
+  @entity_id_delete_not_ascii_plain
+  Scenario Outline: Delete an attribute by entity ID using NGSI v2 with not ascii plain entity id values
+    Given a definition of headers
+      | parameter          | value                 |
+      | Fiware-Service     | test_delete_entity_id |
+      | Fiware-ServicePath | /test                 |
+      | Content-Type       | application/json      |
+    When delete an attribute "temperature_0" in the entity with id "<entity_id>"
+    Then verify that receive a "Bad Request" http code
+    And verify an error response
+      | parameter   | value                    |
+      | error       | BadRequest               |
+      | description | invalid character in URI |
+    Examples:
+      | entity_id  |
+      | habitación |
+      | españa     |
+      | barça      |
 
   @entity_not_exists
   Scenario: Try to delete an attribute by entity ID but it does not exists using NGSI v2
@@ -352,7 +390,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_delete_happy_path |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
-    When delete an attribute "temperature_0" in entities with id "dsfsdfds"
+    When delete an attribute "temperature_0" in the entity with id "fdgdfgfdgd"
     Then verify that receive a "Not Found" http code
     And verify an error response
       | parameter   | value                                                      |
@@ -366,21 +404,24 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_delete_happy_path |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
-    And create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter         | value       |
+      | entities_type     | house       |
+      | entities_id       | room        |
+      | attributes_number | 3           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+      | metadatas_number  | 2           |
+      | metadatas_name    | very_hot    |
+      | metadatas_type    | alarm       |
+      | metadatas_value   | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
     And verify that receive several "Created" http code
-    And create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | home        |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 45          |
-    And verify that receive several "Created" http code
-    When delete an attribute "temperature_0" in entities with id "room"
+    When delete an attribute "temperature_0" in the entity with id "room"
     Then verify that receive a "Conflict" http code
     And verify an error response
       | parameter   | value                                                                          |
@@ -394,7 +435,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_replace_entity_id |
       | Fiware-ServicePath | /test                  |
       | Content-Type       | application/json       |
-    When delete an attribute "temperature_0" in entities with id "<entity_id>"
+    When delete an attribute "temperature_0" in the entity with id "<entity_id>"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                    |
@@ -410,6 +451,50 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | house(flat)         |
       | {\'a\':34}          |
       | [\'34\', \'a\', 45] |
+      | house_&             |
+      | my house            |
+
+  @entity_id_delete_invalid
+  Scenario: Try to delete an attribute by entity ID using NGSI v2 with empty right-hand-side for entity id
+    Given a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_replace_entity_id |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    When delete an attribute "temperature_0" in the entity with id "house_?"
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | BadRequest                                                 |
+      | description | Empty right-hand-side for URI param //attrs/temperature_0/ |
+
+  @entity_id_delete_invalid
+  Scenario: Try to delete an attribute by entity ID using NGSI v2 with invalid entity id values
+    Given a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_replace_entity_id |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    When delete an attribute "temperature_0" in the entity with id "house_/"
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value             |
+      | error       | BadRequest        |
+      | description | service not found |
+
+  @entity_id_delete_invalid
+  Scenario: Try to delete an attribute by entity ID using NGSI v2 with invalid entity id values
+    Given a definition of headers
+      | parameter          | value                  |
+      | Fiware-Service     | test_replace_entity_id |
+      | Fiware-ServicePath | /test                  |
+      | Content-Type       | application/json       |
+    When delete an attribute "temperature_0" in the entity with id "house_#"
+    Then verify that receive an "Not Found" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
 
  # --------------------- attribute name  ------------------------------------
 
@@ -420,20 +505,23 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_attribute_name_delete |
       | Fiware-ServicePath | /test                      |
       | Content-Type       | application/json           |
-    And create "1" entities with "1" attributes
+   # These properties below are used in create request
+    And properties to entities
       | parameter        | value             |
       | entities_type    | house             |
       | entities_id      | room              |
       | attributes_name  | <attributes_name> |
       | attributes_value | 34                |
-      | attributes_type  | celcius           |
+      | attributes_type  | celsius           |
       | metadatas_number | 2                 |
       | metadatas_name   | very_hot          |
       | metadatas_type   | alarm             |
       | metadatas_value  | hot               |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
     And verify that receive several "Created" http code
-    And verify that entities are stored in mongo
-    When delete an attribute "the same value of the previous request" in entities with id "room"
+    When delete an attribute "the same value of the previous request" in the entity with id "room_1"
     Then verify that receive a "No Content" http code
     And verify that the attribute is deleted into mongo
     Examples:
@@ -447,13 +535,28 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | house.flat      |
       | house-flat      |
       | house@flat      |
+      | random=10       |
+      | random=100      |
+      | random=256      |
+
+  @attribute_name_delete_not_ascii_plain
+  Scenario Outline: Delete an attribute by entity ID using NGSI v2 with not ascii plain attribute names
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_attribute_name_delete |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+    When delete an attribute "<attributes_name>" in the entity with id "room_1"
+    Then verify that receive a "Not Found" http code
+    And verify an error response
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
+    Examples:
+      | attributes_name |
       | habitación      |
       | españa          |
       | barça           |
-      | random=10       |
-      | random=100      |
-      | random=10000    |
-      | random=50000    |
 
   @attribute_name_not_exists
   Scenario:  Try to delete an attribute by entity ID using NGSI v2 but the attribute name does not exist
@@ -462,19 +565,23 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_attribute_name_update |
       | Fiware-ServicePath | /test                      |
       | Content-Type       | application/json           |
-    And create "1" entities with "1" attributes
+   # These properties below are used in create request
+    And properties to entities
       | parameter        | value       |
       | entities_type    | house       |
       | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
-      | attributes_type  | celcius     |
+      | attributes_type  | celsius     |
       | metadatas_number | 2           |
       | metadatas_name   | very_hot    |
       | metadatas_type   | alarm       |
       | metadatas_value  | hot         |
+    And create entity group with "2" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
     And verify that receive several "Created" http code
-    When delete an attribute "wrwerwerw" in entities with id "room"
+    When delete an attribute "wrwerwerw" in the entity with id "room_1"
     Then verify that receive a "Not Found" http code
     And verify an error response
       | parameter   | value               |
@@ -488,7 +595,7 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_attribute_name_update_error |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    When delete an attribute "<attributes_name>" in entities with id "<entity_id>"
+    When delete an attribute "<attributes_name>" in the entity with id "<entity_id>"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value                    |
@@ -513,12 +620,12 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_attribute_name_update_error |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    When delete an attribute "<attributes_name>" in entities with id "<entity_id>"
-    Then verify that receive a "Bad Request" http code
+    When delete an attribute "<attributes_name>" in the entity with id "<entity_id>"
+    Then verify that receive a "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | BadRequest               |
-      | description | invalid character in URI |
+      | parameter   | value                                                      |
+      | error       | NotFound                                                   |
+      | description | The requested entity has not been found. Check type and id |
     Examples:
       | entity_id | attributes_name |
       | room_9    | house_?         |
@@ -533,21 +640,144 @@ Feature: delete an attribute request using NGSI v2 API. "DELETE" - /v2/entities/
       | Fiware-Service     | test_attribute_name_update_error |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    And create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celcius     |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
-    And verify that receive several "Created" http code
-    When delete an attribute "" in entities with id "room"
+    When delete an attribute "" in the entity with id "room"
     Then verify that receive a "Bad Request" http code
     And verify an error response
       | parameter   | value             |
       | error       | BadRequest        |
       | description | service not found |
+
+   #   -------------- queries parameters ------------------------------------------
+   #   ---  type query parameter ---
+
+  @qp_type
+  Scenario Outline:  delete an attribute by entity ID using NGSI v2 with "type" query parameter
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an attribute "temperature" in the entity with id "room"
+      | parameter | value   |
+      | type      | <types> |
+    Then verify that receive a "No Content" http code
+    And verify that the attribute is deleted into mongo
+    Examples:
+      | types   |
+      | house_0 |
+      | house_1 |
+      | house_2 |
+
+  @qp_type_empty
+  Scenario:  try to delete an attribute by entity ID using NGSI v2 with "type" query parameter with empty value
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an attribute "temperature" in the entity with id "room"
+      | parameter | value |
+      | type      |       |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                      |
+      | error       | BadRequest                                 |
+      | description | Empty right-hand-side for URI param /type/ |
+
+  @qp_unknown @BUG_1831 @skip
+  Scenario Outline:  try to delete an attribute by entity ID using NGSI v2 with unknown query parameter
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+ # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an attribute "temperature" in the entity with id "room"
+      | parameter   | value   |
+      | <parameter> | house_1 |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                      |
+      | error       | BadRequest                                 |
+      | description | Empty right-hand-side for URI param /type/ |
+    Examples:
+      | parameter |
+      |           |
+      | dfgdfgfgg |
+      | house_&   |
+      | my house  |
+      | p_/       |
+      | p_#       |
+
+  @qp_invalid
+  Scenario Outline:  try to delete an attribute by entity ID using NGSI v2 with "type" query parameter with invalid value
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+ # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an attribute "temperature" in the entity with id "room"
+      | parameter   | value   |
+      | <parameter> | house_1 |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                              |
+      | error       | BadRequest                         |
+      | description | invalid character in URI parameter |
+    Examples:
+      | parameter           |
+      | ========            |
+      | p<flat>             |
+      | p=flat              |
+      | p'flat'             |
+      | p\'flat\'           |
+      | p;flat              |
+      | p(flat)             |
+      | {\'a\':34}          |
+      | [\'34\', \'a\', 45] |
+
+
+

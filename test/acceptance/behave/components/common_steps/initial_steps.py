@@ -93,12 +93,11 @@ def start_context_broker(context):
         __logger__.debug("Starting contextBroker per command line interface...")
         props_cb["CB_EXTRA_OPS"] = props_cb["CB_EXTRA_OPS"].replace('"', "")
         # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
-        __logger__.debug("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
-            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
-             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
-        resp = context.my_fab.run("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
-            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
-             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        command = "contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %\
+                  (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
+                   props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"])
+        __logger__.debug("command: %s" % command)
+        resp = context.my_fab.run(command)
         __logger__.debug("output: %s" % repr(resp))
         __logger__.info("...Started contextBroker command line interface")
 

@@ -27,6 +27,8 @@
 #
 
 Feature: delete an entity request using NGSI v2 API. "DELETE" - /v2/entities/
+  queries parameters:
+  tested: type
   As a context broker user
   I would like to delete entities requests using NGSI v2 API
   So that I can manage and use them in my scripts
@@ -477,3 +479,136 @@ Feature: delete an entity request using NGSI v2 API. "DELETE" - /v2/entities/
       | house_?   |
       | house_/   |
       | house_#   |
+
+   #   -------------- queries parameters ------------------------------------------
+   #   ---  type query parameter ---
+
+  @qp_type
+  Scenario Outline:  delete an entity using NGSI v2 with "type" query parameter
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an entity with id "room"
+      | parameter | value   |
+      | type      | <types> |
+    Then verify that receive a "No Content" http code
+    And verify that entities are not stored in mongo
+    Examples:
+      | types   |
+      | house_0 |
+      | house_1 |
+      | house_2 |
+
+  @qp_type_empty
+  Scenario:  try to delete an entity using NGSI v2 with "type" query parameter with empty value
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an entity with id "room"
+      | parameter | value |
+      | type      |       |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                      |
+      | error       | BadRequest                                 |
+      | description | Empty right-hand-side for URI param /type/ |
+
+  @qp_unknown @BUG_1831 @skip
+  Scenario Outline:  try to delete an entity using NGSI v2 with unknown query parameter
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+ # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an entity with id "room"
+      | parameter   | value   |
+      | <parameter> | house_1 |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                      |
+      | error       | BadRequest                                 |
+      | description | Empty right-hand-side for URI param /type/ |
+    Examples:
+      | parameter |
+      |           |
+      | dfgdfgfgg |
+      | house_&   |
+      | my house  |
+      | p_/       |
+      | p_#       |
+
+  @qp_invalid
+  Scenario Outline:  try to delete an entity using NGSI v2 with "type" query parameter with invalid value
+    Given  a definition of headers
+      | parameter          | value             |
+      | Fiware-Service     | test_attr_type_qp |
+      | Fiware-ServicePath | /test             |
+      | Content-Type       | application/json  |
+ # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
+    And verify that receive several "Created" http code
+    When delete an entity with id "room"
+      | parameter   | value   |
+      | <parameter> | house_1 |
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                              |
+      | error       | BadRequest                         |
+      | description | invalid character in URI parameter |
+    Examples:
+      | parameter           |
+      | ========            |
+      | p<flat>             |
+      | p=flat              |
+      | p'flat'             |
+      | p\'flat\'           |
+      | p;flat              |
+      | p(flat)             |
+      | {\'a\':34}          |
+      | [\'34\', \'a\', 45] |
+
