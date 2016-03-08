@@ -153,7 +153,7 @@ mv /tmp/version.h              src/app/contextBroker/version.h
 rm -rf CHANGES_NEXT_RELEASE
 touch CHANGES_NEXT_RELEASE
 
-# Adjust Readthedocs documentation badge. Note that the procedure is not symetric (like in version.h), as
+# Adjust Readthedocs documentation badge. Note that the procedure is not symmetric (like in version.h), as
 # dev release sets 'latest' and not 'X.Y.Z-next"
 if [ "$BROKER_RELEASE" != "dev" ]
 then
