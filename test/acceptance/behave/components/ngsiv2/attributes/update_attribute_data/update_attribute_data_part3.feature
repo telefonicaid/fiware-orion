@@ -1387,6 +1387,12 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
       | metadatas_value  | 5654    |
       | metadatas_type   |         |
     When update an attribute by ID "room" and attribute name "temperature" if it exists
-    Then verify that receive an "No Content" http code
-    And verify that an entity is updated in mongo
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                            |
+      | error       | BadRequest                                       |
+      | description | metadata type length: 0, min length supported: 1 |
+
+
+
 
