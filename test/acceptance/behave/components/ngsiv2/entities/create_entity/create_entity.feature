@@ -291,7 +291,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | SERVICE            |
       | max length allowed |
 
-  @service_error @BUG_1087
+  @service_error @BUG_1087 @BUG_1873
   Scenario Outline:  try to create entities using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value            |
@@ -310,18 +310,17 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | parameter   | value                                                                                  |
       | error       | BadRequest                                                                             |
       | description | bad character in tenant name - only underscore and alphanumeric characters are allowed |
-    And verify that entities are not stored in mongo
     Examples:
-      | service     |
-      | service.sr  |
-      | Service-sr  |
-      | Service(sr) |
-      | Service=sr  |
-      | Service<sr> |
-      | Service,sr  |
-      | service#sr  |
-      | service%sr  |
-      | service&sr  |
+      | service       |
+      | servicedot.sr |
+      | Service-sr    |
+      | Service(sr)   |
+      | Service=sr    |
+      | Service<sr>   |
+      | Service,sr    |
+      | service#sr    |
+      | service%sr    |
+      | service&sr    |
 
   @service_bad_length @BUG_1087
   Scenario:  try to create entities using NGSI v2 with several bad length in services headers
@@ -342,7 +341,6 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | parameter   | value                                                    |
       | error       | BadRequest                                               |
       | description | bad length - a tenant name can be max 50 characters long |
-    And verify that entities are not stored in mongo
 
   # ---------- Services path --------------------------------
 
@@ -543,7 +541,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | 50         |
       | 100        |
 
-  @metadatas_number
+  @metadatas_number @too_slow
   Scenario Outline:  create entities using NGSI v2 with several attributes metadatas
     Given  a definition of headers
       | parameter          | value            |

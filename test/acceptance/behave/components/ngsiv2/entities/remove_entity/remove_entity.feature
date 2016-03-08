@@ -137,7 +137,7 @@ Feature: delete an entity request using NGSI v2 API. "DELETE" - /v2/entities/
     Then verify that receive a "No Content" http code
     And verify that entities are not stored in mongo
 
-  @service_delete_error
+  @service_delete_error @BUG_1873
   Scenario Outline: Try to delete entities by ID using NGSI v2 with wrong service header values
     Given a definition of headers
       | parameter          | value            |
