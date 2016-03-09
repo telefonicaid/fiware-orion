@@ -1974,20 +1974,6 @@ bool entitiesQuery
         }
       }
     }
-    else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      // FIXME P4: Once issue #1705 is implemented, this check can be removed.
-      if (qStringFilters(sco->value, filters) != true)
-      {
-        if (badInputP)  // Bad Input reported by higher level
-        {
-          *badInputP = true;
-          *err       = "invalid query expression";
-        }
-
-        return false;
-      }
-    }
     else
     {
       std::string details = std::string("unknown scope type '") + sco->type + "', ignoring";

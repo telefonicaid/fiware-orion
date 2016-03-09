@@ -27,6 +27,9 @@
 */
 #include <string>
 
+#include "rest/StringFilter.h"
+
+
 
 /* ***********************************************
 *
@@ -40,8 +43,9 @@ struct SubscriptionExpression
   std::string               geometry;
   std::string               coords;
   std::string               georel;
+
+  StringFilter              stringFilter;
   bool                      isSet;
 };
-
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTIONEXPRESSION_H_

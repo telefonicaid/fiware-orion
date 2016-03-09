@@ -99,6 +99,8 @@ struct CachedSubscription
   char*                       reference;
   SubscriptionExpression      expression;
   struct CachedSubscription*  next;
+
+  void qParse(void);
 };
 
 

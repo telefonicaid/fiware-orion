@@ -1,0 +1,502 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Sub cache object errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. GET /v2/entities with empty item in q (q=)
+# 02. GET /v2/entities with empty item in q (q=;)
+# 03. GET /v2/entities with empty item in q (q=;;)
+# 04. GET /v2/entities with empty item in q (q=a==55;)
+# 05. GET /v2/entities with empty item in q (q=a==55;;)
+# 06. GET /v2/entities with empty left-hand-side in q-item
+# 07. GET /v2/entities with empty right-hand-side in q-item
+# 08. GET /v2/entities with invalid char in q-item
+# 09. GET /v2/entities with only whitespace in q-item (q=   )
+# 10. GET /v2/entities with only whitespace in q-item (q=a==12;   )
+#
+# 11. GET /v2/entities with > RANGE
+# 12. GET /v2/entities with == RANGE, but missing 'from'
+# 13. GET /v2/entities with == RANGE, but missing 'to'
+# 14. GET /v2/entities with == RANGE, but with 'from' as a boolean
+# 15. GET /v2/entities with == RANGE, but with 'to' as null
+# 16. GET /v2/entities with == RANGE, but with 'to' and 'from' of different types
+#
+# 17. GET /v2/entities with < LIST
+# 18. GET /v2/entities with != LIST, but with boolean value as first item
+# 19. GET /v2/entities with != LIST, but with null value as second item
+# 20. GET /v2/entities with != LIST, but with mixed type in list
+# 21. GET /v2/entities with != LIST, but with empty item in list (1,)
+#
+
+echo "01. GET /v2/entities with empty item in q (q=)"
+echo "=============================================="
+q='q='
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "02. GET /v2/entities with empty item in q (q=;)"
+echo "==============================================="
+q='q=;'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "03. GET /v2/entities with empty item in q (q=;;)"
+echo "================================================"
+q='q=;;'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "04. GET /v2/entities with empty item in q (q=a==55;)"
+echo "===================================================="
+q='q=a==55;'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "05. GET /v2/entities with empty item in q (q=a==55;;)"
+echo "====================================================="
+q='q=a==55;;'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "06. GET /v2/entities with empty left-hand-side in q-item"
+echo "========================================================"
+q='q=>7'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "07. GET /v2/entities with empty right-hand-side in q-item"
+echo "========================================================="
+q='q=a>'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "08. GET /v2/entities with invalid char in q-item"
+echo "================================================"
+q='q=a()==12'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "09. GET /v2/entities with only whitespace in q-item (q=   )"
+echo "==========================================================="
+q='q=   '
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "10. GET /v2/entities with only whitespace in q-item (q=a==12;   )"
+echo "================================================================="
+q='q=a==12;   '
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "11. GET /v2/entities with > RANGE"
+echo "================================="
+q='q=a>10..20'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "12. GET /v2/entities with == RANGE, but missing 'from'"
+echo "======================================================"
+q='q=a==10..'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "13. GET /v2/entities with == RANGE, but missing 'to'"
+echo "===================================================="
+q='q=a==..20'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "14. GET /v2/entities with == RANGE, but with 'from' as a boolean"
+echo "================================================================"
+q='q=a==true..20'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "15. GET /v2/entities with == RANGE, but with 'to' as null"
+echo "========================================================="
+q='q=a==10..null'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "16. GET /v2/entities with == RANGE, but with 'to' and 'from' of different types"
+echo "==============================================================================="
+q='q=a==10..string'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "17. GET /v2/entities with < LIST"
+echo "================================"
+q='q=a<1,2'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "18. GET /v2/entities with != LIST, but with boolean value as first item"
+echo "======================================================================="
+q='q=a!=true,false'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "19. GET /v2/entities with != LIST, but with null value as second item"
+echo "====================================================================="
+q='q=a!=1,null'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "20. GET /v2/entities with != LIST, but with mixed type in list"
+echo "=============================================================="
+q='q=a!=1,str'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+echo "21. GET /v2/entities with != LIST, but with empty item in list (1,)"
+echo "==================================================================="
+q='q=a!=1,'
+orionCurl --url "/v2/entities?$q" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/entities with empty item in q (q=)
+==============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 78
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Empty right-hand-side for URI param /q/",
+    "error": "BadRequest"
+}
+
+
+02. GET /v2/entities with empty item in q (q=;)
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty q",
+    "error": "BadRequest"
+}
+
+
+03. GET /v2/entities with empty item in q (q=;;)
+================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 51
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty q-item",
+    "error": "BadRequest"
+}
+
+
+04. GET /v2/entities with empty item in q (q=a==55;)
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 51
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty q-item",
+    "error": "BadRequest"
+}
+
+
+05. GET /v2/entities with empty item in q (q=a==55;;)
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 51
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty q-item",
+    "error": "BadRequest"
+}
+
+
+06. GET /v2/entities with empty left-hand-side in q-item
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty left-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+07. GET /v2/entities with empty right-hand-side in q-item
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty right-hand-side in q-item",
+    "error": "BadRequest"
+}
+
+
+08. GET /v2/entities with invalid char in q-item
+================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid character found in URI param /q/",
+    "error": "BadRequest"
+}
+
+
+09. GET /v2/entities with only whitespace in q-item (q=   )
+===========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 78
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Empty right-hand-side for URI param /q/",
+    "error": "BadRequest"
+}
+
+
+10. GET /v2/entities with only whitespace in q-item (q=a==12;   )
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 51
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty q-item",
+    "error": "BadRequest"
+}
+
+
+11. GET /v2/entities with > RANGE
+=================================
+HTTP/1.1 400 Bad Request
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "ranges only valid for == and != ops",
+    "error": "BadRequest"
+}
+
+
+12. GET /v2/entities with == RANGE, but missing 'from'
+======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 58
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty item in range",
+    "error": "BadRequest"
+}
+
+
+13. GET /v2/entities with == RANGE, but missing 'to'
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 58
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty item in range",
+    "error": "BadRequest"
+}
+
+
+14. GET /v2/entities with == RANGE, but with 'from' as a boolean
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid data type for /range-from/",
+    "error": "BadRequest"
+}
+
+
+15. GET /v2/entities with == RANGE, but with 'to' as null
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid data type for /range-to/",
+    "error": "BadRequest"
+}
+
+
+16. GET /v2/entities with == RANGE, but with 'to' and 'from' of different types
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid range: types mixed",
+    "error": "BadRequest"
+}
+
+
+17. GET /v2/entities with < LIST
+================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "lists only valid for == and != ops",
+    "error": "BadRequest"
+}
+
+
+18. GET /v2/entities with != LIST, but with boolean value as first item
+=======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid JSON value type in list",
+    "error": "BadRequest"
+}
+
+
+19. GET /v2/entities with != LIST, but with null value as second item
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid JSON value type in list",
+    "error": "BadRequest"
+}
+
+
+20. GET /v2/entities with != LIST, but with mixed type in list
+==============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid JSON value type in list",
+    "error": "BadRequest"
+}
+
+
+21. GET /v2/entities with != LIST, but with empty item in list (1,)
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 57
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty item in list",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -51,6 +51,7 @@
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
 #include "common/limits.h"  // SERVICE_NAME_MAX_LEN
+#include "rest/StringFilter.h"
 
 
 
@@ -74,6 +75,7 @@ static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
 __thread char                    clientIp[IP_LENGTH_MAX + 1];
+__thread StringFilter*           stringFilterP        = NULL;
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
@@ -89,6 +91,8 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
+
+  LM_W(("KZ: got URI param '%s' : '%s''", ckey, val));
 
   if (val == NULL || *val == 0)
   {
@@ -191,6 +195,29 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     else
     {
       ciP->uriParamTypes.push_back(val);
+    }
+  }
+  else if (key == URI_PARAM_Q)
+  {
+    LM_W(("KZ: URI_PARAM_Q"));
+    if (*val != 0)
+    {
+      std::string errorString;
+
+      LM_W(("KZ: URI_PARAM_Q"));
+      stringFilterP = new StringFilter();
+      if (stringFilterP->parse(val, &errorString) == false)
+      {
+        LM_W(("KZ: stringFilter parse ERROR: %s", errorString.c_str()));
+        OrionError error(SccBadRequest, errorString);
+        stringFilterP->present("KZZ: ");
+        delete stringFilterP;
+
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer         = error.render(ciP, "");
+      }
+      else
+        stringFilterP->present("KZZ: ");  // TEMP
     }
   }
   else

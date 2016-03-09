@@ -52,16 +52,23 @@
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/TriggeredSubscription.h"
 #include "cache/subCache.h"
-
+#include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
-
 
 using std::string;
 using std::map;
 using std::auto_ptr;
 using namespace orion;
 using namespace mongo;
+
+
+
+/* ****************************************************************************
+*
+* stringFilterP - 
+*/
+extern __thread StringFilter* stringFilterP;
 
 
 
@@ -1628,8 +1635,14 @@ static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
     return true;
   }
 
-  std::vector<BSONObj> filters;   // not really used, just to match qStringFilters signature
-  return qStringFilters(q, filters, cerP);
+  if (stringFilterP == NULL)
+  {
+    return false;
+  }
+
+  bool match = stringFilterP->match(cerP);
+  LM_W(("match: %s", (match == true)? "true" : "false"));
+  return match;
 }
 
 
