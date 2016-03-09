@@ -1,0 +1,111 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Missing Content-Type header
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1: ++++++++++++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --in " "
+
+echo "2: ++++++++++++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --in "application/x-www-form-encoded"
+
+echo "3: ++++++++++++++++++++"
+# Check that the ending "; charset=..." works (for JSON)
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [ ]
+}'
+orionCurl --url "$url" --payload "$payload" --in "application/json; charset=UTF-8" --out "application/json"
+
+--REGEXPECT--
+1: ++++++++++++++++++++
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 192
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "415",
+        "details": "Content-Type header not used, default application/octet-stream is not supported",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
+2: ++++++++++++++++++++
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 171
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: application/x-www-form-encoded",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

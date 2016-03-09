@@ -21,45 +21,42 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Erroneous Input
+Accept header fail
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
+# Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
+# "Accept: */*" according to HTTP RFC
+url="/v1/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
 
-echo "0: ++++++++++++++++++++"
-orionCurl --url "/NGSI8/contextEntities/entity01"
-echo "1: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/nothingAtAll"
+orionCurl --url "$url" --payload "${payload}" --out " " --json
 
+# Example of payload from file:
+# echo $payload > payload_file
+# orionCurl --url "$url" --payload payload_file --out " "
 --REGEXPECT--
-0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service not found</details>
-</orionError>
-1: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service not found</details>
-</orionError>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 --TEARDOWN--
-
 brokerStop CB
 dbDrop CB
