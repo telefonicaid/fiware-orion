@@ -237,14 +237,36 @@ HttpStatusCode mongoEntityTypes
    *
    * However, considering that the number of types will be small compared with the number of entities,
    * the current approach seems to be ok
+   *
+   * emptyEntityType is special: it must aggregate results for entity type "" and for entities without type.
+   * Is pre-created before starting processing results and destroyed if at the end it has not been used
+   * (i.e. pushed back into the vector)
+   *
    */
+
+  EntityType* emptyEntityType     = new EntityType("");
+  bool        emptyEntityTypeUsed = false;
+
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    EntityType*               entityType  = new EntityType(getStringFieldF(resultItem, "_id"));
+    BSONObj                   resultItem  = resultsArray[ix].embeddedObject();    
     std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
 
-    entityType->count = countEntities(tenant, servicePathV, entityType->type);
+
+    EntityType*               entityType;
+
+    if ((getFieldF(resultItem, "").isNull()) || (getStringFieldF(resultItem, "_id") == ""))
+    {
+      entityType           = emptyEntityType;
+      emptyEntityTypeUsed  = true;
+    }
+    else
+    {
+      entityType = new EntityType(getStringFieldF(resultItem, "_id"));
+    }
+
+    /* Note we use += due to emptyEntityType accumulates */
+    entityType->count += countEntities(tenant, servicePathV, entityType->type);
 
     if (!attrsArray[0].isNull())
     {
@@ -265,7 +287,20 @@ HttpStatusCode mongoEntityTypes
       }
     }
 
-    responseP->entityTypeVector.push_back(entityType);
+    if (!((getFieldF(resultItem, "").isNull()) || (getStringFieldF(resultItem, "_id") == "")))
+    {
+      // entityType is skipped, as it is (eventually) added outside the for loop
+      responseP->entityTypeVector.push_back(entityType);
+    }
+  }
+
+  if (emptyEntityTypeUsed)
+  {
+    responseP->entityTypeVector.push_back(emptyEntityType);
+  }
+  else
+  {
+    delete emptyEntityType;
   }
 
   char detailsMsg[256];
