@@ -32,14 +32,14 @@ brokerStart CB
 echo "+++++ 1. bad characters in URI param 'limit'"
 url="/v1/queryContext?limit=abc"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url "$url" --payload "$payload" --json
 echo
 echo
 
 echo "+++++ 2. bad characters in URI param 'offset'"
 url="/v1/queryContext?offset=qwe"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url "$url" --payload "$payload" --json
 echo
 echo
 
@@ -47,7 +47,7 @@ echo
 echo "+++++ 3. URI param 'limit' == 0"
 url="/v1/queryContext?limit=000000"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url "$url" --payload "$payload" --json
 echo
 echo
 
@@ -55,65 +55,69 @@ echo
 echo "+++++ 4. URI param 'details' == 'Yes'"
 url="/v1/queryContext?details=Yes"
 payload='NO PAYLOAD NECESSARY'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url "$url" --payload "$payload" --json
 echo
 echo
 
 --REGEXPECT--
 +++++ 1. bad characters in URI param 'limit'
 HTTP/1.1 400 Bad Request
-Content-Length: 165
-Content-Type: application/xml
+Content-Length: 156
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad pagination limit: /abc/ [must be a decimal number]</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "Bad pagination limit: /abc/ [must be a decimal number]",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 
 +++++ 2. bad characters in URI param 'offset'
 HTTP/1.1 400 Bad Request
-Content-Length: 166
-Content-Type: application/xml
+Content-Length: 157
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad pagination offset: /qwe/ [must be a decimal number]</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "Bad pagination offset: /qwe/ [must be a decimal number]",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 
 +++++ 3. URI param 'limit' == 0
 HTTP/1.1 400 Bad Request
-Content-Length: 175
-Content-Type: application/xml
+Content-Length: 166
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad pagination limit: /000000/ [a value of ZERO is unacceptable]</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "Bad pagination limit: /000000/ [a value of ZERO is unacceptable]",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 
 +++++ 4. URI param 'details' == 'Yes'
 HTTP/1.1 400 Bad Request
-Content-Length: 196
-Content-Type: application/xml
+Content-Length: 187
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad value for /details/: /Yes/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "Bad value for /details/: /Yes/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 
 --TEARDOWN--

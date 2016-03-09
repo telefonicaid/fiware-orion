@@ -707,9 +707,8 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
-  //   3. text/xml used and acceptTextXml is set to true (iotAgent only)
-  //   4. Content-Type present but not supported
-  //   5. API version 2 and not 'application/json' || text/plain
+  //   3. Content-Type present but not supported
+  //   4. API version 2 and not 'application/json' || text/plain
   //
 
 
