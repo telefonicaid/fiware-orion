@@ -559,9 +559,13 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 */
 void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP, bool useDefaultType)
 {
-  if ((mdP->type != "") || useDefaultType)
+  std::string type =  mdP->type;
+  if (!mdP->typeGiven && useDefaultType)
   {
-    std::string type = (mdP->type == "") ? DEFAULT_TYPE : mdP->type;
+    type = DEFAULT_TYPE;
+  }
+  if (type != "")
+  {
 
     switch (mdP->valueType)
     {
@@ -861,7 +865,7 @@ static bool updateAttribute
 
     int now = getCurrentTime();
 
-    if ((caP->type == "") && (apiVersion == "v2"))
+    if (!caP->typeGiven && (apiVersion == "v2"))
     {
       newAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
     }
@@ -952,7 +956,7 @@ static bool appendAttribute
   valueBson(caP, ab);
 
   /* 2. Type */
-  if ((apiVersion == "v2") && (caP->type == ""))
+  if ((apiVersion == "v2") && !caP->typeGiven)
   {
     ab.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
   }
@@ -2522,7 +2526,7 @@ static bool createEntity
     std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
-    if ((attrsV[ix]->type == "") && (apiVersion == "v2"))
+    if (!attrsV[ix]->typeGiven && (apiVersion == "v2"))
     {
       bsonAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
     }

@@ -1,0 +1,305 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Accept header fail
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
+# "Accept: */*" according to HTTP RFC
+#
+# 01. Invalid 'Accept' HTTP header
+# 02. Invalid JSON payload
+# 03. Explicit 'Accept: application/json' is ok
+# 04. 'Accept-list' with valid mime-type
+# 05. 'Accept-list' with valid mime-type AND encoding after ';'
+# 06. 'Accept-list' with no valid mime-type and invalid XML payload
+# 07. 'Accept-list' with no valid mime-type, invalid XML payload, and extra encoding after ';'
+# 08. Accept preference is correctly taken into account (JSON preferred to XML), order is JSON, XML
+# 09. Accept preference is correctly taken into account (JSON preferred to XML), order is XML, JSON
+#
+
+
+echo "01. Invalid 'Accept' HTTP header"
+echo "================================"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --out " " --json
+echo
+echo
+
+
+echo "02. Invalid JSON payload"
+echo "======================="
+payload='no meaningful payload (failing tests)'
+orionCurl --url /v1/queryContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "03. Explicit 'Accept: application/json' is ok"
+echo "============================================"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "application/json" --json
+echo
+echo
+
+
+echo "04. 'Accept-list' with valid mime-type"
+echo "======================================"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json" --json
+echo
+echo
+
+
+echo "05. 'Accept-list' with valid mime-type AND encoding after ';'"
+echo "============================================================="
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json; charset=UTF-8" --json
+echo
+echo
+
+
+echo "06. 'Accept-list' with no valid mime-type and invalid JSON payload"
+echo "=================================================================="
+payload='no meaningful payload (failing tests)'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plane, image/jpeg" --in "application/json"
+echo
+echo
+
+
+echo "07. 'Accept-list' with no valid mime-type, invalid JSON payload, and extra encoding after ';'"
+echo "============================================================================================="
+payload='no meaningful payload (failing tests)'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plane, image/jpeg; charset=UTF-8" --in "application/json"
+echo
+echo
+
+
+echo "08. Accept preference is correctly taken into account (JSON preferred to XML), order is JSON, XML"
+echo "================================================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --in "application/json" --out "application/json, application/xml"
+echo
+echo
+
+
+echo "09. Accept preference is correctly taken into account (JSON preferred to XML), order is XML, JSON"
+echo "================================================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --in "application/json" --out "application/xml, application/json"
+echo
+echo
+
+
+--REGEXPECT--
+01. Invalid 'Accept' HTTP header
+================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+02. Invalid JSON payload
+=======================
+HTTP/1.1 200 OK
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "JSON Parse Error",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+03. Explicit 'Accept: application/json' is ok
+============================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+04. 'Accept-list' with valid mime-type
+======================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+05. 'Accept-list' with valid mime-type AND encoding after ';'
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+06. 'Accept-list' with no valid mime-type and invalid JSON payload
+==================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 194
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "406",
+        "details": "acceptable MIME types: application/json. Accept header in request: text/plane, image/jpeg",
+        "reasonPhrase": "Not Acceptable"
+    }
+}
+
+
+07. 'Accept-list' with no valid mime-type, invalid JSON payload, and extra encoding after ';'
+=============================================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 217
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "406",
+        "details": "acceptable MIME types: application/json. Accept header in request: text/plane, image/jpeg&#59; charset&#61;UTF-8",
+        "reasonPhrase": "Not Acceptable"
+    }
+}
+
+
+08. Accept preference is correctly taken into account (JSON preferred to XML), order is JSON, XML
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+09. Accept preference is correctly taken into account (JSON preferred to XML), order is XML, JSON
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

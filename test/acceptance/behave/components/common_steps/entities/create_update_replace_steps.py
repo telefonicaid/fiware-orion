@@ -295,5 +295,5 @@ def verify_that_an_entity_is_updated_in_mongo(context):
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
     ngsi = NGSI()
-    ngsi.verify_entity_updated_in_mongo(mongo, context.cb.get_entity_context(), context.cb.get_headers())
+    ngsi.verify_entity_updated_in_mongo(mongo, context.cb.get_entity_context(), context.cb.get_headers(), context.cb.get_entities_parameters())
     __logger__.info(" >> verified that an entity is updated in mongo")

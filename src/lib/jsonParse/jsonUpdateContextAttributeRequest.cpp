@@ -107,6 +107,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
   reqData->upcar.metadataP->type = value;
+  reqData->upcar.metadataP->typeGiven = true;
   return "OK";
 }
 

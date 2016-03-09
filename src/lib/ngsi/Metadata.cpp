@@ -77,9 +77,9 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   stringValue  = mP->stringValue;
   numberValue  = mP->numberValue;
   boolValue    = mP->boolValue;
-  typeGiven    = false;
+  typeGiven    = mP->typeGiven;
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && !typeGiven)
   {
     type = DEFAULT_TYPE;
   }
@@ -241,6 +241,14 @@ std::string Metadata::check
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+
+  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
