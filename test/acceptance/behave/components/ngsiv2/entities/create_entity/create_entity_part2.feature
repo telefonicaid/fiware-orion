@@ -304,7 +304,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | room_5      | house;flat       |
       | room_6      | house(flat)      |
 
-  @attributes_value_without
+  @attributes_value_without_attr_value @BUG_1789
   Scenario:  try to create entities using NGSI v2 without attributes values
     Given  a definition of headers
       | parameter          | value                         |
@@ -317,14 +317,10 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | entities_id     | room        |
       | attributes_name | temperature |
     When create entity group with "1" entities in "normalized" mode
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
-    And verify that entities are not stored in mongo
+    Then verify that receive several "Created" http code
+    And verify that entities are stored in mongo
 
-  @attributes_value_without_with_type @BUG_1195
+  @attributes_value_without_with_type @BUG_1195 @BUG_1789
   Scenario:  try to create entities using NGSI v2 without attributes values but with attribute type
     Given  a definition of headers
       | parameter          | value                         |
@@ -338,14 +334,10 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | attributes_name | temperature |
       | attributes_type | celsius     |
     When create entity group with "1" entities in "normalized" mode
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
-    And verify that entities are not stored in mongo
+    Then verify that receive several "Created" http code
+    And verify that entities are stored in mongo
 
-  @attributes_value_without_with_metadata @BUG_1195
+  @attributes_value_without_with_metadata @BUG_1195 @BUG_1789
   Scenario:  try to create entities using NGSI v2 without attributes values but with metadata
     Given  a definition of headers
       | parameter          | value                         |
@@ -362,12 +354,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | metadatas_type   | alarm       |
       | metadatas_value  | hot         |
     When create entity group with "1" entities in "normalized" mode
-    Then verify that receive several "Bad Request" http code
-    And verify several error responses
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
-    And verify that entities are not stored in mongo
+    Then verify that receive several "Created" http code
+    And verify that entities are stored in mongo
 
   @attributes_value_special @BUG_1106
   Scenario Outline:  create an entity using NGSI v2 with several attributes special values without type (compound, vector, boolean, etc)

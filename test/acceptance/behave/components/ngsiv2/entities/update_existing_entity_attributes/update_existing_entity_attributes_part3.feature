@@ -279,7 +279,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | random=100           |
       | random=254           |
 
-  @attribute_metadata_name_without_attr_value @BUG_1217 @ISSUE_1786 @BUG_1789 @skip
+  @attribute_metadata_name_without_attr_value @BUG_1217 @ISSUE_1786 @BUG_1789
   Scenario:  try to update an attribute by entity ID using NGSI v2 with several attribute metadata name without metadata type nor attribute value
     Given  a definition of headers
       | parameter          | value                               |
@@ -309,13 +309,16 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | metadatas_name  | my_meta     |
       | metadatas_value | 5678        |
     When update attributes by ID "room_1" if it exists and with "normalized" mode
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
 
-  @attribute_metadata_name_without_attr_value @BUG_1217 @ISSUE_1786 @BUG_1789 @skip
+    #Then verify that receive an "Bad Request" http code
+    #And verify an error response
+    #  | parameter   | value                                             |
+    #  | error       | BadRequest                                        |
+    #  | description | no 'value' for ContextAttribute without keyValues |
+
+  @attribute_metadata_name_without_attr_value @BUG_1217 @ISSUE_1786 @BUG_1789
   Scenario:  try to update an attribute by entity ID using NGSI v2 with several attribute metadata name with metadata type nor attribute value
     Given  a definition of headers
       | parameter          | value                               |
@@ -346,11 +349,14 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | metadatas_value | 5678        |
       | metadatas_type  | nothing     |
     When update attributes by ID "room_1" if it exists and with "normalized" mode
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+
+    #Then verify that receive an "Bad Request" http code
+    #And verify an error response
+    #  | parameter   | value                                             |
+    #  | error       | BadRequest                                        |
+    #  | description | no 'value' for ContextAttribute without keyValues |
 
   @attribute_metadata_replace @BUG_1788 @skip
   Scenario:  update an attribute by entity ID using NGSI v2 and append a new metadata without metadata type
