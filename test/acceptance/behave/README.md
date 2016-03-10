@@ -304,6 +304,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | delete_context_provider_registration        |  (pending)   | DELETE  | /v2/registrations/`<registration_id>`                | No        | No             |   
 |                                                                                                                                                          |
 |**alarms folder**                            |  (pending)   |                                                                                             |
+|**cli_parameters folder**                    |  (pending)   |                                                                                             |
 
   
 ## Hints:
