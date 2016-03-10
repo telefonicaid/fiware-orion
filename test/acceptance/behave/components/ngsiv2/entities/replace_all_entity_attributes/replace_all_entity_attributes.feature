@@ -1047,7 +1047,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | room17    | null                                                                          |
       | room_18   | {"rt.ty": "5678"}                                                             |
 
-  @attribute_value_error_without
+  @attribute_value_error_without_attr_value @BUG_1789
   Scenario:  try to replace attributes by entity ID using NGSI v2 without attribute values
     Given  a definition of headers
       | parameter          | value                         |
@@ -1070,11 +1070,8 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | parameter       | value    |
       | attributes_name | pressure |
     When replace attributes by ID "room_1" if it exists and with "normalized" mode
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
 
   @attribute_value_invalid
   Scenario Outline:  try to replace attributes by entity ID using NGSI v2 without invalid attribute values in replace request

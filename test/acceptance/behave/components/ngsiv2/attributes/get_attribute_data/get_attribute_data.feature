@@ -318,7 +318,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
-    When get an attribute "temperature" by ID "room_0"
     When get an attribute "temperature_0" by ID "<entity_id>"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
