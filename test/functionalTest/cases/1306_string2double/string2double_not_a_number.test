@@ -148,12 +148,12 @@ echo
 01. Not a number for q, op >
 ============================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "values of type /String/ not supported for operator /GreaterThan/",
     "error": "BadRequest"
 }
 
@@ -161,12 +161,12 @@ Date: REGEX(.*)
 02. Not a number for q, op <
 ============================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 100
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "values of type /String/ not supported for operator /LessThan/",
     "error": "BadRequest"
 }
 
@@ -194,12 +194,12 @@ Date: REGEX(.*)
 05. Not a number for q, op >=
 =============================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 110
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "values of type /String/ not supported for operator /GreaterThanOrEqual/",
     "error": "BadRequest"
 }
 
@@ -207,12 +207,12 @@ Date: REGEX(.*)
 06. Not a number for q, op <=
 =============================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 107
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "values of type /String/ not supported for operator /LessThanOrEqual/",
     "error": "BadRequest"
 }
 
@@ -220,12 +220,12 @@ Date: REGEX(.*)
 07. Not a number for q op == and range, lower limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 65
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "invalid range: types mixed",
     "error": "BadRequest"
 }
 
@@ -233,12 +233,12 @@ Date: REGEX(.*)
 08. Not a number for q op == and range, upper limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 65
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "invalid range: types mixed",
     "error": "BadRequest"
 }
 
@@ -246,12 +246,12 @@ Date: REGEX(.*)
 09. Not a number for q op != and range, lower limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 65
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "invalid range: types mixed",
     "error": "BadRequest"
 }
 
@@ -259,12 +259,12 @@ Date: REGEX(.*)
 10. Not a number for q op != and range, upper limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 65
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "invalid range: types mixed",
     "error": "BadRequest"
 }
 

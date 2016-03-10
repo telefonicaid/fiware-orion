@@ -38,6 +38,7 @@ brokerStart CB
 # 06. GET entities with q=A1!=10 (1 hit)
 # 07. GET entities with q=A1!='10' (1 hit)
 # 08. GET entities with invalid q=A1=='10'x (error)
+# 09. GET entities with invalid q=A1=='10'x' (error)
 #
 
 
@@ -101,6 +102,13 @@ echo
 echo "08. GET entities with invalid q=A1=='10'x (error)"
 echo "================================================="
 orionCurl --url "/v2/entities?q=A1=='10'x" --json
+echo
+echo
+
+
+echo "09. GET entities with invalid q=A1=='10'x' (error)"
+echo "=================================================="
+orionCurl --url "/v2/entities?q=A1=='10'x'" --json
 echo
 echo
 
@@ -236,12 +244,25 @@ Date: REGEX(.*)
 08. GET entities with invalid q=A1=='10'x (error)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 67
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "non-terminated forced string",
+    "error": "BadRequest"
+}
+
+
+09. GET entities with invalid q=A1=='10'x' (error)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "quote in forced string",
     "error": "BadRequest"
 }
 

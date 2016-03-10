@@ -100,13 +100,14 @@ public:
   const char*               opName(void);
   const char*               valueTypeName(void);
 
-  void                      valueGet(char*                   s,
+  bool                      valueGet(char*                   s,
                                      StringFilterValueType*  valueTypeP,
                                      double*                 doubleP,
                                      std::string*            stringP,
-                                     bool*                   boolP);
+                                     bool*                   boolP,
+                                     std::string* errorStringP);
 
-  void                      valueParse(char* s);
+  bool                      valueParse(char* s, std::string* errorStringP);
   bool                      rangeParse(char* s, std::string* errorStringP);
   bool                      listParse(char* s, std::string* errorStringP);
   bool                      listItemAdd(char* s, std::string* errorStringP);

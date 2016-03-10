@@ -59,6 +59,7 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
+#include "rest/StringFilter.h"
 
 using namespace mongo;
 using std::auto_ptr;
@@ -76,6 +77,14 @@ static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
+
+
+
+/* ****************************************************************************
+*
+* stringFilterP - 
+*/
+extern __thread StringFilter* stringFilterP;
 
 
 
@@ -1972,6 +1981,23 @@ bool entitiesQuery
           std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
           finalQuery.append(locCoords, areaQuery);
         }
+      }
+    }
+    else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      LM_W(("KZ: got a Scope of type '%s'", SCOPE_TYPE_SIMPLE_QUERY));
+      stringFilterP = new StringFilter();
+      LM_W(("KZ: parsing scope '%s'", sco->value.c_str()));
+      if (stringFilterP->parse(sco->value.c_str(), err) == false)
+      {
+        LM_W(("KZ: Bad Input"));
+        *badInputP = true;
+        return false;
+      }
+      LM_W(("KZ: Parsed"));
+      for (unsigned int ix = 0; ix < stringFilterP->mongoFilters.size(); ++ix)
+      {
+        finalQuery.appendElements(stringFilterP->mongoFilters[ix]);
       }
     }
     else

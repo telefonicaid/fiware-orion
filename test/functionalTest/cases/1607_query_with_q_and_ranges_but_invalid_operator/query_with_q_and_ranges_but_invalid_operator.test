@@ -200,12 +200,12 @@ Date: REGEX(.*)
 05. Erroneous GET entities with q=A1>=0..20
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 74
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "ranges only valid for == and != ops",
     "error": "BadRequest"
 }
 
@@ -213,12 +213,12 @@ Date: REGEX(.*)
 06. Erroneous GET entities with q=A1>0..20
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 74
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "ranges only valid for == and != ops",
     "error": "BadRequest"
 }
 
@@ -226,12 +226,12 @@ Date: REGEX(.*)
 07. Erroneous GET entities with q=A1<=0..20
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 74
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "ranges only valid for == and != ops",
     "error": "BadRequest"
 }
 
@@ -239,12 +239,12 @@ Date: REGEX(.*)
 08. Erroneous GET entities with q=A1<0..20
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 74
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "ranges only valid for == and != ops",
     "error": "BadRequest"
 }
 
@@ -301,12 +301,12 @@ Date: REGEX(.*)
 11. Erroneous GET entities with q=A1==a..b
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 68
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "string range is not supported",
     "error": "BadRequest"
 }
 

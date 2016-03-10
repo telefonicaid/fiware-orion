@@ -561,7 +561,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);

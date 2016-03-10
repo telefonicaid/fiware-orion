@@ -42,7 +42,7 @@ accumulatorStart
 
 echo "01. Create ONANYCHANGE subscription"
 echo "==================================="
-payload='{
+payload1='{
   "entities": [
     {
         "type": "T",
@@ -59,14 +59,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload1" --json
 echo
 echo
 
 
 echo "02. Create entity E2 not covered by subscription (no notification)"
 echo "=================================================================="
-payload='{
+payload2='{
     "id": "E2",
     "type": "T",
     "isPattern": "false",
@@ -77,14 +77,14 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}" --json
+orionCurl --url /v1/contextEntities --payload "${payload2}" --json
 echo
 echo
 
 
 echo "03. Create entity E1 covered by subscription with attributes A1 and A2 (notification)"
 echo "====================================================================================="
-payload='{
+payload3='{
     "id": "E1",
     "type": "T",
     "isPattern": "false",
@@ -99,37 +99,37 @@ payload='{
         }
     ]
 }'
-orionCurl --url /v1/contextEntities --payload "${payload}" --json
+orionCurl --url /v1/contextEntities --payload "${payload3}" --json
 echo
 echo
 
 
 echo "04. Update A1 (notification)"
 echo "============================"
-payload='{
+payload4='{
     "value": "aa"
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/E1/attributes/A1 --payload "$payload4" --json -X PUT
 echo
 echo
 
 
 echo "05. Update A2 (notification)"
 echo "============================"
-payload='{
+payload5='{
     "value": "bb"
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A2 --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextEntities/E1/attributes/A2 --payload "$payload5" --json -X PUT
 echo
 echo
 
 
 echo "06. Append A3 (notification)"
 echo "============================"
-payload='{
+payload6='{
     "value": "cc"
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A3 --payload "$payload" --json -X POST
+orionCurl --url /v1/contextEntities/E1/attributes/A3 --payload "$payload6" --json -X POST
 echo
 echo
 

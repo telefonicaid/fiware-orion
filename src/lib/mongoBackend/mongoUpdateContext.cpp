@@ -64,6 +64,7 @@ HttpStatusCode mongoUpdateContext
 
     reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
 
+    LM_W(("KZ: In mongoUpdateContext"));
     /* Check that the service path vector has only one element, returning error otherwise */
     if (servicePathV.size() > 1)
     {
@@ -79,6 +80,7 @@ HttpStatusCode mongoUpdateContext
         /* Process each ContextElement */
         for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
         {
+          LM_W(("KZ: Calling processContextElement"));
           processContextElement(requestP->contextElementVector[ix],
                                 responseP,
                                 requestP->updateActionType.get(),
@@ -88,6 +90,7 @@ HttpStatusCode mongoUpdateContext
                                 xauthToken,
                                 apiVersion,
                                 ngsiv2Flavour);
+          LM_W(("KZ: Back from processContextElement"));
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this
@@ -97,5 +100,6 @@ HttpStatusCode mongoUpdateContext
     }    
     reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
     
+    LM_W(("KZ: From mongoUpdateContext"));
     return SccOk;
 }

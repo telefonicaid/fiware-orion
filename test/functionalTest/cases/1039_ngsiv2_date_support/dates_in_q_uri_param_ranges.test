@@ -198,12 +198,12 @@ Date: REGEX(.*)
 07. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO '2016-02-24T10:00:00.00Z', see error (as to-value is a string)
 ==============================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 65
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "invalid range: types mixed",
     "error": "BadRequest"
 }
 
