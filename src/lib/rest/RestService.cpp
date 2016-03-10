@@ -120,7 +120,7 @@ std::string payloadParse
   }
   else
   {
-    alarmMgr.badInput(clientIp, "payload mime-type is neither JSON nor XML");
+    alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
     return "Bad inFormat";
   }
 

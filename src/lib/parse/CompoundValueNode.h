@@ -43,7 +43,7 @@ namespace orion
 * The class fields:
 * -------------------------------------------------------------------------------
 * o name         When parsing an XML payload, each node in the tree has a tag.
-*                The name of the node is taken from the tag-name.
+*                The name of the node is taken from the tag-name. (FIXME P4 #1862: reference to XML in this comment is obsolete)
 *                When parsing a JSON payload, not necessarily all nodes have a
 *                tag, so 'name' can be empty.
 *                Also, when creating the tree from mongo BSON, there will often

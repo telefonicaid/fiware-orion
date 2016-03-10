@@ -184,7 +184,9 @@ std::string jsonTreat
   //
   // If the payload is empty, the XML parsing library does an assert
   // and the broker dies. I don't know about the JSON library, but just in case ...
-  // 
+  //
+  // FIXME P4 #1862: check if we really need this now that Orion only support JSON
+  //
   // 'OK' is returned as there is no error to send a request without payload.
   //
   if ((content == NULL) || (*content == 0))

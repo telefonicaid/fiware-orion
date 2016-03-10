@@ -63,6 +63,9 @@ static std::string attributeValue(const std::string& path, const std::string& va
   //       save the 'typeFromXmlAttribute', a ContextAttribute has been added to 
   //       UpdateContextAttributeData.
   //
+  // FIXME P4 #1862: typeFromXmlAttribute was removed. The comment abov is obsolete and maybe
+  // also part of the implementation
+  //
   reqData->lastContextAttribute   = &reqData->upcar.attribute;
   reqData->upcar.res.valueType    = orion::ValueTypeString;
   reqData->upcar.res.contextValue = value;
