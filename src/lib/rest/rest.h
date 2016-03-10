@@ -75,7 +75,11 @@ extern char            restAllowedOrigin[64];
 */
 typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 
-
+/* ****************************************************************************
+*
+* uriParamPush -
+*/
+int uriParamPush(ConnectionInfo *ciP, const char* ckey, const char* val);
 
 /* ****************************************************************************
 *

@@ -31,15 +31,18 @@
 
 #include "logMsg/logMsg.h"
 #include "rest/HttpHeaders.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/rest.h"
 #include "parser.h"
 
 void ws_parser_parse
 (
-    const char*   msg,
-    std::string&  url,
-    std::string&  verb,
-    std::string&  payload,
-    HttpHeaders&  head
+  const char*     msg,
+  ConnectionInfo* ciP,
+  std::string&    url,
+  std::string&    verb,
+  std::string&    payload,
+  HttpHeaders&    head
 )
 {
   rapidjson::Document doc;
@@ -84,4 +87,49 @@ void ws_parser_parse
   {
     head.gotHeaders = false;
   }
+
+  if (doc.HasMember("params") && doc["params"].IsObject())
+  {
+    rapidjson::Value::ConstMemberIterator it = doc["params"].MemberBegin();
+    while (it != doc["params"].MemberEnd())
+    {
+      uriParamPush(ciP, it->name.GetString(), it->value.GetString());
+      ++it;
+    }
+  }
+}
+
+const char *ws_parser_message
+(
+ const std::string&  msg,
+ const HttpHeaders&  head,
+ int                 statusCode
+)
+{
+  const char *tmpl = "{\"headers\": %s, \"message\": %s, \"status\": \"%d\"}";
+
+  rapidjson::StringBuffer buff;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buff);
+  writer.StartObject();
+  std::map<std::string, std::string *>::const_iterator it = head.headerMap.begin();
+  while (it != head.headerMap.end())
+  {
+    writer.Key(it->first.c_str());
+    writer.String(it->second->c_str());
+    ++it;
+  }
+  writer.EndObject();
+
+  if (statusCode < 100 || statusCode > 599) // Code is not a valid HTTP status code
+    statusCode = 500;
+
+  const char *headers = buff.GetString();
+
+  /* Sum all lengths, discard string format specifier (-6)
+   * and add status code (3) and the final null character
+   */
+  char *json = (char *) malloc(strlen(tmpl) - 6 + strlen(headers) + msg.size() + 3 + 1);
+  sprintf(json, tmpl, headers, msg.c_str(), statusCode);
+
+  return json;
 }
