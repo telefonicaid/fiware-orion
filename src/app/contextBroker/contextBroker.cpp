@@ -267,6 +267,9 @@ bool            statNotifQueue;
 int             lsPeriod;
 bool            relogAlarms;
 bool            strictIdv1;
+bool 		metadataId;
+bool		attributeId;
+bool 		nameId;
 
 
 
@@ -319,7 +322,9 @@ bool            strictIdv1;
 #define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
-
+#define CHECK_METADATA_V1      "additional checks for metadata  in the NGSIv1 API"
+#define CHECK_ATTRIBUTE_V1     "additional checks for attribute in the NGSIv1 API"
+#define CHECK_NAME_V1          "additional checks for name  in the NGSIv1 API"
 
 
 
@@ -357,7 +362,7 @@ PaArgument paArgs[] =
   { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
   { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
 
-  { "-https",         &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
+  { "-https",         &https,        "HTTPSCHECK_NAME_V1",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
   { "-key",           httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
   { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
 
@@ -388,6 +393,10 @@ PaArgument paArgs[] =
   { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
 
   { "-strictNgsiv1Ids",  &strictIdv1, "CHECK_ID_V1",  PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC  },
+  
+  { "-strictNgsiv1Metadata",   &metadataId, "CHECK_METADATA_V1",  PaBool, PaOpt, false, false, true, CHECK_METADATA_V1  },  
+  { "-strictNgsiv1Attribute",  &attributeId, "CHECK_ATTRIBUTE_V1",  PaBool, PaOpt, false, false, true, CHECK_ATTRIBUTE_V1  }, 
+  { "-strictNgsiv1Name",       &nameId,      "CHECK_NAME_V1",       PaBool, PaOpt, false, false, true, CHECK_NAME_V1  },
 
   PA_END_OF_ARGS
 };
@@ -1737,7 +1746,7 @@ int main(int argC, char* argV[])
 
   pidFile();
   SemOpType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1, metadataId, attributeId, nameId);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
