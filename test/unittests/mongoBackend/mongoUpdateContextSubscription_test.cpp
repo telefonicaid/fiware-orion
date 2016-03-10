@@ -225,7 +225,7 @@ static void prepareDatabase(void) {
                         "expiration" << 20000000 <<
                         "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
@@ -239,7 +239,7 @@ static void prepareDatabase(void) {
                         "expiration" << 20000000 <<
                         "lastNotification" << 25000000 <<
                         "reference" << "http://notify2.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
@@ -252,7 +252,7 @@ static void prepareDatabase(void) {
                         "expiration" << 30000000 <<
                         "lastNotification" << 35000000 <<
                         "reference" << "http://notify3.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
@@ -266,7 +266,7 @@ static void prepareDatabase(void) {
                         "expiration" << 40000000 <<
                         "lastNotification" << 45000000 <<
                         "reference" << "http://notify4.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false") <<
                                                  BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
@@ -280,7 +280,7 @@ static void prepareDatabase(void) {
                         "lastNotification" << 55000000 <<
                         "throttling" << 10 <<
                         "reference" << "http://notify5.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
                         "conditions" << BSON_ARRAY(BSON(
@@ -496,7 +496,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -541,7 +541,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     /* Invoke the function in mongoBackend library */
     std::string tenant      = "";
     std::string servicePath = "";
-    ms = mongoUpdateContextSubscription(&req, &res, XML, tenant, servicePath, emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, tenant, servicePath, emptyServicePathV);
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
@@ -567,7 +567,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
 
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -632,7 +632,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -657,7 +657,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     EXPECT_EQ(55000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(4, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -708,7 +708,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -733,7 +733,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     EXPECT_EQ(55000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify5.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -791,7 +791,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -816,7 +816,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_C1)
     EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -874,7 +874,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -899,7 +899,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_C1)
     EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -961,7 +961,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -986,7 +986,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CN)
     EXPECT_EQ(15000000, sub.getField("lastNotification").Long());  // No notification attempt should have been made
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1051,7 +1051,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1076,7 +1076,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_CNbis)
     EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1139,7 +1139,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1164,7 +1164,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CN)
     EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1231,7 +1231,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1256,7 +1256,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_CNbis)
     EXPECT_EQ(25000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1319,7 +1319,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1344,7 +1344,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_C1)
     EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1406,7 +1406,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1431,7 +1431,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_C1)
     EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1498,7 +1498,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1523,7 +1523,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CN)
     EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1588,7 +1588,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1613,7 +1613,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_CNbis)
     EXPECT_EQ(35000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1677,7 +1677,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1702,7 +1702,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CN)
     EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1770,7 +1770,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1795,7 +1795,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_CNbis)
     EXPECT_EQ(45000000, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1856,7 +1856,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1871,7 +1871,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1896,7 +1896,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1965,7 +1965,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, JSON, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2041,7 +2041,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2056,7 +2056,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2081,7 +2081,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2133,7 +2133,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2148,7 +2148,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2173,7 +2173,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2240,7 +2240,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2255,7 +2255,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2280,7 +2280,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2346,7 +2346,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2361,7 +2361,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2386,7 +2386,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2446,7 +2446,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2461,7 +2461,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2486,7 +2486,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2546,7 +2546,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2561,7 +2561,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2586,7 +2586,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2658,7 +2658,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2673,7 +2673,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2698,7 +2698,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2770,7 +2770,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2785,7 +2785,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2810,7 +2810,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2865,7 +2865,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2883,7 +2883,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2908,7 +2908,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2967,7 +2967,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2985,7 +2985,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3010,7 +3010,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3070,7 +3070,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3086,7 +3086,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3111,7 +3111,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3163,7 +3163,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3181,7 +3181,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3206,7 +3206,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3265,7 +3265,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3283,7 +3283,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3308,7 +3308,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3367,7 +3367,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3385,7 +3385,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3410,7 +3410,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3469,7 +3469,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3485,7 +3485,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3510,7 +3510,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3566,7 +3566,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3584,7 +3584,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3609,7 +3609,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify2.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -3680,7 +3680,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3695,7 +3695,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3720,7 +3720,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3781,7 +3781,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3796,7 +3796,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3821,7 +3821,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3888,7 +3888,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3906,7 +3906,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3931,7 +3931,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -4002,7 +4002,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4018,7 +4018,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4043,7 +4043,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify3.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -4105,7 +4105,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -4123,7 +4123,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4148,7 +4148,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -4215,7 +4215,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4231,7 +4231,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4256,7 +4256,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     EXPECT_EQ(1360232700, sub.getField("lastNotification").Long());
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify4.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -4321,7 +4321,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4346,7 +4346,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     EXPECT_EQ(15000000, sub.getField("lastNotification").Long());
     EXPECT_EQ(60, sub.getIntField("throttling"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4404,7 +4404,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4470,7 +4470,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    ms = mongoUpdateContextSubscription(&req, &res, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4478,7 +4478,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
-              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"\", conditions: [], lastNotification: 15000000, format: \"XML\" }> "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, servicePath: \"\", conditions: [], lastNotification: 15000000, format: \"JSON\" }> "
               "- exception: boom!!)", res.subscribeError.errorCode.details);
 
     /* Restore real DB connection */

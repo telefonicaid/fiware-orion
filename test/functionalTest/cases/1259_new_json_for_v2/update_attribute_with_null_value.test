@@ -34,13 +34,13 @@ brokerStart CB 0
 # 02. Get E1/A1 (see that A1 has null value)
 # 03. Create E2/A2='03'
 # 04. Modify E2/A2=null (PATCH)
-# 05. Get E2/A2 (A2 stays the same)
+# 05. Get E2/A2 (value of A2 has been replaced)
 # 06. Create E3/A3='06'
 # 07. Modify E3/A3=null (PUT)
 # 08. Get E3/A3 (value of A3 has been replaced)
 # 09. Create E4/A4='09'
 # 10. Modify E4/A4=null (POST)
-# 11. Get E4/A4 (A4 stays the same)
+# 11. Get E4/A4 (value of A4 has been replaced)
 # 12. Create (POST /v2/entities) E5/A5=null using URI param keyValues
 # 13. Get E5/A5 (see that A5 has null value)
 # 14. Create E6/A6='14'
@@ -101,8 +101,8 @@ echo
 echo
 
 
-echo "05. Get E2/A2 (A2 stays the same)"
-echo "================================="
+echo "05. Get E2/A2 (value of A2 has been replaced)"
+echo "============================================="
 orionCurl --url /v2/entities/E2 --json
 echo
 echo
@@ -165,8 +165,8 @@ echo
 echo
 
 
-echo "11. Get E4/A4 (A4 stays the same)"
-echo "================================="
+echo "11. Get E4/A4 (value of A4 has been replaced)"
+echo "============================================="
 orionCurl --url /v2/entities/E4 --json
 echo
 echo
@@ -203,8 +203,8 @@ echo
 echo
 
 
-echo "15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)"
-echo "==============================================================="
+echo "15. Modify E6/A6=null (PATCH), with keyValues (A6 is null)"
+echo "=========================================================="
 payload='{
   "A6": null
 }'
@@ -213,8 +213,8 @@ echo
 echo
 
 
-echo "16. Get E6/A6 (see that A6 is still 14)"
-echo "======================================="
+echo "16. Get E6/A6 (see that A6 is null)"
+echo "==================================="
 orionCurl --url /v2/entities/E6?options=keyValues --json
 echo
 echo
@@ -271,8 +271,8 @@ echo
 echo
 
 
-echo "22. GET E8/A8 (see A8 unchanged)"
-echo "================================"
+echo "22. GET E8/A8 (see A8 null)"
+echo "==========================="
 orionCurl --url /v2/entities/E8?options=keyValues --json
 echo
 echo
@@ -323,18 +323,18 @@ Date: REGEX(.*)
 
 
 
-05. Get E2/A2 (A2 stays the same)
-=================================
+05. Get E2/A2 (value of A2 has been replaced)
+=============================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A2": {
         "metadata": {},
-        "type": "AT2",
-        "value": "03"
+        "type": "none",
+        "value": null
     },
     "id": "E2",
     "type": "T"
@@ -393,18 +393,18 @@ Date: REGEX(.*)
 
 
 
-11. Get E4/A4 (A4 stays the same)
-=================================
+11. Get E4/A4 (value of A4 has been replaced)
+=============================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "A4": {
         "metadata": {},
-        "type": "AT4",
-        "value": "09"
+        "type": "none",
+        "value": null
     },
     "id": "E4",
     "type": "T"
@@ -443,23 +443,23 @@ Date: REGEX(.*)
 
 
 
-15. Modify E6/A6=null (PATCH), with keyValues (A6 is unchanged)
-===============================================================
+15. Modify E6/A6=null (PATCH), with keyValues (A6 is null)
+==========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-16. Get E6/A6 (see that A6 is still 14)
-=======================================
+16. Get E6/A6 (see that A6 is null)
+===================================
 HTTP/1.1 200 OK
 Content-Length: 33
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A6": "14",
+    "A6": null,
     "id": "E6",
     "type": "T6"
 }
@@ -513,15 +513,15 @@ Date: REGEX(.*)
 
 
 
-22. GET E8/A8 (see A8 unchanged)
-================================
+22. GET E8/A8 (see A8 null)
+===========================
 HTTP/1.1 200 OK
 Content-Length: 33
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "A8": "20",
+    "A8": null,
     "id": "E8",
     "type": "T8"
 }

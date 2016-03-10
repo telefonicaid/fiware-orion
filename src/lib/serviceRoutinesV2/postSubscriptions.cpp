@@ -58,7 +58,7 @@ extern std::string postSubscriptions
     alarmMgr.badInput(clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.render(SubscribeContext, ciP->outFormat, ""));
+    TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
     return answer;
   }
 
@@ -68,7 +68,7 @@ extern std::string postSubscriptions
 
   if (scr.subscribeError.errorCode.code != SccNone )
   {
-    TIMED_RENDER(answer = scr.render(SubscribeContext, JSON, ""));
+    TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
     return answer;
   }
   std::string location = "/v2/subscriptions/" + scr.subscribeResponse.subscriptionId.string;

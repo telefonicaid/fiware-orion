@@ -383,17 +383,17 @@ int Scope::fill
 *
 * Scope::render -
 */
-std::string Scope::render(Format format, const std::string& indent, bool notLastInVector)
+std::string Scope::render(const std::string& indent, bool notLastInVector)
 {
   std::string out      = "";
   std::string tag      = "operationScope";
-  const char* tTag     = (format == XML)? "scopeType"  : "type";
-  const char* vTag     = (format == XML)? "scopeValue" : "value";
+  const char* tTag     = "type";
+  const char* vTag     = "value";
 
-  out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", tTag, type, format, true);
-  out += valueTag(indent + "  ", vTag, value, format);
-  out += endTag(indent, tag, format, notLastInVector);
+  out += startTag2(indent, tag, false, false);
+  out += valueTag1(indent + "  ", tTag, type, true);
+  out += valueTag1(indent + "  ", vTag, value);
+  out += endTag(indent, notLastInVector);
 
   return out;
 }
@@ -407,7 +407,6 @@ std::string Scope::render(Format format, const std::string& indent, bool notLast
 std::string Scope::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

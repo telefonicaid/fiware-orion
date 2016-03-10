@@ -5,7 +5,7 @@ Here there are a set of test Scripts created to cover the needs showed during th
 
 You find all the information about Orion Context Broker and its tests in the FI-WARE Catalogue:
 
-http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
+http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 
 
 ##Scripts:

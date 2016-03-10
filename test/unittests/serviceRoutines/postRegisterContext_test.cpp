@@ -71,8 +71,8 @@ TEST(postRegisterContext, DISABLED_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  ci.outFormat    = XML;
-  ci.inFormat     = XML;
+  ci.outFormat    = JSON;
+  ci.inFormat     = JSON;
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
@@ -89,8 +89,8 @@ TEST(postRegisterContext, DISABLED_ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.outFormat    = XML;
-  ci2.inFormat     = XML;
+  ci2.outFormat    = JSON;
+  ci2.inFormat     = JSON;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out              = restService(&ci2, rs);

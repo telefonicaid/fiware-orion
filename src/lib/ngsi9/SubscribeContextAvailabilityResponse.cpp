@@ -83,22 +83,22 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const
 *
 * SubscribeContextAvailabilityResponse::render - 
 */
-std::string SubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string SubscribeContextAvailabilityResponse::render(RequestType requestType, const std::string& indent)
 {
   std::string  tag                = "subscribeContextAvailabilityResponse";
   std::string  out                = "";
   bool         durationRendered   = !duration.isEmpty();
   bool         errorCodeRendered  = (errorCode.code != SccNone);
 
-  out += startTag(indent, tag, format, false);
+  out += startTag1(indent, tag, false);
 
-  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, format, indent + "  ", durationRendered || errorCodeRendered);
-  out += duration.render(format, indent + "  ", errorCodeRendered);
+  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, indent + "  ", durationRendered || errorCodeRendered);
+  out += duration.render(indent + "  ", errorCodeRendered);
 
   if (errorCodeRendered)
-     out += errorCode.render(format, indent + "  ", false);
+     out += errorCode.render(indent + "  ", false);
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent);
   
   return out;
 }  

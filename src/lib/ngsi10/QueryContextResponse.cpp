@@ -43,7 +43,7 @@
 */
 QueryContextResponse::QueryContextResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -55,7 +55,7 @@ QueryContextResponse::QueryContextResponse()
 QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -126,7 +126,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   //
   // 02. render 
   //
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if (contextElementResponseVector.size() > 0)
   {
@@ -135,7 +135,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 
   if (errorCodeRendered == true)
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
 
 
@@ -149,10 +149,10 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }
@@ -171,7 +171,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType request
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(ciP, QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);

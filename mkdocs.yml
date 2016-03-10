@@ -15,6 +15,7 @@ pages:
       - 'Introduction': 'user/index.md'
       - 'API Walkthrough': 'user/walkthrough_apiv1.md'
       - 'Adding entities and attributes': 'user/append_and_delete.md'
+      - 'Delete entity': 'user/delete_entity.md'
       - 'Attribute Metadata': 'user/metadata.md'
       - 'Empty Types': 'user/empty_types.md'
       - 'Structured values for attributes': 'user/structured_attribute_valued.md'

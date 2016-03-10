@@ -25,6 +25,7 @@
 date
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
+echo $testStartTime > /tmp/brokerStartCounter
 
 
 

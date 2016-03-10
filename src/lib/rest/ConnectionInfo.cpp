@@ -163,7 +163,7 @@ ConnectionInfo::ConnectionInfo(const std::string &_api, Format _format, bool _ws
 ConnectionInfo::ConnectionInfo(Format _outFormat):
   connection             (NULL),
   verb                   (NOVERB),
-  inFormat               (XML),
+  inFormat               (JSON),
   outFormat              (_outFormat),
   payload                (NULL),
   payloadSize            (0),
@@ -182,8 +182,8 @@ ConnectionInfo::ConnectionInfo(Format _outFormat):
 ConnectionInfo::ConnectionInfo(const std::string &_url, const std::string &_method, const std::string &_version, MHD_Connection* _connection):
   connection             (_connection),
   verb                   (NOVERB),
-  inFormat               (XML),
-  outFormat              (XML),
+  inFormat               (JSON),
+  outFormat              (JSON),
   url                    (_url),
   method                 (_method),
   version                (_version),

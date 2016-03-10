@@ -1,0 +1,90 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute Compound Value parsing for POST /v1/notifyContext (notifyContextRequest)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# Just one request needed here to make dure the broker doesn't crash when receiving
+# a compound attribute value for "POST /v1/notifyContext"
+#
+# 01. POST /v1/notifyContext with compound attribute value using JSON
+#
+
+echo "01. POST /v1/notifyContext with compound attribute value using JSON"
+echo "==================================================================="
+payload='{
+  "subscriptionId": "012345678901234567890123",
+  "originator": "localhost",
+  "contextResponses": [
+    {
+      "contextElement": {
+        "type": "Test",
+        "isPattern": "false",
+        "id": "E",
+        "attributes": [
+          {
+            "name": "att",
+            "type": "X",
+            "value": {
+              "a": 1
+            }
+          }
+        ]
+      },
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+      }
+    }
+  ]
+}'
+orionCurl --url /v1/notifyContext --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v1/notifyContext with compound attribute value using JSON
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "responseCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+--TEARDOWN--
+dbDrop CB
+brokerStop CB

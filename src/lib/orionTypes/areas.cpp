@@ -66,7 +66,7 @@ Point::Point(::std::string latitude, ::std::string longitude): valid(true)
 *
 * Point::Point - 
 */
-Point::Point(double _lat, double _lon)
+Point::Point(double _lat, double _lon): valid(true)
 {
   lat = _lat;
   lon = _lon;

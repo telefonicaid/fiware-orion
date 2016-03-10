@@ -47,8 +47,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(deleteIndividualContextEntity, notFound)
+TEST(deleteIndividualContextEntity, DISABLED_notFound)
 {
 
   ConnectionInfo ci("/ngsi10/contextEntities/entity701",  "DELETE", "1.1");

@@ -256,6 +256,19 @@ function brokerStopAwait
 #
 # brokerStartAwait
 #
+# For some really strange reason, all functests fail under valgrind when executed by Jenkins
+# without the line:
+#
+#   echo "Broker started after $loopNo checks" >> /tmp/brokerStartCounter
+#
+# It also works with echo to /dev/null, but using a file we get some more information.
+#
+# As we only append (>>) to /tmp/brokerStartCounter in this file, /tmp/brokerStartCounter
+# is reset in testHarness.sh, using the command "date > tmp/brokerStartCounter".
+#
+# The reason we send information to a file is that in case the 100 loop is not enough in the future,
+# we will have that information in the file /tmp/brokerStartCounter 
+#
 function brokerStartAwait
 {
   if [ "$BROKER_AWAIT_SLEEP_TIME" != "" ]
@@ -270,7 +283,7 @@ function brokerStartAwait
   typeset -i loopNo
   typeset -i loops
   loopNo=0
-  loops=50
+  loops=100
 
   while [ $loopNo -lt $loops ]
   do
@@ -278,6 +291,7 @@ function brokerStartAwait
     if [ "$?" == "0" ]
     then
       vMsg The orion context broker has started, listening on port $port
+      echo "Broker started after $loopNo checks" >> /tmp/brokerStartCounter
       sleep 1
       break;
     fi
@@ -289,9 +303,10 @@ function brokerStartAwait
 
   sleep .5
 
-  # Check that CB started fine
-  curl -s localhost:${port}/version | grep version > /dev/null
+  # Check that CB started
+  curl -s localhost:${port}/version | grep version >> /tmp/brokerStartCounter
   result=$?
+  echo "result: $result" >> /tmp/brokerStartCounter
 }
 
 

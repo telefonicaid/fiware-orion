@@ -105,7 +105,7 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, JSON, "", "", 0)) != "OK")
+    if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
       return error.render(ciP, "");
@@ -128,7 +128,7 @@ std::string jsonRequestTreat
       return answer;
     }
     
-    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, JSON, "", "", 0)) != "OK")
+    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, "", "", 0)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid subscription");
       return answer;

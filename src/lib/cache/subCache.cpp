@@ -69,10 +69,9 @@ volatile SubCacheState subCacheState = ScsIdle;
 *
 * EntityInfo::EntityInfo - 
 */
-EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern)
+EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern) : entityId(_entityId), entityType(_entityType) 
 {
-  entityId     = _entityId;
-  entityType   = _entityType;
+  
   isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
 
   if (isPattern)
