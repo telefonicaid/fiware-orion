@@ -1026,7 +1026,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
           ba.append(itemP->numberList[ix]);
         }
 
-        bb.append("$nin", ba.arr());
+        bb.append("$exists", true).append("$nin", ba.arr());
         bob.append(k, bb.obj());
         f = bob.obj();
       }
@@ -1044,7 +1044,7 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
           ba.append(itemP->stringList[ix]);
         }
 
-        bb.append("$nin", ba.arr());
+        bb.append("$exists", true).append("$nin", ba.arr());
         bob.append(k, bb.obj());
         f = bob.obj();
       }
