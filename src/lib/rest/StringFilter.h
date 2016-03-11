@@ -111,7 +111,6 @@ public:
   bool                      rangeParse(char* s, std::string* errorStringP);
   bool                      listParse(char* s, std::string* errorStringP);
   bool                      listItemAdd(char* s, std::string* errorStringP);
-  void                      present(std::string prefix);
   bool                      matchEquals(ContextAttribute* caP);
   bool                      matchGreaterThan(ContextAttribute* caP);
   bool                      matchLessThan(ContextAttribute* caP);
@@ -134,7 +133,6 @@ public:
   bool  parse(const char* q, std::string* errorStringP);
   bool  mongoFilterPopulate(std::string* errorStringP);
   bool  match(ContextElementResponse* cerP);
-  void  present(std::string prefix);
 };
 
 #endif  // SRC_LIB_REST_STRINGFILTERS_H_

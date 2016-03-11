@@ -723,7 +723,8 @@ void subCacheItemInsert
   std::string errorString;
   if (cSubP->expression.stringFilter.parse(q.c_str(), &errorString) == false)
   {
-    LM_E(("Runtime Error (error parsing q-string '%s')", q.c_str()));
+    LM_E(("Runtime Error (error parsing q-string '%s': %s)", q.c_str(), errorString.c_str()));
+    return;
   }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
@@ -1157,14 +1158,4 @@ void subCacheStart(void)
     return;
   }
   pthread_detach(tid);
-}
-
-
-
-void CachedSubscription::qParse(void)
-{
-  if (expression.q == "")
-  {
-    return;
-  }
 }

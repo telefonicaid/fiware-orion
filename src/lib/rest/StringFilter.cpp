@@ -390,9 +390,9 @@ bool StringFilterItem::valueGet
 *       >=         Translates to GTE
 *       <=         Translates to LTE
 *
-*     -Unary operators:
-*       NOTHING:   Translates to EXISTS
-*       !          Translates to DOES NOT EXIST
+*     - Unary operators:
+*       !          Translates to DOES NOT EXIST (the string that comes after is the name of an attribute)
+*       NOTHING:   Translates to EXISTS (the string is the name of an attribute)
 */
 bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
 {
@@ -713,68 +713,6 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
   }
 
   return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* StringFilterItem::present - 
-*/
-void StringFilterItem::present(std::string prefix)
-{
-  LM_W(("%sStringFilterItem '%s':", prefix.c_str(), left.c_str()));
-  LM_W(("%s  OP:  %s", prefix.c_str(), opName()));
-  LM_W(("%s  RHS: %s", prefix.c_str(), valueTypeName()));
-
-  if (valueType == SfvtString)
-  {
-    LM_W(("%s  '%s'", prefix.c_str(), stringValue.c_str()));
-  }
-  else if (valueType == SfvtBool)
-  {
-    LM_W(("%s  %s", prefix.c_str(), (boolValue == true)? "true" : "false"));
-  }
-  else if (valueType == SfvtNumber)
-  {
-    LM_W(("%s  %f", prefix.c_str(), numberValue));
-  }
-  else if (valueType == SfvtNull)
-  {
-    LM_W(("%s  NULL", prefix.c_str()));
-  }
-  else if (valueType == SfvtDate)
-  {
-    LM_W(("%s  %f", prefix.c_str(), numberValue));
-  }
-  else if (valueType == SfvtNumberRange)
-  {
-    LM_W(("%s  %f - %f", prefix.c_str(), numberRangeFrom, numberRangeTo));
-  }
-  else if (valueType == SfvtDateRange)
-  {
-    LM_W(("%s  %f - %f", prefix.c_str(), numberRangeFrom, numberRangeTo));
-  }
-  else if (valueType == SfvtStringRange)
-  {
-    LM_W(("%s  '%s' - '%s'", prefix.c_str(), stringRangeFrom.c_str(), stringRangeTo.c_str()));
-  }
-  else if (valueType == SfvtNumberList)
-  {
-    LM_W(("%s  %f, %f, ... (%d values in vector)", prefix.c_str(), numberList[0], numberList[1], numberList.size()));
-  }
-  else if (valueType == SfvtDateList)
-  {
-    LM_W(("%s  %f, %f, ... (%d values in vector)", prefix.c_str(), numberList[0], numberList[1], numberList.size()));
-  }
-  else if (valueType == SfvtStringList)
-  {
-    LM_W(("%s  '%s', '%s', ... (%d values in vector)", prefix.c_str(), stringList[0].c_str(), stringList[1].c_str(), stringList.size()));
-  }
-  else
-  {
-    LM_W(("%s  Invalid value-type", prefix.c_str()));
-  }
 }
 
 
@@ -1160,20 +1098,4 @@ bool StringFilter::match(ContextElementResponse* cerP)
   }
 
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* StringFilter::present - 
-*/
-void StringFilter::present(std::string prefix)
-{
-  LM_W(("%sStringFilter '%s' [%d items]", prefix.c_str(), plainString.c_str(), filters.size()));
-
-  for (unsigned int ix = 0; ix < filters.size(); ++ix)
-  {
-    filters[ix].present(prefix + "  ");
-  }
 }

@@ -1638,8 +1638,7 @@ static bool matchExpression(ContextElementResponse* cerP, StringFilter* sfP)
     return true;
   }
 
-  bool match = sfP->match(cerP);
-  return match;
+  return sfP->match(cerP);
 }
 
 
