@@ -1274,7 +1274,6 @@ static bool addTriggeredSubscriptions_withCache
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
-
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
@@ -1664,6 +1663,7 @@ static bool processSubscriptions
   {
     std::string             mapSubId  = it->first;
     TriggeredSubscription*  trigs     = it->second;
+
 
     /* There are some checks to perform on TriggeredSubscription in order to see if the notification has to be actually sent. Note
      * that checks are done in increasing cost order (e.g. georel check is done at the end).
