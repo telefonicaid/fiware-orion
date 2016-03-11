@@ -48,7 +48,7 @@ brokerStart CB
 # 16. PUT /v2/entities/E1/attrs/A1 (without payload)
 # 17a. GET /v2/entities/E1/attrs/A1
 # 17b. PUT /v2/entities/E1/attrs/A1 (empty payload)
-# 17c. GET /v2/entities/E1/attrs/A1 - A1 should be as in 17a
+# 17c. GET /v2/entities/E1/attrs/A1 - A1 should be null
 # 18. PATCH /v2/entities/E1/attrs/A1 (without payload)
 # 19. PATCH /v2/entities/E1/attrs/A1 (empty payload)
 
@@ -195,8 +195,8 @@ orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
 echo
 echo
 
-echo "17c. GET /v2/entities/E1/attrs/A1 - A1 should be as in 17a"
-echo "=========================================================="
+echo "17c. GET /v2/entities/E1/attrs/A1 - A1 should be null"
+echo "====================================================="
 orionCurl --url /v2/entities/E1/attrs/A1 --json
 echo
 echo
@@ -445,17 +445,17 @@ Date: REGEX(.*)
 
 
 
-17c. GET /v2/entities/E1/attrs/A1 - A1 should be as in 17a
-==========================================================
+17c. GET /v2/entities/E1/attrs/A1 - A1 should be null
+=====================================================
 HTTP/1.1 200 OK
-Content-Length: 39
+Content-Length: 42
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
     "type": "none",
-    "value": 0
+    "value": null
 }
 
 
