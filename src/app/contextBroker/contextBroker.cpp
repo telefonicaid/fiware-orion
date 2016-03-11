@@ -267,9 +267,9 @@ bool            statNotifQueue;
 int             lsPeriod;
 bool            relogAlarms;
 bool            strictIdv1;
-bool 		metadataId;
-bool		attributeId;
-bool 		nameId;
+bool            metadataId;
+bool            attributeId;
+bool            nameId;
 
 
 
@@ -322,6 +322,7 @@ bool 		nameId;
 #define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
 #define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
+
 #define CHECK_METADATA_V1      "additional checks for metadata  in the NGSIv1 API"
 #define CHECK_ATTRIBUTE_V1     "additional checks for attribute in the NGSIv1 API"
 #define CHECK_NAME_V1          "additional checks for name  in the NGSIv1 API"
@@ -362,7 +363,7 @@ PaArgument paArgs[] =
   { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
   { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
 
-  { "-https",         &https,        "HTTPSCHECK_NAME_V1",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
+  { "-https",         &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
   { "-key",           httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
   { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
 
