@@ -497,7 +497,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       alarmMgr.badInputReset(clientIp);
     }
 
-    LM_W(("KZ: ================== Serving %s %s =======================", ciP->method.c_str(), ciP->url.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     filterRelease(&parseData, serviceV[ix].request);   

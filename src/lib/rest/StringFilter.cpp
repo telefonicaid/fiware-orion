@@ -48,13 +48,10 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
 {
   bool b;
 
-  LM_W(("KZ: Calling valueGet"));
   b = valueGet(s, &valueType, &numberValue, &stringValue, &boolValue, errorStringP);
-  LM_W(("KZ: op == %s, valueType == %s", opName(), valueTypeName()));
 
   if (b == false)
   {
-    LM_W(("KZ: valueGet returned false: %s", errorStringP->c_str()));
     return b;
   }
 
@@ -67,7 +64,6 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
   }
   else if ((op == SfopGreaterThan) || (op == SfopGreaterThanOrEqual) || (op == SfopLessThan) || (op == SfopLessThanOrEqual))
   {
-    LM_W(("KZ: op == %s, valueType == %s", opName(), valueTypeName()));
     if ((valueType != SfvtNumber) && (valueType != SfvtDate))
     {
       *errorStringP = std::string("values of type /") + valueTypeName() + "/ not supported for operator /" + opName() + "/";
@@ -161,15 +157,6 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
     return false;
   }
 
-  LM_W(("KZ: -----------------------"));
-  LM_W(("KZ: Got a %s range", valueTypeName()));
-  if (valueType == SfvtNumberRange)
-  {
-    LM_W(("KZ:   From: %f", numberRangeFrom));
-    LM_W(("KZ:   To:   %f", numberRangeTo));
-  }
-  LM_W(("KZ: -----------------------"));
-
   return true;
 }
 
@@ -186,7 +173,6 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   std::string            str;
   bool                   b;
 
-  LM_W(("KZ: listItemAdd: s == '%s'", s));
   s = wsStrip(s);
   if (*s == 0)
   {
@@ -263,8 +249,6 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
     return false;
   }
 
-  LM_W(("KZ: list to parse: '%s", s));
-  
   char* itemStart = wsStrip(s);
   char* cP        = itemStart;
   bool  inString  = false;
@@ -282,7 +266,6 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
       {
         inString = false;
         *cP = 0;
-        LM_W(("KZ: list item item with stripped \'s: %s", itemStart));
       }
       ++cP;
     }
@@ -355,8 +338,6 @@ bool StringFilterItem::valueGet
       *errorStringP = "quote in forced string";
       return false;
     }
-
-    LM_W(("KZ: String value with quotes"));
   }
   else if (str2double(s, doubleP))
   {
@@ -523,13 +504,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   }
 
 
-  LM_W(("KZ: LHS: '%s'", lhs));
-  LM_W(("KZ: OP:  '%s'", opName()));
-  LM_W(("KZ: RHS: '%s'", rhs));
-  LM_W(("KZ: OR:   %s %s %s", lhs, opName(), rhs));
-  LM_W(("KZ: -------------------------"));
-  LM_W(("KZ"));
-
   //
   // Now, the right-hand-side, is it a RANGE, a LIST, a SIMPLE VALUE, or an attribute name?
   // And, what type of values?
@@ -546,7 +520,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
     else                                  b = valueParse(rhs, errorStringP);
   }
 
-  LM_W(("KZ: returning %s", b? "true":"false"));
   return b;
 }
 
@@ -607,21 +580,12 @@ const char* StringFilterItem::valueTypeName(void)
 */
 bool StringFilterItem::matchEquals(ContextAttribute* caP)
 {
-  LM_W(("KZ: valueType == %s", valueTypeName()));
-
   if ((valueType == SfvtNumberRange) || (valueType == SfvtDateRange))
   {
-    LM_W(("KZ: NumberRange or DateRange"));
-    LM_W(("KZ: caP->numberValue == %f", caP->numberValue));
-    LM_W(("KZ: numberRangeFrom  == %f", numberRangeFrom));
-    LM_W(("KZ: numberRangeTo    == %f",numberRangeTo));
-
     if ((caP->numberValue < numberRangeFrom) || (caP->numberValue > numberRangeTo))
     {
-      LM_W(("KZ: matchEquals: FALSE"));
       return false;
     }
-    LM_W(("KZ: matchEquals: OK"));
   }
   else if (valueType == SfvtStringRange)
   {
@@ -698,7 +662,6 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
     return false;
   }
 
-  LM_W(("KZ: return TRUE"));
   return true;
 }
 
@@ -824,8 +787,6 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 {
   plainString = q;
 
-  LM_W(("KZ: parse q '%s'", q));
-
   //
   // Initial Sanity check (of the entire string)
   // - Not empty             (empty q)
@@ -880,7 +841,6 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
     }
     else
     {
-      LM_W(("KZ: ERROR: %s", errorStringP->c_str()));
       free(toFree);
       return false;
     }
@@ -888,9 +848,7 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
     str = NULL;  // So that strtok_r continues eating the initial string
   }
 
-  LM_W(("KZ: StringFilter parse was successful"));
   free(toFree);
-  LM_W(("KZ: Calling mongoFilterPopulate"));
   return mongoFilterPopulate(errorStringP);
 }
 
@@ -952,7 +910,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       else if (itemP->valueType == SfvtStringRange)
       {
         *errorStringP = "string range is not supported";
-        LM_W(("KZ: %s", (*errorStringP).c_str()));
         return false;
       }
       else if ((itemP->valueType == SfvtNumberList) || (itemP->valueType == SfvtDateList))
@@ -986,7 +943,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       else if (itemP->valueType == SfvtNull)
       {
         *errorStringP = "null values not supported";
-        LM_W(("KZ: %s", (*errorStringP).c_str()));
         return false;
       }
       else if ((itemP->valueType == SfvtNumber) || (itemP->valueType == SfvtDate))
@@ -1003,15 +959,12 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else
       {
-        LM_W(("KZ: invalid valueType (%d) for q-item", itemP->valueType));
         *errorStringP = "invalid valueType for q-item";
-        LM_W(("KZ: %s", (*errorStringP).c_str()));
         return false;
       }
       break;
 
     case SfopDiffers:
-      LM_W(("KZ: NOT EQUAL"));
       if ((itemP->valueType == SfvtNumberRange) || (itemP->valueType == SfvtDateRange))
       {
         bb.append("$gte", itemP->numberRangeFrom).append("$lte", itemP->numberRangeTo);
@@ -1033,14 +986,12 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       else if (itemP->valueType == SfvtStringRange)
       {
         *errorStringP = "string range is not supported";
-        LM_W(("KZ: %s", (*errorStringP).c_str()));
         return false;
       }
       else if (itemP->valueType == SfvtStringList)
       {
         for (unsigned int ix = 0; ix < itemP->stringList.size(); ++ix)
         {
-          LM_W(("KZ: NOT EQUAL to %s", itemP->stringList[ix].c_str()));
           ba.append(itemP->stringList[ix]);
         }
 
@@ -1057,7 +1008,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       else if (itemP->valueType == SfvtNull)
       {
         *errorStringP = "null values not supported";
-        LM_W(("KZ: %s", (*errorStringP).c_str()));
         return false;
       }
       else if ((itemP->valueType == SfvtNumber) || (itemP->valueType == SfvtDate))
@@ -1102,8 +1052,6 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     mongoFilters.push_back(f);
   }
 
-  LM_W(("KZ: pushed %d filters to mongoFilters vector", mongoFilters.size()));
-  LM_W(("KZ: mongoFilter 0: %s", mongoFilters[0].toString().c_str()));
   return true;
 }
 
@@ -1115,31 +1063,23 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 */
 bool StringFilter::match(ContextElementResponse* cerP)
 {
-  LM_W(("KZ: In StringFilter::match"));
-
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem* itemP = &filters[ix];
 
-    LM_W(("KZ: StringFilter %d: op == %s", ix, itemP->opName()));
     // Unary operator?
     if ((itemP->op == SfopExists) || (itemP->op == SfopNotExists))
     {
       ContextAttribute* caP = cerP->contextElement.getAttribute(itemP->attributeName);
 
-      LM_W(("KZ: attribute '%s' at %p", itemP->attributeName.c_str(), caP));
       if ((itemP->op == SfopExists) && (caP == NULL))
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
       else if ((itemP->op == SfopNotExists) && (caP != NULL))
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
-      
-      LM_W(("KZ: OK from a exist/not-exist point of view for attribute '%s'", itemP->attributeName.c_str()));
     }
 
     //
@@ -1153,11 +1093,9 @@ bool StringFilter::match(ContextElementResponse* cerP)
 
     if ((itemP->left == DATE_CREATED) || (itemP->left == DATE_MODIFIED))
     {
-      LM_W(("KZ: DATE_CREATED or DATE_MODIFIED"));
       caP            = &ca;
       ca.valueType   = orion::ValueTypeNumber;
       ca.numberValue = (itemP->left == DATE_CREATED)? cerP->contextElement.creDate : cerP->contextElement.modDate;
-      LM_W(("KZ: ca.numberValue: %f", ca.numberValue));
     }
     else if (itemP->op != SfopNotExists)
     {
@@ -1166,7 +1104,6 @@ bool StringFilter::match(ContextElementResponse* cerP)
       // If the attribute doesn't exist, no need to go further: filter fails
       if (caP == NULL)
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
     }
@@ -1179,10 +1116,8 @@ bool StringFilter::match(ContextElementResponse* cerP)
       break;
 
     case SfopEquals:
-      LM_W(("KZ: Equals"));
       if (itemP->matchEquals(caP) == false)
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
       break;
@@ -1190,7 +1125,6 @@ bool StringFilter::match(ContextElementResponse* cerP)
     case SfopDiffers:
       if (itemP->matchEquals(caP) == true)
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
       break;
@@ -1198,7 +1132,6 @@ bool StringFilter::match(ContextElementResponse* cerP)
     case SfopGreaterThan:
       if (itemP->matchGreaterThan(caP) == false)
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
       break;
@@ -1206,7 +1139,6 @@ bool StringFilter::match(ContextElementResponse* cerP)
     case SfopLessThan:
       if (itemP->matchLessThan(caP) == false)
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
       break;
@@ -1214,7 +1146,6 @@ bool StringFilter::match(ContextElementResponse* cerP)
     case SfopGreaterThanOrEqual:
       if (itemP->matchLessThan(caP) == true)
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
       break;
@@ -1222,14 +1153,12 @@ bool StringFilter::match(ContextElementResponse* cerP)
     case SfopLessThanOrEqual:
       if (itemP->matchGreaterThan(caP) == true)
       {
-        LM_W(("KZ: From StringFilter::match: false"));
         return false;
       }
       break;
     }
   }
 
-  LM_W(("KZ: From StringFilter::match: true"));
   return true;
 }
 

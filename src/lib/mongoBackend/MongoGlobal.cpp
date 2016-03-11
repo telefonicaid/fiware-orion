@@ -1985,16 +1985,13 @@ bool entitiesQuery
     }
     else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      LM_W(("KZ: got a Scope of type '%s'", SCOPE_TYPE_SIMPLE_QUERY));
       stringFilterP = new StringFilter();
-      LM_W(("KZ: parsing scope '%s'", sco->value.c_str()));
       if (stringFilterP->parse(sco->value.c_str(), err) == false)
       {
-        LM_W(("KZ: Bad Input"));
         *badInputP = true;
         return false;
       }
-      LM_W(("KZ: Parsed"));
+
       for (unsigned int ix = 0; ix < stringFilterP->mongoFilters.size(); ++ix)
       {
         finalQuery.appendElements(stringFilterP->mongoFilters[ix]);

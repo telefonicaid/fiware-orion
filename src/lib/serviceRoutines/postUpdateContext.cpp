@@ -436,7 +436,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
-  LM_W(("KZ: In postUpdateContext"));
+
   //
   // 01. Check service-path consistency
   //
@@ -451,7 +451,6 @@ std::string postUpdateContext
 
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
-    LM_W(("KZ: From postUpdateContext"));
     return answer;
   }
   else if (ciP->servicePathV.size() == 0)
@@ -466,7 +465,6 @@ std::string postUpdateContext
 
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
-    LM_W(("KZ: From postUpdateContext"));
     return answer;
   }
 
@@ -478,9 +476,7 @@ std::string postUpdateContext
   attributesToNotFound(upcrP);
   
   HttpStatusCode httpStatusCode;
-  LM_W(("KZ: Calling mongoUpdateContext"));
   TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, ngsiV2Flavour));
-  LM_W(("KZ: after mongoUpdateContext"));
 
   if (ciP->httpStatusCode != SccCreated)
   {
@@ -502,7 +498,6 @@ std::string postUpdateContext
     TIMED_RENDER(answer = upcrsP->render(ciP, UpdateContext, ""));
 
     upcrP->release();
-    LM_W(("KZ: From postUpdateContext"));
     return answer;
   }
 
@@ -621,8 +616,6 @@ std::string postUpdateContext
     }
   }
 
-
-  LM_W(("KZ: ready to forward the Updates"));
 
   //
   // Now we are ready to forward the Updates

@@ -98,7 +98,6 @@ std::string postIndividualContextEntity
   std::string                   answer;
   std::string                   out;
 
-  LM_W(("KZ: IN postIndividualContextEntity"));
   //
   // 01. Check that total input in consistent and correct
   //
@@ -164,10 +163,8 @@ std::string postIndividualContextEntity
   parseDataP->upcr.res.fill(&parseDataP->acer.res, entityId, entityType);
 
 
-  LM_W(("KZ: Calling postUpdateContext"));
   // 03. Call postUpdateContext standard service routine
   postUpdateContext(ciP, components, compV, parseDataP);
-  LM_W(("KZ: After postUpdateContext"));
 
 
   // 04. Translate UpdateContextResponse to AppendContextElementResponse

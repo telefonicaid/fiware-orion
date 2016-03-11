@@ -1636,12 +1636,10 @@ static bool matchExpression(ContextElementResponse* cerP, StringFilter* sfP)
 {
   if (sfP == NULL)
   {
-    LM_W(("KZ: stringFilter == NULL - returning TRUE"));
     return true;
   }
 
   bool match = sfP->match(cerP);
-  LM_W(("KZ: matchExpression returning %s", (match == true)? "true" : "false"));
   return match;
 }
 
@@ -1662,7 +1660,6 @@ static bool processSubscriptions
 {
   bool ret = true;
 
-  LM_W(("KZ: In processSubscriptions"));
   *err = "";
 
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
@@ -1693,7 +1690,6 @@ static bool processSubscriptions
     }
 
     /* Check 2: expression (q) */
-    LM_W(("KZ: In processSubscriptions - calling matchExpression"));
     if (noCache == true)
     {
       if (trigs->expression.q != "")
@@ -1702,7 +1698,6 @@ static bool processSubscriptions
 
         if (stringFilterP->parse(trigs->expression.q.c_str(), err) == false)
         {
-          LM_W(("KZ: error parsing stringFilter"));
           return false;
         }
 
@@ -1711,17 +1706,14 @@ static bool processSubscriptions
           delete stringFilterP;
           stringFilterP = NULL;
 
-          LM_W(("KZ: processSubscriptions: matchExpression returned FALSE. q == '%s'", trigs->expression.q.c_str()));
           continue;
         }
       }
     }
     else if (!matchExpression(notifyCerP, trigs->stringFilterP))
     {
-      LM_W(("KZ: processSubscriptions: matchExpression returned FALSE. q == '%s'", trigs->expression.q.c_str()));
       continue;
     }
-    LM_W(("KZ: In processSubscriptions - after matchExpression returned TRUE"));
 
     /* Check 3: expression (georel, which also uses geometry and coords) */
     // TBD (issue #1678)
