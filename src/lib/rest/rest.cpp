@@ -75,7 +75,6 @@ static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
 __thread char                    clientIp[IP_LENGTH_MAX + 1];
-__thread StringFilter*           stringFilterP        = NULL;
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
@@ -201,12 +200,19 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       std::string errorString;
 
-      stringFilterP = new StringFilter();
-      if (stringFilterP->parse(val, &errorString) == false)
+      if (ciP->stringFilterP != NULL)
+      {
+        delete ciP->stringFilterP;
+        ciP->stringFilterP = NULL;
+      }
+
+      ciP->stringFilterP = new StringFilter();
+      if (ciP->stringFilterP->parse(val, &errorString) == false)
       {
         OrionError error(SccBadRequest, errorString);
-        delete stringFilterP;
 
+        delete ciP->stringFilterP;
+        ciP->stringFilterP  = NULL;
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer         = error.render(ciP, "");
       }
@@ -442,6 +448,12 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 static void serve(ConnectionInfo* ciP)
 {
   restService(ciP, restServiceV);
+
+  if (ciP->stringFilterP != NULL)
+  {
+    delete ciP->stringFilterP;
+    ciP->stringFilterP = NULL;
+  }
 }
 
 
@@ -463,6 +475,12 @@ static void requestCompleted
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
+  }
+
+  if (ciP->stringFilterP != NULL)
+  {
+    delete ciP->stringFilterP;
+    ciP->stringFilterP = NULL;
   }
 
   *con_cls = NULL;
@@ -914,6 +932,7 @@ static std::string apiVersionGet(const char* path)
 * Call 2: *con_cls != NULL  AND  *upload_data_size != 0
 * Call 3: *con_cls != NULL  AND  *upload_data_size == 0
 */
+static int reqNo       = 1;
 static int connectionTreat
 (
    void*            cls,
@@ -928,7 +947,6 @@ static int connectionTreat
 {
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
-  static int             reqNo       = 1;
 
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers

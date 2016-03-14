@@ -66,14 +66,6 @@ using namespace mongo;
 
 /* ****************************************************************************
 *
-* stringFilterP - 
-*/
-extern __thread StringFilter* stringFilterP;
-
-
-
-/* ****************************************************************************
-*
 * Forward declarations
 */
 static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);
@@ -1692,20 +1684,25 @@ static bool processSubscriptions
     {
       if (trigs->expression.q != "")
       {
-        stringFilterP = new StringFilter();
+        StringFilter* sfP = new StringFilter();
 
-        if (stringFilterP->parse(trigs->expression.q.c_str(), err) == false)
+        if (sfP->parse(trigs->expression.q.c_str(), err) == false)
         {
+          delete sfP;
+          sfP = NULL;
+
           return false;
         }
 
-        if (!matchExpression(notifyCerP, stringFilterP))
+        if (!matchExpression(notifyCerP, sfP))
         {
-          delete stringFilterP;
-          stringFilterP = NULL;
+          delete sfP;
+          sfP = NULL;
 
           continue;
         }
+
+        delete sfP;
       }
     }
     else if (!matchExpression(notifyCerP, trigs->stringFilterP))
