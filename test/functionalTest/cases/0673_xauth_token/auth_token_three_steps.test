@@ -237,7 +237,7 @@ Content-Length: 459
 X-Auth-Token: kz02
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -312,7 +312,7 @@ Content-Length: 460
 X-Auth-Token: kz03
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {

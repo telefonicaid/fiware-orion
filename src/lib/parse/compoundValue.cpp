@@ -85,11 +85,6 @@ void compoundValueStart
   if (ciP->parseDataP->lastContextAttribute == NULL)
     orionExitFunction(1, "No pointer to last ContextAttribute");
 
-  if (ciP->parseDataP->lastContextAttribute->typeFromXmlAttribute == "vector")
-  {
-    ciP->compoundValueP->valueType = orion::ValueTypeVector;
-  }
-
   ciP->compoundValueVector.push_back(ciP->compoundValueP);
   LM_T(LmtCompoundValueAdd, ("Created new toplevel element"));
   compoundValueMiddle(ciP, rest, name, value, type);
@@ -158,7 +153,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
 
   //
   // Give the root pointer of this Compound to the active ContextAttribute
-  // lastContextAttribute is set in the XML parsing routines, to point at the
+  // lastContextAttribute is set in the JSON v1 parsing routines, to point at the
   // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
   // owner of this compound value tree.
   //

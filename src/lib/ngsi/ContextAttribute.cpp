@@ -67,7 +67,6 @@ ContextAttribute::ContextAttribute()
   stringValue           = "";
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
-  typeFromXmlAttribute  = "";
   found                 = false;
   skip                  = false;
   typeGiven             = false;
@@ -103,7 +102,6 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   compoundValueP        = caP->compoundValueP;
   caP->compoundValueP   = NULL;
   found                 = caP->found;
-  typeFromXmlAttribute  = "";
   skip                  = false;
   typeGiven             = caP->typeGiven;
 
@@ -276,7 +274,6 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();
-  typeFromXmlAttribute  = "";
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;

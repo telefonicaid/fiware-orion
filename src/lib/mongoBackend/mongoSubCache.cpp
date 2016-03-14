@@ -93,7 +93,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               formatString  = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "XML";
+  std::string               formatString  = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "JSON";
   std::vector<BSONElement>  eVec          = sub.getField(CSUB_ENTITIES).Array();
   std::vector<BSONElement>  attrVec       = sub.getField(CSUB_ATTRS).Array();
   std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
@@ -292,7 +292,7 @@ int mongoSubCacheItemInsert
   //
   // 03. Extract data from mongo sub
   //
-  std::string               formatString  = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "XML";
+  std::string               formatString  = sub.hasField(CSUB_FORMAT)? sub.getField(CSUB_FORMAT).String() : "JSON";
   std::vector<BSONElement>  attrVec       = sub.getField(CSUB_ATTRS).Array();
   std::vector<BSONElement>  condVec       = sub.getField(CSUB_CONDITIONS).Array();
 

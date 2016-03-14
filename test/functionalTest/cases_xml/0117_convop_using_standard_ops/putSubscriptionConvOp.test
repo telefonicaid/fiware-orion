@@ -376,7 +376,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 879
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -433,7 +433,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 879
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -470,7 +470,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -542,7 +542,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 879
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -579,7 +579,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -651,7 +651,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 879
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -688,7 +688,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -725,7 +725,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 574
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
