@@ -143,13 +143,13 @@ std::string getEntityAttributeValue
 
         if (attributeType == DATE_TYPE)
         {
-          answer = isodate2str(attribute.pcontextAttribute->numberValue);
+          TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
         }
         else
         {
-          answer =  attribute.pcontextAttribute->getValue();
+          TIMED_RENDER(answer =  attribute.pcontextAttribute->getValue());
         }
-        TIMED_RENDER(answer = answer);
+
       }
 
       ciP->outFormat = TEXT;
