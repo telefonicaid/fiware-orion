@@ -1,0 +1,83 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Attribute Value of type daye
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. POST /v2/entities creating room
+# 02. GET /v2/entities/room/attrs/temperature/value as text/plain
+#
+
+echo '01. POST /v2/entities creating room'
+echo '==================================='
+payload='{
+"type": "Room",
+"id": "room",
+"type": "Room",
+"temperature": {
+  "type": "date",
+  "value": "2035-06-15T07:21:24.238Z"
+  }
+}
+'
+orionCurl --url '/v2/entities' --payload "$payload" --json
+echo
+echo
+
+
+echo '02. GET /v2/entities/room/attrs/temperature/value as text/plain'
+echo '==============================================================='
+orionCurl --url /v2/entities/room/attrs/temperature/value --out text
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities creating room
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/room?type=Room
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities/room/attrs/temperature/value as text/plain
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 23
+Content-Type: text/plain
+Date: REGEX(.*)
+
+2035-06-15T07:21:24.00Z
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
