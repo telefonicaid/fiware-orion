@@ -176,7 +176,9 @@ extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
 extern bool               checkIdv1;
-
+extern bool               checkMetadatav1;
+extern bool               checkAttributev1;
+extern bool               checkNamev1;
 
 
 /* ****************************************************************************
@@ -192,7 +194,10 @@ extern void orionInit
   bool               _semWaitStatistics,
   bool               _timingStatistics,
   bool               _notifQueueStatistics,
-  bool               _checkIdv1
+  bool               _checkIdv1,
+  bool               _checkMetadatav1,
+  bool               _checkAttributev1,
+  bool               _checkNamev1
 );
 
 

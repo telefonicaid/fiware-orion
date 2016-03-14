@@ -73,5 +73,8 @@ Usage:                [option '-U' (extended usage)]
                       [option '-logSummary' <log summary period in seconds (defaults to 0, meaning 'off')>]
                       [option '-relogAlarms' (log messages for existing alarms beyond the raising alarm log message itself)]
                       [option '-strictNgsiv1Ids' (additional checks for id fields in the NGSIv1 API)]
+                      [option '-strictNgsiv1Metadata'(additional checks for metadata  in the NGSIv1 API)]
+                      [option '-strictNgsiv1Attribute'(additional checks for attribute  in the NGSIv1 API)]
+                      [option '-strictNgsiv1Name'(additional checks for name in the NGSIv1 API)]
 
 --TEARDOWN--

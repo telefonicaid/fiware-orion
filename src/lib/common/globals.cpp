@@ -53,6 +53,9 @@ bool                   semWaitStatistics    = false;
 bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
 bool                   checkIdv1            = false;
+bool                   checkMetadatav1      = false;
+bool                   checkAttributev1     = false;
+bool                   checkNamev1          = false;
 
 
 /* ****************************************************************************
@@ -136,7 +139,10 @@ void orionInit
   bool               _semWaitStatistics,
   bool               _timingStatistics,
   bool               _notifQueueStatistics,
-  bool _checkIdv1)
+  bool               _checkIdv1,
+  bool               _checkMetadatav1,
+  bool               _checkAttributev1,
+  bool               _checkNamev1)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -168,7 +174,10 @@ void orionInit
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
 
-  checkIdv1 = _checkIdv1;
+  checkIdv1        = _checkIdv1;
+  checkMetadatav1  = _checkMetadatav1;
+  checkAttributev1 = _checkAttributev1;
+  checkNamev1      = _checkNamev1;
 }
 
 
