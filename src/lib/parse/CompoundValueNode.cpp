@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
+#include "parse/forbiddenChars.h"
 
 #include "orionTypes/OrionValueType.h"
 #include "rest/ConnectionInfo.h"
@@ -575,13 +576,13 @@ void CompoundValueNode::show(const std::string& indent)
 *
 * Encountered errors are saved in the 'error' field of the root of the tree (rootP->error).
 */
-void CompoundValueNode::check(void)
+std::string CompoundValueNode::check(void)
 {
   if (valueType == orion::ValueTypeVector)
   {
     if (childV.size() == 0)
     {
-      return;
+      return "OK";
     }
 
     for (uint64_t ix = 1; ix < childV.size(); ++ix)
@@ -592,7 +593,7 @@ void CompoundValueNode::check(void)
           std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
 
         alarmMgr.badInput(clientIp, rootP->error);
-        return;
+        return rootP->error;
       }
     }
   }
@@ -600,7 +601,7 @@ void CompoundValueNode::check(void)
   {
     if (childV.size() == 0)
     {
-      return;
+      return "OK";
     }
 
     for (uint64_t ix = 0; ix < childV.size() - 1; ++ix)
@@ -612,22 +613,32 @@ void CompoundValueNode::check(void)
           rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
           alarmMgr.badInput(clientIp, rootP->error);
 
-          return;
+          return rootP->error;
         }
       }
     }
   }
   else
   {
-    // No check made for Strings
-    return;
+    if (forbiddenChars(stringValue.c_str()))
+    {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      return "Invalid characters in attribute value";
+    }
   }
 
   // 'recursively' call the check method for all children
+  std::string res;
+
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
-    childV[ix]->check();
+    res = childV[ix]->check();
+    if (res !="OK")
+    {
+      return res;
+    }
   }
+  return "OK";
 }
 
 
