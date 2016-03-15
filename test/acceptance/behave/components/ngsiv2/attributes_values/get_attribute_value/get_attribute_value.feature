@@ -79,7 +79,7 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
     And verify that the attribute value by ID is returned
 
   @date_type @BUG_1885 @ISSUE_1604 @skip
-  # this scenario is only to automate a bug.
+  # this scenario is only to automate the check for a bug.
   # later, it is necessary more scenarios and examples to testing of the date type, See ISO8601 format.
   Scenario:  get an attribute value by entity ID and attribute name if it exists using NGSI v2 with date in attribute type
     Given  a definition of headers
