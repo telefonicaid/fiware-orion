@@ -877,10 +877,6 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
-#define OPR_EXIST     "EXISTS"
-#define OPR_NOT_EXIST "NOT EXIST"
-
-
 /* *****************************************************************************
 *
 * addFilterScope -

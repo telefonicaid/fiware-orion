@@ -55,7 +55,6 @@
 #include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
-#include "rest/StringFilter.h"
 
 using std::string;
 using std::map;
@@ -1641,23 +1640,6 @@ static bool processOnChangeConditionForUpdateContext
   getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
   return true;
 }
-
-
-#if 0
-/* ****************************************************************************
-*
-* matchExpression
-*/
-static bool matchExpression(ContextElementResponse* cerP, StringFilter* sfP)
-{
-  if (sfP == NULL)
-  {
-    return true;
-  }
-
-  return sfP->match(cerP);
-}
-#endif
 
 
 

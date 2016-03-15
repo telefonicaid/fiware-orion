@@ -33,7 +33,12 @@
 
 /* ***********************************************
 *
-* SubscriptionExpression
+* SubscriptionExpression -
+*
+* NOTE
+*   This struct contains both 'q' and stringFilter.
+*   q is the 'plain string' of the stringFilter and it is used in parsing of V2 Subscriptions
+*   and when the q-string is read from the database.
 */
 struct SubscriptionExpression
 {
