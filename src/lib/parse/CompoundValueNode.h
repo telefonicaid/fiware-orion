@@ -158,7 +158,7 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const char* _value);
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, double _value);
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
-  void                check(void);
+  std::string         check(void);
   std::string         finish(void);
   std::string         render(ConnectionInfo* ciP, const std::string& indent);
   std::string         toJson(bool isLastElement);

@@ -77,8 +77,16 @@ std::string putEntityAttributeValue
     return oe.render(ciP, "");
   }
 
+
   // 01. Fill in UpdateContextRequest with data from URI and payload
   parseDataP->av.attribute.name = attributeName;
+
+  std::string err = parseDataP->av.attribute.check(ciP,ciP->requestType,"","", 0);
+  if (err != "OK")
+  {
+    OrionError oe(SccBadRequest, err);
+    return oe.render(ciP, "");
+  }
   parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, "UPDATE", type);
 
 
