@@ -55,6 +55,7 @@
 #include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
+#include "rest/StringFilter.h"
 
 using std::string;
 using std::map;
@@ -1513,6 +1514,25 @@ static bool addTriggeredSubscriptions_noCache
         std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringField(expr, CSUB_EXPR_COORDS) : "";
 
         trigs->fillExpression(q, georel, geometry, coords);
+
+        // Parsing q
+        if (trigs->expression.q != "")
+        {
+          StringFilter* stringFilterP = new StringFilter();
+          if (stringFilterP->parse(trigs->expression.q.c_str(), &err) == false)
+          {
+            delete stringFilterP;
+          
+            LM_E(("Runtime Error (%s)", err.c_str()));
+            TIME_STAT_MONGO_READ_WAIT_STOP();
+            releaseMongoConnection(connection);
+            return false;
+          }
+          else
+          {
+            trigs->stringFilterSet(stringFilterP);
+          }
+        }
       }
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
@@ -1689,18 +1709,8 @@ static bool processSubscriptions
     {
       if (trigs->expression.q != "")
       {
-        stringFilterP = new StringFilter();
-
-        if (stringFilterP->parse(trigs->expression.q.c_str(), err) == false)
+        if (!matchExpression(notifyCerP, trigs->stringFilterP))
         {
-          return false;
-        }
-
-        if (!matchExpression(notifyCerP, stringFilterP))
-        {
-          delete stringFilterP;
-          stringFilterP = NULL;
-
           continue;
         }
       }
