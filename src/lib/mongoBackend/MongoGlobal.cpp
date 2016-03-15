@@ -1893,10 +1893,10 @@ bool entitiesQuery
   const std::string&               sortOrderList,
   bool                             includeCreDate,
   bool                             includeModDate,
-  const std::string&               apiVersion
+  const std::string&               apiVersion,
+  StringFilter*                    stringFilterP
 )
 {
-
   /* Query structure is as follows
    *
    * {
@@ -1983,7 +1983,7 @@ bool entitiesQuery
         }
       }
     }
-    else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
+    else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)  // Used for string filters in V1
     {
       stringFilterP = new StringFilter();
       if (stringFilterP->parse(sco->value.c_str(), err) == false)
@@ -2001,6 +2001,14 @@ bool entitiesQuery
     {
       std::string details = std::string("unknown scope type '") + sco->type + "', ignoring";
       alarmMgr.badInput(clientIp, details);
+    }
+  }
+
+  if (stringFilterP != NULL)
+  {
+    for (unsigned int ix = 0; ix < stringFilterP->mongoFilters.size(); ++ix)
+    {
+      finalQuery.appendElements(stringFilterP->mongoFilters[ix]);
     }
   }
 

@@ -185,15 +185,6 @@ std::string getEntities
   // 01. Fill in QueryContextRequest - type "" is valid for all types
   //
 
-  // If URI param 'q' is given, its value must be put in a scope
-  if (q != "")
-  {
-    Scope* scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
-
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
-  }
-
-
   //
   // URI param 'type', three options:
   // 1. Not used, so empty
