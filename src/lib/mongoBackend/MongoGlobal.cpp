@@ -2087,6 +2087,11 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 {
   for (std::map<std::string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
+    if ((it->second->stringFilterToBeDeleted == true) && (it->second->stringFilterP != NULL))
+    {
+      delete it->second->stringFilterP;
+    }
+
     delete it->second;
   }
 

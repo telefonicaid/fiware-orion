@@ -311,7 +311,7 @@ std::string postQueryContext
                                                       ciP->uriParamOptions,
                                                       countP,
                                                       ciP->apiVersion,
-                                                      stringFilterP));
+                                                      ciP->stringFilterP));
 
   if (qcrsP->errorCode.code == SccBadRequest)
   {
