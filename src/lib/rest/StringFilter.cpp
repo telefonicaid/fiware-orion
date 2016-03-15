@@ -758,8 +758,6 @@ StringFilter::~StringFilter()
 */
 bool StringFilter::parse(const char* q, std::string* errorStringP)
 {
-  plainString = q;
-
   //
   // Initial Sanity check (of the entire string)
   // - Not empty             (empty q)

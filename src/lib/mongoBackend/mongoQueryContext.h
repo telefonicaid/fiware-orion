@@ -30,6 +30,7 @@
 
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "rest/StringFilter.h"
 
 
 
@@ -45,8 +46,9 @@ extern HttpStatusCode mongoQueryContext
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
   std::map<std::string, bool>&          options,
-  long long*                            countP = NULL,
-  const std::string&                    apiVersion = "v1"
+  long long*                            countP        = NULL,
+  const std::string&                    apiVersion    = "v1",
+  StringFilter*                         stringFilterP = NULL
 );
 
 #endif

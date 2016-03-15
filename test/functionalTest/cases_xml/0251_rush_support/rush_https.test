@@ -147,7 +147,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 X-Relayer-Protocol: https
 Host: localhost:REGEX(\d+)
 X-Relayer-Host: 128.1.2.3:1234
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>

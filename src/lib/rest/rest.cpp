@@ -735,7 +735,7 @@ int servicePathSplit(ConnectionInfo* ciP)
 *   so we don't want to use the default 200
 *
 * NOTE
-*   In version 1 of the protocol, we admit ONLY application/json and application/xml
+*   In version 1 of the protocol, we admit ONLY application/json
 *   In version 2 of the protocol, we admit ONLY application/json and text/plain
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
@@ -1348,7 +1348,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 * restInit - 
 *
 * FIXME P5: add vector of the accepted content-types, instead of the bool
-*           argument _acceptTextXml that was added for iotAgent only.
 *           See Issue #256
 */
 void restInit

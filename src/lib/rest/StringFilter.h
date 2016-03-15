@@ -78,6 +78,22 @@ typedef enum StringFilterValueType
 /* ****************************************************************************
 *
 * StringFilterItem - 
+*
+* FIELDS
+*   left                 the left-hand-side of a filter-item
+*   op                   the operator of the filter-item
+*   valueType            the type of the right-hand-side
+*   numberValue          if 'valueType' is 'numeric', the value is stored here
+*   stringValue          if 'valueType' is 'string', the value isstored here
+*   boolValue            if 'valueType' is 'boolean', the value is stored here
+*   stringList           vector/list of string values
+*   numberList           vector/list of numeric values
+*   numberRangeFrom      lower limit for numeric ranges
+*   numberRangeTo        upper limit for numeric ranges
+*   stringRangeFrom      lower limit for string ranges
+*   stringRangeTo        upper limit for string ranges
+*   attributeName        The name of the attribute, used for unary operators only
+*   
 */
 class StringFilterItem
 {
@@ -124,13 +140,18 @@ class ContextElementResponse;
 /* ****************************************************************************
 *
 * StringFilter - 
+*
+* FIELDS
+*   filters       vector of filter-items, see StringFilterItem comment header
+*   mongoFilters  the filter-items translated to filters that can be used by mongo
+*                 Note that the method 'mongoFilterPopulate' must be called to translate
+*                 'filters' to 'mongoFilters'
 */
 class StringFilter
 {
 public:
   std::vector<StringFilterItem>  filters;
   std::vector<BSONObj>           mongoFilters;
-  std::string                    plainString;
 
   StringFilter();
   ~StringFilter();

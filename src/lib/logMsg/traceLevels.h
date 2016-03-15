@@ -124,8 +124,6 @@ typedef enum TraceLevels
 
   /* Others (>=230) */
   LmtCm = 230,
-  LmtIotaXmlReg,
-  LmtIotaXmlObs,
   LmtRush,
   LmtSoftError,
   LmtNotImplemented,

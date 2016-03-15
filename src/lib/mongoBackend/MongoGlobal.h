@@ -258,7 +258,8 @@ extern bool entitiesQuery
   const std::string&               sortOrderList  = "",
   bool                             includeCreDate = false,
   bool                             includeModDate = false,
-  const std::string&               apiVersion     = "v1"
+  const std::string&               apiVersion     = "v1",
+  StringFilter*                    stringFilterP  = NULL
 );
 
 /* ****************************************************************************

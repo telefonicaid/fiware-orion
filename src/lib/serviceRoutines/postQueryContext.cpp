@@ -46,6 +46,8 @@
 #include "serviceRoutines/postQueryContext.h"
 #include "jsonParse/jsonRequest.h"
 
+extern __thread StringFilter*  stringFilterP;
+
 
 
 /* ****************************************************************************
@@ -308,7 +310,8 @@ std::string postQueryContext
                                                       ciP->uriParam,
                                                       ciP->uriParamOptions,
                                                       countP,
-                                                      ciP->apiVersion));
+                                                      ciP->apiVersion,
+                                                      stringFilterP));
 
   if (qcrsP->errorCode.code == SccBadRequest)
   {
