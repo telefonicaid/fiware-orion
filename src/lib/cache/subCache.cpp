@@ -33,6 +33,7 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
+#include "alarmMgr/alarmMgr.h"
 
 using std::map;
 
@@ -725,7 +726,7 @@ void subCacheItemInsert
   {
     if (cSubP->expression.stringFilter.parse(q.c_str(), &errorString) == false)
     {
-      LM_E(("Runtime Error (error parsing q-string '%s': %s)", q.c_str(), errorString.c_str()));
+      alarmMgr.badInput(clientIp, errorString);
       return;
     }
   }
