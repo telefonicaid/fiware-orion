@@ -1337,7 +1337,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
 
-    sub->fillExpression(cSubP->expression.q, cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
+    sub->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
     sub->stringFilterSet(&cSubP->expression.stringFilter);
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
@@ -1513,13 +1513,14 @@ static bool addTriggeredSubscriptions_noCache
         std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringField(expr, CSUB_EXPR_GEOM)   : "";
         std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringField(expr, CSUB_EXPR_COORDS) : "";
 
-        trigs->fillExpression(q, georel, geometry, coords);
+        trigs->fillExpression(georel, geometry, coords);
 
         // Parsing q
-        if (trigs->expression.q != "")
+        if (q != "")
         {
           StringFilter* stringFilterP = new StringFilter();
-          if (stringFilterP->parse(trigs->expression.q.c_str(), &err) == false)
+
+          if (stringFilterP->parse(q.c_str(), &err) == false)
           {
             delete stringFilterP;
           
@@ -1642,7 +1643,7 @@ static bool processOnChangeConditionForUpdateContext
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * matchExpression
@@ -1656,6 +1657,7 @@ static bool matchExpression(ContextElementResponse* cerP, StringFilter* sfP)
 
   return sfP->match(cerP);
 }
+#endif
 
 
 
@@ -1704,18 +1706,8 @@ static bool processSubscriptions
       }
     }
 
-    /* Check 2: expression (q) */
-    if (noCache == true)
-    {
-      if (trigs->expression.q != "")
-      {
-        if (!matchExpression(notifyCerP, trigs->stringFilterP))
-        {
-          continue;
-        }
-      }
-    }
-    else if (!matchExpression(notifyCerP, trigs->stringFilterP))
+    /* Check 2: String Filter */
+    if ((trigs->stringFilterP) && (!trigs->stringFilterP->match(notifyCerP)))
     {
       continue;
     }

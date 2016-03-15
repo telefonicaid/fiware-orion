@@ -59,8 +59,8 @@ class TriggeredSubscription
   std::string   tenant;
   StringFilter* stringFilterP;
 
+  // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
   struct {
-    std::string               q;
     std::string               geometry;
     std::string               coords;
     std::string               georel;
@@ -80,10 +80,10 @@ class TriggeredSubscription
 
   ~TriggeredSubscription();
 
-  void fillExpression(const std::string& q, const std::string& georel, const std::string& geometry, const std::string& coords);
-  void stringFilterSet(StringFilter* _stringFilterP);
-
-  std::string toString(const std::string& delimiter);
+  // FIXME P5: This method will cease to exist once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
+  void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
+  void         stringFilterSet(StringFilter* _stringFilterP);
+  std::string  toString(const std::string& delimiter);
 };
 
 #endif  // SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_

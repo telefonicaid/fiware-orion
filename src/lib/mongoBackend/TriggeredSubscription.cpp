@@ -102,13 +102,11 @@ TriggeredSubscription::~TriggeredSubscription()
 */
 void TriggeredSubscription::fillExpression
 (
-  const std::string&  q,
   const std::string&  georel,
   const std::string&  geometry,
   const std::string&  coords
 )
 {
-  expression.q        = q;
   expression.georel   = georel;
   expression.geometry = geometry;
   expression.coords   = coords;
@@ -124,7 +122,7 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
   std::stringstream ss;
 
   ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;  
-  ss << expression.q << delimiter << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
+  ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
 
   return ss.str();
 }
