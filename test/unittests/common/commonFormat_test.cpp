@@ -81,13 +81,7 @@ TEST(commonFormat, formatParse)
    Format format;
 
    format = formatParse("*/*", NULL);
-   EXPECT_EQ(JSON, format) << "bad translation for XML format (*/*)";
-
-   format = formatParse("application/xml", NULL);
-   EXPECT_EQ(JSON, format) << "bad translation for XML format (application/xml)";
-
-   format = formatParse("text/xml", NULL);
-   EXPECT_EQ(JSON, format) << "bad translation for XML format (text/xml)";
+   EXPECT_EQ(JSON, format) << "bad translation for JSON format (*/*)";
 
    format = formatParse("text/json", NULL);
    EXPECT_EQ(JSON, format) << "bad translation for JSON format (text/json)";
@@ -96,7 +90,7 @@ TEST(commonFormat, formatParse)
    EXPECT_EQ(JSON, format) << "bad translation for JSON format (application/json)";
 
    format = formatParse("XXX", NULL);
-   EXPECT_EQ(JSON, format) << "bad translation for XML format (XXX - unknown )";
+   EXPECT_EQ(JSON, format) << "bad translation for JSON format (XXX - unknown )";
 
    std::string charset;
    format = formatParse("application/json; charset=CHSET", &charset);

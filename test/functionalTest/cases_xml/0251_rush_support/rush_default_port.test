@@ -145,7 +145,7 @@ Content-Length: 717
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 X-Relayer-Host: 128.1.2.3:80
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>

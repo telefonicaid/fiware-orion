@@ -343,7 +343,7 @@ int httpRequestSendWithCurl
   }
 
   // ----- Accept
-  std::string acceptedFormats = "application/xml, application/json";
+  std::string acceptedFormats = "application/json";
   if (acceptFormat != "")
   {
     acceptedFormats = acceptFormat;

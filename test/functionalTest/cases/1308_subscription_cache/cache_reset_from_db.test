@@ -314,7 +314,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -350,7 +350,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t1
 Content-Type: application/json; charset=utf-8
 
@@ -387,7 +387,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t2
 Content-Type: application/json; charset=utf-8
 
@@ -452,7 +452,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -484,7 +484,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -520,7 +520,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t1
 Content-Type: application/json; charset=utf-8
 
@@ -553,7 +553,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t1
 Content-Type: application/json; charset=utf-8
 
@@ -590,7 +590,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t2
 Content-Type: application/json; charset=utf-8
 
@@ -623,7 +623,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t2
 Content-Type: application/json; charset=utf-8
 

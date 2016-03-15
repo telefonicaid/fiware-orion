@@ -28,6 +28,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
+#include "common/string.h"
 
 #include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
@@ -105,6 +106,9 @@ std::string getEntityAttributeValue
   }
   else
   {
+    // save the original attribute type
+    std::string attributeType = attribute.pcontextAttribute->type ;
+
     // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
 
@@ -136,7 +140,16 @@ std::string getEntityAttributeValue
       }
       else
       {
-        TIMED_RENDER(answer = attribute.pcontextAttribute->getValue());
+
+        if (attributeType == DATE_TYPE)
+        {
+          TIMED_RENDER(answer = isodate2str(attribute.pcontextAttribute->numberValue));
+        }
+        else
+        {
+          TIMED_RENDER(answer =  attribute.pcontextAttribute->getValue());
+        }
+
       }
 
       ciP->outFormat = TEXT;

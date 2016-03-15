@@ -42,12 +42,8 @@ namespace orion
 *
 * The class fields:
 * -------------------------------------------------------------------------------
-* o name         When parsing an XML payload, each node in the tree has a tag.
-*                The name of the node is taken from the tag-name.
-*                When parsing a JSON payload, not necessarily all nodes have a
-*                tag, so 'name' can be empty.
-*                Also, when creating the tree from mongo BSON, there will often
-*                be no 'name', just like the case of JSON payload parsing.
+* o name         Note that not all nodes have a name, not in JSON payloads, nor when
+*                getting the info from mongo BSON
 *
 * o valueType    There are the following types of nodes: Vectors, Objects, Strings, Numbers and Bools
 *                The root node is somehow special, but is always either Vector or Object.
