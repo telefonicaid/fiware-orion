@@ -244,7 +244,7 @@ def update_an_attribute_value_by_id_and_attribute_name_if_it_exists(context, ent
     :param attribute_name: attribute name to update
     """
     __logger__.debug("updating an attribute value by entity id and by attribute name...")
-    context.resp = context.cb.update_an_attribute_by_id_and_by_name(context, entity_id, attribute_name, True)
+    context.resp = context.cb.update_an_attribute_by_id_and_by_name(context, entity_id, attribute_name, "value")
     __logger__.info("...updated an attribute value by entity id and by attribute name")
 
 
@@ -257,7 +257,7 @@ def update_an_attribute_value_by_id_and_attribute_name_if_it_exists_in_raw_mode(
     :param attribute_name: attribute name to update
     """
     __logger__.debug("updating an attribute value by entity id and by attribute name in raw mode...")
-    context.resp = context.cb.update_an_attribute_by_id_and_by_name_in_raw_mode(context, entity_id, attribute_name, True)
+    context.resp = context.cb.update_an_attribute_by_id_and_by_name_in_raw_mode(context, entity_id, attribute_name, "value")
     __logger__.info("...updated an attribute value by entity id and by attribute name in raw mode")
 
 

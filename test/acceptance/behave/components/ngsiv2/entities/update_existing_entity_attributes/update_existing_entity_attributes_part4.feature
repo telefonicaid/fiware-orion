@@ -49,6 +49,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
   Setup: stop ContextBroker
 
   # --------------------- queries parameters  ------------------------------------
+  # ----- keyValues query parameter  ----
 
   @qp_options_key_values
   Scenario:  update attributes by entity ID if it exists using NGSI v2 with options=keyvalues query parameter and keyValues format
