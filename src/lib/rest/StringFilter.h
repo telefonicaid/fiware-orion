@@ -93,7 +93,21 @@ typedef enum StringFilterValueType
 *   stringRangeFrom      lower limit for string ranges
 *   stringRangeTo        upper limit for string ranges
 *   attributeName        The name of the attribute, used for unary operators only
-*   
+*
+* METHODS
+*   parse                parse a string, like 'a>14' into a StringFilterItem
+*   opName               help method to translate the 'op' field into a string
+*   valueTypeName        help method to translate the 'valueType' field into a string
+*   valueGet             extract the value of RHS (right hand side), including type, etc.
+*   valueParse           extract the value of RHS and check its validity
+*   rangeParse           parse a range 'xxx..yyy' and check its validity
+*   listParse            parse a list 'a,b,c,d' and check its validity
+*   listItemAdd          add an item to a list - used by listParse
+*   matchEquals          returns true if '== comparison' with ContextAttribute gives a match
+*   matchGreaterThan     returns true if '> comparison' with ContextAttribute gives a match
+*                        Note that '<= comparisons' use !matchGreaterThan()
+*   matchLessThan        returns true if '< comparison' with ContextAttribute gives a match
+*                        Note that '>= comparisons' use !matchLessThan()
 */
 class StringFilterItem
 {
@@ -146,6 +160,19 @@ class ContextElementResponse;
 *   mongoFilters  the filter-items translated to filters that can be used by mongo
 *                 Note that the method 'mongoFilterPopulate' must be called to translate
 *                 'filters' to 'mongoFilters'
+*
+* METHODS
+*   parse                 parse the string filter string in 'q' and create the filters.
+*                         This is the main method of StringFilter and before this method has been executed,
+*                         the string filter is empty.
+*                         THIS METHOD MUST BE USED BEFORE ANY OTHER.
+*   mongoFilterPopulate   translate 'filters' into mongo-understandable 'mongoFilters'.
+*                         Of course, parse() must be called b efore mongoFilterPopulate(), so that there
+*                         filters to translate.
+*   match                 Compare a ContextElementResponse to the entire StringFilter and return TRUE if
+*                         a match exists.
+*                         It is an 'AND-match', so ALL StringFilterItems in 'filters' must match the ContextElementResponse
+*                         in order for 'match' to return TRUE.
 */
 class StringFilter
 {
