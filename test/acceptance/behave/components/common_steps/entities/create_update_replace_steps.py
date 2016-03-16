@@ -57,6 +57,16 @@ def definition_of_headers(context):
     __logger__.info("Define header used in request...")
     context.cb.definition_headers(context)
 
+@step(u'modify headers and keep previous values "([^"]*)"')
+def definition_of_headers(context, prev):
+    """
+    modification or append of headers (service, service path, Content-Type, Accept, etc)
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param prev:determine if the previous headers are kept or not ( true | false )
+    """
+    __logger__.info("Modify or append headers used in new request...")
+    context.cb.modification_headers(context, prev)
+
 @step(u'properties to entities')
 def properties_to_entities(context):
     """
