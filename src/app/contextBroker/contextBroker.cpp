@@ -1618,6 +1618,7 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("remove builtin", "--silent");
   paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
@@ -1650,14 +1651,6 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
-
-  // Argument consistency check (--silent AND -logLevel)
-  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
-  {
-    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
-    paUsage();
-    exit(1);
-  }
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
