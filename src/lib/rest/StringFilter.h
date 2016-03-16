@@ -167,12 +167,13 @@ class ContextElementResponse;
 *                         the string filter is empty.
 *                         THIS METHOD MUST BE USED BEFORE ANY OTHER.
 *   mongoFilterPopulate   translate 'filters' into mongo-understandable 'mongoFilters'.
-*                         Of course, parse() must be called b efore mongoFilterPopulate(), so that there
+*                         Of course, parse() must be called before mongoFilterPopulate(), so that there are
 *                         filters to translate.
 *   match                 Compare a ContextElementResponse to the entire StringFilter and return TRUE if
 *                         a match exists.
 *                         It is an 'AND-match', so ALL StringFilterItems in 'filters' must match the ContextElementResponse
 *                         in order for 'match' to return TRUE.
+*                         Also here, parse() must be called before match() can be used.
 */
 class StringFilter
 {
