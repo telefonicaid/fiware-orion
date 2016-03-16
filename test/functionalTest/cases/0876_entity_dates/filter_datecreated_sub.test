@@ -85,7 +85,7 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1s
+sleep 0.9
 
 
 echo "03. At t_2: Create entity E2 (notif)"
@@ -98,7 +98,7 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1s
+sleep 0.9
 
 
 echo "04. At t_3: Create entity E3 (notif)"
@@ -111,7 +111,7 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1s
+sleep 0.9
 
 
 echo "05. At t_4: Create entity E4 (notif)"
@@ -124,7 +124,7 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1s
+sleep 1.5
 
 
 echo "06. At t_5: Create entity E5 (not notif)"
