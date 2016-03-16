@@ -377,7 +377,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
  # ------------------------ Service path header ----------------------------------------------
 
   @service_path_update @BUG_1423
-  Scenario Outline:  update attributes value by entity ID and attribute nameusing NGSI v2 with several service path header values
+  Scenario Outline:  update attributes value by entity ID and attribute name using NGSI v2 with several service path header values
     Given a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
