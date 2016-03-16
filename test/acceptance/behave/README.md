@@ -281,7 +281,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**attributes_value folder**                                                                                                                               |
 | get_attribute_value                         |    190       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
-| update_attribute_value                      |    237       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
+| update_attribute_value                      |    337       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
 |                                                                                                                                                          |
 |**types folder**                                                                                                                                          |
 | retrieve_entity_types                       |     66       | GET     | /v2/types/                                           | No        | Yes            |   
