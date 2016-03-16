@@ -44,14 +44,15 @@ TriggeredSubscription::TriggeredSubscription
   const std::string&   _cacheSubId,
   const char*          _tenant
 ):
-  throttling        (_throttling),
-  lastNotification  (_lastNotification),
-  format            (_format),
-  reference         (_reference),
-  attrL             (_attrL),
-  cacheSubId        (_cacheSubId),
-  tenant            ((_tenant == NULL)? "" : _tenant),
-  stringFilterP     (NULL)
+  throttling              (_throttling),
+  lastNotification        (_lastNotification),
+  format                  (_format),
+  reference               (_reference),
+  attrL                   (_attrL),
+  cacheSubId              (_cacheSubId),
+  tenant                  ((_tenant == NULL)? "" : _tenant),
+  stringFilterP           (NULL),
+  stringFilterToBeDeleted (false)
 {
 }
 
@@ -69,14 +70,15 @@ TriggeredSubscription::TriggeredSubscription
   const std::string&   _reference,
   const AttributeList& _attrL
 ):
-  throttling        (-1),
-  lastNotification  (-1),
-  format            (_format),
-  reference         (_reference),
-  attrL             (_attrL),
-  cacheSubId        (""),
-  tenant            (""),
-  stringFilterP     (NULL)
+  throttling              (-1),
+  lastNotification        (-1),
+  format                  (_format),
+  reference               (_reference),
+  attrL                   (_attrL),
+  cacheSubId              (""),
+  tenant                  (""),
+  stringFilterP           (NULL),
+  stringFilterToBeDeleted (false)
 {
 }
 

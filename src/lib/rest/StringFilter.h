@@ -30,7 +30,7 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "ngsi/ContextAttribute.h"
+struct ContextAttribute;
 
 using namespace mongo;
 
@@ -112,6 +112,8 @@ public:
   std::string               stringRangeTo;
   std::string               attributeName;  // Used for unary operators only
 
+  ~StringFilterItem();
+
   bool                      parse(char* qItem, std::string* errorStringP);
   const char*               opName(void);
   const char*               valueTypeName(void);
@@ -150,6 +152,9 @@ class StringFilter
 public:
   std::vector<StringFilterItem>  filters;
   std::vector<BSONObj>           mongoFilters;
+
+  StringFilter();
+  ~StringFilter();
 
   bool  parse(const char* q, std::string* errorStringP);
   bool  mongoFilterPopulate(std::string* errorStringP);

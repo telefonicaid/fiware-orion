@@ -42,6 +42,18 @@ using namespace mongo;
 
 /* ****************************************************************************
 *
+* StringFilterItem::~StringFilterItem - 
+*/
+StringFilterItem::~StringFilterItem()
+{
+  stringList.clear();
+  numberList.clear();
+}
+
+
+
+/* ****************************************************************************
+*
 * StringFilterItem::valueParse - 
 */
 bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
@@ -428,10 +440,10 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
 
     if (strchr(s, '\'') != NULL)
     {
+      free(toFree);
       *errorStringP = "quote in forced string";
       return false;
     }
-
   }
 
 
@@ -520,6 +532,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
     else                                  b = valueParse(rhs, errorStringP);
   }
 
+  free(toFree);
   return b;
 }
 
@@ -713,6 +726,28 @@ bool StringFilterItem::matchLessThan(ContextAttribute* caP)
   }
 
   return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::StringFilter - 
+*/
+StringFilter::StringFilter()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* StringFilter::~StringFilter - 
+*/
+StringFilter::~StringFilter()
+{
+  mongoFilters.clear();
+  filters.clear();
 }
 
 

@@ -66,14 +66,6 @@ using namespace mongo;
 
 /* ****************************************************************************
 *
-* stringFilterP - 
-*/
-extern __thread StringFilter* stringFilterP;
-
-
-
-/* ****************************************************************************
-*
 * Forward declarations
 */
 static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);
@@ -1530,6 +1522,7 @@ static bool addTriggeredSubscriptions_noCache
           }
           else
           {
+            trigs->stringFilterToBeDeleted = true;
             trigs->stringFilterSet(stringFilterP);
           }
         }

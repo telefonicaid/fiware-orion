@@ -42,8 +42,8 @@
 */
 struct SubscriptionExpression
 {
-  SubscriptionExpression(): isSet(false) {}
-
+SubscriptionExpression(): isSet(false) { }
+~SubscriptionExpression() { }
   std::string               q;
   std::string               geometry;
   std::string               coords;

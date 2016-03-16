@@ -82,14 +82,6 @@ static bool                 multitenant;
 
 /* ****************************************************************************
 *
-* stringFilterP - 
-*/
-extern __thread StringFilter* stringFilterP;
-
-
-
-/* ****************************************************************************
-*
 * mongoMultitenant - 
 */
 bool mongoMultitenant(void)
@@ -1053,16 +1045,17 @@ bool entitiesQuery
     }
     else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)  // Used for string filters in V1
     {
-      stringFilterP = new StringFilter();
-      if (stringFilterP->parse(sco->value.c_str(), err) == false)
+      StringFilter stringFilter;
+
+      if (stringFilter.parse(sco->value.c_str(), err) == false)
       {
         *badInputP = true;
         return false;
       }
 
-      for (unsigned int ix = 0; ix < stringFilterP->mongoFilters.size(); ++ix)
+      for (unsigned int ix = 0; ix < stringFilter.mongoFilters.size(); ++ix)
       {
-        finalQuery.appendElements(stringFilterP->mongoFilters[ix]);
+        finalQuery.appendElements(stringFilter.mongoFilters[ix]);
       }
     }
     else
@@ -2090,6 +2083,11 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 {
   for (std::map<std::string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
+    if ((it->second->stringFilterToBeDeleted == true) && (it->second->stringFilterP != NULL))
+    {
+      delete it->second->stringFilterP;
+    }
+
     delete it->second;
   }
 
