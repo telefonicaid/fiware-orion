@@ -22,3 +22,6 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
+# see generic environment.py in root path
+
+from environment import *

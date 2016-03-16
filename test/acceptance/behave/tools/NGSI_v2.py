@@ -809,8 +809,6 @@ class NGSI:
         items_dict = convert_str_to_dict(resp.content, JSON)
         items_list = items_dict.keys()  # list of keys
         for item in items_list:
-            if item == EMPTY:
-                item = "untyped"
             __logger__.debug("verified: %s include in %s" % (item, types))
             assert item in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
 
