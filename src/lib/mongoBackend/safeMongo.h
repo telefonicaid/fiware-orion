@@ -40,6 +40,7 @@
 #define getIntOrLongFieldAsLongF(b, field)  getIntOrLongFieldAsLong(b, field, __FUNCTION__, __LINE__)
 #define getBoolFieldF(b, field)             getBoolField(b, field, __FUNCTION__, __LINE__)
 #define getFieldF(b, field)                 getField(b, field, __FUNCTION__,  __LINE__)
+#define nextSafeOrErrorF(c, r, err)         nextSafeOrError(c, r, err, __FUNCTION__,  __LINE__)
 
 /* ****************************************************************************
 *
@@ -94,7 +95,7 @@ extern bool moreSafe(const std::auto_ptr<mongo::DBClientCursor>& cursor);
 * nextSafeOrError -
 *
 */
-extern bool nextSafeOrError(const std::auto_ptr<mongo::DBClientCursor>& cursor, mongo::BSONObj* r, std::string* err);
+extern bool nextSafeOrError(const std::auto_ptr<mongo::DBClientCursor>& cursor, mongo::BSONObj* r, std::string* err, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *

@@ -172,6 +172,7 @@ bool AlarmManager::dbError(const std::string& details)
   {
     if (dbErrorLogAlways)
     {
+      //FIXME P10: to be discussed at PR time. DB alarms are loged at ERROR level, so this should be LM_E... copy-paste error? :)
       LM_W(("Repeated Database Error: %s", details.c_str()));
     }
 

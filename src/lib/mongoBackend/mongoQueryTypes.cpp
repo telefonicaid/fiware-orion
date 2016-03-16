@@ -76,10 +76,9 @@ static std::string attributeType
   while (moreSafe(cursor))
   {
     BSONObj r;
-    if (!nextSafeOrError(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe() at %s: <%s>, query: <%s>)",
-            __FUNCTION__, err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
@@ -255,7 +254,9 @@ HttpStatusCode mongoEntityTypes
 
     EntityType*               entityType;
 
-    if ((getFieldF(resultItem, "").isNull()) || (getStringFieldF(resultItem, "_id") == ""))
+    bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) || (getStringFieldF(resultItem, "_id") == "");
+
+    if (nullId)
     {
       entityType           = emptyEntityType;
       emptyEntityTypeUsed  = true;
@@ -287,9 +288,9 @@ HttpStatusCode mongoEntityTypes
       }
     }
 
-    if (!((getFieldF(resultItem, "").isNull()) || (getStringFieldF(resultItem, "_id") == "")))
-    {
-      // entityType is skipped, as it is (eventually) added outside the for loop
+    // entityType corresponding to nullId case is skipped, as it is (eventually) added outside the for loop
+    if (!nullId)
+    {      
       responseP->entityTypeVector.push_back(entityType);
     }
   }

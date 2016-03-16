@@ -356,7 +356,8 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
+        // FIXME P10: overloggin (registrationQuery() false return menas that collectionRangedQuery() retursn false, corresponding to internal alarms in that function)
+        //alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -375,7 +376,8 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
+        // FIXME P10: overloggin (registrationQuery() false return menas that collectionRangedQuery() retursn false, corresponding to internal alarms in that function)
+        //alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -394,7 +396,8 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
+        // FIXME P10: overloggin (registrationQuery() false return menas that collectionRangedQuery() retursn false, corresponding to internal alarms in that function)
+        //alarmMgr.dbError(err);
       }
       crrV.release();
     }
@@ -414,7 +417,8 @@ HttpStatusCode mongoQueryContext
       else
       {
         /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
+        // FIXME P10: overloggin (registrationQuery() false return menas that collectionRangedQuery() retursn false, corresponding to internal alarms in that function)
+        //alarmMgr.dbError(err);
       }
       crrV.release();
     }

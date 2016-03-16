@@ -409,7 +409,8 @@ void mongoSubCacheRefresh(const std::string& database)
   DBClientBase* connection = getMongoConnection();
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
-    alarmMgr.dbError(errorString);
+    // FIXME P10: overloggin (collectionQuery() false involves to internal alarms in that function)
+    //alarmMgr.dbError(errorString);
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     return;
@@ -422,10 +423,9 @@ void mongoSubCacheRefresh(const std::string& database)
     BSONObj      sub;
     std::string  err;
 
-    if (!nextSafeOrError(cursor, &sub, &err))
+    if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe() at %s: <%s>, query: <%s>)",
-            __FUNCTION__, err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), query.toString().c_str()));
       continue;
     }
 
