@@ -78,7 +78,7 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
     Then verify that receive an "OK" http code
     And verify that the attribute value by ID is returned
 
-  @date_type @BUG_1885 @ISSUE_1604 @skip
+  @date_type @BUG_1885 @ISSUE_1604
   # this scenario is only to automate the check for a bug.
   # later, it is necessary more scenarios and examples to testing of the date type, See ISO8601 format.
   Scenario:  get an attribute value by entity ID and attribute name if it exists using NGSI v2 with date in attribute type
@@ -89,17 +89,17 @@ Feature: get an attribute value by entity ID and attribute name if it exists usi
       | Content-Type       | application/json       |
     # These properties below are used in create request
     And properties to entities
-      | parameter         | value                |
-      | entities_type     | house                |
-      | entities_id       | room                 |
-      | attributes_number | 3                    |
-      | attributes_name   | timestamp            |
-      | attributes_value  | 2035-06-15T07:21:24Z |
-      | attributes_type   | date                 |
-      | metadatas_number  | 2                    |
-      | metadatas_name    | very_hot             |
-      | metadatas_type    | alarm                |
-      | metadatas_value   | hot                  |
+      | parameter         | value                   |
+      | entities_type     | house                   |
+      | entities_id       | room                    |
+      | attributes_number | 3                       |
+      | attributes_name   | timestamp               |
+      | attributes_value  | 2035-06-15T07:21:24.00Z |
+      | attributes_type   | date                    |
+      | metadatas_number  | 2                       |
+      | metadatas_name    | very_hot                |
+      | metadatas_type    | alarm                   |
+      | metadatas_value   | hot                     |
     And create entity group with "3" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
