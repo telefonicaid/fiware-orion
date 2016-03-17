@@ -385,7 +385,7 @@ Date: REGEX(.*)
 08. Notification count from mongo
 =================================
 Notification count from mongo:
-{ "count" : 16 }
+{ "count" : NumberLong(16) }
 
 
 09. Unsubscribe

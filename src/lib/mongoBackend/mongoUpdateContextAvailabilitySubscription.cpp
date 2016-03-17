@@ -131,7 +131,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   /* Duration (optional) */
   if (requestP->duration.isEmpty())
   {
-    newSub.append(CASUB_EXPIRATION, getField(sub, CASUB_EXPIRATION).numberLong());
+    newSub.append(CASUB_EXPIRATION, getFieldF(sub, CASUB_EXPIRATION).numberLong());
   }
   else {
       long long expiration = getCurrentTime() + requestP->duration.parse();
@@ -140,13 +140,13 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Reference is not updatable, so it is appended directly */
-  newSub.append(CASUB_REFERENCE, getStringField(sub, CASUB_REFERENCE));
+  newSub.append(CASUB_REFERENCE, getStringFieldF(sub, CASUB_REFERENCE));
 
-  int count = sub.hasField(CASUB_COUNT) ? getIntField(sub, CASUB_COUNT) : 0;
+  int count = sub.hasField(CASUB_COUNT) ? getIntFieldF(sub, CASUB_COUNT) : 0;
 
   /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
   if (sub.hasField(CASUB_LASTNOTIFICATION)) {
-      newSub.append(CASUB_LASTNOTIFICATION, getIntField(sub, CASUB_LASTNOTIFICATION));
+      newSub.append(CASUB_LASTNOTIFICATION, getIntFieldF(sub, CASUB_LASTNOTIFICATION));
   }
   if (sub.hasField(CASUB_COUNT)) {
       newSub.append(CASUB_COUNT, count);
@@ -164,7 +164,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringField(sub, CASUB_REFERENCE), notifyFormat, tenant);
+  processAvailabilitySubscription(requestP->entityIdVector,
+                                  requestP->attributeList,
+                                  requestP->subscriptionId.get(),
+                                  getStringFieldF(sub, CASUB_REFERENCE),
+                                  notifyFormat,
+                                  tenant);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */

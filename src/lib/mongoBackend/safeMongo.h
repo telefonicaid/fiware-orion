@@ -32,47 +32,57 @@
 
 #include "mongo/client/dbclient.h"
 
+/* Some macros to make the usage of these function prettier */
+#define getObjectFieldF(b, field)           getObjectField(b, field, __FUNCTION__, __LINE__)
+#define getStringFieldF(b, field)           getStringField(b, field, __FUNCTION__, __LINE__)
+#define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
+#define getLongFieldF(b, field)             getLongField(b, field, __FUNCTION__, __LINE__)
+#define getIntOrLongFieldAsLongF(b, field)  getIntOrLongFieldAsLong(b, field, __FUNCTION__, __LINE__)
+#define getBoolFieldF(b, field)             getBoolField(b, field, __FUNCTION__, __LINE__)
+#define getFieldF(b, field)                 getField(b, field, __FUNCTION__,  __LINE__)
+#define nextSafeOrErrorF(c, r, err)         nextSafeOrError(c, r, err, __FUNCTION__,  __LINE__)
+
 /* ****************************************************************************
 *
 * getObjectField -
 */
-extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field);
+extern mongo::BSONObj getObjectField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
 * getStringField -
 */
-extern std::string getStringField(const mongo::BSONObj& b, const std::string& field);
+extern std::string getStringField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
 * getIntField -
 */
-extern int getIntField(const mongo::BSONObj& b, const std::string& field);
+extern int getIntField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
 * getLongField -
 */
-extern long long getLongField(const mongo::BSONObj& b, const std::string& field);
+extern long long getLongField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
 * getIntOrLongFieldAsLong -
 */
-extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field);
+extern long long getIntOrLongFieldAsLong(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
 * getBoolField -
 */
-extern bool getBoolField(const mongo::BSONObj& b, const std::string& field);
+extern bool getBoolField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
 * getField -
 */
-extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field);
+extern mongo::BSONElement getField(const mongo::BSONObj& b, const std::string& field, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
@@ -85,7 +95,7 @@ extern bool moreSafe(const std::auto_ptr<mongo::DBClientCursor>& cursor);
 * nextSafeOrError -
 *
 */
-extern bool nextSafeOrError(const std::auto_ptr<mongo::DBClientCursor>& cursor, mongo::BSONObj* r, std::string* err);
+extern bool nextSafeOrError(const std::auto_ptr<mongo::DBClientCursor>& cursor, mongo::BSONObj* r, std::string* err, const std::string& caller = "<none>", int line = 0);
 
 /* ****************************************************************************
 *
