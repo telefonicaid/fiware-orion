@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
- Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+ Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 
  This file is part of Orion Context Broker.
 
@@ -21,4 +21,6 @@
  iot_support at tid dot es
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
+
+
 

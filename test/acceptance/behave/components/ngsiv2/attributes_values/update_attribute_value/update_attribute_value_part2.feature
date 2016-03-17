@@ -477,7 +477,7 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | {"a":{"b":{"c":{"d": {"e": {"f": 34?}}}}}}                       |
       | {"x":  "b\"}                                                     |
 
-  @attribute_value_application_json_forbidden @BUG_1905 @skip
+  @attribute_value_application_json_forbidden @BUG_1905
   Scenario Outline:  update attributes value by entity ID and atrribute name using NGSI v2 with application/json in Content-Type and forbidden values
     Given  a definition of headers
       | parameter          | value                       |
@@ -499,8 +499,11 @@ Feature: update an attribute value by entity ID and attribute name if it exists 
       | parameter        | value              |
       | attributes_value | <attributes_value> |
     When update an attribute value by ID "<entity_id>" and attribute name "temperature" if it exists in raw mode
-    Then verify that receive an "No Content" http code
-    And verify that an entity is updated in mongo
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
+      | parameter   | value                                 |
+      | error       | BadRequest                            |
+      | description | Invalid characters in attribute value |
     Examples:
       | entity_id | attributes_value |
       | room1     | {"x": "<a>"}     |
