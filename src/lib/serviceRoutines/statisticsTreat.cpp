@@ -115,6 +115,7 @@ static void resetStatistics(void)
   noOfEntityByIdAttributeByNameIdAndType            = -1;
 
   noOfLogRequests                                 = -1;
+  noOfLogLevelRequests                            = -1;
   noOfVersionRequests                             = -1;
   noOfExitRequests                                = -1;
   noOfLeakRequests                                = -1;
@@ -201,7 +202,8 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
   renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
   renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
-  renderUsedCounter(&js, "logRequests", noOfLogRequests);
+  renderUsedCounter(&js, "logRequests",                               noOfLogRequests);
+  renderUsedCounter(&js, "logLevelRequests",                          noOfLogLevelRequests);
 
   //
   // The valgrind test suite uses REST GET /version to check that the broker is alive

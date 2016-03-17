@@ -75,6 +75,7 @@ const char* requestType(RequestType rt)
   case Ngsi10SubscriptionsConvOp:                   return "Ngsi10SubscriptionsConvOp";
 
   case LogRequest:                                  return "Log";
+  case LogLevelRequest:                             return "LogLevel";
   case VersionRequest:                              return "Version";
   case StatisticsRequest:                           return "Statistics";
   case ExitRequest:                                 return "Exit";

@@ -871,6 +871,11 @@ static std::string apiVersionGet(const char* path)
     return "v2";
   }
 
+  if (strcmp(path, "/admin/log") == 0)
+  {
+    return "v2";
+  }
+
   return "v1";
 }
 
@@ -910,7 +915,6 @@ static int connectionTreat
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
   static int             reqNo       = 1;
-
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -974,7 +978,6 @@ static int connectionTreat
 
     LM_T(LmtRequest, (""));
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
-
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;
     ciP->ip      = ip;
@@ -1140,7 +1143,9 @@ static int connectionTreat
     ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
 
-  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
+  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && 
+      (ciP->httpHeaders.contentLength == 0) && 
+      ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
   {
     std::string errorMsg = restErrorReplyGet(ciP, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;

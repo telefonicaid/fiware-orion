@@ -83,6 +83,7 @@ typedef enum RequestType
   UpdateContextAttribute,
 
   LogRequest = 51,
+  LogLevelRequest,
   VersionRequest,
   ExitRequest,
   LeakRequest,
@@ -94,7 +95,7 @@ typedef enum RequestType
   RtContextElementResponse,
   RtContextAttributeResponse,
 
-  EntityTypes = 61,
+  EntityTypes = 62,
   AttributesForEntityType,
   RtEntityTypesResponse,
   RtAttributesForEntityTypeResponse,
