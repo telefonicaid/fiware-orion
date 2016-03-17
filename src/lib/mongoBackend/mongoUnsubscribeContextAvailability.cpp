@@ -84,8 +84,6 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    // FIXME P10: overloggin (collectionQuery() false involves to internal alarms in that function)
-    //alarmMgr.dbError(responseP->statusCode.details);
     return SccOk;
   }
   alarmMgr.dbErrorReset();

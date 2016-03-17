@@ -244,7 +244,7 @@ static bool addTriggeredSubscriptions
     std::string err;
     if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     BSONElement idField = getFieldF(sub, "_id");

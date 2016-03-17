@@ -523,7 +523,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunct
     BSONObj sub;
     if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     treatFunction(tenant, sub);
@@ -2239,14 +2239,14 @@ bool entitiesQuery
     catch (const std::exception &e)
     {
       *err = e.what();
-      LM_E(("Runtime Error (exception in nextSafe() at %s:%d: <%s> - query: <%s>)", __FUNCTION__, __LINE__, e.what(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", e.what(), query.toString().c_str()));
       releaseMongoConnection(connection);
       return false;
     }
     catch (...)
     {
       *err = "generic exception at nextSafe()";
-      LM_E(("Runtime Error (generic exception in nextSafe() at %s:%d - query: <%s>)", __FUNCTION__, __LINE__, query.toString().c_str()));
+      LM_E(("Runtime Error (generic exception in nextSafe() - query: %s)", query.toString().c_str()));
       releaseMongoConnection(connection);
       return false;
     }
@@ -2650,7 +2650,7 @@ bool registrationsQuery
     BSONObj r;
     if (!nextSafeOrErrorF(cursor, &r, err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err->c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err->c_str(), query.toString().c_str()));
       continue;
     }
     docs++;

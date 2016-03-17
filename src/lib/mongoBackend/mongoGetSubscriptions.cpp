@@ -252,7 +252,7 @@ void mongoListSubscriptions
 
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), q.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
     }
     docs++;
@@ -327,7 +327,7 @@ void mongoGetSubscription
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       releaseMongoConnection(connection);
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), q.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;

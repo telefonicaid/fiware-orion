@@ -78,7 +78,7 @@ static std::string attributeType
     BSONObj r;
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
@@ -254,6 +254,10 @@ HttpStatusCode mongoEntityTypes
 
     EntityType*               entityType;
 
+
+    // nullId true means that the "cumulative" entityType for both no-type and type "" has to be used. This happens
+    // when the results item has the field "" and at the same time the value of that field is JSON null or when
+    // the value of the field "_id" is ""
     bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) || (getStringFieldF(resultItem, "_id") == "");
 
     if (nullId)

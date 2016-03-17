@@ -74,8 +74,6 @@ static HttpStatusCode processDiscoverContextAvailability
                           &count))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
-    // FIXME P10: overloggin (registrationQuery() false return menas that collectionRangedQuery() retursn false, corresponding to internal alarms in that function)
-    //alarmMgr.dbError(responseP->errorCode.details);
     return SccOk;
   }
 

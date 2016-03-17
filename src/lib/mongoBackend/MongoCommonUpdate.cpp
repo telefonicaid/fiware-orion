@@ -1428,8 +1428,6 @@ static bool addTriggeredSubscriptions_noCache
   DBClientBase* connection = getMongoConnection();
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
-    // FIXME P10: collectionQuery already calls dbMgr in the case of problem. Redundant alarmMsg.dbError() ?
-    //alarmMgr.dbError(errorString);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     releaseMongoConnection(connection);
     return false;
@@ -1444,7 +1442,7 @@ static bool addTriggeredSubscriptions_noCache
     std::string err;
     if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     BSONElement  idField  = getFieldF(sub, "_id");
@@ -3278,7 +3276,7 @@ void processContextElement
     BSONObj r;
     if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s - with query: <%s>)", err.c_str(), query.toString().c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;

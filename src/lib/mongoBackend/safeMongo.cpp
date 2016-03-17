@@ -244,12 +244,16 @@ bool nextSafeOrError(const std::auto_ptr<DBClientCursor>& cursor, BSONObj* r, st
   }
   catch (const std::exception &e)
   {
-    *err = std::string(e.what()) + " at " + caller;
+    char lineString[STRING_SIZE_FOR_INT];
+    snprintf(lineString, sizeof(lineString), "%d", line);
+    *err = std::string(e.what()) + " at " + caller + ":" + lineString;
     return false;
   }
   catch (...)
   {
-    *err = "generic exception at " + caller;
+    char lineString[STRING_SIZE_FOR_INT];
+    snprintf(lineString, sizeof(lineString), "%d", line);
+    *err = "generic exception at " + caller + ":" + lineString;
     return false;
   }
 }
