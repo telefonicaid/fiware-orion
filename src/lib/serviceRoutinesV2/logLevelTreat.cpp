@@ -63,6 +63,12 @@ std::string logLevelTreat
     return "{\"error\":\"log level missing\"}";
   }
 
+  //
+  // Internally, the broker does not support "warn", nor "fatal".
+  // However, to easy the task for our users, the broker accepts both of them:
+  //  - "fatal" is translated into the internal "None", meaning complete silence.
+  //  - "warn" is translated into "Warning" which is accepted internally.
+  //
   if ((strcasecmp(levelP, "none")    == 0) ||
       (strcasecmp(levelP, "fatal")   == 0) ||
       (strcasecmp(levelP, "error")   == 0) ||
