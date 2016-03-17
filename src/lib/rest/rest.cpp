@@ -1143,6 +1143,12 @@ static int connectionTreat
     ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
 
+  //
+  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with two exceptions.
+  //
+  // - Old log requests  (URL contains '/log/')
+  // - New log requests  (URL is exactly '/admin/log')
+  //
   if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && 
       (ciP->httpHeaders.contentLength == 0) && 
       ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
