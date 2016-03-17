@@ -1107,9 +1107,9 @@ static const char* validLogLevels[] =
   { "*", INV, INV10_COMPS,   "", badNgsi10Request }, \
   { "*", INV, INV_ALL_COMPS, "", badRequest       }
 
-#define LOGLEVEL_REQUESTS_V2                                                        \
-  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "putLogLevel",  logLevelTreat                    }, \
-  { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "*LogLevel",    badVerbPutOnly                   }
+#define LOGLEVEL_REQUESTS_V2                                                         \
+  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", logLevelTreat                      }, \
+  { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
 
 
 

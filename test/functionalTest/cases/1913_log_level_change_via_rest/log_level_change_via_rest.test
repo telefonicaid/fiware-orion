@@ -31,7 +31,7 @@ brokerStart CB 0-255
 
 #
 # 01. POST /admin/log and see error 'method not allowed'
-# 02. PUT /admin/log and see error 'log level missing or empty'
+# 02. PUT /admin/log and see error 'log level missing'
 # 03. PUT /admin/log?level= and see error 'Empty right-hand-side for URI param'
 # 04. PUT /admin/log?level=notValid and see error 'invalid log level'
 # 05. PUT /admin/log?level=ERROR and see it work
@@ -48,8 +48,8 @@ orionCurl --url /admin/log -X POST --json
 echo
 echo
 
-echo "02. PUT /admin/log and see error 'log level missing or empty'"
-echo "============================================================="
+echo "02. PUT /admin/log and see error 'log level missing'"
+echo "===================================================="
 orionCurl --url /admin/log -X PUT --json 
 echo
 echo
@@ -121,8 +121,8 @@ Date: REGEX(.*)
 
 
 
-02. PUT /admin/log and see error 'log level missing or empty'
-=============================================================
+02. PUT /admin/log and see error 'log level missing'
+====================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 29
 Content-Type: application/json
