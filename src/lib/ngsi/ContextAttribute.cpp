@@ -810,14 +810,14 @@ std::string ContextAttribute::check
   }
 
 
-  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (ciP->apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(ciP->apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
