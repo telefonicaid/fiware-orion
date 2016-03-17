@@ -194,31 +194,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->uriParamTypes.push_back(val);
     }
   }
-  else if (key == URI_PARAM_Q)
-  {
-    if (*val != 0)
-    {
-      std::string errorString;
-
-      if (ciP->stringFilterP != NULL)
-      {
-        delete ciP->stringFilterP;
-        ciP->stringFilterP = NULL;
-      }
-
-      ciP->stringFilterP = new StringFilter();
-      if (ciP->stringFilterP->parse(val, &errorString) == false)
-      {
-        OrionError error(SccBadRequest, errorString);
-
-        delete ciP->stringFilterP;
-        ciP->stringFilterP  = NULL;
-        ciP->httpStatusCode = SccBadRequest;
-        ciP->answer         = error.render(ciP, "");
-      }
-    }
-  }
-  else
+  else if (key != URI_PARAM_Q)  // FIXME P1: possible more known options here ...
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }

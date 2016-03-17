@@ -1008,14 +1008,14 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
-    const Scope* sco = res.scopeVector[ix];
+    const Scope* scopeP = res.scopeVector[ix];
 
-    if (sco->type.find(SCOPE_FILTER) == 0)
+    if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
       // FIXME P5: NGSI "v1" filter, probably to be removed in the future
-      addFilterScope(sco, filters);
+      addFilterScope(scopeP, filters);
     }
-    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED || sco->type == FIWARE_LOCATION_V2)
+    else if (scopeP->type == FIWARE_LOCATION || scopeP->type == FIWARE_LOCATION_DEPRECATED || scopeP->type == FIWARE_LOCATION_V2)
     {
       geoScopes++;
       if (geoScopes > 1)
@@ -1027,13 +1027,13 @@ bool entitiesQuery
         BSONObj areaQuery;
 
         bool result;
-        if (sco->type == FIWARE_LOCATION_V2)
+        if (scopeP->type == FIWARE_LOCATION_V2)
         {
-          result = processAreaScopeV2(sco, areaQuery);
+          result = processAreaScopeV2(scopeP, areaQuery);
         }
         else // FIWARE Location NGSIv1 (legacy)
         {
-          result = processAreaScope(sco, areaQuery);
+          result = processAreaScope(scopeP, areaQuery);
         }
 
         if (result)
@@ -1043,24 +1043,16 @@ bool entitiesQuery
         }
       }
     }
-    else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)  // Used for string filters in V1
+    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      StringFilter stringFilter;
-
-      if (stringFilter.parse(sco->value.c_str(), err) == false)
+      for (unsigned int ix = 0; ix < scopeP->stringFilter.mongoFilters.size(); ++ix)
       {
-        *badInputP = true;
-        return false;
-      }
-
-      for (unsigned int ix = 0; ix < stringFilter.mongoFilters.size(); ++ix)
-      {
-        finalQuery.appendElements(stringFilter.mongoFilters[ix]);
+        finalQuery.appendElements(scopeP->stringFilter.mongoFilters[ix]);
       }
     }
     else
     {
-      std::string details = std::string("unknown scope type '") + sco->type + "', ignoring";
+      std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
       alarmMgr.badInput(clientIp, details);
     }
   }
