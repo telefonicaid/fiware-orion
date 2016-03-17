@@ -689,7 +689,7 @@ static const char* validLogLevels[] =
 //
 // Log, version, statistics ...
 //
-#define LOG                LogRequest
+#define LOG                LogTraceRequest
 #define LOGT_COMPS_V0      2, { "log", "trace"                           }
 #define LOGTL_COMPS_V0     3, { "log", "trace",      "*"                 }
 #define LOG2T_COMPS_V0     2, { "log", "traceLevel"                      }

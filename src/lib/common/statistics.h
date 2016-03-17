@@ -287,7 +287,7 @@ extern int noOfAttributeValueInstanceWithTypeAndId;
 extern int noOfContextEntitiesByEntityIdAndType;
 extern int noOfEntityByIdAttributeByNameIdAndType;
 
-extern int noOfLogRequests;
+extern int noOfLogTraceRequests;
 extern int noOfLogLevelRequests;
 extern int noOfVersionRequests;
 extern int noOfExitRequests;

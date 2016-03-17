@@ -82,7 +82,7 @@ typedef enum RequestType
   AppendContextElement,
   UpdateContextAttribute,
 
-  LogRequest = 51,
+  LogTraceRequest = 51,
   LogLevelRequest,
   VersionRequest,
   ExitRequest,
