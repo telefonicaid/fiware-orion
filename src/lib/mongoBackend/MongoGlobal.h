@@ -218,20 +218,6 @@ extern void ensureLocationIndex(const std::string& tenant);
 
 /* ****************************************************************************
 *
-* recoverOntimeIntervalThreads -
-*/
-extern void recoverOntimeIntervalThreads(const std::string& tenant);
-
-/* ****************************************************************************
-*
-* destroyAllOntimeIntervalThreads -
-*
-* This function is only to be used under harakiri mode, not for real use
-*/
-extern void destroyAllOntimeIntervalThreads(const std::string& tenant);
-
-/* ****************************************************************************
-*
 * matchEntity -
 */
 extern bool matchEntity(const EntityId* en1, const EntityId* en2);
@@ -264,12 +250,15 @@ extern bool entitiesQuery
   bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
-  int                              offset       = DEFAULT_PAGINATION_OFFSET_INT,
-  int                              limit        = DEFAULT_PAGINATION_LIMIT_INT,
-  bool*                            limitReached = NULL,
-  long long*                       countP       = NULL,
-  bool*                            badInputP    = NULL,
-  const std::string                apiVersion   = "v1"
+  int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,
+  int                              limit          = DEFAULT_PAGINATION_LIMIT_INT,
+  bool*                            limitReached   = NULL,
+  long long*                       countP         = NULL,
+  bool*                            badInputP      = NULL,
+  const std::string&               sortOrderList  = "",
+  bool                             includeCreDate = false,
+  bool                             includeModDate = false,
+  const std::string&               apiVersion     = "v1"
 );
 
 /* ****************************************************************************
@@ -332,12 +321,6 @@ extern EntityIdVector subToEntityIdVector(const BSONObj& sub);
 */
 extern AttributeList subToAttributeList(const BSONObj& attrL);
 
-/* ****************************************************************************
-*
-* processOntimeIntervalCondition -
-*
-*/
-extern void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant);
 
 /* ****************************************************************************
 *

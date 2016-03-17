@@ -106,28 +106,28 @@ echo
 
 echo "05. GET /v2/entities, circle with wide radius capturing all three cities"
 echo "========================================================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance=15000&geometry=point&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:15000&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "06. GET /v2/entities, circle with not so wide radius capturing only Madrid and Leganes"
 echo "======================================================================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance=13500&geometry=point&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:13500&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "07. GET /v2/entities, circle with narrow radius capturing only Madrid"
 echo "====================================================================="
-orionCurl --url '/v2/entities?georel=near;maxDistance=1000&geometry=point&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:1000&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "08. GET /v2/entities, inverted circle with narrow radius capturing Leganes and Alcobendas"
 echo "========================================================================================="
-orionCurl --url '/v2/entities?georel=near;minDistance=1000&geometry=point&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;minDistance:1000&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
@@ -193,7 +193,7 @@ echo
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Madrid
+Location: /v2/entities/Madrid?type=City
 Date: REGEX(.*)
 
 
@@ -202,7 +202,7 @@ Date: REGEX(.*)
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Leganes
+Location: /v2/entities/Leganes?type=City
 Date: REGEX(.*)
 
 
@@ -211,7 +211,7 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Alcobendas
+Location: /v2/entities/Alcobendas?type=City
 Date: REGEX(.*)
 
 

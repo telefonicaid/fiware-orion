@@ -67,7 +67,7 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -75,19 +75,19 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 171
+Content-Length: 175
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr01": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": 7
     },
     "attr02": {
         "metadata": {},
-        "type": null,
+        "type": "none",
         "value": true
     },
     "attr03": {

@@ -29,6 +29,7 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoSubscribeContext.h"
@@ -55,12 +56,8 @@ HttpStatusCode mongoSubscribeContext
   const std::vector<std::string>&      servicePathV
 )
 {
-    const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    Format             notifyFormat          = stringToFormat(notifyFormatAsString);
     std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];    
-    bool               reqSemTaken           = false;
-
-    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
+    bool               reqSemTaken           = false;    
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
@@ -148,7 +145,7 @@ HttpStatusCode mongoSubscribeContext
                                              requestP->attributeList, oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             notifyFormat,
+                                             JSON,
                                              tenant,
                                              xauthToken,
                                              servicePathV,
@@ -175,7 +172,7 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, notifyFormatAsString);
+    sub.append(CSUB_FORMAT, "JSON");
 
     /* Insert document in database */
     std::string err;
@@ -200,7 +197,7 @@ HttpStatusCode mongoSubscribeContext
                        oidString.c_str(),
                        expiration,
                        throttling,
-                       notifyFormat,
+                       JSON,
                        notificationDone,
                        lastNotificationTime,
                        requestP->expression.q,

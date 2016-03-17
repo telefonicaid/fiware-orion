@@ -5,6 +5,7 @@
 * [No-Existence type filter](#no-existence-type-filter)
 * [Entity type filter](#entity-type-filter)
 * [Geo-location filter](#geo-location-filter)
+* [Geo-location filter NGSIv2](#geo-location-filter-ngsiv2)
 * [String query filter](#string-filter)
     
 ## Introduction
@@ -137,6 +138,13 @@ described in detail in [the following section](geolocation.md#geo-located-querie
 
 In the current version of Orion, there is no equivalent convenience
 operation filter.
+
+[Top](#top)
+
+## Geo-location filter NGSIv2
+
+The scope corresponding to this type is "FIWARE::Location::NGSIv2". It is
+described in detail in [the following section](geolocation.md#geo-located-queries-ngsiv2).
 
 [Top](#top)
 

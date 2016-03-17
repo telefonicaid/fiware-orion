@@ -67,12 +67,12 @@ echo
 01. PUT entity attribute with forbidden char in attr name
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid character in URI",
+    "description": "Invalid characters in attribute name",
     "error": "BadRequest"
 }
 

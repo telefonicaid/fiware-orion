@@ -42,7 +42,8 @@ extern std::string parseEntityVector
 (
   ConnectionInfo*                    ciP,
   const Value::ConstMemberIterator&  iter,
-  Entities*                          evP
+  Entities*                          evP,
+  bool                               attributesAllowed
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEENTITYVECTOR_H_

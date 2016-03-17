@@ -34,25 +34,14 @@
 */
 TEST(ErrorCode, render)
 {
-  ErrorCode    e1;
-  ErrorCode    e2(200, "REASON", "DETAILS");
+  ErrorCode    e1; 
   std::string  out;
-  const char*  outfile1 = "ngsi.errorCode.render1.valid.xml";
-  const char*  outfile2 = "ngsi.errorCode.render1.middle.json";
-  const char*  outfile3 = "ngsi.errorCode.render2.valid.xml";
+  const char*  outfile1 = "ngsi.errorCode.render1.middle.json";
 
   utInit();
 
-  out = e1.render(XML, "");
+  out = e1.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e1.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e2.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -76,13 +65,13 @@ TEST(ErrorCode, check)
 
   utInit();
 
-  rendered = e1.check(RegisterContext, XML, "", "", 0);
+  rendered = e1.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
-  rendered = e2.check(RegisterContext, XML, "", "", 0);
+  rendered = e2.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
-  rendered = e3.check(RegisterContext, XML, "", "", 0);
+  rendered = e3.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 
   utExit();

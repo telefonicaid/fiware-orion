@@ -62,11 +62,56 @@
 
 /* ****************************************************************************
 *
+* Special orderBy keywords
+*/
+#define ORDER_BY_PROXIMITY "geo:distance"
+
+
+
+/* ****************************************************************************
+*
 * other special types
 */
-#define DATE_TYPE  "date"
+#define DATE_TYPE     "date"
+#define DEFAULT_TYPE  "none"
 
 
+
+/* ****************************************************************************
+*
+* virtual attributes
+*/
+#define DATE_CREATED   "dateCreated"
+#define DATE_MODIFIED  "dateModified"
+
+
+
+/* ****************************************************************************
+*
+* Render modes - 
+*/
+#define RENDER_MODE_NORMALIZED    "normalized"
+#define RENDER_MODE_KEY_VALUES    "keyValues"
+#define RENDER_MODE_VALUES        "values"
+#define RENDER_MODE_UNIQUE_VALUES "unique"
+
+
+
+/* ****************************************************************************
+*
+* Values for the URI param 'options'
+*/
+#define OPT_COUNT           "count"
+#define OPT_APPEND          "append"
+#define OPT_NORMALIZED      RENDER_MODE_NORMALIZED
+#define OPT_VALUES          RENDER_MODE_VALUES
+#define OPT_KEY_VALUES      RENDER_MODE_KEY_VALUES
+#define OPT_UNIQUE_VALUES   RENDER_MODE_UNIQUE_VALUES
+#define OPT_DATE_CREATED    DATE_CREATED
+#define OPT_DATE_MODIFIED   DATE_MODIFIED
+
+
+ 
 /* ****************************************************************************
 *
 * NGSIv2 "flavours" to tune some behaviours in mongoBackend -

@@ -29,6 +29,11 @@
 
 #include "common/Format.h"
 
+/* FIXME P2: this file (along with some other places around all the code) uses
+ * the old term "tag", coming from the XML days. Now we only support JSON and
+ * all the terminology should use "key" or "keyName". We have changed terminology
+ * in many places, but there are yet some remains (not so important, anyway).
+ */
 
 
 /* ****************************************************************************
@@ -65,25 +70,29 @@ extern std::string jsonInvalidCharsTransformation(const std::string& input);
 /* ****************************************************************************
 *
 * startTag -  
+*
+* FIXME P3: in the past, this entire family of functions was named just startTag().
+* However, changes in the function signature due to XML format removal have caused
+* that different startTag() instances end with the same (or conflicting, due to
+* optional parameters) signatures. Thus, we use startTag1() and startTag2() to
+* distinguish. I know they are awful names :), we should find better ones, but given
+* this is NGSIv1 functionality that will be deprecated in the future, the priority
+* to do this is low.
 */
-extern std::string startTag
+extern std::string startTag1
 (
   const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
-  bool                showTag    = true,
+  const std::string&  key,
+  bool                showKey    = true,
   bool                isToplevel = false
 );
 
-extern std::string startTag
+extern std::string startTag2
 (
   const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
-  Format              format,
+  const std::string&  key,
   bool                isVector         = false,
-  bool                showTag          = true,
-  bool                isCompoundVector = false
+  bool                showKey          = true
 );
 
 
@@ -95,8 +104,6 @@ extern std::string startTag
 extern std::string endTag
 (
   const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
   bool                comma      = false,
   bool                isVector   = false,
   bool                nl         = true,
@@ -108,13 +115,20 @@ extern std::string endTag
 /* ****************************************************************************
 *
 * valueTag -  
+*
+* FIXME P3: in the past, this entire family of functions was named just valueTag().
+* However, changes in the function signature due to XML format removal have caused
+* that different valueTag() instances end with the same (or conflicting, due to
+* optional parameters) signatures. Thus, we use valueTag() and valueTag() to
+* distinguish. I know they are awful names :), we should find better ones, but given
+* this is NGSIv1 functionality that will be deprecated in the future, the priority
+* to do this is low.
 */
-extern std::string valueTag
+extern std::string valueTag1
 (
   const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   const std::string&  value,
-  Format              format,
   bool                showComma           = false,
   bool                isVectorElement     = false,
   bool                valueIsNumberOrBool = false
@@ -123,19 +137,16 @@ extern std::string valueTag
 extern std::string valueTag
 (
   const std::string&  indent,
-  const std::string&  tagName,
+  const std::string&  key,
   int                 value,
-  Format              format,
   bool                showComma     = false
 );
 
-extern std::string valueTag
+extern std::string valueTag2
 (
   const std::string&  indent,
-  const std::string&  xmlTag,
-  const std::string&  jsonTag,
+  const std::string&  key,
   const std::string&  value,
-  Format              format,
   bool                showComma           = false,
   bool                valueIsNumberOrBool = false
 );
@@ -149,9 +160,8 @@ extern std::string valueTag
 extern std::string startArray
 (
   const std::string&  indent,
-  const std::string&  tagName,
-  Format              format,
-  bool                showTag = true
+  const std::string&  key,
+  bool                showKey = true
 );
 
 
@@ -160,6 +170,6 @@ extern std::string startArray
 *
 * endArray -
 */
-extern std::string endArray(const std::string& indent, const std::string& tagName, Format format);
+extern std::string endArray(const std::string& indent, const std::string& key);
 
 #endif  // SRC_LIB_COMMON_TAG_H_

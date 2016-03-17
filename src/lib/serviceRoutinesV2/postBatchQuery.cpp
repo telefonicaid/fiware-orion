@@ -42,7 +42,7 @@
 *
 * postBatchQuery -
 *
-* PATCH /v2/op/query
+* POST /v2/op/query
 *
 * Payload In:  BatchQueryRequest
 * Payload Out: Entities

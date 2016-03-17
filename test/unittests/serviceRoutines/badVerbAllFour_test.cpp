@@ -46,8 +46,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * error - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(badVerbAllFour, error)
+TEST(badVerbAllFour, DISABLED_error)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/123",  "PUST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");

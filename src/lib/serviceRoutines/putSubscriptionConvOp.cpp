@@ -64,7 +64,6 @@ std::string putSubscriptionConvOp
     std::string out;
 
     out = restErrorReplyGet(ciP,
-                            ciP->outFormat,
                             "",
                             "updateContextSubscription",
                             SccBadRequest,

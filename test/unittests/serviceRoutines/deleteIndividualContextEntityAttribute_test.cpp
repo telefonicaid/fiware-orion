@@ -46,8 +46,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(deleteIndividualContextEntityAttribute, ok)
+TEST(deleteIndividualContextEntityAttribute, DISABLED_ok)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entity901/attributes/aa",  "DELETE", "1.1");
   const char*     outfile = "ngsi10.deleteIndividualContextEntityAttribute.valid.xml";

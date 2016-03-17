@@ -1,0 +1,128 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 batch update, entity not found
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Batch Update with actionType UPDATE on non-existing entity, see error
+# 02. Batch Update with actionType DELETE on non-existing entity, see error
+# 03. Batch Update with actionType REPLACE on non-existing entity, see error
+#
+
+echo "01. Batch Update with actionType UPDATE on non-existing entity, see error"
+echo "========================================================================="
+payload='{
+  "actionType": "UPDATE",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Batch Update with actionType DELETE on non-existing entity, see error"
+echo "========================================================================="
+payload='{
+  "actionType": "DELETE",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Batch Update with actionType REPLACE on non-existing entity, see error"
+echo "=========================================================================="
+payload='{
+  "actionType": "REPLACE",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Update with actionType UPDATE on non-existing entity, see error
+=========================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 38
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "E",
+    "error": "NotFound"
+}
+
+
+02. Batch Update with actionType DELETE on non-existing entity, see error
+=========================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 38
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "E",
+    "error": "NotFound"
+}
+
+
+03. Batch Update with actionType REPLACE on non-existing entity, see error
+==========================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 38
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "E",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

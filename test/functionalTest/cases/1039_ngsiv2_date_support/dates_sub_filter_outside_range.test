@@ -1,0 +1,269 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Date subscription filter (list)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create subscription with q: birthday!=2016-02-24T10:00:00..00Z,2016-02-26T10:00:00.00Z
+# 02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)
+# 03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)
+# 04. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)
+# 05. Update entity to birthdaty: 2016-02-26T10:00:00.00Z (not notif)
+# 06. Update entity to birthdaty: 2016-02-27T10:00:00.00Z (notif)
+# 07. Dump accumulator (2 notifications)
+#
+
+echo "01. Create subscription with q: birthday!=2016-02-24T10:00:00.00Z..2016-02-26T10:00:00.00Z"
+echo "=========================================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attributes": [ ],
+            "expression": {
+               "q": "birthday!=2016-02-24T10:00:00.00Z..2016-02-26T10:00:00.00Z"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:'$LISTENER_PORT'/notify",
+        "attributes": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)"
+echo "================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "birthday": {
+    "value": "2016-02-23T10:00:00.00Z",
+    "type": "date"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)"
+echo "==================================================================="
+payload='{
+ "birthday": {
+   "value": "2016-02-24T10:00:00.00Z",
+   "type": "date"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)"
+echo "==================================================================="
+payload='{
+ "birthday": {
+   "value": "2016-02-25T10:00:00.00Z",
+   "type": "date"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "06. Update entity to birthdaty: 2016-02-26T10:00:00.00Z (not notif)"
+echo "==================================================================="
+payload='{
+ "birthday": {
+   "value": "2016-02-26T10:00:00.00Z",
+   "type": "date"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "07. Update entity to birthdaty: 2016-02-27T10:00:00.00Z (notif)"
+echo "==============================================================="
+payload='{
+ "birthday": {
+   "value": "2016-02-27T10:00:00.00Z",
+   "type": "date"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "06. Get accumulator dump (2 notifications)"
+echo "=========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with q: birthday!=2016-02-24T10:00:00.00Z..2016-02-26T10:00:00.00Z
+==========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (notif)
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T
+Date: REGEX(.*)
+
+
+
+03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (not notif)
+===================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)
+===================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Update entity to birthdaty: 2016-02-26T10:00:00.00Z (not notif)
+===================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. Update entity to birthdaty: 2016-02-27T10:00:00.00Z (notif)
+===============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Get accumulator dump (2 notifications)
+==========================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 488
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "birthday",
+            "type" : "date",
+            "value" : "2016-02-23T10:00:00.00Z"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 488
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "birthday",
+            "type" : "date",
+            "value" : "2016-02-27T10:00:00.00Z"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

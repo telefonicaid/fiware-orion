@@ -37,7 +37,6 @@ unset BROKER_AWAIT_SLEEP_TIME
 #
 # 01. Register E1/T1/A1 in CB, Context Provider is CP1
 # 02. Query E1/T1/A1 in CB, using JSON - get NotFound
-# 03. Query E1/T1/A1 in CB, using XML - get NotFound
 #
 
 
@@ -88,24 +87,6 @@ echo
 echo
 
 
-echo "03. Query E1/T1/A1 in CB, using XML - get NotFound"
-echo "=================================================="
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T1" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url /v1/queryContext --payload "$payload"
-echo
-echo
-
-
 --REGEXPECT--
 01. Register E1/T1/A1 in CB, Context Provider is CP1
 ====================================================
@@ -133,22 +114,6 @@ Date: REGEX(.*)
         "reasonPhrase": "No context element found"
     }
 }
-
-
-03. Query E1/T1/A1 in CB, using XML - get NotFound
-==================================================
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
 
 
 --TEARDOWN--

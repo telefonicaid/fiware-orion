@@ -56,8 +56,7 @@ payload='{
           "value" : "ES"
         },
     "madeInCountry": {
-          "value" : "DE",
-          "type" : ""
+          "value" : "DE"
         },
     "model" : {
           "type": "myString",
@@ -109,7 +108,7 @@ echo
 =============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/8787GHY
+Location: /v2/entities/8787GHY?type=Car
 Date: REGEX(.*)
 
 
@@ -159,14 +158,14 @@ Date: REGEX(.*)
 05. GET /v2/entities/8787GHY/attrs/A3
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 79
+Content-Length: 81
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {
         "m1": {
-            "type": null,
+            "type": "none",
             "value": "M1"
         }
     },

@@ -76,7 +76,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
@@ -92,7 +91,6 @@
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
-#include "ngsiNotify/onTimeIntervalThread.h"
 #include "ngsiNotify/QueueNotifier.h"
 #include "ngsiNotify/QueueWorkers.h"
 #include "ngsiNotify/senderThread.h"
@@ -173,6 +171,7 @@
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutinesV2/badVerbGetPutOnly.h"
+#include "serviceRoutinesV2/badVerbGetDeletePatchOnly.h"
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
@@ -197,6 +196,7 @@
 #include "serviceRoutinesV2/deleteSubscription.h"
 #include "serviceRoutinesV2/patchSubscription.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
+#include "serviceRoutinesV2/postBatchUpdate.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -475,6 +475,9 @@ static const char* validLogLevels[] =
 #define BQR_COMPS_V2            3, { "v2", "op", "query" }
 #define BQR_COMPS_WORD          ""
 
+#define BUR                     BatchUpdateRequest
+#define BUR_COMPS_V2            3, { "v2", "op", "update" }
+#define BUR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -725,7 +728,7 @@ static const char* validLogLevels[] =
 
 #define API_V2                                                                                         \
   { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
-  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbAllFour           }, \
+  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
   { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
@@ -755,15 +758,18 @@ static const char* validLogLevels[] =
                                                                                                        \
   { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
   { "POST",   SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          postSubscriptions        }, \
-  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }, \
+  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
   { "DELETE", ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          deleteSubscription       }, \
   { "PATCH",  ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          patchSubscription        }, \
-  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetOnly           }, \
+  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetDeletePatchOnly}, \
                                                                                                        \
   { "POST",   BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          postBatchQuery           }, \
-  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }
+  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }, \
+                                                                                                       \
+  { "POST",   BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          postBatchUpdate          }, \
+  { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
 
 
 
@@ -801,7 +807,7 @@ static const char* validLogLevels[] =
 
 
 #define STANDARD_REQUESTS_V0                                                                             \
-  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
   { "*",      UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -817,7 +823,7 @@ static const char* validLogLevels[] =
 
 
 #define STANDARD_REQUESTS_V1                                                                               \
-  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
   { "*",      UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -917,7 +923,7 @@ static const char* validLogLevels[] =
   { "PUT",    ICEAA, ICEAA_COMPS_V0,       ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
   { "POST",   ICEAA, ICEAA_COMPS_V0,       ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
   { "DELETE", ICEAA, ICEAA_COMPS_V0,       "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbGetPostDeleteOnly                  }, \
+  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbAllFour                            }, \
                                                                                                          \
   { "GET",    AVI,   AVI_COMPS_V0,         "",              getAttributeValueInstance                 }, \
   { "PUT",    AVI,   AVI_COMPS_V0,         AVI_PUT_WORD,    putAttributeValueInstance                 }, \
@@ -959,7 +965,7 @@ static const char* validLogLevels[] =
   { "PUT",    ICEAA, ICEAA_COMPS_V1,         ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
   { "POST",   ICEAA, ICEAA_COMPS_V1,         ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
   { "DELETE", ICEAA, ICEAA_COMPS_V1,         "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbGetPostDeleteOnly                  }, \
+  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbAllFour                            }, \
                                                                                                            \
   { "GET",    AVI,   AVI_COMPS_V1,           "",              getAttributeValueInstance                 }, \
   { "PUT",    AVI,   AVI_COMPS_V1,           AVI_PUT_WORD,    putAttributeValueInstance                 }, \
@@ -984,12 +990,13 @@ static const char* validLogLevels[] =
                                                                                                            \
   { "GET",    ET,    ET_COMPS_V1,            "",              getEntityTypes                            }, \
   { "*",      ET,    ET_COMPS_V1,            "",              badVerbGetOnly                            }, \
+                                                                                                           \
   { "GET",    AFET,  AFET_COMPS_V1,          "",              getAttributesForEntityType                }, \
   { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
   { "POST",   ACE,   ACE_COMPS_V1,           ACE_POST_WORD,   postIndividualContextEntity               }, \
-  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
+  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
                                                                                                            \
   { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
   { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
@@ -1028,30 +1035,30 @@ static const char* validLogLevels[] =
 #define LOG_REQUESTS_V0                                                              \
   { "GET",    LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbPutDeleteOnly                   }, \
   { "GET",    LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbAllFour                         }
+  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbPutDeleteOnly                   }
 
 #define LOG_REQUESTS_V1                                                              \
   { "GET",    LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbPutDeleteOnly                   }, \
   { "GET",    LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbAllFour                         }
+  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbPutDeleteOnly                   }
 
 #define STAT_REQUESTS_V0                                                             \
   { "GET",    STAT, STAT_COMPS_V0,    "",  statisticsTreat                        }, \
@@ -1258,16 +1265,6 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
-  //
-  // Cancel all threads to avoid false leaks in valgrind
-  //
-  std::vector<std::string> dbs;
-  getOrionDatabases(dbs);
-  for (unsigned int ix = 0; ix < dbs.size(); ++ix)
-  {
-    destroyAllOntimeIntervalThreads(dbs[ix]);
-  }
-
   exit(code);
 }
 
@@ -1348,21 +1345,7 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
   /* Set notifier object (singleton) */
   setNotifier(pNotifier);
 
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
-  recoverOntimeIntervalThreads("");
-  if (multitenant)
-  {
-    /* We get tenant database names and recover ontime interval threads on each one */
-    std::vector<std::string> orionDbs;
-    getOrionDatabases(orionDbs);
-    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
-    {
-      std::string orionDb = orionDbs[ix];
-      std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-      recoverOntimeIntervalThreads(tenant);
-    }
-  }
-
+  /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
 }
 
@@ -1635,6 +1618,7 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("remove builtin", "--silent");
   paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
@@ -1667,14 +1651,6 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
-
-  // Argument consistency check (--silent AND -logLevel)
-  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
-  {
-    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
-    paUsage();
-    exit(1);
-  }
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))

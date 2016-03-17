@@ -35,25 +35,24 @@ brokerStart CB 0-255 IPV4
 echo "1. Create an entity using foo as tenant"
 echo "======================================="
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>compound</type>
-          <contextValue>03</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --tenant "foo"
+payload='{
+  "contextElements": [
+  {
+    "type": "Test",
+    "isPattern": "false",
+    "id": "E",
+    "attributes": [
+    {
+      "name": "att",
+      "type": "compound",
+      "value": "03"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --tenant "foo" --json
 echo
 echo
 
@@ -73,33 +72,32 @@ echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
 1. Create an entity using foo as tenant
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 625
-Content-Type: application/xml
+Content-Length: 387
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 2. Check that the number of orion databases is just 1

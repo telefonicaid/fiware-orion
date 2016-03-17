@@ -135,6 +135,8 @@ ContextElementResponse::ContextElementResponse
   const mongo::BSONObj&  entityDoc,
   const AttributeList&   attrL,
   bool                   includeEmpty,
+  bool                   includeCreDate,
+  bool                   includeModDate,
   const std::string&     apiVersion
 )
 {
@@ -266,6 +268,20 @@ ContextElementResponse::ContextElementResponse
 
     contextElement.contextAttributeVector.push_back(caP);
   }
+
+  /* creDate and modDate as "virtual" attributes. The entityDoc.hasField(...) part is a safety meassure to prevent entities created with
+   * very old Orion version which didn't implement creation/modification date */
+  if (includeCreDate && entityDoc.hasField(ENT_CREATION_DATE))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_CREATED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_CREATION_DATE));
+    contextElement.contextAttributeVector.push_back(caP);
+  }
+
+  if (includeModDate && entityDoc.hasField(ENT_MODIFICATION_DATE))
+  {
+    ContextAttribute* caP = new ContextAttribute(DATE_MODIFIED, DATE_TYPE, (double) getIntOrLongFieldAsLong(entityDoc, ENT_MODIFICATION_DATE));
+    contextElement.contextAttributeVector.push_back(caP);
+  }
 }
 
 
@@ -276,9 +292,9 @@ ContextElementResponse::ContextElementResponse
 *
 * This constructor builds the CER from a CEP. Note that statusCode is not touched.
 */
-ContextElementResponse::ContextElementResponse(ContextElement* ceP)
+ContextElementResponse::ContextElementResponse(ContextElement* ceP, bool useDefaultType)
 {
-  contextElement.fill(ceP);
+  contextElement.fill(ceP, useDefaultType);
 }
 
 
@@ -296,14 +312,13 @@ std::string ContextElementResponse::render
   bool                omitAttributeValues
 )
 {
-  std::string xmlTag   = "contextElementResponse";
-  std::string jsonTag  = "contextElement";
-  std::string out      = "";
+  std::string key = "contextElement";
+  std::string out = "";
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  out += startTag2(indent, key, false, false);
   out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
-  out += statusCode.render(ciP->outFormat, indent + "  ", false);
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+  out += statusCode.render(indent + "  ", false);
+  out += endTag(indent, comma, false);
 
   return out;
 }
@@ -330,7 +345,6 @@ std::string ContextElementResponse::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -338,12 +352,12 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = contextElement.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = statusCode.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = statusCode.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

@@ -152,7 +152,7 @@ echo
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T
 Date: REGEX(.*)
 
 
@@ -161,7 +161,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T
 Date: REGEX(.*)
 
 
@@ -170,7 +170,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T
 Date: REGEX(.*)
 
 
@@ -179,7 +179,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4
+Location: /v2/entities/E4?type=T
 Date: REGEX(.*)
 
 
@@ -188,7 +188,7 @@ Date: REGEX(.*)
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5
+Location: /v2/entities/E5?type=T
 Date: REGEX(.*)
 
 
@@ -205,10 +205,10 @@ Date: REGEX(.*)
 07. Dump accumulator (1 notification with E1+E2)
 ================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1250
+Content-Length: 1274
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -223,17 +223,17 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "humidity",
-            "type" : "",
+            "type" : "none",
             "value" : 80
           },
           {
             "name" : "status",
-            "type" : "",
+            "type" : "none",
             "value" : "OK"
           },
           {
             "name" : "temperature",
-            "type" : "",
+            "type" : "none",
             "value" : 20
           }
         ]
@@ -251,17 +251,17 @@ Content-Type: application/json; charset=utf-8
         "attributes" : [
           {
             "name" : "humidity",
-            "type" : "",
+            "type" : "none",
             "value" : 70
           },
           {
             "name" : "status",
-            "type" : "",
+            "type" : "none",
             "value" : "ERR"
           },
           {
             "name" : "temperature",
-            "type" : "",
+            "type" : "none",
             "value" : 30
           }
         ]

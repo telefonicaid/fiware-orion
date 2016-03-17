@@ -126,7 +126,7 @@ above. Similarly to attributes, each piece of metadata has
  * a **metadata type**, describing the NGSI value type of the metadata value
  * a **metadata value** containing the actual metadata
 
-Note that in NGSI it is not forseen that metadata values can
+Note that in NGSI it is not foreseen that metadata values can
 themselves have metadata.
 
 #### Restrictions and Operation Scopes
@@ -242,11 +242,14 @@ There are two representation modes, which must be supported by implementations, 
 ```
 
 * *values mode*. This mode represents the entity only by a collection of attribute values conveyed by an Array. Id and type information are left out.
-  See example below.
+  See example below. The order of the attributes in the Array is specified by the `attrs` URI param (e.g. `attrs=branch,colour,engine`) or arbitrary
+  order in the case `attrs` is not used.
 
 ```
 [ 'Ford', 'black', 78.3 ]
 ```
+
+* *unique mode*. This mode is just like *values mode*, with the only difference that values are not repeated.
 
 ## Partial Representations
 
@@ -254,15 +257,14 @@ Some operations imply that only a partial representation of an entity will be pr
 
 * `id` and `type` are not allowed in update operations, as they are inmutable properties.
 
-* In the requests in which entity `type` is allowed, it may be omitted. When omitted, the default value `null` 
+* In the requests in which entity `type` is allowed, it may be omitted. When omitted, the default string value `none`
   is used for the type.
 
 * In some cases, not all the attributes of the entity are shown, e.g. a query which selects a subset of entity attributes.
 
 * Attribute/metadata `value` may be omitted in requests, meaning that the attribute/metadata has `null` value. It is always present in responses.
 
-* Attribute/metadata `type` may be ommitted in requests, meaning that the attribute/metadata doesn't have a NGSI type. In responses, this
-  property is set to `null` if the attribute doesn't have a type.
+* Attribute/metadata `type` may be ommitted in requests. When omitted, the default string value `none`.
 
 * Attribute `metadata` may be ommitted in requests, meaning that there are not metadata elements associated to the attribute. In responses, this property is set to
   `{}` if the attribute doesn't have metadata.
@@ -286,6 +288,24 @@ an opaque way. Nonetheless, the types described below are used to convey an spec
 }
 ```
 
+## Virtual attributes
+
+There are entity properties that are not directly modificable by NGSIv2 clients, but that can be rendered
+by NGSIv2 servers to provide extra information. From a representation point of view, they are like
+regular attributes, with name, value and type.
+
+Virtual attributes are not rendered by default. In oder to render an specific attribute, add its name
+to the `options` URL parameter.
+
+The list of virtual attributes is the following:
+
+* `dateCreation` (type: `date`): entity creation date as ISO 8601 string.
+* `dateModification` (type: `date`): entity modification date as ISO 8601 string.
+
+As regular attributes, they can be  used in `attrs`, `q` filters and `orderBy`. However, they cannot be used
+in resource URLs.
+
+
 ## Field syntax restrictions
 
 Fields used as identifiers in the NGSIv2 API follow special rules regarding allowed syntax. These rules applies to:
@@ -299,8 +319,9 @@ Fields used as identifiers in the NGSIv2 API follow special rules regarding allo
 
 The rules are:
 
-* Allowed characters are the ones in the plain ASCII set except the following ones: whitespace, `&`, `?`, `/` and `#`.
+* Allowed characters are the ones in the plain ASCII set except the following ones: control characters, whitespace, `&`, `?`, `/` and `#`.
 * Maximum field length is 256 characters.
+* Minimum field length is 1 character.
 
 In addition to the above rules, given NGSIv2 server implementations could add additional syntactical restrictions in those
 or other fields, e.g. to avoid some cross script injection attacks.
@@ -308,6 +329,29 @@ or other fields, e.g. to avoid some cross script injection attacks.
 In the case a client attemps to use a field not valid from a syntax point of view, it shall get a "Bad Request" error
 explaining the cause.
 
+## Atrribute names restrictions
+
+The following strings must not be used as attribute names:
+
+* `id`, as it would conflict to the field used to represent entity id)
+
+* `type`, as it would conflict to the field used to represent entity type)
+
+* `geo:distance`, as it would conflict with the string used in `orderBy` for proximity to center point.
+
+* Virtual attribute names (see specific section about virtual attributes)
+
+## Ordering results
+
+Operations that retrieve lists of entities allow the `orderBy` URI parameter to specify the order; its 
+value can be:
+
+* The keyword geo:distance to order results by distance to a reference geometry when a "near" (`georel=near`) spatial 
+  relationship is used. 
+
+* A comma-separated list of attributes (including virtual attributes), e.g. `temperature,!humidity`. Results are ordered
+  by the first attribute. On ties, the results are ordered by the second attribute and so on. A "!" before the attribute
+  name means that the order is reversed.
 
 ## Error responses
 
@@ -507,13 +551,9 @@ In the case of equal or unequal, if the value to match include a `,`, you can us
 (`'`), e.g: `color=='light,green','deep,blue'`.
 
 Unary negatory statements use the unary operator `!`, while affirmative unary statements use no operator at all.
-The unary statements are used in two situations:
-
-+ To check for attribute existence. E.g. `temperature` matches entities that have
-  an attribute called 'temperature' (no matter its value), while `!temperature` matches entities that do not have
-  a temperature attribute.
-+ To check for entity type existence, with the `type` keyword. E.g, `!type` matches entities which do not have a type,
-  while `type` matches entities having a type.
+The unary statements are used to check for attribute existence. E.g. `temperature` matches entities that have
+an attribute called 'temperature' (no matter its value), while `!temperature` matches entities that do not have
+a temperature attribute.
   
  
 ## Geographical Queries
@@ -555,10 +595,10 @@ in accordance with the geometry specified and the rules mandated by the Simple L
 
 Examples:
 
-`georel=near;maxDistance=1000&geometry=point&coords=-40.4,-3.5`.
+`georel=near;maxDistance:1000&geometry=point&coords=-40.4,-3.5`.
 Matching entities will be located, at a maximum, 1000 meters far away from the reference point.
 
-`georel=near;minDistance=5000&geometry=point&coords=-40.4,-3.5`.
+`georel=near;minDistance:5000&geometry=point&coords=-40.4,-3.5`.
 Matching entities will be at least 5000 meters far away from the reference point. 
 
 `georel=coveredBy&geometry=polygon&coords=25.774,-80.190;18.466,-66.118;32.321,-64.757;25.774,-80.190`
@@ -594,6 +634,87 @@ must be sent.
 *default location*, then the query will be declared as ambigous and an HTTP error response with code ``409``
 must be sent. 
 
+## Notification messages
+
+Notifications include two fields:
+
+* `subscriptionId` which represents the concerned subscription that originates the notification
+* `data` an array with the notification data itself which includes the entity and attributes concerned. Each
+  element in the array corresponds to a different entity. By default each entity will be represented in
+  normalized mode. However by using the `attrsFormat` modifier it can be requested a simplified representation.
+
+If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation is used:
+
+```
+{
+   "subscriptionId": "12345",
+   "data": [
+     {
+       "id": "Room1",
+       "type": "Room",
+       "temperature": {
+         "value": 23,
+         "type": "none",
+         "metadata": {}
+       },
+       "humidity": {
+         "value": 70,
+         "type": "percentage",
+         "metadata": {}
+       }
+     },
+     {
+     "id": "Room2",
+     "type": "Room",
+     "temperature": {
+       "value": 24,
+       "type": "none",
+       "metadata": {}
+     }
+   ]
+}
+```
+
+If `attrsFormat` is `keyValues` then keyValues entity partial representation mode is used:
+
+```
+{
+   "subscriptionId": "12345",
+   "data": [
+     {
+       "id": "Room1",
+       "type": "Room",
+       "temperature": 23,
+       "humidity": 70
+       }
+     },
+     {
+     "id": "Room2",
+     "type": "Room",
+     "temperature": 24
+     }
+   ]
+}
+```
+
+
+If `attrsFormat` is `values` then values entity partial representation mode is used:
+
+```
+{
+   "subscriptionId": "12345",
+   "data": [ [23, 70], [24] ]
+}
+```
+
+Notifications must include a `X-Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
+so notification receiver can know the format used without needing processing notification payload.
+
+### Notification templates
+
+Based on the "template" field defined as part of the subscription and in a macro replacement language
+that could be used in "template" "callback", "headers" and "query". Details TBD.
+
 ## Group API Entry Point
 
 ### Retrieve API Resources [GET /v2]
@@ -617,7 +738,7 @@ to keep your client decoupled from implementation details.
 
 # Group Entities
 
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,georel,geometry,coords,attrs,orderBy}]
 
 Retrieves a list of entities which match different criteria (by id, idPattern, type or those which match
 a query or geographical query). A given entity have to match all the criteria to be retrieved
@@ -659,7 +780,10 @@ Response code:
     + offset: 20 (optional, number) - Establishes the offset from which entities will be returned
     
     + attrs: seatNumber (optional, string) - Comma-separated list of attribute names which data will be included in the response.
-    If this parameter is not included, all the attributes are retrieved.
+    The attributes are retrieved in the order specified by this parameter. If this parameter is not included, all the attributes
+    are retrieved in arbitrary order.
+
+    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering results" section for details.
     
     + options (optional, string) - Options dictionary
       + Members
@@ -668,6 +792,8 @@ Response code:
           section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 + Response 200 (application/json)
 
@@ -677,7 +803,7 @@ Response code:
             "id": "DC_S1-D41",
             "temperature": {
                 "value": 35.6,
-                "type": null,
+                "type": "none",
                 "metadata": {}
             }
          },
@@ -686,7 +812,7 @@ Response code:
             "id": "Boe-Idearium",
             "temperature": {
                 "value": 22.5,
-                "type": null,
+                "type": "none",
                 "metadata": {}
             }
          },
@@ -699,7 +825,7 @@ Response code:
                 "metadata": {
                     "accuracy": {
                         "value": 2,
-                        "type": null
+                        "type": "none"
                     },
                     "timestamp": {
                         "value": "2015-06-04T07:20:27.378Z",
@@ -753,12 +879,12 @@ Response:
 
     + Headers
 
-            Location: /v2/entities/Bcn-Welt
+            Location: /v2/entities/Bcn-Welt?type=Room
 
 
-## Entity by ID [/v2/entities/{entityId}{?attrs,options}]
+## Entity by ID [/v2/entities/{entityId}{?type,attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?attrs,options}]
+### Retrieve entity [GET /v2/entities/{entityId}{?type,attrs,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in a section above).
@@ -775,14 +901,19 @@ Response:
 
 + Parameters
     + entityId (required, string) - Entity id to be retrieved
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
-    data will be included in the response. If this parameter is not included, all the attributes are retrieved.
+    data will be included in the response. The attributes are retrieved in the order specified by this parameter.
+    If this parameter is not included, all the attributes are retrieved in arbitrary order.
     + options (optional, string) - Options dictionary
       + Members
           + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See 
           corresponding section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 + Response 200 (application/json)
 
@@ -791,11 +922,11 @@ Response:
             "id": "Bcn_Welt",
             "temperature": {
                 "value": 21.7,
-                "type": null
+                "type": "none"
             },
             "humidity": {
                 "value": 60,
-                "type": null
+                "type": "none"
             },
             "location": {
                 "value": "41.3763726, 2.1864475",
@@ -803,13 +934,13 @@ Response:
                 "metadata": {
                     "crs": {
                         "value": "WGS84",
-                        "type": null
+                        "type": "none"
                     }
                 }
             }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}?{options}]
+### Update or append entity attributes [POST /v2/entities/{entityId}{?type,options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -831,6 +962,8 @@ Response:
 
 + Parameters
     + entityId (required, string) - Entity id to be updated
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
             + append - Force an append operation
@@ -849,7 +982,7 @@ Response:
 
 + Response 204
 
-### Update existing entity attributes [PATCH /v2/entities/{entityId}?{options}]
+### Update existing entity attributes [PATCH /v2/entities/{entityId}{?type,options}]
 
 The request payload is an object representing the attributes to update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -865,6 +998,8 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id to be updated
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
             + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
@@ -883,7 +1018,7 @@ Response:
 
 + Response 204
 
-### Replace all entity attributes [PUT /v2/entities/{entityId}?{options}]
+### Replace all entity attributes [PUT /v2/entities/{entityId}{?type,options}]
 
 The request payload is an object representing the new entity attributes. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -899,6 +1034,8 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + options (optional, string) - Operations options
         + Members
             + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See 
@@ -917,7 +1054,7 @@ Response:
 
 + Response 204
 
-### Remove entity [DELETE /v2/entities/{entityId}]
+### Remove entity [DELETE /v2/entities/{entityId}{?type}]
 
 Delete the entity.
 
@@ -928,15 +1065,17 @@ Response:
 
 + Parameters 
     + entityId (required, string) - Entity id to be deleted
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
 
 + Response 204
 
 
 # Group Attributes
 
-## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}]
+## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}{?type}]
 
-### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
+### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Returns a JSON object with the attribute data of the attribute. The object follows the JSON representation for attributes
 (described in a section above).
@@ -948,17 +1087,19 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute to be retrieved.
 
 + Response 200 (application/json)
 
         {
             "value": 21.7,
-            "type": null,
+            "type": "none",
             "metadata": {}
         }
 
-### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}]
+### Update attribute data [PUT /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 The request payload is an object representing the new attributes data. Previous attribute data
 is replaced by the one in the request. The object follows the JSON representation for attributes
@@ -971,6 +1112,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name
 
 + Request (application/json)
@@ -987,7 +1130,7 @@ Response:
 + Response 200
 
 
-### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
+### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}{?type}]
 
 Removes an entity attribute.
 
@@ -998,6 +1141,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name
 
 + Response 204
@@ -1005,9 +1150,9 @@ Response:
 
 # Group Attribute Value
 
-## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value]
+## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value?{type}]
 
-### Get attribute value [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+### Get attribute value [GET /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 It returns the `value` property with the value of the attribute.
 
@@ -1029,6 +1174,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute to be retrieved.
 
 + Response 200 (application/json)
@@ -1040,7 +1187,7 @@ Response:
             "country": "Spain"
         }
 
-### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+### Update attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value{?type}]
 
 The request payload is the new attribute value.
 
@@ -1063,6 +1210,8 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + type (optional, string) - Entity type, to avoid ambiguity in the case there are several
+    entities with the same entity id.
     + attrName: temperature (required, string) - Attribute name
 
 + Request (application/json)
@@ -1107,7 +1256,7 @@ Response code:
           "Car": {
             "attrs": {
               "speed": {
-                "type": null
+                "type": "none"
               },
               "fuel": {
                 "type": "gasoline"
@@ -1124,7 +1273,7 @@ Response code:
           "Room": {
             "attrs": {
               "pressure": {
-                "type": null
+                "type": "none"
               },
               "humidity": {
                 "type": "percentage"
@@ -1157,7 +1306,7 @@ Response code:
           {
             "attrs": {
               "pressure": {
-                "type": null
+                "type": "none"
               },
               "humidity": {
                 "type": "percentage"
@@ -1194,9 +1343,16 @@ A `subject` contains the following subfields:
 A `notification` object contains the following subfields:
 
 + `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
-  in the notification
+  in the notification. It also defines the order in which attributes will appear in notifications when `attrsFormat` `value` is used
+  (see "Notification messages" section).
 + `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
++ `headers` (optional): a key-map of HTTP headers that will be included in the notification messages. Note that this cannot be used
+  to override headers that make the notification inconsistent (e.g. `Content-Type: application/json`).
++ `query` (optional): a key-map of URL query parameters that will be included in the notification message.
++ `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
+  `normalized` (the one used if the field is omitted), `keyValues` or `values`. If `attrsFormat` takes any value different
+  than those an error will be raised. See detail in "Notification messages" section.
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive notifications. It
   is optional.
 + `timesSent` (not editable, only in GET operations): Number of notifications sent due to this subscription.
@@ -1250,6 +1406,13 @@ Response:
                 },
                 "notification": {
                     "callback": "http://localhost:1234",
+                    "headers": {
+                      "X-MyHeader": "foo"
+                    },
+                    "query": {
+                      "authToken": "bar"
+                    },
+                    "attrsFormat": "keyValues",
                     "attributes": ["temperature", "humidity"],
                     "throttling": 5,
                     "count": 12,
@@ -1432,11 +1595,11 @@ Response:
                 "metadata": {
                     "providingService": {
                        "value": "weather.example.com",
-                       "type": null
+                       "type": "none"
                      },
                     "providingAuthority": {
                        "value": "AEMET - Spain",
-                       "type": null
+                       "type": "none"
                      }
                 },
                 "duration": "PT1M"
@@ -1561,7 +1724,7 @@ The payload is an object with two properties:
 
 Response:
 
-* Successful operation uses 200 OK.
+* Successful operation uses 204 No Content.
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Request (application/json)
@@ -1584,7 +1747,13 @@ Response:
             ]
         }
 
-+ Response 200
++ Parameters
+    + options (optional, string) - Options dictionary
+      + Members
+          + keyValues - when used, the request payload uses `keyValues` simplified entity representation. See corresponding 
+          section for details.
+
++ Response 204
 
 
 ### Query [POST /v2/op/query{?limit,offset,options}]
@@ -1613,12 +1782,17 @@ Response code:
 + Parameters
     + limit: 10 (optional, number) - Limit the number of entities to be retrieved
     + offset: 20 (optional, number) - Skip a number of records
+    + orderBy: temperature,!speed (optional, string) - Criteria for ordering results. See "Ordering results" section for details.
     + options (optional, string) - Options dictionary
       + Members
           + count - the total number of entities is returned in the response as an
           HTTP header named `X-Total-Count`.
-          + canonical - when used, the response payload uses the "canonical form".
-          See JSON entity representation format section for details.
+          + keyValues - when used, the response payload uses `keyValues` simplified entity representation. See corresponding
+          section for details.
+          + values - when used, the response payload uses `values` simplified entity representation. See corresponding
+          section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 
 + Request (application/json)

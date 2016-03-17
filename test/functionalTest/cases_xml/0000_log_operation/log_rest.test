@@ -1,0 +1,223 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Log configuration via REST
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 200-255
+
+--SHELL--
+echo "=== 1. GET trace level"
+orionCurl --url "/log/traceLevel" 2> /dev/null
+echo
+echo
+
+
+echo "=== 2. PUT trace level"
+orionCurl --url "/log/traceLevel/5-10" -X "PUT" 2> /dev/null
+echo
+echo
+
+
+echo "=== 3. GET trace level"
+orionCurl --url "/log/traceLevel" 2> /dev/null
+echo
+echo
+
+
+echo "=== 4. POST trace level"
+orionCurl --url "/log/traceLevel/101-102,105" -X "POST" --include 2> /dev/null
+echo
+echo
+
+
+echo "=== 5. PUT trace level"
+orionCurl --url "/log/traceLevel/19,21-25" -X "PUT" 2> /dev/null
+echo
+echo
+
+
+echo "=== 6. GET trace level"
+orionCurl --url "/log/traceLevel" 2> /dev/null
+echo
+echo
+
+
+echo "=== 7. DELETE trace level"
+curl localhost:${CB_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
+# FIXME: Y U NO orionCurl --url "/log/traceLevel/23" -X "DELETE" 2> /dev/null ?
+echo
+echo
+
+
+echo "=== 8. GET trace level"
+orionCurl --url "/log/traceLevel" 2> /dev/null
+echo
+echo
+
+
+echo "=== 9. DELETE trace level"
+orionCurl --url "/log/traceLevel" -X "DELETE" 2> /dev/null
+echo
+echo
+
+
+echo "=== 10. GET trace level"
+orionCurl --url "/log/traceLevel" 2> /dev/null
+echo
+echo
+
+
+--REGEXPECT--
+=== 1. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>200-255</tracelevels>
+  </log>
+</orion>
+
+
+=== 2. PUT trace level
+HTTP/1.1 200 OK
+Content-Length: 70
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>5-10</tracelevels>
+  </log>
+</orion>
+
+
+=== 3. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 70
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>5-10</tracelevels>
+  </log>
+</orion>
+
+
+=== 4. POST trace level
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: PUT, DELETE
+Date: REGEX(.*)
+
+
+
+=== 5. PUT trace level
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>19,21-25</tracelevels>
+  </log>
+</orion>
+
+
+=== 6. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>19, 21-25</tracelevels>
+  </log>
+</orion>
+
+
+=== 7. DELETE trace level
+<orion>
+  <log>
+    <tracelevels removed>23</tracelevels removed>
+  </log>
+</orion>
+
+
+=== 8. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 82
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>19, 21-22, 24-25</tracelevels>
+  </log>
+</orion>
+
+
+=== 9. DELETE trace level
+HTTP/1.1 200 OK
+Content-Length: 86
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>all trace levels off</tracelevels>
+  </log>
+</orion>
+
+
+=== 10. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <log>
+    <tracelevels>empty</tracelevels>
+  </log>
+</orion>
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

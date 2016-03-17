@@ -92,7 +92,7 @@ TEST(RestService, payloadParse)
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
 
 
@@ -106,7 +106,7 @@ TEST(RestService, payloadParse)
   ci.payload      = (char*) "123";
   ci.payloadSize  = strlen(ci.payload);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("Bad inFormat", out);
 
   utExit();

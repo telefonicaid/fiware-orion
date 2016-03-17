@@ -77,15 +77,15 @@ typedef struct Scope
                     const std::string&  georelString,
                     std::string*        errorString);
 
-  std::string  render(Format format, const std::string& indent, bool notLastInVector);
+  std::string  render(const std::string& indent, bool notLastInVector);
   void         present(const std::string& indent, int ix);
   void         release(void);
 
   std::string  check(RequestType         requestType,
-                     Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+  void         areaTypeSet(const std::string& areaTypeString);
 } Scope;
 
 #endif  // SRC_LIB_NGSI_SCOPE_H_

@@ -51,6 +51,9 @@ Scope::Scope()
   value    = "";
   oper     = "";
   areaType = orion::NoArea;
+
+  georel.maxDistance = -1;
+  georel.minDistance = -1;
 }
 
 
@@ -65,6 +68,9 @@ Scope::Scope(const std::string& _type, const std::string& _value, const std::str
   value    = _value;
   oper     = _oper;
   areaType = orion::NoArea;
+
+  georel.maxDistance = -1;
+  georel.minDistance = -1;
 }
 
 
@@ -193,18 +199,24 @@ int Scope::fill
     if (coords != 2)
     {
       *errorStringP = "invalid point in URI param /coords/";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
     if (!str2double(coordV[0].c_str(), &latitude))
     {      
       *errorStringP = "invalid coordinates";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
     if (!str2double(coordV[1].c_str(), &longitude))
     {
       *errorStringP = "invalid coordinates";
+      pointVectorRelease(pointV);
+      pointV.clear();
       return -1;
     }
 
@@ -371,17 +383,17 @@ int Scope::fill
 *
 * Scope::render -
 */
-std::string Scope::render(Format format, const std::string& indent, bool notLastInVector)
+std::string Scope::render(const std::string& indent, bool notLastInVector)
 {
   std::string out      = "";
   std::string tag      = "operationScope";
-  const char* tTag     = (format == XML)? "scopeType"  : "type";
-  const char* vTag     = (format == XML)? "scopeValue" : "value";
+  const char* tTag     = "type";
+  const char* vTag     = "value";
 
-  out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", tTag, type, format, true);
-  out += valueTag(indent + "  ", vTag, value, format);
-  out += endTag(indent, tag, format, notLastInVector);
+  out += startTag2(indent, tag, false, false);
+  out += valueTag1(indent + "  ", tTag, type, true);
+  out += valueTag1(indent + "  ", vTag, value);
+  out += endTag(indent, notLastInVector);
 
   return out;
 }
@@ -395,7 +407,6 @@ std::string Scope::render(Format format, const std::string& indent, bool notLast
 std::string Scope::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -548,6 +559,30 @@ std::string Scope::check
     }
   }
 
+  if (type == FIWARE_LOCATION_V2)
+  {
+    if ((areaType == orion::PointType) && (georel.type == "coveredBy"))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: point geometry cannot be used with coveredBy georel");
+      return "Query not supported: point geometry cannot be used with coveredBy georel";
+    }
+    else if ((areaType == orion::LineType) && (georel.type == "coveredBy"))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: line  geometry cannot be used with coveredBy georel");
+      return "Query not supported: line geometry cannot be used with coveredBy georel";
+    }
+    else if ((areaType == orion::LineType) && (line.pointList.size() < 2))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: not enough points for a line");
+      return "Query not supported: not enough points for a line";
+    }
+    else if ((areaType == orion::PolygonType) && (polygon.vertexList.size() < 4))
+    {
+      alarmMgr.badInput(clientIp, "Query not supported: not enough vertices for a polygon");
+      return "Query not supported: not enough vertices for a polygon";
+    }
+  }
+
   return "OK";
 }
 
@@ -651,4 +686,20 @@ void Scope::release(void)
   // note that georel, circle, box, point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* Scope::areaTypeSet -
+*/
+void Scope::areaTypeSet(const std::string& areaTypeString)
+{
+  if      (areaTypeString == "line")    areaType = orion::LineType;
+  else if (areaTypeString == "polygon") areaType = orion::PolygonType;
+  else if (areaTypeString == "circle")  areaType = orion::CircleType;
+  else if (areaTypeString == "point")   areaType = orion::PointType;
+  else if (areaTypeString == "box")     areaType = orion::BoxType;
+  else                                  areaType = orion::NoArea;       
 }

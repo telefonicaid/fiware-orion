@@ -33,7 +33,7 @@
   },
   "notifyConditions" : [
     {
-      "type" : "ONTIMEINTERVAL",
+      "type" : "ONCHANGE",
       "condValueList" : [
         "temperature",
         "lightstatus"

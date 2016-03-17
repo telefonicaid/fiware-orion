@@ -30,47 +30,29 @@ brokerStart CB
 --SHELL--
 echo "1: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
 orionCurl --url "$url" --payload "$payload" --in " "
 
 echo "2: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
 orionCurl --url "$url" --payload "$payload" --in "application/x-www-form-encoded"
 
-
 echo "3: ++++++++++++++++++++"
-# Check that the ending "; charset=..." works (for XML)
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --in "application/xml; charset=UTF-8"
-
-
-echo "4: ++++++++++++++++++++"
 # Check that the ending "; charset=..." works (for JSON)
 url="/v1/queryContext"
 payload='{
@@ -83,59 +65,47 @@ payload='{
   ],
   "attributes": [ ]
 }'
-orionCurl --url "$url" --payload "$payload" --in "application/json; charset=UTF-8" --out "application/xml"
+orionCurl --url "$url" --payload "$payload" --in "application/json; charset=UTF-8" --out "application/json"
 
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 201
-Content-Type: application/xml
+Content-Length: 192
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>415</code>
-  <reasonPhrase>Unsupported Media Type</reasonPhrase>
-  <details>Content-Type header not used, default application/octet-stream is not supported</details>
-</orionError>
+{
+    "orionError": {
+        "code": "415",
+        "details": "Content-Type header not used, default application/octet-stream is not supported",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
 2: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 180
-Content-Type: application/xml
+Content-Length: 171
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>415</code>
-  <reasonPhrase>Unsupported Media Type</reasonPhrase>
-  <details>not supported content type: application/x-www-form-encoded</details>
-</orionError>
+{
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: application/x-www-form-encoded",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-4: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

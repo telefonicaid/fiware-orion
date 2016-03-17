@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * notFound - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(getIndividualContextEntityAttribute, notFound)
+TEST(getIndividualContextEntityAttribute, DISABLED_notFound)
 {
   setupDatabase();
 
@@ -59,7 +61,7 @@ TEST(getIndividualContextEntityAttribute, notFound)
 
   utInit();
 
-  ci.outFormat = XML;
+  ci.outFormat = JSON;
   out          = restService(&ci, rs);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

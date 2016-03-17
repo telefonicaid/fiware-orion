@@ -1,0 +1,314 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 batch update
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND
+# 02. GET /v2/entities/E1 to see E1/T1/A1=1
+# 03. Add an attribute A1=3 using POST /v2/op/update with APPEND_STRICT, see error
+# 04. GET /v2/entities/E1 to see E1/T1/A1=1 (step 03 did NOT modify A1)
+# 05. 'Add' an attribute A1=5 using POST /v2/op/update with APPEND
+# 06. GET /v2/entities/E1 to see E1/T1/A1=5
+# 07. 'Add' an attribute A1=7 using POST /v2/update?options=keyValues with APPEND
+# 08. GET /v2/entities/E1 to see E1/T1/A1=7
+# 09. Add an attribute A2=9 using POST /v2/op/update with APPEND_STRICT
+# 10. GET /v2/entities/E1 to see E1/T1/A1=7,A2=9
+#
+
+echo "01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND"
+echo "==========================================================="
+payload='{
+  "actionType": "APPEND",
+  "entities": [
+    {
+      "id": "E1",
+      "type": "T1",
+      "A1": {
+        "value": 1
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "02. GET /v2/entities/E1 to see E1/T1/A1=1"
+echo "========================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. Add an attribute A1=3 using POST /v2/op/update with APPEND_STRICT, see error"
+echo "================================================================================"
+payload='{
+  "actionType": "APPEND_STRICT",
+  "entities": [
+    {
+      "id": "E1",
+      "type": "T1",
+      "A1": {
+        "value": 3
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "04. GET /v2/entities/E1 to see E1/T1/A1=1 (step 03 did NOT modify A1)"
+echo "====================================================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. 'Add' an attribute A1=5 using POST /v2/op/update with APPEND"
+echo "================================================================"
+payload='{
+  "actionType": "APPEND",
+  "entities": [
+    {
+      "id": "E1",
+      "type": "T1",
+      "A1": {
+        "value": 5
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "06. GET /v2/entities/E1 to see E1/T1/A1=5"
+echo "========================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "07. 'Add' an attribute A1=7 using POST /v2/update?options=keyValues with APPEND"
+echo "==============================================================================="
+payload='{
+  "actionType": "APPEND",
+  "entities": [
+    {
+      "id": "E1",
+      "type": "T1",
+      "A1": 7
+    }
+  ]
+}'
+orionCurl --url /v2/op/update?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "08. GET /v2/entities/E1 to see E1/T1/A1=7"
+echo "========================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "09. Add an attribute A2=9 using POST /v2/op/update with APPEND_STRICT"
+echo "====================================================================="
+payload='{
+  "actionType": "APPEND_STRICT",
+  "entities": [
+    {
+      "id": "E1",
+      "type": "T1",
+      "A2": 9
+    }
+  ]
+}'
+orionCurl --url /v2/op/update?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "10. GET /v2/entities/E1 to see E1/T1/A1=7,A2=9"
+echo "=============================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1/T1/A1=1, using POST /v2/op/update with APPEND
+===========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+02. GET /v2/entities/E1 to see E1/T1/A1=1
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+03. Add an attribute A1=3 using POST /v2/op/update with APPEND_STRICT, see error
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "one or more of the attributes in the request already exist: [ A1 ]",
+    "error": "BadRequest"
+}
+
+
+04. GET /v2/entities/E1 to see E1/T1/A1=1 (step 03 did NOT modify A1)
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+05. 'Add' an attribute A1=5 using POST /v2/op/update with APPEND
+================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. GET /v2/entities/E1 to see E1/T1/A1=5
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 5
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+07. 'Add' an attribute A1=7 using POST /v2/update?options=keyValues with APPEND
+===============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. GET /v2/entities/E1 to see E1/T1/A1=7
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 7
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+09. Add an attribute A2=9 using POST /v2/op/update with APPEND_STRICT
+=====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+10. GET /v2/entities/E1 to see E1/T1/A1=7,A2=9
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 7
+    },
+    "A2": {
+        "metadata": {},
+        "type": "none",
+        "value": 9
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

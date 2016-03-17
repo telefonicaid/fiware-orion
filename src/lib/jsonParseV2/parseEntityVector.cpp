@@ -42,7 +42,7 @@
 *
 * parseEntityVector - 
 */
-std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, Entities* evP)
+std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, Entities* evP, bool attributesAllowed)
 {
   std::string type = jsonParseTypeNames[iter->value.GetType()];
 
@@ -58,7 +58,7 @@ std::string parseEntityVector(ConnectionInfo* ciP, const Value::ConstMemberItera
 
     evP->vec.push_back(eP);
 
-    r = parseEntityObject(ciP, iter2, eP, false);
+    r = parseEntityObject(ciP, iter2, eP, attributesAllowed);
     if (r != "OK")
     {
       return r;

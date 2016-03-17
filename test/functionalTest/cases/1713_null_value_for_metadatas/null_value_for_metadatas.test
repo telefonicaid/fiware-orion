@@ -56,7 +56,7 @@ echo
 =====================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/room17
+Location: /v2/entities/room17?type=room
 Date: REGEX(.*)
 
 
@@ -64,7 +64,7 @@ Date: REGEX(.*)
 02. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 118
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -73,11 +73,11 @@ Date: REGEX(.*)
     "temperature": {
         "metadata": {
             "alarm": {
-                "type": null,
+                "type": "none",
                 "value": null
             }
         },
-        "type": null,
+        "type": "none",
         "value": "34"
     },
     "type": "room"

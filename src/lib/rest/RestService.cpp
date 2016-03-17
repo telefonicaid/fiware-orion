@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 
 #include "logMsg/logMsg.h"
@@ -92,7 +91,6 @@ std::string payloadParse
   ConnectionInfo*            ciP,
   ParseData*                 parseDataP,
   RestService*               service,
-  XmlRequest**               reqPP,
   JsonRequest**              jsonPP,
   JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
@@ -105,22 +103,11 @@ std::string payloadParse
 
   ciP->requestType = service->request;
 
-  if (ciP->inFormat == XML)
+  if (ciP->inFormat == JSON)
   {
     if (compV[0] == "v2")
     {
-      alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
-      return "Bad inFormat";
-    }
-
-    LM_T(LmtParsedPayload, ("Calling xmlTreat for service request %d, payloadWord '%s'", service->request, service->payloadWord.c_str()));
-    result = xmlTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, reqPP);
-  }
-  else if (ciP->inFormat == JSON)
-  {
-    if (compV[0] == "v2")
-    {
-      result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP);
+      result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
     }
     else
     {
@@ -133,7 +120,7 @@ std::string payloadParse
   }
   else
   {
-    alarmMgr.badInput(clientIp, "payload mime-type is neither JSON nor XML");
+    alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
     return "Bad inFormat";
   }
 
@@ -365,7 +352,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
-  XmlRequest*               reqP       = NULL;
   JsonRequest*              jsonReqP   = NULL;
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
@@ -425,18 +411,13 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
       LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, &jsonRelease, compV);
+      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
       {
         alarmMgr.badInput(clientIp, response);
         restReply(ciP, response);
-
-        if (reqP != NULL)
-        {
-          reqP->release(&parseData);
-        }
 
         if (jsonReqP != NULL)
         {
@@ -484,11 +465,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       restReply(ciP, response);
 
-      if (reqP != NULL)
-      {
-        reqP->release(&parseData);
-      }
-
       if (jsonReqP != NULL)
       {
         jsonReqP->release(&parseData);
@@ -523,12 +499,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
-    filterRelease(&parseData, serviceV[ix].request);
-
-    if (reqP != NULL)
-    {
-      reqP->release(&parseData);
-    }
+    filterRelease(&parseData, serviceV[ix].request);   
 
     if (jsonReqP != NULL)
     {
@@ -555,7 +526,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   alarmMgr.badInput(clientIp, details);
 
   ciP->httpStatusCode = SccBadRequest;
-  std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
+  std::string answer = restErrorReplyGet(ciP, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
   restReply(ciP, answer);
 
   compV.clear();

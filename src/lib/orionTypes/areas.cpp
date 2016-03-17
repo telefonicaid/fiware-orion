@@ -66,7 +66,7 @@ Point::Point(::std::string latitude, ::std::string longitude): valid(true)
 *
 * Point::Point - 
 */
-Point::Point(double _lat, double _lon)
+Point::Point(double _lat, double _lon): valid(true)
 {
   lat = _lat;
   lon = _lon;
@@ -495,7 +495,7 @@ int Georel::parse(const char* in, std::string* errorString)
 
       type = items[ix];
     }
-    else if (strncmp(item, "maxDistance=", 12) == 0)
+    else if (strncmp(item, "maxDistance:", 12) == 0)
     {
       if (maxDistanceSet)
       {
@@ -511,7 +511,7 @@ int Georel::parse(const char* in, std::string* errorString)
 
       maxDistanceSet = true;
     }
-    else if (strncmp(item, "minDistance=", 12) == 0)
+    else if (strncmp(item, "minDistance:", 12) == 0)
     {
       if (minDistanceSet)
       {

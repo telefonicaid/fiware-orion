@@ -96,7 +96,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
     if (name == "entities")
     {
-      std::string r = parseEntityVector(ciP, iter, &bqrP->entities);
+      std::string r = parseEntityVector(ciP, iter, &bqrP->entities, false);  // param 4: attributes are NOT allowed in payload
 
       if (r != "OK")
       {
