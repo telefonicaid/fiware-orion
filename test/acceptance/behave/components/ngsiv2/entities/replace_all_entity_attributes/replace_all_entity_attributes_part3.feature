@@ -29,6 +29,9 @@
 
 
 Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<entity_id> plus payload
+  Queries parameters:
+  tested: options=keyValues
+  pending: type
   As a context broker user
   I would like to replace attributes by entity ID using NGSI v2
   So that I can manage and use them in my scripts

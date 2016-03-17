@@ -29,6 +29,8 @@
 
 
 Feature: get an attribute value by entity ID and attribute name if it exists using NGSI v2 API. "GET" - /v2/entities/<entity_id>/attrs/<attr_name>/value
+  Queries parameters
+  tested: type
   As a context broker user
   I would like to get an attribute value by entity ID and attribute name if it exists using NGSI v2 API
   So that I can manage and use them in my scripts
