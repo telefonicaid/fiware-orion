@@ -30,9 +30,9 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. POST /v2/entities creating room
-# 02. PUT /v2/entities/room/attrs/temperature/value (forbidden chars)
-# 03. GET /v2/entities/room (type is not "none")
+# 01. POST /v2/entities creating room_1
+# 02. PUT /v2/entities/room_1/attrs/temperature_0/value
+# 03. GET /v2/entities/room_1 (type is not "none")
 
 echo '01. POST /v2/entities creating room'
 echo '==================================='
@@ -54,16 +54,16 @@ echo
 echo
 
 
-echo '02. PUT /v2/entities/room/attrs/temperature/value'
-echo '================================================='
+echo '02. PUT /v2/entities/room_1/attrs/temperature_0/value'
+echo '====================================================='
 payload='true'
 orionCurl --url /v2/entities/room_1/attrs/temperature_0/value --payload "$payload" --in text -X PUT
 echo
 echo
 
 
-echo '03. GET /v2/entities/room (type is not "none")'
-echo '=============================================='
+echo '03. GET /v2/entities/room_1 (type is not "none")'
+echo '================================================'
 orionCurl --url /v2/entities/room_1
 echo
 echo
@@ -79,16 +79,16 @@ Date: REGEX(.*)
 
 
 
-02. PUT /v2/entities/room/attrs/temperature/value
-=================================================
+02. PUT /v2/entities/room_1/attrs/temperature_0/value
+=====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-03. GET /v2/entities/room (type is not "none")
-==============================================
+03. GET /v2/entities/room_1 (type is not "none")
+================================================
 HTTP/1.1 200 OK
 Content-Length: 477
 Content-Type: text/plain
