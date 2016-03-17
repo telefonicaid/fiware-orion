@@ -236,7 +236,6 @@ bool moreSafe(const std::auto_ptr<DBClientCursor>& cursor)
 */
 bool nextSafeOrError(const std::auto_ptr<DBClientCursor>& cursor, BSONObj* r, std::string* err, const std::string& caller, int line)
 {
-  // FIXME P4: use line in the trace (just "+ line" doesn't work ;)
   try
   {
     *r = cursor->nextSafe();
