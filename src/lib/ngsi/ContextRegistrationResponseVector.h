@@ -42,7 +42,7 @@ typedef struct ContextRegistrationResponseVector
 
   void                          push_back(ContextRegistrationResponse* item);
   unsigned int                  size(void);
-  std::string                   render(Format format, const std::string& indent, bool comma = false);
+  std::string                   render(const std::string& indent, bool comma = false);
   void                          present(const std::string& indent);
   void                          release(void);
 
@@ -51,7 +51,6 @@ typedef struct ContextRegistrationResponseVector
 
   std::string                   check(ConnectionInfo*     ciP,
                                       RequestType         requestType,
-                                      Format              format,
                                       const std::string&  indent,
                                       const std::string&  predetectedError,
                                       int                 counter);

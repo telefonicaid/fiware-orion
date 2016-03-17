@@ -33,7 +33,7 @@
 *
 * STAT_ADD - 
 */
-#define STAT_ADD(out, format, indent, buf, tag, comma)                        \
+#define STAT_ADD(out, indent, buf, tag, comma)                        \
 do                                                                            \
 {                                                                             \
   if (format == JSON)                                                         \
@@ -70,7 +70,6 @@ __thread TimeStat  threadLastTimeStat;
 * Statistic counters for NGSI REST requests
 */
 int noOfJsonRequests                                     = -1;
-int noOfXmlRequests                                      = -1;
 int noOfRequestsWithoutPayload                           = -1;
 int noOfRegistrations                                    = -1;
 int noOfRegistrationErrors                               = -1;
@@ -204,7 +203,6 @@ inline float timeSpecToFloat(const struct timespec& t)
 * xxxReqTime           - the total time that the LAST request took.
 *                        Measuring from the first MHD callback to 'connectionTreat',
 *                        until the MHD callback to 'requestCompleted'.
-* xxxXmlParseTime      - the time that the XML Parse of the LAST request took.
 * xxxJsonV1ParseTime   - the time that the JSON parse+treat of the LAST request took.
 * xxxJsonV2ParseTime   - the time that the JSON parse+treat of the LAST request took.
 * xxxMongoBackendTime  - the time that the mongoBackend took to treat the last request
@@ -227,7 +225,6 @@ std::string renderTimingStatistics(void)
   bool accMongoCommandWaitTime = (accTimeStat.mongoCommandWaitTime.tv_sec != 0)   || (accTimeStat.mongoCommandWaitTime.tv_nsec != 0);
   bool accRenderTime           = (accTimeStat.renderTime.tv_sec != 0)             || (accTimeStat.renderTime.tv_nsec != 0);
   bool accReqTime              = (accTimeStat.reqTime.tv_sec != 0)                || (accTimeStat.reqTime.tv_nsec != 0);
-  bool accXmlParseTime         = (accTimeStat.xmlParseTime.tv_sec != 0)           || (accTimeStat.xmlParseTime.tv_nsec != 0);
 
   bool lastJsonV1ParseTime      = (lastTimeStat.jsonV1ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV1ParseTime.tv_nsec != 0);
   bool lastJsonV2ParseTime      = (lastTimeStat.jsonV2ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV2ParseTime.tv_nsec != 0);
@@ -237,10 +234,9 @@ std::string renderTimingStatistics(void)
   bool lastMongoCommandWaitTime = (lastTimeStat.mongoCommandWaitTime.tv_sec != 0) || (lastTimeStat.mongoCommandWaitTime.tv_nsec != 0);
   bool lastRenderTime           = (lastTimeStat.renderTime.tv_sec != 0)           || (lastTimeStat.renderTime.tv_nsec != 0);
   bool lastReqTime              = (lastTimeStat.reqTime.tv_sec != 0)              || (lastTimeStat.reqTime.tv_nsec != 0);
-  bool lastXmlParseTime         = (lastTimeStat.xmlParseTime.tv_sec != 0)         || (lastTimeStat.xmlParseTime.tv_nsec != 0);
 
-  bool last = lastJsonV1ParseTime || lastJsonV2ParseTime || lastMongoBackendTime || lastRenderTime || lastReqTime || lastXmlParseTime;
-  bool acc  = accJsonV1ParseTime || accJsonV2ParseTime || accMongoBackendTime || accRenderTime || accReqTime || accXmlParseTime;
+  bool last = lastJsonV1ParseTime || lastJsonV2ParseTime || lastMongoBackendTime || lastRenderTime || lastReqTime;
+  bool acc  = accJsonV1ParseTime || accJsonV2ParseTime || accMongoBackendTime || accRenderTime || accReqTime;
 
   if (!acc && !last)
   {
@@ -262,7 +258,6 @@ std::string renderTimingStatistics(void)
     if (accMongoCommandWaitTime) accJh.addFloat("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
     if (accRenderTime)           accJh.addFloat("render",           timeSpecToFloat(accTimeStat.renderTime));
     if (accReqTime)              accJh.addFloat("total",            timeSpecToFloat(accTimeStat.reqTime));
-    if (accXmlParseTime)         accJh.addFloat("xmlParse",         timeSpecToFloat(accTimeStat.xmlParseTime));
 
     jh.addRaw("accumulated", accJh.str());
   }
@@ -278,7 +273,6 @@ std::string renderTimingStatistics(void)
     if (lastMongoCommandWaitTime) lastJh.addFloat("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
     if (lastRenderTime)           lastJh.addFloat("render",           timeSpecToFloat(lastTimeStat.renderTime));
     if (lastReqTime)              lastJh.addFloat("total",            timeSpecToFloat(lastTimeStat.reqTime));
-    if (lastXmlParseTime)         lastJh.addFloat("xmlParse",         timeSpecToFloat(lastTimeStat.xmlParseTime));
 
     jh.addRaw("last", lastJh.str());
   }
@@ -309,11 +303,7 @@ void timingStatisticsReset(void)
 */
 void statisticsUpdate(RequestType request, Format inFormat)
 {
-  if (inFormat == XML)
-  {
-     ++noOfXmlRequests;
-  }
-  else if (inFormat == JSON)
+  if (inFormat == JSON)
   {
     ++noOfJsonRequests;
   }

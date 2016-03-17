@@ -272,19 +272,19 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | update_or_append_entity_attributes          |    823       | POST    | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
 | update_existing_entity_attributes           |    642       | PATCH   | /v2/entities/`<entity_id>`                           | Yes       | Yes            |
 | replace_all_entity_attributes               |    586       | PUT     | /v2/entities/`<entity_id>`                           | Yes       | Yes            |  
-| remove_entity                               |     73       | DELETE  | /v2/entities/`<entity_id>`                           | No        | No             |
+| remove_entity                               |     92       | DELETE  | /v2/entities/`<entity_id>`                           | No        | Yes            |
 |                                                                                                                                                          |
 |**attributes folder**                                                                                                                                     |
 | get_attribute_data                          |    244       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |   
-| update_attribute_data                       |    610       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | No             |
-| remove_a_single_attribute                   |     98       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | No             |
+| update_attribute_data                       |    610       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes       | Yes            |
+| remove_a_single_attribute                   |    121       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |
 |                                                                                                                                                          |
 |**attributes_value folder**                                                                                                                               |
-| get_attribute_value                         |  (pending)   | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
-| update_attribute_value                      |    237       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
+| get_attribute_value                         |    190       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
+| update_attribute_value                      |    337       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
 |                                                                                                                                                          |
 |**types folder**                                                                                                                                          |
-| retrieve_entity_types                       |     66       | GET     | /v2/types/                                           | No        | Yes            |   
+| retrieve_entity_types                       |     68       | GET     | /v2/types/                                           | No        | Yes            |   
 | retrieve_an_entity_type                     |  (pending)   | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
@@ -304,6 +304,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | delete_context_provider_registration        |  (pending)   | DELETE  | /v2/registrations/`<registration_id>`                | No        | No             |   
 |                                                                                                                                                          |
 |**alarms folder**                            |  (pending)   |                                                                                             |
+|**cli_parameters folder**                    |  (pending)   |                                                                                             |
 
   
 ## Hints:

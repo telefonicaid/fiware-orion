@@ -29,8 +29,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/Request.h"
 #include "jsonParse/jsonRequest.h"
-#include "xmlParse/xmlRequest.h"
-#include "xmlParse/xmlParse.h"
 #include "serviceRoutines/postQueryContext.h"
 
 #include "unittest.h"
@@ -66,43 +64,6 @@
 
 /* ****************************************************************************
 *
-* ok_xml - 
-*/
-TEST(QueryContextRequest, ok_xml)
-{
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.queryContextRequest.ok.valid.xml";
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  lmTraceLevelSet(LmtDump, false);
-
-  EXPECT_EQ("OK", out) << "this test should be OK";
-
-  //
-  // With the data obtained, render, present and release methods are exercised
-  //
-  QueryContextRequest*  qcrP = &reqData.qcr.res;
-  const char*  outfile = "ngsi10.queryContextRequest.ok2.valid.xml";
-  
-  qcrP->present(""); // No output
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = qcrP->render(QueryContext, XML, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  qcrP->release();
-
-  utExit();
-}
-
-/* ****************************************************************************
-*
 * ok_json - 
 */
 TEST(QueryContextRequest, ok_json)
@@ -135,7 +96,7 @@ TEST(QueryContextRequest, ok_json)
   qcrP->present(""); // No output
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
+  rendered = qcrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   qcrP->present("");
@@ -149,9 +110,12 @@ TEST(QueryContextRequest, ok_json)
 /* ****************************************************************************
 *
 * entityIdIdAsAttribute_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, entityIdIdAsAttribute_xml)
+TEST(QueryContextRequest, DISABLED_entityIdIdAsAttribute_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile   = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
@@ -166,30 +130,7 @@ TEST(QueryContextRequest, entityIdIdAsAttribute_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* badIsPattern_xml - 
-*/
-TEST(QueryContextRequest, badIsPattern_xml)
-{
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile  = "ngsi10.queryContextRequest.isPattern.invalid.xml";
-  const char*     outfile = "ngsi10.queryContextResponse.isPattern.valid.xml";
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
+#endif
 }
 
 
@@ -275,9 +216,12 @@ TEST(QueryContextRequest, emptyAttributeExpression_json)
 /* ****************************************************************************
 *
 * unsupportedEntityIdAttribute_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, unsupportedEntityIdAttribute_xml)
+TEST(QueryContextRequest, DISABLED_unsupportedEntityIdAttribute_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.attributeUnknown.invalid.xml";
@@ -292,6 +236,7 @@ TEST(QueryContextRequest, unsupportedEntityIdAttribute_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -299,9 +244,12 @@ TEST(QueryContextRequest, unsupportedEntityIdAttribute_xml)
 /* ****************************************************************************
 *
 * entityIdType_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, entityIdType_xml)
+TEST(QueryContextRequest, DISABLED_entityIdType_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     inFile  = "ngsi10.queryContextRequest.entityIdTypeAsField.invalid.xml";
@@ -316,6 +264,7 @@ TEST(QueryContextRequest, entityIdType_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -323,9 +272,12 @@ TEST(QueryContextRequest, entityIdType_xml)
 /* ****************************************************************************
 *
 * entityIdIsPattern_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, entityIdIsPattern_xml)
+TEST(QueryContextRequest, DISABLED_entityIdIsPattern_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     inFile  = "ngsi10.queryContextRequest.entityIdIsPatternAsField.invalid.xml";
@@ -340,6 +292,7 @@ TEST(QueryContextRequest, entityIdIsPattern_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -347,9 +300,12 @@ TEST(QueryContextRequest, entityIdIsPattern_xml)
 /* ****************************************************************************
 *
 * overwriteEntityIdType_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, overwriteEntityIdType_xml)
+TEST(QueryContextRequest, DISABLED_overwriteEntityIdType_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     inFile  = "ngsi10.queryContextRequest.typeAsField.invalid.xml";
@@ -364,6 +320,7 @@ TEST(QueryContextRequest, overwriteEntityIdType_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -371,9 +328,12 @@ TEST(QueryContextRequest, overwriteEntityIdType_xml)
 /* ****************************************************************************
 *
 * overwriteEntityIdIsPattern_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
+TEST(QueryContextRequest, DISABLED_overwriteEntityIdIsPattern_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     inFile  = "ngsi10.queryContextRequest.isPatternAsField.invalid.xml";
@@ -388,6 +348,7 @@ TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -395,9 +356,12 @@ TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
 /* ****************************************************************************
 *
 * noEntityList_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, noEntityList_xml)
+TEST(QueryContextRequest, DISABLED_noEntityList_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.noEntityList.invalid.xml";
@@ -412,6 +376,7 @@ TEST(QueryContextRequest, noEntityList_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -419,9 +384,12 @@ TEST(QueryContextRequest, noEntityList_xml)
 /* ****************************************************************************
 *
 * emptyEntityList_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, emptyEntityList_xml)
+TEST(QueryContextRequest, DISABLED_emptyEntityList_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.emptyEntityList.invalid.xml";
@@ -436,6 +404,7 @@ TEST(QueryContextRequest, emptyEntityList_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -443,9 +412,12 @@ TEST(QueryContextRequest, emptyEntityList_xml)
 /* ****************************************************************************
 *
 * emptyEntityIdId_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
 TEST(QueryContextRequest, emptyEntityIdId_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.emptyEntityIdId.invalid.xml";
@@ -460,6 +432,7 @@ TEST(QueryContextRequest, emptyEntityIdId_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -467,9 +440,12 @@ TEST(QueryContextRequest, emptyEntityIdId_xml)
 /* ****************************************************************************
 *
 * noAttributeExpression_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, noAttributeExpression_xml)
+TEST(QueryContextRequest, DISABLED_noAttributeExpression_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.noAttributeExpression.invalid.xml";
@@ -483,29 +459,7 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
   EXPECT_EQ(expect, out);
 
   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* emptyAttributeExpression_xml - 
-*/
-TEST(QueryContextRequest, emptyAttributeExpression_xml)
-{
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.xml";
-  const char*     expect = "OK";
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, out);
-
-  utExit();
+#endif
 }
 
 
@@ -513,9 +467,12 @@ TEST(QueryContextRequest, emptyAttributeExpression_xml)
 /* ****************************************************************************
 *
 * emptyScopeType_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, emptyScopeType_xml)
+TEST(QueryContextRequest, DISABLED_emptyScopeType_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.emptyScopeType.invalid.xml";
@@ -530,6 +487,7 @@ TEST(QueryContextRequest, emptyScopeType_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -537,9 +495,12 @@ TEST(QueryContextRequest, emptyScopeType_xml)
 /* ****************************************************************************
 *
 * emptyScopeValue_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, emptyScopeValue_xml)
+TEST(QueryContextRequest, DISABLED_emptyScopeValue_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.emptyScopeValue.invalid.xml";
@@ -554,6 +515,7 @@ TEST(QueryContextRequest, emptyScopeValue_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -561,9 +523,12 @@ TEST(QueryContextRequest, emptyScopeValue_xml)
 /* ****************************************************************************
 *
 * noScopeType_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, noScopeType_xml)
+TEST(QueryContextRequest, DISABLED_noScopeType_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.noScopeType.invalid.xml";
@@ -578,6 +543,7 @@ TEST(QueryContextRequest, noScopeType_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -585,9 +551,12 @@ TEST(QueryContextRequest, noScopeType_xml)
 /* ****************************************************************************
 *
 * noScopeValue_xml - 
+*
+* FIXME P5 #1862: _json counterpart?
 */
-TEST(QueryContextRequest, noScopeValue_xml)
+TEST(QueryContextRequest, DISABLED_noScopeValue_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile  = "ngsi10.queryContextRequest.noScopeValue.invalid.xml";
@@ -602,6 +571,7 @@ TEST(QueryContextRequest, noScopeValue_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
+#endif
 }
 
 
@@ -609,9 +579,12 @@ TEST(QueryContextRequest, noScopeValue_xml)
 /* ****************************************************************************
 *
 * noRestriction_xml - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(QueryContextRequest, noRestriction_xml)
+TEST(QueryContextRequest, DISABLED_noRestriction_xml)
 {
+#if 0
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.noRestriction.valid.xml";
@@ -627,6 +600,7 @@ TEST(QueryContextRequest, noRestriction_xml)
   EXPECT_EQ("OK", out);
 
   utExit();
+#endif
 }
 
 
@@ -634,8 +608,10 @@ TEST(QueryContextRequest, noRestriction_xml)
 /* ****************************************************************************
 *
 * fill - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(QueryContextRequest, fill)
+TEST(QueryContextRequest, DISABLED_fill)
 {
   QueryContextRequest q0;
   QueryContextRequest q1;
@@ -648,108 +624,13 @@ TEST(QueryContextRequest, fill)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   q0.fill("", "", "");
   q0.restrictions = 0;
-  out = q0.render(QueryContext, XML, "");
+  out = q0.render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   q1.fill("EID", "ETYPE", "Attribute");
   q1.restrictions = 0;
-  out = q1.render(QueryContext, XML, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationCircleOk - 
-*/
-TEST(QueryContextRequest, scopeGeolocationCircleOk)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.circleOk.postponed.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     result;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ("OK", result.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationCircleInverted - 
-*/
-TEST(QueryContextRequest, scopeGeolocationCircleInverted)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.circleInverted.postponed.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-
-  out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ("OK", out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationCircleInvertedBadValue - 
-*/
-TEST(QueryContextRequest, scopeGeolocationCircleInvertedBadValue)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.circleInvertedBadValue.postponed.xml";
-  const char*     outfile = "ngsi10.queryContextResponse.circleInvertedBadValue.valid.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationCircleZeroRadius - 
-*/
-TEST(QueryContextRequest, scopeGeolocationCircleZeroRadius)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.circleZeroRadius.postponed.xml";
-  const char*     outfile = "ngsi10.queryContextResponse.circleZeroRadius.valid.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  out = q1.render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -854,150 +735,6 @@ TEST(QueryContextRequest, scopeGeolocationCircleZeroRadiusJson)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "queryContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationPolygonOk - 
-*/
-TEST(QueryContextRequest, scopeGeolocationPolygonOk)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.polygonOk.postponed.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     result;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ("OK", result.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationPolygonInverted - 
-*/
-TEST(QueryContextRequest, scopeGeolocationPolygonInverted)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.polygonInverted.postponed.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     result;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ("OK", result.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationPolygonInvertedBadValue - 
-*/
-TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValue)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.polygonInvertedBadValue.postponed.xml";
-  const char*     outfile = "ngsi10.queryContextResponse.polygonInvertedBadValue.valid.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationPolygonNoVertices - 
-*/
-TEST(QueryContextRequest, scopeGeolocationPolygonNoVertices)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.polygonNoVertices.postponed.xml";
-  const char*     outfile = "ngsi10.queryContextResponse.polygonNoVertices.valid.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationPolygonOneVertex - 
-*/
-TEST(QueryContextRequest, scopeGeolocationPolygonOneVertex)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.polygonOneVertex.postponed.xml";
-  const char*     outfile = "ngsi10.queryContextResponse.polygonOneVertex.valid.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeGeolocationPolygonTwoVertices - 
-*/
-TEST(QueryContextRequest, scopeGeolocationPolygonTwoVertices)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.queryContextRequest.polygonTwoVertices.postponed.xml";
-  const char*     outfile = "ngsi10.queryContextResponse.polygonTwoVertices.valid.xml";
-  ConnectionInfo  ci("/ngsi10/queryContext", "POST", "1.1");
-  std::string     out;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

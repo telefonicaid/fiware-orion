@@ -59,8 +59,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * put - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(putAvailabilitySubscriptionConvOp, put)
+TEST(putAvailabilitySubscriptionConvOp, DISABLED_put)
 {
   ConnectionInfo ci1("/ngsi9/contextAvailabilitySubscriptions",  "POST", "1.1");
   ConnectionInfo ci2("/ngsi9/contextAvailabilitySubscriptions",  "GET",  "1.1");

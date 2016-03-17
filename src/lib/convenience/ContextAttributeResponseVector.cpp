@@ -40,9 +40,8 @@
 */
 std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestType request, std::string indent)
 {
-  std::string out     = "";
-  std::string xmlTag  = "contextResponseList";
-  std::string jsonTag = "contextResponses";
+  std::string out = "";
+  std::string key = "contextResponses";
 
   if (vec.size() == 0)
   {
@@ -52,10 +51,12 @@ std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestT
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true);
+  out += startTag2(indent, key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(ciP, request, indent + "  ");
-  out += endTag(indent, xmlTag, ciP->outFormat, false, true);
+  }
+  out += endTag(indent, false, true);
 
   return out;
 }

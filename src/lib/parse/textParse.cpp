@@ -114,7 +114,7 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
       return answer;
     }
 
-    if ((answer = parseDataP->av.attribute.check(ciP, EntityAttributeValueRequest, ciP->outFormat, "", "", 0)) != "OK")
+    if ((answer = parseDataP->av.attribute.check(ciP, EntityAttributeValueRequest, "", "", 0)) != "OK")
     {
       OrionError error(SccBadRequest, answer);
       return error.render(ciP, "");

@@ -55,8 +55,8 @@ public:
   ConnectionInfo():
     connection             (NULL),
     verb                   (NOVERB),
-    inFormat               (XML),
-    outFormat              (XML),
+    inFormat               (JSON),
+    outFormat              (JSON),
     tenant                 (""),
     servicePath            (""),
     payload                (NULL),
@@ -77,7 +77,7 @@ public:
   ConnectionInfo(Format _outFormat):
     connection             (NULL),
     verb                   (NOVERB),
-    inFormat               (XML),
+    inFormat               (JSON),
     outFormat              (_outFormat),
     tenant                 (""),
     servicePath            (""),
@@ -99,8 +99,8 @@ public:
   ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL):
     connection             (_connection),
     verb                   (NOVERB),
-    inFormat               (XML),
-    outFormat              (XML),
+    inFormat               (JSON),
+    outFormat              (JSON),
     url                    (_url),
     method                 (_method),
     version                (_version),

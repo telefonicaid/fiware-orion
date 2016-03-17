@@ -29,43 +29,8 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
-#include "xmlParse/xmlRequest.h"
 
 #include "unittest.h"
-
-
-
-/* ****************************************************************************
-*
-* ok_xml - 
-*/
-TEST(NotifyContextAvailabilityRequest, ok_xml)
-{
-  ParseData       parseData;
-  const char*     inFile  = "ngsi9.notifyContextAvailabilityRequest.ok.valid.xml";
-  const char*     outFile = "ngsi9.notifyContextAvailabilityRequestRendered.ok.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-  std::string     rendered;
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result);
-  lmTraceLevelSet(LmtDump, false);
-
-  NotifyContextAvailabilityRequest* ncarP = &parseData.ncar.res;
-
-  rendered = ncarP->render(NotifyContext, XML, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-  ncarP->release();
-  
-  utExit();
-}
 
 
 
@@ -96,7 +61,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
   const char*     outfile = "ngsi9.notifyContextAvailabilityRequest.ok.valid.json";
 
-  out = ncarP->render(NotifyContext, JSON, "");
+  out = ncarP->render(NotifyContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -110,9 +75,12 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 /* ****************************************************************************
 *
 * badEntityAttribute_xml - 
+*
+* FIME P5 #1862: _json counterpart?
 */
-TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
+TEST(NotifyContextAvailabilityRequest, DISABLED_badEntityAttribute_xml)
 {
+#if 0
   ParseData       parseData;
   const char*     infile  = "ngsi9.notifyContextAvailabilityRequest.entityAttribute.invalid.xml";
   const char*     outfile = "ngsi9.notifyContextAvailabilityResponse.invalidEntityAttribute.valid.xml";
@@ -127,6 +95,7 @@ TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
   
   utExit();
+#endif
 }
 
 
@@ -134,8 +103,10 @@ TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
 /* ****************************************************************************
 *
 * check - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(NotifyContextAvailabilityRequest, check)
+TEST(NotifyContextAvailabilityRequest, DISABLED_check)
 {
   NotifyContextAvailabilityRequest  ncr;
   std::string                       out;
@@ -145,15 +116,15 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   utInit();
 
-  out = ncr.check(&ci, NotifyContextAvailability, XML, "", "", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, "", "", 0);
   EXPECT_EQ("OK", out);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ncr.check(&ci, NotifyContextAvailability, XML, "", "predetected error", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, "", "predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
  
   ncr.subscriptionId.set("12345");
-  out = ncr.check(&ci, NotifyContextAvailability, XML, "", "", 0);
+  out = ncr.check(&ci, NotifyContextAvailability, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
@@ -197,7 +168,7 @@ TEST(NotifyContextAvailabilityRequest, json_render)
 
   // Test 1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncarP->render(QueryContext, JSON, "");
+  rendered = ncarP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   
 
@@ -218,7 +189,7 @@ TEST(NotifyContextAvailabilityRequest, json_render)
   crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest2");
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncarP->render(QueryContext, JSON, "");
+  rendered = ncarP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   
   utExit();

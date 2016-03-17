@@ -707,7 +707,7 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | room17    | null                                                                          |
       | room_18   | {"rt.ty": "5678"}                                                             |
 
-  @attribute_value_error_without
+  @attribute_value_error_without @BUG_1789
   Scenario:  try to update or append an attribute by entity ID using NGSI v2 without attribute values
     Given  a definition of headers
       | parameter          | value                        |
@@ -731,11 +731,8 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
       | parameter       | value       |
       | attributes_name | temperature |
     When update or append attributes by ID "room_1" and with "normalized" mode
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
 
   @attribute_value_forbidden @BUG_1200
   Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 without forbidden attribute values in update request

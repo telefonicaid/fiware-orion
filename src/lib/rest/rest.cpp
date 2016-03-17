@@ -61,7 +61,6 @@
 static RestService*              restServiceV          = NULL;
 static unsigned short            port                  = 0;
 static RestServeFunction         serveFunction         = NULL;
-static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
@@ -99,25 +98,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     return MHD_YES;
   }
 
-  if (key == URI_PARAM_NOTIFY_FORMAT)
-  {
-    if (strcasecmp(val, "xml") == 0)
-    {
-      value = "XML";
-    }
-    else if (strcasecmp(val, "json") == 0)
-    {
-      value = "JSON";
-    }
-    else
-    {
-      OrionError error(SccBadRequest, std::string("Bad notification format: /") + value + "/. Valid values: /XML/ and /JSON/");
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = error.render(ciP, "");
-      return MHD_YES;
-    }
-  }
-  else if (key == URI_PARAM_PAGINATION_OFFSET)
+  if (key == URI_PARAM_PAGINATION_OFFSET)
   {
     char* cP = (char*) val;
 
@@ -368,7 +349,6 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 
   free(copy);
 
-  bool xml  = false;
   bool json = false;
   bool text = true;
 
@@ -396,35 +376,26 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              { xml  = true; json = true; text=true;}
-     if (format == "*/xml")            { xml  = true; }
-     if (format == "application/*")    { xml  = true; json = true; }
-     if (format == "application/xml")  { xml  = true; }
+     if (format == "*/*")              { json = true; text=true;}
+     if (format == "application/*")    { json = true; }
      if (format == "application/json") { json = true; }
      if (format == "*/json")           { json = true; }
      if (format == "text/plain")       { text = true; }
-     
-     if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
 
      //
      // Resetting charset
      //
      if (charsetP != NULL)
-        *charsetP = "";
+     {
+       *charsetP = "";
+     }
   }
 
-  //
-  // API version 1 has XML as default format, v2 has JSON
-  //
   if (apiVersion == "v2")
   {
     if (json == true)
     {
       return JSON;
-    }
-    else if (xml == true)
-    {
-      return XML;
     }
     else if (text)
     {
@@ -433,11 +404,7 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
   }
   else
   {
-    if (xml == true)
-    {
-      return XML;
-    }
-    else if (json == true)
+    if (json == true)
     {
       return JSON;
     }
@@ -520,7 +487,6 @@ static void requestCompleted
     clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
     clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
     clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
-    clock_addtime(&accTimeStat.xmlParseTime,          &threadLastTimeStat.xmlParseTime);
 
     timeStatSemGive(__FUNCTION__, "updating statistics");
   }
@@ -540,13 +506,12 @@ static int outFormatCheck(ConnectionInfo* ciP)
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
     ciP->httpStatusCode = SccNotAcceptable;
     ciP->answer = restErrorReplyGet(ciP,
-                                    XML,
                                     "",
                                     "OrionError",
                                     SccNotAcceptable,
-                                    std::string("acceptable MIME types: application/xml, application/json. Accept header in request: ") + ciP->httpHeaders.accept);
+                                    std::string("acceptable MIME types: application/json. Accept header in request: ") + ciP->httpHeaders.accept);
 
-    ciP->outFormat      = XML; // We use XML as default format
+    ciP->outFormat      = JSON; // We use JSON as default format
     ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
@@ -733,7 +698,7 @@ int servicePathSplit(ConnectionInfo* ciP)
 *   so we don't want to use the default 200
 *
 * NOTE
-*   In version 1 of the protocol, we admit ONLY application/json and application/xml
+*   In version 1 of the protocol, we admit ONLY application/json
 *   In version 2 of the protocol, we admit ONLY application/json and text/plain
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
@@ -742,9 +707,8 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
-  //   3. text/xml used and acceptTextXml is set to true (iotAgent only)
-  //   4. Content-Type present but not supported
-  //   5. API version 2 and not 'application/json' || text/plain
+  //   3. Content-Type present but not supported
+  //   4. API version 2 and not 'application/json' || text/plain
   //
 
 
@@ -760,37 +724,29 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
     ciP->httpStatusCode = SccUnsupportedMediaType;
 
     return 1;
   }
 
-
   // Case 3
-  if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/json"))
   {
-    return 0;
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    return 1;
   }
 
 
   // Case 4
-  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
-  {
-    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-    return 1;
-  }
-
-
-  // Case 5
   if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
     ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
@@ -1037,8 +993,7 @@ static int connectionTreat
     //
     // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
     //           Once we *really* look to scratch some efficiency, this change should be made.
-    // 
-    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]      = DEFAULT_PARAM_NOTIFY_FORMAT;
+    //     
     ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
@@ -1066,7 +1021,7 @@ static int connectionTreat
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
     {
-      ciP->outFormat = XML; // XML is default output format
+      ciP->outFormat = JSON; // JSON is default output format
     }
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
@@ -1169,27 +1124,7 @@ static int connectionTreat
     alarmMgr.badInput(clientIp, "error in URI parameters");
     restReply(ciP, ciP->answer);
     return MHD_YES;
-  }
-  LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-
-  // Set default mime-type for notifications
-  if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
-  {
-    if (ciP->outFormat == XML)
-    {
-      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
-    }
-    else if (ciP->outFormat == JSON)
-    {
-      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
-    }
-    else
-    {
-      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
-    }
-    
-    LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-  }
+  }  
 
   //
   // Here, if the incoming request was too big, return error about it
@@ -1201,13 +1136,13 @@ static int connectionTreat
 
     alarmMgr.badInput(clientIp, details);
 
-    ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
+    ciP->answer         = restErrorReplyGet(ciP, "", ciP->url, SccRequestEntityTooLarge, details);
     ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
 
   if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
   {
-    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
+    std::string errorMsg = restErrorReplyGet(ciP, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -1376,7 +1311,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 * restInit - 
 *
 * FIXME P5: add vector of the accepted content-types, instead of the bool
-*           argument _acceptTextXml that was added for iotAgent only.
 *           See Issue #256
 */
 void restInit
@@ -1394,8 +1328,7 @@ void restInit
   const char*         _allowedOrigin,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
-  RestServeFunction   _serveFunction,
-  bool                _acceptTextXml
+  RestServeFunction   _serveFunction
 )
 {
   const char* key  = _httpsKey;
@@ -1404,8 +1337,7 @@ void restInit
   port             = _port;
   restServiceV     = _restServiceV;
   ipVersionUsed    = _ipVersion;
-  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;
-  acceptTextXml    = _acceptTextXml;
+  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;  
   multitenant      = _multitenant;
   connMemory       = _connectionMemory;
   maxConns         = _maxConnections;

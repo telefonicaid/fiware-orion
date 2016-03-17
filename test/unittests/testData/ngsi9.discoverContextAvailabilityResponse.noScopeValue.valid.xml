@@ -1,7 +1,0 @@
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Empty value in restriction scope</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>

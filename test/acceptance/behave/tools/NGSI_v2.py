@@ -46,8 +46,9 @@ class NGSI:
         """
         constructor
         """
+
     # ------------------------------------ validations ------------------------------------------
-    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers):
+    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers, qp_types=None):
         """
         return a cursor with a entities list
         :param entities_contexts: entities context (attr_name, attr_value, attr_type, id, type, metadatas, etc)
@@ -75,19 +76,16 @@ class NGSI:
                 service_path = headers[FIWARE_SERVICE_PATH_HEADER]
         else:
             service_path = "/"
-        if "entities_type" in entities_contexts:
-            type = entities_contexts["entities_type"]
+        if qp_types is None:
+            entity_type = entities_contexts["entities_type"]
         else:
-            type = ""
+            entity_type = qp_types
         __logger__.info("Database verified: %s" % database_name)
         __logger__.info("collection verified: entities")
         __logger__.info("service path verified: %s" % service_path)
-        curs_list = []
-        if type is not None:
-            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path,
-                     "_id.type": type}
-        else:
-            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path}
+        query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]},
+                 "_id.servicePath": service_path,
+                 "_id.type": entity_type}
         __logger__.info("query: %s" % str(query))
 
         curs = mongo_driver.find_data(query)
@@ -122,7 +120,7 @@ class NGSI:
                     " ERROR -- attribute: %s is not stored in mongo" % attr_name
                 assert entities_contexts["attributes_value"] == entity[u'attrs'][attr_name][u'value'], \
                     " ERROR -- attribute value: %s is not stored successful in mongo" % str(entities_contexts["attributes_value"])
-                if entities_contexts["attributes_type"] is not None:
+                if entities_contexts["attributes_type"] != "none":
                     assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
                     " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
                 # verify metadatas
@@ -131,7 +129,7 @@ class NGSI:
                     for m in range(int(entities_contexts["metadatas_number"])):    # manages N metadatas
                         assert entities_contexts["metadatas_value"] == md[m][u'value'], \
                             " ERROR -- metadata value: %s is not stored successful in mongo" % entities_contexts["metadatas_value"]
-                        if entities_contexts["metadatas_type"] is not None:
+                        if entities_contexts["metadatas_type"] != "none":
 
                             assert entities_contexts["metadatas_type"] == md[m][u'type'], \
                                 " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
@@ -204,13 +202,16 @@ class NGSI:
         __logger__.debug("Total of docs read from mongo: %s" % str(len(curs_list)))
         mongo_driver.disconnect()
 
-    def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers):
+    def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers, parameters):
         """
         verify that entities are not stored in mongo
         :param entities_contexts:  entities context (see constructor in cb_v2_utils.py)
         :param headers: headers used (see "definition_headers" method in cb_v2_utils.py)
         """
-        entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
+        qp_types = None
+        if "type" in parameters:
+            qp_types = parameters["type"]
+        entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, qp_types)
         assert len(entity_list) > 0, " ERROR - notihing is returned from mongo, review the query in behave log"
         entity = entity_list[0]
         # verify attributes
@@ -254,6 +255,7 @@ class NGSI:
         text_to_comma_replace = "<&_i_&>"
         final_list = []
         posi = 0
+        posf = 0
         has_quote = True
 
         while has_quote:
@@ -294,7 +296,7 @@ class NGSI:
                 op = statement[:1]
                 # Unary type
                 if statement.find("type") >= 0:
-                    if op == "+" and entity_context["entities_type"] is not None:
+                    if op == "+" and entity_context["entities_type"] != "none":
                         result = "this entity has type"
                     if op == "-" and entity_context["entities_type"] is None:
                         result = "this entity has not type"
@@ -330,8 +332,8 @@ class NGSI:
                             if op == "==" and ((float(entity_context["attributes_value"]) >= float(items[1][0])) and
                                               (float(entity_context["attributes_value"]) <= float(items[1][1]))):
                                     result = "this statement does match"  # range q=attr==x..y
-                            elif op == "!=" and ((float(entity_context["attributes_value"]) <= float(items[1][0])) or \
-                                (float(entity_context["attributes_value"]) >= float(items[1][1]))):
+                            elif op == "!=" and ((float(entity_context["attributes_value"]) <= float(items[1][0])) or
+                                                 (float(entity_context["attributes_value"]) >= float(items[1][1]))):
                                     result = "this statement does match"  # range q=attr!=x..y
                         except Exception, e:
                             __logger__.warn("some value is not numeric format, %s" % str(e))
@@ -478,9 +480,9 @@ class NGSI:
                 assert id_exists, 'ERROR - id %s does not exist' % items_list[i]["id"]
 
                 if "type" in items_list[i]:
-                    if items_list[i]["type"] is not None:
+                    if items_list[i]["type"] != "none":
                         for tp in types:
-                            if tp is not None:
+                            if tp != "none":
                                 if items_list[i]["type"].find(tp) >= 0:
                                     type_exists = True
                                     break
@@ -513,10 +515,12 @@ class NGSI:
                             sub_group["attributes_value"] = float(sub_group["attributes_value"])
                         if str(attribute["value"]).isdigit():
                             attribute["value"] = float(attribute["value"])
+                        if str(sub_group["attributes_value"]) in ("true", "false"):
+                            sub_group["attributes_value"] = convert_str_to_bool(sub_group["attributes_value"])
                     except Exception, e:
                         __logger__.warn(" WARN - the attribute value is not verified if it is digit: \n   - %s" % e)
                     if not options_key_values:
-                        if sub_group["attributes_type"] is not None:
+                        if sub_group["attributes_type"] != "none":
                             assert sub_group["attributes_type"] == attribute["type"], \
                                 'ERROR - in attribute type "%s" in position: %s' % (sub_group["attributes_type"], str(i))
 
@@ -534,10 +538,10 @@ class NGSI:
                                 assert meta_name in attribute["metadata"],  \
                                     'ERROR - attribute metadata name "%s" does not exist' % meta_name
                                 metadata = attribute["metadata"][meta_name]
-                                if sub_group["metadatas_type"] is not None:
+                                if sub_group["metadatas_type"] != "none":
                                     assert sub_group["metadatas_type"] == metadata["type"], \
                                         'ERROR - in attribute metadata type "%s"' % sub_group["metadatas_type"]
-                                if sub_group["metadatas_value"] is not None:
+                                if sub_group["metadatas_value"] != "none":
                                     assert sub_group["metadatas_value"] == metadata["value"], \
                                         'ERROR - in attribute metadata value "%s"' % sub_group["metadatas_value"]
 
@@ -629,7 +633,7 @@ class NGSI:
         resp_json = convert_str_to_dict(resp.content, JSON)
         __logger__.debug("query parameter: %s" % str(queries_parameters))
         assert resp_json["id"] == entity_id_to_test,  'ERROR - in id "%s"' % resp_json["id"]
-        if entities_context["entities_type"] is not None:
+        if entities_context["entities_type"] != "none":
             assert resp_json["type"] == entities_context["entities_type"],  'ERROR - in type "%s" ' % resp_json["type"]
 
         #  attr query parameter
@@ -652,7 +656,7 @@ class NGSI:
             assert attr_name in resp_json, 'ERROR - in attribute name "%s" ' % attr_name
             attribute = resp_json[attr_name]
             if not options_key_values:
-                if entities_context["attributes_type"] is not None:
+                if entities_context["attributes_type"] != "none":
                     assert entities_context["attributes_type"] == attribute["type"], \
                         'ERROR - in attribute type "%s" without keyValues option' % entities_context["attributes_type"]
                 if entities_context["attributes_value"] is not None:
@@ -669,18 +673,16 @@ class NGSI:
                             'ERROR - attribute metadata name "%s" does not exist without keyValues option' \
                             % meta_name
                         metadata = attribute["metadata"][meta_name]
-                        if entities_context["metadatas_type"] is not None:
+                        if entities_context["metadatas_type"] != "none":
                             assert entities_context["metadatas_type"] == metadata["type"], \
                                 'ERROR - in attribute metadata type "%s" without keyValues option' % entities_context["metadatas_type"]
-                        if entities_context["metadatas_value"] is not None:
+                        if entities_context["metadatas_value"] != "none":
                             assert entities_context["metadatas_value"] == metadata["value"], \
                                 'ERROR - in attribute metadata value "%s" without keyValues option' % entities_context["metadatas_value"]
             else:
-                if entities_context["attributes_value"] is not None:
+                if entities_context["attributes_value"] != "none":
                     assert entities_context["attributes_value"] == attribute, \
                         'ERROR - in attribute value "%s" with keyValues option' % entities_context["attributes_value"]
-
-
 
     def verify_an_attribute_by_id(self, entities_context, resp, attribute_name_to_request):
         """
@@ -703,7 +705,7 @@ class NGSI:
             }
         """
         attribute = convert_str_to_dict(resp.content, JSON)
-        if entities_context["attributes_type"] is not None:
+        if entities_context["attributes_type"] != "none":
             assert entities_context["attributes_type"] == attribute["type"],\
                 'ERROR - in attribute type "%s"' % (entities_context["attributes_type"])
         if entities_context["attributes_value"] is not None:
@@ -719,7 +721,7 @@ class NGSI:
                     meta_name = entities_context["metadatas_name"]
                 assert meta_name in attribute["metadata"], 'ERROR - attribute metadata name "%s" does not exist' % meta_name
                 metadata = attribute["metadata"][meta_name]
-                if entities_context["metadatas_type"] is not None:
+                if entities_context["metadatas_type"] != "none":
                     assert entities_context["metadatas_type"] == metadata["type"], \
                         'ERROR - in attribute metadata type "%s"' % (entities_context["metadatas_type"])
                 if entities_context["metadatas_value"] is not None:
@@ -739,7 +741,7 @@ class NGSI:
         attribute = convert_str_to_dict(resp.text, JSON)   # in raw mode is used only one entity
         __logger__.debug("attribute: %s" % str(attribute))
 
-        if entities_context["attributes_type"] is not None:
+        if entities_context["attributes_type"] != "none":
             assert remove_quote(entities_context["attributes_type"]) == attribute["type"], \
                 'ERROR - in attribute type "%s" in raw mode' % (remove_quote(entities_context["attributes_type"]))
 
@@ -753,32 +755,46 @@ class NGSI:
         :param entities_context:
         :param resp:
         ex:
-            {
-                value: "017-06-17T07:21:24.238Z"
-            }
+            2017-06-17T07:21:24.238Z (text/plain)
+            or:
+            {"a":45, "b":true} (application/json)
         """
-        resp_json = convert_str_to_dict(resp.content, JSON)
-        assert "value" in resp_json, 'ERROR - value key dos not exist in response: \n %s' %  resp.content
-        assert resp_json["value"] == entities_context["attributes_value"], "ERROR - the value %s is not the expected: %s" % (resp_json["value"], entities_context["attributes_value"])
+        json_object = False
+        json_chars = ["{", "["]
+        __logger__.debug("Content-Type in response:  %s" % resp.headers["content-type"])
+        for o in json_chars:    # determine if the response is an json object or not
+            if resp.content.find(o) >= 0:
+                json_object = True
+        try:
+            if json_object:
+                resp_json = convert_str_to_dict(resp.content, JSON)
+                assert cmp(resp_json, entities_context["attributes_value"]) == 0, "ERROR - the value %s is not the expected: %s" % (str(resp_json), str(entities_context["attributes_value"]))
+            else:
+                assert str(resp.content) == str(entities_context["attributes_value"]), "ERROR - the value %s is not the expected: %s" % (str(resp.content), str(entities_context["attributes_value"]))
+        except Exception, e:
+            __logger__.error(e)
 
-    def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers):
+    def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers, parameters):
         """
         verify if the attribute has been deleted
         :param entity_context:
         :param headers:
         """
-        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
+        __logger__.debug("parameters: %s" % str(parameters))
+        __logger__.debug("headers: %s" % str(headers))
+        __logger__.debug("properties: %s" % str(entities_contexts))
+        qp_types = None
+        if "type" in parameters:
+            qp_types = parameters["type"]
+        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, qp_types)
 
-        # verify entities
-        __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
-        for i in range(int(entities_contexts["entities_number"])):
-            # verify if the entity is stored in mongo
-            __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
-            __logger__.debug("attribute name to verify: %s" % entities_contexts["attributes_name"])
-            assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
-            entity = curs_list[i]  # manages N entities
-            assert entities_contexts["attributes_name"] not in entity["attrNames"], " ERROR - the attribute: %s exists in the entity No: %s" % \
-                                                                                    (entities_contexts["attributes_name"], str(i+1))
+        # verify attribute in entity
+        __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
+        __logger__.debug("attribute name to verify: %s" % entities_contexts["attributes_name"])
+        assert len(curs_list) == 1, " ERROR - should be returned only one entity"
+        entity = curs_list[0]
+        assert entities_contexts["attributes_name"] not in entity["attrNames"], \
+            " ERROR - the attribute: %s exists in the entity " %  entities_contexts["attributes_name"]
         mongo_driver.disconnect()
 
     def verify_entity_types(self, types, resp):
@@ -793,8 +809,6 @@ class NGSI:
         items_dict = convert_str_to_dict(resp.content, JSON)
         items_list = items_dict.keys()  # list of keys
         for item in items_list:
-            if item == EMPTY:
-                item = "untyped"
             __logger__.debug("verified: %s include in %s" % (item, types))
             assert item in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
 

@@ -61,8 +61,8 @@ std::string BatchQuery::check(ConnectionInfo* ciP, RequestType requestType)
   std::string err;
 
   if (((res = entities.check(ciP, requestType))                != "OK") ||
-      ((res = attributeV.check(requestType, JSON, "", err, 0)) != "OK") ||
-      ((res = scopeV.check(requestType, JSON, "", err, 0))     != "OK"))
+      ((res = attributeV.check(requestType, "", err, 0)) != "OK") ||
+      ((res = scopeV.check(requestType, "", err, 0))     != "OK"))
   {
     std::string error = res;
 

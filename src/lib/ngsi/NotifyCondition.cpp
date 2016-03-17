@@ -63,7 +63,7 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
 *
 * NotifyCondition::render -
 */
-std::string NotifyCondition::render(Format format, const std::string& indent, bool notLastInVector)
+std::string NotifyCondition::render(const std::string& indent, bool notLastInVector)
 {
   std::string out = "";
   std::string tag = "notifyCondition";
@@ -74,11 +74,11 @@ std::string NotifyCondition::render(Format format, const std::string& indent, bo
   bool commaAfterCondValueList = restrictionRendered;
   bool commaAfterType          = condValueListRendered || restrictionRendered;
 
-  out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", "type", type, format, commaAfterType);
-  out += condValueList.render(format, indent + "  ",   commaAfterCondValueList);
-  out += restriction.render(format,   indent + "  ",   commaAfterRestriction);
-  out += endTag(indent, tag, format);
+  out += startTag2(indent, tag, false, false);
+  out += valueTag1(indent + "  ", "type", type, commaAfterType);
+  out += condValueList.render(indent + "  ",   commaAfterCondValueList);
+  out += restriction.render(  indent + "  ",   commaAfterRestriction);
+  out += endTag(indent);
 
   return out;
 }
@@ -94,7 +94,6 @@ std::string NotifyCondition::render(Format format, const std::string& indent, bo
 std::string NotifyCondition::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -106,26 +105,20 @@ std::string NotifyCondition::check
   {
     return "empty type for NotifyCondition";
   }
-  else if (strcasecmp(type.c_str(), "ONTIMEINTERVAL") == 0)
-  {
-  }
-  else if (strcasecmp(type.c_str(), "ONCHANGE") == 0)
-  {
-  }
-  else if (strcasecmp(type.c_str(), "ONVALUE") == 0)
+  else if (strcasecmp(type.c_str(), ON_CHANGE_CONDITION) == 0)
   {
   }
   else
   {
-    return std::string("invalid notify condition type: '") + type + "'";
+    return std::string("invalid notify condition type: /") + type + "/";
   }
 
-  if ((res = condValueList.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = condValueList.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = restriction.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = restriction.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

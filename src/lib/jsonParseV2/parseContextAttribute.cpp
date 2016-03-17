@@ -170,7 +170,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
 {
   std::string name      = iter->name.GetString();
   std::string type      = jsonParseTypeNames[iter->value.GetType()];
-  bool        keyValues = ciP->uriParamOptions["keyValues"];
+  bool        keyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
 
   caP->name = name;
 
@@ -240,8 +240,8 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
       return details;
     }
 
-    // Attribute has a regular structure, in which 'value' is mandatory
-    if ((iter->value.HasMember("value")))
+    // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
+    if (iter->value.HasMember("value") || ciP->apiVersion == "v2")
     {
       std::string r = parseContextAttributeObject(iter->value, caP);
       if (r != "OK")
@@ -264,6 +264,11 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     alarmMgr.badInput(clientIp, "no 'name' for ContextAttribute");
     ciP->httpStatusCode = SccBadRequest;
     return "no 'name' for ContextAttribute";
+  }
+
+  if (!caP->typeGiven)
+  {
+    caP->type = DEFAULT_TYPE;
   }
 
   return "OK";
@@ -309,6 +314,10 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
 
     ciP->httpStatusCode = SccBadRequest;
     return oe.render(ciP, "");
+  }
+  if (!caP->typeGiven)
+  {
+    caP->type = DEFAULT_TYPE;
   }
 
   return r;

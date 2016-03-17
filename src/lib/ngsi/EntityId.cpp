@@ -38,7 +38,7 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId() : tag("entityId")
+EntityId::EntityId() : keyName("entityId")
 {
 }
 
@@ -48,7 +48,7 @@ EntityId::EntityId() : tag("entityId")
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(EntityId* eP) : tag("entityId")
+EntityId::EntityId(EntityId* eP) : keyName("entityId")
 {
   fill(eP);
 }
@@ -63,11 +63,11 @@ EntityId::EntityId
   const std::string&  _id,
   const std::string&  _type,
   const std::string&  _isPattern,
-  const std::string&  _tag
+  const std::string&  _keyName
 ) : id(_id),
     type(_type),
     isPattern(_isPattern),
-    tag(_tag)
+    keyName(_keyName)
 {
 }
 
@@ -75,11 +75,11 @@ EntityId::EntityId
 
 /* ****************************************************************************
 *
-* tagSet -
+* keyNameSet -
 */
-void EntityId::tagSet(const std::string& tagName)
+void EntityId::keyNameSet(const std::string& _keyName)
 {
-  tag = tagName;
+  keyName = _keyName;
 }
 
 
@@ -88,12 +88,9 @@ void EntityId::tagSet(const std::string& tagName)
 *
 * EntityId::render -
 *
-* FIXME P1: startTag() is not enough for the XML case of entityId - XML attributes ...
-*           Perhaps add a vector of attributes to startTag() ?
 */
 std::string EntityId::render
 (
-  Format              format,
   const std::string&  indent,
   bool                comma,
   bool                isInVector
@@ -104,36 +101,28 @@ std::string EntityId::render
   char*        typeEscaped      = htmlEscape(type.c_str());
   char*        idEscaped        = htmlEscape(id.c_str());
 
-  if (format == XML)
+
+  std::string indent2 = indent;
+
+  if (isInVector)
   {
-    out += indent + "<"  + tag + " type=\"" + typeEscaped + "\" isPattern=\"" + isPatternEscaped + "\">\n";
-    out += indent + "  " + "<id>"           + idEscaped   + "</id>"           + "\n";
-    out += indent + "</" + tag + ">\n";
+    indent2 += "  ";
+  }
+
+  out += (isInVector? indent + "{\n" : "");
+  out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
+  out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
+  out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
+
+  if ((comma == true) && (isInVector == false))
+  {
+    out += ",\n";
   }
   else
-  {    
-    std::string indent2 = indent;
-
-    if (isInVector)
-    {
-       indent2 += "  ";
-    }
-
-    out += (isInVector? indent + "{\n" : "");
-    out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
-    out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
-    out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
-
-    if ((comma == true) && (isInVector == false))
-    {
-       out += ",\n";
-    }
-    else
-    {
-      out += "\n";
-      out += (isInVector? indent + "}" : "");
-      out += (comma == true)? ",\n" : (isInVector? "\n" : "");
-    }
+  {
+    out += "\n";
+    out += (isInVector? indent + "}" : "");
+    out += (comma == true)? ",\n" : (isInVector? "\n" : "");
   }
 
   free(typeEscaped);
@@ -153,7 +142,6 @@ std::string EntityId::check
 (
   ConnectionInfo* ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter

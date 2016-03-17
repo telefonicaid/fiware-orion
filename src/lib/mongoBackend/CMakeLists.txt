@@ -34,7 +34,6 @@ SET (SOURCES
     mongoSubscribeContext.cpp
     mongoUnsubscribeContext.cpp
     mongoUpdateContextSubscription.cpp
-    mongoOntimeintervalOperations.cpp    
     mongoNotifyContext.cpp
     mongoNotifyContextAvailability.cpp
     mongoQueryTypes.cpp
@@ -62,7 +61,6 @@ SET (HEADERS
     mongoSubscribeContext.h
     mongoUnsubscribeContext.h
     mongoUpdateContextSubscription.h
-    mongoOntimeintervalOperations.h    
     mongoNotifyContext.h
     mongoNotifyContextAvailability.h
     mongoQueryTypes.h

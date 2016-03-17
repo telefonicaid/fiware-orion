@@ -49,14 +49,16 @@ std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::str
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if (entityTypeVector.size() > 0)
+  {
     out += entityTypeVector.render(ciP, indent + "  ", true);
+  }
 
-  out += statusCode.render(ciP->outFormat, indent + "  ");
+  out += statusCode.render(indent + "  ");
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

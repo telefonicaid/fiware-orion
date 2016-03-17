@@ -1089,8 +1089,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house(flat) | keyValues  |
 
   @qp_key_values_off_only_value.row<row.id>
-  @qp_key_values_off_only_value @BUG_1716
-  Scenario Outline:  try to create an entity using NGSI v2 without keyValues mode activated, but in  only values format
+  @qp_key_values_off_only_value @BUG_1716 @BUG_1789
+  Scenario Outline:  try to create an entity using NGSI v2 without keyValues mode activated, but in only values format
     Given  a definition of headers
       | parameter          | value               |
       | Fiware-Service     | test_key_value_mode |
@@ -1105,9 +1105,9 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     When create an entity in raw and "keyValues" modes
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | not a JSON object |
+      | parameter   | value                                                            |
+      | error       | BadRequest                                                       |
+      | description | attribute must be a JSON object, unless keyValues option is used |
     Examples:
       | entity_id | attribute_value                                                               |
       | "room0"   | "34"                                                                          |
@@ -1125,8 +1125,8 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | "room12"  | "sdfsdf.sdfsdf"                                                               |
       | "room13"  | "41.3763726, 2.1864475,14"                                                    |
 
-  @qp_key_values_off_only_value @BUG_1716
-  Scenario Outline:  try to create an entity using NGSI v2 without keyValues mode activated, but in  only values format
+  @qp_key_values_off_only_value_2 @BUG_1716 @BUG_1789 @BUG_1892
+  Scenario Outline:  try to create an entity using NGSI v2 without keyValues mode activated, but in only values format
     Given  a definition of headers
       | parameter          | value               |
       | Fiware-Service     | test_key_value_mode |
@@ -1141,12 +1141,11 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     When create an entity in raw and "keyValues" modes
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+      | parameter   | value                                       |
+      | error       | BadRequest                                  |
+      | description | unrecognized property for context attribute |
     Examples:
       | entity_id | attribute_value                                |
-
       | "room14"  | {"x": {"x1": "a","x2": "b"}}                   |
       | "room15"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}      |
       | "room16"  | {"x": ["a", 45, "rt"],"x2": "b"}               |

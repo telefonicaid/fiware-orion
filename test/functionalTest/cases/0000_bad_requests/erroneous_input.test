@@ -30,35 +30,37 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-orionCurl --url "/NGSI8/contextEntities/entity01"
+orionCurl --url "/NGSI8/contextEntities/entity01" --json
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/v1/registry/nothingAtAll"
+orionCurl --url "/v1/registry/nothingAtAll" --json
 
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/xml
+Content-Length: 119
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service not found</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/xml
+Content-Length: 119
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service not found</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "service not found",
+        "reasonPhrase": "Bad Request"
+    }
+}
 --TEARDOWN--
 
 brokerStop CB

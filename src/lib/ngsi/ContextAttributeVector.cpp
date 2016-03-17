@@ -102,6 +102,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
   // number of valid attributes, then the comma must be rendered.
   //
   int validAttributes = 0;
+  std::map<std::string, bool>  uniqueMap;
   if (attrsFilter == "")
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
@@ -111,7 +112,20 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
         continue;
       }
 
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        if (uniqueMap[vec[ix]->stringValue] == true)
+        {
+          continue;
+        }
+      }
+
       ++validAttributes;
+
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        uniqueMap[vec[ix]->stringValue] = true;
+      }
     }
   }
   else
@@ -132,7 +146,9 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
   //
   std::string  out;
   int          renderedAttributes = 0;
-  
+
+  uniqueMap.clear();
+
   if (attrsFilter == "")
   {
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
@@ -143,7 +159,21 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
       }
 
       ++renderedAttributes;
+
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        if (uniqueMap[vec[ix]->stringValue] == true)
+        {
+          continue;
+        }
+      }
+
       out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
+
+      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      {
+        uniqueMap[vec[ix]->stringValue] = true;
+      }
     }
   }
   else
@@ -181,22 +211,11 @@ std::string ContextAttributeVector::render
   bool                attrsAsName
 )
 {
-  std::string out      = "";
-  std::string xmlTag   = "contextAttributeList";
-  std::string jsonTag  = "attributes";
+  std::string out = "";
+  std::string key = "attributes";
 
   if (vec.size() == 0)
   {
-    if (ciP->outFormat == XML)
-    {
-      if (((request == IndividualContextEntityAttribute)    ||
-           (request == AttributeValueInstance)              ||
-           (request == IndividualContextEntityAttributes)))
-      {
-        return indent + "<contextAttributeList></contextAttributeList>\n";
-      }
-    }
-
     return "";
   }
 
@@ -232,7 +251,7 @@ std::string ContextAttributeVector::render
     // 2. Now it's time to render
     // Note that in the case of attribute as name, we have to use a vector, thus using
     // attrsAsName variable as value for isVector parameter
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, attrsAsName, true);
+    out += startTag2(indent, key, attrsAsName, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
@@ -244,11 +263,11 @@ std::string ContextAttributeVector::render
         out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, attrsAsName);
+    out += endTag(indent, comma, attrsAsName);
   }
   else
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+    out += startTag2(indent, key, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
@@ -260,7 +279,7 @@ std::string ContextAttributeVector::render
         out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
+    out += endTag(indent, comma, true);
   }
 
   return out;
@@ -276,7 +295,6 @@ std::string ContextAttributeVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -286,7 +304,7 @@ std::string ContextAttributeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, 0)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, 0)) != "OK")
       return res;
   }
 

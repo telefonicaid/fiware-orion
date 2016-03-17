@@ -184,6 +184,7 @@ std::string parseContextAttributeCompoundValue
     }
   }
 
+
   return "OK";
 }
 
@@ -328,6 +329,11 @@ std::string parseContextAttributeCompoundValue
 
       ++counter;
     }
+  }
+
+  if (!caP->typeGiven)
+  {
+    caP->type = DEFAULT_TYPE;
   }
 
   return "OK";
@@ -477,6 +483,11 @@ std::string parseContextAttributeCompoundValueStandAlone
 
       ++counter;
     }
+  }
+
+  if (!caP->typeGiven)
+  {
+    caP->type = DEFAULT_TYPE;
   }
 
   return "OK";

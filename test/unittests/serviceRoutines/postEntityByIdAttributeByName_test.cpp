@@ -48,8 +48,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1832: _json counterpart?
 */
-TEST(postEntityByIdAttributeByName, ok)
+TEST(postEntityByIdAttributeByName, DISABLED_ok)
 {
   ConnectionInfo ci("/ngsi9/contextEntities/entity01/attributes/temperature",  "POST", "1.1");
   const char*    infile      = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
@@ -61,8 +63,8 @@ TEST(postEntityByIdAttributeByName, ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.outFormat    = XML;
-  ci.inFormat     = XML;
+  ci.outFormat    = JSON;
+  ci.inFormat     = JSON;
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);

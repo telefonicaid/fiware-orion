@@ -53,7 +53,6 @@ HttpStatusCode mongoUpdateContextSubscription
 (
     UpdateContextSubscriptionRequest*   requestP,
     UpdateContextSubscriptionResponse*  responseP,
-    Format                              notifyFormat,
     const std::string&                  tenant,
     const std::string&                  xauthToken,
     const std::vector<std::string>&     servicePathV,
@@ -238,8 +237,6 @@ HttpStatusCode mongoUpdateContextSubscription
     newSub.appendArray(CSUB_CONDITIONS, getFieldF(sub, CSUB_CONDITIONS).embeddedObject());
   }
   else {
-      /* Destroy any previous ONTIMEINTERVAL thread */
-      getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
       /* Build conditions array (including side-effect notifications and threads creation)
        * In order to do so, we have to create and EntityIdVector and AttributeList from sub
@@ -281,7 +278,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 requestP->subscriptionId.get(),
                                                 getStringFieldF(sub, CSUB_REFERENCE).c_str(),
                                                 &notificationDone,
-                                                notifyFormat,
+                                                JSON,
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
@@ -312,7 +309,7 @@ HttpStatusCode mongoUpdateContextSubscription
     newSub.append(CSUB_EXPR, getFieldF(sub, CSUB_EXPR).Obj());
   }
 
-  long long count = sub.hasField(CSUB_COUNT) ? getIntOrLongFieldAsLong(sub, CSUB_COUNT) : 0;
+  long long count = sub.hasField(CSUB_COUNT) ? getIntOrLongFieldAsLongF(sub, CSUB_COUNT) : 0;
 
   //
   // Update from cached value, if applicable
@@ -376,7 +373,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
   /* Adding format to use in notifications */
-  newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
+  newSub.append(CSUB_FORMAT, std::string(formatToString(JSON)));
 
   /* Update document in MongoDB */
   BSONObj  newSubObject = newSub.obj();

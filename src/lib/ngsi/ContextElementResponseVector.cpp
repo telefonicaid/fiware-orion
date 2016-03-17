@@ -49,23 +49,22 @@ std::string ContextElementResponseVector::render
   bool                omitAttributeValues
 )
 {
-  std::string xmlTag   = "contextResponseList";
-  std::string jsonTag  = "contextResponses";
-  std::string out      = "";
+  std::string key = "contextResponses";
+  std::string out = "";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+  out += startTag2(indent, key, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += vec[ix]->render(ciP, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
   }
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -80,7 +79,6 @@ std::string ContextElementResponseVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -90,7 +88,7 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

@@ -1,0 +1,331 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+ConvOp postSubscribeContextAvailabilityConvOp: POST /v1/registry/contextAvailabilitySubscriptions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Subscribe to E1/T1 (POST /v1/registry/contextAvailabilitySubscriptions)
+# 02. Register E1/T2
+# 03. Dump accumulator to see NOTHING
+# 04. Register E1/T1
+# 05. Dump accumulator to see E1/T1
+# 06. Subscribe to E1/T1, forcing XML notifications (POST /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML)
+# 07. Dump accumulator to see E1/T1, one in JSON, one in XML
+#
+# FIXME: Once NGSI9 Subscriptions implement Restrictions 'exist=entity::type' and '!exist=entity::type'
+# 08. Subscribe to E2/<empty> (POST /v1/registry/contextAvailabilitySubscriptions?!exist=entity::type)
+# 09. Register E2/<empty>
+# 10. Register E2/T1
+# 11. Dump accumulator to see 'E2/<empty>' only
+# 12. Reset accumulator
+# 13. Subscribe to E2/<non-empty>
+# 14. Dump accumulator to see 'E2/T1' only
+# 15. Reset accumulator
+# 16. Subscribe to E2/<non-empty> (POST /v1/registry/contextAvailabilitySubscriptions?exist=entity::type)
+# 17. Dump accumulator to see 'E2/T1' only
+# 18. Reset accumulator
+# 19. Update E2/T1
+# 20. Dump accumulator to see one notification of 'E2/T1' only
+#
+
+echo "01. Subscribe to E1/T1 (POST /v1/registry/contextAvailabilitySubscriptions)"
+echo "==========================================================================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "reference": "http://localhost:'$LISTENER_PORT'/notify",
+  "duration": "P5Y"
+}'
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Register E1/T2"
+echo "=================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "id":   "E1",
+         "type": "T2"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P5Y"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Dump accumulator to see NOTHING"
+echo "==================================="
+accumulatorDump
+echo
+echo
+
+
+echo "04. Register E1/T1"
+echo "=================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "id":   "E1",
+         "type": "T1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P5Y"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Dump accumulator to see E1/T1"
+echo "================================="
+accumulatorDump
+echo
+echo
+
+
+echo "06. Subscribe to E1/T1, forcing XML notifications (POST /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML)"
+echo "======================================================================================================================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "reference": "http://localhost:'$LISTENER_PORT'/notify",
+  "duration": "P5Y"
+}'
+orionCurl --url /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Dump accumulator to see E1/T1, one in JSON, one in XML"
+echo "=========================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Subscribe to E1/T1 (POST /v1/registry/contextAvailabilitySubscriptions)
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P5Y", 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+02. Register E1/T2
+==================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P5Y", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+03. Dump accumulator to see NOTHING
+===================================
+
+
+04. Register E1/T1
+==================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P5Y", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+05. Dump accumulator to see E1/T1
+=================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 497
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "T1",
+            "isPattern" : "false",
+            "id" : "E1"
+          }
+        ],
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "string",
+            "isDomain" : "false"
+          }
+        ],
+        "providingApplication" : "http://kz.tid.es/abc"
+      }
+    }
+  ]
+}
+=======================================
+
+
+06. Subscribe to E1/T1, forcing XML notifications (POST /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML)
+=======================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P5Y", 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. Dump accumulator to see E1/T1, one in JSON, one in XML
+==========================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 497
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "T1",
+            "isPattern" : "false",
+            "id" : "E1"
+          }
+        ],
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "string",
+            "isDomain" : "false"
+          }
+        ],
+        "providingApplication" : "http://kz.tid.es/abc"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 815
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/xml
+
+<notifyContextAvailabilityRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="T1" isPattern="false">
+            <id>E1</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>A1</name>
+            <type>string</type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://kz.tid.es/abc</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</notifyContextAvailabilityRequest>
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

@@ -49,25 +49,24 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 *
 * ContextRegistrationResponseVector::render -
 */
-std::string ContextRegistrationResponseVector::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationResponseVector::render(const std::string& indent, bool comma)
 {
-  std::string  out     = "";
-  std::string  xmlTag  = "contextRegistrationResponseList";
-  std::string  jsonTag = "contextRegistrationResponses";
+  std::string  out = "";
+  std::string  key = "contextRegistrationResponses";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag2(indent, key, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     out += vec[ix]->render(format, indent + "  ", (ix != vec.size() - 1));
+     out += vec[ix]->render(indent + "  ", (ix != vec.size() - 1));
   }
 
-  out += endTag(indent, xmlTag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -141,7 +140,6 @@ std::string ContextRegistrationResponseVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -151,7 +149,7 @@ std::string ContextRegistrationResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

@@ -47,8 +47,8 @@ struct UpdateContextSubscriptionRequest : public SubscribeContextRequest
   SubscriptionId                 subscriptionId;         // Mandatory 
 
   UpdateContextSubscriptionRequest();
-  std::string render(RequestType requestType, Format format, const std::string& indent);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string render(RequestType requestType, const std::string& indent);
+  std::string check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void        present(const std::string& indent);
   void        release(void);
 };

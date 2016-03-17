@@ -363,8 +363,6 @@ void jsonUpcrInit(ParseData* reqDataP)
   reqDataP->upcr.contextMetadataP       = NULL;
   reqDataP->upcr.domainMetadataP        = NULL;
   reqDataP->errorString                 = "";
-
-  reqDataP->upcr.res.init();
 }
 
 
