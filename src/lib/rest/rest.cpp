@@ -862,7 +862,17 @@ std::string defaultServicePath(const char* url, const char* method)
 * This function returns the version of the API for the incoming message,
 * based on the URL.
 * If the URL starts with "/v2" then the request is considered API version 2.
+*
 * Otherwise, API version 1.
+*
+* Except ...
+* The new request to change the log level (not trace level), uses the
+* URL /admin/log, which DOES NOT start with '/v2', but as some render methods
+* depend on the apiVersion and we prefer the 'new render' from v2 for this
+* operation (see OrionError::render), we consider internally /admin/log to be part of v2.
+*
+* FIXME P2: instead of looking at apiVersion for rendering, perhaps we need
+*           some other algorithm, considering 'admin' requests as well ...
 */
 static std::string apiVersionGet(const char* path)
 {
