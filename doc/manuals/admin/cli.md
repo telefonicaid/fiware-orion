@@ -91,6 +91,7 @@ The list of available options is the following:
     - WARNING (show error and warning messages - this is the default setting),
     - INFO    (show error, warning and informational messages),
     - DEBUG   (show ALL messages).
+    Note that the log level can be modified in run-time, using the [admin API](management_api.md).
 -   **-t <trace level>**. Specifies the initial trace levels
     for logging. You can use a single value (e.g. "-t 70"), a
     range (e.g. "-t 20-80"), a comma-separated list (e.g. "-t 70,90") or
