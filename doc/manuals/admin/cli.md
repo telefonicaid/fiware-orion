@@ -85,7 +85,7 @@ The list of available options is the following:
 -   **-logDir <dir\>**. Specifies the directory to use for the contextBroker log file.
 -   **-logAppend**. If used, the log lines are appended to the existing
     contextBroker log file, instead of starting with an empty log file.
--   **-logLevel**. Select logging level, supported levels:
+-   **-logLevel**. Select initial logging level, supported levels:
     - NONE    (suppress ALL log output, including errors),
     - ERROR   (show only error messages),
     - WARNING (show error and warning messages - this is the default setting),
