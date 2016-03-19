@@ -139,6 +139,7 @@
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
 #include "serviceRoutines/badVerbAllFive.h"
+#include "serviceRoutines/badVerbPutOnly.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -197,6 +198,7 @@
 #include "serviceRoutinesV2/patchSubscription.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
 #include "serviceRoutinesV2/postBatchUpdate.h"
+#include "serviceRoutinesV2/logLevelTreat.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -687,7 +689,7 @@ static const char* validLogLevels[] =
 //
 // Log, version, statistics ...
 //
-#define LOG                LogRequest
+#define LOG                LogTraceRequest
 #define LOGT_COMPS_V0      2, { "log", "trace"                           }
 #define LOGTL_COMPS_V0     3, { "log", "trace",      "*"                 }
 #define LOG2T_COMPS_V0     2, { "log", "traceLevel"                      }
@@ -702,6 +704,14 @@ static const char* validLogLevels[] =
 #define STAT_COMPS_V1        3, { "v1", "admin", "statistics"              }
 #define STAT_CACHE_COMPS_V0  2, { "cache", "statistics"                    }
 #define STAT_CACHE_COMPS_V1  4, { "v1", "admin", "cache", "statistics"     }
+
+
+
+//
+// LogLevel
+//
+#define LOGLEVEL           LogLevelRequest
+#define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
 
@@ -1097,6 +1107,10 @@ static const char* validLogLevels[] =
   { "*", INV, INV10_COMPS,   "", badNgsi10Request }, \
   { "*", INV, INV_ALL_COMPS, "", badRequest       }
 
+#define LOGLEVEL_REQUESTS_V2                                                         \
+  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", logLevelTreat                      }, \
+  { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
+
 
 
 /* ****************************************************************************
@@ -1113,8 +1127,6 @@ static const char* validLogLevels[] =
 *
 * This is the default service vector, that is used if the broker is started without the -ngsi9 option
 */
-
-
 RestService restServiceV[] =
 {
   API_V2,
@@ -1135,6 +1147,7 @@ RestService restServiceV[] =
   STAT_CACHE_REQUESTS_V0,
   STAT_CACHE_REQUESTS_V1,
   VERSION_REQUESTS,
+  LOGLEVEL_REQUESTS_V2,
 
 #ifdef DEBUG
   EXIT_REQUESTS,

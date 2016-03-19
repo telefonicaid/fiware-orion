@@ -33,7 +33,7 @@
 *
 * STAT_ADD - 
 */
-#define STAT_ADD(out, indent, buf, tag, comma)                        \
+#define STAT_ADD(out, indent, buf, tag, comma)                                \
 do                                                                            \
 {                                                                             \
   if (format == JSON)                                                         \
@@ -128,7 +128,8 @@ int noOfIndividualContextEntityAttributeWithTypeAndId    = -1;
 int noOfAttributeValueInstanceWithTypeAndId              = -1;
 int noOfEntityByIdAttributeByNameIdAndType               = -1;
 
-int noOfLogRequests                                      = -1;
+int noOfLogTraceRequests                                 = -1;
+int noOfLogLevelRequests                                 = -1;
 int noOfVersionRequests                                  = -1;
 int noOfExitRequests                                     = -1;
 int noOfLeakRequests                                     = -1;
@@ -360,7 +361,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case ContextEntitiesByEntityIdAndType:                 ++noOfContextEntitiesByEntityIdAndType; break;
   case EntityByIdAttributeByNameIdAndType:               ++noOfEntityByIdAttributeByNameIdAndType; break;
 
-  case LogRequest:                                       ++noOfLogRequests; break;
+  case LogTraceRequest:                                  ++noOfLogTraceRequests; break;
+  case LogLevelRequest:                                  ++noOfLogLevelRequests; break;
   case VersionRequest:                                   ++noOfVersionRequests; break;
   case ExitRequest:                                      ++noOfExitRequests; break;
   case LeakRequest:                                      ++noOfLeakRequests; break;

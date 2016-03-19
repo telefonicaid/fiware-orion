@@ -26,6 +26,8 @@ The `-logLevel` option allows to choose which error messages are printed in the 
 When Orion runs in foreground (i.e. with the `-fg` [CLI argument](cli.md)), it also prints the same log traces
 (but in a simplified way) on the standard output.
 
+The log level can be changed in run-time, using the [admin API](management_api.md) exposed by Orion.
+
 [Top](#top)
 
 ## Log format

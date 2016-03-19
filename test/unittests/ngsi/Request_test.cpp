@@ -82,7 +82,7 @@ TEST(Request, requestType)
     { Ngsi10ContextEntityTypesAttribute,           "Ngsi10ContextEntityTypesAttribute"                      },
     { Ngsi10SubscriptionsConvOp,                   "Ngsi10SubscriptionsConvOp"                              },
 
-    { LogRequest,                                  "Log"                                                    },
+    { LogTraceRequest,                             "Log"                                                    },
     { VersionRequest,                              "Version"                                                },
     { StatisticsRequest,                           "Statistics"                                             },
     { ExitRequest,                                 "Exit"                                                   },
