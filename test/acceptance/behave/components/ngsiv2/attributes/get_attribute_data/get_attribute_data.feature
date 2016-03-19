@@ -29,6 +29,8 @@
 
 
 Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<entity_id>/attrs/<attr_name>
+  Queries parameters
+  tested: type
   As a context broker user
   I would like to get an attribute by entity ID using NGSI v2
   So that I can manage and use them in my scripts
@@ -990,7 +992,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
 
    #   -------------- queries parameters ------------------------------------------
    #   ---  type query parameter ---
-
 
   @more_entities
   Scenario:  try get an attribute by entity ID using NGSI v2 with more than one entity with the same id

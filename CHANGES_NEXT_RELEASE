@@ -15,3 +15,4 @@
 - Fix: GET /v2/entities/id/attrs/name/value for type date (Issue #1885)
 - Fix: PUT /v2/entities/id/attrs/name/value forbidden chars (JSON) (Issue #1905)
 - Fix: PUT /v2/entities/id/attrs/name/value changing type to 'none' (text/plain) (Issue #1904)
+- Add: PUT /admin/log?level=XXX to change log level in run-time (Issue #1913)
