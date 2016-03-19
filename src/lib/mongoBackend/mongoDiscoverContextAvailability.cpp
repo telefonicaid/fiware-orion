@@ -74,7 +74,6 @@ static HttpStatusCode processDiscoverContextAvailability
                           &count))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
-    alarmMgr.dbError(responseP->errorCode.details);
     return SccOk;
   }
 

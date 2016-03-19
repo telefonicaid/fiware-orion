@@ -1,3 +1,7 @@
+- Fix: over-logging at error level due to not checking field existente in BSON objects
+- Hardening: use safeMongo get*Field() methods in places not previously using them (mainly in csubs cache library)
+- Fix: aggregating entities without type and type "" in same entry at GET entity types operation 
+- Fix: DB error relog done at ERROR level (previously it was using WARNING)
 - Fix: check for invalid chars in attribute type (Issue #1847, #1844)
 - Fix: check for field too long in attribute type (Issue #1845)
 - Fix: check for metadatas with empty name (Issue #1438)

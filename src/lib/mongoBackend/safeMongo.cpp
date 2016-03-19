@@ -35,7 +35,7 @@ using namespace mongo;
 *
 * getObjectField -
 */
-BSONObj getObjectField(const BSONObj& b, const std::string& field)
+BSONObj getObjectField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == Object)
   {
@@ -45,12 +45,12 @@ BSONObj getObjectField(const BSONObj& b, const std::string& field)
   // Detect error
   if (!b.hasField(field))
   {
-    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+    LM_E(("Runtime Error (object field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an object but type=%d in BSONObj <%s>)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+    LM_E(("Runtime Error (field '%s' was supposed to be an object but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
   return BSONObj();
 }
@@ -59,7 +59,7 @@ BSONObj getObjectField(const BSONObj& b, const std::string& field)
 *
 * getStringField -
 */
-std::string getStringField(const BSONObj& b, const std::string& field)
+std::string getStringField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == String)
   {
@@ -69,12 +69,12 @@ std::string getStringField(const BSONObj& b, const std::string& field)
   // Detect error
   if (!b.hasField(field))
   {
-    LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+    LM_E(("Runtime Error (string field '%s' is missing in BSONObj <%s> from caller %s)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d in BSONObj <%s>)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+    LM_E(("Runtime Error (field '%s' was supposed to be a string but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }
   return "";
 }
@@ -83,7 +83,7 @@ std::string getStringField(const BSONObj& b, const std::string& field)
 *
 * getIntField -
 */
-int getIntField(const BSONObj& b, const std::string& field)
+int getIntField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == NumberInt)
   {
@@ -93,12 +93,12 @@ int getIntField(const BSONObj& b, const std::string& field)
   // Detect error
   if (!b.hasField(field))
   {
-    LM_E(("Runtime Error (int field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+    LM_E(("Runtime Error (int field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be an int but type=%d in BSONObj <%s>)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+    LM_E(("Runtime Error (field '%s' was supposed to be an int but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }  
   return -1;
 }
@@ -107,7 +107,7 @@ int getIntField(const BSONObj& b, const std::string& field)
 *
 * getLongField -
 */
-long long getLongField(const BSONObj& b, const std::string& field)
+long long getLongField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   if (b.hasField(field) && (b.getField(field).type() == NumberLong))
   {
@@ -117,12 +117,12 @@ long long getLongField(const BSONObj& b, const std::string& field)
   // Detect error
   if (!b.hasField(field))
   {
-    LM_E(("Runtime Error (long field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+    LM_E(("Runtime Error (long field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s>)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+    LM_E(("Runtime Error (field '%s' was supposed to be a long but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }  
 
   return -1;
@@ -132,7 +132,7 @@ long long getLongField(const BSONObj& b, const std::string& field)
 *
 * getIntOrLongFieldAsLong -
 */
-long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field)
+long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   if (b.hasField(field))
   {
@@ -149,12 +149,12 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field)
   // Detect error
   if (!b.hasField(field))
   {
-    LM_E(("Runtime Error (int/long field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+    LM_E(("Runtime Error (int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
   }
   else
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be int or long but type=%d in BSONObj <%s>)",
-          field.c_str(), b.getField(field).type(), b.toString().c_str()));
+    LM_E(("Runtime Error (field '%s' was supposed to be int or long but type=%d in BSONObj <%s> from caller %s:%d)",
+          field.c_str(), b.getField(field).type(), b.toString().c_str(), caller.c_str(), line));
   }  
 
   return -1;
@@ -164,7 +164,7 @@ long long getIntOrLongFieldAsLong(const BSONObj& b, const std::string& field)
 *
 * getBoolField -
 */
-bool getBoolField(const BSONObj& b, const std::string& field)
+bool getBoolField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   if (b.hasField(field) && b.getField(field).type() == Bool)
   {
@@ -178,7 +178,7 @@ bool getBoolField(const BSONObj& b, const std::string& field)
   }
   else 
   {
-    LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s>)",
+    LM_E(("Runtime Error (field '%s' was supposed to be a bool but type=%d in BSONObj <%s> from caller %s:%d)",
           field.c_str(), b.getField(field).type(), b.toString().c_str()));
   }
   return false;
@@ -188,14 +188,14 @@ bool getBoolField(const BSONObj& b, const std::string& field)
 *
 * getField -
 */
-BSONElement getField(const BSONObj& b, const std::string& field)
+BSONElement getField(const BSONObj& b, const std::string& field, const std::string& caller, int line)
 {
   if (b.hasField(field))
   {
     return b.getField(field);
   }
 
-  LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s>)", field.c_str(), b.toString().c_str()));
+  LM_E(("Runtime Error (field '%s' is missing in BSONObj <%s> from caller %s:%d)", field.c_str(), b.toString().c_str(), caller.c_str(), line));
   return BSONElement();
 }
 
@@ -234,7 +234,7 @@ bool moreSafe(const std::auto_ptr<DBClientCursor>& cursor)
 * nextSafeOrError -
 *
 */
-bool nextSafeOrError(const std::auto_ptr<DBClientCursor>& cursor, BSONObj* r, std::string* err)
+bool nextSafeOrError(const std::auto_ptr<DBClientCursor>& cursor, BSONObj* r, std::string* err, const std::string& caller, int line)
 {
   try
   {
@@ -243,12 +243,16 @@ bool nextSafeOrError(const std::auto_ptr<DBClientCursor>& cursor, BSONObj* r, st
   }
   catch (const std::exception &e)
   {
-    *err = e.what();
+    char lineString[STRING_SIZE_FOR_INT];
+    snprintf(lineString, sizeof(lineString), "%d", line);
+    *err = std::string(e.what()) + " at " + caller + ":" + lineString;
     return false;
   }
   catch (...)
   {
-    *err = "generic exception";
+    char lineString[STRING_SIZE_FOR_INT];
+    snprintf(lineString, sizeof(lineString), "%d", line);
+    *err = "generic exception at " + caller + ":" + lineString;
     return false;
   }
 }
