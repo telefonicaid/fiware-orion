@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* Names of the URI parameters
+* Names of URI parameters
 */
 #define URI_PARAM_PAGINATION_OFFSET       "offset"
 #define URI_PARAM_PAGINATION_LIMIT        "limit"
@@ -46,6 +46,10 @@
 #define URI_PARAM_TYPE                    "type"
 #define URI_PARAM_SORTED                  "orderBy"
 #define URI_PARAM_Q                       "q"
+
+
+// URI parameters for 'admin' requests
+#define URI_PARAM_LEVEL                   "level"
 
 
 

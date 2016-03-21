@@ -49,7 +49,7 @@ using namespace ngsiv2;
 */
 static void setSubscriptionId(Subscription* s, const BSONObj& r)
 {
-  s->id = getField(r, "_id").OID().toString();
+  s->id = getFieldF(r, "_id").OID().toString();
 }
 
 
@@ -61,13 +61,13 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 static void setSubject(Subscription* s, const BSONObj& r)
 {
   // Entities
-  std::vector<BSONElement> ents = getField(r, CSUB_ENTITIES).Array();
+  std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj ent           = ents[ix].embeddedObject();
-    std::string id        = getStringField(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringField(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern = getStringField(ent, CSUB_ENTITY_ISPATTERN);
+    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
 
     EntID en;
     if (isFalse(isPattern))
@@ -84,14 +84,14 @@ static void setSubject(Subscription* s, const BSONObj& r)
   }
 
   // Condition
-  std::vector<BSONElement> conds = getField(r, CSUB_CONDITIONS).Array();
+  std::vector<BSONElement> conds = getFieldF(r, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < conds.size(); ++ix)
   {
     BSONObj cond = conds[ix].embeddedObject();
     // The ONCHANGE check is needed, as a subscription could mix different conditions types in DB
-    if (std::string(getStringField(cond, CSUB_CONDITIONS_TYPE)) == ON_CHANGE_CONDITION)
+    if (std::string(getStringFieldF(cond, CSUB_CONDITIONS_TYPE)) == ON_CHANGE_CONDITION)
     {
-      std::vector<BSONElement> condValues = getField(cond, CSUB_CONDITIONS_VALUE).Array();
+      std::vector<BSONElement> condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
       for (unsigned int jx = 0; jx < condValues.size(); ++jx)
       {
         std::string attr = condValues[jx].String();
@@ -100,11 +100,11 @@ static void setSubject(Subscription* s, const BSONObj& r)
     }
   }
   if (r.hasField(CSUB_EXPR)) {
-    mongo::BSONObj expression = getField(r, CSUB_EXPR).Obj();
-    std::string    q          = getField(expression, CSUB_EXPR_Q).String();
-    std::string    geo        = getField(expression, CSUB_EXPR_GEOM).String();
-    std::string    coords     = getField(expression, CSUB_EXPR_COORDS).String();
-    std::string    georel     = getField(expression, CSUB_EXPR_GEOREL).String();
+    mongo::BSONObj expression = getFieldF(r, CSUB_EXPR).Obj();
+    std::string    q          = getFieldF(expression, CSUB_EXPR_Q).String();
+    std::string    geo        = getFieldF(expression, CSUB_EXPR_GEOM).String();
+    std::string    coords     = getFieldF(expression, CSUB_EXPR_COORDS).String();
+    std::string    georel     = getFieldF(expression, CSUB_EXPR_GEOREL).String();
 
     s->subject.condition.expression.q = q;
     s->subject.condition.expression.geometry = geo;
@@ -122,7 +122,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
 static void setNotification(Subscription* s, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
-  std::vector<BSONElement> attrs = getField(r, CSUB_ATTRS).Array();
+  std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     std::string attr = attrs[ix].String();
@@ -130,10 +130,10 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
     s->notification.attributes.push_back(attr);
   }
 
-  s->notification.callback         = getStringField(r, CSUB_REFERENCE);
-  s->notification.throttling       = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(r, CSUB_THROTTLING)       : -1;
-  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(r, CSUB_LASTNOTIFICATION) : -1;
-  s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getField(r, CSUB_COUNT).numberLong()              : -1;
+  s->notification.callback         = getStringFieldF(r, CSUB_REFERENCE);
+  s->notification.throttling       = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
+  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
+  s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
 
   //
   // Check values from subscription cache, update object from cache-values if necessary
@@ -169,7 +169,7 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
 */
 static void setExpires(Subscription* s, const BSONObj& r)
 {
-  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLong(r, CSUB_EXPIRATION) : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : -1;
 
   //
   // Status
@@ -250,9 +250,9 @@ void mongoListSubscriptions
   {
     BSONObj r;    
 
-    if (!nextSafeOrError(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
     }
     docs++;
@@ -324,10 +324,10 @@ void mongoGetSubscription
   if (moreSafe(cursor))
   {
     BSONObj r;    
-    if (!nextSafeOrError(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &r, &err))
     {
       releaseMongoConnection(connection);
-      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;

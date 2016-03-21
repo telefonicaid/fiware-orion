@@ -31,6 +31,7 @@
 Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/entities/<entity_id> plus payload
   queries parameters:
   tested: options=append, options=keyValues
+  pending: type
   s a context broker user
   I would like to update or append an attribute by entity ID
   So that I can manage and use them in my scripts

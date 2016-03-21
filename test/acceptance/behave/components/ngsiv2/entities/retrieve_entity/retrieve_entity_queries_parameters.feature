@@ -31,7 +31,7 @@
 Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
   queries parameters:
   - tested: attrs and options=keyValues
-  - pending: options=values
+  - pending: options=values,type
   As a context broker user
   I would like to get an entity by ID using NGSI v2
   So that I can manage and use them in my scripts

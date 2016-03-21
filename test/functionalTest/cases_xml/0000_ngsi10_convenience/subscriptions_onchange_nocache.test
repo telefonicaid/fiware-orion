@@ -320,7 +320,7 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 1 }
+{ "count" : NumberLong(1) }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 809
@@ -355,7 +355,7 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 2 }
+{ "count" : NumberLong(2) }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 243
@@ -370,7 +370,7 @@ Date: REGEX(.*)
     <throttling>PT6S</throttling>
   </subscribeResponse>
 </updateContextSubscriptionResponse>
-{ "count" : 2 }
+{ "count" : NumberLong(2) }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 805
@@ -405,7 +405,7 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 3 }
+{ "count" : NumberLong(3) }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 805
@@ -469,7 +469,7 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 4 }
+{ "count" : NumberLong(4) }
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 636
