@@ -44,6 +44,7 @@ patchSubscription.cpp
 postBatchQuery.cpp
 badVerbGetDeletePatchOnly.cpp
 postBatchUpdate.cpp
+logLevelTreat.cpp
 )
 
 SET (HEADERS
@@ -70,6 +71,7 @@ patchSubscription.h
 postBatchQuery.h
 badVerbGetDeletePatchOnly.h
 postBatchUpdate.h
+logLevelTreat.h
 )
 
 

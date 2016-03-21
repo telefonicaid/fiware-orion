@@ -84,7 +84,6 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    alarmMgr.dbError(responseP->statusCode.details);
     return SccOk;
   }
   alarmMgr.dbErrorReset();

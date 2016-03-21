@@ -35,18 +35,18 @@
 */
 static RestService rs[] = 
 {
-   { "GET",    LogRequest,                            2, { "log", "verbose"                                         }, logVerboseTreat                           },
-   { "PUT",    LogRequest,                            3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
-   { "POST",   LogRequest,                            3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
-   { "DELETE", LogRequest,                            2, { "log", "verbose"                                         }, logVerboseTreat                           },
+   { "GET",    LogTraceRequest,                       2, { "log", "verbose"                                         }, logVerboseTreat                           },
+   { "PUT",    LogTraceRequest,                       3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
+   { "POST",   LogTraceRequest,                       3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
+   { "DELETE", LogTraceRequest,                       2, { "log", "verbose"                                         }, logVerboseTreat                           },
 
-   { "GET",    LogRequest,                            2, { "log", "traceLevel"                                      }, logTraceTreat                             },
-   { "PUT",    LogRequest,                            3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
-   { "POST",   LogRequest,                            3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
-   { "DELETE", LogRequest,                            2, { "log", "traceLevel"                                      }, logTraceTreat                             },
+   { "GET",    LogTraceRequest,                       2, { "log", "traceLevel"                                      }, logTraceTreat                             },
+   { "PUT",    LogTraceRequest,                       3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
+   { "POST",   LogTraceRequest,                       3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
+   { "DELETE", LogTraceRequest,                       2, { "log", "traceLevel"                                      }, logTraceTreat                             },
 
-   { "*",      LogRequest,                            2, { "log", "*"                                               }, logErrorTreat                             },
-   { "*",      LogRequest,                            3, { "log", "*", "*"                                          }, logErrorTreat                             },
+   { "*",      LogTraceRequest,                       2, { "log", "*"                                               }, logErrorTreat                             },
+   { "*",      LogTraceRequest,                       3, { "log", "*", "*"                                          }, logErrorTreat                             },
 
    { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                             }, badRequest                                },
 
