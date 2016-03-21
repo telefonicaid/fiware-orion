@@ -258,7 +258,7 @@ HttpStatusCode mongoEntityTypes
     // nullId true means that the "cumulative" entityType for both no-type and type "" has to be used. This happens
     // when the results item has the field "" and at the same time the value of that field is JSON null or when
     // the value of the field "_id" is ""
-    bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) || (getStringFieldF(resultItem, "_id") == "");
+    bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) || getFieldF(resultItem, "_id").isNull() || (getStringFieldF(resultItem, "_id") == "");
 
     if (nullId)
     {
