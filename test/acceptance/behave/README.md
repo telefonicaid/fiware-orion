@@ -304,9 +304,11 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | delete_context_provider_registration        |  (pending)   | DELETE  | /v2/registrations/`<registration_id>`                | No        | No             |   
 |                                                                                                                                                          |
 |**alarms folder**                            |  (pending)   |                                                                                             |
+|                                                                                                                                                          |
 |**cli_parameters folder**                    |  (pending)   |                                                                                             |
 
-  
+
+
 ## Hints:
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
   - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
@@ -343,7 +345,11 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
        ```
        create an entity in raw and "normalized" modes
        ```
-    
+  - If don´t want verify the value of something trace in log, use `ignored` as value.
+     ```
+      | trace | value   |
+      | time  | ignored |
+     ```
 
 ## Tags
 

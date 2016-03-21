@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
- Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+ Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 
  This file is part of Orion Context Broker.
 
@@ -20,12 +20,14 @@
  For those usages not covered by this license please contact with
  iot_support at tid dot es
 """
-import copy
-import re
 
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
+import copy
+import re
+
 from iotqatools.helpers_utils import *
+from iotqatools.remote_log_utils import Remote_Log
 
 # constants
 EMPTY = u''
@@ -33,6 +35,7 @@ FIWARE_SERVICE_HEADER = u'Fiware-Service'
 FIWARE_SERVICE_PATH_HEADER = u'Fiware-ServicePath'
 ORION_PREFIX = u'orion'
 PARAMETER = u'parameter'
+TRACE = u'trace'
 VALUE = u'value'
 
 __logger__ = logging.getLogger("utils")
@@ -898,3 +901,22 @@ class NGSI:
                 assert count == count_total, " ERROR - the x-total-count header: %d does not match with the expected total: %d" \
                                              % (count, count_total)
 
+    def verify_log(self, context, line):
+        """
+        verify if traces match in the log line
+        :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+        :param line: log line to seek all traces
+        """
+        trace = {}
+        for row in context.table:
+            trace[row[TRACE]] = row[VALUE]
+
+        for key, value in trace.items():
+            assert line.find(key) >= 0,u'ERROR - the "%s" trace does not exist in the line: \n   %s' % (key, line)
+            __logger__.info(u' the "%s" trace does exist in log line' % key)
+            if trace[key] != "ignored":
+                remote_log = Remote_Log()
+                line_value = remote_log.get_trace(line, key)
+                assert trace[key] == line_value, \
+                    u' ERROR - the "%s" value expected in the "%s" trace does not match with "%s" line value...' \
+                    % (trace[key], key, line_value)
