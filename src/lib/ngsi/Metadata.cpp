@@ -153,6 +153,9 @@ Metadata::Metadata(const BSONObj& mdB)
 {
   name = getStringFieldF(mdB, ENT_ATTRS_MD_NAME);
   type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
+
+  typeGiven = (type == "")? false : true;
+
   switch (getFieldF(mdB, ENT_ATTRS_MD_VALUE).type())
   {
   case String:
