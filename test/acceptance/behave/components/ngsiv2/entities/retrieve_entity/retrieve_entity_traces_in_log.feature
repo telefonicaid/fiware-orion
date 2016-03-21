@@ -53,6 +53,7 @@ Feature: verify fields in log traces with retrieve entity request using NGSI v2.
       | Fiware-Service     | test_log_traces  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
+    # These properties below are used in create request
     And properties to entities
       | parameter         | value       |
       | entities_type     | house       |
