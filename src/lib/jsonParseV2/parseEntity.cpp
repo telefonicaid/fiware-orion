@@ -210,5 +210,10 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     }
   }
 
+  if (!eP->typeGiven)
+  {
+    eP->type = DEFAULT_TYPE;
+  }
+
   return "OK";
 }

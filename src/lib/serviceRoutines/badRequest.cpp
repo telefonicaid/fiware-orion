@@ -54,7 +54,6 @@ std::string badRequest
   alarmMgr.badInput(ciP->ip, details);
 
   answer = restErrorReplyGet(ciP,
-                             ciP->outFormat,
                              "",
                              ciP->payloadWord,
                              SccBadRequest,

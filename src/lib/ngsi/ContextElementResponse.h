@@ -76,7 +76,6 @@ typedef struct ContextElementResponse
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,
-                     Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);

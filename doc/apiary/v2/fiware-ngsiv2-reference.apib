@@ -126,7 +126,7 @@ above. Similarly to attributes, each piece of metadata has
  * a **metadata type**, describing the NGSI value type of the metadata value
  * a **metadata value** containing the actual metadata
 
-Note that in NGSI it is not forseen that metadata values can
+Note that in NGSI it is not foreseen that metadata values can
 themselves have metadata.
 
 #### Restrictions and Operation Scopes
@@ -248,6 +248,8 @@ There are two representation modes, which must be supported by implementations, 
 ```
 [ 'Ford', 'black', 78.3 ]
 ```
+
+* *unique mode*. This mode is just like *values mode*, with the only difference that values are not repeated.
 
 ## Partial Representations
 
@@ -632,6 +634,87 @@ must be sent.
 *default location*, then the query will be declared as ambigous and an HTTP error response with code ``409``
 must be sent. 
 
+## Notification messages
+
+Notifications include two fields:
+
+* `subscriptionId` which represents the concerned subscription that originates the notification
+* `data` an array with the notification data itself which includes the entity and attributes concerned. Each
+  element in the array corresponds to a different entity. By default each entity will be represented in
+  normalized mode. However by using the `attrsFormat` modifier it can be requested a simplified representation.
+
+If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation is used:
+
+```
+{
+   "subscriptionId": "12345",
+   "data": [
+     {
+       "id": "Room1",
+       "type": "Room",
+       "temperature": {
+         "value": 23,
+         "type": "none",
+         "metadata": {}
+       },
+       "humidity": {
+         "value": 70,
+         "type": "percentage",
+         "metadata": {}
+       }
+     },
+     {
+     "id": "Room2",
+     "type": "Room",
+     "temperature": {
+       "value": 24,
+       "type": "none",
+       "metadata": {}
+     }
+   ]
+}
+```
+
+If `attrsFormat` is `keyValues` then keyValues entity partial representation mode is used:
+
+```
+{
+   "subscriptionId": "12345",
+   "data": [
+     {
+       "id": "Room1",
+       "type": "Room",
+       "temperature": 23,
+       "humidity": 70
+       }
+     },
+     {
+     "id": "Room2",
+     "type": "Room",
+     "temperature": 24
+     }
+   ]
+}
+```
+
+
+If `attrsFormat` is `values` then values entity partial representation mode is used:
+
+```
+{
+   "subscriptionId": "12345",
+   "data": [ [23, 70], [24] ]
+}
+```
+
+Notifications must include a `X-Ngsiv2-AttrsFormat` header with the value of `attrsFormat` of the associated subscription,
+so notification receiver can know the format used without needing processing notification payload.
+
+### Notification templates
+
+Based on the "template" field defined as part of the subscription and in a macro replacement language
+that could be used in "template" "callback", "headers" and "query". Details TBD.
+
 ## Group API Entry Point
 
 ### Retrieve API Resources [GET /v2]
@@ -709,6 +792,8 @@ Response code:
           section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 + Response 200 (application/json)
 
@@ -827,6 +912,8 @@ Response:
           corresponding section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding 
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 + Response 200 (application/json)
 
@@ -1236,12 +1323,15 @@ Response code:
 A subscription is represented by a JSON object with the following fields:
 
 + `id`: Subscription unique identifier. Automatically created at creation time.
++ `description` (optional): A free text used by the client to describe the subscription.
 + `subject`: It is an object that describes the subject of the subscription.
 + `notification`: It is an object that describes the notification received by the subscriber.
 + `expires`: Subscription expiration date in ISO8601 format. Permanent subscriptions must omit
    this field.
-+ `status` (not editable, only in GET operations): Either `active` (for permanent subscriptions or if
-   the subscription has not expired yet) or `expired` (for expired subscriptions).
++ `status`: Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
+  If this field is not provided at subscription creation time, new subscriptions are created with
+  the `active` status, which can be changed by clients afterwards. For expired subscriptions this
+  attribute is set to `expired` value (no matter if the client updates it to `active`/`inactive`).
 
 A `subject` contains the following subfields:
 
@@ -1256,9 +1346,16 @@ A `subject` contains the following subfields:
 A `notification` object contains the following subfields:
 
 + `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
-  in the notification
+  in the notification. It also defines the order in which attributes will appear in notifications when `attrsFormat` `value` is used
+  (see "Notification messages" section).
 + `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
++ `headers` (optional): a key-map of HTTP headers that will be included in the notification messages. Note that this cannot be used
+  to override headers that make the notification inconsistent (e.g. `Content-Type: application/json`).
++ `query` (optional): a key-map of URL query parameters that will be included in the notification message.
++ `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
+  `normalized` (the one used if the field is omitted), `keyValues` or `values`. If `attrsFormat` takes any value different
+  than those an error will be raised. See detail in "Notification messages" section.
 + `throttling`: Minimal period of time in seconds which must elapse between two consecutive notifications. It
   is optional.
 + `timesSent` (not editable, only in GET operations): Number of notifications sent due to this subscription.
@@ -1296,6 +1393,7 @@ Response:
         [
             {
                 "id": "abcdefg",
+                "description": "One subscription to rule them all",
                 "subject": {                    
                     "entities": [
                         {
@@ -1312,6 +1410,13 @@ Response:
                 },
                 "notification": {
                     "callback": "http://localhost:1234",
+                    "headers": {
+                      "X-MyHeader": "foo"
+                    },
+                    "query": {
+                      "authToken": "bar"
+                    },
+                    "attrsFormat": "keyValues",
                     "attributes": ["temperature", "humidity"],
                     "throttling": 5,
                     "count": 12,
@@ -1336,6 +1441,7 @@ Response:
 + Request (application/json)
 
         {
+            "description": "One subscription to rule them all",
             "subject": {
                 "entities": [
                     {
@@ -1382,6 +1488,7 @@ Response:
 
         {
             "id": "abcdef",
+            "description": "One subscription to rule them all",
             "subject": {
                 "entities": [
                     {
@@ -1690,6 +1797,8 @@ Response code:
           section for details.
           + values - when used, the response payload uses `values` simplified entity representation. See corresponding
           section for details.
+          + unique - when used, the response payload uses `values` simplified entity representation. And, recurring values are left out.
+          See corresponding section for details.
 
 
 + Request (application/json)

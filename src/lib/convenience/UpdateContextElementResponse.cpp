@@ -42,7 +42,7 @@
 */
 UpdateContextElementResponse::UpdateContextElementResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -61,18 +61,18 @@ std::string UpdateContextElementResponse::render
   std::string tag = "updateContextElementResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
   else
   {
     out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

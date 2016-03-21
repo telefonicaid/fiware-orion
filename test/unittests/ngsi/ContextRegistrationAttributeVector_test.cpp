@@ -40,34 +40,26 @@ TEST(ContextRegistrationAttributeVector, render)
   ContextRegistrationAttributeVector crav;
   ContextRegistrationAttribute       cra("name", "type", "false");
   ContextRegistrationAttribute       cra2("name2", "type2", "true");
-  std::string                        out;
-  const char*                        outfile1 = "ngsi.contextRegistrationAttributeVector.render1.middle.xml";
-  const char*                        outfile2 = "ngsi.contextRegistrationAttributeVector.render1.middle.json";
-  const char*                        outfile3 = "ngsi.contextRegistrationAttributeVector.render2.middle.xml";
-  const char*                        outfile4 = "ngsi.contextRegistrationAttributeVector.render2.middle.json";
+  std::string                        out;  
+  const char*                        outfile1 = "ngsi.contextRegistrationAttributeVector.render1.middle.json";
+  const char*                        outfile2 = "ngsi.contextRegistrationAttributeVector.render2.middle.json";
 
   utInit();
 
-  out = crav.render(XML, "");
+  out = crav.render("");
   EXPECT_STREQ("", out.c_str());
 
-  out = crav.render(JSON, "");
+  out = crav.render("");
   EXPECT_STREQ("", out.c_str());
 
   crav.push_back(&cra);
-  out = crav.render(XML, "");
+  out = crav.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  out = crav.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   crav.push_back(&cra2);
-  out = crav.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  out = crav.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  out = crav.render("");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

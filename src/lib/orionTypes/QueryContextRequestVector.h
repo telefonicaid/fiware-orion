@@ -40,12 +40,9 @@
 typedef struct QueryContextRequestVector
 {
   std::vector<QueryContextRequest*>  vec;
-  int                                xmls;
-  int                                jsons;
 
   QueryContextRequestVector();
 
-  Format                format(void);
   unsigned int          size(void);
   void                  push_back(QueryContextRequest* item);
   QueryContextRequest*  lookup(const std::string& contextProvider, EntityId* eP);

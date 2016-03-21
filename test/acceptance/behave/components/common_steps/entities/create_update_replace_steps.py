@@ -57,6 +57,16 @@ def definition_of_headers(context):
     __logger__.info("Define header used in request...")
     context.cb.definition_headers(context)
 
+@step(u'modify headers and keep previous values "([^"]*)"')
+def definition_of_headers(context, prev):
+    """
+    modification or append of headers (service, service path, Content-Type, Accept, etc)
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param prev:determine if the previous headers are kept or not ( true | false )
+    """
+    __logger__.info("Modify or append headers used in new request...")
+    context.cb.modification_headers(context, prev)
+
 @step(u'properties to entities')
 def properties_to_entities(context):
     """
@@ -234,7 +244,7 @@ def update_an_attribute_value_by_id_and_attribute_name_if_it_exists(context, ent
     :param attribute_name: attribute name to update
     """
     __logger__.debug("updating an attribute value by entity id and by attribute name...")
-    context.resp = context.cb.update_an_attribute_by_id_and_by_name(context, entity_id, attribute_name, True)
+    context.resp = context.cb.update_an_attribute_by_id_and_by_name(context, entity_id, attribute_name, "value")
     __logger__.info("...updated an attribute value by entity id and by attribute name")
 
 
@@ -247,7 +257,7 @@ def update_an_attribute_value_by_id_and_attribute_name_if_it_exists_in_raw_mode(
     :param attribute_name: attribute name to update
     """
     __logger__.debug("updating an attribute value by entity id and by attribute name in raw mode...")
-    context.resp = context.cb.update_an_attribute_by_id_and_by_name_in_raw_mode(context, entity_id, attribute_name, True)
+    context.resp = context.cb.update_an_attribute_by_id_and_by_name_in_raw_mode(context, entity_id, attribute_name, "value")
     __logger__.info("...updated an attribute value by entity id and by attribute name in raw mode")
 
 
@@ -295,5 +305,5 @@ def verify_that_an_entity_is_updated_in_mongo(context):
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"])
     ngsi = NGSI()
-    ngsi.verify_entity_updated_in_mongo(mongo, context.cb.get_entity_context(), context.cb.get_headers())
+    ngsi.verify_entity_updated_in_mongo(mongo, context.cb.get_entity_context(), context.cb.get_headers(), context.cb.get_entities_parameters())
     __logger__.info(" >> verified that an entity is updated in mongo")

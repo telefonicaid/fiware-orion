@@ -50,12 +50,12 @@ std::string EntityTypeResponse::render(ConnectionInfo* ciP, const std::string& i
   std::string out                 = "";
   std::string tag                 = "entityTypeAttributesResponse";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   out += entityType.render(ciP, indent + "  ", true, true);
-  out += statusCode.render(ciP->outFormat, indent + "  ");
+  out += statusCode.render(indent + "  ");
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }

@@ -34,21 +34,15 @@ brokerStart CB
 # a compound attribute value for "PUT /v1/contextEntities/entityId":
 #
 # 01. PUT /v1/contextEntities/entityId with compound attribute value using JSON
-# 02. PUT /v1/contextEntities/entityId with compound attribute value using XML
 #
 # However, to see 'good' results, the entity should exist:
 #
-# 03. POST /v1/contextEntities/entityId with compound attribute value using JSON
-# 04. POST /v1/contextEntities/entityId with compound attribute value using XML
+# 02. POST /v1/contextEntities/entityId with compound attribute value using JSON
 #
 # Now we try PUT again (and GET to assure it's working):
 #
-# 05. PUT /v1/contextEntities/entityId with compound attribute value using JSON
-# 06. GET /v1/contextEntities/entityId with compound attribute value using JSON
-# 07. PUT /v1/contextEntities/entityId with compound attribute value using XML
-# 08. GET /v1/contextEntities/entityId with compound attribute value using XML
-#
-#
+# 03. PUT /v1/contextEntities/entityId with compound attribute value using JSON
+# 04. GET /v1/contextEntities/entityId with compound attribute value using JSON
 #
 
 echo "01. PUT /v1/contextEntities/entityId with compound attribute value using JSON"
@@ -67,26 +61,7 @@ echo
 echo
 
 
-echo "02. PUT /v1/contextEntities/entityId with compound attribute value using XML"
-echo "============================================================================"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextElementRequest>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>sdf</name>
-      <type></type>
-      <contextValue>
-        <a>1</a>
-      </contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</updateContextElementRequest>'
-orionCurl --url /v1/contextEntities/entityId -X PUT --payload "$payload"
-echo
-echo
-
-
-echo "03. POST /v1/contextEntities/entityId with compound attribute value using JSON"
+echo "02. POST /v1/contextEntities/entityId with compound attribute value using JSON"
 echo "=============================================================================="
 payload='{
   "attributes": [
@@ -102,26 +77,7 @@ echo
 echo
 
 
-echo "04. POST /v1/contextEntities/entityId with compound attribute value using XML"
-echo "============================================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<appendContextElementRequest>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>sdf</name>
-      <type></type>
-      <contextValue>
-        <a>2</a>
-      </contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url /v1/contextEntities/entityId --payload "$payload"
-echo
-echo
-
-
-echo "05. PUT /v1/contextEntities/entityId with compound attribute value using JSON"
+echo "03. PUT /v1/contextEntities/entityId with compound attribute value using JSON"
 echo "============================================================================="
 payload='{
   "attributes": [
@@ -137,35 +93,9 @@ echo
 echo
 
 
-echo "06. GET /v1/contextEntities/entityId with compound attribute value using JSON"
+echo "04. GET /v1/contextEntities/entityId with compound attribute value using JSON"
 echo "============================================================================="
 orionCurl --url /v1/contextEntities/entityId --json
-echo
-echo
-
-
-echo "07. PUT /v1/contextEntities/entityId with compound attribute value using XML"
-echo "============================================================================"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextElementRequest>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>sdf</name>
-      <type></type>
-      <contextValue>
-        <a>7</a>
-      </contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</updateContextElementRequest>'
-orionCurl --url /v1/contextEntities/entityId -X PUT --payload "$payload"
-echo
-echo
-
-
-echo "08. GET /v1/contextEntities/entityId with compound attribute value using XML"
-echo "============================================================================"
-orionCurl --url /v1/contextEntities/entityId
 echo
 echo
 
@@ -187,24 +117,7 @@ Date: REGEX(.*)
 }
 
 
-02. PUT /v1/contextEntities/entityId with compound attribute value using XML
-============================================================================
-HTTP/1.1 200 OK
-Content-Length: 203
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextElementResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>entityId</details>
-  </errorCode>
-</updateContextElementResponse>
-
-
-03. POST /v1/contextEntities/entityId with compound attribute value using JSON
+02. POST /v1/contextEntities/entityId with compound attribute value using JSON
 ==============================================================================
 HTTP/1.1 200 OK
 Content-Length: 315
@@ -233,37 +146,7 @@ Date: REGEX(.*)
 }
 
 
-04. POST /v1/contextEntities/entityId with compound attribute value using XML
-=============================================================================
-HTTP/1.1 200 OK
-Content-Length: 559
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="" isPattern="false">
-    <id>entityId</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>sdf</name>
-          <type/>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
-
-
-05. PUT /v1/contextEntities/entityId with compound attribute value using JSON
+03. PUT /v1/contextEntities/entityId with compound attribute value using JSON
 =============================================================================
 HTTP/1.1 200 OK
 Content-Length: 254
@@ -289,7 +172,7 @@ Date: REGEX(.*)
 }
 
 
-06. GET /v1/contextEntities/entityId with compound attribute value using JSON
+04. GET /v1/contextEntities/entityId with compound attribute value using JSON
 =============================================================================
 HTTP/1.1 200 OK
 Content-Length: 306
@@ -316,63 +199,6 @@ Date: REGEX(.*)
         "reasonPhrase": "OK"
     }
 }
-
-
-07. PUT /v1/contextEntities/entityId with compound attribute value using XML
-============================================================================
-HTTP/1.1 200 OK
-Content-Length: 484
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextElementResponse>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>sdf</name>
-          <type/>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</updateContextElementResponse>
-
-
-08. GET /v1/contextEntities/entityId with compound attribute value using XML
-============================================================================
-HTTP/1.1 200 OK
-Content-Length: 478
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<contextElementResponse>
-  <contextElement>
-    <entityId type="" isPattern="false">
-      <id>entityId</id>
-    </entityId>
-    <contextAttributeList>
-      <contextAttribute>
-        <name>sdf</name>
-        <type/>
-        <contextValue>
-          <a>7</a>
-        </contextValue>
-      </contextAttribute>
-    </contextAttributeList>
-  </contextElement>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</contextElementResponse>
 
 
 --TEARDOWN--

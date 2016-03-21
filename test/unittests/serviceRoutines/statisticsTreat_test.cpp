@@ -52,8 +52,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * delete - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, delete)
+TEST(statisticsTreat, DISABLED_delete)
 {
   ConnectionInfo ci("/statistics",  "DELETE", "1.1");
   const char*    outfile1   = "orion.statistics.ok.valid.xml";
@@ -77,8 +79,10 @@ TEST(statisticsTreat, delete)
 /* ****************************************************************************
 *
 * get - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, get)
+TEST(statisticsTreat, DISABLED_get)
 {
   ConnectionInfo ci("/statistics",  "GET", "1.1");
   const char*    outfile1  = "orion.statistics.ok.valid.xml";
@@ -100,8 +104,10 @@ TEST(statisticsTreat, get)
 /* ****************************************************************************
 *
 * delete (cache) -
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, deleteCache)
+TEST(statisticsTreat, DISABLED_deleteCache)
 {
   ConnectionInfo ci("/cache/statistics",  "DELETE", "1.1");
   const char*    outfile1   = "orion.statistics.ok.valid.xml";
@@ -125,8 +131,10 @@ TEST(statisticsTreat, deleteCache)
 /* ****************************************************************************
 *
 * get (cache) -
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(statisticsTreat, getCache)
+TEST(statisticsTreat, DISABLED_getCache)
 {
   ConnectionInfo ci("/cache/statistics",  "GET", "1.1");
   const char*    outfile1  = "orion.statistics.ok.valid.xml";

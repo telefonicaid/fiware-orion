@@ -270,7 +270,7 @@ static bool addTriggeredSubscriptions
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CASUB_FORMAT)) : XML,
+        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CASUB_FORMAT)) : JSON,
         getStringFieldF(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 

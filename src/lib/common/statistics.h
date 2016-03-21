@@ -221,7 +221,6 @@ typedef struct TimeStat
   struct timespec  mongoCommandWaitTime;
   struct timespec  renderTime;
   struct timespec  reqTime;
-  struct timespec  xmlParseTime;
 } TimeStat;
 
 extern TimeStat           accTimeStat;
@@ -235,7 +234,6 @@ extern __thread TimeStat  threadLastTimeStat;
 * Statistic counters for NGSI REST requests
 */
 extern int noOfJsonRequests;
-extern int noOfXmlRequests;
 extern int noOfRegistrations;
 extern int noOfRegistrationErrors;
 extern int noOfRegistrationUpdates;
@@ -289,7 +287,8 @@ extern int noOfAttributeValueInstanceWithTypeAndId;
 extern int noOfContextEntitiesByEntityIdAndType;
 extern int noOfEntityByIdAttributeByNameIdAndType;
 
-extern int noOfLogRequests;
+extern int noOfLogTraceRequests;
+extern int noOfLogLevelRequests;
 extern int noOfVersionRequests;
 extern int noOfExitRequests;
 extern int noOfLeakRequests;

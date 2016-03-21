@@ -78,8 +78,7 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
-  std::string  xmlTag                           = "contextElement";
-  std::string  jsonTag                          = "contextElement";
+  std::string  key                              = "contextElement";
   bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
   bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
@@ -91,19 +90,19 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
   if (requestType == UpdateContext)
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+    out += startTag2(indent, key, false, false);
   }
   else
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    out += startTag2(indent, key, false, true);
   }
 
-  out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
+  out += entityId.render(indent + "  ", commaAfterEntityId, false);
+  out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
   out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
-  out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
+  out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+  out += endTag(indent, comma, false);
 
   return out;
 }
@@ -137,7 +136,6 @@ std::string ContextElement::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -145,22 +143,22 @@ std::string ContextElement::check
 {
   std::string res;
 
-  if ((res = entityId.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = entityId.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = attributeDomainName.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = attributeDomainName.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = contextAttributeVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = domainMetadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = domainMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

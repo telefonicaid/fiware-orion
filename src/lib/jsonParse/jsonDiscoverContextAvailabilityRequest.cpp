@@ -253,7 +253,6 @@ std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
   return reqDataP->dcar.res.check(ciP,
                                   DiscoverContextAvailability,
-                                  ciP->outFormat,
                                   "",
                                   reqDataP->errorString,
                                   reqDataP->dcar.res.restrictions);

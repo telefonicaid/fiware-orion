@@ -194,7 +194,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {
@@ -226,7 +226,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
 
 {

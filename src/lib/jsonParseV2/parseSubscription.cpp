@@ -351,7 +351,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     }
     scrP->reference.string = callback.GetString();
 
-    std::string refError = scrP->reference.check(SubscribeContext,JSON, "" ,"", 0);
+    std::string refError = scrP->reference.check(SubscribeContext, "" ,"", 0);
     if (refError != "OK")
     {
       alarmMgr.badInput(clientIp, refError);

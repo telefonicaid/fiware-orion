@@ -89,7 +89,7 @@ static void setSubject(Subscription* s, const BSONObj& r)
   {
     BSONObj cond = conds[ix].embeddedObject();
     // The ONCHANGE check is needed, as a subscription could mix different conditions types in DB
-    if (std::string(getStringFieldF(cond, CSUB_CONDITIONS_TYPE)) == "ONCHANGE")
+    if (std::string(getStringFieldF(cond, CSUB_CONDITIONS_TYPE)) == ON_CHANGE_CONDITION)
     {
       std::vector<BSONElement> condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
       for (unsigned int jx = 0; jx < condValues.size(); ++jx)
@@ -223,11 +223,11 @@ void mongoListSubscriptions
 
   if (!servicePath.empty() && servicePath != "/#")
   {
-    q = Query(BSON(CSUB_SERVICE_PATH << servicePath << conds << "ONCHANGE"));
+    q = Query(BSON(CSUB_SERVICE_PATH << servicePath << conds << ON_CHANGE_CONDITION));
   }
   else
   {
-    q = Query(BSON(conds << "ONCHANGE"));
+    q = Query(BSON(conds << ON_CHANGE_CONDITION));
   }
 
   q.sort(BSON("_id" << 1));

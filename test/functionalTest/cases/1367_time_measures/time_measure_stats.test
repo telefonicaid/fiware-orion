@@ -43,14 +43,13 @@ brokerStart CB 101,38 IPv4 -statTiming
 # 00. Pre-call to GET /statistics to give VALGRIND a possibility
 #
 # 01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
-# 02. Create entity E1/A1-A5 with XML
-# 03. GET /statistics
-# 04. Create entity E2/A1-A5 (identical) with v1 JSON
-# 05. GET /statistics
-# 06. Create entity E3/A1-A5 (identical) with v2 JSON
-# 07. GET /statistics
-# 08. GET /v1/contextTypes
-# 09. GET /statistics
+# 02. GET /statistics
+# 03. Create entity E2/A1-A5 (identical) with v1 JSON
+# 04. GET /statistics
+# 05. Create entity E3/A1-A5 (identical) with v2 JSON
+# 06. GET /statistics
+# 07. GET /v1/contextTypes
+# 08. GET /statistics
 #
 
 # 00. Pre-call to GET /statistics to give VALGRIND a possibility
@@ -64,95 +63,8 @@ echo
 echo
 
 
-echo "02. Create entity E1/A1-A5 with XML"
-echo "==================================="
-payload='<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E1</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>degree</type>
-          <contextValue>1</contextValue>
-          <metadata>
-            <contextMetadata>
-              <name>ID</name>
-              <type>string</type>
-              <value>floor</value>
-            </contextMetadata>
-          </metadata>
-        </contextAttribute>
-        <contextAttribute>
-          <name>A2</name>
-          <type>degree</type>
-          <contextValue>2</contextValue>
-          <metadata>
-            <contextMetadata>
-              <name>ID</name>
-              <type>string</type>
-              <value>ceiling</value>
-            </contextMetadata>
-          </metadata>
-        </contextAttribute>
-        <contextAttribute>
-          <name>A3</name>
-          <type>degree</type>
-          <contextValue>3</contextValue>
-          <metadata>
-            <contextMetadata>
-              <name>ID</name>
-              <type>string</type>
-              <value>ceiling</value>
-            </contextMetadata>
-          </metadata>
-        </contextAttribute>
-        <contextAttribute>
-          <name>A4</name>
-          <type>degree</type>
-          <contextValue>4</contextValue>
-          <metadata>
-            <contextMetadata>
-              <name>ID</name>
-              <type>string</type>
-              <value>ceiling</value>
-            </contextMetadata>
-          </metadata>
-        </contextAttribute>
-        <contextAttribute>
-          <name>A5</name>
-          <type>degree</type>
-          <contextValue>5</contextValue>
-          <metadata>
-            <contextMetadata>
-              <name>ID</name>
-              <type>string</type>
-              <value>ceiling</value>
-            </contextMetadata>
-          </metadata>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
-
-
-echo "03. GET /statistics"
-echo "==================="
-orionCurl --url /statistics --json
-echo
-echo
-
-
-echo "04. Create entity E2/A1-A5 (identical) with v1 JSON"
-echo "==================================================="
+echo "02. Create entity E2/A1-A5 with v1 JSON"
+echo "======================================="
 payload='{
   "contextElements": [
     {
@@ -229,14 +141,14 @@ echo
 echo
 
 
-echo "05. GET /statistics"
+echo "03. GET /statistics"
 echo "==================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
-echo "06. Create entity E3/A1-A5 (identical) with v2 JSON"
+echo "04. Create entity E3/A1-A5 (identical) with v2 JSON"
 echo "==================================================="
 payload='{
   "id": "E3",
@@ -272,21 +184,21 @@ echo
 echo
 
 
-echo "07. GET /statistics"
+echo "05. GET /statistics"
 echo "==================="
 orionCurl --url /statistics --json
 echo
 echo
 
 
-echo "08. GET /v1/contextTypes"
+echo "06. GET /v1/contextTypes"
 echo "========================"
 orionCurl --url /v1/contextTypes --json
 echo
 echo
 
 
-echo "09. GET /statistics"
+echo "07. GET /statistics"
 echo "==================="
 orionCurl --url /statistics --json
 echo
@@ -324,128 +236,8 @@ Date: REGEX(.*)
 }
 
 
-02. Create entity E1/A1-A5 with XML
-===================================
-HTTP/1.1 200 OK
-Content-Length: 2360
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>degree</type>
-            <contextValue/>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>floor</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A2</name>
-            <type>degree</type>
-            <contextValue/>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>ceiling</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A3</name>
-            <type>degree</type>
-            <contextValue/>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>ceiling</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A4</name>
-            <type>degree</type>
-            <contextValue/>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>ceiling</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A5</name>
-            <type>degree</type>
-            <contextValue/>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>ceiling</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
-
-
-03. GET /statistics
-===================
-HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "measuring_interval_in_secs": REGEX(\d+),
-    "timing": {
-        "accumulated": {
-            "mongoBackend": REGEX(.*.A*),
-            "mongoCommandWait": REGEX(.*.A*),
-            "mongoReadWait": REGEX(.*.A*),
-            "mongoWriteWait": REGEX(.*.A*),
-            "render": REGEX(.*.A*),
-            "total": REGEX(.*.A*),
-            "xmlParse": REGEX(.*.A*)
-        },
-        "last": {
-            "mongoBackend": REGEX(.*.A*),
-            "mongoCommandWait": REGEX(.*.A*),
-            "mongoReadWait": REGEX(.*.A*),
-            "mongoWriteWait": REGEX(.*.A*),
-            "render": REGEX(.*.A*),
-            "total": REGEX(.*.A*),
-            "xmlParse": REGEX(.*.A*)
-        }
-    },
-    "uptime_in_secs": REGEX(\d+)
-}
-
-
-04. Create entity E2/A1-A5 (identical) with v1 JSON
-===================================================
+02. Create entity E2/A1-A5 with v1 JSON
+=======================================
 HTTP/1.1 200 OK
 Content-Length: 1702
 Content-Type: application/json
@@ -530,6 +322,48 @@ Date: REGEX(.*)
 }
 
 
+03. GET /statistics
+===================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "measuring_interval_in_secs": REGEX(\d+),
+    "timing": {
+        "accumulated": {
+            "jsonV1Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
+        },
+        "last": {
+            "jsonV1Parse": REGEX(.*.A*),
+            "mongoBackend": REGEX(.*.A*),
+            "mongoCommandWait": REGEX(.*.A*),
+            "mongoReadWait": REGEX(.*.A*),
+            "mongoWriteWait": REGEX(.*.A*),
+            "render": REGEX(.*.A*),
+            "total": REGEX(.*.A*)
+        }
+    },
+    "uptime_in_secs": REGEX(\d+)
+}
+
+
+04. Create entity E3/A1-A5 (identical) with v2 JSON
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=Test
+Date: REGEX(.*)
+
+
+
 05. GET /statistics
 ===================
 HTTP/1.1 200 OK
@@ -542,57 +376,13 @@ Date: REGEX(.*)
     "timing": {
         "accumulated": {
             "jsonV1Parse": REGEX(.*.A*),
-            "mongoBackend": REGEX(.*.A*),
-            "mongoCommandWait": REGEX(.*.A*),
-            "mongoReadWait": REGEX(.*.A*),
-            "mongoWriteWait": REGEX(.*.A*),
-            "render": REGEX(.*.A*),
-            "total": REGEX(.*.A*),
-            "xmlParse": REGEX(.*.A*)
-        },
-        "last": {
-            "jsonV1Parse": REGEX(.*.A*),
-            "mongoBackend": REGEX(.*.A*),
-            "mongoCommandWait": REGEX(.*.A*),
-            "mongoReadWait": REGEX(.*.A*),
-            "mongoWriteWait": REGEX(.*.A*),
-            "render": REGEX(.*.A*),
-            "total": REGEX(.*.A*)
-        }
-    },
-    "uptime_in_secs": REGEX(\d+)
-}
-
-
-06. Create entity E3/A1-A5 (identical) with v2 JSON
-===================================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Test
-Date: REGEX(.*)
-
-
-
-07. GET /statistics
-===================
-HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "measuring_interval_in_secs": REGEX(\d+),
-    "timing": {
-        "accumulated": {
-            "jsonV1Parse": REGEX(.*.A*),
             "jsonV2Parse": REGEX(.*.A*),
             "mongoBackend": REGEX(.*.A*),
             "mongoCommandWait": REGEX(.*.A*),
             "mongoReadWait": REGEX(.*.A*),
             "mongoWriteWait": REGEX(.*.A*),
             "render": REGEX(.*.A*),
-            "total": REGEX(.*.A*),
-            "xmlParse": REGEX(.*.A*)
+            "total": REGEX(.*.A*)
         },
         "last": {
             "jsonV2Parse": REGEX(.*.A*),
@@ -608,7 +398,7 @@ Date: REGEX(.*)
 }
 
 
-08. GET /v1/contextTypes
+06. GET /v1/contextTypes
 ========================
 HTTP/1.1 200 OK
 Content-Length: 227
@@ -635,7 +425,7 @@ Date: REGEX(.*)
 }
 
 
-09. GET /statistics
+07. GET /statistics
 ===================
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
@@ -653,8 +443,7 @@ Date: REGEX(.*)
             "mongoReadWait": REGEX(.*.A*),
             "mongoWriteWait": REGEX(.*.A*),
             "render": REGEX(.*.A*),
-            "total": REGEX(.*.A*),
-            "xmlParse": REGEX(.*.A*)
+            "total": REGEX(.*.A*)
         },
         "last": {
             "mongoBackend": REGEX(.*.A*),

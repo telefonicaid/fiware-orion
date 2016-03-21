@@ -46,7 +46,14 @@
 *
 * jsonRequestTreat - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP)
+std::string jsonRequestTreat
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RequestType                requestType,
+  JsonDelayedRelease*        releaseP,
+  std::vector<std::string>&  compV
+)
 {
   std::string      answer;
   struct timespec  start;
@@ -91,10 +98,17 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 
   case EntityAttributeRequest:
     releaseP->attribute = &parseDataP->attr.attribute;
+    releaseP->attribute->name = compV[4];
     answer = parseContextAttribute(ciP, &parseDataP->attr.attribute);
     if (answer != "OK")
     {
       return answer;
+    }
+
+    if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
+    {
+      OrionError error(SccBadRequest, answer);
+      return error.render(ciP, "");
     }
     break;
 
@@ -114,7 +128,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
       return answer;
     }
     
-    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, JSON, "", "", 0)) != "OK")
+    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, "", "", 0)) != "OK")
     {
       alarmMgr.badInput(clientIp, "invalid subscription");
       return answer;

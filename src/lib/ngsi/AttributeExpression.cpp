@@ -40,7 +40,6 @@
 std::string AttributeExpression::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -111,14 +110,14 @@ void AttributeExpression::present(const std::string& indent)
 *
 * AttributeExpression::render - 
 */
-std::string AttributeExpression::render(Format format, const std::string& indent, bool comma)
+std::string AttributeExpression::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "attributeExpression", string, format, comma);
+  return valueTag1(indent, "attributeExpression", string, comma);
 }
 
 

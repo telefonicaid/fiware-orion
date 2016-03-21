@@ -29,6 +29,8 @@
 
 
 Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<entity_id>/attrs/<attr_name>
+  Queries parameters
+  tested: type
   As a context broker user
   I would like to get an attribute by entity ID using NGSI v2
   So that I can manage and use them in my scripts
@@ -126,7 +128,7 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
 
-  @service_error
+  @service_error @BUG_1873
   Scenario Outline:  try to get an attribute by entity ID using NGSI v2 with wrong several services
     Given  a definition of headers
       | parameter          | value            |
@@ -318,7 +320,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
       | entity | prefix |
       | id     | true   |
     And verify that receive several "Created" http code
-    When get an attribute "temperature" by ID "room_0"
     When get an attribute "temperature_0" by ID "<entity_id>"
     Then verify that receive an "OK" http code
     And verify that the attribute by ID is returned
@@ -991,7 +992,6 @@ Feature: get an attribute by entity ID using NGSI v2. "GET" - /v2/entities/<enti
 
    #   -------------- queries parameters ------------------------------------------
    #   ---  type query parameter ---
-
 
   @more_entities
   Scenario:  try get an attribute by entity ID using NGSI v2 with more than one entity with the same id

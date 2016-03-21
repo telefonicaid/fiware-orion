@@ -65,8 +65,8 @@ typedef struct ContextElement
 
   ContextAttribute* getAttribute(std::string attrName);
 
-  std::string  check(ConnectionInfo* ciP, RequestType         requestType,
-                     Format              format,
+  std::string  check(ConnectionInfo* ciP,
+                     RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);

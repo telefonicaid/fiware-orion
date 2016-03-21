@@ -505,7 +505,7 @@ bool attributeTypeAbsent(ContextAttribute* caP)
 *
 * changedAttr -
 */
-bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
+bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersion)
 {
   /* Not finding the attribute field at MongoDB is consideres as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -515,7 +515,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 
   /* No value in the request means that the value stays as it was before, so it is not
    * a change */
-  if (caP->valueType == ValueTypeNone)
+  if (caP->valueType == ValueTypeNone && apiVersion !="v2")
   {
     return false;
   }
@@ -552,9 +552,13 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 */
 void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP, bool useDefaultType)
 {
-  if ((mdP->type != "") || useDefaultType)
+  std::string type =  mdP->type;
+  if (!mdP->typeGiven && useDefaultType)
   {
-    std::string type = (mdP->type == "") ? DEFAULT_TYPE : mdP->type;
+    type = DEFAULT_TYPE;
+  }
+  if (type != "")
+  {
 
     switch (mdP->valueType)
     {
@@ -736,7 +740,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-      actualUpdate = (attrValueChanges(attr, caP) ||
+      actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
                                              getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
@@ -854,7 +858,7 @@ static bool updateAttribute
 
     int now = getCurrentTime();
 
-    if ((caP->type == "") && (apiVersion == "v2"))
+    if (!caP->typeGiven && (apiVersion == "v2"))
     {
       newAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
     }
@@ -887,7 +891,6 @@ static bool updateAttribute
     BSONObj newAttr;
     BSONObj attr = getFieldF(attrs, effectiveName).embeddedObject();
     actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
-
     if (actualUpdate)
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
@@ -945,7 +948,7 @@ static bool appendAttribute
   valueBson(caP, ab);
 
   /* 2. Type */
-  if ((apiVersion == "v2") && (caP->type == ""))
+  if ((apiVersion == "v2") && !caP->typeGiven)
   {
     ab.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
   }
@@ -1282,6 +1285,7 @@ static bool addTriggeredSubscriptions_withCache
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
+    cSubP->notifyFormat = JSON;
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1491,7 +1495,7 @@ static bool addTriggeredSubscriptions_noCache
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CSUB_FORMAT)) : XML,
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CSUB_FORMAT)) : JSON,
           getStringFieldF(sub, CSUB_REFERENCE),
           subToAttributeList(sub), "", "");
 
@@ -1611,17 +1615,6 @@ static bool processOnChangeConditionForUpdateContext
 
   getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* processOntimeIntervalCondition -
-*/
-void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant)
-{
-  getNotifier()->createIntervalThread(subId, interval, tenant);
 }
 
 
@@ -2518,7 +2511,7 @@ static bool createEntity
     std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
-    if ((attrsV[ix]->type == "") && (apiVersion == "v2"))
+    if (!attrsV[ix]->typeGiven && (apiVersion == "v2"))
     {
       bsonAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
     }
@@ -2917,7 +2910,6 @@ static void updateEntity
 
     return;
   }
-
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 

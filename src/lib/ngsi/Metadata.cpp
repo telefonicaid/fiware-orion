@@ -77,9 +77,9 @@ Metadata::Metadata(Metadata* mP, bool useDefaultType)
   stringValue  = mP->stringValue;
   numberValue  = mP->numberValue;
   boolValue    = mP->boolValue;
-  typeGiven    = false;
+  typeGiven    = mP->typeGiven;
 
-  if (useDefaultType && (type == ""))
+  if (useDefaultType && !typeGiven)
   {
     type = DEFAULT_TYPE;
   }
@@ -153,6 +153,9 @@ Metadata::Metadata(const BSONObj& mdB)
 {
   name = getStringFieldF(mdB, ENT_ATTRS_MD_NAME);
   type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? getStringFieldF(mdB, ENT_ATTRS_MD_TYPE) : "";
+
+  typeGiven = (type == "")? false : true;
+
   switch (getFieldF(mdB, ENT_ATTRS_MD_VALUE).type())
   {
   case String:
@@ -186,17 +189,17 @@ Metadata::Metadata(const BSONObj& mdB)
 *
 * Metadata::render -
 */
-std::string Metadata::render(Format format, const std::string& indent, bool comma)
+std::string Metadata::render(const std::string& indent, bool comma)
 {
   std::string out     = "";
   std::string tag     = "contextMetadata";
   std::string xValue  = stringValue;
 
-  out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", "name", name, format, true);
-  out += valueTag(indent + "  ", "type", type, format, true);
-  out += valueTag(indent + "  ", "value", xValue, format, false);
-  out += endTag(indent, tag, format, comma);
+  out += startTag2(indent, tag, false, false);
+  out += valueTag1(indent + "  ", "name", name, true);
+  out += valueTag1(indent + "  ", "type", type, true);
+  out += valueTag1(indent + "  ", "value", xValue, false);
+  out += endTag(indent, comma);
 
   return out;
 }
@@ -211,7 +214,6 @@ std::string Metadata::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -242,6 +244,14 @@ std::string Metadata::check
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+
+  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
