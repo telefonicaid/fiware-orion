@@ -279,8 +279,7 @@ HttpStatusCode mongoQueryContext
   std::map<std::string, std::string>&  uriParams,
   std::map<std::string, bool>&         options,
   long long*                           countP,
-  const std::string&                   apiVersion,
-  StringFilter*                        stringFilterP
+  const std::string&                   apiVersion
 )
 {
     int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -324,8 +323,7 @@ HttpStatusCode mongoQueryContext
                        sortOrderList,
                        options[DATE_CREATED],
                        options[DATE_MODIFIED],
-                       apiVersion,
-                       stringFilterP);
+                       apiVersion);
 
     if (badInput)
     {

@@ -258,8 +258,7 @@ extern bool entitiesQuery
   const std::string&               sortOrderList  = "",
   bool                             includeCreDate = false,
   bool                             includeModDate = false,
-  const std::string&               apiVersion     = "v1",
-  StringFilter*                    stringFilterP  = NULL
+  const std::string&               apiVersion     = "v1"
 );
 
 /* ****************************************************************************
@@ -338,8 +337,7 @@ extern bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  StringFilter*                    stringFilterP
+  const std::vector<std::string>&  servicePathV
 );
 
 /* ****************************************************************************
@@ -358,8 +356,7 @@ extern BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  StringFilter*                    stringFilterP
+  const std::vector<std::string>&  servicePathV
 );
 
 /* ****************************************************************************

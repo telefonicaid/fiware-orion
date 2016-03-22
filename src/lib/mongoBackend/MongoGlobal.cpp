@@ -953,8 +953,7 @@ bool entitiesQuery
   const std::string&               sortOrderList,
   bool                             includeCreDate,
   bool                             includeModDate,
-  const std::string&               apiVersion,
-  StringFilter*                    stringFilterP
+  const std::string&               apiVersion
 )
 {
   /* Query structure is as follows
@@ -1054,14 +1053,6 @@ bool entitiesQuery
     {
       std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
       alarmMgr.badInput(clientIp, details);
-    }
-  }
-
-  if (stringFilterP != NULL)
-  {
-    for (unsigned int ix = 0; ix < stringFilterP->mongoFilters.size(); ++ix)
-    {
-      finalQuery.appendElements(stringFilterP->mongoFilters[ix]);
     }
   }
 
@@ -1787,8 +1778,7 @@ bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  StringFilter*                    stringFilterP
+  const std::vector<std::string>&  servicePathV
 )
 {
   std::string                   err;
@@ -1796,9 +1786,7 @@ bool processOnChangeConditionForSubscription
   Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
-  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV,
-                     DEFAULT_PAGINATION_OFFSET_INT, DEFAULT_PAGINATION_LIMIT_INT,
-                     NULL, NULL, NULL, "", false, false, "v1", stringFilterP))
+  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -1825,9 +1813,7 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV, 
-                         DEFAULT_PAGINATION_OFFSET_INT, DEFAULT_PAGINATION_LIMIT_INT,
-                         NULL, NULL, NULL, "", false, false, "v1", stringFilterP))
+      if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
@@ -1886,8 +1872,7 @@ BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV,
-  StringFilter*                    stringFilterP
+  const std::vector<std::string>&  servicePathV
 )
 {
   BSONArrayBuilder conds;
@@ -1920,8 +1905,7 @@ BSONArray processConditionVector
                                                   format,
                                                   tenant,
                                                   xauthToken,
-                                                  servicePathV,
-                                                  stringFilterP))
+                                                  servicePathV))
       {
         *notificationDone = true;
       }

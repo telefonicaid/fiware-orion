@@ -53,8 +53,7 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
-  const std::vector<std::string>&      servicePathV,
-  StringFilter*                        stringFilterP
+  const std::vector<std::string>&      servicePathV
 )
 {
     std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];    
@@ -134,8 +133,9 @@ HttpStatusCode mongoSubscribeContext
 
     /* Build attributes array */
     BSONArrayBuilder attrs;
-    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList[ix]);
+    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
+    {
+      attrs.append(requestP->attributeList[ix]);
     }
     sub.append(CSUB_ATTRS, attrs.arr());
 
@@ -149,8 +149,7 @@ HttpStatusCode mongoSubscribeContext
                                              JSON,
                                              tenant,
                                              xauthToken,
-                                             servicePathV,
-                                             stringFilterP);
+                                             servicePathV);
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */

@@ -515,12 +515,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     if (response == "DIE")
     {
-      if (ciP->stringFilterP != NULL)
-      {
-        delete ciP->stringFilterP;
-        ciP->stringFilterP = NULL;
-      }
-
       orionExitFunction(0, "Received a 'DIE' request on REST interface");
     }
 

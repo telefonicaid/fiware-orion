@@ -51,7 +51,6 @@
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
 #include "common/limits.h"  // SERVICE_NAME_MAX_LEN
-#include "rest/StringFilter.h"
 
 
 
@@ -424,12 +423,6 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 static void serve(ConnectionInfo* ciP)
 {
   restService(ciP, restServiceV);
-
-  if (ciP->stringFilterP != NULL)
-  {
-    delete ciP->stringFilterP;
-    ciP->stringFilterP = NULL;
-  }
 }
 
 
@@ -451,12 +444,6 @@ static void requestCompleted
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
-  }
-
-  if (ciP->stringFilterP != NULL)
-  {
-    delete ciP->stringFilterP;
-    ciP->stringFilterP = NULL;
   }
 
   *con_cls = NULL;
@@ -994,6 +981,7 @@ static int connectionTreat
       return MHD_NO;
     }
 
+    LM_W(("KZ: ------------- Serving Request %s %s", method, url));
     if (timingStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);

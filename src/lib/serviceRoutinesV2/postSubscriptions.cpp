@@ -48,6 +48,7 @@ extern std::string postSubscriptions
 {
   SubscribeContextResponse  scr;
   std::string               answer;
+  SubscribeContextRequest*  scrP = &parseDataP->scr.res;
 
   if (ciP->servicePathV.size() > 1)
   {
@@ -70,23 +71,22 @@ extern std::string postSubscriptions
   if (ciP->uriParam[URI_PARAM_Q] != "")
   {
     std::string  errorString;
+    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, ciP->uriParam[URI_PARAM_Q]);
 
-    ciP->stringFilterP = new StringFilter();
-    if (ciP->stringFilterP->parse(ciP->uriParam[URI_PARAM_Q].c_str(), &errorString) == false)
+    if (scopeP->stringFilter.parse(ciP->uriParam[URI_PARAM_Q].c_str(), &errorString) == false)
     {
       OrionError  oe(SccBadRequest, errorString);
       std::string out;
 
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, errorString);
-      delete ciP->stringFilterP;
-      ciP->stringFilterP = NULL;
+      delete scopeP;
 
       TIMED_RENDER(out = oe.render(ciP, ""));
       return out;
     }
 
-    if (ciP->stringFilterP->mongoFilterPopulate(&errorString) == false)
+    if (scopeP->stringFilter.mongoFilterPopulate(&errorString) == false)
     {
       OrionError   oe(SccBadRequest, errorString);
       std::string  out;
@@ -94,16 +94,16 @@ extern std::string postSubscriptions
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, errorString);
 
-      delete ciP->stringFilterP;
-      ciP->stringFilterP = NULL;
+      delete scopeP;
 
       TIMED_RENDER(out = oe.render(ciP, ""));
       return out;
     }
+
+    scrP->restriction.scopeVector.push_back(scopeP);
   }
 
-
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->stringFilterP));
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
 
   parseDataP->scr.res.release();
 

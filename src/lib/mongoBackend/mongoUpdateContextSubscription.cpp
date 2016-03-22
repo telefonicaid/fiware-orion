@@ -42,7 +42,6 @@
 #include "common/Format.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
-#include "rest/StringFilter.h"
 
 
 
@@ -57,8 +56,7 @@ HttpStatusCode mongoUpdateContextSubscription
     const std::string&                  tenant,
     const std::string&                  xauthToken,
     const std::vector<std::string>&     servicePathV,
-    std::string                         version,
-    StringFilter*                       stringFilterP
+    std::string                         version
 )
 { 
   bool          reqSemTaken;
@@ -111,7 +109,8 @@ HttpStatusCode mongoUpdateContextSubscription
    */
   BSONObjBuilder newSub;
 
-  if (version != "v2") {
+  if (version != "v2")
+  {
     /* Entities, attribute list and reference are not updatable, so they are appended directly */
     newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
     newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
@@ -247,7 +246,7 @@ HttpStatusCode mongoUpdateContextSubscription
        AttributeList attrL;
        if (version == "v1")
        {
-         enV = subToEntityIdVector(sub);
+         enV   = subToEntityIdVector(sub);
          attrL = subToAttributeList(sub);
        }
        else // v2
@@ -283,8 +282,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 JSON,
                                                 tenant,
                                                 xauthToken,
-                                                servicePathV,
-                                                stringFilterP);
+                                                servicePathV);
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 

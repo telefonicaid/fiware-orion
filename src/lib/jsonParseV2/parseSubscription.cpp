@@ -445,23 +445,22 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
     if (expression.HasMember("q"))
     {
-      std::string errorString;
+      std::string  errorString;
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
 
-      scrP->expression.q = expression["q"].GetString();
-      ciP->stringFilterP = new StringFilter();
-      if (ciP->stringFilterP->parse(scrP->expression.q.c_str(), &errorString) == false)
+      if (scopeP->stringFilter.parse(scopeP->value.c_str(), &errorString) == false)
       {
-        delete ciP->stringFilterP;
-        ciP->stringFilterP = NULL;
+        delete scopeP;
         return errorString;
       }
 
-      if (ciP->stringFilterP->mongoFilterPopulate(&errorString) == false)
+      if (scopeP->stringFilter.mongoFilterPopulate(&errorString) == false)
       {
-        delete ciP->stringFilterP;
-        ciP->stringFilterP = NULL;
+        delete scopeP;
         return errorString;
       }
+
+      scrP->restriction.scopeVector.push_back(scopeP);
     }
     if (expression.HasMember("geometry"))
     {
