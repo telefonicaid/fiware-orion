@@ -1772,9 +1772,7 @@ The payload may contain the following elements (all of them optional):
 
 + `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
   elements:
-    + `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
-     or pattern (in the case of `idPattern`) of the entities to search for. If omitted, it means "any entity
-     ID".
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same time, but at least one of them must be set.
     + `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
 + `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
 + `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
@@ -1925,9 +1923,7 @@ The payload may contain the following elements (all of them optional):
 
 + `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
   elements:
-    + `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
-     or pattern (in the case of `idPattern`) of the entities to search for. If omitted, it means "any entity
-     ID".
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same time, but at least one of them must be set.
     + `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
 + `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
 + `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
