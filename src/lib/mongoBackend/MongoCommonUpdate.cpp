@@ -1261,9 +1261,10 @@ static bool addTriggeredSubscriptions_withCache
   const std::vector<std::string>&           servicePathV
 )
 {  
-  std::string   servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
+  std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
+  cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
@@ -1329,10 +1330,11 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->tenant);
 
     sub->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
-    sub->stringFilterSet(&cSubP->expression.stringFilter);
+    sub->stringFilterSet(&cSubP->expression.stringFilter);  // FIXME PR: Instead of just referencing stringFilter, clone the whole thing
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
+  cacheSemGive(__FUNCTION__, "match subs for notifications");
   return true;
 }
 
@@ -1521,8 +1523,8 @@ static bool addTriggeredSubscriptions_noCache
           }
           else
           {
-            trigs->stringFilterToBeDeleted = true;
-            trigs->stringFilterSet(stringFilterP);
+            trigs->stringFilterSet(stringFilterP);  // Clones the string filter
+            delete stringFilterP;
           }
         }
       }
@@ -1681,7 +1683,7 @@ static bool processSubscriptions
     }
 
     /* Check 2: String Filter */
-    if ((trigs->stringFilterP) && (!trigs->stringFilterP->match(notifyCerP)))
+    if (!trigs->stringFilter.match(notifyCerP))
     {
       continue;
     }
@@ -1720,6 +1722,8 @@ static bool processSubscriptions
       //
       if (trigs->cacheSubId != "")
       {
+        cacheSemTake(__FUNCTION__, "update lastNotificationTime for cached subscription");
+
         CachedSubscription*  cSubP = subCacheItemLookup(trigs->tenant.c_str(), trigs->cacheSubId.c_str());
 
         if (cSubP != NULL)
@@ -1734,6 +1738,8 @@ static bool processSubscriptions
           LM_E(("Runtime Error (cached subscription '%s' for tenant '%s' not found)",
                 trigs->cacheSubId.c_str(), trigs->tenant.c_str()));
         }
+
+        cacheSemGive(__FUNCTION__, "update lastNotificationTime for cached subscription");
       }
     }
   }
@@ -3147,8 +3153,6 @@ void processContextElement
     return; // Error already in responseP
   } 
 
-  cacheSemTake(__FUNCTION__, "Processing Context Element");
-
   /* Find entities (could be several, in the case of no type or isPattern=true) */
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
@@ -3211,7 +3215,6 @@ void processContextElement
 
     if (!collectionCount(getEntitiesCollectionName(tenant), query, &entitiesNumber, &err))
     {
-      cacheSemGive(__FUNCTION__, "Processing Context Element");
       buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
       return;
     }
@@ -3219,7 +3222,6 @@ void processContextElement
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
-      cacheSemGive(__FUNCTION__, "Processing Context Element");
       buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
       return;
     }
@@ -3227,7 +3229,6 @@ void processContextElement
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPENDORUPDATE))
     {
-      cacheSemGive(__FUNCTION__, "Processing Context Element");
       buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
       return;
     }
@@ -3237,7 +3238,6 @@ void processContextElement
     // thinking too much about it, but NGSIv1 behaviour has to be preserved to keep backward compatibility)
     if (entitiesNumber > 1)
     {
-      cacheSemGive(__FUNCTION__, "Processing Context Element");
       buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, MORE_MATCHING_ENT);
       return;
     }
@@ -3250,7 +3250,6 @@ void processContextElement
   DBClientBase* connection = getMongoConnection();
   if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    cacheSemGive(__FUNCTION__, "Processing Context Element");
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, err);
@@ -3400,7 +3399,6 @@ void processContextElement
                                        tenant,
                                        servicePathV))
         {
-          cacheSemGive(__FUNCTION__, "Processing Context Element");
           releaseTriggeredSubscriptions(subsToNotify);
           cerP->statusCode.fill(SccReceiverInternalError, err);
           responseP->contextElementResponseVector.push_back(cerP);
@@ -3433,8 +3431,6 @@ void processContextElement
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
   }
-
-  cacheSemGive(__FUNCTION__, "Processing Context Element");
 
   // Response in responseP
 }

@@ -42,9 +42,9 @@ accumulatorStart
 
 T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
 T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="2seconds")
-T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="4seconds")
+T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="6seconds")
 
-echo "01. At t_0: Create subscription with q: dateCreated==t_2..t_4"
+echo "01. At t_0: Create subscription with q: dateCreated==t_2..t_6"
 echo "============================================================="
 payload='
 {
@@ -58,7 +58,7 @@ payload='
         "condition": {
             "attributes": [ ],
             "expression": {
-               "q": "dateCreated=='$T_2'..'$T_4'"
+               "q": "dateCreated=='$T_2'..'$T_6'"
             }
          }
     },
@@ -85,7 +85,7 @@ orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
 
-sleep 2.5
+sleep 2.1
 
 echo "03. At t_2: Create entity E2 (notif)"
 echo "===================================="
@@ -122,7 +122,7 @@ orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
 
-sleep 2
+sleep 5
 
 
 echo "06. At t_5: Create entity E5 (not notif)"
@@ -145,7 +145,7 @@ echo
 
 
 --REGEXPECT--
-01. At t_0: Create subscription with q: dateCreated==t_2..t_4
+01. At t_0: Create subscription with q: dateCreated==t_2..t_6
 =============================================================
 HTTP/1.1 201 Created
 Content-Length: 0

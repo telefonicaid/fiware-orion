@@ -50,9 +50,7 @@ TriggeredSubscription::TriggeredSubscription
   reference               (_reference),
   attrL                   (_attrL),
   cacheSubId              (_cacheSubId),
-  tenant                  ((_tenant == NULL)? "" : _tenant),
-  stringFilterP           (NULL),
-  stringFilterToBeDeleted (false)
+  tenant                  ((_tenant == NULL)? "" : _tenant)
 {
 }
 
@@ -76,9 +74,7 @@ TriggeredSubscription::TriggeredSubscription
   reference               (_reference),
   attrL                   (_attrL),
   cacheSubId              (""),
-  tenant                  (""),
-  stringFilterP           (NULL),
-  stringFilterToBeDeleted (false)
+  tenant                  ("")
 {
 }
 
@@ -135,7 +131,7 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 *
 * TriggeredSubscription::stringFilterSet - 
 */
-void TriggeredSubscription::stringFilterSet(StringFilter* _stringFilterP)
+void TriggeredSubscription::stringFilterSet(StringFilter* stringFilterP)
 {
-  stringFilterP = _stringFilterP;
+  stringFilter = *stringFilterP;
 }
