@@ -163,6 +163,16 @@ else
 fi
 mv /tmp/README.md README.md
 
+# Adjust Dockerfile GIT_REV_ORION. Note that the procedure is not symmetric (like in version.h), as
+# dev release sets 'develop' and not 'X.Y.Z-next"
+if [ "$BROKER_RELEASE" != "dev" ]
+then
+  sed "s/ENV GIT_REV_ORION develop/ENV GIT_REV_ORION release\/$NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
+else
+  sed "s/ENV GIT_REV_ORION release\/$currentVersion/ENV GIT_REV_ORION develop/" docker/Dockerfile > /tmp/Dockerfile
+fi
+mv /tmp/Dockerfile docker/Dockerfile
+
 #
 # Do the git stuff only if we are in develop branch
 #
@@ -175,6 +185,7 @@ then
     git add test/functionalTest/cases/0000_version_operation/version_via_rest.test
     git add CHANGES_NEXT_RELEASE
     git add README.md
+    git add docker/Dockerfile
     git commit -m "Step: $currentVersion -> $NEW_VERSION"
     git push origin develop
     # We do the tag only and merge to master only in the case of  non "dev" release
