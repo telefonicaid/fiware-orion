@@ -176,7 +176,6 @@ std::string getEntities
       scopeP->release();
       delete scopeP;
 
-      TIMED_RENDER(out = oe.render(ciP, ""));
       return out;
     }
 

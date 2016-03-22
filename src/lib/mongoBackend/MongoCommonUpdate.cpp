@@ -1330,7 +1330,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->tenant);
 
     sub->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
-    sub->stringFilterSet(&cSubP->expression.stringFilter);  // FIXME PR: Instead of just referencing stringFilter, clone the whole thing
+    sub->stringFilterSet(&cSubP->expression.stringFilter);
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
