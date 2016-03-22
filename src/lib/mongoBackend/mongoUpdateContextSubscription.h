@@ -30,6 +30,7 @@
 #include "common/Format.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
+#include "rest/StringFilter.h"
 
 
 
@@ -44,7 +45,8 @@ extern HttpStatusCode mongoUpdateContextSubscription
   const std::string&                  tenant,
   const std::string&                  xauthToken,
   const std::vector<std::string>&     servicePathV,
-  std::string                         version = "v1"
+  std::string                         version        = "v1",
+  StringFilter*                       stringFilterP  = NULL
 );
 
 #endif

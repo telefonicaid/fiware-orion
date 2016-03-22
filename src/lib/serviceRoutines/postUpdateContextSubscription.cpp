@@ -58,7 +58,9 @@ std::string postUpdateContextSubscription
                                                                    &ucsr,                                                                   
                                                                    ciP->tenant,
                                                                    ciP->httpHeaders.xauthToken,
-                                                                   ciP->servicePathV));
+                                                                   ciP->servicePathV,
+                                                                   ciP->apiVersion,
+                                                                   ciP->stringFilterP));
 
   TIMED_RENDER(answer = ucsr.render(UpdateContextSubscription, ""));
 

@@ -80,8 +80,6 @@ std::string postBatchQuery
   //
   if (q != "")
   {
-    LM_W(("KZ: parsing q-stringFilter"));
-
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 

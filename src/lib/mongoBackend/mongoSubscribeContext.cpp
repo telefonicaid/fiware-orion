@@ -53,7 +53,8 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
-  const std::vector<std::string>&      servicePathV
+  const std::vector<std::string>&      servicePathV,
+  StringFilter*                        stringFilterP
 )
 {
     std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];    
@@ -149,7 +150,7 @@ HttpStatusCode mongoSubscribeContext
                                              tenant,
                                              xauthToken,
                                              servicePathV,
-                                             requestP->expression.q);
+                                             stringFilterP);
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */

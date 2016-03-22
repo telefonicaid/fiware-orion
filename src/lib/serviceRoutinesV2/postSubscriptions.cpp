@@ -1,4 +1,3 @@
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -29,7 +28,8 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
-
+#include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutinesV2/postSubscriptions.h"
 
 
@@ -62,8 +62,48 @@ extern std::string postSubscriptions
     return answer;
   }
 
-  LM_W(("KZ: Calling mongoSubscribeContext"));
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
+
+  //
+  // String filter in URI param 'q' ?
+  // What if it was also in NotifyConditionVector::NotifyCondition::Expression ... ?
+  //
+  if (ciP->uriParam[URI_PARAM_Q] != "")
+  {
+    std::string  errorString;
+
+    ciP->stringFilterP = new StringFilter();
+    if (ciP->stringFilterP->parse(ciP->uriParam[URI_PARAM_Q].c_str(), &errorString) == false)
+    {
+      OrionError  oe(SccBadRequest, errorString);
+      std::string out;
+
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, errorString);
+      delete ciP->stringFilterP;
+      ciP->stringFilterP = NULL;
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+      return out;
+    }
+
+    if (ciP->stringFilterP->mongoFilterPopulate(&errorString) == false)
+    {
+      OrionError   oe(SccBadRequest, errorString);
+      std::string  out;
+
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, errorString);
+
+      delete ciP->stringFilterP;
+      ciP->stringFilterP = NULL;
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+      return out;
+    }
+  }
+
+
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->stringFilterP));
 
   parseDataP->scr.res.release();
 

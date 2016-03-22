@@ -440,7 +440,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
   if (condition.HasMember("expression"))
   {
-    scrP->expression.isSet = true;
+    scrP->expression.isSet  = true;
     const Value& expression = condition["expression"];
 
     if (expression.HasMember("q"))
@@ -448,9 +448,15 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
       std::string errorString;
 
       scrP->expression.q = expression["q"].GetString();
-      LM_W(("KZ: parsing stringFilter"));
       ciP->stringFilterP = new StringFilter();
       if (ciP->stringFilterP->parse(scrP->expression.q.c_str(), &errorString) == false)
+      {
+        delete ciP->stringFilterP;
+        ciP->stringFilterP = NULL;
+        return errorString;
+      }
+
+      if (ciP->stringFilterP->mongoFilterPopulate(&errorString) == false)
       {
         delete ciP->stringFilterP;
         ciP->stringFilterP = NULL;

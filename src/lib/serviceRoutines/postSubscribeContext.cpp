@@ -35,6 +35,7 @@
 #include "ngsi10/SubscribeContextResponse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/postSubscribeContext.h"
 
 
@@ -51,6 +52,7 @@
 *
 * URI parameters
 *   - notifyFormat=XXX    (used by mongoBackend)
+*   - q
 */
 std::string postSubscribeContext
 (
@@ -82,7 +84,47 @@ std::string postSubscribeContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
+
+  //
+  // String filter in URI param 'q' ?
+  //
+  StringFilter* stringFilterP = NULL;
+  if (ciP->uriParam[URI_PARAM_Q] != "")
+  {
+    std::string  errorString;
+
+    stringFilterP = new StringFilter();
+    if (stringFilterP->parse(ciP->uriParam[URI_PARAM_Q].c_str(), &errorString) == false)
+    {
+      OrionError   oe(SccBadRequest, errorString);
+      std::string  out;
+
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, errorString);
+      delete stringFilterP;
+      stringFilterP = NULL;
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+      return out;
+    }
+
+    if (stringFilterP->mongoFilterPopulate(&errorString) == false)
+    {
+      OrionError   oe(SccBadRequest, errorString);
+      std::string  out;
+
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, errorString);
+
+      delete stringFilterP;
+      stringFilterP = NULL;
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+      return out;
+    }
+  }
+
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, stringFilterP));
   TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
 
   parseDataP->scr.res.release();

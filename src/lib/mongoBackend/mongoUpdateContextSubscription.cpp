@@ -42,6 +42,7 @@
 #include "common/Format.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
+#include "rest/StringFilter.h"
 
 
 
@@ -56,8 +57,9 @@ HttpStatusCode mongoUpdateContextSubscription
     const std::string&                  tenant,
     const std::string&                  xauthToken,
     const std::vector<std::string>&     servicePathV,
-    std::string                         version
-    )
+    std::string                         version,
+    StringFilter*                       stringFilterP
+)
 { 
   bool          reqSemTaken;
 
@@ -282,7 +284,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
-                                                requestP->expression.q);
+                                                stringFilterP);
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
@@ -439,7 +441,6 @@ HttpStatusCode mongoUpdateContextSubscription
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
 
-  LM_W(("KZ: Calling mongoSubCacheItemInsert, q == '%s'", requestP->expression.q.c_str()));
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,

@@ -994,8 +994,6 @@ static int connectionTreat
       return MHD_NO;
     }
 
-    LM_W(("KZ: ------------ Treating service %s %s", ciP->method.c_str(), ciP->url.c_str()));
-
     if (timingStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);

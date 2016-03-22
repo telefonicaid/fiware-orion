@@ -1788,7 +1788,7 @@ bool processOnChangeConditionForSubscription
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               qFilter
+  StringFilter*                    stringFilterP
 )
 {
   std::string                   err;
@@ -1796,14 +1796,9 @@ bool processOnChangeConditionForSubscription
   Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
-  /* Include scopes for entitiesQuery() if q filter is not empty */
-  if (qFilter != "")
-  {
-    Scope* sc = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qFilter);
-    res.scopeVector.push_back(sc);
-  }
-
-  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV))
+  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV,
+                     DEFAULT_PAGINATION_OFFSET_INT, DEFAULT_PAGINATION_LIMIT_INT,
+                     NULL, NULL, NULL, "", false, false, "v1", stringFilterP))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
@@ -1830,7 +1825,9 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV, 
+                         DEFAULT_PAGINATION_OFFSET_INT, DEFAULT_PAGINATION_LIMIT_INT,
+                         NULL, NULL, NULL, "", false, false, "v1", stringFilterP))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
@@ -1890,7 +1887,7 @@ BSONArray processConditionVector
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               qFilter
+  StringFilter*                    stringFilterP
 )
 {
   BSONArrayBuilder conds;
@@ -1924,7 +1921,7 @@ BSONArray processConditionVector
                                                   tenant,
                                                   xauthToken,
                                                   servicePathV,
-                                                  qFilter))
+                                                  stringFilterP))
       {
         *notificationDone = true;
       }

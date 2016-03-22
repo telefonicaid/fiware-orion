@@ -70,7 +70,8 @@ std::string patchSubscription
                                                                    ciP->tenant,
                                                                    ciP->httpHeaders.xauthToken,
                                                                    ciP->servicePathV,
-                                                                   ciP->apiVersion));
+                                                                   ciP->apiVersion,
+                                                                   ciP->stringFilterP));
 
   if (ciP->httpStatusCode != SccOk)
   {
