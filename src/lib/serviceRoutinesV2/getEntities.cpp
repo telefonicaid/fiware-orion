@@ -176,6 +176,7 @@ std::string getEntities
       scopeP->release();
       delete scopeP;
 
+      TIMED_RENDER(out = oe.render(ciP, ""));
       return out;
     }
 
@@ -192,6 +193,8 @@ std::string getEntities
   //
   if (q != "")
   {
+    LM_W(("KZ: parsing q-stringFilter"));
+
     Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
@@ -204,8 +207,11 @@ std::string getEntities
       scopeP->release();
       delete scopeP;
 
+      TIMED_RENDER(out = oe.render(ciP, ""));
       return out;
     }
+
+    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
 

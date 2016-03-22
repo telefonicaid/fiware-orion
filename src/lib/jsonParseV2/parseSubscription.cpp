@@ -445,7 +445,17 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
     if (expression.HasMember("q"))
     {
+      std::string errorString;
+
       scrP->expression.q = expression["q"].GetString();
+      LM_W(("KZ: parsing stringFilter"));
+      ciP->stringFilterP = new StringFilter();
+      if (ciP->stringFilterP->parse(scrP->expression.q.c_str(), &errorString) == false)
+      {
+        delete ciP->stringFilterP;
+        ciP->stringFilterP = NULL;
+        return errorString;
+      }
     }
     if (expression.HasMember("geometry"))
     {

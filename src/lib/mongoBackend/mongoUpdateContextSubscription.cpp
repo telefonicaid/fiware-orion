@@ -439,6 +439,7 @@ HttpStatusCode mongoUpdateContextSubscription
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
 
+  LM_W(("KZ: Calling mongoSubCacheItemInsert, q == '%s'", requestP->expression.q.c_str()));
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,

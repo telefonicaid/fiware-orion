@@ -30,11 +30,13 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
 #include "apiTypesV2/ErrorCode.h"
 #include "apiTypesV2/Entities.h"
-#include "serviceRoutinesV2/postBatchQuery.h"
 #include "ngsi10/QueryContextRequest.h"
+#include "alarmMgr/alarmMgr.h"
 #include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postBatchQuery.h"
 
 
 
@@ -51,6 +53,7 @@
 *   - limit=NUMBER
 *   - offset=NUMBER
 *   - options=count,keyValues
+*   - q
 */
 std::string postBatchQuery
 (
@@ -62,11 +65,43 @@ std::string postBatchQuery
 {
   BatchQuery*           bqP  = &parseDataP->bq.res;
   QueryContextRequest*  qcrP = &parseDataP->qcr.res;
+  std::string           q    = ciP->uriParam[URI_PARAM_Q];
   Entities              entities;
   std::string           answer;
 
   qcrP->fill(bqP);
   bqP->release();  // qcrP just 'took over' the data from bqP, bqP no longer needed
+
+  //
+  // String filter in URI param 'q' ?
+  // If so, put it in a new Scope and parse the q-string.
+  // The plain q-string is saved uin Scope::value, just in case.
+  // Might be useful for debugging, if nothing else.
+  //
+  if (q != "")
+  {
+    LM_W(("KZ: parsing q-stringFilter"));
+
+    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
+    std::string  errorString;
+
+    if (scopeP->stringFilter.parse(q.c_str(), &errorString) == false)
+    {
+      OrionError   oe(SccBadRequest, errorString);
+      std::string  out;
+
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, errorString);
+      scopeP->release();
+      delete scopeP;
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+      return out;
+    }
+
+    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
+
 
   answer = postQueryContext(ciP, components, compV, parseDataP);
 

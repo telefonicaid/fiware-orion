@@ -1652,6 +1652,7 @@ static bool processSubscriptions
 
   *err = "";
 
+  LM_W(("KZ: In processSubscriptions (%d subs)", subs.size()));
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
     std::string             mapSubId  = it->first;
@@ -1681,6 +1682,7 @@ static bool processSubscriptions
     }
 
     /* Check 2: String Filter */
+    LM_W(("KZ: checking stringFilter for subscription"));
     if ((trigs->stringFilterP) && (!trigs->stringFilterP->match(notifyCerP)))
     {
       continue;

@@ -221,14 +221,14 @@ Date: REGEX(.*)
 
 09. GET /v2/entities/E1 with ALL illegal char in URI param 'q' - ok
 ===================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 70
+HTTP/1.1 404 Not Found
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "empty right-hand-side in q-item",
-    "error": "BadRequest"
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
 }
 
 

@@ -62,6 +62,7 @@ extern std::string postSubscriptions
     return answer;
   }
 
+  LM_W(("KZ: Calling mongoSubscribeContext"));
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
 
   parseDataP->scr.res.release();
