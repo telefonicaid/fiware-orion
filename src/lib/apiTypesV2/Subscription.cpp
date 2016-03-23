@@ -111,17 +111,14 @@ std::string Condition::toJson()
 
   jh.addRaw("attributes", vectorToJson(this->attributes));
 
-  {
-    JsonHelper jhe;
+  JsonHelper jhe;
 
-    LM_W(("KZ: Rendering Subscription: expression.q == '%s'", expression.q.c_str()));
-    jhe.addString("q", this->expression.q);
-    jhe.addString("geometry", this->expression.geometry);
-    jhe.addString("coords", this->expression.coords);
-    jhe.addString("georel", this->expression.georel);
-
-    jh.addRaw("expression", jhe.str());
-  }
+  jhe.addString("q", this->expression.q);
+  jhe.addString("geometry", this->expression.geometry);
+  jhe.addString("coords", this->expression.coords);
+  jhe.addString("georel", this->expression.georel);
+  
+  jh.addRaw("expression", jhe.str());
 
   return jh.str();
 }
