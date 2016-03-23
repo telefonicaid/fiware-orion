@@ -24,7 +24,7 @@ Note that contribution workflows themselves (e.g. pull requests, etc.) are descr
 ### Directory layout
 
 * **src**: contains the source code, with the following subdirectories
-* **app**: contains the code for applications (each application in a separate subdirectory). The main application, the Orion context broker resides in the **contextBroker** directory.
+* **app**: contains the code for applications (each application in a separate subdirectory). The main application, the Orion context broker, resides in the **contextBroker** directory.
 * **lib**: contains code libraries (each library in a separate subdirectory)
 * **test**: contains tests. There are several subdirectories (each subdirectory corresponding to a different test 
   suite/procedure), but the most important ones for the time being are: 
@@ -49,7 +49,7 @@ Source code files are found under the `src/` directory.
 The suffix '.cpp' MUST be used for source files and '.h' MUST be used for header files.
 
 As a general rule, for C/C++ source code, every concept SHOULD have its own module. With a module is referred a 
-header file (`.h`) and its corresponding source file (`.cpp`). In some cases only a header files is beeded (without any corresponding `.cpp` 
+header file (`.h`) and its corresponding source file (`.cpp`). In some cases only a header file is needed (without any corresponding `.cpp` 
 source file): header files containing only constants, macros or inline functions.
 
 A class SHOULD reside in its own module, with the class definition in the header file
