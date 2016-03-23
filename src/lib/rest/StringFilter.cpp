@@ -758,6 +758,8 @@ StringFilter::~StringFilter()
 */
 bool StringFilter::parse(const char* q, std::string* errorStringP)
 {
+  LM_W(("KZ: Parsing StringFilter '%s'", q));
+
   //
   // Initial Sanity check (of the entire string)
   // - Not empty             (empty q)
@@ -831,6 +833,8 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
 */
 bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 {
+  LM_W(("KZ: Populating mongo filter"));
+
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem*  itemP = &filters[ix];
@@ -1034,6 +1038,13 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
 */
 bool StringFilter::match(ContextElementResponse* cerP)
 {
+  // TEMP: assuming there is ONE attribute in cerP and that it is a DATE
+  ContextAttribute* caP = cerP->contextElement.contextAttributeVector[0];
+  LM_W(("KZ: Matching with ContextElementResponse. %s=%f", caP->name.c_str(), caP->numberValue));
+  LM_W(("KZ: Comparing with %d filters", filters.size()));
+
+
+
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     StringFilterItem* itemP = &filters[ix];

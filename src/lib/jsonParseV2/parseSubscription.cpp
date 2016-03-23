@@ -448,19 +448,15 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
 
+      LM_W(("KZ: Calling parse for string filter"));
       if (scopeP->stringFilter.parse(scopeP->value.c_str(), &errorString) == false)
       {
         delete scopeP;
         return errorString;
       }
 
-      if (scopeP->stringFilter.mongoFilterPopulate(&errorString) == false)
-      {
-        delete scopeP;
-        return errorString;
-      }
-
       scrP->restriction.scopeVector.push_back(scopeP);
+      LM_W(("KZ: Scope with string filter pushed to SubscribeContextRequest::restriction::ScopeVector"));
     }
     if (expression.HasMember("geometry"))
     {

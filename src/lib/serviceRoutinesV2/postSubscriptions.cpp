@@ -48,7 +48,6 @@ extern std::string postSubscriptions
 {
   SubscribeContextResponse  scr;
   std::string               answer;
-  SubscribeContextRequest*  scrP = &parseDataP->scr.res;
 
   if (ciP->servicePathV.size() > 1)
   {
@@ -61,46 +60,6 @@ extern std::string postSubscriptions
 
     TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
     return answer;
-  }
-
-
-  //
-  // String filter in URI param 'q' ?
-  // What if it was also in NotifyConditionVector::NotifyCondition::Expression ... ?
-  //
-  if (ciP->uriParam[URI_PARAM_Q] != "")
-  {
-    std::string  errorString;
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, ciP->uriParam[URI_PARAM_Q]);
-
-    if (scopeP->stringFilter.parse(ciP->uriParam[URI_PARAM_Q].c_str(), &errorString) == false)
-    {
-      OrionError  oe(SccBadRequest, errorString);
-      std::string out;
-
-      ciP->httpStatusCode = SccBadRequest;
-      alarmMgr.badInput(clientIp, errorString);
-      delete scopeP;
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-      return out;
-    }
-
-    if (scopeP->stringFilter.mongoFilterPopulate(&errorString) == false)
-    {
-      OrionError   oe(SccBadRequest, errorString);
-      std::string  out;
-
-      ciP->httpStatusCode = SccBadRequest;
-      alarmMgr.badInput(clientIp, errorString);
-
-      delete scopeP;
-
-      TIMED_RENDER(out = oe.render(ciP, ""));
-      return out;
-    }
-
-    scrP->restriction.scopeVector.push_back(scopeP);
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));

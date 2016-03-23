@@ -664,7 +664,7 @@ void subCacheItemInsert
   Format                    notifyFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
-  const std::string&        q,
+  StringFilter*             stringFilterP,
   const std::string&        geometry,
   const std::string&        coords,
   const std::string&        georel
@@ -706,29 +706,23 @@ void subCacheItemInsert
   //
   // 1. First the non-complex values
   //
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
-  cSubP->servicePath           = strdup(servicePath);
-  cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->reference             = strdup(scrP->reference.get().c_str());
-  cSubP->expirationTime        = expirationTime;
-  cSubP->throttling            = throttling;
-  cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->notifyFormat          = notifyFormat;
-  cSubP->next                  = NULL;
-  cSubP->count                 = (notificationDone == true)? 1 : 0;
-  cSubP->expression.q          = q;
-  cSubP->expression.geometry   = geometry;
-  cSubP->expression.coords     = coords;
-  cSubP->expression.georel     = georel;
+  cSubP->tenant                  = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->servicePath             = strdup(servicePath);
+  cSubP->subscriptionId          = strdup(subscriptionId);
+  cSubP->reference               = strdup(scrP->reference.get().c_str());
+  cSubP->expirationTime          = expirationTime;
+  cSubP->throttling              = throttling;
+  cSubP->lastNotificationTime    = lastNotificationTime;
+  cSubP->notifyFormat            = notifyFormat;
+  cSubP->next                    = NULL;
+  cSubP->count                   = (notificationDone == true)? 1 : 0;
+  cSubP->expression.geometry     = geometry;
+  cSubP->expression.coords       = coords;
+  cSubP->expression.georel       = georel;
 
-  std::string errorString;
-  if (q != "")
+  if (stringFilterP != NULL)
   {
-    if (cSubP->expression.stringFilter.parse(q.c_str(), &errorString) == false)
-    {
-      alarmMgr.badInput(clientIp, errorString);
-      return;
-    }
+    cSubP->expression.stringFilter = *stringFilterP;  // Object copy
   }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));

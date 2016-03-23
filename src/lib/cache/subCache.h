@@ -175,7 +175,7 @@ extern void subCacheItemInsert
   Format                    notifyFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
-  const std::string&        q,
+  StringFilter*             stringFilterP,
   const std::string&        geometry,
   const std::string&        coords,
   const std::string&        georel

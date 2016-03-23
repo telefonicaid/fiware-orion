@@ -190,7 +190,22 @@ HttpStatusCode mongoSubscribeContext
 
     LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
 
+    //
+    // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in restriction.scopeVector?
+    // If so, set it as string filter to the sub-cache item
+    //
+    StringFilter* stringFilterP = NULL;
+
+    for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+    {
+      if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+      {
+        stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+      }
+    }
+
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
+    LM_W(("KZ: Calling subCacheItemInsert, q=='%s'", requestP->expression.q.c_str()));
     subCacheItemInsert(tenant.c_str(),
                        servicePath.c_str(),
                        requestP,
@@ -200,7 +215,7 @@ HttpStatusCode mongoSubscribeContext
                        JSON,
                        notificationDone,
                        lastNotificationTime,
-                       requestP->expression.q,
+                       stringFilterP,
                        requestP->expression.geometry,
                        requestP->expression.coords,
                        requestP->expression.georel);
