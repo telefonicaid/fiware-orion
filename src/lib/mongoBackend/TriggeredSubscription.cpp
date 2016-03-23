@@ -133,5 +133,10 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 */
 void TriggeredSubscription::stringFilterSet(StringFilter* stringFilterP)
 {
+  //
+  // This is an object copy, like
+  //   memcpy(&stringFilter, stringFilterP)
+  // but including the vectors inside stringFilterP
+  //
   stringFilter = *stringFilterP;
 }
