@@ -337,7 +337,8 @@ extern bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  Restriction*                     resP
 );
 
 /* ****************************************************************************
@@ -356,7 +357,8 @@ extern BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  Restriction*                     resP
 );
 
 /* ****************************************************************************

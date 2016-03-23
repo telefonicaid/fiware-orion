@@ -139,6 +139,25 @@ HttpStatusCode mongoSubscribeContext
     }
     sub.append(CSUB_ATTRS, attrs.arr());
 
+
+    //
+    // StringFilter in Scope?
+    //
+    Restriction    restriction;
+    StringFilter*  stringFilterP = NULL;
+
+    LM_W(("KZ: scopes: %d", requestP->restriction.scopeVector.size()));
+    for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+    {
+      if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+      {
+        stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+
+        Scope* scopeP = new Scope(requestP->restriction.scopeVector[ix]);
+        restriction.scopeVector.push_back(scopeP);
+      }
+    }
+
     /* Build conditions array (including side-effect notifications and threads creation) */
     bool notificationDone = false;
     BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
@@ -149,7 +168,8 @@ HttpStatusCode mongoSubscribeContext
                                              JSON,
                                              tenant,
                                              xauthToken,
-                                             servicePathV);
+                                             servicePathV,
+                                             &restriction);
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */
@@ -194,15 +214,6 @@ HttpStatusCode mongoSubscribeContext
     // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in restriction.scopeVector?
     // If so, set it as string filter to the sub-cache item
     //
-    StringFilter* stringFilterP = NULL;
-
-    for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
-    {
-      if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-      {
-        stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
-      }
-    }
 
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
     LM_W(("KZ: Calling subCacheItemInsert, q=='%s'", requestP->expression.q.c_str()));

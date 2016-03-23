@@ -273,6 +273,7 @@ HttpStatusCode mongoUpdateContextSubscription
          }
        }
 
+       Restriction res;
        BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                                 enV,
                                                 attrL,
@@ -282,7 +283,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 JSON,
                                                 tenant,
                                                 xauthToken,
-                                                servicePathV);
+                                                servicePathV,
+                                                &res);
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 

@@ -1778,19 +1778,19 @@ bool processOnChangeConditionForSubscription
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  Restriction*                     resP
 )
 {
   std::string                   err;
   NotifyContextRequest          ncr;
-  Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
-  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV))
+  if (!entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
-    res.release();
+    resP->release();
 
     return false;
   }
@@ -1813,11 +1813,11 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
-        res.release();
+        resP->release();
 
         return false;
       }
@@ -1832,7 +1832,7 @@ bool processOnChangeConditionForSubscription
         getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
         allCerV.release();
         ncr.contextElementResponseVector.release();
-        res.release();
+        resP->release();
 
         return true;
       }
@@ -1843,14 +1843,14 @@ bool processOnChangeConditionForSubscription
     {
       getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
       ncr.contextElementResponseVector.release();
-      res.release();
+      resP->release();
 
       return true;
     }
   }
 
   ncr.contextElementResponseVector.release();
-  res.release();
+  resP->release();
 
   return false;
 }
@@ -1872,10 +1872,13 @@ BSONArray processConditionVector
   Format                           format,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  Restriction*                     resP
 )
 {
   BSONArrayBuilder conds;
+
+  LM_W(("KZ: In processConditionVector"));
 
   *notificationDone = false;
 
@@ -1897,6 +1900,7 @@ BSONArray processConditionVector
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
 
+      LM_W(("KZ: Calling processOnChangeConditionForSubscription"));
       if (processOnChangeConditionForSubscription(enV,
                                                   attrL,
                                                   &(nc->condValueList),
@@ -1905,7 +1909,8 @@ BSONArray processConditionVector
                                                   format,
                                                   tenant,
                                                   xauthToken,
-                                                  servicePathV))
+                                                  servicePathV,
+                                                  resP))
       {
         *notificationDone = true;
       }
