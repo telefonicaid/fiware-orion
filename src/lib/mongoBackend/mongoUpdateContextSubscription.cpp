@@ -131,7 +131,7 @@ HttpStatusCode mongoUpdateContextSubscription
     newSub.append(CSUB_REFERENCE, ref);
 
     // Entities
-    if (requestP->entityIdVector.size() >0)
+    if (requestP->entityIdVector.size() > 0)
     {
       /* Build entities array */
       BSONArrayBuilder entities;
@@ -158,7 +158,7 @@ HttpStatusCode mongoUpdateContextSubscription
       newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
     }
 
-    //Attributes
+    // Attributes
     if (requestP->attributeList.size() > 0)
     {
       /* Build attributes array */
@@ -172,7 +172,6 @@ HttpStatusCode mongoUpdateContextSubscription
     {
       newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
     }
-
   }
 
   /* Duration update */
@@ -232,6 +231,26 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
+
+  //
+  // StringFilter in Scope?
+  //
+  Restriction    restriction;
+  StringFilter*  stringFilterP = NULL;
+
+  LM_W(("KZ: scopes: %d", requestP->restriction.scopeVector.size()));
+  for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+  {
+    if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+
+      Scope* scopeP = new Scope(requestP->restriction.scopeVector[ix]);
+      restriction.scopeVector.push_back(scopeP);
+    }
+  }
+
+
   /* Notify conditions */
   bool notificationDone = false;
   if (requestP->notifyConditionVector.size() == 0) {
@@ -273,7 +292,6 @@ HttpStatusCode mongoUpdateContextSubscription
          }
        }
 
-       Restriction res;
        BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                                 enV,
                                                 attrL,
@@ -284,7 +302,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
-                                                &res);
+                                                &restriction);
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
@@ -294,7 +312,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
 
-  // Expresssion
+  // Expression
   if (requestP->expression.isSet)
   {
     /* Build expression */
