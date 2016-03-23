@@ -146,7 +146,6 @@ HttpStatusCode mongoSubscribeContext
     Restriction    restriction;
     StringFilter*  stringFilterP = NULL;
 
-    LM_W(("KZ: scopes: %d", requestP->restriction.scopeVector.size()));
     for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
     {
       if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
@@ -216,7 +215,6 @@ HttpStatusCode mongoSubscribeContext
     //
 
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-    LM_W(("KZ: Calling subCacheItemInsert, q=='%s'", requestP->expression.q.c_str()));
     subCacheItemInsert(tenant.c_str(),
                        servicePath.c_str(),
                        requestP,

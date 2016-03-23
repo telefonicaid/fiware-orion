@@ -238,7 +238,6 @@ HttpStatusCode mongoUpdateContextSubscription
   Restriction    restriction;
   StringFilter*  stringFilterP = NULL;
 
-  LM_W(("KZ: scopes: %d", requestP->restriction.scopeVector.size()));
   for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
   {
     if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)

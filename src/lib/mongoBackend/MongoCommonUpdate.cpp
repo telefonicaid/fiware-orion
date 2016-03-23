@@ -1264,8 +1264,6 @@ static bool addTriggeredSubscriptions_withCache
   std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
-  LM_W(("KZ: In addTriggeredSubscriptions_withCache"));
-
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
@@ -1323,7 +1321,6 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->throttling));
     }
 
-    LM_W(("KZ: Adding TriggeredSubscription"));
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->notifyFormat,
@@ -1363,8 +1360,6 @@ static bool addTriggeredSubscriptions_noCache
   std::vector<std::string>  spathV;
   std::string               spathRegex      = servicePathSubscriptionRegex(servicePath, spathV);
 
-
-  LM_W(("KZ: In addTriggeredSubscriptions_noCache"));
 
   //
   // Create the REGEX for the Service Path
@@ -1688,13 +1683,10 @@ static bool processSubscriptions
     }
 
     /* Check 2: String Filter */
-    LM_W(("KZ: checking if match with stringFilter"));
     if (!trigs->stringFilter.match(notifyCerP))
     {
-      LM_W(("KZ: not a match"));
       continue;
     }
-    LM_W(("KZ: match found"));
 
     /* Check 3: expression (georel, which also uses geometry and coords) */
     // TBD (issue #1678)
@@ -3155,8 +3147,6 @@ void processContextElement
   Ngsiv2Flavour                        ngsiv2Flavour
 )
 {
-  LM_W(("KZ: In processContextElement: action == '%s'", action.c_str()));
-
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(ceP, responseP, action, apiVersion))
   {
@@ -3357,7 +3347,6 @@ void processContextElement
       cerP->contextElement.contextAttributeVector.push_back(ca);
     }
 
-    LM_W(("KZ: action is %s", action.c_str()));
     if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
     {
       /* In the case of UPDATE or DELETE we look for context providers */
@@ -3425,7 +3414,6 @@ void processContextElement
         notifyCerP->contextElement.modDate = now;
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
-        LM_W(("KZ: Calling processSubscriptions"));
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
 
         notifyCerP->release();

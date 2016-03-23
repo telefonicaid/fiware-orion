@@ -981,7 +981,6 @@ static int connectionTreat
       return MHD_NO;
     }
 
-    LM_W(("KZ: ------------- Serving Request %s %s", method, url));
     if (timingStatistics)
     {
       clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);

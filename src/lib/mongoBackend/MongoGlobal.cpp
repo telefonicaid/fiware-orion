@@ -1044,10 +1044,8 @@ bool entitiesQuery
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      LM_W(("KZ: found a Scope of type SCOPE_TYPE_SIMPLE_QUERY: mongoFilters: %d", scopeP->stringFilter.mongoFilters.size()));
       for (unsigned int ix = 0; ix < scopeP->stringFilter.mongoFilters.size(); ++ix)
       {
-        LM_W(("KZ: pushing mongoFilter %d to finalQuery", ix));
         finalQuery.appendElements(scopeP->stringFilter.mongoFilters[ix]);
       }
     }
@@ -1788,8 +1786,6 @@ bool processOnChangeConditionForSubscription
   NotifyContextRequest          ncr;
   ContextElementResponseVector  rawCerV;
 
-  LM_W(("KZ: Calling entitiesQuery, %d scopes in resP", resP->scopeVector.size()));
-
   if (!entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
@@ -1882,8 +1878,6 @@ BSONArray processConditionVector
 {
   BSONArrayBuilder conds;
 
-  LM_W(("KZ: In processConditionVector"));
-
   *notificationDone = false;
 
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
@@ -1904,7 +1898,6 @@ BSONArray processConditionVector
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
 
-      LM_W(("KZ: Calling processOnChangeConditionForSubscription"));
       if (processOnChangeConditionForSubscription(enV,
                                                   attrL,
                                                   &(nc->condValueList),
