@@ -29,6 +29,7 @@
 #include <sstream>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "common/JsonHelper.h"
 
 namespace ngsiv2
@@ -113,6 +114,7 @@ std::string Condition::toJson()
   {
     JsonHelper jhe;
 
+    LM_W(("KZ: Rendering Subscription: expression.q == '%s'", expression.q.c_str()));
     jhe.addString("q", this->expression.q);
     jhe.addString("geometry", this->expression.geometry);
     jhe.addString("coords", this->expression.coords);

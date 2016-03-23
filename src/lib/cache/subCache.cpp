@@ -665,6 +665,7 @@ void subCacheItemInsert
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
   StringFilter*             stringFilterP,
+  const std::string&        q,
   const std::string&        geometry,
   const std::string&        coords,
   const std::string&        georel
@@ -716,6 +717,7 @@ void subCacheItemInsert
   cSubP->notifyFormat            = notifyFormat;
   cSubP->next                    = NULL;
   cSubP->count                   = (notificationDone == true)? 1 : 0;
+  cSubP->expression.q            = q;
   cSubP->expression.geometry     = geometry;
   cSubP->expression.coords       = coords;
   cSubP->expression.georel       = georel;

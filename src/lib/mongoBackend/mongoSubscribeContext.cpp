@@ -216,6 +216,7 @@ HttpStatusCode mongoSubscribeContext
                        notificationDone,
                        lastNotificationTime,
                        stringFilterP,
+                       requestP->expression.q,
                        requestP->expression.geometry,
                        requestP->expression.coords,
                        requestP->expression.georel);
