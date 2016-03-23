@@ -24,33 +24,32 @@ Note that contribution workflows themselves (e.g. pull requests, etc.) are descr
 ### Directory layout
 
 * **src**: contains the source code, with the following subdirectories
-* **app**: contains the code for applications (each application in a separate subdirectories). Main application
-  corresponds to **contextBroker** directory.
+* **app**: contains the code for applications (each application in a separate subdirectory). The main application, the Orion context broker resides in the **contextBroker** directory.
 * **lib**: contains code libraries (each library in a separate subdirectory)
-* **test**: contains tests. It has several subdirectories (each corresponding to a different testing 
+* **test**: contains tests. There are several subdirectories (each subdirectory corresponding to a different test 
   suite/procedure), but the most important ones for the time being are: 
-  * **unittest**: contains unit test
+  * **unittest**: contains unit tests
   * **functionalTest**: contains functional end-to-end tests based on the “test harness” engine
-  * **acceptance**: contains functional end-to-end test based in the Behave (NGSIv2) or Lettuce (NGSIv1) Python  
+  * **acceptance**: contains functional end-to-end test based on the Behave (NGSIv2) or Lettuce (NGSIv1) Python  
     frameworks.
 * **scripts**: contains utility scripts (e.g. scripts included in the Orion RPM along with Orion binary itself,
-  scripts used by the testing framework, etc.)
+  scripts used by the test frameworks, etc.)
 * **doc**: contains documentation, with the following subdirectories:
   * **apiary**: for apiary-based documentation
   * **manuals**: for markdown based documentation
-* **rpm**: contains stuff related with RPM building
+* **rpm**: contains files for RPM building
 * **etc**: scripts that are installed under etc/ (typically, included in RPM package)
-* **docker**: contains the docker stuff
-* **archive**: contains stuff that is no longer used but that we don’t want to remove yet.
+* **docker**: contains the docker files
+* **archive**: contains older files that is no longer used but that we don’t want to remove yet.
 
 ### File layout for source code files 
 
-These are the ones in `src/` directory.
+Source code files are found under the `src/` directory.
 
 The suffix '.cpp' MUST be used for source files and '.h' MUST be used for header files.
 
 As a general rule, for C/C++ source code, every concept SHOULD have its own module. With a module is referred a 
-header file (`.h`) and a source file (`.cpp`). In some cases only a header files is used (without associated `.cpp` 
+header file (`.h`) and its corresponding source file (`.cpp`). In some cases only a header files is beeded (without any corresponding `.cpp` 
 source file): header files containing only constants, macros or inline functions.
 
 A class SHOULD reside in its own module, with the class definition in the header file
@@ -64,19 +63,19 @@ affected classes.
 ## Code style guidelines
 
 Note that currently not all Orion existing code base conforms to these rules. There are some parts of the code that were 
-written before they were established. However, all new code contributions has to follow these rules and, eventually, old code will be modified to conform also to them.
+written before the guidelines were established. However, all new code contributions MUST follow these rules and, eventually, old code will be modified to conform to the guidelines.
 
 ### ‘MUST follow’ rules 
 
 #### M1 (Headers Files Inclusion):
 
-*Rule*: All header or source files MUST include all the header files it need AND NO OTHER header files. They MUST
-NOT depend on inclusions of other header files. Also, all header and source file MUST NOT include any header files it 
-does not itself need.
+*Rule*: All header or source files MUST include all the header files it needs AND NO OTHER header files. They MUST
+NOT depend on inclusions of other header files. Also, all header and source files MUST NOT include any header files it 
+does not need itself.
 
 *Rationale*: each file should not depend on the inclusions other files have/doesn’t have. Also, if a header file
-include more files than it needs, its ‘clients’ has no other choice that to include those ‘extra’ files as
-well. This sometimes leads to conflicts and must be avoided. In addition, it increases compilation times.
+includes more files than it needs, its ‘clients’ has no other choice than to include those ‘extra’ files as
+well. This sometimes leads to conflicts and must be avoided. In addition, it increases the compilation time.
 
 *How to check*": manually?, make lint?, other? TBD
 
@@ -165,7 +164,7 @@ Example:
 *   - protocol    To output the PROTOCOL of the URL
 *
 * RETURN VALUE
-*   parseUrl returns TRUE on successful    operation, FALSE otherwise
+*   parseUrl returns TRUE on successful operation, FALSE otherwise
 *
 * NOTE
 *   About the components in a URL: according to 
@@ -359,7 +358,7 @@ if (a==b)
 
 #### M11 (Spaces)
 
-*Rule*: The keywords that are followed by '(' MUST have a space between the keywords the parenthesis:
+*Rule*: The keywords that are followed by '(' MUST have a space between the keywords and the parenthesis:
 
 ```
 if () ...
@@ -384,7 +383,7 @@ funcCall();
   * 'condition glue operators' (`&&`, `||`) MUST be preceded and superceded by space: ` && `, ` || `.
   * all operators (`==`, `>` ...) MUST be preceded and superceded by space: `if (a == 7) ...`
   * NO space after `(`, nor before `)`
-* After a comma, always a space, just like for normal text. The exception is when horizontal alignment helps 
+* After a comma, one space, just like for normal text. The exception is when horizontal alignment helps 
   readability when commas may be followed by more than one space:
 
 ```
@@ -536,7 +535,7 @@ variable name. Sometimes the type consists of more than one word (e.g. `struct t
 
 *Rule*: 
 
-* Included files MUST start with files from the standard C library, like `<stdio.h>` or `<string.h>`
+* The list of include files MUST start with files from the standard C library, like `<stdio.h>` or `<string.h>`
 * After that, C++ files from the STL, like `<string>` or `<vector>`
 * Third party header files, like `mongo/xxx.h`
 * Files from other libraries of this executable
@@ -661,15 +660,15 @@ values are assigned at object construction time in memory at execution time.
 
 ## Programming patterns
 
-Some patterns are not allowed in Orion Context Broker code, except if some strong reason justify using it. 
-If you plan to use some of them, please talk in advance with core developers about it.
+Some patterns are not allowed in Orion Context Broker code, except if some strong reason justifies the use of it. 
+If you plan to use some of them, please consult before with the core developers.
 
 * Multiple inheritance. It introduces complexity in the code. It is generally accepted that it is a “problematic”
   pattern.
 * C++ exceptions 
-  * Exceptions (not checked in C++) make harder to follow the flow of execution. It is hard to say whether a function will 
-  throw an exception, complicating refactoring and debugging.
+  * Exceptions (not checked in C++) make it harder to follow the flow of execution. It is hard to say whether
+  a function will throw an exception, complicating refactoring and debugging.
   * Exception-safe functions requires assuring the transactional semantic is kept, (beyond RAII to avoid resource leaks), 
   making the code error-prone due to subtle interactions. It gets worse in a multithreaded environment.
-  * The flavor of this project is biased to C clearly.  Many plain C libraries are used and mixing exceptions and traditional 
-  if-checking method should be avoided as much as possible.
+  * The flavor of this project is biased to C clearly. Many plain C libraries are used and mixing exceptions and
+  traditional if-checking method should be avoided as much as possible.
