@@ -34,6 +34,7 @@
 #include "common/string.h"
 #include "common/statistics.h"
 #include "alarmMgr/alarmMgr.h"
+#include "rest/StringFilter.h"
 
 #include "cache/subCache.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -224,7 +225,8 @@ int mongoSubCacheItemInsert
   const std::string&  q,
   const std::string&  geometry,
   const std::string&  coords,
-  const std::string&  georel
+  const std::string&  georel,
+  StringFilter*       stringFilterP
 )
 {
   //
@@ -320,6 +322,11 @@ int mongoSubCacheItemInsert
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
+
+  if (stringFilterP != NULL)
+  {
+    cSubP->expression.stringFilter = *stringFilterP;
+  }
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 

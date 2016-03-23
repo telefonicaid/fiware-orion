@@ -251,11 +251,12 @@ HttpStatusCode mongoUpdateContextSubscription
 
   /* Notify conditions */
   bool notificationDone = false;
-  if (requestP->notifyConditionVector.size() == 0) {
+  if (requestP->notifyConditionVector.size() == 0)
+  {
     newSub.appendArray(CSUB_CONDITIONS, getFieldF(sub, CSUB_CONDITIONS).embeddedObject());
   }
-  else {
-
+  else
+  {
       /* Build conditions array (including side-effect notifications and threads creation)
        * In order to do so, we have to create and EntityIdVector and AttributeList from sub
        * document, given the processConditionVector() signature */
@@ -466,7 +467,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                           requestP->expression.q,
                                           requestP->expression.geometry,
                                           requestP->expression.coords,
-                                          requestP->expression.georel);
+                                          requestP->expression.georel,
+                                          stringFilterP);
 
   if (cSubP != NULL)
   {
