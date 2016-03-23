@@ -143,7 +143,9 @@ HttpStatusCode mongoSubscribeContext
     //
     // StringFilter in Scope?
     //
-    Restriction    restriction;
+    // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+    // If so, set it as string filter to the sub-cache item
+    //
     StringFilter*  stringFilterP = NULL;
 
     for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
@@ -151,9 +153,6 @@ HttpStatusCode mongoSubscribeContext
       if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
       {
         stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
-
-        Scope* scopeP = new Scope(requestP->restriction.scopeVector[ix]);
-        restriction.scopeVector.push_back(scopeP);
       }
     }
 
@@ -168,7 +167,7 @@ HttpStatusCode mongoSubscribeContext
                                              tenant,
                                              xauthToken,
                                              servicePathV,
-                                             &restriction);
+                                             &requestP->restriction);
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */
@@ -208,11 +207,6 @@ HttpStatusCode mongoSubscribeContext
     std::string oidString = oid.toString();
 
     LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
-
-    //
-    // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in restriction.scopeVector?
-    // If so, set it as string filter to the sub-cache item
-    //
 
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
     subCacheItemInsert(tenant.c_str(),

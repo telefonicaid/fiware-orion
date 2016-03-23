@@ -235,7 +235,9 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   // StringFilter in Scope?
   //
-  Restriction    restriction;
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+  // If so, set it as string filter to the sub-cache item
+  //
   StringFilter*  stringFilterP = NULL;
 
   for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
@@ -243,9 +245,6 @@ HttpStatusCode mongoUpdateContextSubscription
     if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
       stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
-
-      Scope* scopeP = new Scope(requestP->restriction.scopeVector[ix]);
-      restriction.scopeVector.push_back(scopeP);
     }
   }
 
@@ -301,7 +300,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
-                                                &restriction);
+                                                &requestP->restriction);
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
