@@ -46,8 +46,6 @@
 #include "serviceRoutines/postQueryContext.h"
 #include "jsonParse/jsonRequest.h"
 
-extern __thread StringFilter*  stringFilterP;
-
 
 
 /* ****************************************************************************

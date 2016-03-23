@@ -71,7 +71,6 @@ extern std::string             rushHost;
 extern unsigned short          rushPort;
 extern bool                    multitenant;
 extern char                    restAllowedOrigin[64];
-extern __thread StringFilter*  stringFilterP;
 
 
 
