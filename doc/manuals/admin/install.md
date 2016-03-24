@@ -20,10 +20,11 @@ building from sources, check [this document](build_source.md).
 
 * System resources: see [these recommendations](diagnosis.md##resource-availability)
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 6.3
-but it should work also in any later CentOS/RedHat 6.x version.
-* Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](../user/geolocation.md) may not work.
-    * Note that the officially supported MongoDB version is 2.6. In the case of using MongoDB 3.0 with its new authentication mechanism
-      (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver. See [this issue](https://github.com/telefonicaid/fiware-orion/issues/1061) for details.
+  but it should work also in any later CentOS/RedHat 6.x version.
+* Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB versions
+  are 2.6/3.0/3.2. It is not recommended using MongoDB 2.4.x., as some [geolocated queries](../user/geolocation.md) may not work.
+    * In the case of using MongoDB 3.0/3.2 with its new authentication mechanism (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver.
+      See [this issue](https://github.com/telefonicaid/fiware-orion/issues/1061) for details.
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
     * The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, gnutls, libgcrypt, logrotate and libcurl.
     * The contextBroker-test package (optional) depends on the following packages: python, python-flask, python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
@@ -78,8 +79,9 @@ You only need to pay attention to this if your upgrade path crosses 0.11.0 or 0.
 
 * Orion versions previous to 0.11.0 recommend MongoDB 2.2
 * Orion version from 0.11.0 to 0.20.0 recommend MongoDB 2.4. Check [the 2.4 upgrade procedure in the oficial MongoDB documentation.](http://docs.mongodb.org/master/release-notes/2.4-upgrade/)
-* Orion version from 0.21.0 on recommend MongoDB 2.6 o 3.0. check [the 2.6 upgrade procedure](http://docs.mongodb.org/master/release-notes/2.6-upgrade/) or
-[the 3.0 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.0-upgrade/) in the oficial MongoDB documentation.
+* Orion version from 0.21.0 on recommend MongoDB 2.6/3.0/3,2. check [the 2.6 upgrade procedure](http://docs.mongodb.org/master/release-notes/2.6-upgrade/),
+  [the 3.0 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.0-upgrade/) or [the 3.2 upgrade procedure](http://docs.mongodb.org/master/release-notes/3.2-upgrade/) in the oficial
+  MongoDB documentation.
 
 ### Migrating the data stored in DB
 

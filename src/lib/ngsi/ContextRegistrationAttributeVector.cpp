@@ -39,19 +39,23 @@
 *
 * ContextRegistrationAttributeVector::render -
 */
-std::string ContextRegistrationAttributeVector::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationAttributeVector::render(const std::string& indent, bool comma)
 {
-  std::string xmlTag   = "contextRegistrationAttributeList";
-  std::string jsonTag  = "attributes";
-  std::string out      = "";
+
+  std::string key = "attributes";
+  std::string out = "";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag2(indent, key, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
-  out += endTag(indent, xmlTag, format, comma, true);
+  {
+    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
+  }
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -66,7 +70,6 @@ std::string ContextRegistrationAttributeVector::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -76,7 +79,7 @@ std::string ContextRegistrationAttributeVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }

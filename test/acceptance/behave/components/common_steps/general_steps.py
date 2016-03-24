@@ -120,24 +120,25 @@ def delete_database_in_mongo(context):
     """
     fiware_service_header = u'Fiware-Service'
     orion_prefix = u'orion'
-    database_name = EMPTY
+    database_name = orion_prefix
     props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
               password=props_mongo["MONGO_PASS"])
     headers = context.cb.get_headers()
-    __logger__.debug("Deleting database in mongo...")
+
     if fiware_service_header in headers:
-        if headers[fiware_service_header] == EMPTY:
-            database_name = orion_prefix
-        elif headers[fiware_service_header].find(".") < 0:
-            database_name = "%s-%s" % (orion_prefix, headers[fiware_service_header])
-    else:
-        database_name = orion_prefix
-    if database_name != EMPTY:
-        mongo.connect(database_name.lower())
-        mongo.drop_database()
-        mongo.disconnect()
-        __logger__.info("...Database \"%s\" is deleted" % database_name.lower())
+        if headers[fiware_service_header] != EMPTY:
+           if headers[fiware_service_header].find(".") < 0:
+               database_name = "%s-%s" % (database_name, headers[fiware_service_header].lower())
+           else:
+               postfix = headers[fiware_service_header].lower()[0:headers[fiware_service_header].find(".")]
+               database_name = "%s-%s" % (database_name, postfix)
+
+    __logger__.debug("Deleting database \"%s\" in mongo..." % database_name)
+    mongo.connect(database_name)
+    mongo.drop_database()
+    mongo.disconnect()
+    __logger__.info("...Database \"%s\" is deleted" % database_name)
 
 # ------------------------------------- validations ----------------------------------------------
 

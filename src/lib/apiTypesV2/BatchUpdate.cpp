@@ -61,7 +61,7 @@ std::string BatchUpdate::check(ConnectionInfo* ciP, RequestType requestType)
   std::string err;
 
   if (((res = entities.check(ciP, requestType))                      != "OK") ||
-      ((res = updateActionType.check(requestType, JSON, "", err, 0)) != "OK"))
+      ((res = updateActionType.check(requestType, "", err, 0)) != "OK"))
   {
     std::string error = res;
 

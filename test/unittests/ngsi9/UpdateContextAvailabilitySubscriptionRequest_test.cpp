@@ -94,16 +94,16 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  out = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
+  out = ucasP->render(UpdateContextAvailabilitySubscription, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, JSON, "", "predetected error", 0);
+  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, "", "predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ucasP->duration.set("eeeee");
-  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, JSON, "", "", 0);
+  out = ucasP->check(&ci, UpdateContextAvailabilitySubscription, "", "", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -141,8 +141,10 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 /* ****************************************************************************
 *
 * response - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(UpdateContextAvailabilitySubscriptionRequest, response)
+TEST(UpdateContextAvailabilitySubscriptionRequest, DISABLED_response)
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   StatusCode                                     ec(SccBadRequest, "Detail");
@@ -159,25 +161,25 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 
   ucas.subscriptionId.set("012345678901234567890123");
 
-  out = ucas.check(UpdateContextAvailabilitySubscription, XML, "", "", 0);
+  out = ucas.check(UpdateContextAvailabilitySubscription, "", "", 0);
   EXPECT_EQ("OK", out);
   
-  out = ucas.render(UpdateContextAvailabilitySubscription, XML, "", 0);
+  out = ucas.render(UpdateContextAvailabilitySubscription, "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucas.errorCode.fill(SccBadRequest, "Detail");
-  out = ucas.render(UpdateContextAvailabilitySubscription, XML, "", 0);
+  out = ucas.render(UpdateContextAvailabilitySubscription, "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
   ucas.errorCode.fill(SccNone);
   ucas.duration.set("ddd");
-  out = ucas.check(UpdateContextAvailabilitySubscription, XML, "", "", 0);
+  out = ucas.check(UpdateContextAvailabilitySubscription, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = ucas.check(UpdateContextAvailabilitySubscription, XML, "", "predetected error", 0);
+  out = ucas.check(UpdateContextAvailabilitySubscription, "", "predetected error", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -76,30 +76,29 @@ std::string EntityType::render
   bool                typeNameBefore
 )
 {
-  std::string  out            = "";
-  std::string  xmlTag         = "entityType";
-  std::string  jsonTag        = "type";
+  std::string  out = "";
+  std::string  key = "type";
 
   if ((typeNameBefore == true) && (ciP->outFormat == JSON))
   {
-    out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
+    out += valueTag1(indent  + "  ", "name", type, true);
     out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true, true);
   }
   else
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+    out += startTag2(indent, key, false, false);
 
     if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true" || contextAttributeVector.size() == 0)
-    {
-      out += valueTag(indent  + "  ", "name", type, ciP->outFormat, false);
+    {     
+      out += valueTag1(indent  + "  ", "name", type, false);
     }
     else
     {
-      out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
+      out += valueTag1(indent  + "  ", "name", type, true);
       out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true, true);
     }
 
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+    out += endTag(indent, comma, false);
   }
 
   return out;
@@ -127,7 +126,7 @@ std::string EntityType::check
     return "Empty Type";
   }
 
-  return contextAttributeVector.check(ciP, EntityTypes, ciP->outFormat, indent, "", 0);
+  return contextAttributeVector.check(ciP, EntityTypes, indent, "", 0);
 
 }
 

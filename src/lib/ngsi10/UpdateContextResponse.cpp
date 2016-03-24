@@ -47,7 +47,7 @@
 */
 UpdateContextResponse::UpdateContextResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -59,7 +59,7 @@ UpdateContextResponse::UpdateContextResponse()
 UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
   LM_T(LmtDestructor, ("destroyed"));
 }
 
@@ -72,7 +72,7 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 UpdateContextResponse::~UpdateContextResponse()
 {
   errorCode.release();
-//  errorCode.tagSet("errorCode");
+//  errorCode.keyNameSet("errorCode");
   contextElementResponseVector.release();
   LM_T(LmtDestructor, ("destroyed"));
 }
@@ -88,24 +88,24 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
   std::string out = "";
   std::string tag = "updateContextResponse";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.render(ciP->outFormat, indent + "  ");
+      out += errorCode.render(indent + "  ");
     }
     else
       out += contextElementResponseVector.render(ciP, RtUpdateContextResponse, indent + "  ", false);
   }
   
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }
@@ -131,7 +131,7 @@ std::string UpdateContextResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (contextElementResponseVector.check(ciP, UpdateContext, ciP->outFormat, indent, predetectedError, 0) != "OK")
+  else if (contextElementResponseVector.check(ciP, UpdateContext, indent, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);

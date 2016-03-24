@@ -107,6 +107,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
   reqData->upcar.metadataP->type = value;
+  reqData->upcar.metadataP->typeGiven = true;
   return "OK";
 }
 
@@ -171,7 +172,7 @@ void jsonUpcarRelease(ParseData* reqData)
 */
 std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcar.res.check(ciP, UpdateContextAttribute, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->upcar.res.check(ciP, UpdateContextAttribute, "", reqData->errorString, 0);
 }
 
 

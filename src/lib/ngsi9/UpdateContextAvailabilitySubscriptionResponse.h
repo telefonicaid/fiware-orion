@@ -50,8 +50,8 @@ typedef struct UpdateContextAvailabilitySubscriptionResponse
   UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode);
   ~UpdateContextAvailabilitySubscriptionResponse();
 
-  std::string render(RequestType requestType, Format format, const std::string& indent, int counter);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string render(RequestType requestType, const std::string& indent, int counter);
+  std::string check(RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
 } UpdateContextAvailabilitySubscriptionResponse;
 
 #endif

@@ -39,8 +39,7 @@ TEST(AttributeDomainName, ok)
 {
   AttributeDomainName adn;
   std::string         out;
-  const char*         outfile1 = "ngsi10.attributeDomainName.ok.middle.xml";
-  const char*         outfile2 = "ngsi10.attributeDomainName.ok.middle.json";
+  const char*         outfile1 = "ngsi10.attributeDomainName.ok.middle.json";
 
   utInit();
 
@@ -51,19 +50,15 @@ TEST(AttributeDomainName, ok)
   EXPECT_STREQ("ADN", adn.get().c_str());
   EXPECT_STREQ("ADN", adn.c_str());
 
-  out = adn.render(XML, "");
+  out = adn.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = adn.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Just to exercise the code
   adn.present("");
   adn.set("");
   adn.present("");
-  out = adn.render(JSON, "");
+  out = adn.render("");
   EXPECT_STREQ("", out.c_str());
 
   utExit();

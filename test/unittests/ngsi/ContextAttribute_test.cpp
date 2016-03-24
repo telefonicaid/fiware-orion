@@ -45,17 +45,17 @@ TEST(ContextAttribute, checkOne)
   utInit();
 
   ca.name = "";
-  res     = ca.check(&ci, RegisterContext, XML, "", "", 0);
+  res     = ca.check(&ci, RegisterContext, "", "", 0);
   EXPECT_TRUE(res == "missing attribute name");
 
   ca.name  = "Algo, lo que sea!";
   ca.stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = ca.check(&ci, RegisterContext, XML, "", "", 0);
+  res     = ca.check(&ci, RegisterContext, "", "", 0);
   EXPECT_TRUE(res == "OK");
   
   ca.stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-  res     = ca.check(&ci, RegisterContext, XML, "", "", 0);
+  res     = ca.check(&ci, RegisterContext, "", "", 0);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -85,7 +85,7 @@ TEST(ContextAttribute, checkVector)
   caVector.push_back(&ca0);
   caVector.push_back(&ca1);
 
-  res     = caVector.check(&ci, RegisterContext, XML, "", "", 0);
+  res     = caVector.check(&ci, RegisterContext, "", "", 0);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -101,19 +101,14 @@ TEST(ContextAttribute, render)
 {
   ContextAttribute  ca("NAME", "TYPE", "VALUE");
   std::string       out;
-  const char*       outfile1 = "ngsi.contextAttribute.render.middle.xml";
-  const char*       outfile2 = "ngsi.contextAttribute.render.middle.json";
-  ConnectionInfo    ci(XML);
+  const char*       outfile1 = "ngsi.contextAttribute.render.middle.json";
+  ConnectionInfo    ci(JSON);
 
   utInit();
 
-  out = ca.render(&ci, UpdateContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   ci.outFormat = JSON;
   out = ca.render(&ci, UpdateContext, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

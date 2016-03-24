@@ -47,7 +47,7 @@ class NGSI:
         constructor
         """
     # ------------------------------------ validations ------------------------------------------
-    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers):
+    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers, qp_types = None):
         """
         return a cursor with a entities list
         :param entities_contexts: entities context (attr_name, attr_value, attr_type, id, type, metadatas, etc)
@@ -75,19 +75,16 @@ class NGSI:
                 service_path = headers[FIWARE_SERVICE_PATH_HEADER]
         else:
             service_path = "/"
-        if "entities_type" in entities_contexts:
-            type = entities_contexts["entities_type"]
+        if qp_types is None:
+            entity_type = entities_contexts["entities_type"]
         else:
-            type = ""
+            entity_type = qp_types
         __logger__.info("Database verified: %s" % database_name)
         __logger__.info("collection verified: entities")
         __logger__.info("service path verified: %s" % service_path)
-        curs_list = []
-        if type != "none":
-            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path,
-                     "_id.type": type}
-        else:
-            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path}
+        query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]},
+                 "_id.servicePath": service_path,
+                 "_id.type": entity_type}
         __logger__.info("query: %s" % str(query))
 
         curs = mongo_driver.find_data(query)
@@ -204,13 +201,19 @@ class NGSI:
         __logger__.debug("Total of docs read from mongo: %s" % str(len(curs_list)))
         mongo_driver.disconnect()
 
-    def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers):
+    def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers, parameters):
         """
         verify that entities are not stored in mongo
         :param entities_contexts:  entities context (see constructor in cb_v2_utils.py)
         :param headers: headers used (see "definition_headers" method in cb_v2_utils.py)
         """
-        entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
+        qp_types = None
+        if "type" in parameters:
+            qp_types = parameters["type"]
+        entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, qp_types)
+
+
+        #entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
         assert len(entity_list) > 0, " ERROR - notihing is returned from mongo, review the query in behave log"
         entity = entity_list[0]
         # verify attributes
@@ -763,24 +766,27 @@ class NGSI:
         assert "value" in resp_json, 'ERROR - value key dos not exist in response: \n %s' %  resp.content
         assert resp_json["value"] == entities_context["attributes_value"], "ERROR - the value %s is not the expected: %s" % (resp_json["value"], entities_context["attributes_value"])
 
-    def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers):
+    def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers, parameters):
         """
         verify if the attribute has been deleted
         :param entity_context:
         :param headers:
         """
-        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
+        __logger__.debug("parameters: %s" % str(parameters))
+        __logger__.debug("headers: %s" % str(headers))
+        __logger__.debug("properties: %s" % str(entities_contexts))
+        qp_types = None
+        if "type" in parameters:
+            qp_types = parameters["type"]
+        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, qp_types)
 
-        # verify entities
-        __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
-        for i in range(int(entities_contexts["entities_number"])):
-            # verify if the entity is stored in mongo
-            __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
-            __logger__.debug("attribute name to verify: %s" % entities_contexts["attributes_name"])
-            assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
-            entity = curs_list[i]  # manages N entities
-            assert entities_contexts["attributes_name"] not in entity["attrNames"], " ERROR - the attribute: %s exists in the entity No: %s" % \
-                                                                                    (entities_contexts["attributes_name"], str(i+1))
+        # verify attribute in entity
+        __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
+        __logger__.debug("attribute name to verify: %s" % entities_contexts["attributes_name"])
+        assert len(curs_list) == 1, " ERROR - should be returned only one entity"
+        entity = curs_list[0]
+        assert entities_contexts["attributes_name"] not in entity["attrNames"], \
+            " ERROR - the attribute: %s exists in the entity " %  entities_contexts["attributes_name"]
         mongo_driver.disconnect()
 
     def verify_entity_types(self, types, resp):

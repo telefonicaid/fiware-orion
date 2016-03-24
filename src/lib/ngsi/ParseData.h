@@ -118,7 +118,7 @@ typedef struct DiscoverContextAvailabilityResponseData
 */
 struct QueryContextData
 {
-  QueryContextData(): entityIdP(NULL), scopeP(NULL), vertexP(NULL) {}
+  QueryContextData(): entityIdP(NULL), scopeP(NULL), vertexP(NULL),pointNo(0), coords(0) {}
   QueryContextRequest  res;
   EntityId*            entityIdP;
   Scope*               scopeP;

@@ -49,7 +49,7 @@ typedef struct EntityIdVector
 {
   std::vector<EntityId*>  vec;
 
-  std::string  render(Format format, const std::string& indent, bool comma = false);
+  std::string  render(const std::string& indent, bool comma = false);
   void         present(const std::string& indent);
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);
@@ -62,7 +62,6 @@ typedef struct EntityIdVector
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,
-                     Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);

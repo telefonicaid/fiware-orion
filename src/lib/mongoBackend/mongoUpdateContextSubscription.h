@@ -40,8 +40,7 @@
 extern HttpStatusCode mongoUpdateContextSubscription
 (
   UpdateContextSubscriptionRequest*   requestP,
-  UpdateContextSubscriptionResponse*  responseP,
-  Format                              notifyFormat,
+  UpdateContextSubscriptionResponse*  responseP,  
   const std::string&                  tenant,
   const std::string&                  xauthToken,
   const std::vector<std::string>&     servicePathV,

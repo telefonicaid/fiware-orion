@@ -36,13 +36,10 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include <map>
 
 #include <pthread.h>
 
 #include <libwebsockets.h>
-
-std::map<unsigned, lws*> map;
 
 RestService *orionServices;
 
@@ -87,9 +84,6 @@ static int wsCallback(lws * ws,
       dat->request = NULL;
       dat->index = 0;
       LM_I(("Connecction id: %d", dat->cid));
-
-      map[dat->cid] = ws;
-
       break;
     }
     case LWS_CALLBACK_CLOSED:
@@ -182,21 +176,6 @@ void *runWS(void *ptr)
     pthread_mutex_lock(&mtx);
     lws_service(ws->ctx, 50);
     pthread_mutex_unlock(&mtx);
-/*
-    if (!map.empty())
-    {
-      std::cout << "Trying to write ("<<map.size() << "\n";
-      for (std::map<unsigned, lws*>::iterator it=map.begin(); it!=map.end(); ++it)
-      {
-        size_t size = LWS_SEND_BUFFER_PRE_PADDING + LWS_SEND_BUFFER_POST_PADDING + 4;
-        unsigned char *msg = (unsigned char *) malloc (size);
-        unsigned char *p = &msg[LWS_SEND_BUFFER_PRE_PADDING];
-        sprintf((char *)p,"%s", "hola");
-
-        lws_write(it->second, p, 4, LWS_WRITE_TEXT);
-      }
-    }
-*/
   }
   return 0;
 }

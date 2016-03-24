@@ -47,13 +47,12 @@ typedef struct ContextRegistrationAttribute
 
   ContextRegistrationAttribute();
   ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain = "");
-  std::string     render(Format format, const std::string& indent, bool comma = false);
+  std::string     render(const std::string& indent, bool comma = false);
   void            present(int ix, const std::string& indent);
   void            release(void);
 
   std::string     check(ConnectionInfo*     ciP,
                         RequestType         requestType,
-                        Format              format,
                         const std::string&  indent,
                         const std::string&  predetectedError,
                         int                 counter);

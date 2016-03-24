@@ -526,7 +526,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   alarmMgr.badInput(clientIp, details);
 
   ciP->httpStatusCode = SccBadRequest;
-  std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
+  std::string answer = restErrorReplyGet(ciP, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
   restReply(ciP, answer);
 
   compV.clear();
