@@ -44,7 +44,7 @@
 */
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
-  metadataVector.tagSet("metadata");
+  metadataVector.keyNameSet("metadata");
   compoundValueP = NULL;
   valueType = orion::ValueTypeNone;
 }
@@ -55,19 +55,19 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format format, std::string indent)
+std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::string indent)
 {
   std::string tag = "updateContextAttributeRequest";
   std::string out = "";
   std::string indent2 = indent + "  ";
   bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag(indent, tag, format, false);
-  out += valueTag(indent2, "type", type, format, true);
+  out += startTag1(indent, tag, false);
+  out += valueTag1(indent2, "type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, format, true);
+    out += valueTag1(indent2, "contextValue", contextValue, true);
   }
   else
   {
@@ -78,13 +78,13 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(ciP, format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
+    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += compoundValueP->render(ciP, indent + "    ");
+    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(format, indent2);
-  out += endTag(indent, tag, format);
+  out += metadataVector.render(indent2);
+  out += endTag(indent);
 
   return out;
 }
@@ -99,7 +99,6 @@ std::string UpdateContextAttributeRequest::check
 (
   ConnectionInfo* ciP,
   RequestType     requestType,
-  Format          format,
   std::string     indent,
   std::string     predetectedError,
   int             counter
@@ -108,21 +107,13 @@ std::string UpdateContextAttributeRequest::check
   StatusCode       response;
   std::string      res;
 
-  if (format == (Format) 0)
-  {
-    format = XML;
-  }
-
-  if (format == JSON)
-  {
-    indent = "  ";
-  }
+  indent = "  ";
 
   if (predetectedError != "")
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = metadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  else if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }
@@ -131,12 +122,9 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(format, indent);
+  std::string out = response.render(indent);
 
-  if (format == JSON)
-  {
-    out = "{\n" + out + "}\n";
-  }
+  out = "{\n" + out + "}\n";
 
   return out;
 }

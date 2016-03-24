@@ -56,18 +56,13 @@ TEST(NotifyCondition, Creation)
 TEST(NotifyCondition, render)
 {
   NotifyCondition  nc;
-  const char*      outfile1 = "ngsi.notifyCondition.render.middle.xml";
-  const char*      outfile2 = "ngsi.notifyCondition.render.middle.json";
+  const char*      outfile1 = "ngsi.notifyCondition.render.middle.json";
   std::string      out;
 
   utInit();
 
-  out = nc.render(XML, "", false);
+  out = nc.render("", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = nc.render(JSON, "", false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -104,11 +99,11 @@ TEST(NotifyCondition, check)
 
   utInit();
 
-  checked = nc.check(RegisterContext, XML, "", "", 0);
+  checked = nc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("empty type for NotifyCondition", checked.c_str());
   
   nc.type = "XXX";
-  checked = nc.check(RegisterContext, XML, "", "", 0);
+  checked = nc.check(RegisterContext, "", "", 0);
   EXPECT_STREQ("invalid notify condition type: /XXX/", checked.c_str());
 
   nc.release();

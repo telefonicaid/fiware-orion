@@ -85,12 +85,12 @@ std::string postSubscribeContext
 
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.render(SubscribeContext, ciP->outFormat, ""));
+    TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
     return answer;
   }
 
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
-  TIMED_RENDER(answer = scr.render(SubscribeContext, ciP->outFormat, ""));
+  TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
 
   parseDataP->scr.res.release();
 

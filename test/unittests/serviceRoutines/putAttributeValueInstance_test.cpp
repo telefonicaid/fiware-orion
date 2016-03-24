@@ -75,8 +75,8 @@ TEST(putAttributeValueInstance, DISABLED_notFound)
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci1.outFormat    = XML;
-  ci1.inFormat     = XML;
+  ci1.outFormat    = JSON;
+  ci1.inFormat     = JSON;
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out              = restService(&ci1, rs);
@@ -84,8 +84,8 @@ TEST(putAttributeValueInstance, DISABLED_notFound)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.outFormat    = XML;
-  ci2.inFormat     = XML;
+  ci2.outFormat    = JSON;
+  ci2.inFormat     = JSON;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out              = restService(&ci2, rs);
@@ -93,8 +93,8 @@ TEST(putAttributeValueInstance, DISABLED_notFound)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  ci3.outFormat    = XML;
-  ci3.inFormat     = XML;
+  ci3.outFormat    = JSON;
+  ci3.inFormat     = JSON;
   ci3.payload      = testBuf;
   ci3.payloadSize  = strlen(testBuf);
   out              = restService(&ci3, rs);
@@ -127,8 +127,8 @@ TEST(putAttributeValueInstance, DISABLED_found)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci1.outFormat    = XML;
-  ci1.inFormat     = XML;
+  ci1.outFormat    = JSON;
+  ci1.inFormat     = JSON;
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out              = restService(&ci1, rs);
@@ -136,8 +136,8 @@ TEST(putAttributeValueInstance, DISABLED_found)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.outFormat    = XML;
-  ci2.inFormat     = XML;
+  ci2.outFormat    = JSON;
+  ci2.inFormat     = JSON;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out              = restService(&ci2, rs);

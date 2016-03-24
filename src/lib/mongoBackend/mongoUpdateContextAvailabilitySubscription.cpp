@@ -50,13 +50,11 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
 (
   UpdateContextAvailabilitySubscriptionRequest*   requestP,
   UpdateContextAvailabilitySubscriptionResponse*  responseP,
-  Format                                          notifyFormat,
   const std::string&                              tenant
 )
 {
   bool reqSemTaken;
 
-  LM_T(LmtMongo, ("Update Context Subscription, notifyFormat: '%s'", formatToString(notifyFormat)));
   reqSemTake(__FUNCTION__, "ngsi9 update subscription request", SemWriteOp, &reqSemTaken);  
 
   /* Look for document */
@@ -153,7 +151,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Adding format to use in notifications */
-  newSub.append(CASUB_FORMAT, std::string(formatToString(notifyFormat)));
+  newSub.append(CASUB_FORMAT, "JSON");
 
   /* Update document in MongoDB */
   if (!collectionUpdate(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << OID(requestP->subscriptionId.get())), newSub.obj(), false, &err))
@@ -164,7 +162,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringField(sub, CASUB_REFERENCE), notifyFormat, tenant);
+  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringField(sub, CASUB_REFERENCE), JSON, tenant);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */

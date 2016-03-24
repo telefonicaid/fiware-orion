@@ -88,7 +88,7 @@ void jsonUncrRelease(ParseData* parseDataP)
 */
 std::string jsonUncrCheck(ParseData* parseData, ConnectionInfo* ciP)
 {
-  return parseData->uncr.res.check(UnsubscribeContext, ciP->outFormat, "", parseData->errorString, 0);
+  return parseData->uncr.res.check(UnsubscribeContext, "", parseData->errorString, 0);
 }
 
 

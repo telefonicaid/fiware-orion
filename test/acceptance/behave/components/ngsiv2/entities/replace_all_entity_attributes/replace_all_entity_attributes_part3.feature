@@ -48,6 +48,73 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
 
   # --------------------- attribute metadata value  ------------------------------------
 
+  @attribute_metadata_value_replace_wo_attr_value @BUG_1789
+  Scenario:  replace attributes by entity ID using NGSI v2 with new attribute metadata values without attribute value nor metadata type
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_metadata_value_replace |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "1" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter       | value     |
+      | attributes_name | pressure  |
+      | metadatas_name  | very_cold |
+      | metadatas_value | 45        |
+    When replace attributes by ID "room" if it exists and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+
+  @attribute_metadata_value_replace_wo_attr_value @BUG_1789
+  Scenario:  replace attributes by entity ID using NGSI v2 with new attribute metadata values without attribute value but with metadata type
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_metadata_value_replace |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "1" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter       | value     |
+      | attributes_name | pressure  |
+      | metadatas_name  | very_cold |
+      | metadatas_value | 45        |
+      | metadatas_type  | nothing   |
+    When replace attributes by ID "room" if it exists and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+
   @attribute_metadata_value_replace_without_meta_type @BUG_1220
   Scenario Outline:  replace attributes by entity ID using NGSI v2 with several attribute metadata values without attribute metadata type
     Given  a definition of headers

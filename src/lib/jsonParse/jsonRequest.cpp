@@ -200,7 +200,6 @@ std::string jsonTreat
   {
     std::string errorReply =
       restErrorReplyGet(ciP,
-                        ciP->outFormat,
                         "",
                         requestType(request),
                         SccBadRequest,
@@ -233,7 +232,6 @@ std::string jsonTreat
   catch (const std::exception &e)
   {
     std::string errorReply  = restErrorReplyGet(ciP,
-                                                ciP->outFormat,
                                                 "",
                                                 reqP->keyword,
                                                 SccBadRequest,
@@ -246,7 +244,6 @@ std::string jsonTreat
   catch (...)
   {
     std::string errorReply  = restErrorReplyGet(ciP,
-                                                ciP->outFormat,
                                                 "",
                                                 reqP->keyword,
                                                 SccBadRequest,
@@ -263,7 +260,7 @@ std::string jsonTreat
 
     ciP->httpStatusCode = SccBadRequest;
 
-    std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
+    std::string answer = restErrorReplyGet(ciP, "", payloadWord, ciP->httpStatusCode, res);
     return answer;
   }
 

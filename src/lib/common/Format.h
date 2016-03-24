@@ -33,8 +33,8 @@
 *
 * DEFAULT_FORMAT - 
 */
-#define DEFAULT_FORMAT              XML
-#define DEFAULT_FORMAT_AS_STRING    "XML"
+#define DEFAULT_FORMAT              JSON
+#define DEFAULT_FORMAT_AS_STRING    "JSON"
 
 
 
@@ -44,11 +44,10 @@
 */
 typedef enum Format
 {
-  XML      = 1,
-  JSON     = 2,
-  TEXT     = 3,
-  HTML     = 4,
-  NOFORMAT = 5
+  JSON     = 1,
+  TEXT     = 2,
+  HTML     = 3,
+  NOFORMAT = 4
 } Format;
 
 

@@ -52,7 +52,7 @@ struct ParseData;
 class ConnectionInfo
 {
 public:
-  ConnectionInfo(const std::string &_api = "v1", Format _format = XML, bool _ws = false);
+  ConnectionInfo(const std::string &_api = "v1", Format _format = JSON, bool _ws = false);
   ConnectionInfo(Format _outFormat);
   ConnectionInfo(const std::string &_url, const std::string &_method, const std::string &_version, MHD_Connection* _connection = NULL);
   ~ConnectionInfo();

@@ -15,6 +15,7 @@
   * [Multy tenancy](multitenancy.md)
   * [Entity service paths](service_path.md)
   * [Adding and removing attributes and entities with APPEND and DELETE in updateContext](append_and_delete.md)
+  * [Delete entity](delete_entity.md)
   * [Updating registrations and subscriptions](updating_regs_and_subs.md)
   * [Context broker federation](federation.md)
   * [Forbidden characters](forbidden_characters.md)

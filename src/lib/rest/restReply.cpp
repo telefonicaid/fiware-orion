@@ -168,7 +168,7 @@ static std::string tagGet(const std::string& request)
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& details)
+std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& details)
 {
    std::string   tag = tagGet(request);
    StatusCode    errorCode(code, details, "errorCode");
@@ -179,32 +179,32 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    if (tag == "registerContextResponse")
    {
       RegisterContextResponse rcr("000000000000000000000000", errorCode);
-      reply =  rcr.render(RegisterContext, format, indent);
+      reply =  rcr.render(RegisterContext, indent);
    }
    else if (tag == "discoverContextAvailabilityResponse")
    {
       DiscoverContextAvailabilityResponse dcar(errorCode);
-      reply =  dcar.render(DiscoverContextAvailability, format, indent);
+      reply =  dcar.render(DiscoverContextAvailability, indent);
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
       SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-      reply =  scar.render(SubscribeContextAvailability, format, indent);
+      reply =  scar.render(SubscribeContextAvailability, indent);
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")
    {
       UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-      reply =  ucas.render(UpdateContextAvailabilitySubscription, format, indent, 0);
+      reply =  ucas.render(UpdateContextAvailabilitySubscription, indent, 0);
    }
    else if (tag == "unsubscribeContextAvailabilityResponse")
    {
       UnsubscribeContextAvailabilityResponse ucar(errorCode);
-      reply =  ucar.render(UnsubscribeContextAvailability, format, indent);
+      reply =  ucar.render(UnsubscribeContextAvailability, indent);
    }
    else if (tag == "notifyContextAvailabilityResponse")
    {
       NotifyContextAvailabilityResponse ncar(errorCode);
-      reply =  ncar.render(NotifyContextAvailability, format, indent);
+      reply =  ncar.render(NotifyContextAvailability, indent);
    }
 
    else if (tag == "queryContextResponse")
@@ -215,17 +215,17 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    else if (tag == "subscribeContextResponse")
    {
       SubscribeContextResponse scr(errorCode);
-      reply =  scr.render(SubscribeContext, format, indent);
+      reply =  scr.render(SubscribeContext, indent);
    }
    else if (tag == "updateContextSubscriptionResponse")
    {
       UpdateContextSubscriptionResponse ucsr(errorCode);
-      reply =  ucsr.render(UpdateContextSubscription, format, indent);
+      reply =  ucsr.render(UpdateContextSubscription, indent);
    }
    else if (tag == "unsubscribeContextResponse")
    {
       UnsubscribeContextResponse uncr(errorCode);
-      reply =  uncr.render(UnsubscribeContext, format, indent);
+      reply =  uncr.render(UnsubscribeContext, indent);
    }
    else if (tag == "updateContextResponse")
    {
@@ -235,12 +235,12 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    else if (tag == "notifyContextResponse")
    {
       NotifyContextResponse ncr(errorCode);
-      reply =  ncr.render(NotifyContext, format, indent);
+      reply =  ncr.render(NotifyContext, indent);
    }
    else if (tag == "StatusCode")
    {
      StatusCode sc(code, details);
-     reply = sc.render(format, indent);
+     reply = sc.render(indent);
    }
    else
    {

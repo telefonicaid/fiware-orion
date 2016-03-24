@@ -45,10 +45,10 @@ std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType
   std::string tag = "updateContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
-  out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
+  out += startTag1(indent, tag, false);
+  out += attributeDomainName.render(indent + "  ", true);
   out += contextAttributeVector.render(ciP, requestType, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }
@@ -63,7 +63,7 @@ std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType
 * FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
 *           in its place:
 -
-*   else if ((res = attributeDomainName.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
+*   else if ((res = attributeDomainName.check(AppendContextElement, indent, predetectedError, counter)) != "OK")
 *   {
 *     response.errorCode.fill(SccBadRequest, res);
 *   }
@@ -80,13 +80,12 @@ std::string UpdateContextElementRequest::check
 {
   UpdateContextElementResponse  response;
   std::string                   res;
-  Format                        fmt = ciP->outFormat;
 
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(ciP, UpdateContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(ciP, UpdateContextElement, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }

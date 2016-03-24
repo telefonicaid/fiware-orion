@@ -312,14 +312,13 @@ std::string ContextElementResponse::render
   bool                omitAttributeValues
 )
 {
-  std::string xmlTag   = "contextElementResponse";
-  std::string jsonTag  = "contextElement";
-  std::string out      = "";
+  std::string key = "contextElement";
+  std::string out = "";
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  out += startTag2(indent, key, false, false);
   out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
-  out += statusCode.render(ciP->outFormat, indent + "  ", false);
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+  out += statusCode.render(indent + "  ", false);
+  out += endTag(indent, comma, false);
 
   return out;
 }
@@ -346,7 +345,6 @@ std::string ContextElementResponse::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -354,12 +352,12 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = contextElement.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextElement.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = statusCode.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = statusCode.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }

@@ -1,5 +1,8 @@
 #<a name="top"></a>Orion Context Broker
 
+<!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
+     release.sh needs to be changed also -->
+
 [![License badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion.readthedocs.org/en/latest/?badge=latest)
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)

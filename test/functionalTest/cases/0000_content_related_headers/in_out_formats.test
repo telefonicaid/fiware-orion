@@ -1,0 +1,316 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Input and Output Format Test
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+echo "0.0: Add an Entity with UpdateContext:APPEND"
+echo "============================================"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "12"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url ${url} --payload "${payload}" --json
+echo
+echo
+
+
+echo "0.1: Query the Entity just to make sure it is there"
+echo "==================================================="
+orionCurl --url "/v1/contextEntities/OfficeRoom" --json
+echo
+echo
+
+
+echo "1.1: Unrecognized Content-Type, Accepts ONLY JSON: 415, response in JSON"
+echo '========================================================================'
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "application/json"
+echo
+echo
+
+
+echo "1.2: Unrecognized Content-Type, Accepts BOTH JSON and XML: 415, response in JSON"
+echo '================================================================================'
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "application/xml, application/json"
+echo
+echo
+
+
+echo "1.3: Unrecognized Content-Type, Accepts text/plain: 415, response in JSON"
+echo '========================================================================='
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "text/plain" --payloadCheck json
+echo
+echo
+
+
+echo "1.4: Unrecognized Content-Type, Accepts NOTHING: 415, response in JSON"
+echo '======================================================================'
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out " " --payloadCheck json
+echo
+echo
+
+
+echo "2.1: Content-Type OK, Accepts ONLY JSON: 200, response in JSON"
+echo '=============================================================='
+orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json"
+echo
+echo
+
+
+echo "2.2: Content-Type OK, Accepts BOTH JSON and XML: 200, response in JSON"
+echo '======================================================================'
+orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/xml, application/json"
+echo
+echo
+
+
+echo "2.3: Content-Type OK, Accepts text/plain: 406, Response in JSON"
+echo '==============================================================='
+orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "text/plain" --payloadCheck json
+echo
+echo
+
+
+--REGEXPECT--
+0.0: Add an Entity with UpdateContext:APPEND
+============================================
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+0.1: Query the Entity just to make sure it is there
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "temperature",
+                "type": "degree",
+                "value": "12"
+            }
+        ],
+        "id": "OfficeRoom",
+        "isPattern": "false",
+        "type": "Room"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+1.1: Unrecognized Content-Type, Accepts ONLY JSON: 415, response in JSON
+========================================================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: text/plain",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
+
+
+1.2: Unrecognized Content-Type, Accepts BOTH JSON and XML: 415, response in JSON
+================================================================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: text/plain",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
+
+
+1.3: Unrecognized Content-Type, Accepts text/plain: 415, response in JSON
+=========================================================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: text/plain",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
+
+
+1.4: Unrecognized Content-Type, Accepts NOTHING: 415, response in JSON
+======================================================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: text/plain",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
+
+
+2.1: Content-Type OK, Accepts ONLY JSON: 200, response in JSON
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+2.2: Content-Type OK, Accepts BOTH JSON and XML: 200, response in JSON
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+2.3: Content-Type OK, Accepts text/plain: 406, Response in JSON
+===============================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 182
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "406",
+        "details": "acceptable MIME types: application/json. Accept header in request: text/plain",
+        "reasonPhrase": "Not Acceptable"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

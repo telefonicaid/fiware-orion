@@ -37,29 +37,6 @@
 
 /* ****************************************************************************
 *
-* render_xml - 
-*/
-TEST(ContextAttributeResponse, render_xml)
-{
-  ContextAttribute          ca("caName", "caType", "caValue");
-  ContextAttributeResponse  car;
-  std::string               out;
-  ConnectionInfo            ci;
-
-  utInit();
-
-  car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk);
-
-  out = car.render(&ci, ContextEntityAttributes, "");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render_json - 
 */
 TEST(ContextAttributeResponse, render_json)
@@ -76,49 +53,6 @@ TEST(ContextAttributeResponse, render_json)
 
   ci.outFormat = JSON;
   out = car.render(&ci, ContextEntityAttributes, "");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* check_xml - 
-*/
-TEST(ContextAttributeResponse, check_xml)
-{
-  ContextAttribute          ca("caName", "caType", "caValue");
-  ContextAttributeResponse  car;
-  std::string               out;
-  const char*               outfile1 = "ngsi10.contextAttributeResponse.check3.valid.xml";
-  const char*               outfile2 = "ngsi10.contextAttributeResponse.check4.valid.xml";
-  ConnectionInfo            ci;
-
-  utInit();
-
-  // 1. OK
-  car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk); 
-
-  out = car.check(&ci, UpdateContextAttribute, "", "", 0);
-  EXPECT_STREQ("OK", out.c_str());
-
-
-  // 2. predetectedError
-  out = car.check(&ci, UpdateContextAttribute, "", "PRE Error", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-
-  // 3. Bad ContextAttribute
-  ContextAttribute          ca2("", "caType", "caValue");
-  car.contextAttributeVector.push_back(&ca2);
-  
-  LM_M(("car.contextAttributeVector.size: %d - calling ContextAttributeResponse::check", car.contextAttributeVector.size()));
-  out = car.check(&ci, UpdateContextAttribute, "", "", 0);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

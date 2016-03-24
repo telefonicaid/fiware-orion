@@ -160,4 +160,13 @@
 #define MAX_ID_LEN 256
 #endif
 
+/* ****************************************************************************
+ *
+ * MIN_ID_LEN - min length of id and type for entities, attributes and metadata
+ */
+#ifndef MIN_ID_LEN
+#define MIN_ID_LEN 1
+#endif
+
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_

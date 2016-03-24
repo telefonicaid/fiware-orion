@@ -133,7 +133,6 @@ void utInit(void)
   // URI parameters used for unit testing
   //   Default mime type for notifications: application/xml
   //
-  uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
   uriParams[URI_PARAM_PAGINATION_OFFSET]   = DEFAULT_PAGINATION_OFFSET;
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = DEFAULT_PAGINATION_LIMIT;
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = DEFAULT_PAGINATION_DETAILS;

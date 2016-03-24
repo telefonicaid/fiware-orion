@@ -42,7 +42,6 @@
 std::string Restriction::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -63,8 +62,8 @@ std::string Restriction::check
     return "empty restriction";
   }
 
-  if (((res = scopeVector.check(requestType, format, indent, predetectedError,  counter))         != "OK") ||
-      ((res = attributeExpression.check(requestType, format, indent, predetectedError,  counter)) != "OK"))
+  if (((res = scopeVector.check(requestType, indent, predetectedError,  counter))         != "OK") ||
+      ((res = attributeExpression.check(requestType, indent, predetectedError,  counter)) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
     alarmMgr.badInput(clientIp, res);
@@ -94,7 +93,7 @@ void Restriction::present(const std::string& indent)
 *
 * Restriction::render -
 */
-std::string Restriction::render(Format format, const std::string& indent, int restrictions, bool comma)
+std::string Restriction::render(const std::string& indent, int restrictions, bool comma)
 {
   std::string  tag = "restriction";
   std::string  out = "";
@@ -105,10 +104,10 @@ std::string Restriction::render(Format format, const std::string& indent, int re
     return "";
   }
 
-  out += startTag(indent, tag, format);
-  out += attributeExpression.render(format, indent + "  ", scopeVectorRendered);
-  out += scopeVector.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format, comma);
+  out += startTag1(indent, tag);
+  out += attributeExpression.render(indent + "  ", scopeVectorRendered);
+  out += scopeVector.render(indent + "  ", false);
+  out += endTag(indent, comma);
 
   return out;
 }

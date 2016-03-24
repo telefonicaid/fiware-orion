@@ -703,7 +703,7 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | room16    | "2017-06-17T07:21:24.238Z"                                                    |
       | room17    | null                                                                          |
 
-  @attribute_value_error_without
+  @attribute_value_error_without_attr_value @BUG_1789
   Scenario:  try to update an attribute by entity ID using NGSI v2 without attribute values
     Given  a definition of headers
       | parameter          | value                        |
@@ -727,11 +727,8 @@ Feature: update an attribute by entity ID if it exists using NGSI v2. "PATCH" - 
       | parameter       | value         |
       | attributes_name | temperature_0 |
     When update attributes by ID "room_1" if it exists and with "normalized" mode
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | no 'value' for ContextAttribute without keyValues |
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
 
   @attribute_value_invalid @BUG_1200
   Scenario Outline:  try to update an attribute by entity ID using NGSI v2 with invalid attribute values in update request

@@ -44,8 +44,10 @@ static RestService rs[] =
 /* ****************************************************************************
 *
 * ok - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(badNgsi9Request, ok)
+TEST(badNgsi9Request, DISABLED_ok)
 {
   ConnectionInfo ci("/ngsi9/badbadbad",  "GET", "1.1");
   std::string    out;  

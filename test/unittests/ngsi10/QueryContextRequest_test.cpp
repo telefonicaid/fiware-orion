@@ -96,7 +96,7 @@ TEST(QueryContextRequest, ok_json)
   qcrP->present(""); // No output
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
+  rendered = qcrP->render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   qcrP->present("");
@@ -608,8 +608,10 @@ TEST(QueryContextRequest, DISABLED_noRestriction_xml)
 /* ****************************************************************************
 *
 * fill - 
+*
+* FIXME P5 #1862: _json countepart?
 */
-TEST(QueryContextRequest, fill)
+TEST(QueryContextRequest, DISABLED_fill)
 {
   QueryContextRequest q0;
   QueryContextRequest q1;
@@ -622,13 +624,13 @@ TEST(QueryContextRequest, fill)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   q0.fill("", "", "");
   q0.restrictions = 0;
-  out = q0.render(QueryContext, XML, "");
+  out = q0.render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   q1.fill("EID", "ETYPE", "Attribute");
   q1.restrictions = 0;
-  out = q1.render(QueryContext, XML, "");
+  out = q1.render(QueryContext, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
