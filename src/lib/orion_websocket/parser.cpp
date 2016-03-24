@@ -76,8 +76,12 @@ void ws_parser_parse
     std::map<std::string, std::string *>::iterator it = head.headerMap.begin();
     while (it != head.headerMap.end())
     {
-      const char *value = doc["headers"][it->first.c_str()].GetString();
-      *(it->second) = value ? std::string(value) : std::string();
+      int length = doc["headers"][it->first.c_str()].GetStringLength();
+      if (length > 0)
+      {
+        const char *value = doc["headers"][it->first.c_str()].GetString();
+        *(it->second) = std::string(value);
+      }
       ++it;
     }
 
@@ -106,6 +110,7 @@ const char *ws_parser_message
  int                 statusCode
 )
 {
+
   const char *tmpl = "{\"headers\": %s, \"message\": %s, \"status\": \"%d\"}";
 
   rapidjson::StringBuffer buff;
@@ -115,7 +120,15 @@ const char *ws_parser_message
   while (it != head.headerMap.end())
   {
     writer.Key(it->first.c_str());
-    writer.String(it->second->c_str());
+
+    if (it->second->empty())
+    {
+        writer.String("");
+    }
+    else
+    {
+        writer.String(it->second->c_str());
+    }
     ++it;
   }
   writer.EndObject();

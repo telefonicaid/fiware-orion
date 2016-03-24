@@ -69,7 +69,6 @@ static bool isValidOption(std::string item)
 }
 
 
-
 /* ****************************************************************************
 *
 * uriParamOptionsParse - parse the URI param 'options' into uriParamOptions map
@@ -211,7 +210,28 @@ ConnectionInfo::~ConnectionInfo()
   servicePathV.clear();
 }
 
-void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload, const HttpHeaders &head)
+void ConnectionInfo::reset()
+{
+  version = "HTTP/1.1";
+  servicePath = "/";
+
+  httpHeaders.gotHeaders = true;
+  httpHeaders.userAgent = "orionWS/0.1";
+  httpHeaders.accept = "*/*";
+  httpHeaders.contentLength = 0;
+  httpHeaders.servicePath = "/";
+  httpHeaders.tenant.clear();
+
+  uriParam["details"] = "off";
+  uriParam["limit"] = "20";
+  uriParam["notifyFormat"] = "JSON";
+  uriParam["offset"] = "0";
+
+  tenant.clear();
+  tenantFromHttpHeader.clear();
+}
+
+void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload)
 {
   url = _url;
   method = _verb;
@@ -219,12 +239,10 @@ void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, c
   verb = strToVerb(_verb);
   servicePathV.clear();
 
-  if (head.gotHeaders)
-  {
-    httpHeaders = head;
-    servicePath = head.servicePath;
-    servicePathV.push_back(head.servicePath);
-  }
+  tenant = httpHeaders.tenant;
+  tenantFromHttpHeader = httpHeaders.tenant;
+  servicePath = httpHeaders.servicePath;
+  servicePathV.push_back(httpHeaders.servicePath);
 
   if (payload)
   {
