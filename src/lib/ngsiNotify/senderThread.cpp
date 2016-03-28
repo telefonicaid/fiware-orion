@@ -30,6 +30,18 @@
 #include "ngsiNotify/senderThread.h"
 
 
+// FIXME P11 #1669: remove this stub when the actual sendNotifyContextRequestWs() gets developed a the end. @fortizc please take care of this
+// in the ws library
+int sendNotifyContextRequestWs(const std::string& subId, const std::map<std::string, std::string>& headers, const std::string& data)
+{
+  return 0;
+}
+
+
+// FIME P11 #1669: move this to WS library. @fortizc please take care of this
+#define WS_SCHEME         "ws://"
+#define WS_SCHEME_LENGTH  5
+
 
 /* ****************************************************************************
 *
@@ -61,19 +73,32 @@ void* startSenderThread(void* p)
       std::string  out;
       int          r;
 
-      r = httpRequestSend(params->ip,
-                          params->port,
-                          params->protocol,
-                          params->verb,
-                          params->tenant,
-                          params->servicePath,
-                          params->xauthToken,
-                          params->resource,
-                          params->content_type,
-                          params->content,
-                          true,
-                          NOTIFICATION_WAIT_MODE,
-                          &out);
+      if (params->protocol == WS_SCHEME)
+      {
+        std::map<std::string, std::string> headers;
+        headers.insert(std::make_pair("Fiware-Service",     params->tenant));
+        headers.insert(std::make_pair("Fiware-ServicePath", params->servicePath));
+        headers.insert(std::make_pair("X-AuthToken",        params->xauthToken));
+
+        // callback to WS library
+        r = sendNotifyContextRequestWs(params->subId, headers, params->content);
+      }
+      else
+      {
+        r = httpRequestSend(params->ip,
+                            params->port,
+                            params->protocol,
+                            params->verb,
+                            params->tenant,
+                            params->servicePath,
+                            params->xauthToken,
+                            params->resource,
+                            params->content_type,
+                            params->content,
+                            true,
+                            NOTIFICATION_WAIT_MODE,
+                            &out);
+      }
 
       if (r == 0)
       {

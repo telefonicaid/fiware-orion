@@ -36,14 +36,9 @@
 #include "ngsiNotify/Notifier.h"
 
 
-
-/* ****************************************************************************
-*
-* Select 'method' to send notifications - only one can be uncommented
-*/
-//#define SEND_BLOCKING
-#define SEND_IN_NEW_THREAD
-
+// FIME P11 #1669: move this to WS library. @fortizc please take care of this
+#define WS_SCHEME         "ws://"
+#define WS_SCHEME_LENGTH  5
 
 
 /* ****************************************************************************
@@ -104,53 +99,26 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string  uriPath;
     std::string  protocol;
 
-    if (!parseUrl(url, host, port, uriPath, protocol))
+    if ((url.length() == WS_SCHEME_LENGTH) && (url.find(WS_SCHEME) == 0))
     {
-      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
-      return;
+      // In this case host, port and uriPath are not needed, as the WS library has all the connection information related with the WS
+      protocol = WS_SCHEME;
+    }
+    else
+    {
+      if (!parseUrl(url, host, port, uriPath, protocol))
+      {
+        LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+        return;
+      }
     }
 
     /* Set Content-Type */
     std::string content_type = "application/json";
-
-#ifdef SEND_BLOCKING
-    int r;
-
-    r = httpRequestSend(host,
-                        port,
-                        protocol,
-                        "POST",
-                        tenant,
-                        spathList,
-                        xauthToken,
-                        uriPath,
-                        content_type,
-                        payload,
-                        true,
-                        NOTIFICATION_WAIT_MODE);
-
-    char portV[STRING_SIZE_FOR_INT];
-    snprintf(portV, sizeof(portV), "%d", port);
-    std::string url = host + ":" + portV + params->resource;
-
-    if (r == 0)
-    {
-      statisticsUpdate(NotifyContextSent, format);
-      QueueStatistics::incSentOK();
-      alarmMgr.notificationErrorReset(url);
-    }
-    else
-    {
-      QueueStatistics::incSentError();
-      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");
-    }
-
-#endif
-
-#ifdef SEND_IN_NEW_THREAD
     /* Send the message (no wait for response), in a separate thread to avoid blocking */
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
+    params->subId         = ncr->subscriptionId.get();
     params->ip            = host;
     params->port          = port;
     params->protocol      = protocol;
@@ -171,7 +139,6 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
       return;
     }
     pthread_detach(tid);
-#endif
 }
 
 
@@ -206,23 +173,6 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     std::string content_type = "application/json";
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
-#ifdef SEND_BLOCKING
-    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
-
-    if (r == 0)
-    {
-      statisticsUpdate(NotifyContextSent, format);
-      QueueStatistics::incSentOK();
-      alarmMgr.notificationErrorReset(url);
-    }
-    else
-    {
-      QueueStatistics::incSentError();
-      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");      
-    }
-#endif
-
-#ifdef SEND_IN_NEW_THREAD
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
 
@@ -242,5 +192,4 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
       return;
     }
     pthread_detach(tid);
-#endif
 }
