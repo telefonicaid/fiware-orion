@@ -62,7 +62,6 @@ ConnectionInfo *connection_manager_get(int cid, const char *message)
   std::string url;
   std::string verb;
   std::string payload;
-  HttpHeaders head;
 
   pthread_mutex_lock(&mtx_conn);
   std::map<int, ConnectionInfo *>::iterator it;
@@ -71,16 +70,17 @@ ConnectionInfo *connection_manager_get(int cid, const char *message)
   {
     pthread_mutex_unlock(&mtx_conn);
 
-    ws_parser_parse(message, it->second, url, verb, payload, head);
-    it->second->modify(url, verb, payload, head);
+    it->second->reset();
+    ws_parser_parse(message, it->second, url, verb, payload, it->second->httpHeaders);
+    it->second->modify(url, verb, payload);
     return it->second;
   }
 
   pthread_mutex_unlock(&mtx_conn);
 
   ConnectionInfo *ci = new ConnectionInfo("v2", JSON, true);
-  ws_parser_parse(message, ci, url, verb, payload, head);
-  ci->modify(url, verb, payload, head);
+  ws_parser_parse(message, ci, url, verb, payload, ci->httpHeaders);
+  ci->modify(url, verb, payload);
 
   pthread_mutex_lock(&mtx_conn);
   connections[cid] = ci;

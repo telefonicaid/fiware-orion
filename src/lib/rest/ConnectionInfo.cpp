@@ -27,6 +27,7 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "rest/uriParamFormat.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -67,7 +68,6 @@ static bool isValidOption(std::string item)
 
   return false;
 }
-
 
 
 /* ****************************************************************************
@@ -152,10 +152,9 @@ ConnectionInfo::ConnectionInfo(const std::string &_api, Format _format, bool _ws
     httpHeaders.contentLength = 0;
     httpHeaders.servicePath = "/";
 
-    uriParam["details"] = "off";
-    uriParam["limit"] = "20";
-    uriParam["notifyFormat"] = "JSON";
-    uriParam["offset"] = "0";
+    uriParam[URI_PARAM_PAGINATION_DETAILS] = "off";
+    uriParam[URI_PARAM_PAGINATION_LIMIT] = "20";
+    uriParam[URI_PARAM_PAGINATION_OFFSET] = "0";
   }
 
 }
@@ -211,7 +210,38 @@ ConnectionInfo::~ConnectionInfo()
   servicePathV.clear();
 }
 
-void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload, const HttpHeaders &head)
+
+/* ****************************************************************************
+*
+* reset - Reset some class memeber to use in a websocket connection
+*/
+void ConnectionInfo::reset()
+{
+  version = "HTTP/1.1";
+  servicePath = "/";
+
+  httpHeaders.gotHeaders = true;
+  httpHeaders.userAgent = "orionWS/0.1";
+  httpHeaders.accept = "*/*";
+  httpHeaders.contentLength = 0;
+  httpHeaders.servicePath = "/";
+  httpHeaders.tenant.clear();
+
+  uriParam[URI_PARAM_PAGINATION_DETAILS] = "off";
+  uriParam[URI_PARAM_PAGINATION_LIMIT] = "20";
+  uriParam[URI_PARAM_PAGINATION_OFFSET] = "0";
+
+  tenant.clear();
+  tenantFromHttpHeader.clear();
+}
+
+
+/* ****************************************************************************
+*
+* modify - Modify a ConnectionInfo using the given parameters
+*/
+
+void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload)
 {
   url = _url;
   method = _verb;
@@ -219,12 +249,10 @@ void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, c
   verb = strToVerb(_verb);
   servicePathV.clear();
 
-  if (head.gotHeaders)
-  {
-    httpHeaders = head;
-    servicePath = head.servicePath;
-    servicePathV.push_back(head.servicePath);
-  }
+  tenant = httpHeaders.tenant;
+  tenantFromHttpHeader = httpHeaders.tenant;
+  servicePath = httpHeaders.servicePath;
+  servicePathV.push_back(httpHeaders.servicePath);
 
   if (payload)
   {
