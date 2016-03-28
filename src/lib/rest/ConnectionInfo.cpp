@@ -27,6 +27,7 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "rest/uriParamFormat.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -151,10 +152,9 @@ ConnectionInfo::ConnectionInfo(const std::string &_api, Format _format, bool _ws
     httpHeaders.contentLength = 0;
     httpHeaders.servicePath = "/";
 
-    uriParam["details"] = "off";
-    uriParam["limit"] = "20";
-    uriParam["notifyFormat"] = "JSON";
-    uriParam["offset"] = "0";
+    uriParam[URI_PARAM_PAGINATION_DETAILS] = "off";
+    uriParam[URI_PARAM_PAGINATION_LIMIT] = "20";
+    uriParam[URI_PARAM_PAGINATION_OFFSET] = "0";
   }
 
 }
@@ -227,10 +227,9 @@ void ConnectionInfo::reset()
   httpHeaders.servicePath = "/";
   httpHeaders.tenant.clear();
 
-  uriParam["details"] = "off";
-  uriParam["limit"] = "20";
-  uriParam["notifyFormat"] = "JSON";
-  uriParam["offset"] = "0";
+  uriParam[URI_PARAM_PAGINATION_DETAILS] = "off";
+  uriParam[URI_PARAM_PAGINATION_LIMIT] = "20";
+  uriParam[URI_PARAM_PAGINATION_OFFSET] = "0";
 
   tenant.clear();
   tenantFromHttpHeader.clear();
