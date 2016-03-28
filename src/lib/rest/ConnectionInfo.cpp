@@ -210,6 +210,11 @@ ConnectionInfo::~ConnectionInfo()
   servicePathV.clear();
 }
 
+
+/* ****************************************************************************
+*
+* reset - Reset some class memeber to use in a websocket connection
+*/
 void ConnectionInfo::reset()
 {
   version = "HTTP/1.1";
@@ -230,6 +235,12 @@ void ConnectionInfo::reset()
   tenant.clear();
   tenantFromHttpHeader.clear();
 }
+
+
+/* ****************************************************************************
+*
+* modify - Modify a ConnectionInfo using the given parameters
+*/
 
 void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload)
 {
