@@ -107,7 +107,7 @@ Date: REGEX(.*)
 2: Empty context attribute value for XML
 HTTP/1.1 200 OK
 Content-Length: 623
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
