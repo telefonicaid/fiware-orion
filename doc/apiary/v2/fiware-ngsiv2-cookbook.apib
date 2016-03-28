@@ -395,21 +395,16 @@ This resource allows you to obtain a list of subresources published by the API:
             
 # Group Query Context
 
-## Query Entities [/v2/entities{?q,limit,offset,coords,geometry,attrs,options}]
+## Query Entities [/v2/entities{?q,type,limit,offset,georel,coords,geometry,attrs,options}]
 
-### Value filter and Geoquery [GET /v2/entities{?q,limit,offset,coords,geometry,attrs,options}]
+### Query by attribute content [GET /v2/entities{?q,limit,offset,attrs,options}]
 
 + Parameters
     + q: temperature==22.5;humidity==60 (optional, string) - General query parameter that allows
-    to filter by attribute content
-    + coords: 41.3763726, 2.1864475 (optional, string) - Coordinates. Comma separated values.
-    The number of values will depend on the 'geometry' attribute.
-    + geometry: circle;radius=10000 (optional, string) - Geospatial area for the query. 
-    The 'exterior' modifier allows to indicate that the referred area is the outside
-    of the region, for instance, 'polygon;exterior'
+    to filter by attribute content. 
     + limit: 20 - Limit the number of results (optional, number) - Maximum number of results to return
     + attrs: seatsNumber (optional, string) - Attributes to be returned
-    + options: count,keyValues (optional, string) - query options (count total, keyValues mode)
+    + options: keyValues (optional, string) - query options (`keyValues` mode)
 
 + Response 200 (application/json)
 
@@ -421,8 +416,32 @@ This resource allows you to obtain a list of subresources published by the API:
          }
         ]
 
+### Query by distance to a certain point [GET /v2/entities{?type,coords,georel,geometry,options}]
 
-### No results [GET /v2/entities{?q,limit,coords,geometry,attrs}]
++ Parameters
+    + type: WeatherStation (optional, string) - Entity type requested.
+    + coords: 41.3763726, 2.1864475 (optional, string) - Coordinates of the reference point.
+    + geometry: point (optional, string) - Geometry (point, line, polygon) represented by the `coords` parameter. 
+    + georel: near;maxDistance:1000 (optional, string) - Geospatial relationship.
+    This example refers to those entities located at a maximum distance of 1000 meters from the reference point.
+    + options: keyValues (optional, string) - query options (`keyValues` mode)
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "WeatherStation",
+            "id": "AEMET-789",
+            "location": "43.5,-8.2"
+         }
+        ]
+
+
+### No results [GET /v2/entities{?q}]
+
++ Parameters
+    + q: temperature>45 (optional, string) - General query parameter that allows
+    to filter by attribute content
 
 + Response 200 (application/json)
 
