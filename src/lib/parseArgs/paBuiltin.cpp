@@ -120,7 +120,7 @@ PaiArgument paBuiltin[] =
   { "",           paVisual,        "!VISUAL",     PaStr,  PaHid,  0, PaNL, PaNL, "visual",              PAI_REST   },
   { "-t",         paTraceV,        "TRACE",       PaStr,  PaOpt,  0, PaNL, PaNL, "trace level",         PAI_REST_U },
   { "--silent",   &paSilent,       "SILENT",      PaBool, PaHid,  F,    T,    F, "silent mode",         PAI_REST_U },
-  { "-logLevel",  &paLogLevel,     "LOG_LEVEL",   PaStr,  PaOpt,  0, PaNL, PaNL, "log level (NONE, ERROR, WARNING, INFO, DEBUG)", PAI_REST_U },
+  { "-logLevel",  &paLogLevel,     "LOG_LEVEL",   PaStr,  PaOpt,  0, PaNL, PaNL, "initial log level (NONE, ERROR, WARNING, INFO, DEBUG)", PAI_REST_U },
   { "-v",         &paVerbose,      "VERBOSE",     PaBool, PaOpt,  F,    T,    F, "verbose mode",        PAI_REST_U },
   { "-vv",        &paVerbose2,     "VERBOSE2",    PaBool, PaOpt,  F,    T,    F, "verbose2 mode",       PAI_REST_U },
   { "-vvv",       &paVerbose3,     "VERBOSE3",    PaBool, PaOpt,  F,    T,    F, "verbose3 mode",       PAI_REST_U },

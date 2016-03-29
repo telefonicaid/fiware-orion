@@ -212,7 +212,7 @@ static void prepareDatabase(void) {
                         "lastNotification" << 15000000 <<
                         "throttling" << 60 <<
                         "reference" << "http://notify1.me" <<
-                        "format" << "XML" <<
+                        "format" << "JSON" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
                         "conditions" << BSON_ARRAY(BSON(

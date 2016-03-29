@@ -632,9 +632,9 @@ Feature: update an attribute by entity ID and attribute name if it exists using 
     When update an attribute by ID "house_?" and attribute name "temperature_0" if it exists
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                                                      |
-      | error       | BadRequest                                                 |
-      | description | Empty right-hand-side for URI param //attrs/temperature_0/ |
+      | parameter   | value                                                       |
+      | error       | BadRequest                                                  |
+      | description | Empty right-hand-side for URI param //attrs/temperature_0// |
 
   @entity_id_update_invalid @BUG_1351
   Scenario:  try to update an attribute by entity ID and attribute name using NGSI v2 with invalid entity id values

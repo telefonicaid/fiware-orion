@@ -280,11 +280,11 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | remove_a_single_attribute                   |    121       | DELETE  | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No        | Yes            |
 |                                                                                                                                                          |
 |**attributes_value folder**                                                                                                                               |
-| get_attribute_value                         |  (pending)   | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
-| update_attribute_value                      |    237       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | No             |
+| get_attribute_value                         |    190       | GET     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | No        | Yes            |  
+| update_attribute_value                      |    337       | PUT     | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes       | Yes            |
 |                                                                                                                                                          |
 |**types folder**                                                                                                                                          |
-| retrieve_entity_types                       |     66       | GET     | /v2/types/                                           | No        | Yes            |   
+| retrieve_entity_types                       |     68       | GET     | /v2/types/                                           | No        | Yes            |   
 | retrieve_an_entity_type                     |  (pending)   | GET     | /v2/types/`<entity_type>`                            | No        | No             |   
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
@@ -304,6 +304,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 | delete_context_provider_registration        |  (pending)   | DELETE  | /v2/registrations/`<registration_id>`                | No        | No             |   
 |                                                                                                                                                          |
 |**alarms folder**                            |  (pending)   |                                                                                             |
+|**cli_parameters folder**                    |  (pending)   |                                                                                             |
 
   
 ## Hints:

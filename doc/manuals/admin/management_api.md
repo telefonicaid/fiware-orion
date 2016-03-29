@@ -1,10 +1,18 @@
 # Management REST interface
 
 Apart from the NGSI 9/10 interface, Orion Context Broker exposes a REST
-API for management that allows to change the trace and verbosity levels
-(which initial value is set using "-t" command line options).
+API for management that allows to change the log level and the trace levels
+(whose initial value is set using `-t` and `-logLevel` command line options).
 
-In order to manage the trace level:
+To change the log level:
+
+```
+curl --request PUT <host>:<port>/admin/log?level=<fatal|error|warning|warn|info|debug|none>
+```
+
+
+
+To manage the trace level:
 
 ```
 curl --request DELETE <host>:<port>/log/trace

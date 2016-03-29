@@ -36,11 +36,11 @@
 */
 static RestService rs[] = 
 {
-  { "GET",    LogRequest,                            2, { "log", "traceLevel"                                  }, "", logTraceTreat                             },
-  { "PUT",    LogRequest,                            3, { "log", "traceLevel", "*"                             }, "", logTraceTreat                             },
-  { "POST",   LogRequest,                            3, { "log", "traceLevel", "*"                             }, "", logTraceTreat                             },
-  { "DELETE", LogRequest,                            2, { "log", "traceLevel"                                  }, "", logTraceTreat                             },
-  { "DELETE", LogRequest,                            3, { "log", "traceLevel", "*"                             }, "", logTraceTreat                             },
+  { "GET",    LogTraceRequest,                       2, { "log", "traceLevel"                                  }, "", logTraceTreat                             },
+  { "PUT",    LogTraceRequest,                       3, { "log", "traceLevel", "*"                             }, "", logTraceTreat                             },
+  { "POST",   LogTraceRequest,                       3, { "log", "traceLevel", "*"                             }, "", logTraceTreat                             },
+  { "DELETE", LogTraceRequest,                       2, { "log", "traceLevel"                                  }, "", logTraceTreat                             },
+  { "DELETE", LogTraceRequest,                       3, { "log", "traceLevel", "*"                             }, "", logTraceTreat                             },
 
   { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
   { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }

@@ -1323,12 +1323,15 @@ Response code:
 A subscription is represented by a JSON object with the following fields:
 
 + `id`: Subscription unique identifier. Automatically created at creation time.
++ `description` (optional): A free text used by the client to describe the subscription.
 + `subject`: It is an object that describes the subject of the subscription.
 + `notification`: It is an object that describes the notification received by the subscriber.
 + `expires`: Subscription expiration date in ISO8601 format. Permanent subscriptions must omit
    this field.
-+ `status` (not editable, only in GET operations): Either `active` (for permanent subscriptions or if
-   the subscription has not expired yet) or `expired` (for expired subscriptions).
++ `status`: Either `active` (for active subscriptions) or `inactive` (for inactive subscriptions).
+  If this field is not provided at subscription creation time, new subscriptions are created with
+  the `active` status, which can be changed by clients afterwards. For expired subscriptions this
+  attribute is set to `expired` value (no matter if the client updates it to `active`/`inactive`).
 
 A `subject` contains the following subfields:
 
@@ -1390,6 +1393,7 @@ Response:
         [
             {
                 "id": "abcdefg",
+                "description": "One subscription to rule them all",
                 "subject": {                    
                     "entities": [
                         {
@@ -1437,6 +1441,7 @@ Response:
 + Request (application/json)
 
         {
+            "description": "One subscription to rule them all",
             "subject": {
                 "entities": [
                     {
@@ -1483,6 +1488,7 @@ Response:
 
         {
             "id": "abcdef",
+            "description": "One subscription to rule them all",
             "subject": {
                 "entities": [
                     {
@@ -1826,12 +1832,18 @@ Response code:
          {
             "type": "Room",
             "id": "DC_S1-D41",
-            "temperature": 35.6
+            "temperature": {
+              "value": 35.6,
+              "type": "none"
+            }
          },
          {
             "type": "Room",
             "id": "Boe-Idearium",
-            "temperature": 22.5
+            "temperature": {
+              "value": 22.5,
+              "type": "none"
+            }
          },
          {
             "type": "Car",

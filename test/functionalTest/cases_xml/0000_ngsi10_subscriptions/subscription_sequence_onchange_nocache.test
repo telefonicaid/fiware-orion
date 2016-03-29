@@ -345,7 +345,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 Notification count from mongo:
-{ "count" : 1 }
+{ "count" : NumberLong(1) }
 
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -383,7 +383,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 Notification count from mongo:
-{ "count" : 2 }
+{ "count" : NumberLong(2) }
 
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -401,7 +401,7 @@ Date: REGEX(.*)
 </updateContextSubscriptionResponse>
 
 Notification count from mongo:
-{ "count" : 2 }
+{ "count" : NumberLong(2) }
 
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -439,7 +439,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 Notification count from mongo:
-{ "count" : 3 }
+{ "count" : NumberLong(3) }
 
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -507,7 +507,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 Notification count from mongo:
-{ "count" : 4 }
+{ "count" : NumberLong(4) }
 
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -590,7 +590,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 737
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -622,7 +622,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 911
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -659,7 +659,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 911
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -696,7 +696,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 910
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/xml
 
 <notifyContextRequest>

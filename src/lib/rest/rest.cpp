@@ -707,7 +707,7 @@ int servicePathSplit(ConnectionInfo* ciP)
 *   so we don't want to use the default 200
 *
 * NOTE
-*   In version 1 of the protocol, we admit ONLY application/json and application/xml
+*   In version 1 of the protocol, we admit ONLY application/json
 *   In version 2 of the protocol, we admit ONLY application/json and text/plain
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
@@ -871,11 +871,26 @@ std::string defaultServicePath(const char* url, const char* method)
 * This function returns the version of the API for the incoming message,
 * based on the URL.
 * If the URL starts with "/v2" then the request is considered API version 2.
+*
 * Otherwise, API version 1.
+*
+* Except ...
+* The new request to change the log level (not trace level), uses the
+* URL /admin/log, which DOES NOT start with '/v2', but as some render methods
+* depend on the apiVersion and we prefer the 'new render' from v2 for this
+* operation (see OrionError::render), we consider internally /admin/log to be part of v2.
+*
+* FIXME P2: instead of looking at apiVersion for rendering, perhaps we need
+*           some other algorithm, considering 'admin' requests as well ...
 */
 static std::string apiVersionGet(const char* path)
 {
   if ((path[1] == 'v') && (path[2] == '2'))
+  {
+    return "v2";
+  }
+
+  if (strcmp(path, "/admin/log") == 0)
   {
     return "v2";
   }
@@ -919,7 +934,6 @@ static int connectionTreat
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
   static int             reqNo       = 1;
-
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -983,7 +997,6 @@ static int connectionTreat
 
     LM_T(LmtRequest, (""));
     LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
-
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;
     ciP->ip      = ip;
@@ -1149,7 +1162,15 @@ static int connectionTreat
     ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
 
-  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
+  //
+  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with two exceptions.
+  //
+  // - Old log requests  (URL contains '/log/')
+  // - New log requests  (URL is exactly '/admin/log')
+  //
+  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && 
+      (ciP->httpHeaders.contentLength == 0) && 
+      ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
   {
     std::string errorMsg = restErrorReplyGet(ciP, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
@@ -1320,7 +1341,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 * restInit - 
 *
 * FIXME P5: add vector of the accepted content-types, instead of the bool
-*           argument _acceptTextXml that was added for iotAgent only.
 *           See Issue #256
 */
 void restInit

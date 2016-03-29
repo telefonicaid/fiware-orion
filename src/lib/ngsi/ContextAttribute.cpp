@@ -67,7 +67,6 @@ ContextAttribute::ContextAttribute()
   stringValue           = "";
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
-  typeFromXmlAttribute  = "";
   found                 = false;
   skip                  = false;
   typeGiven             = false;
@@ -103,7 +102,6 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType)
   compoundValueP        = caP->compoundValueP;
   caP->compoundValueP   = NULL;
   found                 = caP->found;
-  typeFromXmlAttribute  = "";
   skip                  = false;
   typeGiven             = caP->typeGiven;
 
@@ -276,7 +274,6 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();
-  typeFromXmlAttribute  = "";
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
@@ -813,14 +810,14 @@ std::string ContextAttribute::check
   }
 
 
-  if (ciP->apiVersion == "v2" && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (ciP->apiVersion == "v2" && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(ciP->apiVersion, type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
@@ -828,9 +825,7 @@ std::string ContextAttribute::check
 
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
-    // FIXME P9: Use CompoundValueNode::check here and stop calling it from where it is called right now.
-    //           Also, change CompoundValueNode::check to return std::string
-    return "OK";
+    return compoundValueP->check();
   }
 
   if (valueType == orion::ValueTypeString)

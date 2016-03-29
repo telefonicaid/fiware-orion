@@ -139,6 +139,7 @@
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
 #include "serviceRoutines/badVerbAllFive.h"
+#include "serviceRoutines/badVerbPutOnly.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -197,6 +198,7 @@
 #include "serviceRoutinesV2/patchSubscription.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
 #include "serviceRoutinesV2/postBatchUpdate.h"
+#include "serviceRoutinesV2/logLevelTreat.h"
 
 #include "orion_websocket/ws.h"
 
@@ -689,7 +691,7 @@ static const char* validLogLevels[] =
 //
 // Log, version, statistics ...
 //
-#define LOG                LogRequest
+#define LOG                LogTraceRequest
 #define LOGT_COMPS_V0      2, { "log", "trace"                           }
 #define LOGTL_COMPS_V0     3, { "log", "trace",      "*"                 }
 #define LOG2T_COMPS_V0     2, { "log", "traceLevel"                      }
@@ -704,6 +706,14 @@ static const char* validLogLevels[] =
 #define STAT_COMPS_V1        3, { "v1", "admin", "statistics"              }
 #define STAT_CACHE_COMPS_V0  2, { "cache", "statistics"                    }
 #define STAT_CACHE_COMPS_V1  4, { "v1", "admin", "cache", "statistics"     }
+
+
+
+//
+// LogLevel
+//
+#define LOGLEVEL           LogLevelRequest
+#define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
 
@@ -1099,6 +1109,10 @@ static const char* validLogLevels[] =
   { "*", INV, INV10_COMPS,   "", badNgsi10Request }, \
   { "*", INV, INV_ALL_COMPS, "", badRequest       }
 
+#define LOGLEVEL_REQUESTS_V2                                                         \
+  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", logLevelTreat                      }, \
+  { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
+
 
 
 /* ****************************************************************************
@@ -1115,8 +1129,6 @@ static const char* validLogLevels[] =
 *
 * This is the default service vector, that is used if the broker is started without the -ngsi9 option
 */
-
-
 RestService restServiceV[] =
 {
   API_V2,
@@ -1137,6 +1149,7 @@ RestService restServiceV[] =
   STAT_CACHE_REQUESTS_V0,
   STAT_CACHE_REQUESTS_V1,
   VERSION_REQUESTS,
+  LOGLEVEL_REQUESTS_V2,
 
 #ifdef DEBUG
   EXIT_REQUESTS,
@@ -1620,6 +1633,7 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("remove builtin", "--silent");
   paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
@@ -1652,14 +1666,6 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
-
-  // Argument consistency check (--silent AND -logLevel)
-  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
-  {
-    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
-    paUsage();
-    exit(1);
-  }
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))

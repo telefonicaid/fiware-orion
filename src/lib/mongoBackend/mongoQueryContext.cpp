@@ -353,11 +353,7 @@ HttpStatusCode mongoQueryContext
           processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
         }
       }
-      else
-      {
-        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 
@@ -372,11 +368,7 @@ HttpStatusCode mongoQueryContext
           processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
         }
       }
-      else
-      {
-        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 
@@ -391,11 +383,7 @@ HttpStatusCode mongoQueryContext
           fillContextProviders(rawCerV, crrV);
         }
       }
-      else
-      {
-        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 
@@ -411,11 +399,7 @@ HttpStatusCode mongoQueryContext
           addContextProviders(rawCerV, crrV, limitReached);
         }
       }
-      else
-      {
-        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 

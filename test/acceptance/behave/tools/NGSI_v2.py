@@ -46,8 +46,9 @@ class NGSI:
         """
         constructor
         """
+
     # ------------------------------------ validations ------------------------------------------
-    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers, qp_types = None):
+    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers, qp_types=None):
         """
         return a cursor with a entities list
         :param entities_contexts: entities context (attr_name, attr_value, attr_type, id, type, metadatas, etc)
@@ -211,9 +212,6 @@ class NGSI:
         if "type" in parameters:
             qp_types = parameters["type"]
         entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, qp_types)
-
-
-        #entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
         assert len(entity_list) > 0, " ERROR - notihing is returned from mongo, review the query in behave log"
         entity = entity_list[0]
         # verify attributes
@@ -257,6 +255,7 @@ class NGSI:
         text_to_comma_replace = "<&_i_&>"
         final_list = []
         posi = 0
+        posf = 0
         has_quote = True
 
         while has_quote:
@@ -333,8 +332,8 @@ class NGSI:
                             if op == "==" and ((float(entity_context["attributes_value"]) >= float(items[1][0])) and
                                               (float(entity_context["attributes_value"]) <= float(items[1][1]))):
                                     result = "this statement does match"  # range q=attr==x..y
-                            elif op == "!=" and ((float(entity_context["attributes_value"]) <= float(items[1][0])) or \
-                                (float(entity_context["attributes_value"]) >= float(items[1][1]))):
+                            elif op == "!=" and ((float(entity_context["attributes_value"]) <= float(items[1][0])) or
+                                                 (float(entity_context["attributes_value"]) >= float(items[1][1]))):
                                     result = "this statement does match"  # range q=attr!=x..y
                         except Exception, e:
                             __logger__.warn("some value is not numeric format, %s" % str(e))
@@ -685,8 +684,6 @@ class NGSI:
                     assert entities_context["attributes_value"] == attribute, \
                         'ERROR - in attribute value "%s" with keyValues option' % entities_context["attributes_value"]
 
-
-
     def verify_an_attribute_by_id(self, entities_context, resp, attribute_name_to_request):
         """
         verify that the attribute by ID is returned
@@ -758,13 +755,24 @@ class NGSI:
         :param entities_context:
         :param resp:
         ex:
-            {
-                value: "017-06-17T07:21:24.238Z"
-            }
+            2017-06-17T07:21:24.238Z (text/plain)
+            or:
+            {"a":45, "b":true} (application/json)
         """
-        resp_json = convert_str_to_dict(resp.content, JSON)
-        assert "value" in resp_json, 'ERROR - value key dos not exist in response: \n %s' %  resp.content
-        assert resp_json["value"] == entities_context["attributes_value"], "ERROR - the value %s is not the expected: %s" % (resp_json["value"], entities_context["attributes_value"])
+        json_object = False
+        json_chars = ["{", "["]
+        __logger__.debug("Content-Type in response:  %s" % resp.headers["content-type"])
+        for o in json_chars:    # determine if the response is an json object or not
+            if resp.content.find(o) >= 0:
+                json_object = True
+        try:
+            if json_object:
+                resp_json = convert_str_to_dict(resp.content, JSON)
+                assert cmp(resp_json, entities_context["attributes_value"]) == 0, "ERROR - the value %s is not the expected: %s" % (str(resp_json), str(entities_context["attributes_value"]))
+            else:
+                assert str(resp.content) == str(entities_context["attributes_value"]), "ERROR - the value %s is not the expected: %s" % (str(resp.content), str(entities_context["attributes_value"]))
+        except Exception, e:
+            __logger__.error(e)
 
     def verify_attribute_is_deleted(self, mongo_driver, entities_contexts, headers, parameters):
         """
@@ -801,8 +809,6 @@ class NGSI:
         items_dict = convert_str_to_dict(resp.content, JSON)
         items_list = items_dict.keys()  # list of keys
         for item in items_list:
-            if item == EMPTY:
-                item = "untyped"
             __logger__.debug("verified: %s include in %s" % (item, types))
             assert item in type_list, " ERROR - \"%s\" type does not match with types to verify" % item
 
