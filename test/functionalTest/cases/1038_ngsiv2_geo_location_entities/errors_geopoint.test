@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Errors related with geo:point, geo:line, geo:box and geo:polygon
+Errors related with geo:point
 
 --SHELL-INIT--
 dbInit CB
@@ -29,27 +29,18 @@ brokerStart CB
 
 --SHELL--
 
-# FIXME P10: missing geo:line, geo:box and geo:polygon checks
 # Inspired by 0000_ngsi10_geolocation_query tests
+# (all steps include a 'b' sub-step to check entity)
 #
-# 01.  Create entity with two geo:point -> fail
-# 01b. Check entity
-# 02.  Create entity with one geo:point (attr1) -> OK
-# 02b. Check entity
-# 03.  Update attr1 geo:point attribute -> OK
-# 03b. Check entity
-# 04.  Append a new geo:point attribute (attr2) -> fail
-# 04b. Check entity
-# 05.  Remove the geo:point attribute (attr1) -> OK
-# 05b. Check entity
-# 06.  Append a new geo:point attribute (attr2) -> OK
-# 06b. Check entity
-# 07.  Change attribute type to no-geo:point (attr2) -> OK
-# 07b. Check entity
-# 08.  Append new geo:point attribute (attr3) -> OK
-# 08b. Check entity
-# 09.  Change attr2 type to geo:point again -> fail
-# 09b. Check entity
+# 01. Create entity with two geo:point -> fail
+# 02. Create entity with one geo:point (attr1) -> OK
+# 03. Update attr1 geo:point attribute -> OK
+# 04. Append a new geo:point attribute (attr2) -> fail
+# 05. Remove the geo:point attribute (attr1) -> OK
+# 06. Append a new geo:point attribute (attr2) -> OK
+# 07. Change attribute type to no-geo:point (attr2) -> OK
+# 08. Append new geo:point attribute (attr3) -> OK
+# 09. Change attr2 type to geo:point again -> fail
 #
 
 echo "01. Create entity with two geo:point -> fail"
@@ -241,8 +232,8 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "NoResourcesAvailable",
-    "error": "No more than one geo-location attribute allowed"
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
 }
 
 
@@ -320,8 +311,8 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "NoResourcesAvailable",
-    "error": "No more than one geo-location attribute allowed"
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
 }
 
 
@@ -455,8 +446,8 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "NoResourcesAvailable",
-    "error": "No more than one geo-location attribute allowed"
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
 }
 
 

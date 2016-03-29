@@ -33,6 +33,7 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
+#include "rest/errorAdaptation.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
 
@@ -130,16 +131,13 @@ std::string postEntities
   }
   else if (rhttpcode == SccInvalidParameter)
   {
-    // This v1 -> v2 error conversion is a little crazy (for example, the same
-    // SccInvalidParameter at v1 level could match two different error conditions
-    // at v2 level, making harder de logic). However, I'm afraid that we need
-    // to live with this while NGSIv1 and NGSIv2 coexists :(
-    OrionError oe(SccRequestEntityTooLarge, "NoResourcesAvailable", "No more than one geo-location attribute allowed");
-    ciP->httpStatusCode = SccRequestEntityTooLarge;
-    TIMED_RENDER(answer = oe.render(ciP, ""));
+    OrionError oe;
+    if (invalidParameterForNgsiv2(rstatuscode.details, &oe))
+    {
+      ciP->httpStatusCode = oe.code;
+      TIMED_RENDER(answer = oe.render(ciP, ""));
+    }
   }
-
-
 
   // 04. Cleanup and return result
   eP->release();

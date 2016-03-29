@@ -1,0 +1,440 @@
+/*
+*
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+*
+* This file is part of Orion Context Broker.
+*
+* Orion Context Broker is free software: you can redistribute it and/or
+* modify it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Orion Context Broker is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+* General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+*
+* For those usages not covered by this license please contact with
+* iot_support at tid dot es
+*
+* Author: Fermin Galan
+*
+*/
+
+#include "mongoBackend/location.h"
+
+#include <string>
+#include <vector>
+#include "common/string.h"
+#include "ngsi/ContextAttribute.h"
+#include "parse/CompoundValueNode.h"
+
+using namespace mongo;
+using namespace orion;
+
+/* ****************************************************************************
+*
+* stringArray2coords -
+*/
+static bool stringArray2coords
+(
+  const ContextAttribute*  caP,
+  std::vector<double>*     coordLat,
+  std::vector<double>*     coordLong,
+  std::string*             errDetail
+)
+{
+  if ((caP->compoundValueP == NULL) || !(caP->compoundValueP->isVector()))
+  {
+    *errDetail = "geo:line, geo:box and geo:polygon needs array of strings as value";
+    return false;
+  }
+
+  for (unsigned int ix = 0; ix < caP->compoundValueP->childV.size() ; ix++)
+  {
+     CompoundValueNode* item = caP->compoundValueP->childV[ix];
+     if (!item->isString())
+     {
+       *errDetail = "geo:line, geo:box and geo:polygon needs array of strings but some element is not";
+       return false;
+     }
+
+     double lat;
+     double lon;
+     if (!string2coords(item->stringValue, lat, lon))
+     {
+       *errDetail = "geo coordinates format error [see Orion user manual]: " + item->stringValue;
+       return false;
+     }
+
+     coordLat->push_back(lat);
+     coordLong->push_back(lon);
+  }
+
+  return true;
+
+}
+
+/* ****************************************************************************
+*
+* getGeoJson -
+*
+* Get the GeoJSON information (geoJsonType and geoJsonCoords) for the given
+* ContextAttribute provided as parameter.
+*
+* It returns true, except in the case of error (in which in addition errDatail gets
+* filled)
+*/
+static bool getGeoJson
+(
+  const ContextAttribute*  caP,
+  std::string*             geoJsonType,
+  BSONArray*               geoJsonCoords,
+  std::string*             errDetail,
+  const std::string        apiVersion
+)
+{
+  double               aLat;
+  double               aLong;
+  std::vector<double>  coordLat;
+  std::vector<double>  coordLong;
+  BSONArrayBuilder     ba;
+
+  if ((apiVersion == "v1") || (caP->type == GEO_POINT))
+  {
+    if (!string2coords(caP->stringValue, aLat, aLong))
+    {
+      *errDetail = "geo coordinates format error [see Orion user manual]: " + caP->stringValue;
+      return false;
+    }
+
+    *geoJsonType   = "Point";
+    *geoJsonCoords = BSON_ARRAY(aLong << aLat);
+
+    return true;
+  }
+
+  // geo:line, geo:box and geo:polygon use vector of coordinates
+  if (!stringArray2coords(caP, &coordLat, &coordLong, errDetail))
+  {
+    return false;
+  }
+
+  // geo:box is a bit special, it composed "directly" the coords array based on opposite corners
+  if (caP->type == GEO_BOX)
+  {
+    // Exactly 2 points (just checking one of the vectors is enough)
+    if (coordLat.size() != 2)
+    {
+      *errDetail = "geo:box uses exactly 2 coordinates";
+      return false;
+    }
+
+    double minLat;
+    double minLon;
+    double maxLat;
+    double maxLon;
+
+    if (!orderCoordsForBox(&minLat, &maxLat, &minLon, &maxLon, coordLat[0], coordLat[1], coordLong[0], coordLong[1]))
+    {
+      *errDetail = "geo:box coordinates are not defining an actual box";
+      return false;
+    }
+
+    ba.append(BSON_ARRAY(minLon << minLat));
+    ba.append(BSON_ARRAY(minLon << maxLat));
+    ba.append(BSON_ARRAY(maxLon << maxLat));
+    ba.append(BSON_ARRAY(maxLon << minLat));
+    ba.append(BSON_ARRAY(minLon << minLat));
+
+    *geoJsonType   = "Polygon";
+    *geoJsonCoords = BSON_ARRAY(ba.arr());
+
+    return true;
+  }
+
+  // geo:line and geo:polygon (different from geo:box) both build the coords array in the same way
+  for (unsigned int ix = 0; ix < coordLat.size(); ix++)
+  {
+    ba.append(BSON_ARRAY(coordLong[ix] << coordLat[ix]));
+  }
+
+  if (caP->type == GEO_LINE)
+  {
+    // At least 2 points (just checking one of the vectors is enough)
+    if (coordLat.size() < 2)
+    {
+      *errDetail = "geo:line uses at least 2 coordinates";
+      return false;
+    }
+
+    *geoJsonType   = "LineString";
+    *geoJsonCoords = ba.arr();
+
+    return true;
+  }
+
+  if (caP->type == GEO_POLYGON)
+  {
+    // At least 4 points (just checking one of the vectors is enough)
+    if (coordLat.size() < 4)
+    {
+      *errDetail = "geo:polygon uses at least 4 coordinates";
+      return false;
+    }
+
+    // First and last coordinates must be the same
+    int n = coordLat.size();
+    if ((coordLat[0] != coordLat[n-1]) || (coordLong[0] != coordLong[n-1]))
+    {
+      *errDetail = "geo:polygon first and last coordinates must match";
+      return false;
+    }
+
+    *geoJsonType   = "Polygon";
+    *geoJsonCoords = BSON_ARRAY(ba.arr());
+
+    return true;
+  }
+
+  LM_E(("attribute detected as location but unknown type: %s", caP->type.c_str()));
+  *errDetail = "error processing geo location attribute, see log traces";
+
+  return false;
+}
+
+/* ****************************************************************************
+*
+* processLocationAtEntityCreation -
+*
+* This function process the context attribute vector, searching for an attribute meaning
+* location. In that case, it fills geoJsonType and geoJsonCoords. If a location
+* attribute is not found, then locAttr is filled with an empty string, i.e. "".
+*
+* This function always return true (no matter if the attribute was found or not), except in an
+* error situation, in which case errorDetail is filled.
+*
+*/
+bool processLocationAtEntityCreation
+(
+  const ContextAttributeVector&  caV,
+  std::string*                   locAttr,
+  std::string*                   geoJsonType,
+  BSONArray*                     geoJsonCoords,
+  std::string*                   errDetail,
+  const std::string&             apiVersion
+)
+{
+  *locAttr = "";
+
+  for (unsigned ix = 0; ix < caV.size(); ++ix)
+  {
+    const ContextAttribute* caP = caV[ix];
+
+    std::string location = caP->getLocation(apiVersion);
+
+    if (location.length() == 0)
+    {
+      continue;
+    }
+
+    if (locAttr->length() > 0)
+    {
+      *errDetail = "You cannot use more than one geo location attribute "
+                   "when creating an entity [see Orion user manual]";
+      return false;
+    }
+
+    if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
+    {
+      *errDetail = "only WGS84 are supported, found: " + location;
+      return false;
+    }
+
+    if (!getGeoJson(caP, geoJsonType, geoJsonCoords, errDetail, apiVersion))
+    {
+      return false;
+    }
+
+    *locAttr = caP->name;
+  }
+
+  return true;
+}
+
+/* ****************************************************************************
+*
+* processLocationAtUpdateAttribute -
+*
+*/
+bool processLocationAtUpdateAttribute
+(
+  std::string*                   currentLocAttrName,
+  const ContextAttribute*        targetAttr,
+  std::string*                   geoJsonType,
+  mongo::BSONArray*              geoJsonCoords,
+  std::string*                   errDetail,
+  const std::string&             apiVersion
+)
+{
+  std::string subErr;
+
+  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
+  // note that with the current logic, the name of the attribute meaning location
+  // is preserved on a replace operation. By the moment, we can leave this as it is now
+  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
+  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
+  // removed from code)
+  std::string locationString = targetAttr->getLocation(apiVersion);
+
+  /* Check that location (if any) is using the correct coordinates string (it only
+   * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
+  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  {
+    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
+    return false;
+  }
+
+  /* Case 1: update *to* location. There are 3 sub-cases */
+  if (locationString.length() > 0)
+  {
+    /* Case 1a: no location yet -> the updated attribute becomes the location attribute */
+    if (*currentLocAttrName == "")
+    {
+      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      {
+        *errDetail = "error parsing location attribute: " + subErr;
+        return false;
+      }
+
+      *currentLocAttrName = targetAttr->name;
+      return true;
+    }
+
+    /* Case 1b: currently we have a loation but the attribute holding it is different from the target attribute -> error */
+    if (*currentLocAttrName != targetAttr->name)
+    {
+      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
+                    " when another one has been previously defined [" + *currentLocAttrName + "]";
+      return false;
+    }
+
+    /* Case 1c: currently we have a location and the attribute holding it is the target attribute -> update the current location
+     * (note that shape may change in the process, e.g. geo:point to geo:line)  */
+    if (*currentLocAttrName == targetAttr->name)
+    {
+      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      {
+        *errDetail = "error parsing location attribute: " + subErr;
+        return false;
+      }
+      return true;
+    }
+  }
+
+  /* Case 2: update *to* no-location and the attribute previously holding it is the same than the target attribute
+   * The behaviour is differenet depending on NGSI version */
+  else if (*currentLocAttrName == targetAttr->name)
+  {
+    if (apiVersion == "v1")
+    {
+      /* In this case, no-location means that the target attribute doesn't have the "location" metadata. In order
+       * to mantain backwards compabitibility, this is interpreted as a location update */
+      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      {
+        *errDetail = "error parsing location attribute: " + subErr;
+        return false;
+      }
+    }
+    else // v2
+    {
+      // Location is null-ified
+      *currentLocAttrName = "";
+    }
+  }
+
+  return true;
+}
+
+/* ****************************************************************************
+*
+* processLocationAtAppendAttribute -
+*
+*/
+bool processLocationAtAppendAttribute
+(
+  std::string*                   currentLocAttrName,
+  const ContextAttribute*        targetAttr,
+  bool                           actualAppend,
+  std::string*                   geoJsonType,
+  mongo::BSONArray*              geoJsonCoords,
+  std::string*                   errDetail,
+  const std::string&             apiVersion
+)
+{
+  std::string subErr;
+  std::string locationString = targetAttr->getLocation(apiVersion);
+
+  /* Check that location (if any) is using the correct coordinates string (it only
+     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
+  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  {
+    *errDetail = "only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]";
+    return false;
+  }
+
+  /* Case 1: append of new location attribute */
+  if (actualAppend && (locationString.length() > 0))
+  {
+    /* Case 1a: there is a previous location attribute -> error */
+    if (currentLocAttrName->length() != 0)
+    {
+      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
+                   " when another one has been previously defined [" + *currentLocAttrName + "]";
+      return false;
+    }
+    /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
+    else
+    {
+      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      {
+        *errDetail = "error parsing location attribute for new attribute: " + subErr;
+        return false;
+      }
+      *currentLocAttrName = targetAttr->name;
+    }
+  }
+  /* Case 2: append-as-update changing attribute type from no-location -> location */
+  else if (!actualAppend && (locationString.length() > 0))
+  {
+    /* Case 2a: there is a previous (which different name) location attribute -> error */
+    if (*currentLocAttrName != targetAttr->name)
+    {
+      *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
+                   " when another one has been previously defined [" + *currentLocAttrName + "]";
+      return false;
+    }
+
+    /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
+    if (*currentLocAttrName == "")
+    {
+      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      {
+        *errDetail = "error parsing location attribute for existing attribute: " + subErr;
+        return false;
+      }
+      *currentLocAttrName = targetAttr->name;
+    }
+  }
+  /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
+   * attribute, then remove location attribute */
+  else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
+  {
+    *currentLocAttrName = "";
+  }
+
+  return true;
+}

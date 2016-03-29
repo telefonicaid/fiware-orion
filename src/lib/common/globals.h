@@ -290,5 +290,15 @@ int transactionIdGet(bool readonly = true);
 */
 extern void transactionIdSet(void);
 
+
+/* ****************************************************************************
+*
+* orderCoordsForBox
+*
+* It return false in the case of a 'degenerate' box
+*
+*/
+extern bool orderCoordsForBox(double* minLat, double* maxLat, double* minLon, double* maxLon, double lat1, double lat2, double lon1, double lon2);
+
 #endif  // SRC_LIB_COMMON_GLOBALS_H_
 	

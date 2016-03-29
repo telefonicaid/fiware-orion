@@ -1,9 +1,9 @@
-#ifndef ORION_ERROR_H
-#define ORION_ERROR_H
+#ifndef SRC_LIB_REST_ERROR_ADAPTATION_H
+#define SRC_LIB_REST_ERROR_ADAPTATION_H
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,32 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan
 */
+
 #include <string>
 
-#include "common/Format.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "OrionError.h"
 
+/* ****************************************************************************
+*
+* errorStringForV2 -
+*/
+extern std::string errorStringForV2(const std::string& reasonPhrase);
 
 
 /* ****************************************************************************
 *
-* OrionError - 
+*  invalidParameterForNgsiv2 -
 */
-typedef struct OrionError
-{
-  HttpStatusCode  code;
-  std::string     reasonPhrase;
-  std::string     details;
+extern bool invalidParameterForNgsiv2(const std::string& details, OrionError* oe);
 
-  OrionError();
-  OrionError(StatusCode& statusCode);
-  OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
+#endif // SRC_LIB_REST_ERROR_ADAPTATION_H
 
-  std::string  render(ConnectionInfo* ciP, const std::string& indent);  
-  void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
-} OrionError;
 
-#endif

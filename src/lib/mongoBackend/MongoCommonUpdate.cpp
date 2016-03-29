@@ -51,6 +51,8 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/TriggeredSubscription.h"
+#include "mongoBackend/location.h"
+
 #include "cache/subCache.h"
 
 #include "ngsi/Scope.h"
@@ -1069,67 +1071,6 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
 }
 
 
-/* ****************************************************************************
-*
-* processLocation -
-*
-* This function process the context attribute vector, searching for an attribute marked with
-* the location metadata. In that case, it fills locAttr, coordLat and coordLOng. If a location
-* attribute is not found, then locAttr is filled with an empty string, i.e. "".
-*
-* This function always return true (no matter if the attribute was found or not), except in an
-* error situation, in which case errorDetail is filled. This can be due to two reasons: ilegal
-* usage of the metadata or parsing error in the attribute value.
-*
-*/
-static bool processLocation
-(
-  const ContextAttributeVector&  caV,
-  std::string&                   locAttr,
-  double&                        coordLat,
-  double&                        coordLong,
-  std::string*                   errDetail,
-  const std::string&             apiVersion
-)
-{
-  locAttr = "";
-
-  for (unsigned ix = 0; ix < caV.size(); ++ix)
-  {
-    const ContextAttribute* caP = caV[ix];
-
-    std::string location = caP->getLocation(apiVersion);
-
-    if (location.length() == 0)
-    {
-      continue;
-    }
-
-    if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
-    {
-      *errDetail = "only WGS84 are supported, found: " + location;
-      return false;
-    }
-
-    if (locAttr.length() > 0)
-    {
-      *errDetail = "You cannot use more than one location attribute "
-                     "when creating an entity [see Orion user manual]";
-      return false;
-    }
-
-    if (!string2coords(caP->stringValue, coordLat, coordLong))
-    {
-      *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
-      return false;
-    }
-
-    locAttr = caP->name;
-  }
-
-  return true;
-}
-
 
 /* ****************************************************************************
 *
@@ -1964,17 +1905,19 @@ static bool updateContextAttributeItem
   bool&                     actualUpdate,
   bool&                     entityModified,
   std::string*              currentLocAttrName,
-  double&                   coordLat,
-  double&                   coordLong,
+  std::string*              geoJsonType,
+  BSONArray*                geoJsonCoords,
   bool                      isReplace,
   const std::string&        apiVersion
 )
 {
+
+  std::string err;
+
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
     // Attribute was found
-    entityModified = actualUpdate || entityModified;
-    updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
+    entityModified = actualUpdate || entityModified;    
   }
   else
   {
@@ -1998,84 +1941,22 @@ static bool updateContextAttributeItem
   }
 
   /* Check aspects related with location */
-  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // note that with the current logic, the name of the attribute meaning location
-  // is preserved on a replace operation. By the moment, we can leave this as it is now
-  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
-  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
-  // removed from code)
-  std::string locationString = targetAttr->getLocation(apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-   * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJsonType, geoJsonCoords, &err, apiVersion))
   {
     cerP->statusCode.fill(
           SccInvalidParameter,
           std::string("action: UPDATE") +
           " - entity: [" + eP->toString() + "]" +
           " - offending attribute: " + targetAttr->getName() +
-          " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-    alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
+          " - " + err);
+    alarmMgr.badInput(clientIp, err);
     return false;
   }
 
-  /* Case 1: update attribute from no-location -> location. There are 2 sub-cases */
-  if (locationString.length() > 0)
-  {
-    /* Case 1a: there is a previous (which different name) location attribute -> error */
-    if (*currentLocAttrName != targetAttr->name)
-    {
-      cerP->statusCode.fill(
-            SccInvalidParameter,
-            std::string("action: UPDATE") +
-            " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->getName() +
-            " - attempt to define a location attribute [" + targetAttr->name + "]" +
-            " when another one has been previously defined [" + *currentLocAttrName + "]");
-      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-      return false;
-    }
-
-    /* Case 1b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
-    if (*currentLocAttrName == "")
-    {
-      /* Check coordinates syntax (and get parsed valued if they are correct) */
-      if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-      {
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: UPDATE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->getName() +
-                              " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
-        alarmMgr.badInput(clientIp, "error parsing location attribute");
-        return false;
-      }
-
-      *currentLocAttrName = targetAttr->name;
-    }
-  }
-  /* Check 2: update attribute from location -> current location is nullified
-   * attribute, then remove location attribute (Disabled in NGSIv1 due to compatibility issues) */
-  else if ((apiVersion == "v2") && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
-  {
-    *currentLocAttrName = "";
-  }
-  /* Case 3: update the current location attribute (Onfly for NGSIv1)  */
-  else if ((apiVersion == "v1") && (*currentLocAttrName == targetAttr->name))
-  {
-    /* Check coordinates syntax (and get parsed valued if they are correct) */
-    if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-    {
-      cerP->statusCode.fill(SccInvalidParameter,
-                            std::string("action: UPDATE") +
-                            " - entity: [" + eP->toString() + "]" +
-                            " - offending attribute: " + targetAttr->getName() +
-                            " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
-      alarmMgr.badInput(clientIp, "error parsing location attribute");
-      return false;
-    }
-  }
+  // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
+  // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
+  // to be called after the location processing logic (as this logic may need the compoundValueP
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   return true;
 }
@@ -2099,11 +1980,13 @@ static bool appendContextAttributeItem
   bool&                     actualUpdate,
   bool&                     entityModified,
   std::string*              currentLocAttrName,
-  double&                   coordLat,
-  double&                   coordLong,
+  std::string*              geoJsonType,
+  BSONArray*                geoJsonCoords,
   const std::string&        apiVersion
 )
 {
+  std::string err;
+
   if (!legalIdUsage(attrs, targetAttr))
   {
     /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
@@ -2113,101 +1996,32 @@ static bool appendContextAttributeItem
                           std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->getName() +
-                          " - attribute can not be appended");
-    alarmMgr.badInput(clientIp, "attribute can not be appended");
+                          " - attribute cannot be appended");
+    alarmMgr.badInput(clientIp, "attribute cannot be appended");
     return false;
   }
 
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
   entityModified = actualUpdate || entityModified;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   /* Check aspects related with location */
-  std::string locationString = targetAttr->getLocation(apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJsonType, geoJsonCoords,
+                                        &err, apiVersion))
   {
     cerP->statusCode.fill(
           SccInvalidParameter,
           std::string("action: APPEND") +
           " - entity: [" + eP->toString() + "]" +
           " - offending attribute: " + targetAttr->getName() +
-          " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-    alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
+          " - " + err);
+    alarmMgr.badInput(clientIp, err);
     return false;
   }
 
-  /* Check coordinates syntax (and get parsed valued in the case they will needed at the end, if they are correct) */
-  double preLat;
-  double preLong;
-  if ((locationString.length() > 0) && (!string2coords(targetAttr->stringValue, preLat, preLong)))
-  {
-    cerP->statusCode.fill(SccInvalidParameter,
-                          std::string("action: APPEND") +
-                          " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
-    alarmMgr.badInput(clientIp, "error parsing location attribute");
-    return false;
-  }
-
-  /* Case 1: append of new location attribute */
-  if (actualAppend && (locationString.length() > 0))
-  {
-    /* Case 1a: there is a previous location attribute -> error */
-    if (currentLocAttrName->length() != 0)
-    {
-      cerP->statusCode.fill(
-            SccInvalidParameter,
-            std::string("action: APPEND") +
-            " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->getName() +
-            " - attempt to define a location attribute [" + targetAttr->name + "]" +
-            " when another one has been previously defined [" + *currentLocAttrName + "]");
-      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-      return false;
-    }
-    /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
-    else
-    {
-      *currentLocAttrName = targetAttr->name;
-      coordLat            = preLat;
-      coordLong           = preLong;
-    }
-  }
-  /* Case 2: append-as-update changing attribute type from no-location -> location */
-  else if (!actualAppend && (locationString.length() > 0))
-  {
-    /* Case 2a: there is a previous (which different name) location attribute -> error */
-    if (*currentLocAttrName != targetAttr->name)
-    {
-      cerP->statusCode.fill(
-            SccInvalidParameter,
-            std::string("action: APPEND") +
-            " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->getName() +
-            " - attempt to define a location attribute [" + targetAttr->name + "]" +
-            " when another one has been previously defined [" + *currentLocAttrName + "]");
-      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-      return false;
-    }
-
-    /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
-    if (*currentLocAttrName == "")
-    {
-      *currentLocAttrName = targetAttr->name;
-      coordLat            = preLat;
-      coordLong           = preLong;
-    }
-  }
-  /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
-     * attribute, then remove location attribute */
-  else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
-  {
-    *currentLocAttrName = "";
-  }
+  // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
+  // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
+  // to be called after the location processing logic (as this logic may need the compoundValueP
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   return true;
 }
@@ -2299,8 +2113,8 @@ static bool processContextAttributeVector
   BSONArrayBuilder*                          toPull,
   ContextElementResponse*                    cerP,
   std::string*                               currentLocAttrName,
-  double&                                    coordLat,
-  double&                                    coordLong,
+  std::string*                               geoJsonType,
+  BSONArray*                                 geoJsonCoords,
   std::string                                tenant,
   const std::vector<std::string>&            servicePathV,
   const std::string&                         apiVersion
@@ -2344,8 +2158,8 @@ static bool processContextAttributeVector
                                       actualUpdate,
                                       entityModified,
                                       currentLocAttrName,
-                                      coordLat,
-                                      coordLong,
+                                      geoJsonType,
+                                      geoJsonCoords,
                                       strcasecmp(action.c_str(), "replace") == 0,
                                       apiVersion))
       {
@@ -2364,8 +2178,8 @@ static bool processContextAttributeVector
                                       actualUpdate,
                                       entityModified,
                                       currentLocAttrName,
-                                      coordLat,
-                                      coordLong,
+                                      geoJsonType,
+                                      geoJsonCoords,
                                       apiVersion))
       {
         return false;
@@ -2495,10 +2309,10 @@ static bool createEntity
 
   /* Search for a potential location attribute */
   std::string  locAttr;
-  double       coordLat;
-  double       coordLong;
+  std::string  geoJsonType;
+  BSONArray    geoJsonCoords;
 
-  if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail, apiVersion))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJsonType, &geoJsonCoords, errDetail, apiVersion))
   {
     return false;
   }
@@ -2588,8 +2402,8 @@ static bool createEntity
   {
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                            ENT_LOCATION_COORDS   <<
-                                           BSON("type" << "Point" <<
-                                                "coordinates" << BSON_ARRAY(coordLong << coordLat))));
+                                           BSON("type" << geoJsonType <<
+                                                "coordinates" << geoJsonCoords)));
   }
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
@@ -2809,22 +2623,22 @@ static void updateEntity
    * subscription id */
   std::map<string, TriggeredSubscription*> subsToNotify;
 
-  /* Is the entity using location? In that case, we fill the locAttr, coordLat and coordLong attributes with that information, otherwise
+  /* Is the entity using location? In that case, we fill the locAttr, geoJsonType and geoJsonCoords attributes with that information, otherwise
    * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
    * processes the attributes in the updateContext */
   std::string  locAttr = "";
-  double       coordLat;
-  double       coordLong;
+  std::string  geoJsonType;
+  BSONArray    geoJsonCoords;
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc = getObjectFieldF(r, ENT_LOCATION);
+    BSONObj loc   = getObjectFieldF(r, ENT_LOCATION);
 
-    locAttr     = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
-
-    // FIXME P10: this only works for "Point" locations. NGSIv2 allows other types.
-    coordLong   = getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").Array()[0].Double();
-    coordLat    = getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").Array()[1].Double();
+    locAttr       = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
+    geoJsonType   = getStringFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "type");
+    // FIXME P6: BSONArray casting could be dangerous... maybe it should be hiden by a safeMongo function
+    // Maybe the BSONObj::couldBeArray() method could help. See also http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
+    geoJsonCoords = (BSONArray) getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").embeddedObject();
   }
 
   //
@@ -2877,8 +2691,8 @@ static void updateEntity
                                      &toPull,
                                      cerP,
                                      &locAttr,
-                                     coordLat,
-                                     coordLong,
+                                     &geoJsonType,
+                                     &geoJsonCoords,
                                      tenant,
                                      servicePathV,
                                      apiVersion))
@@ -2926,8 +2740,8 @@ static void updateEntity
   {
     toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                     ENT_LOCATION_COORDS   <<
-                                    BSON("type" << "Point" <<
-                                         "coordinates" << BSON_ARRAY(coordLong << coordLat))));
+                                    BSON("type" << geoJsonType <<
+                                         "coordinates" << geoJsonCoords)));
   }
   else
   {
