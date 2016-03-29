@@ -1336,7 +1336,7 @@ A subscription is represented by a JSON object with the following fields:
 A `subject` contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or `type` must be present):
-    + `id` or `idPattern`: Id or pattern of the affected entities (optional). Both cannot be used at the same time.
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same time, but at least one of them must be set.
     + `type`: Type of the affected entities (optional).
 + `condition`: Condition that will trigger the notification. It can have two optional properties:
     + `attributes`: array of attribute names
@@ -1445,11 +1445,12 @@ Response:
             "subject": {
                 "entities": [
                     {
+                        "idPattern": ".*",
                         "type": "Room"
                     }
                 ],
                 "condition": {
-                    "attributes": [ "temperature " ],
+                    "attributes": [ "temperature" ],
                     "expression": {
                        "q": "temperature>40"
                     }
@@ -1491,7 +1492,7 @@ Response:
             "description": "One subscription to rule them all",
             "subject": {
                 "entities": [
-                    {
+                        "idPattern": ".*",
                         "type": "Room"
                     }
                 ],
@@ -1566,7 +1567,7 @@ It must follow the same representation conventions as context attribute metadata
 A `subject` contains the following subfields:
 
 + `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or type must be present):
-    + `id` or `idPattern`: Id or pattern of the affected entities (optional). Both cannot be used at the same time.
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same time, but at least one of them must be set.
     + `type`: Type of the affected entities (optional).
 + `attributes`: List of attributes to be provided (if not specified it would mean all).
 
@@ -1629,6 +1630,7 @@ Response:
             "subject": {
                 "entities": [
                     {
+                        "id": "room2",  					    
                         "type": "Room"
                     }
                 ],
@@ -1672,6 +1674,7 @@ Response:
             "subject": {
                 "entities": [
                     {
+                        "id": "room2",
                         "type": "Room"
                     }
                 ],
@@ -1771,9 +1774,7 @@ The payload may contain the following elements (all of them optional):
 
 + `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
   elements:
-    + `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
-     or pattern (in the case of `idPattern`) of the entities to search for. If omitted, it means "any entity
-     ID".
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same time, but at least one of them must be set.
     + `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
 + `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
 + `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
@@ -1930,9 +1931,7 @@ The payload may contain the following elements (all of them optional):
 
 + `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
   elements:
-    + `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
-     or pattern (in the case of `idPattern`) of the entities to search for. If omitted, it means "any entity
-     ID".
+    + `id` or `idPattern`: Id or pattern of the affected entities. Both cannot be used at the same time, but at least one of them must be set.
     + `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
 + `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
 + `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
