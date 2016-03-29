@@ -164,6 +164,26 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Mar 29 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.0.0-1
+- Add: new value for URI param 'options': unique - like 'values', but avoiding duplicates (Issue #1050)
+- Add: PUT /admin/log?level=XXX to change log level in run-time (Issue #1913)
+- Add: check min length for IDs in v2 (Issue #1836)
+- Fix: over-logging at error level due to not checking field existente in BSON objects
+- Fix: aggregating entities without type and type "" in same entry at GET entity types operation 
+- Fix: DB error relog done at ERROR level (previously it was using WARNING)
+- Fix: check for invalid chars in attribute type (Issue #1847, #1844)
+- Fix: check for field too long in attribute type (Issue #1845)
+- Fix: check for metadatas with empty name (Issue #1438)
+- Fix: accepting backslash-slash in JSON v1 payload (Issue #1852)
+- Fix: PATCH /v2/entities correct interpretaion of null value and missing type in payload
+. Fix: PATCH /v2/entities missing value field (Issue #1789)
+- Fix: GET /v2/entities/id/attrs/name/value for type date (Issue #1885)
+- Fix: PUT /v2/entities/id/attrs/name/value forbidden chars (JSON) (Issue #1905)
+- Fix: PUT /v2/entities/id/attrs/name/value changing type to 'none' (text/plain) (Issue #1904)
+- Hardening: use safeMongo get*Field() methods in places not previously using them (mainly in csubs cache library)
+- Remove: deprecated functionality related with ONTIMEINTERVAL subscriptions
+- Remove: XML support (deprecated functionality) (Issue #1862)
+
 * Mon Feb 29 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.28.0-1
 - Add: implemented new operation: POST /v2/op/query (Issue #1080)
 - Add: implemented new operation: POST /v2/op/update (Issue #1715)
