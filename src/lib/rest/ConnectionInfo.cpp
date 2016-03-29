@@ -27,7 +27,7 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "rest/uriParamFormat.h"
+#include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
 
 
