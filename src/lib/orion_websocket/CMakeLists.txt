@@ -24,12 +24,14 @@ SET (SOURCES
     ws.cpp
     connection_manager.cpp
     parser.cpp
+    constants.cpp
 )
 
 SET (HEADERS
     ws.h
     connection_manager.h
     parser.h
+    constants.h
 )
 
 
