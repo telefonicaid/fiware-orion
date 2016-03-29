@@ -22,4 +22,3 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
-from components.common_steps.all_steps import *
