@@ -24,6 +24,7 @@
 */
 
 #include "ws.h"
+#include "constants.h"
 #include "connection_manager.h"
 #include "parser.h"
 
@@ -141,19 +142,6 @@ static int wsCallback(lws * ws,
   return 0;
 }
 
-static struct lws_protocols protocols[] = {
-    {
-        "orion-ws",
-        wsCallback,
-        sizeof(data),
-        128,
-        1,
-        NULL
-    },
-    {
-        NULL, NULL, 0, 0, 0, 0
-    }
-};
 
 pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
@@ -174,7 +162,7 @@ void *runWS(void *ptr)
     pthread_mutex_unlock(&mtx);
 
     pthread_mutex_lock(&mtx);
-    lws_service(ws->ctx, 50);
+    lws_service(ws->ctx, WSConstants::Pooling);
     pthread_mutex_unlock(&mtx);
   }
   return 0;
@@ -182,8 +170,22 @@ void *runWS(void *ptr)
 
 orion_websocket *orion_websocket_new(RestService *serv)
 {
+  static struct lws_protocols protocols[] = {
+    {
+      WSConstants::ProtocolName.c_str(),
+      wsCallback,
+      sizeof(data),
+      WSConstants::DataSize,
+      1,
+      NULL
+    },
+    {
+      NULL, NULL, 0, 0, 0, 0
+    }
+  };
+
   struct lws_context_creation_info info = {
-    9010,
+    WSConstants::Port,
     NULL,
     protocols,
     lws_get_internal_extensions(),
