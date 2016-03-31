@@ -36,6 +36,7 @@
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/parseSubscription.h"
+#include "parse/forbiddenChars.h"
 
 using namespace rapidjson;
 
@@ -319,6 +320,27 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
         return oe.render(ciP, "");
       }
+      size_t len = type.size();
+      if (len > MAX_ID_LEN)
+      {
+        char errorMsg[128];
+
+        snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+        alarmMgr.badInput(clientIp, errorMsg);
+        OrionError oe(SccBadRequest, errorMsg);
+
+        return oe.render(ciP, "");
+      }
+
+      if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+      {
+        alarmMgr.badInput(clientIp, "found a forbidden character in the type of a subscription");
+        OrionError oe(SccBadRequest, "Invalid characters in entity type");
+
+        return oe.render(ciP, "");
+      }
+
+
     }
 
     EntityId*  eiP = new EntityId(id, type, isPattern);

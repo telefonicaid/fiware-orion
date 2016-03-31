@@ -1,0 +1,3 @@
+=======
+- Fix: POST /v2/subscriptions fix validation of entities type (Issues #1964, #1965, #1967)
+
