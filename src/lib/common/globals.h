@@ -57,6 +57,7 @@
 #define GEO_LINE     "geo:line"
 #define GEO_BOX      "geo:box"
 #define GEO_POLYGON  "geo:polygon"
+#define GEO_JSON     "geo:json"
 
 
 

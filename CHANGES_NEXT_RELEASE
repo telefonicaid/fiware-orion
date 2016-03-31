@@ -1,1 +1,2 @@
-- Add: support for geo:line, geo:box and geo:polygon types as ways of specifying location attribute in NGSIv2 (Issue #1038)
+- Add: support for geo:line, geo:box and geo:polygon types as ways of specifying entity location in NGSIv2 (Issue #1038)
+- Add: GeoJSON support as a way of specifying entity location in NGSIv2 (Issue #1920)

@@ -39,8 +39,7 @@ extern bool processLocationAtEntityCreation
 (
   const ContextAttributeVector&  caV,
   std::string*                   locAttr,
-  std::string*                   geoJsonType,
-  mongo::BSONArray*              geoJsonCoords,
+  mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   const std::string&             apiVersion
 );
@@ -54,8 +53,7 @@ extern bool processLocationAtUpdateAttribute
 (
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
-  std::string*                   geoJsonType,
-  mongo::BSONArray*              geoJsonCoords,
+  mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   const std::string&             apiVersion
 );
@@ -70,8 +68,7 @@ extern bool processLocationAtAppendAttribute
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
   bool                           actualAppend,
-  std::string*                   geoJsonType,
-  mongo::BSONArray*              geoJsonCoords,
+  mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   const std::string&             apiVersion
 );

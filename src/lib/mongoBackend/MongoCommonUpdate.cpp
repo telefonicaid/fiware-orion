@@ -69,195 +69,6 @@ using namespace mongo;
 
 /* ****************************************************************************
 *
-* Forward declarations
-*/
-static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);
-
-
-
-/* ****************************************************************************
-*
-* compoundValueBson (for arrays) -
-*/
-static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArrayBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    orion::CompoundValueNode* child = children[ix];
-
-    if (child->valueType == orion::ValueTypeString)
-    {
-      b.append(child->stringValue);
-    }
-    else if (child->valueType == orion::ValueTypeNumber)
-    {
-      b.append(child->numberValue);
-    }
-    else if (child->valueType == orion::ValueTypeBoolean)
-    {
-      b.append(child->boolValue);
-    }
-    else if (child->valueType == orion::ValueTypeNone)
-    {
-      b.appendNull();
-    }
-    else if (child->valueType == orion::ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(ba.arr());
-    }
-    else if (child->valueType == orion::ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(bo.obj());
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Unknown type in compound value"));
-    }
-  }
-}
-
-
-/* ****************************************************************************
-*
-* compoundValueBson -
-*/
-static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    orion::CompoundValueNode* child = children[ix];
-
-    std::string effectiveName = dbDotEncode(child->name);
-
-    if (child->valueType == orion::ValueTypeString)
-    {
-      b.append(effectiveName, child->stringValue);
-    }
-    else if (child->valueType == orion::ValueTypeNumber)
-    {
-      b.append(effectiveName, child->numberValue);
-    }
-    else if (child->valueType == orion::ValueTypeBoolean)
-    {
-      b.append(effectiveName, child->boolValue);
-    }
-    else if (child->valueType == orion::ValueTypeNone)
-    {
-      b.appendNull(effectiveName);
-    }
-    else if (child->valueType == orion::ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(effectiveName, ba.arr());
-    }
-    else if (child->valueType == orion::ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(effectiveName, bo.obj());
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Unknown type in compound value"));
-    }
-  }
-}
-
-/* ****************************************************************************
-*
-* bsonAppendAttrValue -
-*
-*/
-void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const ContextAttribute* caP)
-{
-  switch(caP->valueType)
-  {
-    case ValueTypeString:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->stringValue);
-      break;
-
-    case ValueTypeNumber:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->numberValue);
-      break;
-
-    case ValueTypeBoolean:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->boolValue);
-      break;
-
-    case ValueTypeNone:
-      bsonAttr.appendNull(ENT_ATTRS_VALUE);
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown attribute type: %d)", caP->valueType));
-  }
-}
-
-
-/* ****************************************************************************
-*
-* valueBson -
-*/
-static void valueBson(const ContextAttribute* caP, BSONObjBuilder& bsonAttr)
-{
-  if (caP->compoundValueP == NULL)
-  {
-    bsonAppendAttrValue(bsonAttr, caP);
-  }
-  else
-  {
-    if (caP->compoundValueP->valueType == orion::ValueTypeVector)
-    {
-      BSONArrayBuilder b;
-      compoundValueBson(caP->compoundValueP->childV, b);
-      bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeObject)
-    {
-      BSONObjBuilder b;
-
-      compoundValueBson(caP->compoundValueP->childV, b);
-      bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeString)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->stringValue);
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeNumber)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->numberValue);
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeBoolean)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->boolValue);
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeNone)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.appendNull(ENT_ATTRS_VALUE);
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Unknown type in compound value"));
-    }
-  }
-}
-
-
-/* ****************************************************************************
-*
 * isNotCustomMetadata -
 *
 * Check that the parameter is a not custom metadata, i.e. one metadata without
@@ -628,7 +439,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (!attributeValueAbsent(caP, apiVersion))
   {
-    valueBson(caP, ab);
+    caP->valueBson(ab);
   }
   else
   {
@@ -871,7 +682,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    valueBson(caP, newAttr);
+    caP->valueBson(newAttr);
 
     /* Custom metadata */
     BSONObj mdV;
@@ -947,7 +758,7 @@ static bool appendAttribute
   BSONObjBuilder ab;
 
   /* 1. Value */
-  valueBson(caP, ab);
+  caP->valueBson(ab);
 
   /* 2. Type */
   if ((apiVersion == "v2") && !caP->typeGiven)
@@ -1905,8 +1716,7 @@ static bool updateContextAttributeItem
   bool&                     actualUpdate,
   bool&                     entityModified,
   std::string*              currentLocAttrName,
-  std::string*              geoJsonType,
-  BSONArray*                geoJsonCoords,
+  BSONObjBuilder*           geoJson,
   bool                      isReplace,
   const std::string&        apiVersion
 )
@@ -1941,7 +1751,7 @@ static bool updateContextAttributeItem
   }
 
   /* Check aspects related with location */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJsonType, geoJsonCoords, &err, apiVersion))
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion))
   {
     cerP->statusCode.fill(
           SccInvalidParameter,
@@ -1980,8 +1790,7 @@ static bool appendContextAttributeItem
   bool&                     actualUpdate,
   bool&                     entityModified,
   std::string*              currentLocAttrName,
-  std::string*              geoJsonType,
-  BSONArray*                geoJsonCoords,
+  BSONObjBuilder*           geoJson,
   const std::string&        apiVersion
 )
 {
@@ -2005,7 +1814,7 @@ static bool appendContextAttributeItem
   entityModified = actualUpdate || entityModified;
 
   /* Check aspects related with location */
-  if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJsonType, geoJsonCoords,
+  if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
                                         &err, apiVersion))
   {
     cerP->statusCode.fill(
@@ -2113,8 +1922,7 @@ static bool processContextAttributeVector
   BSONArrayBuilder*                          toPull,
   ContextElementResponse*                    cerP,
   std::string*                               currentLocAttrName,
-  std::string*                               geoJsonType,
-  BSONArray*                                 geoJsonCoords,
+  BSONObjBuilder*                            geoJson,
   std::string                                tenant,
   const std::vector<std::string>&            servicePathV,
   const std::string&                         apiVersion
@@ -2158,8 +1966,7 @@ static bool processContextAttributeVector
                                       actualUpdate,
                                       entityModified,
                                       currentLocAttrName,
-                                      geoJsonType,
-                                      geoJsonCoords,
+                                      geoJson,
                                       strcasecmp(action.c_str(), "replace") == 0,
                                       apiVersion))
       {
@@ -2178,8 +1985,7 @@ static bool processContextAttributeVector
                                       actualUpdate,
                                       entityModified,
                                       currentLocAttrName,
-                                      geoJsonType,
-                                      geoJsonCoords,
+                                      geoJson,
                                       apiVersion))
       {
         return false;
@@ -2308,11 +2114,10 @@ static bool createEntity
   }
 
   /* Search for a potential location attribute */
-  std::string  locAttr;
-  std::string  geoJsonType;
-  BSONArray    geoJsonCoords;
+  std::string     locAttr;
+  BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJsonType, &geoJsonCoords, errDetail, apiVersion))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion))
   {
     return false;
   }
@@ -2337,7 +2142,7 @@ static bool createEntity
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    valueBson(attrsV[ix], bsonAttr);
+    attrsV[ix]->valueBson(bsonAttr);
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
     if (attrId.length() != 0)
@@ -2399,11 +2204,9 @@ static bool createEntity
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)
-  {
+  {    
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                           ENT_LOCATION_COORDS   <<
-                                           BSON("type" << geoJsonType <<
-                                                "coordinates" << geoJsonCoords)));
+                                          ENT_LOCATION_COORDS   << geoJson.obj()));
   }
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
@@ -2623,22 +2426,19 @@ static void updateEntity
    * subscription id */
   std::map<string, TriggeredSubscription*> subsToNotify;
 
-  /* Is the entity using location? In that case, we fill the locAttr, geoJsonType and geoJsonCoords attributes with that information, otherwise
+  /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
    * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
    * processes the attributes in the updateContext */
-  std::string  locAttr = "";
-  std::string  geoJsonType;
-  BSONArray    geoJsonCoords;
+  std::string     locAttr = "";
+  BSONObj         currentGeoJson;
+  BSONObjBuilder  geoJson;
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc   = getObjectFieldF(r, ENT_LOCATION);
+    BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
 
-    locAttr       = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
-    geoJsonType   = getStringFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "type");
-    // FIXME P6: BSONArray casting could be dangerous... maybe it should be hiden by a safeMongo function
-    // Maybe the BSONObj::couldBeArray() method could help. See also http://stackoverflow.com/questions/36307126/getting-bsonarray-from-bsonelement-in-an-direct-way
-    geoJsonCoords = (BSONArray) getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").embeddedObject();
+    locAttr        = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
+    currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
   }
 
   //
@@ -2691,8 +2491,7 @@ static void updateEntity
                                      &toPull,
                                      cerP,
                                      &locAttr,
-                                     &geoJsonType,
-                                     &geoJsonCoords,
+                                     &geoJson,
                                      tenant,
                                      servicePathV,
                                      apiVersion))
@@ -2735,13 +2534,17 @@ static void updateEntity
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // not sure how the following if behaves in the case of "replace"...
+  // not sure how the following behaves in the case of "replace"...
   if (locAttr.length() > 0)
   {
+    BSONObj newGeoJson = geoJson.obj();
+
+    // If processContextAttributeVector() didn't touched the geoJson, then we
+    // use the existing object
+    BSONObj finalGeoJson = newGeoJson.nFields() > 0 ? newGeoJson : currentGeoJson;
+
     toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                    ENT_LOCATION_COORDS   <<
-                                    BSON("type" << geoJsonType <<
-                                         "coordinates" << geoJsonCoords)));
+                                    ENT_LOCATION_COORDS   << finalGeoJson));
   }
   else
   {

@@ -32,6 +32,11 @@
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
 
+// FIXME P5: the following could be not necessary if we optimize the valueBson() thing. See
+// the next FIXME P5 comment in this file
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
+
 using namespace mongo;
 using namespace orion;
 
@@ -82,7 +87,7 @@ static bool stringArray2coords
 *
 * getGeoJson -
 *
-* Get the GeoJSON information (geoJsonType and geoJsonCoords) for the given
+* Get the GeoJSON information (geoJson output argument) for the given
 * ContextAttribute provided as parameter.
 *
 * It returns true, except in the case of error (in which in addition errDatail gets
@@ -91,8 +96,7 @@ static bool stringArray2coords
 static bool getGeoJson
 (
   const ContextAttribute*  caP,
-  std::string*             geoJsonType,
-  BSONArray*               geoJsonCoords,
+  BSONObjBuilder*          geoJson,
   std::string*             errDetail,
   const std::string        apiVersion
 )
@@ -111,8 +115,34 @@ static bool getGeoJson
       return false;
     }
 
-    *geoJsonType   = "Point";
-    *geoJsonCoords = BSON_ARRAY(aLong << aLat);
+    geoJson->append("type", "Point");
+    geoJson->append("coordinates", BSON_ARRAY(aLong << aLat));
+    return true;
+  }
+
+  if (caP->type == GEO_JSON)
+  {
+    // Attribute value has to be object in this case
+    if ((caP->compoundValueP == NULL) || !(caP->compoundValueP->isObject()))
+    {
+      *errDetail = "geo:json needs an object as value";
+      return false;
+    }
+
+    /* FIXME P5: the procedure we are currently using is sub-optimal, as valueBson() is
+     * called from location.cpp one time to generate the BSON for the location.coords field
+     * and called again (before or after... I'm not sure right now and may depend on the
+     * particular opartion, i.e. entity creation, update APPEND or update UPPDATE) to
+     * generated the BSON for the attribute value. We should find a way of calling just one
+     * time.
+     *
+     * Note that valueBson() puts the BSON object in the "value" field of the builder passed
+     * as argument.
+     */
+    BSONObjBuilder bo;
+    caP->valueBson(bo);
+
+    geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
 
     return true;
   }
@@ -150,8 +180,8 @@ static bool getGeoJson
     ba.append(BSON_ARRAY(maxLon << minLat));
     ba.append(BSON_ARRAY(minLon << minLat));
 
-    *geoJsonType   = "Polygon";
-    *geoJsonCoords = BSON_ARRAY(ba.arr());
+    geoJson->append("type", "Polygon");
+    geoJson->append("coordinates", BSON_ARRAY(ba.arr()));
 
     return true;
   }
@@ -171,8 +201,8 @@ static bool getGeoJson
       return false;
     }
 
-    *geoJsonType   = "LineString";
-    *geoJsonCoords = ba.arr();
+    geoJson->append("type", "LineString");
+    geoJson->append("coordinates", ba.arr());
 
     return true;
   }
@@ -194,13 +224,13 @@ static bool getGeoJson
       return false;
     }
 
-    *geoJsonType   = "Polygon";
-    *geoJsonCoords = BSON_ARRAY(ba.arr());
+    geoJson->append("type", "Polygon");
+    geoJson->append("coordinates", BSON_ARRAY(ba.arr()));
 
     return true;
   }
 
-  LM_E(("attribute detected as location but unknown type: %s", caP->type.c_str()));
+  LM_E(("Runtime Error (attribute detected as location but unknown type: %s)", caP->type.c_str()));
   *errDetail = "error processing geo location attribute, see log traces";
 
   return false;
@@ -211,8 +241,8 @@ static bool getGeoJson
 * processLocationAtEntityCreation -
 *
 * This function process the context attribute vector, searching for an attribute meaning
-* location. In that case, it fills geoJsonType and geoJsonCoords. If a location
-* attribute is not found, then locAttr is filled with an empty string, i.e. "".
+* location. In that case, it fills geoJson. If a location attribute is not found, then
+* locAttr is filled with an empty string, i.e. "".
 *
 * This function always return true (no matter if the attribute was found or not), except in an
 * error situation, in which case errorDetail is filled.
@@ -222,8 +252,7 @@ bool processLocationAtEntityCreation
 (
   const ContextAttributeVector&  caV,
   std::string*                   locAttr,
-  std::string*                   geoJsonType,
-  BSONArray*                     geoJsonCoords,
+  BSONObjBuilder*                geoJson,
   std::string*                   errDetail,
   const std::string&             apiVersion
 )
@@ -254,7 +283,7 @@ bool processLocationAtEntityCreation
       return false;
     }
 
-    if (!getGeoJson(caP, geoJsonType, geoJsonCoords, errDetail, apiVersion))
+    if (!getGeoJson(caP, geoJson, errDetail, apiVersion))
     {
       return false;
     }
@@ -274,8 +303,7 @@ bool processLocationAtUpdateAttribute
 (
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
-  std::string*                   geoJsonType,
-  mongo::BSONArray*              geoJsonCoords,
+  mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   const std::string&             apiVersion
 )
@@ -304,7 +332,7 @@ bool processLocationAtUpdateAttribute
     /* Case 1a: no location yet -> the updated attribute becomes the location attribute */
     if (*currentLocAttrName == "")
     {
-      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
         return false;
@@ -326,7 +354,7 @@ bool processLocationAtUpdateAttribute
      * (note that shape may change in the process, e.g. geo:point to geo:line)  */
     if (*currentLocAttrName == targetAttr->name)
     {
-      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
         return false;
@@ -343,7 +371,7 @@ bool processLocationAtUpdateAttribute
     {
       /* In this case, no-location means that the target attribute doesn't have the "location" metadata. In order
        * to mantain backwards compabitibility, this is interpreted as a location update */
-      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute: " + subErr;
         return false;
@@ -369,8 +397,7 @@ bool processLocationAtAppendAttribute
   std::string*                   currentLocAttrName,
   const ContextAttribute*        targetAttr,
   bool                           actualAppend,
-  std::string*                   geoJsonType,
-  mongo::BSONArray*              geoJsonCoords,
+  mongo::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
   const std::string&             apiVersion
 )
@@ -399,7 +426,7 @@ bool processLocationAtAppendAttribute
     /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
     else
     {
-      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute for new attribute: " + subErr;
         return false;
@@ -421,7 +448,7 @@ bool processLocationAtAppendAttribute
     /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
     if (*currentLocAttrName == "")
     {
-      if (!getGeoJson(targetAttr, geoJsonType, geoJsonCoords, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
       {
         *errDetail = "error parsing location attribute for existing attribute: " + subErr;
         return false;
