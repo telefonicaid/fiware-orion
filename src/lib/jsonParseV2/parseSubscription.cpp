@@ -36,6 +36,7 @@
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/parseSubscription.h"
+#include "parse/forbiddenChars.h"
 
 using namespace rapidjson;
 
@@ -319,6 +320,27 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 
         return oe.render(ciP, "");
       }
+      size_t len = type.size();
+      if (len > MAX_ID_LEN)
+      {
+        char errorMsg[128];
+
+        snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+        alarmMgr.badInput(clientIp, errorMsg);
+        OrionError oe(SccBadRequest, errorMsg);
+
+        return oe.render(ciP, "");
+      }
+
+      if (forbiddenIdChars(ciP->apiVersion, type.c_str()))
+      {
+        alarmMgr.badInput(clientIp, "found a forbidden character in the type of a subscription");
+        OrionError oe(SccBadRequest, "Invalid characters in entity type");
+
+        return oe.render(ciP, "");
+      }
+
+
     }
 
     EntityId*  eiP = new EntityId(id, type, isPattern);
@@ -445,18 +467,47 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
     if (expression.HasMember("q"))
     {
+      if (!expression["q"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "q is not a string");
+        OrionError oe(SccBadRequest, "q is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.q = expression["q"].GetString();
     }
+
     if (expression.HasMember("geometry"))
     {
+      if (!expression["geometry"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "geometry is not a string");
+        OrionError oe(SccBadRequest, "geometry is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.geometry = expression["geometry"].GetString();
     }
     if (expression.HasMember("coords"))
     {
+      if (!expression["coords"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "coords is not a string");
+        OrionError oe(SccBadRequest, "coords is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.coords = expression["coords"].GetString();
     }
     if (expression.HasMember("georel"))
     {
+      if (!expression["georel"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "georel is not a string");
+        OrionError oe(SccBadRequest, "georel is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.georel = expression["georel"].GetString();
     }
   }
