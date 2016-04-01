@@ -467,18 +467,47 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
     if (expression.HasMember("q"))
     {
+      if (!expression["q"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "q is not a string");
+        OrionError oe(SccBadRequest, "q is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.q = expression["q"].GetString();
     }
+
     if (expression.HasMember("geometry"))
     {
+      if (!expression["geometry"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "geometry is not a string");
+        OrionError oe(SccBadRequest, "geometry is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.geometry = expression["geometry"].GetString();
     }
     if (expression.HasMember("coords"))
     {
+      if (!expression["coords"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "coords is not a string");
+        OrionError oe(SccBadRequest, "coords is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.coords = expression["coords"].GetString();
     }
     if (expression.HasMember("georel"))
     {
+      if (!expression["georel"].IsString())
+      {
+        alarmMgr.badInput(clientIp, "georel is not a string");
+        OrionError oe(SccBadRequest, "georel is not a string");
+
+        return oe.render(ciP, "");
+      }
       scrP->expression.georel = expression["georel"].GetString();
     }
   }
