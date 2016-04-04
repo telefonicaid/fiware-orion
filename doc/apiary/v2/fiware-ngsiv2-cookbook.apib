@@ -447,22 +447,62 @@ This resource allows you to obtain a list of subresources published by the API:
 
         []
 
-# Group Entity Ingestion
+# Group Provide Context
 
-### Create a new entity [POST /v2/entities]
+## Create a new entity [/v2/entities{?options}]
+
+### Normalized mode [POST /v2/entities]
 
 + Request (application/json)
 
         {
             "type": "Room",
             "id": "Bcn-Welt",
+            "temperature": {
+              "value": 21.7,
+              "metadata": {
+                 "unitCode": {
+                    "value": "CEL"
+                 }
+              }
+            },
+            "humidity": {
+              "value": 60    
+            },
+            "address": {
+              "value": {
+                "addressCountry":  "ES",
+                "addressLocality": "Barcelona",
+                "streetAddress":   "Diagonal 00"             
+              },
+              "type": "PostalAddress"
+            }
+        }
+      
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/Bcn-Welt?type=Room
+
+
+### keyValues mode [POST /v2/entities{?options}]
+
++ Parameters
+    + options: keyValues (optional, string) - operation options (`keyValues` mode)
+
++ Request (application/json)    
+
+        {
+            "type": "Room",
+            "id": "Bcn-Welt",
             "temperature": 21.7,
             "humidity": 60,
-            "location": {
-                "value":  "41.3763726, 2.1864475",
-                "type": "geo:point",
-                "crs": "WGS84"
-            },
+            "address": {
+              "addressCountry":  "ES",
+              "addressLocality": "Barcelona",
+              "streetAddress":   "Diagonal 00"
+            }  
         }
 
 + Response 201 (application/json)
@@ -471,8 +511,66 @@ This resource allows you to obtain a list of subresources published by the API:
 
             Location: /v2/entities/Bcn-Welt?type=Room
 
+### Georeferencing using simple location format [POST /v2/entities]
 
-### Create a new entity. Error [POST /v2/entities]
++ Request (application/json)
+
+        {
+           "id":   "AEMET-1351",
+           "type": "WeatherStation",
+           "address": {
+              "value": {
+                "addressCountry":  "ES",
+                "addressLocality": "Mañón",
+                "addressRegion":   "La Coruña"
+              }
+           },
+           "name": "Estaca de Bares",
+           "location": {              
+              "type":  "geo:point",
+              "value": "43.7861, -7.6847"
+            }
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/AEMET-1351?type=WeatherStation
+
+### Georeferencing using GeoJSON [POST /v2/entities]
+
++ Request (application/json)
+
+        {
+           "id":   "porto-AmbientArea-Boavista",
+           "type": "AmbientArea",
+           "name": "Boavista",
+           "location": {              
+              "type": "geo:json",
+              "value": {
+                 "type": "Polygon",
+                 "coordinates": [ [
+                    [ -8.633629796628234, 41.163854282188204 ],
+                    [ -8.630357419242978, 41.165230294132279 ],
+                    [ -8.627010741427831, 41.164981131496575 ],
+                    [ -8.637337472778501, 41.155229636824181 ],
+                    [ -8.637313461931976, 41.158014959877839 ],
+                    [ -8.636775456788547, 41.161148008811146 ],
+                    [ -8.633629796628234, 41.163854282188204 ]
+                 ] ]
+              }
+            }
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/porto-AmbientArea-Boavista?type=AmbientArea
+            
+            
+### Creation error. Already exists. [POST /v2/entities?options=keyValues]
 
 + Request (application/json)
 
@@ -489,10 +587,47 @@ This resource allows you to obtain a list of subresources published by the API:
             "description": "An entity with the same id and type is already present"
         }
 
-### Update entity attributes. [PATCH /v2/entities/{entityId}]
+
+## Remove Entity [/v2/entities/{entityId}]
+
+### By Id [DELETE /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+
++ Response 204
+
+
+## Manage entity attributes [/v2/entities/{entityId}{?options}]
+
+### Update. Normalized mode. [PATCH /v2/entities/{entityId}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "temperature": {
+                  "value": 21.7,
+                  "metadata": {
+                    "unitCode": "CEL"
+                  }
+                },
+                "ambientNoise": {
+                  "value": 31.5
+                }
+            }
+
++ Response 204
+
+### Update. keyValues mode. [PATCH /v2/entities/{entityId}{?options}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + options:  keyValues (optional, string) - operation options (`keyValues` mode)
 
 + Request (application/json)
 
@@ -506,10 +641,11 @@ This resource allows you to obtain a list of subresources published by the API:
 + Response 204
 
 
-### Update or append entity attributes. [POST /v2/entities/{entityId}]
+### Update or append. keyValues mode. [POST /v2/entities/{entityId}{?options}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + options:  keyValues (optional, string) - operation options (`keyValues` mode)
 
 + Request (application/json)
 
@@ -520,19 +656,11 @@ This resource allows you to obtain a list of subresources published by the API:
 
 + Response 204
 
-
-### Remove an entity [DELETE /v2/entities/{entityId}]
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-
-+ Response 204
-
-### Remove one or more entity attributes[DELETE /v2/entities/{entityId}{?attrs}]
+### Remove [DELETE /v2/entities/{entityId}{?attrs}]
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
-    + attrs: humidity, seatsNumber - Attributes
+    + attrs: humidity, seatsNumber - Attribute list
 
 + Response 204
 
