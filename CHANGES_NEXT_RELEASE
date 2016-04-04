@@ -1,0 +1,2 @@
+- Fix crash with some invalid subscriptions in V2 (Issues #1947, #1972)
+
