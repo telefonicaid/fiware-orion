@@ -42,7 +42,7 @@ This resource allows you to obtain a list of subresources published by the API:
 
 ## List all entities [/v2/entities]
 
-### Default mode [GET /v2/entities]
+### Normalized mode [GET /v2/entities]
 
 + Response 200 (application/json)
 
@@ -52,21 +52,21 @@ This resource allows you to obtain a list of subresources published by the API:
             "id": "DC_S1_D41",
             "temperature": {
                "value": 35.6,
-               "type": "urn:ogc:def:phenomenon:temperature",
+               "type":  "urn:ogc:def:phenomenon:temperature",
                "metadata": {
                    "accuracy": {
-                       "type": null,
-                       "value": "0.1"
+                       "type": "none",
+                       "value": 0.1
                    }
                }
             }
          },
          {
             "type": "Car",
-            "id": "abc345fg",
+            "id":   "abc345fg",
             "speed": {
-                "value": 14.7,
-                "type": null,
+                "value":    14.7,
+                "type":     "none",
                 "metadata": { }
             }
          }
@@ -116,8 +116,8 @@ This resource allows you to obtain a list of subresources published by the API:
                "type": "urn:ogc:def:phenomenon:temperature",
                "metadata": {
                    "accuracy": {
-                       "type": null,
-                       "value": "0.1"
+                       "type":  "none",
+                       "value": 0.1
                    }
                }
             }
@@ -126,8 +126,8 @@ This resource allows you to obtain a list of subresources published by the API:
             "type": "Car",
             "id": "abc345fg",
             "speed": {
-                "value": 14.7,
-                "type": null,
+                "value"   : 14.7,
+                "type"    : "none",
                 "metadata": { }
             }
          }
@@ -168,7 +168,7 @@ This resource allows you to obtain a list of subresources published by the API:
                "type": "urn:ogc:def:phenomenon:temperature",
                "metadata": {
                    "accuracy": {
-                       "type": null,
+                       "type":  "none",
                        "value": "0.1"
                    }
                }
@@ -219,27 +219,27 @@ This resource allows you to obtain a list of subresources published by the API:
             "type": "ParkingLot",
             "id": "P12345-A",
             "name": {
-               "value": "Marques de Pombal",
-               "type": null,
+               "value":    "Marques de Pombal",
+               "type":     "string",
                "metadata": { }
             },
             "availableSpotNumber": {
-              "value": 111,
-              "type": null,
+              "value":    111,
+              "type":     "number",
               "metadata": { }
             },
             "totalSpotNumber": {
-              "value": 250,
-              "type": null,
+              "value":    250,
+              "type":     "number",
               "metadata": { }
             },
             "lastEntrance": {
-               "value": "2015-11-26T11:45:12.398Z",
-               "type": "date",
+               "value":    "2015-11-26T11:45:12.398Z",
+               "type":     "date",
                "metadata": { }
             },
             "location": {
-              "type": "geo:point",
+              "type":  "geo:point",
               "value": "40.6378754,-8.6370621",
               "metadata": {
                 "crs": {
@@ -253,13 +253,13 @@ This resource allows you to obtain a list of subresources published by the API:
             "type": "StreetParking",
             "id": "A45678",
             "availableSpotNumber": {
-              "value": 11,
-              "type": null,
+              "value":     11,
+              "type":      "number",
               "metadata": { }
             },
             "totalSpotNumber": {
-              "value": 20,
-              "type": null,
+              "value":    20,
+              "type":     "number",
               "metadata": { }
             },
             "location": {
@@ -351,8 +351,8 @@ This resource allows you to obtain a list of subresources published by the API:
             "type": "Room",
             "id": "Boe_Idearium",
             "temperature": {
-              "value": 22.7,
-              "type": "urn:ogc:def:phenomenon:temperature",
+              "value":    22.7,
+              "type":     "urn:ogc:def:phenomenon:temperature",
               "metadata": { }
             }
         }
