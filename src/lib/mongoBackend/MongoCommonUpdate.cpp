@@ -2996,6 +2996,7 @@ static void updateEntity
   // The servicePath of THIS object is entitySPath
   char espath[SERVICE_PATH_MAX_TOTAL];
   slashEscape(entitySPath.c_str(), espath, sizeof(espath));
+  const std::string servicePathValue  = std::string("^") + espath + "$";
 
   // servicePathString from earlier in this function
   if (servicePathV.size() == 0)
@@ -3004,7 +3005,7 @@ static void updateEntity
   }
   else
   {
-    query.appendRegex(servicePathString, espath);
+    query.appendRegex(servicePathString, servicePathValue);
   }
 
   std::string err;
