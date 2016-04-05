@@ -68,7 +68,7 @@ orionCurl --url "$url" --payload "$payload"
 1: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 566
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -95,7 +95,7 @@ Date: REGEX(.*)
 2: ++++++++++ query for object compound in XML ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 844
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

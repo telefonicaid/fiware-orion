@@ -82,7 +82,7 @@ echo "5: ++++++++++++++++++++"
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -95,7 +95,7 @@ Date: REGEX(.*)
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 243
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -109,7 +109,7 @@ Date: REGEX(.*)
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 207
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

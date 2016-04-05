@@ -35,7 +35,7 @@ orionCurl --url "/v1/contextEntities/entity01" -X "DELETE"
 +++++ 1. delete an entity +++++
 HTTP/1.1 200 OK
 Content-Length: 132
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

@@ -187,7 +187,7 @@ Date: REGEX(.*)
 +++++ 4. lookup an attribute by the other valueID in XML +++++
 HTTP/1.1 200 OK
 Content-Length: 516
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

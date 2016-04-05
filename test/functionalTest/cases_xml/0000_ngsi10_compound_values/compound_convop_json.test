@@ -187,7 +187,7 @@ Date: REGEX(.*)
 3: ++++++++++ query for vector compound in XML ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 994
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 4: ++++++++++ query for object compound in XML ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 844
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -345,7 +345,7 @@ Date: REGEX(.*)
 7: ++++++++++ query for vector compound in XML convop ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 774
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -383,7 +383,7 @@ Date: REGEX(.*)
 8: ++++++++++ query for object compound in XML convop ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 640
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

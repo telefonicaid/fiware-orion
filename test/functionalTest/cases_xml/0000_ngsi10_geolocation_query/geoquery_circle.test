@@ -221,7 +221,7 @@ echo
 1: +++++++++ Prepare entity for Madrid +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 856
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -258,7 +258,7 @@ Date: REGEX(.*)
 2: +++++++++ Prepare entity for Alcobendas +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 860
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -295,7 +295,7 @@ Date: REGEX(.*)
 3: +++++++++ Prepare entity for Leganes +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 857
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -332,7 +332,7 @@ Date: REGEX(.*)
 4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1649
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -394,7 +394,7 @@ Date: REGEX(.*)
 5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
 Content-Length: 2431
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -481,7 +481,7 @@ Date: REGEX(.*)
 6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
 Content-Length: 878
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
