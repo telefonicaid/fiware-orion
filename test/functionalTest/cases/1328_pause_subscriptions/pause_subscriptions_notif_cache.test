@@ -35,9 +35,9 @@ accumulatorStart
 # using diff :)
 #
 # Note we use sleep in some point to let time the DB to sync with regards to
-# cache timeSent value (WAIT_TIME = 1.5 * subCacheIval)
+# cache timeSent value (WAIT_TIME = 2 * subCacheIval)
 #
-WAIT_TIME=1.5s
+WAIT_TIME=2s
 #
 # 01. Create subscription at "inactive" status
 # 02. Create entity (should trigger notification, but subscription is inactive)
