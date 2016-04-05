@@ -118,7 +118,8 @@ static int wsCallback(lws * ws,
         ci->modify(url, verb, payload);
 
         const char *restMsg = restService(ci, orionServices).c_str();
-        dat->message = strdup(ws_parser_message(restMsg, ci->httpHeaders, (int)ci->httpStatusCode));
+        dat->message = strdup(ws_parser_message(restMsg, ci->httpHeaders, ci->httpHeader, ci->httpHeaderValue, (int)ci->httpStatusCode));
+
 
         delete ci;
         free(dat->request);

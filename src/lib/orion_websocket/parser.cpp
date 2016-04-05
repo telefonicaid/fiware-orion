@@ -103,10 +103,31 @@ void ws_parser_parse
   }
 }
 
+static void addHeaders
+(
+ const std::string& name,
+ const std::string& value,
+ rapidjson::Writer<rapidjson::StringBuffer>& writer
+)
+{
+  writer.Key(name.c_str());
+
+  if (value.empty())
+  {
+    writer.String("");
+  }
+  else
+  {
+    writer.String(value.c_str());
+  }
+}
+
 const char *ws_parser_message
 (
  const std::string&  msg,
  const HttpHeaders&  head,
+ const std::vector<std::string> headName,
+ const std::vector<std::string> headValue,
  int                 statusCode
 )
 {
@@ -119,18 +140,15 @@ const char *ws_parser_message
   std::map<std::string, std::string *>::const_iterator it = head.headerMap.begin();
   while (it != head.headerMap.end())
   {
-    writer.Key(it->first.c_str());
-
-    if (it->second->empty())
-    {
-        writer.String("");
-    }
-    else
-    {
-        writer.String(it->second->c_str());
-    }
+    addHeaders(it->first, *(it->second), writer);
     ++it;
   }
+
+  for (unsigned i = 0; i < headName.size(); ++i)
+  {
+    addHeaders(headName[i], headValue[i], writer);
+  }
+
   writer.EndObject();
 
   if (statusCode < 100 || statusCode > 599) // Code is not a valid HTTP status code

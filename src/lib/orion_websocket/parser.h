@@ -46,6 +46,8 @@ const char *ws_parser_message
 (
  const std::string&  msg,
  const HttpHeaders&  head,
+ const std::vector<std::string> headName,
+ const std::vector<std::string> headValue,
  int                 statusCode
 );
 
