@@ -35,7 +35,7 @@ orionCurl --url "/v1/contextEntities/entity01/attributes"
 +++++ 1. get an entity +++++
 HTTP/1.1 200 OK
 Content-Length: 326
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

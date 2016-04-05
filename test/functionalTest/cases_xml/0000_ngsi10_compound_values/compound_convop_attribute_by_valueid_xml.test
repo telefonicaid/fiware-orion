@@ -155,7 +155,7 @@ orionCurl --url "/v1/contextEntities/EObject/attributes/A/wall"
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1108
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -201,7 +201,7 @@ Date: REGEX(.*)
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1108
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -247,7 +247,7 @@ Date: REGEX(.*)
 3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 786
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -287,7 +287,7 @@ Date: REGEX(.*)
 4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 784
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -327,7 +327,7 @@ Date: REGEX(.*)
 5: ++++++++++ query for object compound by valueID 'ground' ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 660
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -363,7 +363,7 @@ Date: REGEX(.*)
 6: ++++++++++ query for object compound by valueID 'wall' ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 658
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

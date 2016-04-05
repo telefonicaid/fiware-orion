@@ -638,7 +638,7 @@ Date: REGEX(.*)
 ==============================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 174
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -739,7 +739,7 @@ Content-Type: application/json; charset=utf-8
 ==================================
 HTTP/1.1 200 OK
 Content-Length: 211
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -758,7 +758,7 @@ Content-Length: 717
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -795,7 +795,7 @@ Content-Type: application/xml
 =============================================================
 HTTP/1.1 200 OK
 Content-Length: 211
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -882,7 +882,7 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 200 OK
 Content-Length: 192
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -901,7 +901,7 @@ Content-Length: 717
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -1073,7 +1073,7 @@ Content-Length: 717
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -1141,7 +1141,7 @@ Date: REGEX(.*)
 ===================================================================
 HTTP/1.1 200 OK
 Content-Length: 192
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -1160,7 +1160,7 @@ Content-Length: 717
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -1228,7 +1228,7 @@ Date: REGEX(.*)
 ====================================================================
 HTTP/1.1 200 OK
 Content-Length: 192
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

@@ -1,0 +1,182 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Convenience2 contextEntityTypes test
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4
+
+--SHELL--
+
+echo "0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "celsius",
+          "value": "0"
+        },
+        {
+          "name": "pressure",
+          "type": "mmHg",
+          "value": "0"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url '/v1/updateContext' --payload "$payload" --json
+echo
+echo
+
+
+echo "1. Listing of Entity Types. Response in JSON"
+orionCurl --url '/v1/contextTypes' --json 
+echo
+echo
+
+
+echo "2. Listing of Entity Types. Response in JSON, with details=on"
+orionCurl --url '/v1/contextTypes?details=on' --json 
+echo
+echo
+
+
+echo "3. Listing of Entity Types. Response in JSON, with details=on and collapse=true"
+orionCurl --url '/v1/contextTypes?details=on&collapse=true' --json  
+echo
+echo
+
+
+--REGEXPECT--
+0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
+HTTP/1.1 200 OK
+Content-Length: 519
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "celsius",
+                        "value": ""
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "mmHg",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+1. Listing of Entity Types. Response in JSON
+HTTP/1.1 200 OK
+Content-Length: 200
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "types": [
+        {
+            "attributes": [
+                "pressure",
+                "temperature"
+            ],
+            "name": "Room"
+        }
+    ]
+}
+
+
+2. Listing of Entity Types. Response in JSON, with details=on
+HTTP/1.1 200 OK
+Content-Length: 228
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "details": "Count: 1",
+        "reasonPhrase": "OK"
+    },
+    "types": [
+        {
+            "attributes": [
+                "pressure",
+                "temperature"
+            ],
+            "name": "Room"
+        }
+    ]
+}
+
+
+3. Listing of Entity Types. Response in JSON, with details=on and collapse=true
+HTTP/1.1 200 OK
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "details": "Count: 1",
+        "reasonPhrase": "OK"
+    },
+    "types": [
+        {
+            "name": "Room"
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

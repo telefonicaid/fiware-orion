@@ -145,7 +145,7 @@ orionCurl --url "$url" --payload "$payload"
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -156,7 +156,7 @@ Date: REGEX(.*)
 ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 902
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -187,7 +187,7 @@ Date: REGEX(.*)
 ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 902
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -218,7 +218,7 @@ Date: REGEX(.*)
 ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 791
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

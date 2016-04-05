@@ -72,7 +72,7 @@ orionCurl --url "$url" --payload "$payload" --json
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 566
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

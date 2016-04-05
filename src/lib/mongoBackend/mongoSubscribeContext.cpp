@@ -138,6 +138,10 @@ HttpStatusCode mongoSubscribeContext
     }
     sub.append(CSUB_ATTRS, attrs.arr());
 
+    /* Adding status */
+    std::string status = requestP->status == ""?  STATUS_ACTIVE : requestP->status;
+    sub.append(CSUB_STATUS, status);
+
     /* Build conditions array (including side-effect notifications and threads creation) */
     bool notificationDone = false;
     BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
@@ -149,7 +153,8 @@ HttpStatusCode mongoSubscribeContext
                                              tenant,
                                              xauthToken,
                                              servicePathV,
-                                             requestP->expression.q);
+                                             requestP->expression.q,
+                                             status);
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */
@@ -200,6 +205,7 @@ HttpStatusCode mongoSubscribeContext
                        JSON,
                        notificationDone,
                        lastNotificationTime,
+                       status,
                        requestP->expression.q,
                        requestP->expression.geometry,
                        requestP->expression.coords,

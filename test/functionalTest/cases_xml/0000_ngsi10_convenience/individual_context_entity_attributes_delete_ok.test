@@ -56,7 +56,7 @@ orionCurl --url "/v1/contextEntities/entity01"
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
 Content-Length: 573
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -83,7 +83,7 @@ Date: REGEX(.*)
 +++++ 2. lookup the entity +++++
 HTTP/1.1 200 OK
 Content-Length: 466
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -108,7 +108,7 @@ Date: REGEX(.*)
 +++++ 3. delete the entity +++++
 HTTP/1.1 200 OK
 Content-Length: 80
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -119,7 +119,7 @@ Date: REGEX(.*)
 +++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++
 HTTP/1.1 200 OK
 Content-Length: 326
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

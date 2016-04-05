@@ -50,7 +50,7 @@ orionCurl --url "/v1/contextEntities/entity01/attributes/temperature" -X "DELETE
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
 Content-Length: 573
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -77,7 +77,7 @@ Date: REGEX(.*)
 +++++ 2. delete the entity attribute +++++
 HTTP/1.1 200 OK
 Content-Length: 80
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
