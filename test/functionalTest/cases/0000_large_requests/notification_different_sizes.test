@@ -1,0 +1,253 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications of different sizes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart
+
+#
+# Taking into account that the notification size depends on (but is not exactly equal to)
+# the document size, which in sequence depends on (but it is not exactly equal to)
+# the size of the "inflated" attribute, the third parameter has been determined empirically
+#
+dbInsertEntity $CB_DB_NAME E1 1900
+dbInsertEntity $CB_DB_NAME E2 2100
+dbInsertEntity $CB_DB_NAME E3 810000
+dbInsertEntity $CB_DB_NAME E4 840000
+
+--SHELL--
+
+# Close to the static buffer limit (~19 KB)
+url="/v1/subscribeContext"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+echo
+
+sleep 1
+echo "1: ++++++++++++++++++++"
+# Passing the static buffer limit (~21 KB)
+url="/v1/subscribeContext"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E2"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+echo
+
+
+sleep 1
+echo "2: ++++++++++++++++++++"
+# Close to the dynamic buffer limit (~7.9 MB)
+url="/v1/subscribeContext"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E3"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+echo
+
+
+sleep 1
+echo "3: ++++++++++++++++++++"
+# Passing the dynamic buffer limit, causing an error (~8.1 MB)
+url="/v1/subscribeContext"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E4"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+echo
+
+
+echo "4: ++++++++++++++++++++"
+echo "** Notifications sent:"
+accumulatorCount
+
+# ----------------------------------------------------------------------
+# These two tests make reference to the old functionality provided by
+# the sendHttpSocket() function in file clientSocketHttp.cpp. If we are
+# ever to activate it through the USE_OLD_SENDHTTPSOCKET flag these lines
+# are necesary for the test to pass.
+
+# The log has to show exactly 1 case of static buffer usage
+#echo "** Static buffer usages:"
+#grep "to HTTP server: sending static message of" /tmp/contextBroker.log | wc -l
+
+# The log has to show exactly 2 cases of dynamic buffer usage
+#echo "** Dynamic buffer usages:"
+#grep "to HTTP server: sending dynamic message of" /tmp/contextBroker.log | wc -l
+# ----------------------------------------------------------------------
+
+# The log has to show exactly 1 error about notification too large
+echo "** Too large errors:"
+grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
+
+# Notification sizes. Note that if don't use the cut, some character in the log line prologue
+# breaks the test harness: @, :, [, ], ~, /, (, ), etc.
+echo "** Notification sizes:"
+grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $9 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+
+--REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+4: ++++++++++++++++++++
+** Notifications sent:
+3
+** Too large errors:
+1
+** Notification sizes:
+ Sending message 1 to HTTP server: sending message of REGEX((19614|19615|19616|19617|19618|19619|19620)) bytes to HTTP server
+ Sending message 2 to HTTP server: sending message of REGEX((21615|21615|21616|21617|21618|21619|21620)) bytes to HTTP server
+ Sending message 3 to HTTP server: sending message of REGEX((8100616|8100617|8100618|8100619|8100620|8100621|8100622)) bytes to HTTP server
+--TEARDOWN--
+#
+# NOTE: the six different sizes above is to cover for different sizes in the version string
+#
+#       19614|19615|19616|19617|19618|19619|19620:
+#
+#       19614:   d.d.d
+#       19615:   d.dd.d
+#       19620:   d.dd.d-next
+
+brokerStop CB
+accumulatorStop
+dbDrop CB

@@ -1,2 +1,4 @@
 - Add: support for geo:line, geo:box and geo:polygon types as ways of specifying entity location in NGSIv2 (Issue #1038)
 - Add: GeoJSON support as a way of specifying entity location in NGSIv2 (Issue #1920)
+- Fix: updates on default service path entity causes wrong update in same id/type entity in not-default service path (#1956)
+- Fix crash with some invalid subscriptions in V2 (Issues #1947, #1972)

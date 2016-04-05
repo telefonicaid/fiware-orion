@@ -319,8 +319,9 @@ def verify_headers_in_response(context):
     """
     verify headers in response
     Ex:
-      | parameter      | value      |
-      | x-total-counts | <entities> |
+          | parameter      | value                |
+          | x-total-counts | 5                    |
+          | location       | /v2/subscriptions/.* |
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     __logger__.debug("Verifying headers in response...")

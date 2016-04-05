@@ -63,7 +63,7 @@ Trying to ask for HTML as Notification Format
 =============================================
 HTTP/1.1 400 Bad Request
 Content-Length: 174
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

@@ -95,7 +95,7 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature" --json
 +++++ 1. create entity +++++
 HTTP/1.1 200 OK
 Content-Length: 729
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -127,7 +127,7 @@ Date: REGEX(.*)
 +++++ 2. put an entity with type +++++
 HTTP/1.1 200 OK
 Content-Length: 80
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -138,7 +138,7 @@ Date: REGEX(.*)
 +++++ 3. query +++++
 HTTP/1.1 200 OK
 Content-Length: 615
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -168,7 +168,7 @@ Date: REGEX(.*)
 +++++ 4. put an entity without type +++++
 HTTP/1.1 200 OK
 Content-Length: 80
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -179,7 +179,7 @@ Date: REGEX(.*)
 +++++ 5. query again +++++
 HTTP/1.1 200 OK
 Content-Length: 615
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

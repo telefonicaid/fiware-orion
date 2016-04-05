@@ -355,7 +355,7 @@ echo
 1: +++++++++ Point A +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 852
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -393,7 +393,7 @@ Date: REGEX(.*)
 2: +++++++++ Point B +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 852
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -431,7 +431,7 @@ Date: REGEX(.*)
 3: +++++++++ Point C +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 852
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -469,7 +469,7 @@ Date: REGEX(.*)
 4: ++++++++++ Rectangle in: A, B ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1612
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -532,7 +532,7 @@ Date: REGEX(.*)
 5: ++++++++++ Rectangle in: B, C ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1612
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -595,7 +595,7 @@ Date: REGEX(.*)
 6: ++++++++++ Triangle in: A ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 854
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -633,7 +633,7 @@ Date: REGEX(.*)
 7: ++++++++++ Rectangle out: A ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 854
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -671,7 +671,7 @@ Date: REGEX(.*)
 8: ++++++++++ Triangle out: B, C ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1612
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
