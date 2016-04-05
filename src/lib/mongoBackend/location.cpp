@@ -63,7 +63,7 @@ static bool stringArray2coords
      CompoundValueNode* item = caP->compoundValueP->childV[ix];
      if (!item->isString())
      {
-       *errDetail = "geo:line, geo:box and geo:polygon needs array of strings but some element is not";
+       *errDetail = "geo:line, geo:box and geo:polygon needs array of strings but some element is not a string";
        return false;
      }
 

@@ -103,7 +103,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Finally, `location.coords` could held an arbitrary JSON object, representing a location
+* Finally, `location.coords` could hold an arbitrary JSON object, representing a location
   in [GeoJSON](http://www.macwright.org/2015/03/23/geojson-second-bite.html) format. Arbitrary
   GeoJSON can be used with the geo:json attribute type and it is up to the user to introduce
   a valid object. Note that the three above cases are actually GeoJSON representation for
