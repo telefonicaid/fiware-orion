@@ -77,7 +77,7 @@ does not need itself.
 includes more files than it needs, its ‘clients’ has no other choice than to include those ‘extra’ files as
 well. This sometimes leads to conflicts and must be avoided. In addition, it increases the compilation time.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### M2 (Copyright header)
 
@@ -140,7 +140,7 @@ For Python, bash script, CMakeLists.txt, etc.:
 
 *Rationale*: to have an homogenous copyright header for all files.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*": checked using either the internal script ```scripts/check_files_compliance.py```, or ```scripts/style_check.sh```
 
 #### M3 (Function header)
 
@@ -176,7 +176,7 @@ Example:
 
 *Rationale*: the code is simply easier to read when prepared like this
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*": manually
 
 #### M4 (Indent)
 
@@ -184,7 +184,7 @@ Example:
  
 *Rationale*: two whitespaces is enough. It makes the lines not too long
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*": checked using the internal script ```scripts/style_check.sh```
 
 #### M5 (Variable declaration):
 
@@ -203,7 +203,7 @@ int a, b;
 
 *Rationale*: easier to read.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### M6 (Naming conventions):
 
@@ -216,7 +216,7 @@ int a, b;
 *Rationale*: this rule makes it easy to understand whether we’re dealing with a macro or a constant, or a variable  
 for that matter. Same with function vs macro.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### M7 (Multi line macros):
 
@@ -232,7 +232,7 @@ do                          \
 
 *Rationale*: easier on the eye.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### M8 (Code blocks):
 
@@ -287,7 +287,7 @@ where a block ends. The alternative style `if () {` gains one line which makes a
 (for printing on paper), to save one line, but it does not make much sense to save that line in a source code file
 that is only viewed using editors.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### M9 (Switch statement):
 
@@ -328,7 +328,7 @@ case '1'
 *Rationale*: in general, each statement on a separate line makes the code much easier to read. However, these typical very 
 short switches are really much easier to read if we relax the rule a little.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### M10 (Command & operators separation):
 
@@ -354,7 +354,7 @@ if (a==b)
 
 *Rationale*: easier on the eye.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: checked using the internal script ```scripts/style_check.sh```
 
 #### M11 (Spaces)
 
@@ -393,7 +393,7 @@ xyzInit(user,   pwd  host);
 
 *Rationale*: easier on the eye.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: checked using the internal script ```scripts/style_check.sh```
 
 ### ‘SHOULD follow’ rules:
 
@@ -403,7 +403,7 @@ xyzInit(user,   pwd  host);
 
 *Rationale*: easier to read the code.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S2 (Object action naming convention):
 
@@ -424,7 +424,7 @@ findList()
 
 *Rationale*: a set of functions are ‘grouped’ thanks to their prefix (“object”, in the example: “list”).
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S3 (Parenthesis in Part-Conditions):
 
@@ -436,7 +436,7 @@ if ((a == 2) || (a == 7)) ...
 
 *Rationale*: much easier to read, impossible to get unwanted behavior due to precedence.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S4 (Function separation)
 
@@ -445,7 +445,7 @@ if ((a == 2) || (a == 7)) ...
 *Rationale*: it is good to clearly see when one function ends and another one starts. Why three lines? Well, one 
 line is not enough, three is good.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S5 (Preconditions)
 
@@ -493,7 +493,7 @@ bool stringCheck(char* s1, char* s2, char* s3, char* s4)
 
 *Rationale*: This to avoid long nested 'if-else's that only make a function more difficult to understand.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S6 (Variable align)
 
@@ -511,7 +511,7 @@ variable name. Sometimes the type consists of more than one word (e.g. `struct t
 
 *Rationale*: the code gets much easier to read.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S7 (Order in source/header files):
 
@@ -529,7 +529,7 @@ variable name. Sometimes the type consists of more than one word (e.g. `struct t
 
 *Rationale*: order, order and more order.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S8 (Includes):
 
@@ -552,7 +552,7 @@ which states that `listInit` has no parameters. Result?  Disaster. Often SIGSEGV
 files MUST include their corresponding header file, and this possible problem is ALWAYS detected at compilation
 time.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually, except order in inclusions (first std C files, then std C++ files, etc), that is checked by the internal script ```scripts/style_check.sh```
 
 #### S9 (Line length):
 
@@ -580,7 +580,7 @@ if ((mdP->name == "") && (mdP->type == "") && (mdP->xyz == NULL))
 *Rationale*: 120 is a reasonable limit taking into account the current visualization technologies (high 
 definition monitors, resizable windows and scrollbars).
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*": checked by the internal script ```scripts/style_check.sh```
 
 #### S10 (Ternary operator):
 
@@ -613,7 +613,7 @@ case Perhaps:  boolValue = "Perhaps"; break;
 
 *Rationale*: readibility.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S11 (Empty lines):
 
@@ -633,7 +633,7 @@ Empty lines MUST NOT appear after `{` or before `}`.
 
 *Rationale*: It can really help the readability of source code.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: manually
 
 #### S12 (C++ initialization lists):
 
@@ -656,7 +656,7 @@ Y:Y(const std::string& _fooName, const std::string& _myLongFooName):
 *Rationale*: doing this way is more efficient than assigning values in the constructor body given that the 
 values are assigned at object construction time in memory at execution time.
 
-*How to check*": manually?, make lint?, other? TBD
+*How to check*: combination of compiler warning + manually
 
 ## Programming patterns
 
