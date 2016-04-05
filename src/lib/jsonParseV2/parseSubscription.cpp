@@ -100,6 +100,34 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     return oe.render(ciP, "");
   }
 
+  // Description field
+  destination->descriptionProvided = false;
+  if (document.HasMember("description"))
+  {
+    const Value& description      = document["description"];
+
+    if (!description.IsString())
+    {
+      OrionError oe(SccBadRequest, "description must be a string");
+
+      alarmMgr.badInput(clientIp, "description must be a string");
+      return oe.render(ciP, "");
+    }
+
+    std::string descriptionString = description.GetString();
+
+    if (descriptionString.length() > MAX_DESCRIPTION_LENGTH)
+    {
+      OrionError oe(SccBadRequest, "max description length exceeded");
+
+      alarmMgr.badInput(clientIp, "max description length exceeded");
+      return oe.render(ciP, "");
+    }
+
+    destination->descriptionProvided = true;
+    destination->description = descriptionString;
+  }
+
   // Subject field
   if (document.HasMember("subject"))
   {

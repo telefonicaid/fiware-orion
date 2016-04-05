@@ -225,6 +225,24 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
+  /* Description */
+  if (requestP->descriptionProvided)
+  {
+    // Note that in the case of description "" the field is deleted
+    if (requestP->description != "")
+    {
+      newSub.append(CSUB_DESCRIPTION, requestP->description);
+    }
+  }
+  else
+  {
+    // Pass-through of the current subscription
+    if (sub.hasField(CSUB_DESCRIPTION))
+    {
+      newSub.append(CSUB_DESCRIPTION, getStringFieldF(sub, CSUB_DESCRIPTION));
+    }
+  }
+
   /* Adding status */
   std::string status;
   if (requestP->status != "")

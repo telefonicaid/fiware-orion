@@ -43,6 +43,10 @@ std::string Subscription::toJson()
   JsonHelper jh;
 
   jh.addString("id", this->id);
+  if (this->description != "")
+  {
+    jh.addString("description", this->description);
+  }
   if (this->expires > 0)
   {    
     jh.addDate("expires", this->expires);

@@ -55,12 +55,15 @@ typedef struct SubscribeContextRequest
   Throttling             throttling;             // Optional
   int64_t                expires;
   SubscriptionExpression expression;             // Only used by NGSIv2 subscription
+
+  std::string            description;            // Only used by NGSIv2 subscription
+  bool                   descriptionProvided;    // Only used by NGSIv2 subscription
   std::string            status;                 // Only used by NGSIv2 subscription
 
   /* The number of restrictions */
   int                    restrictions;
 
-  SubscribeContextRequest(): expires(-1), restrictions(0) {}
+  SubscribeContextRequest(): expires(-1), descriptionProvided(false), restrictions(0) {}
   std::string  render(RequestType requestType, const std::string& indent);
   std::string  check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);

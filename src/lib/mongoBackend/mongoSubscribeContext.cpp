@@ -110,6 +110,11 @@ HttpStatusCode mongoSubscribeContext
       sub.append(CSUB_SERVICE_PATH, servicePath);
     }
 
+    /* Description */
+    if (requestP->description != "")
+    {
+      sub.append(CSUB_DESCRIPTION, requestP->description);
+    }
     
     /* Build entities array */
     BSONArrayBuilder entities;
