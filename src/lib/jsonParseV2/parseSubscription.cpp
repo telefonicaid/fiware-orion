@@ -188,9 +188,9 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
     if ((statusString != "active") && (statusString != "inactive"))
     {
-      OrionError oe(SccBadRequest, "status is not valid (it has to bee either active or inactive)");
+      OrionError oe(SccBadRequest, "status is not valid (it has to be either active or inactive)");
 
-      alarmMgr.badInput(clientIp, "status is not valid (it has to bee either active or inactive)");
+      alarmMgr.badInput(clientIp, "status is not valid (it has to be either active or inactive)");
       return oe.render(ciP, "");
     }
 
