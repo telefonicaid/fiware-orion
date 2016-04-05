@@ -131,7 +131,7 @@ def scan_dir(dir, temp_list, skip_folder=u''):
                         skipped = True
                 if not skipped:
                     temp_list.append("%s/*.feature" % path)
-                    scan_dir(path, temp_list, skip_folder)
+                scan_dir(path, temp_list, skip_folder)
     except Exception, e:
         raise Exception("ERROR - Directory not found. See -u parameter. \n   - %s" %e)
         exit(0)

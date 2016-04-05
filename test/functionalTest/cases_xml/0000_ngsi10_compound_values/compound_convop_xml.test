@@ -94,7 +94,7 @@ orionCurl --url "/v1/contextEntities/EObject" --json
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 566
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -121,7 +121,7 @@ Date: REGEX(.*)
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 566
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -148,7 +148,7 @@ Date: REGEX(.*)
 3: ++++++++++ query for vector compound in XML convop ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 774
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -186,7 +186,7 @@ Date: REGEX(.*)
 4: ++++++++++ query for object compound in XML convop ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 640
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

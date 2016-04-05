@@ -221,6 +221,7 @@ int mongoSubCacheItemInsert
   const char*         servicePath,
   int                 lastNotificationTime,
   long long           expirationTime,
+  const std::string&  status,
   const std::string&  q,
   const std::string&  geometry,
   const std::string&  coords,
@@ -315,6 +316,7 @@ int mongoSubCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
+  cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
@@ -466,8 +468,11 @@ void mongoSubCacheUpdate(const std::string& tenant, const std::string& subId, lo
 
   if (lastNotificationTime != 0)
   {
-    // Update lastNotificationTime
-    condition = BSON("_id" << OID(subId) << CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime));
+    // Update lastNotificationTime    
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false)))
+                    );
     update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
 
     if (collectionUpdate(collection, condition, update, false, &err) != true)

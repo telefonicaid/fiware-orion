@@ -344,7 +344,7 @@ echo
 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
 HTTP/1.1 200 OK
 Content-Length: 142
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -357,7 +357,7 @@ Date: REGEX(.*)
 04. Update/UPDATE E1/A1(=BAD) in broker (is forwarded to CP and nothing is found/updated)
 HTTP/1.1 200 OK
 Content-Length: 668
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -389,7 +389,7 @@ Date: REGEX(.*)
 05. Query broker for E1/A1 (is forwarded to CP but nothing is found)
 HTTP/1.1 200 OK
 Content-Length: 155
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -404,7 +404,7 @@ Date: REGEX(.*)
 06. Update/APPEND E1/A1(=CP) in CP
 HTTP/1.1 200 OK
 Content-Length: 616
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -435,7 +435,7 @@ Date: REGEX(.*)
 07. Query CP for E1/A1 (OK - E1/A1(=CP) is found)
 HTTP/1.1 200 OK
 Content-Length: 616
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -466,7 +466,7 @@ Date: REGEX(.*)
 08. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP) is found)
 HTTP/1.1 200 OK
 Content-Length: 616
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -497,7 +497,7 @@ Date: REGEX(.*)
 09. Update/UPDATE E1/A1(=CP-2) broker (is forwarded to CP and now it is updated)
 HTTP/1.1 200 OK
 Content-Length: 616
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -528,7 +528,7 @@ Date: REGEX(.*)
 10. Query CP for E1/A1 (OK - E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
 Content-Length: 618
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -559,7 +559,7 @@ Date: REGEX(.*)
 11. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
 Content-Length: 618
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -590,7 +590,7 @@ Date: REGEX(.*)
 12. Update/APPEND E1/A1(=broker) in broker
 HTTP/1.1 200 OK
 Content-Length: 616
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -621,7 +621,7 @@ Date: REGEX(.*)
 13. Query broker for E1/A1 (stays local and A1(=broker) is found)
 HTTP/1.1 200 OK
 Content-Length: 620
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -652,7 +652,7 @@ Date: REGEX(.*)
 14. Update/DELETE E1/A1 in broker (its local E1/A1(=broker) is removed)
 HTTP/1.1 200 OK
 Content-Length: 616
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -683,7 +683,7 @@ Date: REGEX(.*)
 15. Query broker for E1/A1 (will go to CP and E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
 Content-Length: 618
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

@@ -116,7 +116,7 @@ Date: REGEX(.*)
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 45
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 {"id":"E","type":"T","A":1,"B":2,"C":3,"D":4}
@@ -126,7 +126,7 @@ Date: REGEX(.*)
 ===============================
 HTTP/1.1 200 OK
 Content-Length: 147
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 {"id":"E","type":"T","B":{"type":"BT","value":2,"metadata":{}},"D":{"type":"DT","value":4,"metadata":{}},"C":{"type":"CT","value":3,"metadata":{}}}
@@ -136,7 +136,7 @@ Date: REGEX(.*)
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 39
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 {"id":"E","type":"T","B":2,"D":4,"C":3}

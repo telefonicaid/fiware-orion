@@ -55,6 +55,7 @@ extern int mongoSubCacheItemInsert
   const char*         servicePath,
   int                 lastNotificationTime,
   long long           expirationTime,
+  const std::string&  status,
   const std::string&  q,
   const std::string&  geometry,
   const std::string&  coords,

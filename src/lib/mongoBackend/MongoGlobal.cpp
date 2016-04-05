@@ -2820,7 +2820,8 @@ BSONArray processConditionVector
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               qFilter
+  const std::string&               qFilter,
+  const std::string&               status
 )
 {
   BSONArrayBuilder conds;
@@ -2845,16 +2846,17 @@ BSONArray processConditionVector
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
 
-      if (processOnChangeConditionForSubscription(enV,
-                                                  attrL,
-                                                  &(nc->condValueList),
-                                                  subId,
-                                                  url,
-                                                  format,
-                                                  tenant,
-                                                  xauthToken,
-                                                  servicePathV,
-                                                  qFilter))
+      if ((status == STATUS_ACTIVE) &&
+          (processOnChangeConditionForSubscription(enV,
+                                                   attrL,
+                                                   &(nc->condValueList),
+                                                   subId,
+                                                   url,
+                                                   format,
+                                                   tenant,
+                                                   xauthToken,
+                                                   servicePathV,
+                                                   qFilter)))
       {
         *notificationDone = true;
       }

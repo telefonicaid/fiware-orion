@@ -148,7 +148,7 @@ orionCurl --url "/v1/contextEntities/EVector/attributes/att"
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1112
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1112
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -240,7 +240,7 @@ Date: REGEX(.*)
 3: ++++++++++ query for vector compound by attribute ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1380
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -305,7 +305,7 @@ Date: REGEX(.*)
 4: ++++++++++ query for object compound by attribute ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1380
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

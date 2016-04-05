@@ -62,7 +62,7 @@ orionCurl --url "/v1/contextEntities/EVector"
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
 Content-Length: 566
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -89,7 +89,7 @@ Date: REGEX(.*)
 7: ++++++++++ query for vector compound in XML convop ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 774
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

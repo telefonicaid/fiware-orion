@@ -176,15 +176,15 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
 
 /* ****************************************************************************
 *
-* setExpires -
+* setStatus -
 */
-static void setExpires(Subscription* s, const BSONObj& r)
+static void setStatus(Subscription* s, const BSONObj& r)
 {
   s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : -1;
 
   //
   // Status
-  // FIXME P10: use an enum for active/expired
+  // FIXME P10: use an enum for active/inactive/expired
   //
   // NOTE:
   //   if the field CSUB_EXPIRATION is not present in the subscription, then the default
@@ -192,7 +192,7 @@ static void setExpires(Subscription* s, const BSONObj& r)
   //
   if ((s->expires > getCurrentTime()) || (s->expires == -1))
   {
-    s->status = "active";
+    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
   }
   else
   {
@@ -273,7 +273,7 @@ void mongoListSubscriptions
 
     setSubscriptionId(&s, r);
     setSubject(&s, r);
-    setExpires(&s, r);
+    setStatus(&s, r);
     setNotification(&s, r, tenant);
 
     subs->push_back(s);
@@ -349,7 +349,7 @@ void mongoGetSubscription
     setDescription(sub, r);
     setSubject(sub, r);
     setNotification(sub, r, tenant);
-    setExpires(sub, r);
+    setStatus(sub, r);
 
     if (moreSafe(cursor))
     {

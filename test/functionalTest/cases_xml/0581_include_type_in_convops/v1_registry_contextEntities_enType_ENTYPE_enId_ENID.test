@@ -157,7 +157,7 @@ Date: REGEX(.*)
 ===================================================================
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -171,7 +171,7 @@ Date: REGEX(.*)
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 499
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

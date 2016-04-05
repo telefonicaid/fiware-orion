@@ -53,7 +53,7 @@ orionCurl --url "$url" --payload "$payload"
 +++++ 1. post an attribute to a non-existing entity +++++
 HTTP/1.1 200 OK
 Content-Length: 80
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

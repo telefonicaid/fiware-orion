@@ -35,7 +35,7 @@
 
 /*****************************************************************************
 * Constant string for field names in collection (first characters
-* are the code name: REG_, ENT_, ASUB_, CSUB */
+* are the code name: REG_, ENT_, CSUB_ and CASUB_) */
 
 #define REG_FWS_REGID               "fwdRegId"
 #define REG_CONTEXT_REGISTRATION    "contextRegistration"
@@ -91,6 +91,7 @@
 #define CSUB_ENTITY_ISPATTERN   "isPattern"
 #define CSUB_COUNT              "count"
 #define CSUB_FORMAT             "format"
+#define CSUB_STATUS             "status"
 #define CSUB_SERVICE_PATH       "servicePath"
 
 #define CASUB_EXPIRATION        "expiration"
@@ -103,6 +104,14 @@
 #define CASUB_LASTNOTIFICATION  "lastNotification"
 #define CASUB_COUNT             "count"
 #define CASUB_FORMAT            "format"
+
+
+
+/*****************************************************************************
+* Constant string for field values acting as keywods */
+
+#define STATUS_ACTIVE        "active"
+#define STATUS_INACTIVE      "inactive"
 
 
 #endif // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_

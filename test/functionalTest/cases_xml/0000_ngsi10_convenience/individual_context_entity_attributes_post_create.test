@@ -52,7 +52,7 @@ orionCurl --url "$url" --payload "$payload"
 +++++ 1. post an entity +++++
 HTTP/1.1 200 OK
 Content-Length: 729
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

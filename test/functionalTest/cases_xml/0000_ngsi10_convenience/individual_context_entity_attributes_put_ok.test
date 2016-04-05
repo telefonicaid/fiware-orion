@@ -74,7 +74,7 @@ orionCurl --url "$url" --payload "$payload" -X "PUT"
 +++++ 1. Create an entity +++++
 HTTP/1.1 200 OK
 Content-Length: 807
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -108,7 +108,7 @@ Date: REGEX(.*)
 +++++ 2. add to the entity +++++
 HTTP/1.1 200 OK
 Content-Length: 498
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
