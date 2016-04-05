@@ -310,8 +310,20 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 
 
 ## Hints:
+  Generals
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
   - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
+  - If would like a query parameter name in POST, PUT or PATCH requests, use `qp_` prefix into `properties to entities` step   
+  - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
+  - It is possible to use the same value of the previous request in another request using this string: 
+       `the same value of the previous request`.
+  - If we wanted an empty payload in a second request, use:
+      ```
+          | parameter          |
+          | without_properties |
+      ```
+  
+  Entities_
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
       The number after "=" is the number of chars
         ex: | attr_name | random=10 |
@@ -326,15 +338,6 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - If metadatas number is equal to "1", the attribute name has not suffix, ex: `metadatas_name=alarm`
     else metadatas number is major than "1" the metadatas name are value plus a suffix (consecutive), ex:
         `metadatas_name=alarm_0, alarm_1, ..., alarm_N`
-  - If would like a query parameter name in POST, PUT or PATCH requests, use `qp_` prefix into `properties to entities` step   
-  - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
-  - It is possible to use the same value of the previous request in another request using this string: 
-       `the same value of the previous request`.
-  - If we wanted an empty payload in a second request, use:
-      ```
-          | parameter          |
-          | without_properties |
-      ```
   - If we wanted attributes in keyValues mode in create or update request, use `keyValues` else use `normalized ` value. ex:
       ```
           create entity group with "3" entities in "keyValues" mode
@@ -345,11 +348,34 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
        ```
        create an entity in raw and "normalized" modes
        ```
+  Logs:     
   - If don´t want verify the value of something trace in log, use `ignored` as value.
      ```
       | trace | value   |
       | time  | ignored |
      ```
+  Subscriptions:   
+  - If `subject_entities_number` is major than "1" will have N entities object using `subject_entities_prefix` to differentiate.
+  - If `condition_attributes_number` is equal "1", the attribute name has not suffix, ex: `"attributes": ["temperature"]`
+    else `condition_attributes_number` is major than "1" the attributes name are value plus a suffix (consecutive), ex:
+       `"attributes": ["temperature", "temperature_0", "temperature_1", ..., "temperature_N"]`
+  - If `notification_attributes_number` is equal "1", the attribute name has not suffix, ex: `"attributes": ["temperature"]`
+    else `notification_attributes_number` is major than "1" the attributes name are value plus a suffix (consecutive), ex:
+       `"attributes": ["temperature", "temperature_0", "temperature_1", ..., "temperature_N"]`
+  - It is possible to use the same value of the previous request in another request using this string:
+       `the same value of the previous request`.
+  - "type", "id", "attributes" could be random values.nThe number after "=" is the number of chars, ex:
+       `| attributes_name | random=10 |`
+  - If would you like that `subject` field is missing, use `subject_type` equals to `without subject field`
+  - If would you like that `entities` field is missing, use `subject_type` equals to `without entities field`
+  - If would you like that `conditions` field is missing, use `condition_attributes` equals to `without condition field`
+  - If would you like that `conditions attributes` field is empty, use `condition_attributes` equals to `array is empty`
+  - If would you like that `conditions expression` field is empty, use `condition_expression` equals to `object is empty`
+  - If would you like that `notification` field is missing, use `notification_callback` equals to `without notification field`
+  - If would you like that `notification attributes` field is empty, use `notification_attributes` equals to `array is empty`
+  - In expression value have multiples expressions uses `&` as separator, and in each operation use `>>>` as separator between the key and the value,
+     ex:
+         `| condition_expression | q>>>temperature>40&georel>>>near&geometry>>>point&coords>>>40.6391 |`
 
 ## Tags
 
