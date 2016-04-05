@@ -252,6 +252,7 @@ Fields:
     the subscription.
 -   **format**: the format to use to send notification, either "XML" or "JSON".
     However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
+-   **description** (optional field): a free string describing the subscription. Maximum length is 1024.
 
 Example document:
 
@@ -286,7 +287,8 @@ Example document:
                 "coords" : "",
                 "georel" : ""
         },
-        "format" : "JSON"
+        "format" : "JSON",
+        "description": "this is an example subscription"
 }
 ```
 [Top](#top)

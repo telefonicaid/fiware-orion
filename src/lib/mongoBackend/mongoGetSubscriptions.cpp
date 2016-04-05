@@ -56,6 +56,17 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 
 /* ****************************************************************************
 *
+* setDescription -
+*/
+static void setDescription(Subscription* s, const BSONObj& r)
+{
+  s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldF(r, CSUB_DESCRIPTION) : "";
+}
+
+
+
+/* ****************************************************************************
+*
 * setSubject -
 */
 static void setSubject(Subscription* s, const BSONObj& r)
@@ -335,6 +346,7 @@ void mongoGetSubscription
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", n, r.toString().c_str()));
 
     setSubscriptionId(sub, r);
+    setDescription(sub, r);
     setSubject(sub, r);
     setNotification(sub, r, tenant);
     setExpires(sub, r);

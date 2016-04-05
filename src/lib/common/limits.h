@@ -169,4 +169,13 @@
 #endif
 
 
+
+/* ****************************************************************************
+*
+* MAX_DESCRIPTION_LENGTH -
+*/
+#define MAX_DESCRIPTION_LENGTH  1024
+
+
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_

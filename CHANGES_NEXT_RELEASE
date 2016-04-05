@@ -1,2 +1,3 @@
 - Fix: updates on default service path entity causes wrong update in same id/type entity in not-default service path (#1956)
 - Fix crash with some invalid subscriptions in V2 (Issues #1947, #1972)
+- Add: description field for NGSIv2 subscriptions (#1918)
