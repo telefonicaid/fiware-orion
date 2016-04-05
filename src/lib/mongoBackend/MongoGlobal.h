@@ -358,7 +358,8 @@ extern BSONArray processConditionVector
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               qFilter
+  const std::string&               qFilter,
+  const std::string&               status
 );
 
 /* ****************************************************************************

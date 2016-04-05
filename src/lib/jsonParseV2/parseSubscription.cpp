@@ -171,6 +171,33 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     return oe.render(ciP, "");
   }
 
+  // Status field
+  if (document.HasMember("status"))
+  {
+    const Value& status = document["status"];
+
+    if (!status.IsString())
+    {
+      OrionError oe(SccBadRequest, "status is not a string");
+
+      alarmMgr.badInput(clientIp, "status is not a string");
+      return oe.render(ciP, "");
+    }
+
+    std::string statusString = status.GetString();
+
+    if ((statusString != "active") && (statusString != "inactive"))
+    {
+      OrionError oe(SccBadRequest, "status is not valid (it has to be either active or inactive)");
+
+      alarmMgr.badInput(clientIp, "status is not valid (it has to be either active or inactive)");
+      return oe.render(ciP, "");
+    }
+
+    destination->status = statusString;
+
+  }
+
   return "OK";
 }
 

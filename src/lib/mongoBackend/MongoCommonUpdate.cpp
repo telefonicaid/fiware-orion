@@ -1282,6 +1282,13 @@ static bool addTriggeredSubscriptions_withCache
       continue;
     }
 
+    // Status is inactive
+    if (cSubP->status == STATUS_INACTIVE)
+    {
+      LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
+      continue;
+    }
+
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
@@ -1387,6 +1394,7 @@ static bool addTriggeredSubscriptions_noCache
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                CSUB_STATUS << BSON("$ne" << STATUS_INACTIVE) <<
                 CSUB_SERVICE_PATH << spBson);
 
   /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
@@ -1415,6 +1423,7 @@ static bool addTriggeredSubscriptions_noCache
   queryPattern.append(entPatternQ, "true");
   queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
   queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryPattern.append(CSUB_STATUS, BSON("$ne" << STATUS_INACTIVE));
   queryPattern.append(CSUB_SERVICE_PATH, spBson);
   queryPattern.appendCode("$where", function);
 
