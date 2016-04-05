@@ -25,7 +25,6 @@
 
 #include "ws.h"
 #include "constants.h"
-#include "connection_manager.h"
 #include "parser.h"
 
 #include "rest/RestService.h"
@@ -54,7 +53,6 @@ struct _orion_websocket
 // Private struct for persistent data
 typedef struct
 {
-  unsigned cid;
   char *message;
   char *request;
   int index;
@@ -73,24 +71,12 @@ static int wsCallback(lws * ws,
   {
     case LWS_CALLBACK_ESTABLISHED:
     {
-      int cid = connection_manager_get_cid();
-
-      if (cid == -1)
-      {
-        LM_E(("No more cid available!"));
-        break;
-      }
-
-      dat->cid = cid;
       dat->request = NULL;
       dat->index = 0;
-      LM_I(("Connecction id: %d", dat->cid));
       break;
     }
     case LWS_CALLBACK_CLOSED:
     {
-      connection_manager_remove(dat->cid);
-      dat->cid = -1;
       break;
     }
 
@@ -102,7 +88,6 @@ static int wsCallback(lws * ws,
 
       unsigned char *buff = (unsigned char *) malloc(size);
       unsigned char *p = &buff[LWS_SEND_BUFFER_PRE_PADDING];
-
       sprintf((char*)p, "%s", dat->message);
       lws_write(ws, p, strlen(dat->message), LWS_WRITE_TEXT);
       free(buff);
@@ -125,10 +110,17 @@ static int wsCallback(lws * ws,
       {
         dat->request[dat->index] = 0;
 
-        ConnectionInfo *ci = connection_manager_get(dat->cid, dat->request);
+        ConnectionInfo *ci = new ConnectionInfo("v2", JSON, true);
+        std::string url;
+        std::string verb;
+        std::string payload;
+        ws_parser_parse(dat->request, ci, url, verb, payload, ci->httpHeaders);
+        ci->modify(url, verb, payload);
 
         const char *restMsg = restService(ci, orionServices).c_str();
         dat->message = strdup(ws_parser_message(restMsg, ci->httpHeaders, (int)ci->httpStatusCode));
+
+        delete ci;
         free(dat->request);
         dat->request = NULL;
         dat->index = 0;
