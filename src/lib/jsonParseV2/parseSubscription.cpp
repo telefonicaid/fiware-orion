@@ -105,9 +105,18 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   if (document.HasMember("description"))
   {
     const Value& description      = document["description"];
+
+    if (!description.IsString())
+    {
+      OrionError oe(SccBadRequest, "description must be a string");
+
+      alarmMgr.badInput(clientIp, "description must be a string");
+      return oe.render(ciP, "");
+    }
+
     std::string descriptionString = description.GetString();
 
-    if(descriptionString.length() > MAX_DESCRIPTION_LENGTH)
+    if (descriptionString.length() > MAX_DESCRIPTION_LENGTH)
     {
       OrionError oe(SccBadRequest, "max description length exceeded");
 

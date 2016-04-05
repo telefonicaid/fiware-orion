@@ -42,6 +42,8 @@ brokerStart CB
 # 09. Create a second subscription with description (desc = three)
 # 10. Get that second subscription (see desc = three)
 #
+# 11. Update second subscription with no string description (fail)
+#
 
 echo "01. Create subscription without description"
 echo "==========================================="
@@ -68,7 +70,7 @@ payload='
         "attributes": ["temperature", "humidity"],
         "throttling": 5
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -166,7 +168,7 @@ payload='
         "attributes": ["temperature", "humidity"],
         "throttling": 5
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -180,6 +182,19 @@ id=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "
 echo "10. Get subscription (see desc = three)"
 echo "======================================="
 orionCurl --url "/v2/subscriptions/$id" --json
+echo
+echo
+
+
+echo "11. Update second subscription with no string description (fail)"
+echo "================================================================"
+payload='
+{
+    "description": {
+      "foo": "bar"
+    }
+}'
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
 echo
 echo
 
@@ -202,7 +217,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -253,7 +268,7 @@ Date: REGEX(.*)
 
 {
     "description": "one",
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -304,7 +319,7 @@ Date: REGEX(.*)
 
 {
     "description": "two",
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -354,7 +369,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -406,7 +421,7 @@ Date: REGEX(.*)
 
 {
     "description": "three",
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -437,6 +452,19 @@ Date: REGEX(.*)
             }
         ]
     }
+}
+
+
+11. Update second subscription with no string description (fail)
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 67
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "description must be a string",
+    "error": "BadRequest"
 }
 
 

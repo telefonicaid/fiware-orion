@@ -63,7 +63,7 @@ payload='
         "attributes": ["temperature", "humidity"],
         "throttling": 5
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -213,7 +213,7 @@ payload='
         "attributes": ["temperature", "humidity"],
         "throttling": 5
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --json -X PATCH
@@ -246,7 +246,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -296,7 +296,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -348,7 +348,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -504,7 +504,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
