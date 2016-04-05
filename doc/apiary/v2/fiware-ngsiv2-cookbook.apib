@@ -666,9 +666,9 @@ This resource allows you to obtain a list of subresources published by the API:
 
 # Group Context Attributes
 
-## Context Entity Attributes [/v2/entities/{entityId}/attrs]
+## Attribute Collection [/v2/entities/{entityId}/attrs{?options}]
 
-### List all attributes [GET /v2/entities/{entityId}/attrs]
+### List all. Normalized Mode. [GET /v2/entities/{entityId}/attrs]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -676,77 +676,91 @@ This resource allows you to obtain a list of subresources published by the API:
 + Response 200 (application/json)
 
         {
-            "temperature": 21.7,
-            "humidity": 60,
+            "temperature": {
+               "type":     "number",
+               "value":    22.5,
+               "metadata": {
+                 "unitCode": {
+                    "type": "none",
+                    "value": "CEL"
+                 }
+               }
+            },
+            "humidity": {
+               "type": "number",
+               "value": 60,
+               "metadata": { }
+            },
             "location": {
-                "value":  "41.3763726, 2.1864475",
-                "type": "geo:point",
-                "crs": "WGS84"
+              "type": "geo:point",
+              "value": "41.3763726, 2.1864475",
+              "metadata": { }
             }
         }
 
-### Replace all attributes [PUT /v2/entities/{entityId}/attrs]
+
+### List all. keyValues Mode. [GET /v2/entities/{entityId}/attrs{?options}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + options: keyValues (optional, string) - flags that payload is in `keyValues`mode.
+
++ Response 200 (application/json)
+
+        {
+            "temperature": 21.7,
+            "humidity":    60,
+            "location":    "41.3763726, 2.1864475"
+        }
+
+        
+### Replace all. keyValues mode [PUT /v2/entities/{entityId}/attrs{?options}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + options: keyValues (optional, string) - flags that payload is in `keyValues`mode.
 
 + Request (application/json)
 
         {
             "temperature": 21.7,
-            "relativeHumidity": {
-                "value": 60,
-                "accuracy": 1
-            },
             "seatsNumber": 12
         }
 
 + Response 200
+        
 
+## Single Attribute [/v2/entities/{entityId}/attrs/{attrName}]
 
-### Get a single attribute, including type and metadata values [GET /v2/entities/{entityId}/attrs/{attrName}]
+### Get [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: illuminance (required, string) - Attribute to be retrieved.
+    + attrName: illuminance (required, string) - Attribute name.
 
 + Response 200 (application/json)
 
         {
             "value": 300,
             "type": "number",
-            "accuracy": 1.0,
-            "unitCode": "LX"
+            "metadata": {
+              "accuracy": {
+                "value": 1.0,
+                "type": "number"
+              },
+              "unitCode": {
+                "value": "LX",
+                "type":  "none"
+              }
+            }
         }
 
-### Get an attribute value as text [GET /v2/entities/{entityId}/attrs/{attrName}/value{?options}]
+
+### Get. Not exists [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-    + options: text (optional, string) - Indicates format as text
-
-+ Response 200 (text/plain)
-
-        300
-
-### Get an attribute value as JSON [GET /v2/entities/{entityId}/attrs/{attrName}/value]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-
-+ Response 200 (application/json)
-
-        {
-            "value": 300
-        }
-
-### Get an attribute. Not exists [GET /v2/entities/{entityId}/attrs/{attrName}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: mistake (required, string) - Attribute to be retrieved.
+    + attrName: mistake (required, string) - Attribute name.
 
 + Response 404 (application/json)
 
@@ -754,29 +768,85 @@ This resource allows you to obtain a list of subresources published by the API:
             "error": "NotFound",
             "description": "The entity does not have such an attribute"
         }
+        
 
-
-### Update an attribute [PUT /v2/entities/{entityId}/attrs/{attrName}]
+### Update [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute Name
+    + attrName: temperature (required, string) - Attribute name.
 
 + Request (application/json)
 
         {
             "value": 25.0,
-            "unitCode": "CEL"
+            "metadata": {
+               "unitCode": "CEL"
+            }
         }
 
 + Response 200
 
 
-### Update an attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+### Remove [DELETE /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute Name
+    + attrName: temperature (required, string) - Attribute name.
+
++ Response 204
+        
+
+## Attribute Value [/v2/entities/{entityId}/attrs/{attrName}/value]
+
+### Get. As text [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
+    
++ Request
+
+  + Headers
+
+      Accept: text/plain
+
++ Response 200 (text/plain)
+
+        300
+
+
+### Get. As JSON [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
+
++ Response 200 (application/json)
+
+        {
+            "value": 300
+        }
+
+
+### Update. As Text [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
+
++ Request (text/plain)
+
+        25.0
+
++ Response 200
+
+
+### Update. As JSON [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
 
 + Request (application/json)
 
@@ -785,15 +855,6 @@ This resource allows you to obtain a list of subresources published by the API:
         }
 
 + Response 200
-
-
-### Remove an attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute Name
-
-+ Response 204
 
 
 # Group Subscriptions
