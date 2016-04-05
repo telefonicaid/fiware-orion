@@ -1,6 +1,6 @@
 # Orion Context Broker Contribution Guide
 
-This document describes the guidelines to contribute to the Orion Context Broker open source repository. If you are
+This document describes the guidelines to contribute to Orion Context Broker. If you are
 planning to contribute to the code you should read this document and get familiar with its content.
 
 ## General principles
@@ -17,7 +17,7 @@ planning to contribute to the code you should read this document and get familia
   Orion Context Broker code.
 
 Note that contribution workflows themselves (e.g. pull requests, etc.) are described in another document 
-([FIWARE Development Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)). 
+([FIWARE Development Guidelines](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Developer_Guidelines)).
 
 ## Filesystem layout guidelines
 
@@ -668,7 +668,7 @@ If you plan to use some of them, please consult before with the core developers.
 * C++ exceptions 
   * Exceptions (not checked in C++) make it harder to follow the flow of execution. It is hard to say whether
   a function will throw an exception, complicating refactoring and debugging.
-  * Exception-safe functions requires assuring the transactional semantic is kept, (beyond RAII to avoid resource leaks), 
+  * Exception-safe functions requires ensuring the transactional semantic is kept, (beyond RAII to avoid resource leaks),
   making the code error-prone due to subtle interactions. It gets worse in a multithreaded environment.
   * The flavor of this project is biased to C clearly. Many plain C libraries are used and mixing exceptions and
   traditional if-checking method should be avoided as much as possible.

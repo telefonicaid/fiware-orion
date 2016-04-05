@@ -145,7 +145,7 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * Container-based deployment
   * [Docker](docker/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
-* [Contribution guide](doc/manuals/contribution_guide.md), specially important if you plan to contribute with code 
+* [Contribution guidelines](doc/manuals/contribution_guidelines.md), especially important if you plan to contribute with code
   to Orion Context Broker
 * [Deprecated features](doc/manuals/deprecated.md)
 
