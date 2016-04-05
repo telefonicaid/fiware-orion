@@ -164,3 +164,34 @@ const char *ws_parser_message
 
   return json;
 }
+
+const char *ws_parser_notify
+(
+ const std::string& subId,
+ const std::map<std::string, std::string>& headers,
+ const std::string &data
+)
+{
+  const char* tmpl = "{\"subscriptionId\": \"%s\", \"headers\": %s, \"data\": %s}";
+
+
+  rapidjson::StringBuffer buff;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buff);
+  writer.StartObject();
+  std::map<std::string, std::string>::const_iterator it = headers.begin();
+  while (it != headers.end())
+  {
+    writer.Key(it->first.c_str());
+    writer.String(it->second.c_str());
+    ++it;
+  }
+  writer.EndObject();
+
+  const char* strHeaders = buff.GetString();
+
+  size_t size = subId.size() + data.size() + strlen(strHeaders) + strlen(tmpl) - 6 + 1;
+  char *json = (char *) malloc(size);
+  sprintf(json, tmpl, subId.c_str(), strHeaders, data.c_str());
+
+  return json;
+}

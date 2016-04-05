@@ -29,18 +29,8 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 
-
-// FIXME P11 #1669: remove this stub when the actual sendNotifyContextRequestWs() gets developed a the end. @fortizc please take care of this
-// in the ws library
-int sendNotifyContextRequestWs(const std::string& subId, const std::map<std::string, std::string>& headers, const std::string& data)
-{
-  return 0;
-}
-
-
-// FIME P11 #1669: move this to WS library. @fortizc please take care of this
-#define WS_SCHEME         "ws://"
-#define WS_SCHEME_LENGTH  5
+#include "orion_websocket/constants.h"
+#include "orion_websocket/wsNotify.h"
 
 
 /* ****************************************************************************
@@ -73,7 +63,7 @@ void* startSenderThread(void* p)
       std::string  out;
       int          r;
 
-      if (params->protocol == WS_SCHEME)
+      if (params->protocol == WSConstants::Scheme)
       {
         std::map<std::string, std::string> headers;
         headers.insert(std::make_pair("Fiware-Service",     params->tenant));

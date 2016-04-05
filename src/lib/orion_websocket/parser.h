@@ -27,6 +27,7 @@
 #define WS_PARSER_H
 
 #include <vector>
+#include <map>
 #include <string>
 
 class HttpHeaders;
@@ -49,6 +50,13 @@ const char *ws_parser_message
  const std::vector<std::string> headName,
  const std::vector<std::string> headValue,
  int                 statusCode
+);
+
+const char *ws_parser_notify
+(
+ const std::string& subId,
+ const std::map<std::string, std::string>& headers,
+ const std::string& data
 );
 
 #endif

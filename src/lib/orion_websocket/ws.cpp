@@ -26,6 +26,7 @@
 #include "ws.h"
 #include "constants.h"
 #include "parser.h"
+#include "wsNotify.h"
 
 #include "rest/RestService.h"
 
@@ -36,6 +37,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <vector>
 
 #include <pthread.h>
 
@@ -53,10 +55,40 @@ struct _orion_websocket
 // Private struct for persistent data
 typedef struct
 {
+  std::vector<std::string> notify;
   char *message;
   char *request;
   int index;
 }data;
+
+static bool isSubscription
+(
+ const std::vector<std::string>& headName,
+ const std::vector<std::string>& headValue,
+ std::string& subId
+)
+{
+  for (unsigned i = 0; i < headName.size(); ++i)
+  {
+    if (headName[i] != "Location")
+      continue;
+
+    size_t pos = headValue[i].find("subscriptions");
+    if (pos == std::string::npos)
+      return false;
+
+    pos = headValue[i].find_last_of('/');
+    if (pos == std::string::npos)
+      return false;
+
+    char buff[25];
+    headValue[i].copy(buff, 24, pos + 1);
+    buff[24] = 0;
+    subId = std::string(buff);
+    return true;
+  }
+  return false;
+}
 
 static int wsCallback(lws * ws,
                       enum lws_callback_reasons reason,
@@ -71,12 +103,14 @@ static int wsCallback(lws * ws,
   {
     case LWS_CALLBACK_ESTABLISHED:
     {
+      dat->notify.clear();
       dat->request = NULL;
       dat->index = 0;
       break;
     }
     case LWS_CALLBACK_CLOSED:
     {
+      removeSenders(dat->notify);
       break;
     }
 
@@ -120,6 +154,12 @@ static int wsCallback(lws * ws,
         const char *restMsg = restService(ci, orionServices).c_str();
         dat->message = strdup(ws_parser_message(restMsg, ci->httpHeaders, ci->httpHeader, ci->httpHeaderValue, (int)ci->httpStatusCode));
 
+        std::string subId;
+        if (isSubscription(ci->httpHeader, ci->httpHeaderValue, subId))
+        {
+          addSender(subId, ws);
+          dat->notify.push_back(subId);
+        }
 
         delete ci;
         free(dat->request);

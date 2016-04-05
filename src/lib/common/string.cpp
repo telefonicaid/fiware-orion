@@ -242,6 +242,10 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     return false;
   }
 
+ if (url == "ws://")
+ {
+    return true;
+ }
 
   /* http://some.host.com/my/path
    *      ^^             ^  ^

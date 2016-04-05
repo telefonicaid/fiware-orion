@@ -35,10 +35,7 @@
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/Notifier.h"
 
-
-// FIME P11 #1669: move this to WS library. @fortizc please take care of this
-#define WS_SCHEME         "ws://"
-#define WS_SCHEME_LENGTH  5
+#include "orion_websocket/constants.h"
 
 
 /* ****************************************************************************
@@ -99,10 +96,10 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string  uriPath;
     std::string  protocol;
 
-    if ((url.length() == WS_SCHEME_LENGTH) && (url.find(WS_SCHEME) == 0))
+    if ((url.length() == WSConstants::Scheme.size()) && (url.find(WSConstants::Scheme) == 0))
     {
       // In this case host, port and uriPath are not needed, as the WS library has all the connection information related with the WS
-      protocol = WS_SCHEME;
+      protocol = WSConstants::Scheme;
     }
     else
     {
