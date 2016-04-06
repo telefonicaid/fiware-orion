@@ -185,6 +185,14 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
 {
   std::string r;
 
+  if (!subject.IsObject())
+  {
+    OrionError oe(SccBadRequest, "subject is not an object");
+
+    alarmMgr.badInput(clientIp, "subject is not an object");
+    return oe.render(ciP, "");
+
+  }
   // Entities
   if (!subject.HasMember("entities"))
   {
@@ -193,14 +201,13 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     alarmMgr.badInput(clientIp, "no subject entities specified");
     return oe.render(ciP, "");
   }
-  else
+
+  r = parseEntitiesVector(ciP, &scrP->entityIdVector, subject["entities"] );
+  if (r != "")
   {
-    r = parseEntitiesVector(ciP, &scrP->entityIdVector, subject["entities"]);
-    if (r != "")
-    {
-      return r;
-    }
+    return r;
   }
+
 
   // Condition
   if (!subject.HasMember("condition"))
@@ -210,16 +217,18 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     alarmMgr.badInput(clientIp, "no subject condition specified");
     return oe.render(ciP, "");
   }
-  else
-  {
-    r = parseNotifyConditionVector(ciP, scrP, subject["condition"]);
-    if (r != "")
-    {
-      return r;
-    }
-  }
 
-  return "";
+  const Value& condition = subject["condition"];
+  if (!condition.IsObject())
+  {
+    OrionError oe(SccBadRequest, "condition is not an object");
+
+    alarmMgr.badInput(clientIp, "condition is not an object");
+    return oe.render(ciP, "");
+  }
+  r = parseNotifyConditionVector(ciP, scrP, condition );
+
+  return r;
 }
 
 
@@ -338,6 +347,15 @@ static std::string parseEntitiesVector(ConnectionInfo* ciP, EntityIdVector* eivP
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextRequest* scrP, const Value& notification)
 {
+  if (!notification.IsObject())
+  {
+    OrionError oe(SccBadRequest, "notitication is not an object");
+
+    alarmMgr.badInput(clientIp, "notification is not an object");
+    return oe.render(ciP, "");
+
+  }
+
   // Callback
   if (notification.HasMember("callback"))
   {
@@ -377,15 +395,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
 
     return oe.render(ciP, "");
   }
-  else
-  {
-    std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attributes"]);
 
-    if (r != "")
-    {
-      return r;
-    }
+  std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attributes"]);
+
+  if (r != "")
+  {
+    return r;
   }
+
 
   // Throttling
   if (notification.HasMember("throttling"))
@@ -419,6 +436,13 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 {
   NotifyConditionVector* ncvP = &scrP->notifyConditionVector;
 
+  if (!condition.IsObject())
+  {
+    alarmMgr.badInput(clientIp, "condition is not an object");
+    OrionError oe(SccBadRequest, "condition is not an object");
+
+    return oe.render(ciP, "");
+  }
   // Attributes
   if (!condition.HasMember("attributes"))
   {
@@ -431,6 +455,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
   NotifyCondition* nc = new NotifyCondition();
   nc->type = ON_CHANGE_CONDITION;
   ncvP->push_back(nc);
+
   std::string r = parseAttributeList(ciP, &nc->condValueList.vec, condition["attributes"]);
 
   if (r != "")
@@ -440,12 +465,29 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
   if (condition.HasMember("expression"))
   {
-    scrP->expression.isSet  = true;
     const Value& expression = condition["expression"];
+
+    if (!expression.IsObject())
+    {
+      alarmMgr.badInput(clientIp, "expression is not an object");
+      OrionError oe(SccBadRequest, "expression is not an object");
+
+      return oe.render(ciP, "");
+    }
+
+    scrP->expression.isSet = true;
 
     if (expression.HasMember("q"))
     {
-      scrP->expression.q = expression["q"].GetString();  // Used when rendering the Subscription
+      const Value& q = expression["q"];
+      if (!q.IsString())
+      {
+        alarmMgr.badInput(clientIp, "q is not a string");
+        OrionError oe(SccBadRequest, "q is not a string");
+
+        return oe.render(ciP, "");
+      }
+      scrP->expression.q = q.GetString();
 
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
@@ -460,15 +502,39 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
     }
     if (expression.HasMember("geometry"))
     {
-      scrP->expression.geometry = expression["geometry"].GetString();
+      const Value& geometry = expression["geometry"];
+      if (!geometry.IsString())
+      {
+        alarmMgr.badInput(clientIp, "geometry is not a string");
+        OrionError oe(SccBadRequest, "geometry is not a string");
+
+        return oe.render(ciP, "");
+      }
+      scrP->expression.geometry = geometry.GetString();
     }
     if (expression.HasMember("coords"))
     {
-      scrP->expression.coords = expression["coords"].GetString();
+      const Value& coords = expression["coords"];
+      if (!coords.IsString())
+      {
+        alarmMgr.badInput(clientIp, "coords is not a string");
+        OrionError oe(SccBadRequest, "coords is not a string");
+
+        return oe.render(ciP, "");
+      }
+      scrP->expression.coords = coords.GetString();
     }
     if (expression.HasMember("georel"))
     {
-      scrP->expression.georel = expression["georel"].GetString();
+      const Value& georel = expression["georel"];
+      if (!georel.IsString())
+      {
+        alarmMgr.badInput(clientIp, "georel is not a string");
+        OrionError oe(SccBadRequest, "georel is not a string");
+
+        return oe.render(ciP, "");
+      }
+      scrP->expression.georel = georel.GetString();
     }
   }
 
@@ -485,6 +551,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 static std::string parseAttributeList(ConnectionInfo* ciP, std::vector<std::string>* vec, const Value& attributes)
 {
   std::set<std::string> s;
+
 
   if (!attributes.IsArray())
   {

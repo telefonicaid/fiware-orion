@@ -44,7 +44,7 @@ Feature: update attributes by entity ID if it exists using NGSI v2. "PATCH" - /v
   Setup: delete database in mongo
 
   Actions After the Feature:
-  #Setup: stop ContextBroker
+  Setup: stop ContextBroker
 
   @happy_path
   Scenario:  update attributes by entity ID if it exists using NGSI v2
