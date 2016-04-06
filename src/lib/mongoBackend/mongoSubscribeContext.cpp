@@ -221,7 +221,6 @@ HttpStatusCode mongoSubscribeContext
     LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
 
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-    LM_W(("Calling subCacheItemInsert with status == %s", status.c_str()));
     subCacheItemInsert(tenant.c_str(),
                        servicePath.c_str(),
                        requestP,
