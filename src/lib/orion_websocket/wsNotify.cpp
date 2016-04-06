@@ -35,17 +35,26 @@ int sendNotifyContextRequestWs
   if (it == client.end())
     return 1;
 
-  size_t size = strlen(msg) +
+  int msg_size = strlen(msg);
+  size_t size = msg_size +
                 LWS_SEND_BUFFER_PRE_PADDING +
                 LWS_SEND_BUFFER_POST_PADDING;
 
   unsigned char *buff = (unsigned char *) malloc(size);
   unsigned char *p = &buff[LWS_SEND_BUFFER_PRE_PADDING];
   sprintf((char *)p, "%s", msg);
-  int result = lws_write(it->second, p, strlen(msg), LWS_WRITE_TEXT);
+
+  int written = 0;
+
+  while (written < msg_size)
+  {
+    written += lws_write(it->second, (p + written), strlen(msg), LWS_WRITE_TEXT);
+    if (written == -1)
+        return 1;
+  }
 
   free((char *)msg);
   free(buff);
 
-  return result < 0;
+  return 0;
 }
