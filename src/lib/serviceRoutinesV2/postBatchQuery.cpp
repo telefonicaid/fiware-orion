@@ -53,7 +53,6 @@
 *   - limit=NUMBER
 *   - offset=NUMBER
 *   - options=count,keyValues
-*   - q
 */
 std::string postBatchQuery
 (
@@ -65,7 +64,6 @@ std::string postBatchQuery
 {
   BatchQuery*           bqP  = &parseDataP->bq.res;
   QueryContextRequest*  qcrP = &parseDataP->qcr.res;
-  std::string           q    = ciP->uriParam[URI_PARAM_Q];
   Entities              entities;
   std::string           answer;
 

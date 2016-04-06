@@ -52,7 +52,6 @@
 *
 * URI parameters
 *   - notifyFormat=XXX    (used by mongoBackend)
-*   - q
 */
 std::string postSubscribeContext
 (
