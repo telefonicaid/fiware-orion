@@ -1278,7 +1278,6 @@ static bool addTriggeredSubscriptions_noCache
             delete stringFilterP;
           
             LM_E(("Runtime Error (%s)", err.c_str()));
-            TIME_STAT_MONGO_READ_WAIT_STOP();
             releaseMongoConnection(connection);
             return false;
           }
