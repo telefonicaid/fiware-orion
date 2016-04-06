@@ -34,6 +34,10 @@
 #include "logMsg/traceLevels.h"
 #include "rest/RestService.h"
 
+#include "ngsi10/UnsubscribeContextRequest.h"
+#include "ngsi10/UnsubscribeContextResponse.h"
+#include "mongoBackend/mongoUnsubscribeContext.h"
+
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
@@ -55,7 +59,10 @@ struct _orion_websocket
 // Private struct for persistent data
 typedef struct
 {
+  // SubId
   std::vector<std::string> notify;
+  // Teanat for each subId
+  std::vector<std::string> tenant;
   char *message;
   char *request;
   int index;
@@ -104,6 +111,7 @@ static int wsCallback(lws * ws,
     case LWS_CALLBACK_ESTABLISHED:
     {
       dat->notify.clear();
+      dat->tenant.clear();
       dat->request = NULL;
       dat->index = 0;
       break;
@@ -111,6 +119,16 @@ static int wsCallback(lws * ws,
     case LWS_CALLBACK_CLOSED:
     {
       removeSenders(dat->notify);
+
+      // Remove all subscriptions from DB
+      for (unsigned i = 0; i < dat->notify.size(); ++i)
+      {
+        UnsubscribeContextRequest req;
+        UnsubscribeContextResponse rsp;
+        req.subscriptionId.set(dat->notify[i]);
+        mongoUnsubscribeContext(&req, &rsp, dat->tenant[i]);
+      }
+
       break;
     }
 
@@ -159,6 +177,7 @@ static int wsCallback(lws * ws,
         {
           addSender(subId, ws);
           dat->notify.push_back(subId);
+          dat->tenant.push_back(ci->tenant);
         }
 
         delete ci;
