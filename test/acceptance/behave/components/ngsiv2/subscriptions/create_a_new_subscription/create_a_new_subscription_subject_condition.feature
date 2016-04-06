@@ -39,7 +39,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
   Check: verify mongo is installed successfully
 
   Actions After each Scenario:
-  #Setup: delete database in mongo
+  Setup: delete database in mongo
 
   Actions After the Feature:
   Setup: stop ContextBroker
@@ -408,6 +408,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     And verify that the subscription is stored in mongo
 
   # ------------ subject - condition - expression - q ---------------------
+  @condition_expression_q.row<row.id>
   @condition_expression_q
   Scenario Outline: create a new subscription using NGSI v2 with "q" condition expression and several values
     Given  a definition of headers
