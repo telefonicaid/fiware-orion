@@ -109,8 +109,7 @@ echo
 
 echo "09. GET /v2/entities/E1 with ALL illegal char in URI param 'q' - ok"
 echo "==================================================================="
-#orionCurl --url "/v2/entities/E2?q=a<>=>()\'\""  --json
-orionCurl --url '/v2/entities/E2?q=a<>\"()=;'\'  --json
+orionCurl --url '/v2/entities/E2?q=a==<>\"()=;'\'  --json
 echo
 echo
 

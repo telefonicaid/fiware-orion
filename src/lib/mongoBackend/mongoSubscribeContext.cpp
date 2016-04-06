@@ -138,10 +138,28 @@ HttpStatusCode mongoSubscribeContext
 
     /* Build attributes array */
     BSONArrayBuilder attrs;
-    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList[ix]);
+    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
+    {
+      attrs.append(requestP->attributeList[ix]);
     }
     sub.append(CSUB_ATTRS, attrs.arr());
+
+
+    //
+    // StringFilter in Scope?
+    //
+    // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+    // If so, set it as string filter to the sub-cache item
+    //
+    StringFilter*  stringFilterP = NULL;
+
+    for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+    {
+      if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+      {
+        stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+      }
+    }
 
     /* Adding status */
     std::string status = requestP->status == ""?  STATUS_ACTIVE : requestP->status;
@@ -158,8 +176,9 @@ HttpStatusCode mongoSubscribeContext
                                              tenant,
                                              xauthToken,
                                              servicePathV,
-                                             requestP->expression.q,
+                                             &requestP->restriction,
                                              status);
+
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */
@@ -193,6 +212,7 @@ HttpStatusCode mongoSubscribeContext
       return SccOk;
     }
 
+
     //
     // 3. Create Subscription for the cache
     //
@@ -210,6 +230,7 @@ HttpStatusCode mongoSubscribeContext
                        JSON,
                        notificationDone,
                        lastNotificationTime,
+                       stringFilterP,
                        status,
                        requestP->expression.q,
                        requestP->expression.geometry,

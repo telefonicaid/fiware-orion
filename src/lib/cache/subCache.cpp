@@ -33,6 +33,7 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
+#include "alarmMgr/alarmMgr.h"
 
 using std::map;
 
@@ -663,6 +664,7 @@ void subCacheItemInsert
   Format                    notifyFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
+  StringFilter*             stringFilterP,
   const std::string&        status,
   const std::string&        q,
   const std::string&        geometry,
@@ -721,6 +723,11 @@ void subCacheItemInsert
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
+
+  if (stringFilterP != NULL)
+  {
+    cSubP->expression.stringFilter = *stringFilterP;  // Object copy
+  }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
@@ -995,8 +1002,8 @@ void subCacheRefresh(void)
 */
 typedef struct CachedSubSaved
 {
-  long long  lastNotificationTime;
-  long long  count;
+  long long    lastNotificationTime;
+  long long    count;
 } CachedSubSaved;
 
 
@@ -1047,7 +1054,7 @@ void subCacheSync(void)
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
 
-    savedSubV[cSubP->subscriptionId]= cssP;
+    savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
   }
 

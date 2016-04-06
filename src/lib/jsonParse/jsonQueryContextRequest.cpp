@@ -234,6 +234,19 @@ static std::string scopeValue(const std::string& path, const std::string& value,
     // Mark the value of the scope to be of complex nature, v2
     reqDataP->qcr.scopeP->value = FIWARE_LOCATION_V2;
   }
+  else if (reqDataP->qcr.scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
+  {
+    std::string errorString;
+
+    reqDataP->qcr.scopeP->value = value;
+
+    bool b = reqDataP->qcr.scopeP->stringFilter.parse(value.c_str(), &errorString);
+
+    if (b != true)
+    {
+      return errorString;
+    }
+  }
   else
   {
     reqDataP->qcr.scopeP->value = value;

@@ -223,7 +223,6 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     }
 
     destination->status = statusString;
-
   }
 
   return "OK";
@@ -281,7 +280,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     alarmMgr.badInput(clientIp, "condition is not an object");
     return oe.render(ciP, "");
   }
-  r = parseNotifyConditionVector(ciP, scrP, condition );
+  r = parseNotifyConditionVector(ciP, scrP, condition);
 
   return r;
 }
@@ -543,6 +542,17 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
         return oe.render(ciP, "");
       }
       scrP->expression.q = q.GetString();
+
+      std::string  errorString;
+      Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
+
+      if (scopeP->stringFilter.parse(scopeP->value.c_str(), &errorString) == false)
+      {
+        delete scopeP;
+        return errorString;
+      }
+
+      scrP->restriction.scopeVector.push_back(scopeP);
     }
     if (expression.HasMember("geometry"))
     {

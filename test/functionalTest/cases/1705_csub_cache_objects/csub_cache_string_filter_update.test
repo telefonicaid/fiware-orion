@@ -1,0 +1,357 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Sub cache string filter update
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create a subscription with q-string-filter q1
+# 02. Create entity E1 that matches q1
+# 03. Create entity E2 that doesn't match q1
+# 04. See notification of E1 in accumulator
+# 05. Update subscription with q-string-filter q2
+# 06. Create entity E3 that matches the old q1
+# 07. See no new notification in accumulator (only E1)
+# 08. Create entity E4 that matches q2
+# 09. See two notifications in accumulator (E1 and E4)
+#
+
+echo "01. Create a subscription with q-string-filter q1"
+echo "================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "E.*"
+      }
+    ],
+    "condition": {
+      "attributes": [ "A1" ],
+      "expression": {
+        "q": "A1<10"
+      }
+    }
+  },
+  "notification": {
+    "callback": "http://localhost:'$LISTENER_PORT'/notify",
+    "attributes": [ "A1" ]
+  },
+  "expires": "2026-04-05T14:00:00.00Z"
+}'
+orionCurl --url "/v2/subscriptions" --payload "$payload" --json
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Create entity E1 that matches q1"
+echo "===================================="
+payload='{
+  "id": "E1",
+  "A1": 9
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Create entity E2 that doesn't match q1"
+echo "=========================================="
+payload='{
+  "id": "E2",
+  "A1": 10
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "04. See notification of E1 in accumulator"
+echo "========================================="
+accumulatorDump
+echo
+echo
+
+
+echo "05. Update subscription with q-string-filter q2"
+echo "==============================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "E.*"
+      }
+    ],
+    "condition": {
+      "attributes": [ "A1" ],
+      "expression": {
+        "q": "A1>10"
+      }
+    }
+  }
+}'
+orionCurl --url "/v2/subscriptions/$subId" --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "06. Create entity E3 that matches the old q1"
+echo "============================================"
+payload='{
+  "id": "E3",
+  "A1": 8
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "07. See no new notification in accumulator (only E1)"
+echo "===================================================="
+accumulatorDump
+echo
+echo
+
+
+echo "08. Create entity E4 that matches q2"
+echo "===================================="
+payload='{
+  "id": "E4",
+  "A1": 11
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "09. See two notifications in accumulator (E1 and E4)"
+echo "===================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with q-string-filter q1
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+02. Create entity E1 that matches q1
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=none
+Date: REGEX(.*)
+
+
+
+03. Create entity E2 that doesn't match q1
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=none
+Date: REGEX(.*)
+
+
+
+04. See notification of E1 in accumulator
+=========================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 461
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : 9
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+05. Update subscription with q-string-filter q2
+===============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Create entity E3 that matches the old q1
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=none
+Date: REGEX(.*)
+
+
+
+07. See no new notification in accumulator (only E1)
+====================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 461
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : 9
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+08. Create entity E4 that matches q2
+====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=none
+Date: REGEX(.*)
+
+
+
+09. See two notifications in accumulator (E1 and E4)
+====================================================
+POST http://localhost:9997/notify
+Content-Length: 461
+User-Agent: orion/1.0.0-next libcurl/7.19.7
+Host: localhost:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : 9
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:9997/notify
+Content-Length: 462
+User-Agent: orion/1.0.0-next libcurl/7.19.7
+Host: localhost:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E4",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : 11
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

@@ -84,7 +84,6 @@ payload='
 orionCurl --url /v2/subscriptions --payload "$payload" --json
 echo
 echo
-sleep 1s
 
 
 echo "03. At t_1: modify entity E1 (not notif)"
@@ -95,7 +94,6 @@ payload='{
 orionCurl --url /v2/entities/E1?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1s
 
 
 echo "04. At t_2: modify entity E1 (not notif)"
@@ -106,8 +104,9 @@ payload='{
 orionCurl --url /v2/entities/E1?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 0.8s    # to avoid "edge effect"
 
+
+sleep 3s
 
 echo "05. At t_3: modify entity E1 (notif)"
 echo "===================================="
@@ -117,7 +116,6 @@ payload='{
 orionCurl --url /v2/entities/E1?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1s
 
 
 echo "06. At t_4: modify entity E1 (notif)"

@@ -27,13 +27,21 @@ Federation
 dbInit CP1
 dbInit CP2
 dbInit CP3
-brokerStart CP1
-brokerStart CP2
-brokerStart CP3
+brokerStart CP1 0
+brokerStart CP2 0
+brokerStart CP3 0
 
 --SHELL--
-echo "0.1.Send a subscribe to CP1"
-echo "==============================================================="
+
+#
+# 01. Make CP2 subscribe to entity Room/Room1 in CP1
+# 02. Make CP3 subscribe to entity Room/Room1 in CP2
+# 03. Create an entity Room/Room1, attribute temperature in CP1 (CP2 should get informed and after that CP3 also)
+# 04. Query CP3 for entity Room/Room1, to make sure the entity has propagated CP1->CP2->CP3
+#
+
+echo "01. Make CP2 subscribe to entity Room/Room1 in CP1"
+echo "=================================================="
 payload='{
     "entities": [
         {
@@ -59,8 +67,8 @@ orionCurl --url /v1/subscribeContext --payload "$payload" --json --port $CP1_POR
 echo
 echo
 
-echo "0.2.Send a subscribe to CP2"
-echo "==============================================================="
+echo "02. Make CP3 subscribe to entity Room/Room1 in CP2"
+echo "=================================================="
 payload='{
     "entities": [
         {
@@ -80,14 +88,13 @@ payload='{
         }
     ],
     "throttling": "PT5S"
-
 }'
 orionCurl --url /v1/subscribeContext --payload "$payload" --json --port $CP2_PORT
 echo
 echo
 
-echo "0.3.Create an entity in context broker CP1"
-echo "==============================================================="
+echo "03. Create an entity Room/Room1, attribute temperature in CP1 (CP2 should get informed and after that CP3 also)"
+echo "==============================================================================================================="
 payload='{
     "contextElements": [
         {
@@ -109,8 +116,8 @@ orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
 echo
 
 
-echo "0.4.Query to context broker CP3"
-echo "==============================================================="
+echo "04. Query CP3 for entity Room/Room1, to make sure the entity has propagated CP1->CP2->CP3"
+echo "========================================================================================="
 url="/v1/queryContext"
 payload='{
     "entities": [
@@ -125,8 +132,8 @@ orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP2_PORT
 echo
 
 --REGEXPECT--
-0.1.Send a subscribe to CP1
-===============================================================
+01. Make CP2 subscribe to entity Room/Room1 in CP1
+==================================================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
@@ -141,8 +148,8 @@ Date: REGEX(.*)
 }
 
 
-0.2.Send a subscribe to CP2
-===============================================================
+02. Make CP3 subscribe to entity Room/Room1 in CP2
+==================================================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
@@ -157,8 +164,8 @@ Date: REGEX(.*)
 }
 
 
-0.3.Create an entity in context broker CP1
-===============================================================
+03. Create an entity Room/Room1, attribute temperature in CP1 (CP2 should get informed and after that CP3 also)
+===============================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 396
 Content-Type: application/json
@@ -187,8 +194,8 @@ Date: REGEX(.*)
     ]
 }
 
-0.4.Query to context broker CP3
-===============================================================
+04. Query CP3 for entity Room/Room1, to make sure the entity has propagated CP1->CP2->CP3
+=========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 398
 Content-Type: application/json

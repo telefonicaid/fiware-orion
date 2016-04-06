@@ -54,10 +54,9 @@
 #include "mongoBackend/location.h"
 
 #include "cache/subCache.h"
-
+#include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
-
 
 using std::string;
 using std::map;
@@ -1014,12 +1013,11 @@ static bool addTriggeredSubscriptions_withCache
   const std::vector<std::string>&           servicePathV
 )
 {  
-  std::string   servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
+  std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
-
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
@@ -1090,13 +1088,12 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
 
-    sub->fillExpression(cSubP->expression.q, cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
-
+    sub->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
+    sub->stringFilterSet(&cSubP->expression.stringFilter);
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
   cacheSemGive(__FUNCTION__, "match subs for notifications");
-
   return true;
 }
 
@@ -1269,7 +1266,27 @@ static bool addTriggeredSubscriptions_noCache
         std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
         std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
 
-        trigs->fillExpression(q, georel, geometry, coords);
+        trigs->fillExpression(georel, geometry, coords);
+
+        // Parsing q
+        if (q != "")
+        {
+          StringFilter* stringFilterP = new StringFilter();
+
+          if (stringFilterP->parse(q.c_str(), &err) == false)
+          {
+            delete stringFilterP;
+          
+            LM_E(("Runtime Error (%s)", err.c_str()));
+            releaseMongoConnection(connection);
+            return false;
+          }
+          else
+          {
+            trigs->stringFilterSet(stringFilterP);  // Clones the string filter
+            delete stringFilterP;
+          }
+        }
       }
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
@@ -1382,23 +1399,6 @@ static bool processOnChangeConditionForUpdateContext
 
 /* ****************************************************************************
 *
-* matchExpression
-*/
-static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
-{
-  if (q == "")
-  {
-    return true;
-  }
-
-  std::vector<BSONObj> filters;   // not really used, just to match qStringFilters signature
-  return qStringFilters(q, filters, cerP);
-}
-
-
-
-/* ****************************************************************************
-*
 * processSubscriptions - send a notification for each subscription in the map
 */
 static bool processSubscriptions
@@ -1418,6 +1418,7 @@ static bool processSubscriptions
   {
     std::string             mapSubId  = it->first;
     TriggeredSubscription*  trigs     = it->second;
+
 
     /* There are some checks to perform on TriggeredSubscription in order to see if the notification has to be actually sent. Note
      * that checks are done in increasing cost order (e.g. georel check is done at the end).
@@ -1441,8 +1442,8 @@ static bool processSubscriptions
       }
     }
 
-    /* Check 2: expression (q) */
-    if (!matchExpression(notifyCerP, trigs->expression.q))
+    /* Check 2: String Filter */
+    if (!trigs->stringFilter.match(notifyCerP))
     {
       continue;
     }
@@ -2532,6 +2533,7 @@ static void updateEntity
 
     return;
   }
+
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
@@ -2663,6 +2665,7 @@ static void updateEntity
   //
   releaseTriggeredSubscriptions(subsToNotify);
 
+
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
   searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
@@ -2780,9 +2783,8 @@ void processContextElement
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+  EntityId*          enP               = &ceP->entityId;
   BSONObjBuilder     bob;
-
-  EntityId* enP = &ceP->entityId;
 
   bob.append(idString, enP->id);
 
@@ -2845,8 +2847,8 @@ void processContextElement
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
-        buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
-        return;
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
+      return;
     }
 
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist

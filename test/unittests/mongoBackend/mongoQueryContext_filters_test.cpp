@@ -269,11 +269,17 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en(".*", "T", "true");
-    Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running");
+    EntityId     en(".*", "T", "true");
+    Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running");
+    std::string  errorString;
+    bool         b;
+
+    b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+    EXPECT_EQ("", errorString);
+    EXPECT_EQ(true, b);
+
     req.entityIdVector.push_back(&en);
     req.restriction.scopeVector.push_back(&sc);
-
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
@@ -309,8 +315,15 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==27");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -359,8 +372,15 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running,error");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running,error");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -400,8 +420,15 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==31,17.8,22");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==31,17.8,22");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -451,8 +478,15 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -492,8 +526,15 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=31");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=31");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -545,8 +586,15 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running,error");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running,error");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -561,7 +609,7 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);
@@ -585,8 +633,15 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=24,26.5,28");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=24,26.5,28");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -637,8 +692,15 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N>26");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N>26");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -689,8 +751,15 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=27");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -740,8 +809,15 @@ TEST(mongoQueryContextRequest_filters, lessThan_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N<27");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N<27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -792,8 +868,15 @@ TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N<=24");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N<=24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -843,8 +926,15 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==17..24");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==17..24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -894,8 +984,15 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=17..24");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=17..24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -946,8 +1043,15 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   prepareDatabase(true);
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -989,8 +1093,15 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   prepareDatabase(true);
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "!S");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "!S");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1035,8 +1146,15 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "colour=='black,white','red,blue'");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "colour=='black,white','red,blue'");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1075,8 +1193,15 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running;N<27");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running;N<27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1114,8 +1239,15 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=17;N<=24");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=17;N<=24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
@@ -1154,8 +1286,15 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==16.99..24.1");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==16.99..24.1");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 

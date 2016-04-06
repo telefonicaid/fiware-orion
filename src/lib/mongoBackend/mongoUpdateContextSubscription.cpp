@@ -57,7 +57,7 @@ HttpStatusCode mongoUpdateContextSubscription
     const std::string&                  xauthToken,
     const std::vector<std::string>&     servicePathV,
     std::string                         version
-    )
+)
 { 
   bool          reqSemTaken;
 
@@ -109,7 +109,8 @@ HttpStatusCode mongoUpdateContextSubscription
    */
   BSONObjBuilder newSub;
 
-  if (version != "v2") {
+  if (version != "v2")
+  {
     /* Entities, attribute list and reference are not updatable, so they are appended directly */
     newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
     newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
@@ -130,7 +131,7 @@ HttpStatusCode mongoUpdateContextSubscription
     newSub.append(CSUB_REFERENCE, ref);
 
     // Entities
-    if (requestP->entityIdVector.size() >0)
+    if (requestP->entityIdVector.size() > 0)
     {
       /* Build entities array */
       BSONArrayBuilder entities;
@@ -157,7 +158,7 @@ HttpStatusCode mongoUpdateContextSubscription
       newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
     }
 
-    //Attributes
+    // Attributes
     if (requestP->attributeList.size() > 0)
     {
       /* Build attributes array */
@@ -171,7 +172,6 @@ HttpStatusCode mongoUpdateContextSubscription
     {
       newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
     }
-
   }
 
   /* Expiration */
@@ -225,6 +225,24 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
+
+  //
+  // StringFilter in Scope?
+  //
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+  // If so, set it as string filter to the sub-cache item
+  //
+  StringFilter*  stringFilterP = NULL;
+
+  for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+  {
+    if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+    }
+  }
+  
+
   /* Description */
   if (requestP->descriptionProvided)
   {
@@ -258,13 +276,15 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   newSub.append(CSUB_STATUS, status);
 
+
   /* Notify conditions */
   bool notificationDone = false;
-  if (requestP->notifyConditionVector.size() == 0) {
+  if (requestP->notifyConditionVector.size() == 0)
+  {
     newSub.appendArray(CSUB_CONDITIONS, getFieldF(sub, CSUB_CONDITIONS).embeddedObject());
   }
-  else {
-
+  else
+  {
       /* Build conditions array (including side-effect notifications and threads creation)
        * In order to do so, we have to create and EntityIdVector and AttributeList from sub
        * document, given the processConditionVector() signature */
@@ -272,7 +292,7 @@ HttpStatusCode mongoUpdateContextSubscription
        AttributeList attrL;
        if (version == "v1")
        {
-         enV = subToEntityIdVector(sub);
+         enV   = subToEntityIdVector(sub);
          attrL = subToAttributeList(sub);
        }
        else // v2
@@ -309,8 +329,9 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
-                                                requestP->expression.q,
+                                                &requestP->restriction,
                                                 status);
+
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
@@ -320,7 +341,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
 
-  // Expresssion
+  // Expression
   if (requestP->expression.isSet)
   {
     /* Build expression */
@@ -466,7 +487,7 @@ HttpStatusCode mongoUpdateContextSubscription
   char* servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
-
+  
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,
@@ -477,7 +498,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                           requestP->expression.q,
                                           requestP->expression.geometry,
                                           requestP->expression.coords,
-                                          requestP->expression.georel);
+                                          requestP->expression.georel,
+                                          stringFilterP);
 
   if (cSubP != NULL)
   {

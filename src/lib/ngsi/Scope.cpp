@@ -77,6 +77,24 @@ Scope::Scope(const std::string& _type, const std::string& _value, const std::str
 
 /* ****************************************************************************
 *
+* Scope::Scope -
+*/
+Scope::Scope(Scope* scopeP)
+{
+  type     = scopeP->type;
+  value    = scopeP->value;
+  oper     = scopeP->oper;
+  areaType = scopeP->areaType;
+
+  stringFilter = scopeP->stringFilter;
+
+  georel.maxDistance = -1;
+  georel.minDistance = -1;
+}
+
+
+/* ****************************************************************************
+*
 * pointVectorRelease - 
 */
 static void pointVectorRelease(const std::vector<orion::Point*>& pointV)

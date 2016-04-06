@@ -35,6 +35,7 @@
 #include "ngsi10/SubscribeContextResponse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/postSubscribeContext.h"
 
 

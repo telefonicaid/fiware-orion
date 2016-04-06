@@ -36,6 +36,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -181,18 +182,40 @@ std::string getEntities
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
-  //
-  // 01. Fill in QueryContextRequest - type "" is valid for all types
-  //
 
-  // If URI param 'q' is given, its value must be put in a scope
+
+  //
+  // String filter in URI param 'q' ?
+  // If so, put it in a new Scope and parse the q-string.
+  // The plain q-string is saved uin Scope::value, just in case.
+  // Might be useful for debugging, if nothing else.
+  //
   if (q != "")
   {
-    Scope* scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
+    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
+    std::string  errorString;
+
+    if (scopeP->stringFilter.parse(q.c_str(), &errorString) == false)
+    {
+      OrionError oe(SccBadRequest, errorString);
+
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, errorString);
+      scopeP->release();
+      delete scopeP;
+
+      TIMED_RENDER(out = oe.render(ciP, ""));
+      return out;
+    }
 
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
+
+
+  //
+  // 01. Fill in QueryContextRequest - type "" is valid for all types
+  //
 
   //
   // URI param 'type', three options:

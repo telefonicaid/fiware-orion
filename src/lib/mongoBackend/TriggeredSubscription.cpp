@@ -44,13 +44,13 @@ TriggeredSubscription::TriggeredSubscription
   const std::string&   _cacheSubId,
   const char*          _tenant
 ):
-  throttling        (_throttling),
-  lastNotification  (_lastNotification),
-  format            (_format),
-  reference         (_reference),
-  attrL             (_attrL),
-  cacheSubId        (_cacheSubId),
-  tenant            ((_tenant == NULL)? "" : _tenant)
+  throttling              (_throttling),
+  lastNotification        (_lastNotification),
+  format                  (_format),
+  reference               (_reference),
+  attrL                   (_attrL),
+  cacheSubId              (_cacheSubId),
+  tenant                  ((_tenant == NULL)? "" : _tenant)
 {
 }
 
@@ -68,13 +68,13 @@ TriggeredSubscription::TriggeredSubscription
   const std::string&   _reference,
   const AttributeList& _attrL
 ):
-  throttling        (-1),
-  lastNotification  (-1),
-  format            (_format),
-  reference         (_reference),
-  attrL             (_attrL),
-  cacheSubId        (""),
-  tenant            ("")
+  throttling              (-1),
+  lastNotification        (-1),
+  format                  (_format),
+  reference               (_reference),
+  attrL                   (_attrL),
+  cacheSubId              (""),
+  tenant                  ("")
 {
 }
 
@@ -97,11 +97,14 @@ TriggeredSubscription::~TriggeredSubscription()
 * TriggeredSubscription class is shared for NGSI9 and NGSI10 subscriptions, so it is better
 * to keep expressions (an artifact for NGSI10) out of the constructor, in its independent fill
 * method
-*
 */
-void TriggeredSubscription::fillExpression (const std::string& q, const std::string& georel, const std::string& geometry, const std::string& coords)
+void TriggeredSubscription::fillExpression
+(
+  const std::string&  georel,
+  const std::string&  geometry,
+  const std::string&  coords
+)
 {
-  expression.q        = q;
   expression.georel   = georel;
   expression.geometry = geometry;
   expression.coords   = coords;
@@ -117,7 +120,23 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
   std::stringstream ss;
 
   ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;  
-  ss << expression.q << delimiter << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
+  ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
 
   return ss.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* TriggeredSubscription::stringFilterSet - 
+*/
+void TriggeredSubscription::stringFilterSet(StringFilter* stringFilterP)
+{
+  //
+  // This is an object copy, like
+  //   memcpy(&stringFilter, stringFilterP)
+  // but including the vectors inside stringFilterP
+  //
+  stringFilter = *stringFilterP;
 }

@@ -211,12 +211,12 @@ Date: REGEX(.*)
 05. Erroneous GET entities with q=A1>=
 ======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "empty right-hand-side in q-item",
     "error": "BadRequest"
 }
 

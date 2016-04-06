@@ -65,6 +65,11 @@ std::string patchSubscription
   // 'Fill In' UpdateContextSubscriptionRequest
   parseDataP->ucsr.res.subscriptionId.set(subscriptionId);
 
+  //
+  // If a string-filter is present, it is parsed in 
+  // jsonParseV2/parseSubscription.cpp, function parseNotifyConditionVector() and
+  // the resulting StringFilter object resides in a Scope in parseDataP->ucsr.res.restriction.scopeVector
+  //
   TIMED_MONGO(ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                                    &ucsr,
                                                                    ciP->tenant,

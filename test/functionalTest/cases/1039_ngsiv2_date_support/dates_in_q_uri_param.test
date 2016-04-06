@@ -47,7 +47,7 @@ brokerStart CB
 #
 # 10. Create entity E25 with birthdate as a string '2016-02-25T10:00:00.00Z'
 # 11. GET entities with birthdate=2016-02-25T10:00:00.00Z, see nothing
-# 12. GET entities with birthdate=2016-02-25T10:00:00.00Z, see E25
+# 12. GET entities with birthdate='2016-02-25T10:00:00.00Z', see E25
 #
 
 echo "01. Create entity E24 with birthdate 2016-02-24T10:00:00.00Z"

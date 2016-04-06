@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "rest/RestService.h"
+#include "rest/StringFilter.h"
 
 
 
@@ -38,11 +39,15 @@
 */
 #define MAX_LEN_IP  64
 
+
+
 /* ****************************************************************************
 *
 * CONSTANTS RESTINIT - 
 */ 
 #define   NO_PORT 0
+
+
 
 /* ****************************************************************************
 *
@@ -61,11 +66,11 @@ typedef enum IpVersion
 *
 * Global vars - 
 */
-extern IpVersion       ipVersionUsed;  
-extern std::string     rushHost;
-extern unsigned short  rushPort;
-extern bool            multitenant;
-extern char            restAllowedOrigin[64];
+extern IpVersion               ipVersionUsed;  
+extern std::string             rushHost;
+extern unsigned short          rushPort;
+extern bool                    multitenant;
+extern char                    restAllowedOrigin[64];
 
 
 
