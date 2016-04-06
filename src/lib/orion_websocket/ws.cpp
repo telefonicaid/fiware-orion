@@ -34,6 +34,8 @@
 #include "logMsg/traceLevels.h"
 #include "rest/RestService.h"
 
+#include "common/limits.h"
+
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
@@ -88,9 +90,9 @@ static bool isSubscription
     if (pos == std::string::npos)
       return false;
 
-    char buff[25];
-    headValue[i].copy(buff, 24, pos + 1);
-    buff[24] = 0;
+    char buff[MAX_LENGTH_SUBID + 1];
+    headValue[i].copy(buff, MAX_LENGTH_SUBID, pos + 1);
+    buff[MAX_LENGTH_SUBID] = 0;
     subId = std::string(buff);
     return true;
   }
