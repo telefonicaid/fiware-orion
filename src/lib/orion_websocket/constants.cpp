@@ -31,5 +31,5 @@ const int WSConstants::Pooling = 50;
 const size_t WSConstants::DataSize = 128;
 // Ok, this is can be a macro, but I prefer
 // to be consistent
-const std::string WSConstants::ProtocolName = "orion-ws";
+const std::string WSConstants::ProtocolName = "ngsiv2-json";
 const std::string WSConstants::Scheme = "ws://";
