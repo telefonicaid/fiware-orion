@@ -665,6 +665,7 @@ void subCacheItemInsert
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
   StringFilter*             stringFilterP,
+  const std::string&        status,
   const std::string&        q,
   const std::string&        geometry,
   const std::string&        coords,
@@ -707,20 +708,21 @@ void subCacheItemInsert
   //
   // 1. First the non-complex values
   //
-  cSubP->tenant                  = (tenant[0] == 0)? NULL : strdup(tenant);
-  cSubP->servicePath             = strdup(servicePath);
-  cSubP->subscriptionId          = strdup(subscriptionId);
-  cSubP->reference               = strdup(scrP->reference.get().c_str());
-  cSubP->expirationTime          = expirationTime;
-  cSubP->throttling              = throttling;
-  cSubP->lastNotificationTime    = lastNotificationTime;
-  cSubP->notifyFormat            = notifyFormat;
-  cSubP->next                    = NULL;
-  cSubP->count                   = (notificationDone == true)? 1 : 0;
-  cSubP->expression.q            = q;
-  cSubP->expression.geometry     = geometry;
-  cSubP->expression.coords       = coords;
-  cSubP->expression.georel       = georel;
+  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->servicePath           = strdup(servicePath);
+  cSubP->subscriptionId        = strdup(subscriptionId);
+  cSubP->reference             = strdup(scrP->reference.get().c_str());
+  cSubP->expirationTime        = expirationTime;
+  cSubP->throttling            = throttling;
+  cSubP->lastNotificationTime  = lastNotificationTime;
+  cSubP->notifyFormat          = notifyFormat;
+  cSubP->next                  = NULL;
+  cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->status                = status;
+  cSubP->expression.q          = q;
+  cSubP->expression.geometry   = geometry;
+  cSubP->expression.coords     = coords;
+  cSubP->expression.georel     = georel;
 
   if (stringFilterP != NULL)
   {
@@ -1000,8 +1002,8 @@ void subCacheRefresh(void)
 */
 typedef struct CachedSubSaved
 {
-  long long  lastNotificationTime;
-  long long  count;
+  long long    lastNotificationTime;
+  long long    count;
 } CachedSubSaved;
 
 
@@ -1052,7 +1054,7 @@ void subCacheSync(void)
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
 
-    savedSubV[cSubP->subscriptionId]= cssP;
+    savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
   }
 

@@ -340,19 +340,17 @@ int Scope::fill
       return -1;
     }
 
-    // Check that points are different and not aligned (either horizontally or vertically)
-    if ((pointV[0]->latitude() == pointV[1]->latitude())  || (pointV[0]->longitude() == pointV[1]->longitude()))
+    double minLat;
+    double maxLat;
+    double minLon;
+    double maxLon;
+    if (!orderCoordsForBox(&minLat, &maxLat, &minLon, &maxLon, pointV[0]->latitude(), pointV[1]->latitude(), pointV[0]->longitude(), pointV[1]->longitude()))
     {
       *errorStringP = "box coordinates are not defining an actual box";
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
     }
-
-    double minLat = (pointV[0]->latitude()  < pointV[1]->latitude())?  pointV[0]->latitude()  : pointV[1]->latitude();
-    double maxLat = (pointV[0]->latitude()  > pointV[1]->latitude())?  pointV[0]->latitude()  : pointV[1]->latitude();
-    double minLon = (pointV[0]->longitude() < pointV[1]->longitude())? pointV[0]->longitude() : pointV[1]->longitude();
-    double maxLon = (pointV[0]->longitude() > pointV[1]->longitude())? pointV[0]->longitude() : pointV[1]->longitude();
 
     // Lower left: smaller lat and long, upper right: greater lat and long
     Point ll;

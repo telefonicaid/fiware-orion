@@ -108,6 +108,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getFieldF(sub, CSUB_STATUS).String().c_str()         : "active";
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -222,6 +223,7 @@ int mongoSubCacheItemInsert
   const char*         servicePath,
   int                 lastNotificationTime,
   long long           expirationTime,
+  const std::string&  status,
   const std::string&  q,
   const std::string&  geometry,
   const std::string&  coords,
@@ -317,6 +319,7 @@ int mongoSubCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
+  cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
@@ -325,12 +328,7 @@ int mongoSubCacheItemInsert
 
   if (stringFilterP != NULL)
   {
-    LM_W(("KZ: size of filters of updated subscription BEFORE:      %d", cSubP->expression.stringFilter.filters.size()));
-    LM_W(("KZ: size of mongoFilters of updated subscription BEFORE: %d", cSubP->expression.stringFilter.mongoFilters.size()));
-    LM_W(("KZ: copying contents of stringFilterP (q==%s)", q.c_str()));
     cSubP->expression.stringFilter = *stringFilterP;
-    LM_W(("KZ: size of filters of updated subscription:      %d", cSubP->expression.stringFilter.filters.size()));
-    LM_W(("KZ: size of mongoFilters of updated subscription: %d", cSubP->expression.stringFilter.mongoFilters.size()));
   }
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
@@ -477,8 +475,11 @@ void mongoSubCacheUpdate(const std::string& tenant, const std::string& subId, lo
 
   if (lastNotificationTime != 0)
   {
-    // Update lastNotificationTime
-    condition = BSON("_id" << OID(subId) << CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime));
+    // Update lastNotificationTime    
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false)))
+                    );
     update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
 
     if (collectionUpdate(collection, condition, update, false, &err) != true)

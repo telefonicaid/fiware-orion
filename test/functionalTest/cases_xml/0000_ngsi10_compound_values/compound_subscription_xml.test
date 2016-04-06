@@ -30,7 +30,7 @@ accumulatorStart
 
 --SHELL--
 echo "1: +++++++++ Prepare subscription +++++++++++"
-(curl localhost:${CB_PORT}/v1/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+(curl localhost:${CB_PORT}/v1/subscribeContext -s -S --header 'Content-Type: application/json' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -53,7 +53,7 @@ echo "1: +++++++++ Prepare subscription +++++++++++"
 EOF
 
 echo "2: ++++++++++ Create the entity attribute with vector value ++++++++++"
-(curl localhost:${CB_PORT}/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${CB_PORT}/v1/updateContext -s -S --header 'Content-Type: application/json' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -88,7 +88,7 @@ echo "2: ++++++++++ Create the entity attribute with vector value ++++++++++"
 EOF
 
 echo "3: ++++++++++ Update the entity attribute with object value ++++++++++"
-(curl localhost:${CB_PORT}/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${CB_PORT}/v1/updateContext -s -S --header 'Content-Type: application/json' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -183,7 +183,7 @@ Content-Length: 1086
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -228,7 +228,7 @@ Content-Length: 936
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>

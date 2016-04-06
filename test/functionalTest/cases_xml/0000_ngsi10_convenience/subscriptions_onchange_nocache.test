@@ -276,7 +276,7 @@ accumulatorDump
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 192
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -289,7 +289,7 @@ Date: REGEX(.*)
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 805
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -324,7 +324,7 @@ Date: REGEX(.*)
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 809
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -359,7 +359,7 @@ Date: REGEX(.*)
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 243
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -374,7 +374,7 @@ Date: REGEX(.*)
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 805
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -409,7 +409,7 @@ Date: REGEX(.*)
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 805
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -443,7 +443,7 @@ Date: REGEX(.*)
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 640
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -473,7 +473,7 @@ Date: REGEX(.*)
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 636
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -502,7 +502,7 @@ Date: REGEX(.*)
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 207
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -516,7 +516,7 @@ Date: REGEX(.*)
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 640
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -548,7 +548,7 @@ Content-Length: 737
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -580,7 +580,7 @@ Content-Length: 911
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -617,7 +617,7 @@ Content-Length: 911
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -654,7 +654,7 @@ Content-Length: 910
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>

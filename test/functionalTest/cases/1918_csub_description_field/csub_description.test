@@ -1,0 +1,473 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Context subscripion description field
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription without description
+# 02. Get subscription (without desc)
+# 03. Update subscription to add description (desc = one)
+# 04. Get subscription (see desc = one)
+# 05. Update subscription to modify description (desc = two)
+# 06. Get subscription (see desc = two)
+# 07. Update subscription to delete description
+# 08. Get subscription (without desc)
+#
+# 09. Create a second subscription with description (desc = three)
+# 10. Get that second subscription (see desc = three)
+#
+# 11. Update second subscription with no string description (fail)
+#
+
+echo "01. Create subscription without description"
+echo "==========================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "type": "Room"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+id=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Get subscription (without desc)"
+echo "==================================="
+orionCurl --url "/v2/subscriptions/$id" --json
+echo
+echo
+
+
+echo "03. Update subscription to add description (desc = one)"
+echo "======================================================="
+payload='
+{
+    "description": "one"
+}'
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Get subscription (see desc = one)"
+echo "===================================="
+orionCurl --url "/v2/subscriptions/$id" --json
+echo
+echo
+
+
+echo "05. Update subscription to modify description (desc = two)"
+echo "=========================================================="
+payload='
+{
+    "description": "two"
+}'
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Get subscription (see desc = two)"
+echo "===================================="
+orionCurl --url "/v2/subscriptions/$id" --json
+echo
+echo
+
+
+echo "07. Update subscription to delete description"
+echo "============================================="
+payload='
+{
+    "description": ""
+}'
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Get subscription (without desc)"
+echo "==================================="
+orionCurl --url "/v2/subscriptions/$id" --json
+echo
+echo
+
+
+echo "09. Create a second subscription with description (desc = three)"
+echo "================================================================"
+payload='
+{
+    "description": "three",
+    "subject": {
+        "entities": [
+            {
+                "type": "Room"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+id=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "10. Get subscription (see desc = three)"
+echo "======================================="
+orionCurl --url "/v2/subscriptions/$id" --json
+echo
+echo
+
+
+echo "11. Update second subscription with no string description (fail)"
+echo "================================================================"
+payload='
+{
+    "description": {
+      "foo": "bar"
+    }
+}'
+orionCurl --url /v2/subscriptions/$id -X PATCH --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription without description
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+02. Get subscription (without desc)
+===================================
+HTTP/1.1 200 OK
+Content-Length: 415
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+03. Update subscription to add description (desc = one)
+=======================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Get subscription (see desc = one)
+====================================
+HTTP/1.1 200 OK
+Content-Length: 435
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "one",
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+05. Update subscription to modify description (desc = two)
+==========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Get subscription (see desc = two)
+====================================
+HTTP/1.1 200 OK
+Content-Length: 435
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "two",
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+07. Update subscription to delete description
+=============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. Get subscription (without desc)
+===================================
+HTTP/1.1 200 OK
+Content-Length: 415
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+09. Create a second subscription with description (desc = three)
+================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+10. Get subscription (see desc = three)
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 437
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "three",
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+11. Update second subscription with no string description (fail)
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 67
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "description must be a string",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

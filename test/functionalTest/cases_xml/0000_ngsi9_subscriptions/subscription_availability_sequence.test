@@ -58,7 +58,7 @@ echo
 
 
 echo "1: ++++++++++++++++++++"
-SUB_OUT=$((curl localhost:${CB_PORT}/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
+SUB_OUT=$((curl localhost:${CB_PORT}/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/json' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextAvailabilityRequest>
   <entityIdList>
@@ -287,7 +287,7 @@ echo
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -309,7 +309,7 @@ Notification count from mongo:
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -324,7 +324,7 @@ Notification count from mongo:
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -336,7 +336,7 @@ Date: REGEX(.*)
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 185
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -351,7 +351,7 @@ Notification count from mongo:
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -363,7 +363,7 @@ Date: REGEX(.*)
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -378,7 +378,7 @@ Notification count from mongo:
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 231
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -393,7 +393,7 @@ Date: REGEX(.*)
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 253
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -408,7 +408,7 @@ Date: REGEX(.*)
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -423,7 +423,7 @@ Content-Length: 837
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextAvailabilityRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -453,7 +453,7 @@ Content-Length: 831
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextAvailabilityRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -483,7 +483,7 @@ Content-Length: 837
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextAvailabilityRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -513,7 +513,7 @@ Content-Length: 833
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextAvailabilityRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>

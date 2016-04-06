@@ -470,8 +470,7 @@ The examples below illustrate the referred syntax:
 
 A context attribute which represents a location encoded using GeoJSON must conform to the following syntax:
 
-* The NGSI type of the attribute must be the MIME type assigned by IETF to the GeoJSON format.
-Currently 'application/vnd.geo+json'.
+* The NGSI type of the attribute must be `geo:json`.
 * The attribute value must be a valid GeoJSON object. It is noteworthy that longitude comes first in GeoJSON coordinates.
 
 The example below illustrates the usage of GeoJSON.
@@ -486,7 +485,7 @@ can be useful in urderstanding the format.
       "type": "Point",
       "coordinates": [2.186447514, 41.3763726]
     },
-    "type": "application/vnd.geo+json"
+    "type": "geo:json"
   }
 }
 ```

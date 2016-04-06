@@ -174,32 +174,26 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
-  /* Duration update */
-  long long expiration = -1;
-
-  if (requestP->expires != -1) //v2
+  /* Expiration */
+  long long expiration = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION) : -1;
+  if (version == "v1")
   {
-    expiration = requestP->expires;
+    // Based on duration
+    if (!requestP->duration.isEmpty())
+    {
+      expiration = getCurrentTime() + requestP->duration.parse();
+    }
   }
-  else
+  else // v2
   {
-    expiration = getCurrentTime() + requestP->duration.parse();
+    // Based on expires
+    if (requestP->expires > 0)
+    {
+      expiration = requestP->expires;
+    }
   }
-
-  if (requestP->duration.isEmpty() && requestP->expires ==-1)
-  {
-    //
-    // No duration in incoming request => "inherit" expirationDate from 'old' subscription
-    //
-    long long expirationTime = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION) : -1;
-
-    newSub.append(CSUB_EXPIRATION, expirationTime);
-  }
-  else
-  {
-    newSub.append(CSUB_EXPIRATION, expiration);
-    LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
-  }
+  newSub.append(CSUB_EXPIRATION, expiration);
+  LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
 
   /* ServicePath update */
   newSub.append(CSUB_SERVICE_PATH, (servicePathV.size() == 0)? "" : servicePathV[0]);
@@ -240,17 +234,48 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   StringFilter*  stringFilterP = NULL;
 
-  LM_W(("KZ: Checking scopeVector for SCOPE_TYPE_SIMPLE_QUERY"));
   for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
   {
     if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      LM_W(("KZ: found a SCOPE_TYPE_SIMPLE_QUERY in scopeVector: '%s'", requestP->restriction.scopeVector[ix]->value.c_str()));
       stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
-      LM_W(("KZ: stringFilterP at %p", stringFilterP));
     }
   }
   
+
+  /* Description */
+  if (requestP->descriptionProvided)
+  {
+    // Note that in the case of description "" the field is deleted
+    if (requestP->description != "")
+    {
+      newSub.append(CSUB_DESCRIPTION, requestP->description);
+    }
+  }
+  else
+  {
+    // Pass-through of the current subscription
+    if (sub.hasField(CSUB_DESCRIPTION))
+    {
+      newSub.append(CSUB_DESCRIPTION, getStringFieldF(sub, CSUB_DESCRIPTION));
+    }
+  }
+
+  /* Adding status */
+  std::string status;
+  if (requestP->status != "")
+  {
+    status = requestP->status;
+  }
+  else
+  {
+    // Note this code will make that subscriptions not using status field (typically, legacy
+    // subscriptions from pre-1.1.0 versions) will get status 'active' first time they get
+    // updated (either the status field is included in that update or not)
+    status = sub.hasField(CSUB_STATUS) ? getStringFieldF(sub, CSUB_STATUS) : STATUS_ACTIVE;
+  }
+  newSub.append(CSUB_STATUS, status);
+
 
   /* Notify conditions */
   bool notificationDone = false;
@@ -272,7 +297,7 @@ HttpStatusCode mongoUpdateContextSubscription
        }
        else // v2
        {
-         // In v2 entities and attribute are updatable (as part of subject or notification) wo
+         // In v2 entities and attribute are updatable (as part of subject or notification) so
          // we have to check in order to know if we get the attribute from the request or from
          // the subscription
          if (requestP->entityIdVector.size() > 0)
@@ -304,7 +329,9 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
-                                                &requestP->restriction);
+                                                &requestP->restriction,
+                                                status);
+
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
@@ -461,13 +488,13 @@ HttpStatusCode mongoUpdateContextSubscription
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
   
-  LM_W(("KZ: calling mongoSubCacheItemInsert with stringFilterP at %p", stringFilterP));
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,
                                           servicePath,
                                           lastNotificationTime,
                                           expiration,
+                                          status,
                                           requestP->expression.q,
                                           requestP->expression.geometry,
                                           requestP->expression.coords,

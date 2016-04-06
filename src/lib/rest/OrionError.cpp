@@ -29,6 +29,7 @@
 #include "common/Format.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "rest/errorAdaptation.h"
 
 
 
@@ -73,52 +74,13 @@ OrionError::OrionError(StatusCode& sc)
 /* ****************************************************************************
 *
 * OrionError::fill - 
+*
 */
-void OrionError::fill(HttpStatusCode _code, const char* _details)
+void OrionError::fill(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
 {
   code          = _code;
-  reasonPhrase  = httpStatusCodeString(code);
+  reasonPhrase  = _reasonPhrase != ""? _reasonPhrase : httpStatusCodeString(code);
   details       = _details;
-}
-
-
-
-/* ****************************************************************************
-*
-* OrionError::errorStringForV2 - 
-*/
-std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
-{
-  if (_reasonPhrase == "Bad Request")
-  {
-    return "BadRequest";
-  }
-  else if (_reasonPhrase == "Length Required")
-  {
-    return "LengthRequired";
-  }
-  else if (_reasonPhrase == "Request Entity Too Large")
-  {
-    return "RequestEntityTooLarge";
-  }
-  else if (_reasonPhrase == "Unsupported Media Type")
-  {
-    return "UnsupportedMediaType";
-  }
-  else if (_reasonPhrase == "Invalid Modification")
-  {
-    return "InvalidModification";
-  }
-  else if (_reasonPhrase == "Too Many Results")
-  {
-    return "TooManyResults";
-  }
-  else if (_reasonPhrase == "No context element found")
-  {
-    return "NotFound";
-  }
-
-  return _reasonPhrase;
 }
 
 
