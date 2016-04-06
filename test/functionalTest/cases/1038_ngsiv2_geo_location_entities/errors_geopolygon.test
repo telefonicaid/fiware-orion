@@ -1,0 +1,653 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Errors related with geo:polygon
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# Inspired by 0000_ngsi10_geolocation_query tests
+# (all steps include a 'b' sub-step to check entity)
+#
+# 01. Create entity with geo:polygon without vector coordinates -> fail
+# 02. Create entity with geo:polygon with 1 coordinate -> fail
+# 03. Create entity with geo:polygon with last coordinate not matching the first -> fail
+# 04. Create entity with two geo:polygon -> fail
+# 02. Create entity with one geo:polygon (attr1) -> OK
+# 03. Update attr1 geo:polygon attribute -> OK
+# 04. Append a new geo:polygon attribute (attr2) -> fail
+# 05. Remove the geo:polygon attribute (attr1) -> OK
+# 06. Append a new geo:polygon attribute (attr2) -> OK
+# 07. Change attribute type to no-geo:polygon (attr2) -> OK
+# 08. Append new geo:polygon attribute (attr3) -> OK
+# 09. Change attr2 type to geo:polygon again -> fail
+#
+
+echo "01. Create entity with geo:polygon without vector coordinates -> fail"
+echo "====================================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": "10, 10",
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "01b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "02. Create entity with geo:polygon with 1 coordinate -> fail"
+echo "============================================================"
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "10, 10" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. Create entity with geo:polygon with last coordinate not matching the first -> fail"
+echo "======================================================================================"
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "10, 10", "20, 20", "20, 10", "10, 0" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "04. Create entity with two geo:polygon -> fail"
+echo "=============================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "10, 10", "20, 20", "20, 10", "10, 10" ],
+    "type": "geo:polygon"
+  },
+  "attr2": {
+    "value": [ "15, 15", "25, 25", "25, 15", "15, 15" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. Create entity with one geo:polygon (attr1) -> OK"
+echo "===================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "20, 20", "30, 30", "30, 20", "20, 20" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "05b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "06. Update attr1 geo:polygon attribute -> OK"
+echo "============================================"
+payload='{
+  "attr1": {
+    "value": [ "-15, -15", "-25, -25", "-25, -15", "-15, -15" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X PATCH --json
+echo
+echo
+
+
+echo "06b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "07. Append a new geo:polygon attribute (attr2) -> fail"
+echo "======================================================"
+payload='{
+  "attr2": {
+    "value": "20, 20",
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "07b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "08. Remove the geo:polygon attribute (attr1) -> OK"
+echo "=================================================="
+orionCurl --url /v2/entities/E1/attrs/attr1 -X DELETE --json
+echo
+echo
+
+
+echo "08b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "09. Append a new geo:polygon attribute (attr2) -> OK"
+echo "===================================================="
+payload='{
+  "attr2": {
+    "value": [ "13, 13", "23, 23", "23, 13", "13, 13" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "09b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "10. Change attribute type to no-geo:polygon (attr2) -> OK"
+echo "========================================================="
+payload='{
+  "attr2": {
+    "value": "foo",
+    "type": "no-geopoint"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "10b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "11. Append new geo:polygon attribute (attr3) -> OK"
+echo "=================================================="
+payload='{
+  "attr3": {
+    "value": [ "13, -13", "23, -23", "23, -13", "13, -13" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "11b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "12. Change attr2 type to geo:polygon again -> fail"
+echo "=================================================="
+payload='{
+  "attr2": {
+    "value": [ "0, 0", "10, 10", "10, 0", "0, 0" ],
+    "type": "geo:polygon"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "12b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with geo:polygon without vector coordinates -> fail
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "geo:line, geo:box and geo:polygon needs array of strings as value",
+    "error": "BadRequest"
+}
+
+
+01b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+02. Create entity with geo:polygon with 1 coordinate -> fail
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 78
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "geo:polygon uses at least 4 coordinates",
+    "error": "BadRequest"
+}
+
+
+02b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+03. Create entity with geo:polygon with last coordinate not matching the first -> fail
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 88
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "geo:polygon first and last coordinates must match",
+    "error": "BadRequest"
+}
+
+
+03b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+04. Create entity with two geo:polygon -> fail
+==============================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+04b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+05. Create entity with one geo:polygon (attr1) -> OK
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=none
+Date: REGEX(.*)
+
+
+
+05b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:polygon",
+        "value": [
+            "20, 20",
+            "30, 30",
+            "30, 20",
+            "20, 20"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+06. Update attr1 geo:polygon attribute -> OK
+============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 124
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:polygon",
+        "value": [
+            "-15, -15",
+            "-25, -25",
+            "-25, -15",
+            "-15, -15"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+07. Append a new geo:polygon attribute (attr2) -> fail
+======================================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+07b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 124
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:polygon",
+        "value": [
+            "-15, -15",
+            "-25, -25",
+            "-25, -15",
+            "-15, -15"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+08. Remove the geo:polygon attribute (attr1) -> OK
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 25
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "id": "E1",
+    "type": "none"
+}
+
+
+09. Append a new geo:polygon attribute (attr2) -> OK
+====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "geo:polygon",
+        "value": [
+            "13, 13",
+            "23, 23",
+            "23, 13",
+            "13, 13"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+10. Change attribute type to no-geo:polygon (attr2) -> OK
+=========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+10b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+11. Append new geo:polygon attribute (attr3) -> OK
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+11b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 179
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "geo:polygon",
+        "value": [
+            "13, -13",
+            "23, -23",
+            "23, -13",
+            "13, -13"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+12. Change attr2 type to geo:polygon again -> fail
+==================================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+12b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 179
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "geo:polygon",
+        "value": [
+            "13, -13",
+            "23, -23",
+            "23, -13",
+            "13, -13"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

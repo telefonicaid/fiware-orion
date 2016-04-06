@@ -1,0 +1,689 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Errors related with geo:box
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# Inspired by 0000_ngsi10_geolocation_query tests
+# (all steps include a 'b' sub-step to check entity)
+#
+# 01. Create entity with geo:box without vector coordinates -> fail
+# 02. Create entity with geo:box with 1 coordinate -> fail
+# 03. Create entity with geo:box with 3 coordinates -> fail
+# 04. Create entity with geo:box with 2 aligned coordinates -> fail
+# 05. Create entity with two geo:box -> fail
+# 06. Create entity with one geo:box (attr1) -> OK
+# 07. Update attr1 geo:box attribute -> OK
+# 08. Append a new geo:box attribute (attr2) -> fail
+# 09. Remove the geo:box attribute (attr1) -> OK
+# 10. Append a new geo:box attribute (attr2) -> OK
+# 11. Change attribute type to no-geo:box (attr2) -> OK
+# 12. Append new geo:box attribute (attr3) -> OK
+# 13. Change attr2 type to geo:box again -> fail
+#
+
+echo "01. Create entity with geo:box without vector coordinates -> fail"
+echo "================================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": "0, 0",
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "01b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "02. Create entity with geo:box with 1 coordinate -> fail"
+echo "========================================================"
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "0, 0" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. Create entity with geo:box with 3 coordinates -> fail"
+echo "========================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "0, 0", "10, 10", "20, 20" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "04. Create entity with geo:box with 2 aligned coordinates -> fail"
+echo "================================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "0, 0", "0, 10" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. Create entity with two geo:box -> fail"
+echo "=========================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "0, 0", "10, 10" ],
+    "type": "geo:box"
+  },
+  "attr2": {
+    "value": [ "20, 20", "30, 30" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "05b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "06. Create entity with one geo:box (attr1) -> OK"
+echo "================================================"
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ "0, 0", "10, 10" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "06b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "07. Update attr1 geo:box attribute -> OK"
+echo "========================================"
+payload='{
+  "attr1": {
+    "value": [ "20, 20", "30, 30" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X PATCH --json
+echo
+echo
+
+
+echo "07b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "08. Append a new geo:box attribute (attr2) -> fail"
+echo "=================================================="
+payload='{
+  "attr2": {
+    "value": [ "40, 40", "50, 50" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "08b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "09. Remove the geo:box attribute (attr1) -> OK"
+echo "=============================================="
+orionCurl --url /v2/entities/E1/attrs/attr1 -X DELETE --json
+echo
+echo
+
+
+echo "09b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "10. Append a new geo:box attribute (attr2) -> OK"
+echo "================================================"
+payload='{
+  "attr2": {
+    "value": [ "50, 50", "60, 60" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "10b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "11. Change attribute type to no-geo:box (attr2) -> OK"
+echo "====================================================="
+payload='{
+  "attr2": {
+    "value": "foo",
+    "type": "no-geopoint"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "11b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "12. Append new geo:box attribute (attr3) -> OK"
+echo "=============================================="
+payload='{
+  "attr3": {
+    "value": [ "-10, 0", "7, 7" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "12b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "13. Change attr2 type to geo:box again -> fail"
+echo "=============================================="
+payload='{
+  "attr2": {
+    "value": [ "-20, 0", "8, 9" ],
+    "type": "geo:box"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "13b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with geo:box without vector coordinates -> fail
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "geo:line, geo:box and geo:polygon needs array of strings as value",
+    "error": "BadRequest"
+}
+
+
+01b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+02. Create entity with geo:box with 1 coordinate -> fail
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "geo:box uses exactly 2 coordinates",
+    "error": "BadRequest"
+}
+
+
+02b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+03. Create entity with geo:box with 3 coordinates -> fail
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "geo:box uses exactly 2 coordinates",
+    "error": "BadRequest"
+}
+
+
+03b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+04. Create entity with geo:box with 2 aligned coordinates -> fail
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "geo:box coordinates are not defining an actual box",
+    "error": "BadRequest"
+}
+
+
+04b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+05. Create entity with two geo:box -> fail
+==========================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+05b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+06. Create entity with one geo:box (attr1) -> OK
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=none
+Date: REGEX(.*)
+
+
+
+06b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:box",
+        "value": [
+            "0, 0",
+            "10, 10"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+07. Update attr1 geo:box attribute -> OK
+========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:box",
+        "value": [
+            "20, 20",
+            "30, 30"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+08. Append a new geo:box attribute (attr2) -> fail
+==================================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+08b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:box",
+        "value": [
+            "20, 20",
+            "30, 30"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+09. Remove the geo:box attribute (attr1) -> OK
+==============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 25
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "id": "E1",
+    "type": "none"
+}
+
+
+10. Append a new geo:box attribute (attr2) -> OK
+================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+10b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "geo:box",
+        "value": [
+            "50, 50",
+            "60, 60"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+11. Change attribute type to no-geo:box (attr2) -> OK
+=====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+11b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+12. Append new geo:box attribute (attr3) -> OK
+==============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+12b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "geo:box",
+        "value": [
+            "-10, 0",
+            "7, 7"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+13. Change attr2 type to geo:box again -> fail
+==============================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+13b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "geo:box",
+        "value": [
+            "-10, 0",
+            "7, 7"
+        ]
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

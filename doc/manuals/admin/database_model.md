@@ -71,17 +71,49 @@ Fields:
     of the following fields:
     -   **attrName**: the attribute name that identifies the geographic
         location in the attrs array
-    -   **coords**: a GJSON of type "Point", containing the longitude
-        and latitude, in that order.
-        -   *Note*: you may wonder why the coordinates are stored in the
-            coords duple as longitude-latitude and in the opposite order
-            in the [geo-location
-            API](../user/geolocation.md).
-            This is due to the internal [MongoDB geolocation
-            functionality](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
-            which uses longitude-latitude order. However, other systems
-            closer to users (e.g. Google Maps) use latitude-longitude
-            format, so we have used the latter for the API.
+    -   **coords**: a GJSON representing the location of the entity. See
+        below for more details.
+
+Regarding `location.coords` in can use several formats:
+
+* Representing a point (the one used by NGSIv1 and NGSIv2 geo:point):
+
+```
+{
+  "type": "Point",
+  "coordinates": [ -3.691944, 40.418889 ]
+}
+```
+
+* Representing a line (the one used by NGSIv2 geo:line):
+
+```
+{
+  "type": "LineString",
+  "coordinates": [ [ 10, 0], [0, 10] ]
+}
+```
+
+* Representing a polygon (the one used by NGSIv2 geo:box and NGSIv2 geo:polygon):
+
+```
+{
+  "type": "Polygon",
+  "coordinates": [ [ [ 10, 0], [0, 10], [0, 0], [10, 0] ] ]
+}
+```
+
+* Finally, `location.coords` could hold an arbitrary JSON object, representing a location
+  in [GeoJSON](http://www.macwright.org/2015/03/23/geojson-second-bite.html) format. Arbitrary
+  GeoJSON can be used with the geo:json attribute type and it is up to the user to introduce
+  a valid object. Note that the three above cases are actually GeoJSON representation for
+  "fixed" cases.
+
+Note that coordinate pairs use the longitude-latitude order, which is opposite to the order used
+in the [geo-location API](../user/geolocation.md). This is due to the internal
+[MongoDB geolocation implementation](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
+(which is based in GeoJSON) uses longitude-latitude order. However, other systems closer
+to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the API.
 
 Example document:
 

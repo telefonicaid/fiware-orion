@@ -37,6 +37,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
+#include "rest/errorAdaptation.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
@@ -99,13 +100,15 @@ std::string postEntity
     {
       if (upcrsP->contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
       {
-        // Ugly v1 -> v2 error conversion here :(
-        OrionError error(SccRequestEntityTooLarge, "NoResourcesAvailable", "No more than one geo-location attribute allowed");
-        std::string res;
-        ciP->httpStatusCode = error.code;
-        TIMED_RENDER(res = error.render(ciP, ""));
-        eP->release();
-        return res;
+        OrionError oe;
+        if (invalidParameterForNgsiv2(upcrsP->contextElementResponseVector[ix]->statusCode.details, &oe))
+        {
+          ciP->httpStatusCode = oe.code;
+          std::string res;
+          TIMED_RENDER(res = oe.render(ciP, ""));
+          eP->release();
+          return res;
+        }
       }
 
       OrionError error(upcrsP->contextElementResponseVector[ix]->statusCode);

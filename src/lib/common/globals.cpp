@@ -431,3 +431,27 @@ int64_t parse8601Time(const std::string& s)
   }
   return (int64_t) timegm(&tm);
 }
+
+
+
+/* ****************************************************************************
+*
+* orderCoordsForBox
+*
+* It return false in the case of a 'degenerate' box
+*
+*/
+bool orderCoordsForBox(double* minLat, double* maxLat, double* minLon, double* maxLon, double lat1, double lat2, double lon1, double lon2)
+{
+  if ((lat1 == lat2) || (lon1 == lon2))
+  {
+    return false;
+  }
+
+  *minLat = (lat1 < lat2)? lat1 : lat2;
+  *maxLat = (lat1 > lat2)? lat1 : lat2;
+  *minLon = (lon1 < lon2)? lon1 : lon2;
+  *maxLon = (lon1 > lon2)? lon1 : lon2;
+
+  return true;
+}

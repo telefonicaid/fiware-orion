@@ -81,8 +81,8 @@ def ignore(root, file):
     if 'BUILD_' in root or '.git' in root:
         return True
 
-    # PNG files in manuals are ignored
-    if 'manuals' in root and file.endswith('.png'):
+    # PNG files in manuals o functionalTest are ignored
+    if ('manuals' in root or 'functionalTest' in root) and file.endswith('.png'):
         return True
 
     # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
