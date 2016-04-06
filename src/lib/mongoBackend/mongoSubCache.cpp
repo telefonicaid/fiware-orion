@@ -325,7 +325,12 @@ int mongoSubCacheItemInsert
 
   if (stringFilterP != NULL)
   {
+    LM_W(("KZ: size of filters of updated subscription BEFORE:      %d", cSubP->expression.stringFilter.filters.size()));
+    LM_W(("KZ: size of mongoFilters of updated subscription BEFORE: %d", cSubP->expression.stringFilter.mongoFilters.size()));
+    LM_W(("KZ: copying contents of stringFilterP (q==%s)", q.c_str()));
     cSubP->expression.stringFilter = *stringFilterP;
+    LM_W(("KZ: size of filters of updated subscription:      %d", cSubP->expression.stringFilter.filters.size()));
+    LM_W(("KZ: size of mongoFilters of updated subscription: %d", cSubP->expression.stringFilter.mongoFilters.size()));
   }
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
@@ -383,7 +388,6 @@ int mongoSubCacheItemInsert
 
   return 0;
 }
-
 
 
 

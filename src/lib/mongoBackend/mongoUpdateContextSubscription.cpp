@@ -240,14 +240,17 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   StringFilter*  stringFilterP = NULL;
 
+  LM_W(("KZ: Checking scopeVector for SCOPE_TYPE_SIMPLE_QUERY"));
   for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
   {
     if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
+      LM_W(("KZ: found a SCOPE_TYPE_SIMPLE_QUERY in scopeVector: '%s'", requestP->restriction.scopeVector[ix]->value.c_str()));
       stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+      LM_W(("KZ: stringFilterP at %p", stringFilterP));
     }
   }
-
+  
 
   /* Notify conditions */
   bool notificationDone = false;
@@ -457,7 +460,8 @@ HttpStatusCode mongoUpdateContextSubscription
   char* servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
-
+  
+  LM_W(("KZ: calling mongoSubCacheItemInsert with stringFilterP at %p", stringFilterP));
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,

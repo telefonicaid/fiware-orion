@@ -226,7 +226,7 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscribeContextRequest* sc
     alarmMgr.badInput(clientIp, "condition is not an object");
     return oe.render(ciP, "");
   }
-  r = parseNotifyConditionVector(ciP, scrP, condition );
+  r = parseNotifyConditionVector(ciP, scrP, condition);
 
   return r;
 }
@@ -467,6 +467,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
   {
     const Value& expression = condition["expression"];
 
+    LM_W(("KZ: Parsing expression"));
     if (!expression.IsObject())
     {
       alarmMgr.badInput(clientIp, "expression is not an object");
@@ -479,6 +480,7 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
     if (expression.HasMember("q"))
     {
+      LM_W(("KZ: Parsing expression.q"));
       const Value& q = expression["q"];
       if (!q.IsString())
       {
@@ -491,14 +493,16 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscribeCont
 
       std::string  errorString;
       Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, expression["q"].GetString());
-
+      LM_W(("KZ: Added Scope for expression.q '%s'", scopeP->value.c_str()));
       if (scopeP->stringFilter.parse(scopeP->value.c_str(), &errorString) == false)
       {
         delete scopeP;
+        LM_W(("KZ: ERROR parsing Scope for expression.q"));
         return errorString;
       }
 
       scrP->restriction.scopeVector.push_back(scopeP);
+      LM_W(("KZ: Pushed new Scope to scopeVector"));
     }
     if (expression.HasMember("geometry"))
     {
