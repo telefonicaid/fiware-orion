@@ -281,9 +281,11 @@ Fields:
     to be sent or not when updates come. It may be composed of the following
     fields: q, georel, geometry and/or coords (optional)
 -   **count**: the number of notifications sent associated to
-    the subscription.
--   **format**: the format to use to send notification, either "XML" or "JSON".
-    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
+    the subscription.   
+-   **format**: the format to use to send notification, currently "JSON"
+    meaning JSON notifications in NGSIv1 format.
+-   **status**: either `active` (for active subscriptions) or `inactive (for inactive subscriptions).
+-   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 
 Example document:
 
@@ -318,7 +320,9 @@ Example document:
                 "coords" : "",
                 "georel" : ""
         },
-        "format" : "JSON"
+        "format" : "JSON",
+        "description": "this is an example subscription",
+        "status" : "active"
 }
 ```
 [Top](#top)
@@ -349,8 +353,8 @@ Fields:
     notification sent associated to a given subscription.
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notification, either "XML" or "JSON".
-    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
+-   **format**: the format to use to send notification, currently "JSON"
+    meaning JSON notifications in NGSIv1 format.
 
 Example document:
 

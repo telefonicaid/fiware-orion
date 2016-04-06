@@ -100,6 +100,34 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     return oe.render(ciP, "");
   }
 
+  // Description field
+  destination->descriptionProvided = false;
+  if (document.HasMember("description"))
+  {
+    const Value& description      = document["description"];
+
+    if (!description.IsString())
+    {
+      OrionError oe(SccBadRequest, "description must be a string");
+
+      alarmMgr.badInput(clientIp, "description must be a string");
+      return oe.render(ciP, "");
+    }
+
+    std::string descriptionString = description.GetString();
+
+    if (descriptionString.length() > MAX_DESCRIPTION_LENGTH)
+    {
+      OrionError oe(SccBadRequest, "max description length exceeded");
+
+      alarmMgr.badInput(clientIp, "max description length exceeded");
+      return oe.render(ciP, "");
+    }
+
+    destination->descriptionProvided = true;
+    destination->description = descriptionString;
+  }
+
   // Subject field
   if (document.HasMember("subject"))
   {
@@ -169,6 +197,33 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
     alarmMgr.badInput(clientIp, "no expires specified");
     return oe.render(ciP, "");
+  }
+
+  // Status field
+  if (document.HasMember("status"))
+  {
+    const Value& status = document["status"];
+
+    if (!status.IsString())
+    {
+      OrionError oe(SccBadRequest, "status is not a string");
+
+      alarmMgr.badInput(clientIp, "status is not a string");
+      return oe.render(ciP, "");
+    }
+
+    std::string statusString = status.GetString();
+
+    if ((statusString != "active") && (statusString != "inactive"))
+    {
+      OrionError oe(SccBadRequest, "status is not valid (it has to be either active or inactive)");
+
+      alarmMgr.badInput(clientIp, "status is not valid (it has to be either active or inactive)");
+      return oe.render(ciP, "");
+    }
+
+    destination->status = statusString;
+
   }
 
   return "OK";

@@ -1,0 +1,384 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Pause subscription not sending notifications (without cache)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -noCache
+accumulatorStart
+
+--SHELL--
+
+#
+# This test is almost a copy of pause_subscriptoins_notif_cache.test (check it
+# using diff :)
+#
+# To keep this .test as similar as possible to the _cache.test version,
+# we also use WAIT_TIME but with time 0s
+
+WAIT_TIME=0s
+
+# 01. Create subscription at "inactive" status
+# 02. Create entity (should trigger notification, but subscription is inactive)
+# 03. Check subscription timesSent value (0)
+# 04. Set "active" status
+# 05. Update entity (triggers notification)
+# 06. Check subscription timesSent value (1)
+# 07. Set "inactive" status
+# 08. Update entity (should trigger notification, but subscription is inactive)
+# 09. Check subscription timesSent value (1)
+# 10. Accumulator dump
+
+
+echo "01. Create subscription at "inactive" status"
+echo "============================================"
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attributes": [ "A" ]
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:'${LISTENER_PORT}'/notify",
+        "attributes": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z",
+    "status": "inactive"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+id1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo '02. Create entity (should trigger notification, but subscription is inactive)'
+echo "============================================================================="
+payload='
+{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": "foo"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+sleep $WAIT_TIME
+
+
+echo '03. Check subscription timesSent value (0)'
+echo "=========================================="
+orionCurl --url /v2/subscriptions/$id1 --json
+echo
+echo
+
+
+echo '04. Set "active" status'
+echo "======================="
+payload='
+{
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload" --json
+echo
+echo
+
+
+echo '05. Update entity (triggers notification)'
+echo "========================================="
+payload='
+{
+  "A": {
+    "value": "bar"
+  }
+}'
+orionCurl --url /v2/entities/E -X PATCH --payload "$payload" --json
+echo
+echo
+sleep $WAIT_TIME
+
+
+echo '06. Check subscription timesSent value (1)'
+echo "=========================================="
+orionCurl --url /v2/subscriptions/$id1 --json
+echo
+echo
+
+
+echo '07. Set "inactive" status'
+echo "========================="
+payload='
+{
+    "status": "inactive"
+}'
+orionCurl --url /v2/subscriptions/$id1 -X PATCH --payload "$payload" --json
+echo
+echo
+
+
+echo '08. Update entity (should trigger notification, but subscription is inactive)'
+echo "============================================================================="
+payload='
+{
+  "A": {
+    "value": "ree"
+  }
+}'
+orionCurl --url /v2/entities/E -X PATCH --payload "$payload" --json
+echo
+echo
+sleep $WAIT_TIME
+
+
+echo '09. Check subscription timesSent value (1)'
+echo "=========================================="
+orionCurl --url /v2/subscriptions/$id1 --json
+echo
+echo
+
+
+echo "10. Accumulator dump"
+echo "===================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription at inactive status
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Date: REGEX(.*)
+
+
+
+02. Create entity (should trigger notification, but subscription is inactive)
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Date: REGEX(.*)
+
+
+
+03. Check subscription timesSent value (0)
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 322
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [],
+        "callback": "http://localhost:9997/notify"
+    },
+    "status": "inactive",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "A"
+            ],
+            "expression": {
+                "coords": "",
+                "geometry": "",
+                "georel": "",
+                "q": ""
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+04. Set "active" status
+=======================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. Update entity (triggers notification)
+=========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. Check subscription timesSent value (1)
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 379
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [],
+        "callback": "http://localhost:9997/notify",
+        "lastNotification": "REGEX(.*)",
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "A"
+            ],
+            "expression": {
+                "coords": "",
+                "geometry": "",
+                "georel": "",
+                "q": ""
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+07. Set "inactive" status
+=========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+08. Update entity (should trigger notification, but subscription is inactive)
+=============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. Check subscription timesSent value (1)
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "expires": "2050-04-05T14:00:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [],
+        "callback": "http://localhost:9997/notify",
+        "lastNotification": "REGEX(.*)",
+        "timesSent": 1
+    },
+    "status": "inactive",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "A"
+            ],
+            "expression": {
+                "coords": "",
+                "geometry": "",
+                "georel": "",
+                "q": ""
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+10. Accumulator dump
+====================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 460
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T",
+        "isPattern" : "false",
+        "id" : "E",
+        "attributes" : [
+          {
+            "name" : "A",
+            "type" : "none",
+            "value" : "bar"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB
