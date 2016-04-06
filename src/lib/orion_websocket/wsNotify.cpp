@@ -21,6 +21,16 @@ void removeSenders(const std::vector<std::string>& subIds)
   }
 }
 
+
+/* ****************************************************************************
+*
+* sendNotifyContextRequestWs - 
+*
+* Send notification throught websocket.
+* On success return 0, on error return 1
+*/
+
+
 int sendNotifyContextRequestWs
 (
   const std::string& subId,
