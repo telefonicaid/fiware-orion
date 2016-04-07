@@ -27,7 +27,7 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "rest/uriParamFormat.h"
+#include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -209,32 +209,6 @@ ConnectionInfo::~ConnectionInfo()
 
   servicePathV.clear();
 }
-
-
-/* ****************************************************************************
-*
-* reset - Reset some class memeber to use in a websocket connection
-*/
-void ConnectionInfo::reset()
-{
-  version = "HTTP/1.1";
-  servicePath = "/";
-
-  httpHeaders.gotHeaders = true;
-  httpHeaders.userAgent = "orionWS/0.1";
-  httpHeaders.accept = "*/*";
-  httpHeaders.contentLength = 0;
-  httpHeaders.servicePath = "/";
-  httpHeaders.tenant.clear();
-
-  uriParam[URI_PARAM_PAGINATION_DETAILS] = "off";
-  uriParam[URI_PARAM_PAGINATION_LIMIT] = "20";
-  uriParam[URI_PARAM_PAGINATION_OFFSET] = "0";
-
-  tenant.clear();
-  tenantFromHttpHeader.clear();
-}
-
 
 /* ****************************************************************************
 *

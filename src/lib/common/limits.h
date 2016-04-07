@@ -117,6 +117,13 @@
 
 /* ****************************************************************************
 *
+* Subscription id maximun length - 
+*/
+#define MAX_LENGTH_SUBID    24
+
+
+/* ****************************************************************************
+*
 * Default timeout - 5000 milliseconds
 */
 #define DEFAULT_TIMEOUT     5000

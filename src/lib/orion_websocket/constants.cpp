@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,40 +23,13 @@
 * Author: Felipe Ortiz
 */
 
-#ifndef WS_PARSER_H
-#define WS_PARSER_H
 
-#include <vector>
-#include <map>
-#include <string>
+#include "constants.h"
 
-class HttpHeaders;
-class ConnectionInfo;
-
-void ws_parser_parse
-(
-  const char*      msg,
-  ConnectionInfo*  ciP,
-  std::string&     url,
-  std::string&     verb,
-  std::string&     payload,
-  HttpHeaders&     head
-);
-
-const char *ws_parser_message
-(
- const std::string&  msg,
- const HttpHeaders&  head,
- const std::vector<std::string> headName,
- const std::vector<std::string> headValue,
- int                 statusCode
-);
-
-const char *ws_parser_notify
-(
- const std::string& subId,
- const std::map<std::string, std::string>& headers,
- const std::string& data
-);
-
-#endif
+const int WSConstants::Port = 9010;
+const int WSConstants::Pooling = 50;
+const size_t WSConstants::DataSize = 128;
+// Ok, this is can be a macro, but I prefer
+// to be consistent
+const std::string WSConstants::ProtocolName = "ngsiv2-json";
+const std::string WSConstants::Scheme = "ws://";

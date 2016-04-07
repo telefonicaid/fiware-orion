@@ -57,7 +57,6 @@ public:
   ConnectionInfo(const std::string &_url, const std::string &_method, const std::string &_version, MHD_Connection* _connection = NULL);
   ~ConnectionInfo();
 
-  void reset();
   void modify(const std::string &_url, const std::string &_verb, const std::string &_payload);
 
   MHD_Connection*            connection;

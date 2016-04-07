@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -24,13 +24,20 @@
 */
 
 
-#ifndef WS_CONNECTION_MANAGER_H
-#define WS_CONNECTION_MANAGER_H
+#ifndef WS_CONSTANTS_H
+#define WS_CONSTANTS_H
 
-class ConnectionInfo;
+#include <string>
 
-int connection_manager_get_cid();
-ConnectionInfo *connection_manager_get(int cid, const char *msg);
-void connection_manager_remove(int cid);
+
+class WSConstants
+{
+public:
+  static const int Port;
+  static const int Pooling;
+  static const size_t DataSize;
+  static const std::string ProtocolName;
+  static const std::string Scheme;
+};
 
 #endif
