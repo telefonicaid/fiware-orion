@@ -133,7 +133,7 @@ FIWARE_REPO=$(mktemp)
 cat > $FIWARE_REPO <<EOF
 [testbed-fiware]
 name=Fiware Repository
-baseurl=http://repositories.lab.fiware.org/repo/rpm/$releasever/x86_64/
+baseurl=http://repositories.lab.fiware.org/repo/rpm/$releasever
 gpgcheck=0
 enabled=1
 EOF
