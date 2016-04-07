@@ -55,12 +55,14 @@ int sendNotifyContextRequestWs
   sprintf((char *)p, "%s", msg);
 
   int written = 0;
+  int bytes = 0;
 
   while (written < msg_size)
   {
-    written += lws_write(it->second, (p + written), strlen(msg), LWS_WRITE_TEXT);
-    if (written == -1)
+    bytes = lws_write(it->second, (p + written), msg_size - bytes, LWS_WRITE_TEXT);
+    if (bytes == -1)
         return 1;
+    written += bytes;
   }
 
   free((char *)msg);
