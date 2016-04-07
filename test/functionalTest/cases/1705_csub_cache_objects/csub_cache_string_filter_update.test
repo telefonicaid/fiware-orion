@@ -287,7 +287,7 @@ Date: REGEX(.*)
 ====================================================
 POST http://localhost:9997/notify
 Content-Length: 461
-User-Agent: orion/1.0.0-next libcurl/7.19.7
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:9997
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -319,7 +319,7 @@ Content-Type: application/json; charset=utf-8
 =======================================
 POST http://localhost:9997/notify
 Content-Length: 462
-User-Agent: orion/1.0.0-next libcurl/7.19.7
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:9997
 Accept: application/json
 Content-Type: application/json; charset=utf-8

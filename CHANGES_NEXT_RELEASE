@@ -7,3 +7,4 @@
 - Fix: csub cache sync logic not persisting lastNotification when the field doesn't initially exist in DB
 - Fix: csub cache at mongoBackend update context subscription logic wrongly setting expiration with current time, ignoring actual expires/duration in the request
 - Fix: GET /v2/types response payload, from key-map to array (#1832)
+- Fix: GET /v2/types response payload, now using array for attribute types (#1636)

@@ -56,7 +56,7 @@ std::string getEntityAllTypes
   EntityTypeVectorResponse  response;
   std::string               answer;
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam));
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
   TIMED_RENDER(answer = response.toJson(ciP));
 
   if (ciP->uriParamOptions["count"])

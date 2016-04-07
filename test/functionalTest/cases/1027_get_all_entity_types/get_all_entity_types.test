@@ -144,7 +144,7 @@ Date: REGEX(.*)
 03. GET /v2/types and get a non-empty list
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 78
+Content-Length: 84
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -152,10 +152,14 @@ Date: REGEX(.*)
     {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             }
         },
         "count": 1,
@@ -185,7 +189,7 @@ Date: REGEX(.*)
 06. GET /v2/types and get a list of three types, each with one entity and two attributes
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 233
+Content-Length: 251
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -193,10 +197,14 @@ Date: REGEX(.*)
     {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             }
         },
         "count": 1,
@@ -205,10 +213,14 @@ Date: REGEX(.*)
     {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A3": {
-                "type": "Bool"
+                "types": [
+                    "Bool"
+                ]
             }
         },
         "count": 1,
@@ -217,10 +229,14 @@ Date: REGEX(.*)
     {
         "attrs": {
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             },
             "A4": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             }
         },
         "count": 1,
@@ -241,7 +257,7 @@ Date: REGEX(.*)
 08. GET /v2/types and get a list of three types, T3 now has three attributes and two entities
 =============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 254
+Content-Length: 275
 Content-Type: application/json
 X-Total-Count: 3
 Date: REGEX(.*)
@@ -250,10 +266,14 @@ Date: REGEX(.*)
     {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             }
         },
         "count": 1,
@@ -262,10 +282,14 @@ Date: REGEX(.*)
     {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A3": {
-                "type": "Bool"
+                "types": [
+                    "Bool"
+                ]
             }
         },
         "count": 1,
@@ -274,13 +298,19 @@ Date: REGEX(.*)
     {
         "attrs": {
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             },
             "A3": {
-                "type": "Bool"
+                "types": [
+                    "Bool"
+                ]
             },
             "A4": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             }
         },
         "count": 2,

@@ -72,6 +72,60 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 
 /* ****************************************************************************
 *
+* ContextAttributeVector::toJsonTypes -
+*
+*/
+std::string ContextAttributeVector::toJsonTypes()
+{
+  // Pass 1 - get per-attribute types
+  std::map<std::string, std::map<std::string, int> > perAttrTypes;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    ContextAttribute* caP = vec[ix];
+    perAttrTypes[caP->name][caP->type] = 1;   // just to mark that type exists
+  }
+
+  // Pass 2 - generate JSON
+  std::string out;
+
+  std::map<std::string, std::map<std::string, int> >::iterator it;
+  unsigned int                                                 ix;
+  for (it = perAttrTypes.begin(), ix = 0; it != perAttrTypes.end(); ++it, ++ix)
+  {
+    std::string                 attrName  = it->first;
+    std::map<std::string, int>  attrTypes = it->second;
+
+    out += JSON_STR(attrName) + ":{" + JSON_STR("types") + ":[";
+
+    std::map<std::string, int>::iterator jt;
+    unsigned int                         jx;
+    for (jt = attrTypes.begin(), jx = 0; jt != attrTypes.end(); ++jt, ++jx)
+    {
+      std::string type = jt->first;
+      out += JSON_STR(type);
+
+      if (jx != attrTypes.size() - 1)
+      {
+        out += ",";
+      }
+    }
+
+    out += "]}";
+
+    if (ix != perAttrTypes.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttributeVector::toJson - 
 *
 * Attributes named 'id' or 'type' are not rendered in API version 2, due to the 
@@ -81,7 +135,7 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const std::string& renderMode, const std::string& attrsFilter)
+std::string ContextAttributeVector::toJson(bool isLastElement, const std::string& renderMode, const std::string& attrsFilter)
 {
   if (vec.size() == 0)
   {
@@ -168,7 +222,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
         }
       }
 
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
+      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderMode);
 
       if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
@@ -187,7 +241,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
       if (caP != NULL)
       {
         ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, types, renderMode);
+        out += caP->toJson(renderedAttributes == validAttributes, renderMode);
       }
     }
   }

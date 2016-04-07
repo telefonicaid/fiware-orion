@@ -756,15 +756,11 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode, RequestType requestType)
+std::string ContextAttribute::toJson(bool isLastElement, const std::string& renderMode, RequestType requestType)
 {
   std::string  out;
 
-  if (types == true)
-  {
-    out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
-  }
-  else if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_KEY_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
+  if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_KEY_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
   {
     out = (renderMode == RENDER_MODE_KEY_VALUES)? JSON_STR(name) + ":" : "";
 

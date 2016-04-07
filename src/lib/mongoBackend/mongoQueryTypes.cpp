@@ -39,24 +39,35 @@
 
 /* ****************************************************************************
 *
-* attributeType -
+* getAttributeTypes -
 *
 */
-static std::string attributeType
+static void getAttributeTypes
 (
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   const std::string&                    entityType,
-  const std::string&                    attrName
+  const std::string&                    attrName,
+  std::vector<std::string>*             attrTypes
 )
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
   std::string  idServicePath  = std::string("_id.")    + ENT_SERVICE_PATH;
   std::string  attributeName  = std::string(ENT_ATTRS) + "." + attrName;
 
-  BSONObj query = BSON(idType        << entityType <<
-                       idServicePath << fillQueryServicePath(servicePathV) <<
-                       attributeName << BSON("$exists" << true));
+  BSONObj query;
+  if (entityType == "")
+  {
+    query = BSON("$or"         << BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ) <<
+                 idServicePath << fillQueryServicePath(servicePathV) <<
+                 attributeName << BSON("$exists" << true));
+  }
+  else
+  {
+    query = BSON(idType        << entityType <<
+                 idServicePath << fillQueryServicePath(servicePathV) <<
+                 attributeName << BSON("$exists" << true));
+  }
 
   std::auto_ptr<DBClientCursor> cursor;
   std::string                   err;
@@ -67,11 +78,10 @@ static std::string attributeType
   {
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    return "";
+    return;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
-  std::string   ret  = "";
   unsigned int  docs = 0;
   while (moreSafe(cursor))
   {
@@ -84,17 +94,12 @@ static std::string attributeType
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    /* It could happen that different entities within the same entity type may have attributes with the same name
-     * but different types. In that case, one type (at random) is returned. A list could be returned but the
-     * NGSIv2 operations only allow to set one type */
     BSONObj attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
     BSONObj attr  = getFieldF(attrs, attrName).embeddedObject();
-    ret           = getStringFieldF(attr, ENT_ATTRS_TYPE);
-    break;
+
+    attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
   }
   releaseMongoConnection(connection);
-
-  return ret;
 }
 
 
@@ -128,10 +133,11 @@ static long long countEntities(const std::string& tenant, const std::vector<std:
 */
 HttpStatusCode mongoEntityTypes
 (
-  EntityTypeVectorResponse*             responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams
+  EntityTypeVectorResponse*            responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,
+  const std::string&                   apiVersion
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -285,10 +291,20 @@ HttpStatusCode mongoEntityTypes
 
         /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
          * This could be unefficient, specially if the number of attributes is large */
-        std::string attrType = attributeType(tenant, servicePathV, entityType->type , attrsArray[jx].str());
+        std::vector<std::string> attrTypes;
+        getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
 
-        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrType, "");
-        entityType->contextAttributeVector.push_back(ca);
+        for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
+        {
+          ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
+          entityType->contextAttributeVector.push_back(ca);
+
+          // For backward compability, NGSIv1 only accepts one element
+          if (apiVersion == "v1")
+          {
+            break;
+          }
+        }
       }
     }
 
@@ -351,7 +367,8 @@ HttpStatusCode mongoAttributesForEntityType
   EntityTypeResponse*                   responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams
+  std::map<std::string, std::string>&   uriParams,
+  const std::string&                    apiVersion
 )
 {  
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -440,10 +457,20 @@ HttpStatusCode mongoAttributesForEntityType
 
     /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
      * This could be unefficient, specially if the number of attributes is large */
-    std::string attrType = attributeType(tenant, servicePathV, entityType , idField.str());
+    std::vector<std::string> attrTypes;
+    getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
 
-    ContextAttribute*  ca = new ContextAttribute(idField.str(), attrType, "");
-    responseP->entityType.contextAttributeVector.push_back(ca);
+    for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
+    {
+      ContextAttribute*  ca = new ContextAttribute(idField.str(), attrTypes[kx], "");
+      responseP->entityType.contextAttributeVector.push_back(ca);
+
+      // For backward compability, NGSIv1 only accepts one element
+      if (apiVersion == "v1")
+      {
+        break;
+      }
+    }
   }
 
   char detailsMsg[256];
