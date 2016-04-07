@@ -1230,11 +1230,16 @@ Response:
 
 ### Retrieve entity types [GET /v2/types/{?limit,offset,options}]
 
-If `values` option is not in use, the operation returns a JSON object which properties are entity types. The properties
-value is a JSON object with information about the type: `attrs` (the union set of attribute names along all the entities
-of such type) and `count` (the number of entities belonging to that type).
+If `values` option is not in use, the operation returns a JSON array with the entity types. Each element
+is a JSON object with information about the type:
+
+* `type` : the type name
+* `attrs` : the union set of attribute names along all the entities of such type.
+* `count` : the number of entities belonging to that type.
 
 If `values` option is used, the operation returns a JSON array with the list of entity type names as strings.
+
+Results are ordered by entity `type` in alphabetical order.
 
 Response code:
 
@@ -1251,8 +1256,9 @@ Response code:
 
 + Response 200 (application/json)
 
-        {
-          "Car": {
+        [
+          {
+            "type": "Car",
             "attrs": {
               "speed": {
                 "type": "none"
@@ -1269,7 +1275,8 @@ Response code:
             },
             "count": 12
           },
-          "Room": {
+          {
+            "type": "Room",
             "attrs": {
               "pressure": {
                 "type": "none"
@@ -1283,14 +1290,16 @@ Response code:
             },
             "count": 7
           }
-        }
+        ]
 
 ## Entity type [/v2/types/{entityType}]
 
 ### Retrieve entity type [GET /v2/types/{entityType}]
 
-The operation returns a JSON object with information about the type: `attrs` (the union set of attribute names along all
-the entities of such type) and `count` (the number of entities belonging to that type).
+The operation returns a JSON object with information about the type:
+
+* `attrs` : the union set of attribute names along all the entities of such type.
+* `count` : the number of entities belonging to that type.
 
 Response code:
 

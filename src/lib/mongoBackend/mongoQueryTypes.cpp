@@ -128,7 +128,7 @@ static long long countEntities(const std::string& tenant, const std::vector<std:
 */
 HttpStatusCode mongoEntityTypes
 (
-  EntityTypeVectorResponse*                  responseP,
+  EntityTypeVectorResponse*             responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams

@@ -129,7 +129,7 @@ Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
 
-{}
+[]
 
 
 02. Create E1/T1/A1+A2
@@ -144,12 +144,12 @@ Date: REGEX(.*)
 03. GET /v2/types and get a non-empty list
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 71
+Content-Length: 78
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "T1": {
+[
+    {
         "attrs": {
             "A1": {
                 "type": "String"
@@ -158,9 +158,10 @@ Date: REGEX(.*)
                 "type": "Int"
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T1"
     }
-}
+]
 
 
 04. Create E2/T2/A1+A3
@@ -184,12 +185,12 @@ Date: REGEX(.*)
 06. GET /v2/types and get a list of three types, each with one entity and two attributes
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 212
+Content-Length: 233
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "T1": {
+[
+    {
         "attrs": {
             "A1": {
                 "type": "String"
@@ -198,9 +199,10 @@ Date: REGEX(.*)
                 "type": "Int"
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T1"
     },
-    "T2": {
+    {
         "attrs": {
             "A1": {
                 "type": "String"
@@ -209,9 +211,10 @@ Date: REGEX(.*)
                 "type": "Bool"
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T2"
     },
-    "T3": {
+    {
         "attrs": {
             "A2": {
                 "type": "Int"
@@ -220,9 +223,10 @@ Date: REGEX(.*)
                 "type": "String"
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T3"
     }
-}
+]
 
 
 07. Create E4/T3/A4+A3
@@ -237,13 +241,13 @@ Date: REGEX(.*)
 08. GET /v2/types and get a list of three types, T3 now has three attributes and two entities
 =============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 233
+Content-Length: 254
 Content-Type: application/json
-X-Total-Count: 4
+X-Total-Count: 3
 Date: REGEX(.*)
 
-{
-    "T1": {
+[
+    {
         "attrs": {
             "A1": {
                 "type": "String"
@@ -252,9 +256,10 @@ Date: REGEX(.*)
                 "type": "Int"
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T1"
     },
-    "T2": {
+    {
         "attrs": {
             "A1": {
                 "type": "String"
@@ -263,9 +268,10 @@ Date: REGEX(.*)
                 "type": "Bool"
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T2"
     },
-    "T3": {
+    {
         "attrs": {
             "A2": {
                 "type": "Int"
@@ -277,9 +283,10 @@ Date: REGEX(.*)
                 "type": "String"
             }
         },
-        "count": 2
+        "count": 2,
+        "type": "T3"
     }
-}
+]
 
 
 --TEARDOWN--
