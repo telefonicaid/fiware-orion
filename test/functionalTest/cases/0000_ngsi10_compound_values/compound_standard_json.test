@@ -83,33 +83,7 @@ payload='{
 }'
 orionCurl --url "$url" --payload "$payload" --json
 
-echo "3: ++++++++++ query for vector compound in XML ++++++++++"
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="T" isPattern="false">
-          <id>EVector</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-
-echo "4: ++++++++++ query for object compound in XML ++++++++++"
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="T" isPattern="false">
-          <id>EObject</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-
-echo "5: ++++++++++ query for vector compound in JSON ++++++++++"
+echo "3: ++++++++++ query for vector compound in JSON ++++++++++"
 url="/v1/queryContext"
 payload='{
     "entities": [
@@ -122,7 +96,7 @@ payload='{
 }'
 orionCurl --url "$url" --payload "$payload" --json
 
-echo "6: ++++++++++ query for object compound in JSON ++++++++++"
+echo "4: ++++++++++ query for object compound in JSON ++++++++++"
 url="/v1/queryContext"
 payload='{
     "entities": [
@@ -135,17 +109,10 @@ payload='{
 }'
 orionCurl --url "$url" --payload "$payload" --json
 
-
-echo "7: ++++++++++ query for vector compound in XML convop ++++++++++"
-orionCurl --url "/v1/contextEntities/EVector"
-
-echo "8: ++++++++++ query for object compound in XML convop ++++++++++"
-orionCurl --url "/v1/contextEntities/EObject"
-
-echo "9: ++++++++++ query for vector compound in JSON convop ++++++++++"
+echo "5: ++++++++++ query for vector compound in JSON convop ++++++++++"
 orionCurl --url "/v1/contextEntities/EVector" --json
 
-echo "10: ++++++++++ query for object compound in JSON convop ++++++++++"
+echo "6: ++++++++++ query for object compound in JSON convop ++++++++++"
 orionCurl --url "/v1/contextEntities/EObject" --json 
 
 --REGEXPECT--
@@ -205,87 +172,7 @@ Date: REGEX(.*)
         }
     ]
 }
-3: ++++++++++ query for vector compound in XML ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 995
-Content-Type: application/json
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>EVector</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue type="vector">
-              <item>22</item>
-              <item>
-                <x type="vector">
-                  <item>x1</item>
-                  <item>x2</item>
-                </x>
-                <y>3</y>
-              </item>
-              <item type="vector">
-                <item>z1</item>
-                <item>z2</item>
-              </item>
-            </contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-4: ++++++++++ query for object compound in XML ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 845
-Content-Type: application/json
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>EObject</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue>
-              <x>
-                <x1>a</x1>
-                <x2>b</x2>
-              </x>
-              <y type="vector">
-                <item>y1</item>
-                <item>y2</item>
-              </y>
-            </contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-5: ++++++++++ query for vector compound in JSON ++++++++++
+3: ++++++++++ query for vector compound in JSON ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 647
 Content-Type: application/json
@@ -326,7 +213,7 @@ Date: REGEX(.*)
         }
     ]
 }
-6: ++++++++++ query for object compound in JSON ++++++++++
+4: ++++++++++ query for object compound in JSON ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 578
 Content-Type: application/json
@@ -363,79 +250,7 @@ Date: REGEX(.*)
         }
     ]
 }
-7: ++++++++++ query for vector compound in XML convop ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 775
-Content-Type: application/json
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<contextElementResponse>
-  <contextElement>
-    <entityId type="T" isPattern="false">
-      <id>EVector</id>
-    </entityId>
-    <contextAttributeList>
-      <contextAttribute>
-        <name>att</name>
-        <type>compound</type>
-        <contextValue type="vector">
-          <item>22</item>
-          <item>
-            <x type="vector">
-              <item>x1</item>
-              <item>x2</item>
-            </x>
-            <y>3</y>
-          </item>
-          <item type="vector">
-            <item>z1</item>
-            <item>z2</item>
-          </item>
-        </contextValue>
-      </contextAttribute>
-    </contextAttributeList>
-  </contextElement>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</contextElementResponse>
-8: ++++++++++ query for object compound in XML convop ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 641
-Content-Type: application/json
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<contextElementResponse>
-  <contextElement>
-    <entityId type="T" isPattern="false">
-      <id>EObject</id>
-    </entityId>
-    <contextAttributeList>
-      <contextAttribute>
-        <name>att</name>
-        <type>compound</type>
-        <contextValue>
-          <x>
-            <x1>a</x1>
-            <x2>b</x2>
-          </x>
-          <y type="vector">
-            <item>y1</item>
-            <item>y2</item>
-          </y>
-        </contextValue>
-      </contextAttribute>
-    </contextAttributeList>
-  </contextElement>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</contextElementResponse>
-9: ++++++++++ query for vector compound in JSON convop ++++++++++
+5: ++++++++++ query for vector compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 490
 Content-Type: application/json
@@ -472,7 +287,7 @@ Date: REGEX(.*)
         "reasonPhrase": "OK"
     }
 }
-10: ++++++++++ query for object compound in JSON convop ++++++++++
+6: ++++++++++ query for object compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 437
 Content-Type: application/json
