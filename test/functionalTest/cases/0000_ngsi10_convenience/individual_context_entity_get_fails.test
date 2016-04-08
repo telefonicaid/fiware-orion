@@ -21,29 +21,35 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience Individual Context Entity - DELETE FAILS
+Convenience Individual Context Entity - GET FAILS
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. delete an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01" -X "DELETE"
+echo "+++++ 1. get an entity +++++"
+orionCurl --url "/v1/contextEntities/entity01" --json
 
 --REGEXPECT--
-+++++ 1. delete an entity +++++
++++++ 1. get an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 132
+Content-Length: 230
 Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>entity01</details>
-</statusCode>
+{
+    "contextElement": {
+        "id": "entity01",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /entity01/",
+        "reasonPhrase": "No context element found"
+    }
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

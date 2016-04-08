@@ -21,32 +21,66 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience Individual Context Entity Attribute - GET FAILS
+Convenience Individual Context Entity Attribute - DELETE OK
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. get an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes/attr01"
+echo "+++++ 1. create an entity +++++"
+url="/v1/contextEntities/entity01"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "+++++ 2. delete the entity attribute +++++"
+orionCurl --url "/v1/contextEntities/entity01/attributes/temperature" -X "DELETE" --json
 
 --REGEXPECT--
-+++++ 1. get an entity +++++
++++++ 1. create an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 258
+Content-Length: 329
 Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextAttributeResponse>
-  <contextAttributeList/>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: /entity01/</details>
-  </statusCode>
-</contextAttributeResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "entity01",
+    "isPattern": "false",
+    "type": ""
+}
++++++ 2. delete the entity attribute +++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
