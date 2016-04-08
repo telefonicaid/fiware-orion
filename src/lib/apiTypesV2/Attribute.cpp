@@ -52,7 +52,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
     else
     {
       out = "{";
-      out += pcontextAttribute->toJson(true, false, renderMode, requestType);  // param 1 'true' as it is the last and only element
+      out += pcontextAttribute->toJson(true, renderMode, requestType);  // param 1 'true' as it is the last and only element
       out += "}";
     }
 

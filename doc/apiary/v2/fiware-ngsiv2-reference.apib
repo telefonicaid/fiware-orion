@@ -1230,11 +1230,19 @@ Response:
 
 ### Retrieve entity types [GET /v2/types/{?limit,offset,options}]
 
-If `values` option is not in use, the operation returns a JSON object which properties are entity types. The properties
-value is a JSON object with information about the type: `attrs` (the union set of attribute names along all the entities
-of such type) and `count` (the number of entities belonging to that type).
+If `values` option is not in use, the operation returns a JSON array with the entity types. Each element
+is a JSON object with information about the type:
+
+* `type` : the entity type name.
+* `attrs` : the set of attribute names along with all the entities of such type, represented in
+  a JSON object whose keys are the attribute names and whose values contain information of such
+  attributes (in particular a list of the types used by attributes with that name along all the
+  entities).
+* `count` : the number of entities belonging to that type.
 
 If `values` option is used, the operation returns a JSON array with the list of entity type names as strings.
+
+Results are ordered by entity `type` in alphabetical order.
 
 Response code:
 
@@ -1251,46 +1259,50 @@ Response code:
 
 + Response 200 (application/json)
 
-        {
-          "Car": {
+        [
+          {
+            "type": "Car",
             "attrs": {
               "speed": {
-                "type": "none"
+                "types": [ "none" ]
               },
               "fuel": {
-                "type": "gasoline"
-              },
-              "fuel": {
-                "type": "diesel"
+                "types": [ "gasoline", "diesel" ]
               },
               "temperature": {
-                "type": "urn:phenomenum:temperature"
+                "types": [ "urn:phenomenum:temperature" ]
               }
             },
             "count": 12
           },
-          "Room": {
+          {
+            "type": "Room",
             "attrs": {
               "pressure": {
-                "type": "none"
+                "types": [ "none" ]
               },
               "humidity": {
-                "type": "percentage"
+                "types": [ "percentage" ]
               },
               "temperature": {
-                "type": "urn:phenomenum:temperature"
+                "types": [ "urn:phenomenum:temperature" ]
               }
             },
             "count": 7
           }
-        }
+        ]
 
 ## Entity type [/v2/types/{entityType}]
 
 ### Retrieve entity type [GET /v2/types/{entityType}]
 
-The operation returns a JSON object with information about the type: `attrs` (the union set of attribute names along all
-the entities of such type) and `count` (the number of entities belonging to that type).
+The operation returns a JSON object with information about the type:
+
+* `attrs` : the set of attribute names along with all the entities of such type, represented in
+  a JSON object whose keys are the attribute names and whose values contain information of such
+  attributes (in particular a list of the types used by attributes with that name along all the
+  entities).
+* `count` : the number of entities belonging to that type.
 
 Response code:
 
@@ -1305,13 +1317,13 @@ Response code:
           {
             "attrs": {
               "pressure": {
-                "type": "none"
+                "types": [ "none" ]
               },
               "humidity": {
-                "type": "percentage"
+                "types": [ "percentage" ]
               },
               "temperature": {
-                "type": "urn:phenomenum:temperature"
+                "types": [ "urn:phenomenum:temperature" ]
               }
             },
             "count": 7
