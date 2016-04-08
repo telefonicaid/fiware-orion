@@ -40,17 +40,16 @@ brokerStart CB
 --SHELL--
 echo "1. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes"
 url="/v1/contextEntities/E1/attributes"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<appendContextElementRequest>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>Attr</type>
-      <contextValue>1</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json
+payload='{
+    "attributes": [
+        {
+            "name": "A1",
+            "type": "Attr",
+            "value": "1"
+        }
+    ]
+}'
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --json
 echo
 echo
 
@@ -69,18 +68,16 @@ echo
 
 echo "4. Update E1/A1 using conv op PUT /v1/contextEntities/E1/attributes"
 url="/v1/contextEntities/E1"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>Attr</type>
-      <contextValue>99</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</updateContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json -X PUT
+payload='{
+    "attributes": [
+        {
+            "name": "A1",
+            "type": "Attr",
+            "value": "99"
+        }
+    ]
+}'
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --json -X PUT
 echo
 echo
 
