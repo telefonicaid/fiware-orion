@@ -30,10 +30,10 @@ brokerStart CB
 --SHELL--
 
 #
-## 01. POST /v2/entities to create E1/T1/A1=0
-## 02. POST /v2/entities to create E1/T2/A1=0
-## 03. PUT /v2/entities/E1/atttrs/A1/value (too many results)
-
+# 01. POST /v2/entities to create E1/T1/A1=0
+# 02. POST /v2/entities to create E1/T2/A1=0
+# 03. PUT /v2/entities/E1/atttrs/A1/value (too many results)
+#
 
 
 echo "01. POST /v2/entities to create E1/T1/A1=0"
@@ -66,6 +66,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -75,6 +76,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -84,6 +86,7 @@ Date: REGEX(.*)
 HTTP/1.1 409 Conflict
 Content-Length: 98
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

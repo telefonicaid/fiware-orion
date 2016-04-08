@@ -30,7 +30,12 @@ brokerStart CB
 --SHELL--
 
 #
-
+# 01. POST /v2/entities/E1 T1
+# 02. POST /v2/entities/E1 T2
+# 03. GET /v2/entities/E1?type=T1
+# 04. GET /v2/entities/E1?type=T1&attrs=A1
+# 05. GET /v2/entities/E1/attrs/A2?type=T2
+# 06. GET /v2/entities/E1/attrs/A1/value?type=T1
 #
 
 echo "01. POST /v2/entities/E1 T1"
@@ -100,6 +105,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -109,6 +115,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -118,6 +125,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 137
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -141,6 +149,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 80
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -159,6 +168,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 51
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -173,6 +183,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 11
 Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 V1 A1 E1/T1
@@ -181,4 +192,3 @@ V1 A1 E1/T1
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-

@@ -36,14 +36,14 @@ brokerStart CB
 # 02. Create entity with geo:polygon with 1 coordinate -> fail
 # 03. Create entity with geo:polygon with last coordinate not matching the first -> fail
 # 04. Create entity with two geo:polygon -> fail
-# 02. Create entity with one geo:polygon (attr1) -> OK
-# 03. Update attr1 geo:polygon attribute -> OK
-# 04. Append a new geo:polygon attribute (attr2) -> fail
-# 05. Remove the geo:polygon attribute (attr1) -> OK
-# 06. Append a new geo:polygon attribute (attr2) -> OK
-# 07. Change attribute type to no-geo:polygon (attr2) -> OK
-# 08. Append new geo:polygon attribute (attr3) -> OK
-# 09. Change attr2 type to geo:polygon again -> fail
+# 05. Create entity with one geo:polygon (attr1) -> OK
+# 06. Update attr1 geo:polygon attribute -> OK
+# 07. Append a new geo:polygon attribute (attr2) -> fail
+# 08. Remove the geo:polygon attribute (attr1) -> OK
+# 09. Append a new geo:polygon attribute (attr2) -> OK
+# 10. Change attribute type to no-geo:polygon (attr2) -> OK
+# 11. Append new geo:polygon attribute (attr3) -> OK
+# 12. Change attr2 type to geo:polygon again -> fail
 #
 
 echo "01. Create entity with geo:polygon without vector coordinates -> fail"
@@ -295,6 +295,7 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 104
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -308,6 +309,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -321,6 +323,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 78
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -334,6 +337,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -347,6 +351,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 88
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -360,6 +365,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -373,6 +379,7 @@ Date: REGEX(.*)
 HTTP/1.1 413 Request Entity Too Large
 Content-Length: 96
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -386,6 +393,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -399,6 +407,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -408,6 +417,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 116
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -430,6 +440,7 @@ Date: REGEX(.*)
 ============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -439,6 +450,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 124
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -462,6 +474,7 @@ Date: REGEX(.*)
 HTTP/1.1 413 Request Entity Too Large
 Content-Length: 96
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -475,6 +488,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 124
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -497,6 +511,7 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -506,6 +521,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 25
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -518,6 +534,7 @@ Date: REGEX(.*)
 ====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -527,6 +544,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 116
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -549,6 +567,7 @@ Date: REGEX(.*)
 =========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -558,6 +577,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -575,6 +595,7 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -584,6 +605,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 179
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -612,6 +634,7 @@ Date: REGEX(.*)
 HTTP/1.1 413 Request Entity Too Large
 Content-Length: 96
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -625,6 +648,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 179
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

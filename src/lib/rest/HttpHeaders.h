@@ -53,6 +53,7 @@ typedef struct HttpHeaders
   std::string   servicePath;
   std::string   xauthToken;
   std::string   xforwardedFor;
+  std::string   correlator;
 
   bool          servicePathReceived;
 

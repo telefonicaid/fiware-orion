@@ -53,7 +53,8 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
-  const std::vector<std::string>&      servicePathV
+  const std::vector<std::string>&      servicePathV,
+  const std::string&                   fiwareCorrelator
 )
 {
     std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];    
@@ -177,7 +178,8 @@ HttpStatusCode mongoSubscribeContext
                                              xauthToken,
                                              servicePathV,
                                              &requestP->restriction,
-                                             status);
+                                             status,
+                                             fiwareCorrelator);
 
     sub.append(CSUB_CONDITIONS, conds);
 

@@ -36,6 +36,7 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/foo/bar" --jso
 HTTP/1.1 200 OK
 Content-Length: 122
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

@@ -276,6 +276,7 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -289,6 +290,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -302,6 +304,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -315,6 +318,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -328,6 +332,7 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 91
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -341,6 +346,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -354,6 +360,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 81
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -367,6 +374,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 79
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -380,6 +388,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -393,6 +402,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 50
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

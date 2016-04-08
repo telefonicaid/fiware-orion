@@ -74,6 +74,7 @@ echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
 HTTP/1.1 200 OK
 Content-Length: 387
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

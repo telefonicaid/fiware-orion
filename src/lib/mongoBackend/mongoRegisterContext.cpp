@@ -57,6 +57,7 @@ HttpStatusCode mongoRegisterContext
   RegisterContextRequest*              requestP,
   RegisterContextResponse*             responseP,
   std::map<std::string, std::string>&  uriParam,
+  const std::string&                   fiwareCorrelator,
   const std::string&                   tenant,
   const std::string&                   servicePath
 )
@@ -75,7 +76,7 @@ HttpStatusCode mongoRegisterContext
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, "JSON");
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, "JSON", fiwareCorrelator);
       reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
       return result;
     }
@@ -120,7 +121,7 @@ HttpStatusCode mongoRegisterContext
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, "JSON");
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, "JSON", fiwareCorrelator);
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     return result;
 }

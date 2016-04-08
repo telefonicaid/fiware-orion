@@ -66,6 +66,7 @@ echo
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 156
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -82,6 +83,7 @@ Date: REGEX(.*)
 HTTP/1.1 406 Not Acceptable
 Content-Length: 187
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

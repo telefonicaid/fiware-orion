@@ -30,9 +30,9 @@ brokerStart CB
 --SHELL--
 
 #
-## 01. POST /v2/entities to create E1/A1=0
-## 02. PATCH /v2/entities/E1/attrs (without payload)
-
+# 01. POST /v2/entities to create E1/A1=0
+# 02. PATCH /v2/entities/E1/attrs (without payload)
+#
 
 echo "01. POST /v2/entities to create E1/A1=0"
 echo "======================================="
@@ -40,6 +40,7 @@ payload='{ "id": "E1", "type": "T1", "A1": 0 }'
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
+
 
 echo "02. PATCH /v2/entities/E1 (without payload)"
 echo "==========================================="
@@ -49,13 +50,13 @@ echo
 echo
 
 
-
 --REGEXPECT--
 01. POST /v2/entities to create E1/A1=0
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -65,6 +66,7 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 91
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

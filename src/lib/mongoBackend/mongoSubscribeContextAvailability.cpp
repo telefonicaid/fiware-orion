@@ -50,6 +50,7 @@ HttpStatusCode mongoSubscribeContextAvailability
   SubscribeContextAvailabilityRequest*   requestP,
   SubscribeContextAvailabilityResponse*  responseP,
   std::map<std::string, std::string>&    uriParam,
+  const std::string&                     fiwareCorrelator,
   const std::string&                     tenant
 )
 {
@@ -111,7 +112,7 @@ HttpStatusCode mongoSubscribeContextAvailability
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), JSON, tenant);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), JSON, tenant, fiwareCorrelator);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;

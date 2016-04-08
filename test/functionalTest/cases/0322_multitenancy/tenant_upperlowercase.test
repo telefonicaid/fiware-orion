@@ -103,6 +103,7 @@ orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -115,6 +116,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -127,6 +129,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -139,6 +142,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 884
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -187,6 +191,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 884
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -235,6 +240,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 884
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

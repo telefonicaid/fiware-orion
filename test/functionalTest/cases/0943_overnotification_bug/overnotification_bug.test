@@ -31,16 +31,10 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Create en1, en2/t, en3/t, en4/t in CB (with a small delay to have different creDates)
-# 02. Create en4/ping in CP1
-# 03. Register en4/ping in CB
-# 04. Query all
-# 05. Query offset=0, limit=1
-# 06. Query offset=0, limit=2
-# 07. Query offset=0, limit=3
-# 08. Query offset=0, limit=4
-# 09. Query offset=0, limit=5
-# 10. Query offset=1, limit=1
+# 01. Create region entity
+# 02. Create subscription
+# 03. Update not covered attribute with APPEND
+# 04. Dump accumulator count (only one notification)
 #
 
 echo "01. Create region entity"
@@ -71,6 +65,7 @@ orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
+
 echo "02. Create subscription"
 echo "======================="
 payload='{
@@ -98,6 +93,7 @@ payload='{
 orionCurl --url /v1/subscribeContext --payload "$payload" --json
 echo
 echo
+
 
 echo "03. Update not covered attribute with APPEND"
 echo "============================================"
@@ -127,11 +123,13 @@ orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
-echo "03. Dump accumulator count (only one notification)"
+
+echo "04. Dump accumulator count (only one notification)"
 echo "=================================================="
 accumulatorCount
 echo
 echo
+
 
 --REGEXPECT--
 01. Create region entity
@@ -139,6 +137,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 517
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -175,6 +174,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -190,6 +190,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 517
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -221,7 +222,7 @@ Date: REGEX(.*)
 }
 
 
-03. Dump accumulator count (only one notification)
+04. Dump accumulator count (only one notification)
 ==================================================
 1
 

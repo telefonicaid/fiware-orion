@@ -41,7 +41,8 @@ extern HttpStatusCode mongoUpdateContextAvailabilitySubscription
 (
   UpdateContextAvailabilitySubscriptionRequest*   requestP,
   UpdateContextAvailabilitySubscriptionResponse*  responseP,
-  const std::string&                              tenant       = ""
+  const std::string&                              fiwareCorrelator = "no correlator",
+  const std::string&                              tenant           = ""
 );
 
 #endif
