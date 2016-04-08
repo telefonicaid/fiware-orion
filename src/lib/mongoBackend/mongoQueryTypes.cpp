@@ -33,6 +33,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
+#include "mongoBackend/dbFieldEncoding.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
@@ -53,20 +54,19 @@ static void getAttributeTypes
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
   std::string  idServicePath  = std::string("_id.")    + ENT_SERVICE_PATH;
-  std::string  attributeName  = std::string(ENT_ATTRS) + "." + attrName;
 
   BSONObj query;
   if (entityType == "")
   {
     query = BSON("$or"         << BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ) <<
                  idServicePath << fillQueryServicePath(servicePathV) <<
-                 attributeName << BSON("$exists" << true));
+                 ENT_ATTRNAMES << attrName);
   }
   else
   {
     query = BSON(idType        << entityType <<
                  idServicePath << fillQueryServicePath(servicePathV) <<
-                 attributeName << BSON("$exists" << true));
+                 ENT_ATTRNAMES << attrName);
   }
 
   std::auto_ptr<DBClientCursor> cursor;
@@ -94,10 +94,30 @@ static void getAttributeTypes
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    BSONObj attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
-    BSONObj attr  = getFieldF(attrs, attrName).embeddedObject();
+    /* Previous versions of this function used a simpler approach:
+     *
+     *   BSONObj attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
+     *   BSONObj attr  = getFieldF(attrs, attrName).embeddedObject();
+     *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+     *
+     * However, it doesn't work when the attribute used metadata ID
+     *
+     */
 
-    attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+    BSONObj                attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
+    std::set<std::string>  attrsSet;
+
+    attrs.getFieldNames(attrsSet);
+    for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
+    {
+      std::string currentAttr = *i;
+      if (basePart(currentAttr) == attrName)
+      {
+        BSONObj attr = getFieldF(attrs, currentAttr).embeddedObject();
+        attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+      }
+    }
+
   }
   releaseMongoConnection(connection);
 }
