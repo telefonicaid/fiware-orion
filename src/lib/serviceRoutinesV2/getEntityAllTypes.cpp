@@ -56,20 +56,13 @@ std::string getEntityAllTypes
   EntityTypeVectorResponse  response;
   std::string               answer;
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam));
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
   TIMED_RENDER(answer = response.toJson(ciP));
 
   if (ciP->uriParamOptions["count"])
   {
-    long long  acc = 0;
-    char       cVec[64];
-
-    for (unsigned int ix = 0; ix < response.entityTypeVector.size(); ++ix)
-    {
-      acc += response.entityTypeVector[ix]->count;
-    }
-
-    snprintf(cVec, sizeof(cVec), "%lld", acc);
+    char cVec[64];
+    snprintf(cVec, sizeof(cVec), "%d", response.entityTypeVector.size());
     ciP->httpHeader.push_back("X-Total-Count");
     ciP->httpHeaderValue.push_back(cVec);
   }

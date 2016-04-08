@@ -1,0 +1,365 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+#
+#
+# 1: Append entity E1 with two different attributes A1 and A2
+# 2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2
+# 3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs
+# 4. Normal Query for the entity E2 for attribute A3 - both attributes are returned
+# 5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned
+#
+#
+
+--NAME--
+Query SEQ with attributes as JSON objects
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1: Append entity E1 with two different attributes A1 and A2"
+url="/v1/updateContext"
+payload='{
+    "contextElements": [
+        {
+            "type": "Test",
+            "isPattern": "false",
+            "id": "E1",
+            "attributes": [
+            {
+                "name": "A1",
+                "type": "test",
+                "value": "1"
+            },
+            {
+                "name": "A2",
+                "type": "test",
+                "value": "2"
+            }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+echo "2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2"
+url="/v1/queryContext"
+payload='{
+    "entities": [
+        {
+            "type": "Test",
+            "isPattern": "false",
+            "id": "E1"
+        }
+    ],
+    "attributes": [ "A1", "A2" ]
+}'
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --json
+echo
+echo
+
+echo "3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs"
+url="/v1/updateContext"
+payload='{
+    "contextElements": [
+        {
+            "type": "Test",
+            "isPattern": "false",
+            "id": "E2",
+            "attributes": [
+            {
+                "name": "A3",
+                "type": "test",
+                "value": "1",
+                "metadatas": [
+                  {
+                    "name": "ID",
+                    "type": "integer",
+                    "value": "A3-1"
+                  }
+                ]
+            },
+            {
+                "name": "A3",
+                "type": "test",
+                "value": "2",
+                "metadatas": [
+                  {
+                    "name": "ID",
+                    "type": "integer",
+                    "value": "A3-2"
+                  }
+                ]
+            }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+echo "4. Normal Query for the entity E2 for attribute A3 - both attributes are returned"
+url="/v1/queryContext"
+payload='{
+    "entities": [
+        {
+            "type": "Test",
+            "isPattern": "false",
+            "id": "E2"
+        }
+    ],
+    "attributes": [ "A3" ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+echo "5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned"
+url="/v1/queryContext"
+payload='{
+    "entities": [
+        {
+            "type": "Test",
+            "isPattern": "false",
+            "id": "E2"
+        }
+    ],
+    "attributes": [ "A3" ]
+}'
+orionCurl --url "$url" --payload "$payload"  --json --urlParams attributeFormat=object
+echo
+echo
+
+
+--REGEXPECT--
+1: Append entity E1 with two different attributes A1 and A2
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "test", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "test", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "Test"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2
+HTTP/1.1 200 OK
+Content-Length: 451
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": {
+                    "A1": {
+                        "type": "test", 
+                        "value": "1"
+                    }, 
+                    "A2": {
+                        "type": "test", 
+                        "value": "2"
+                    }
+                }, 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "Test"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs
+HTTP/1.1 200 OK
+Content-Length: 837
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID", 
+                                "type": "string", 
+                                "value": "A3-1"
+                            }
+                        ], 
+                        "name": "A3", 
+                        "type": "test", 
+                        "value": ""
+                    }, 
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID", 
+                                "type": "string", 
+                                "value": "A3-2"
+                            }
+                        ], 
+                        "name": "A3", 
+                        "type": "test", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "Test"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+4. Normal Query for the entity E2 for attribute A3 - both attributes are returned
+HTTP/1.1 200 OK
+Content-Length: 839
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID", 
+                                "type": "string", 
+                                "value": "A3-1"
+                            }
+                        ], 
+                        "name": "A3", 
+                        "type": "test", 
+                        "value": "1"
+                    }, 
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID", 
+                                "type": "string", 
+                                "value": "A3-2"
+                            }
+                        ], 
+                        "name": "A3", 
+                        "type": "test", 
+                        "value": "2"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "Test"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned
+HTTP/1.1 200 OK
+Content-Length: 538
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": {
+                    "A3": {
+                        "metadatas": [
+                            {
+                                "name": "ID", 
+                                "type": "string", 
+                                "value": "A3-1"
+                            }
+                        ], 
+                        "type": "test", 
+                        "value": "1"
+                    }
+                }, 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "Test"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -50,8 +50,6 @@
 * Payload In:  SubscribeContextRequest
 * Payload Out: SubscribeContextResponse
 *
-* URI parameters
-*   - notifyFormat=XXX    (used by mongoBackend)
 */
 std::string postSubscribeContext
 (
