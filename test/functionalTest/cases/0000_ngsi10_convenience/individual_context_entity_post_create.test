@@ -30,57 +30,54 @@ brokerStart CB
 --SHELL--
 echo "+++++ 1. post an entity +++++"
 url="/v1/contextEntities/entity01"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<appendContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-    <contextAttribute>
-      <name>pressure</name>
-      <type>clima</type>
-      <contextValue>p23</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    },
+    {
+      "name" : "pressue",
+      "type" : "clima",
+      "value" : "p23"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 --REGEXPECT--
 +++++ 1. post an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 729
+Content-Length: 431
 Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="" isPattern="false">
-    <id>entity01</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue/>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>clima</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                },
+                {
+                    "name": "pressue",
+                    "type": "clima",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "entity01",
+    "isPattern": "false",
+    "type": ""
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

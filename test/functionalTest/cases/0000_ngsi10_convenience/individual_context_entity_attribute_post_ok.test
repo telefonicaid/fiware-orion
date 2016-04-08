@@ -21,36 +21,44 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience Individual Context Entity - GET FAILS
+Convenience Individual Context Entity Attribute - POST OK
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. get an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes"
+echo "+++++ 1. post an attribute to a non-existing entity +++++"
+url="/v1/contextEntities/entity01/attributes/attr01"
+payload='{
+   "type": "Room",
+   "value" : "10",
+   "metadatas": [
+     {
+       "name": "ID",
+       "type": "string",
+       "value": "1110"
+     },
+     {
+       "name": "M2",
+       "type": "T2",
+       "value": "V2"
+     }
+   ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 --REGEXPECT--
-+++++ 1. get an entity +++++
++++++ 1. post an attribute to a non-existing entity +++++
 HTTP/1.1 200 OK
-Content-Length: 326
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextElementResponse>
-  <contextElement>
-    <entityId type="" isPattern="false">
-      <id>entity01</id>
-    </entityId>
-  </contextElement>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: /entity01/</details>
-  </statusCode>
-</contextElementResponse>
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

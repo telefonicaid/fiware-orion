@@ -21,36 +21,63 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience Individual Context Entity - GET FAILS
+Convenience Individual Context Entity - POST CREATE
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. get an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01"
+echo "+++++ 1. post an entity +++++"
+url="/v1/contextEntities/entity01/attributes"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    },
+    {
+      "name" : "pressure",
+      "type" : "clima",
+      "value" : "p23"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 --REGEXPECT--
-+++++ 1. get an entity +++++
++++++ 1. post an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 326
+Content-Length: 432
 Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextElementResponse>
-  <contextElement>
-    <entityId type="" isPattern="false">
-      <id>entity01</id>
-    </entityId>
-  </contextElement>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: /entity01/</details>
-  </statusCode>
-</contextElementResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                },
+                {
+                    "name": "pressure",
+                    "type": "clima",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "entity01",
+    "isPattern": "false",
+    "type": ""
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

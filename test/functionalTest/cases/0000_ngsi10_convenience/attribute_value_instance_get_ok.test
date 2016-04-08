@@ -66,9 +66,6 @@ orionCurl --url "/v1/contextEntities/Room1" --json
 echo "+++++ 3. lookup an attribute by valueID in JSON +++++"
 orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground" --json
 
-echo "+++++ 4. lookup an attribute by the other valueID in XML +++++"
-orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/wall"
-
 --REGEXPECT--
 +++++ 1. creating base entity +++++
 HTTP/1.1 200 OK
@@ -184,33 +181,6 @@ Date: REGEX(.*)
         "reasonPhrase": "OK"
     }
 }
-+++++ 4. lookup an attribute by the other valueID in XML +++++
-HTTP/1.1 200 OK
-Content-Length: 516
-Content-Type: application/json
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<contextAttributeResponse>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>centigrade</type>
-      <contextValue>23.5</contextValue>
-      <metadata>
-        <contextMetadata>
-          <name>ID</name>
-          <type>string</type>
-          <value>wall</value>
-        </contextMetadata>
-      </metadata>
-    </contextAttribute>
-  </contextAttributeList>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</contextAttributeResponse>
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
