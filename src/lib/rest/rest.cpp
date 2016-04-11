@@ -946,9 +946,10 @@ static int connectionTreat
   if (ciP == NULL)
   {
     //
-    // First thing to do on a new connection, set correlator to N/A
-    // After reading HTTP headers, the correlator id either changes dur to encountering a 
-    // Fiware-Correlator HTTP Header, or right after, when the transactionId is set.
+    // First thing to do on a new connection, set correlator to N/A.
+    // After reading HTTP headers, the correlator id either changes due to encountering a 
+    // Fiware-Correlator HTTP Header, or, if no HTTP header with Fiware-Correlator is found,
+    // a new correlator is generated.
     //
     correlatorIdSet("N/A");
 
