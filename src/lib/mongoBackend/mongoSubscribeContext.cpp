@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
+#include "common/defaultValues.h"
 #include "common/Format.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
@@ -56,7 +57,7 @@ HttpStatusCode mongoSubscribeContext
   const std::vector<std::string>&      servicePathV
 )
 {
-    std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];    
+    std::string        servicePath           = (servicePathV.size() == 0)? DEFAULT_SERVICE_PATH_RECURSIVE : servicePathV[0];
     bool               reqSemTaken           = false;    
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
@@ -105,10 +106,8 @@ HttpStatusCode mongoSubscribeContext
       sub.append(CSUB_THROTTLING, throttling);
     }
 
-    if (servicePath != "")
-    {
-      sub.append(CSUB_SERVICE_PATH, servicePath);
-    }
+    /* ServicePath (note that it cannot be empty, by construction) */
+    sub.append(CSUB_SERVICE_PATH, servicePath);
 
     /* Description */
     if (requestP->description != "")

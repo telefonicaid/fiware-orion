@@ -260,7 +260,9 @@ Fields:
     queries by subscription IDs are very fast (as there is an automatic
     default index in \_id).
 -   **servicePath**: related with [the service
-    path](../user/service_path.md) functionality.
+    path](../user/service_path.md) functionality. This is the service path
+    associated to the query "encapsulated" by the subscription. Default
+    is `/#`.
 -   **expiration**: this is the timestamp on which the
     subscription expires. This is calculated using the duration
     parameter included in the subscribeContext operation (basically, sum
