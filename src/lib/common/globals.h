@@ -292,6 +292,15 @@ int transactionIdGet(bool readonly = true);
 extern void transactionIdSet(void);
 
 
+
+/* ****************************************************************************
+*
+* correlatorIdSet - 
+*/
+void correlatorIdSet(const char* corrId);
+
+
+
 /* ****************************************************************************
 *
 * orderCoordsForBox

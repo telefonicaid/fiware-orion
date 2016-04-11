@@ -285,7 +285,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
   else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0)
+  {
+    headerP->correlator     = value;
+    correlatorIdSet(headerP->correlator.c_str());
+  }
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -947,6 +951,13 @@ static int connectionTreat
   if (ciP == NULL)
   {
     //
+    // First thing to do on a new connection, set correlator to N/A
+    // After reading HTTP headers, the correlator id either changes dur to encountering a 
+    // Fiware-Correlator HTTP Header, or right after, when the transactionId is set.
+    //
+    correlatorIdSet("N/A");
+
+    //
     // IP Address and port of caller
     //
     char            ip[32];
@@ -1012,11 +1023,6 @@ static int connectionTreat
 
     ++reqNo;
 
-    //
-    // Transaction starts here
-    //
-    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
-
 
     //
     // URI parameters
@@ -1046,6 +1052,12 @@ static int connectionTreat
 
     ciP->httpHeader.push_back("Fiware-Correlator");
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+
+    //
+    // Transaction starts here
+    //
+    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+
 
     /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
     if (ciP->httpHeaders.xforwardedFor == "")

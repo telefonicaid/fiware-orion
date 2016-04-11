@@ -266,7 +266,7 @@ do                                                \
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
-#define F_LEN            150
+#define F_LEN            200
 #define TF_LEN           64
 #define INFO_LEN         512
 #define TMS_LEN          20
@@ -345,9 +345,10 @@ int             inSigHandler                      = 0;
 char*           progName;                         /* needed for messages (and by lmLib) */
 char            progNameV[512];                   /* where to store progName            */
 __thread char   transactionId[64]                 = "N/A";
+__thread char   correlatorId[64]                  = "N/A";
 __thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
 __thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
-__thread char   fromIp[IP_LENGTH_MAX + 1]          = "N/A";
+__thread char   fromIp[IP_LENGTH_MAX + 1]         = "N/A";
 
 
 
@@ -1079,6 +1080,10 @@ static char* lmLineFix
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
     {
       STRING_ADD(transactionId, 8);
+    }
+    else if (strncmp(&format[fi], "CORR_ID", 7) == 0)
+    {
+      STRING_ADD(correlatorId, 7);
     }
     else if (strncmp(&format[fi], "SERVICE", 7) == 0)
     {
@@ -3317,6 +3322,7 @@ struct logMsg
   int  tLev;
   char stre[256];
   char transactionId[64];
+  char correlatorId[64];
   struct logMsg* next;
 };
 

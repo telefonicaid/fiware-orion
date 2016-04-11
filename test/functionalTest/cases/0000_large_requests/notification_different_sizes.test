@@ -154,10 +154,11 @@ echo "** Notifications sent:"
 accumulatorCount
 
 # ----------------------------------------------------------------------
+# NOTE (not a FIXME):
 # These two tests make reference to the old functionality provided by
 # the sendHttpSocket() function in file clientSocketHttp.cpp. If we are
-# ever to activate it through the USE_OLD_SENDHTTPSOCKET flag these lines
-# are necesary for the test to pass.
+# ever to activate it again through the USE_OLD_SENDHTTPSOCKET flag, these lines
+# are necessary for the test to pass.
 
 # The log has to show exactly 1 case of static buffer usage
 #echo "** Static buffer usages:"
@@ -175,7 +176,7 @@ grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $9 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
 
 --REGEXPECT--
 HTTP/1.1 200 OK
