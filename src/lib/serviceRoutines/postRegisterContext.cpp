@@ -76,7 +76,7 @@ std::string postRegisterContext
   }
   else if (ciP->servicePathV.size() == 0)
   {
-    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH_UPDATES);
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
