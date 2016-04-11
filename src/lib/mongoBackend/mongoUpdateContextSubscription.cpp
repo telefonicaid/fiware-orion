@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -196,7 +197,7 @@ HttpStatusCode mongoUpdateContextSubscription
   LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
 
   /* ServicePath update */
-  newSub.append(CSUB_SERVICE_PATH, (servicePathV.size() == 0)? "" : servicePathV[0]);
+  newSub.append(CSUB_SERVICE_PATH, (servicePathV.size() == 0)? DEFAULT_SERVICE_PATH : servicePathV[0]);
 
   /* Throttling update */
   if (!requestP->throttling.isEmpty())
