@@ -100,12 +100,22 @@ for doc in db[COL].find().sort('expiration', DESCENDING):
     n += 1
     csub_id = str(doc['_id'])
 
-    # The following fields are removed from signature calculation: _id, lastNotification, count and expiration
-    # (not sure about throttling... as I have the doubt, I'm leaving it byt the moment)
+    # The following fields are removed from signature calculation: 
+    #
+    # - _id, 
+    # - lastNotification
+    # - count 
+    # - status
+    # - expiration
+    # - description
+    # 
+    # (Not sure about throttling... as I have the doubt, I'm leaving it by the moment)
     doc.pop('_id', None)
     doc.pop('lastNotification', None)
     doc.pop('count', None)
+    doc.pop('status', None)
     doc.pop('expiration', None)
+    doc.pop('description', None)
 
     # In conditions of type ONCHANGE, the conditions value is a list of attribute string that
     # also needs to be ordered
