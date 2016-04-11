@@ -1046,6 +1046,7 @@ static int connectionTreat
       LM_W(("KZ: no correlator, inventing a new one"));
       correlatorGenerate(correlator);
       ciP->httpHeaders.correlator = correlator;
+      correlatorIdSet(correlator);
     }
     else
       LM_W(("KZ: correlator present in incoming request: %s", ciP->httpHeaders.correlator.c_str()));
