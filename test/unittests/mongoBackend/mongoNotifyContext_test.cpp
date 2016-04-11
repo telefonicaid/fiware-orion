@@ -36,6 +36,7 @@
 #include "mongo/client/dbclient.h"
 
 #include "commonMocks.h"
+#include "unittest.h"
 
 using ::testing::_;
 using ::testing::Throw;
@@ -47,7 +48,7 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 * servicePathV - empty service path vector used for these tests 
 */
-static const std::vector<std::string> servicePathV;
+//static const std::vector<std::string> servicePathV;
 
 
 
@@ -177,6 +178,8 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 */
 TEST(mongoNotifyContextRequest, Ent1Attr1)
 {
+    utInit();
+
     HttpStatusCode         ms;
     NotifyContextRequest   req;
     NotifyContextResponse  res;
@@ -201,7 +204,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -312,8 +315,8 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release mock */
     delete timerMock;
+    utExit();
 }
 
 /* ****************************************************************************
@@ -325,6 +328,8 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     HttpStatusCode         ms;
     NotifyContextRequest   req;
     NotifyContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -348,7 +353,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -459,8 +464,8 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release mock */
     delete timerMock;
+    utExit();
 }
 
 /* ****************************************************************************
@@ -472,6 +477,8 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     HttpStatusCode         ms;
     NotifyContextRequest   req;
     NotifyContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -498,7 +505,7 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -609,8 +616,8 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release mock */
     delete timerMock;
+    utExit();
 }
 
 /* ****************************************************************************
@@ -622,6 +629,8 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     HttpStatusCode         ms;
     NotifyContextRequest   req;
     NotifyContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -652,7 +661,7 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -763,8 +772,8 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release mock */
     delete timerMock;
+    utExit();
 }
 
 /* ****************************************************************************
@@ -776,6 +785,8 @@ TEST(mongoNotifyContextRequest, createEntity)
     HttpStatusCode         ms;
     NotifyContextRequest   req;
     NotifyContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -797,7 +808,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -924,7 +935,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
 
-    /* Release mock */
     delete timerMock;
+    utExit();
 }
 

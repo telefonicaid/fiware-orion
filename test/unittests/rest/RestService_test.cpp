@@ -121,6 +121,8 @@ TEST(RestService, payloadParse)
 TEST(RestService, noSuchServiceAndNotFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
+  ci.servicePathV.push_back("");
+
   const char*    infile    = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
   const char*    outfile1  = "ngsi9.discoverContextAvailabilityRsponse.serviceNotRecognized.valid.json";
   const char*    outfile2  = "ngsi9.discoverContextAvailabilityRsponse.notFound.valid.json";

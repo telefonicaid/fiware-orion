@@ -458,7 +458,6 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -612,7 +611,6 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -766,7 +764,6 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -946,7 +943,6 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1130,7 +1126,6 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1298,7 +1293,6 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1464,7 +1458,6 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1638,7 +1631,6 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1796,7 +1788,6 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -1954,7 +1945,6 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2148,7 +2138,6 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2346,7 +2335,6 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2524,7 +2512,6 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2699,7 +2686,6 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -2892,7 +2878,6 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3021,7 +3006,6 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3168,7 +3152,6 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3314,7 +3297,6 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3428,7 +3410,6 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3597,7 +3578,6 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3770,7 +3750,6 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -3927,7 +3906,6 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -4082,7 +4060,6 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -4237,7 +4214,6 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -4396,7 +4372,6 @@ TEST(mongoUpdateContextRequest, createEntity)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -4567,7 +4542,6 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -4743,7 +4717,6 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -4907,7 +4880,6 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -5090,7 +5062,6 @@ TEST(mongoUpdateContextRequest, updateEmptyValueOk)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -5243,7 +5214,6 @@ TEST(mongoUpdateContextRequest, appendEmptyValueOk)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -5402,7 +5372,6 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -5560,7 +5529,6 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -5717,7 +5685,6 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -5899,7 +5866,6 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -6054,7 +6020,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -6237,7 +6202,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -6422,7 +6386,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -6609,7 +6572,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -6803,7 +6765,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -6982,7 +6943,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7160,7 +7120,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7338,7 +7297,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7516,7 +7474,6 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7610,7 +7567,6 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7701,7 +7657,6 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7792,7 +7747,6 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7886,7 +7840,6 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -7982,7 +7935,6 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8081,7 +8033,6 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8178,7 +8129,6 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8269,7 +8219,6 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8361,7 +8310,6 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8452,7 +8400,6 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8546,7 +8493,6 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8712,7 +8658,6 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     uriParams[URI_PARAM_NOT_EXIST] = "entity::type";
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -8872,7 +8817,6 @@ TEST(mongoUpdateContextRequest, createNativeTypes)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -9081,7 +9025,6 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
 
     /* Check response is as expected */
@@ -9254,7 +9197,6 @@ TEST(mongoUpdateContextRequest, preservingNativeTypes)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -9365,7 +9307,6 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -9569,7 +9510,6 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -9673,7 +9613,6 @@ TEST(mongoUpdateContextRequest, preservingMdNativeTypes)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -9769,7 +9708,6 @@ TEST(mongoUpdateContextRequest, replace)
     req.updateActionType.set("REPLACE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -9933,7 +9871,6 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
-  servicePathVector.clear();
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
 
   /* Check response is as expected */
@@ -10084,7 +10021,6 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
-  servicePathVector.clear();
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
 
   /* Check response is as expected */
@@ -10287,7 +10223,6 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -10311,7 +10246,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
 
     EXPECT_EQ("Database Error (collection: utest.entities "
-              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } },{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, modDate: 1360232700 }, $unset: { location: 1 } }> "
+              "- update(): <{ _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $in: [ /^/.*/, null ] } },{ $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, modDate: 1360232700 }, $unset: { location: 1 } }> "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
@@ -10356,7 +10291,6 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
@@ -10375,7 +10309,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.entities "
-              "- query(): { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
+              "- query(): { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $in: [ /^/.*/, null ] } } "
               "- exception: boom!!)", RES_CER_STATUS(0).details);
 
     /* Restore real DB connection */
@@ -10411,6 +10345,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   ce.contextAttributeVector.push_back(&ca);
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("UPDATE");
+  servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
@@ -10502,6 +10437,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   ce.contextAttributeVector.push_back(&ca);
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("APPEND");
+  servicePathVector.clear();
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
@@ -10599,6 +10535,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
+    servicePathVector.clear();
     servicePathVector.push_back("/home/fg");
 
     /* Invoke the function in mongoBackend library */
@@ -10706,6 +10643,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
+    servicePathVector.clear();
     servicePathVector.push_back("/home/fg/01");
 
     /* Invoke the function in mongoBackend library */
@@ -10811,6 +10749,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     ce.entityId.fill("E1", "T1", "false");
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
+    servicePathVector.clear();
     servicePathVector.push_back("/home/kz/01");
 
     /* Invoke the function in mongoBackend library */
