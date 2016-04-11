@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Syntax check for Q-String as URI param
+Simple test of Fiware Correlator inheritance and invention
 
 --SHELL-INIT--
 dbInit CB
