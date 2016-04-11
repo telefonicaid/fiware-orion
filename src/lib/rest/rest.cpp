@@ -1040,16 +1040,14 @@ static int connectionTreat
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
     }
 
+    char correlator[37];
     if (ciP->httpHeaders.correlator == "")
     {
-      char correlator[37];
-      LM_W(("KZ: no correlator, inventing a new one"));
       correlatorGenerate(correlator);
       ciP->httpHeaders.correlator = correlator;
-      correlatorIdSet(correlator);
     }
-    else
-      LM_W(("KZ: correlator present in incoming request: %s", ciP->httpHeaders.correlator.c_str()));
+
+    correlatorIdSet(correlator);
 
     ciP->httpHeader.push_back("Fiware-Correlator");
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
