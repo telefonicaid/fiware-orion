@@ -57,7 +57,7 @@ These are some examples of websocket message for Orion:
 	"verb" : "POST",
 	"url" : "/v2/entities",
 	"params" : {"options" : "keyValues"},
-    "headers": {"Fiware-service": "my_Fiware-service"},
+    "headers": {"Fiware-service": "my_service"},
 	"payload" : {"type": "T", "id": "E1","temp": 1}
 }
 ```
@@ -68,7 +68,7 @@ These are some examples of websocket message for Orion:
 {
 	"verb": "POST",
 	"url": "/v2/subscriptions",
-    "headers": {"Fiware-service": "my_Fiware-service"},
+    "headers": {"Fiware-service": "my_service"},
 	"payload": {
 		"description": "subscription example",
 		"subject": {
@@ -104,7 +104,7 @@ callback field, which must always be exactly "ws://" - this tells Orion how noti
 {
 	"verb" : "POST",
 	"url" : "/v2/entities/E1",
-        "headers": {"Fiware-service": "my_Fiware-service"},
+        "headers": {"Fiware-service": "my_service"},
 	"params" : {"options" : "keyValues"},
 	"payload" : {"temp": 1}
 }
@@ -113,7 +113,7 @@ callback field, which must always be exactly "ws://" - this tells Orion how noti
 * Delete entity
 ```
 {
-	"headers": {"Fiware-service": "my_Fiware-service"},
+	"headers": {"Fiware-service": "my_service"},
 	"verb" : "DELETE",
 	"url" : "/v2/entities/E1"
 }
