@@ -9,6 +9,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * boost: 1.41 (the one that comes in EPEL6 repository)
 * libmicrohttpd: 0.9.48 (from source)
 * libcurl: 7.19.7
+* libuuid: 2.17.2
 * Mongo Driver: legacy-1.0.7 (from source)
 * rapidjson: 1.0.2 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
@@ -26,7 +27,7 @@ commands that require root privilege):
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel
+        sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel libuuid-devel
 
 * Install the Mongo Driver from source:
 
