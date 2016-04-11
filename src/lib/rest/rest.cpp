@@ -284,11 +284,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
   else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0)
-  {
-    headerP->correlator     = value;
-    correlatorIdSet(headerP->correlator.c_str());
-  }
+  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -1046,7 +1042,7 @@ static int connectionTreat
       ciP->httpHeaders.correlator = correlator;
     }
 
-    correlatorIdSet(correlator);
+    correlatorIdSet(ciP->httpHeaders.correlator.c_str());
 
     ciP->httpHeader.push_back("Fiware-Correlator");
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
