@@ -54,7 +54,7 @@ Some additional remarks:
     entities created without Fiware-ServicePath (or that don't include
     service path information in the database) belongs to a root scope
     "/" implicitely. All the queries without using Fiware-ServicePath
-    (including subscriptions) are on "/\#" implicitely. This behavior
+    (including subscriptions) are on "/\#" implicitly. This behavior
     ensures backward compatibility to pre-0.14.0 versions.
 
 -   It is possible to have an entity with the same ID and type in
