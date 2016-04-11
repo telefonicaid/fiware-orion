@@ -845,32 +845,32 @@ std::string defaultServicePath(const char* url, const char* method)
   // Also, if we wait (if we can) until we know what service it is, this whole string-search will come for free
   // Don't think strcasestr is a 'simple' function ...
   //
-  if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "notifyContextAvailability") != NULL)             return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "notifyContext") != NULL)                         return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "notifyContextAvailability") != NULL)             return DEFAULT_SERVICE_PATH_UPDATES;
+  if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH_UPDATES;
+  if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH_UPDATES;
+  if (strcasestr(url, "notifyContext") != NULL)                         return DEFAULT_SERVICE_PATH_UPDATES;
+  if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_QUERIES;
 
   /* Look for convenience operation. Subscription-related operations are special, all the other depend on
    * the method
    */
-  if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_QUERIES;
 
-  if (strcasecmp(method, "POST")   == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "PUT")    == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "GET")    == 0)                                return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasecmp(method, "PATCH")  == 0)                                return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "POST")   == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
+  if (strcasecmp(method, "PUT")    == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
+  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
+  if (strcasecmp(method, "GET")    == 0)                                return DEFAULT_SERVICE_PATH_QUERIES;
+  if (strcasecmp(method, "PATCH")  == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
 
-  return DEFAULT_SERVICE_PATH;
+  return DEFAULT_SERVICE_PATH_UPDATES;
 }
 
 

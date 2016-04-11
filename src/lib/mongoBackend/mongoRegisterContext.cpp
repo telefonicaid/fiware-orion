@@ -70,7 +70,7 @@ HttpStatusCode mongoRegisterContext
     // Default value for service-path is "/"
     if (sPath == "")
     {
-      sPath = DEFAULT_SERVICE_PATH;
+      sPath = DEFAULT_SERVICE_PATH_UPDATES;
     }
 
     /* Check if new registration */

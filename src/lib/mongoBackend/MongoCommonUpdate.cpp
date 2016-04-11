@@ -2204,7 +2204,7 @@ static bool createEntity
   else
   {
     LM_T(LmtServicePath, ("Empty service path string, using default servicepath"));
-    bsonId.append(ENT_SERVICE_PATH, DEFAULT_SERVICE_PATH);
+    bsonId.append(ENT_SERVICE_PATH, DEFAULT_SERVICE_PATH_UPDATES);
   }
 
   BSONObjBuilder insertedDoc;

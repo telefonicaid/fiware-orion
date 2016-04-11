@@ -442,21 +442,15 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
   }
 
   // Attributes
-  if (!notification.HasMember("attributes"))
+  if (notification.HasMember("attributes"))
   {
-    alarmMgr.badInput(clientIp, "no notification attributes specified");
-    OrionError oe(SccBadRequest, "no notification attributes specified");
+    std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attributes"]);
 
-    return oe.render(ciP, "");
+    if (r != "")
+    {
+      return r;
+    }
   }
-
-  std::string r = parseAttributeList(ciP, &scrP->attributeList.attributeV, notification["attributes"]);
-
-  if (r != "")
-  {
-    return r;
-  }
-
 
   // Throttling
   if (notification.HasMember("throttling"))

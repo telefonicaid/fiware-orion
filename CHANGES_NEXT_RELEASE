@@ -8,4 +8,6 @@
 - Fix: csub cache at mongoBackend update context subscription logic wrongly setting expiration with current time, ignoring actual expires/duration in the request
 - Fix: GET /v2/types response payload, from key-map to array (#1832)
 - Fix: GET /v2/types response payload, now using array for attribute types (#1636)
+- Fix: using "/#" as default service path instead of "/" in subscriptiobns (#1961)
+- Fix: POST /v2/subscriptions, attributes in notification are optional (#1952)
 - Add: Correlator as HTTP header and in log file (Issue #1916)

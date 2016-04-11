@@ -28,8 +28,8 @@
 
 
 
-#define  DEFAULT_SERVICE_PATH            "/"
-#define  DEFAULT_SERVICE_PATH_RECURSIVE  "/#"
+#define  DEFAULT_SERVICE_PATH_UPDATES  "/"
+#define  DEFAULT_SERVICE_PATH_QUERIES  "/#"
 
 
 #endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_
