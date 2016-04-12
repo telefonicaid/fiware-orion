@@ -1,0 +1,132 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET PERMANENT Subscriptions V2
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/subscriptions (w/o expires field)
+# 02. GET /v2/subscriptions/ID (w/o expires field)
+#
+
+echo "01. POST /v2/subscriptions (w/o expires field)"
+echo "=============================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "type": "Room"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    }
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo "02. GET /v2/subscriptions/ID (w/o expires field)"
+echo "================================================"
+orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/subscriptions (w/o expires field)
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET /v2/subscriptions/ID (w/o expires field)
+================================================
+HTTP/1.1 200 OK
+Content-Length: 379
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+
