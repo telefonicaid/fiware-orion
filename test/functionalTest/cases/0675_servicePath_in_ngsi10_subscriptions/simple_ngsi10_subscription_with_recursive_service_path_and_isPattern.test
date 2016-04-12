@@ -25,7 +25,7 @@ Simple NGSI10 subscription with recursive service path and isPattern
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -multiservice
+brokerStart CB 0-255
 accumulatorStart
 
 --SHELL--

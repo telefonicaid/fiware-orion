@@ -335,34 +335,38 @@ static bool subMatch
   const std::vector<std::string>&  attrV
 )
 {
-  if ((cSubP->tenant == NULL) || (tenant == NULL) || (cSubP->tenant[0] == 0) || (tenant[0] == 0))
+  //
+  // Check to filter out due to tenant - only valid if Broker has started with -multiservice option
+  //
+  if (subCacheMultitenant == true)
   {
-    if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
+    if ((cSubP->tenant == NULL) || (tenant == NULL) || (cSubP->tenant[0] == 0) || (tenant[0] == 0))
     {
-      LM_T(LmtSubCacheMatch, ("No match due to tenant I"));
-      return false;
-    }
+      if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
+      {
+        LM_T(LmtSubCacheMatch, ("No match due to tenant I"));
+        return false;
+      }
 
-    if ((tenant != NULL) && (tenant[0] != 0))
+      if ((tenant != NULL) && (tenant[0] != 0))
+      {
+        LM_T(LmtSubCacheMatch, ("No match due to tenant II"));
+        return false;
+      }
+    }
+    else if (strcmp(cSubP->tenant, tenant) != 0)
     {
-      LM_T(LmtSubCacheMatch, ("No match due to tenant II"));
+      LM_T(LmtSubCacheMatch, ("No match due to tenant III"));
       return false;
     }
   }
-  else if (strcmp(cSubP->tenant, tenant) != 0)
+
+  if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
-    LM_T(LmtSubCacheMatch, ("No match due to tenant III"));
+    LM_T(LmtSubCacheMatch, ("No match due to servicePath"));
     return false;
   }
 
-  if (subCacheMultitenant == true)  // Broker has started with -multiservice option
-  {
-    if (servicePathMatch(cSubP, (char*) servicePath) == false)
-    {
-      LM_T(LmtSubCacheMatch, ("No match due to servicePath"));
-      return false;
-    }
-  }
 
   //
   // If ONCHANGE and one of the attribute names in the scope vector

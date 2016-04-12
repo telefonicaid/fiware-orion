@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Broker without -multservice must notify without regard to service-path
+Broker without -multservice must notify without regard to tenant
 
 --SHELL-INIT--
 dbInit CB
@@ -32,9 +32,9 @@ accumulatorStart
 
 #
 # 01. Create a subcription to catch everything, for accumulator
-# 02. Create entity without service-path
-# 03. Create entity with empty service-path
-# 04. Create entity with service-path /abc
+# 02. Create entity without tenant
+# 03. Create entity with empty tenant
+# 04. Create entity with tenant abc
 # 05. Dump accelerator, see three notifications
 #
 
@@ -64,8 +64,8 @@ echo
 echo
 
 
-echo "02. Create entity without service-path"
-echo "======================================"
+echo "02. Create entity without tenant"
+echo "================================"
 payload='{
   "id": "E2",
   "A2": 2
@@ -75,24 +75,24 @@ echo
 echo
 
 
-echo "03. Create entity with empty service-path"
-echo "========================================="
+echo "03. Create entity with empty tenant"
+echo "==================================="
 payload='{
   "id": "E3",
   "A3": 3
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --servicePath ""
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --tenant ""
 echo
 echo
 
 
-echo "04. Create entity with service-path /abc"
-echo "========================================"
+echo "04. Create entity with tenant abc"
+echo "================================="
 payload='{
   "id": "E4",
   "A4": 4
 }'
-orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --servicePath "/abc"
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --tenant "abc"
 echo
 echo
 
@@ -115,8 +115,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity without service-path
-======================================
+02. Create entity without tenant
+================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=none
@@ -125,8 +125,8 @@ Date: REGEX(.*)
 
 
 
-03. Create entity with empty service-path
-=========================================
+03. Create entity with empty tenant
+===================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E3?type=none
@@ -135,8 +135,8 @@ Date: REGEX(.*)
 
 
 
-04. Create entity with service-path /abc
-========================================
+04. Create entity with tenant abc
+=================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E4?type=none
@@ -214,11 +214,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /abc
 Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+Fiware-Service: abc
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
