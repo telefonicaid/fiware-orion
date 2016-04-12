@@ -1044,14 +1044,15 @@ class NGSI:
             assert int(curs["expiration"]) == int(ts_expires), u' ERROR - the expiration "%s" is not the expected' % str(curs["expiration"])
             __logger__.info("expiration field is verified successfully")
         # service path field
+            ALL_SERVICE_PATHS = u'/#'
             if FIWARE_SERVICE_PATH_HEADER in headers:
                 if headers[FIWARE_SERVICE_PATH_HEADER] == EMPTY:
-                    service_path = "/"
+                    service_path = ALL_SERVICE_PATHS
                 else:
                     service_path = headers[FIWARE_SERVICE_PATH_HEADER]
             else:
-                service_path = "/"
-            assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected' % curs["servicePath"]
+                service_path = ALL_SERVICE_PATHS
+            assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected "%s"' % (curs["servicePath"], service_path)
             __logger__.info("servicePath field is verified successfully")
         # attrs field
         for a in range(int(subscription_context["notification_attributes_number"])):
