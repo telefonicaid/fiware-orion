@@ -1,5 +1,7 @@
 # Websockets interface
 
+**This is yet experimental functionality. Usage feedback is highly welcomed, but don't rely on it for production, as changes are expected.**
+
 ## What is this?
 
 The websockets interface is a new way to communicate with Orion using websockets, this is point to improve the comunication with a faster and more efficient protocol, because now we have a persistent connection with an open socket. Also websockets are a way of easing the interaction between Orion and client applications running in browsers and smartphone.
