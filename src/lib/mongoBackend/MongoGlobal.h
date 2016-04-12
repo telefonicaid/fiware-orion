@@ -338,7 +338,8 @@ extern bool processOnChangeConditionForSubscription
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP
+  Restriction*                     resP,
+  const std::string&               fiwareCorrelator
 );
 
 /* ****************************************************************************
@@ -359,7 +360,8 @@ extern BSONArray processConditionVector
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
-  const std::string&               status
+  const std::string&               status,
+  const std::string&               fiwareCorrelator
 );
 
 /* ****************************************************************************
@@ -373,7 +375,8 @@ extern bool processAvailabilitySubscription(
     const std::string&    subId,
     const std::string&    notifyUrl,
     Format                format,
-    const std::string&    tenant
+    const std::string&    tenant,
+    const std::string&    fiwareCorrelator
 );
 
 /* ****************************************************************************

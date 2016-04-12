@@ -116,6 +116,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 402
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -147,6 +148,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 299
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -174,6 +176,7 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 151
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -190,6 +193,7 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 151
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -206,6 +210,7 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 151
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -222,6 +227,7 @@ Date: REGEX(.*)
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 151
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -238,6 +244,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 402
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -269,6 +276,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 402
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -300,6 +308,7 @@ Date: REGEX(.*)
 HTTP/1.1 406 Not Acceptable
 Content-Length: 182
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

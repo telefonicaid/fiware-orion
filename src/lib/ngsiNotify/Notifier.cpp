@@ -62,7 +62,15 @@ Notifier::~Notifier (void)
 *
 * Notifier::sendNotifyContextRequest -
 */
-void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format)
+void Notifier::sendNotifyContextRequest
+(
+  NotifyContextRequest*  ncr,
+  const std::string&     url,
+  const std::string&     tenant,
+  const std::string&     xauthToken,
+  const std::string&     fiwareCorrelator,
+  Format                 format
+)
 {
     ConnectionInfo ci;
 
@@ -126,6 +134,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
                         uriPath,
                         content_type,
                         payload,
+                        fiwareCorrelator,
                         true,
                         NOTIFICATION_WAIT_MODE);
 
@@ -151,17 +160,19 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     /* Send the message (no wait for response), in a separate thread to avoid blocking */
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
-    params->ip            = host;
-    params->port          = port;
-    params->protocol      = protocol;
-    params->verb          = "POST";
-    params->tenant        = tenant;
-    params->servicePath   = spathList;
-    params->xauthToken    = xauthToken;
-    params->resource      = uriPath;
-    params->content_type  = content_type;
-    params->content       = payload;
-    params->format        = format;
+    params->ip               = host;
+    params->port             = port;
+    params->protocol         = protocol;
+    params->verb             = "POST";
+    params->tenant           = tenant;
+    params->servicePath      = spathList;
+    params->xauthToken       = xauthToken;
+    params->resource         = uriPath;
+    params->content_type     = content_type;
+    params->content          = payload;
+    params->format           = format;
+    params->fiwareCorrelator = fiwareCorrelator;
+
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
@@ -183,7 +194,14 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
 * they could be refactored in the future to have a common part using a parent
 * class for both types of notifications and using it as first argument
 */
-void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, Format format)
+void Notifier::sendNotifyContextAvailabilityRequest
+(
+  NotifyContextAvailabilityRequest*  ncar,
+  const std::string&                 url,
+  const std::string&                 tenant,
+  const std::string&                 fiwareCorrelator,
+  Format                             format
+)
 {
     /* Render NotifyContextAvailabilityRequest */
     std::string payload = ncar->render(NotifyContextAvailability, "");
@@ -207,7 +225,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
 #ifdef SEND_BLOCKING
-    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, fiwareCorrelator, true, NOTIFICATION_WAIT_MODE);
 
     if (r == 0)
     {
@@ -226,13 +244,15 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
 
-    params->ip           = host;
-    params->port         = port;
-    params->verb         = "POST";
-    params->tenant       = tenant;
-    params->resource     = uriPath;   
-    params->content_type = content_type;
-    params->content      = payload;
+    params->ip               = host;
+    params->port             = port;
+    params->verb             = "POST";
+    params->tenant           = tenant;
+    params->resource         = uriPath;   
+    params->content_type     = content_type;
+    params->content          = payload;
+    params->fiwareCorrelator = fiwareCorrelator;
+
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);

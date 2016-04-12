@@ -1343,7 +1343,8 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      notifyUrl,
   Format                           format,
   std::string                      tenant,
-  const std::string&               xauthToken
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator
 )
 {
   NotifyContextRequest   ncr;
@@ -1391,7 +1392,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
   return true;
 }
 
@@ -1407,7 +1408,8 @@ static bool processSubscriptions
   ContextElementResponse*                   notifyCerP,
   std::string*                              err,
   const std::string&                        tenant,
-  const std::string&                        xauthToken
+  const std::string&                        xauthToken,
+  const std::string&                        fiwareCorrelator
 )
 {
   bool ret = true;
@@ -1459,7 +1461,8 @@ static bool processSubscriptions
                                                  trigs->reference,
                                                  trigs->format,
                                                  tenant,
-                                                 xauthToken))
+                                                 xauthToken,
+                                                 fiwareCorrelator))
     {
       long long rightNow = getCurrentTime();
 
@@ -2389,7 +2392,8 @@ static void updateEntity
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
-  const std::string&              apiVersion
+  const std::string&              apiVersion,
+  const std::string&              fiwareCorrelator
 )
 {
   // Used to accumulate error response information
@@ -2652,7 +2656,7 @@ static void updateEntity
 
   /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
    * previous addTriggeredSubscriptions() invocations */
-  processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken);
+  processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken, fiwareCorrelator);
   notifyCerP->release();
   delete notifyCerP;
 
@@ -2769,6 +2773,7 @@ void processContextElement
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
+  const std::string&                   fiwareCorrelator,
   const std::string&                   apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -2940,7 +2945,8 @@ void processContextElement
                  responseP,
                  &attributeAlreadyExistsError,
                  &attributeAlreadyExistsList,
-                 apiVersion);
+                 apiVersion,
+                 fiwareCorrelator);
   }
 
   /*
@@ -3040,7 +3046,7 @@ void processContextElement
         notifyCerP->contextElement.modDate = now;
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
-        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
+        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);
 
         notifyCerP->release();
         delete notifyCerP;

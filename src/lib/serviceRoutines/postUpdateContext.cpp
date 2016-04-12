@@ -162,6 +162,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       resource,
                       mimeType,
                       cleanPayload,
+                      ciP->httpHeaders.correlator,
                       false,
                       true,
                       &out,
@@ -476,7 +477,7 @@ std::string postUpdateContext
   attributesToNotFound(upcrP);
   
   HttpStatusCode httpStatusCode;
-  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, ngsiV2Flavour));
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->httpHeaders.correlator, ciP->apiVersion, ngsiV2Flavour));
 
   if (ciP->httpStatusCode != SccCreated)
   {

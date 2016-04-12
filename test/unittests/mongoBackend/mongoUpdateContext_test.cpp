@@ -9082,7 +9082,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "v2");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -9163,9 +9163,10 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
     EXPECT_TRUE(findAttr(attrNames, "A3"));
-    EXPECT_TRUE(findAttr(attrNames, "A4"));    
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("T",C_STR_FIELD(a3, "type"));
     EXPECT_TRUE(a3.getField("value").isNull());
+    LM_W(("a3 value == '%s'", a3.getField("value").toString().c_str()));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
@@ -9933,7 +9934,7 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
 
   /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
   servicePathVector.clear();
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "v2");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -10084,7 +10085,7 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
 
   /* Invoke the function in mongoBackend library (note the "v2" to activate NGSIv2 special behaviours) */
   servicePathVector.clear();
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "v2");
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "no correlator", "v2");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

@@ -65,7 +65,8 @@ static bool processSubscriptions
   const EntityIdVector&                 triggerEntitiesV,
   map<string, TriggeredSubscription*>&  subs,
   std::string&                          err,
-  const std::string&                    tenant
+  const std::string&                    tenant,
+  const std::string&                    fiwareCorrelator
 )
 {
   bool ret = true;
@@ -81,7 +82,8 @@ static bool processSubscriptions
                                          mapSubId,
                                          trigs->reference,
                                          trigs->format,
-                                         tenant))
+                                         tenant,
+                                         fiwareCorrelator))
     {
       LM_T(LmtMongo, ("Notification failure"));
       ret = false;
@@ -304,7 +306,8 @@ HttpStatusCode processRegisterContext
   OID*                      id,
   const std::string&        tenant,
   const std::string&        servicePath,
-  const std::string&        format
+  const std::string&        format,
+  const std::string&        fiwareCorrelator
 )
 {
   std::string err;
@@ -419,7 +422,7 @@ HttpStatusCode processRegisterContext
   // Send notifications for each one of the subscriptions accumulated by
   // previous addTriggeredSubscriptions() invocations
   //
-  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant);
+  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant, fiwareCorrelator);
 
   // Fill the response element
   responseP->duration = requestP->duration;

@@ -120,6 +120,7 @@ orionCurl --url "/v1/contextEntities/EObject" --json
 HTTP/1.1 200 OK
 Content-Length: 390
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -148,6 +149,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 390
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -176,6 +178,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 647
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -217,6 +220,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 578
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -254,6 +258,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 490
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -291,6 +296,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 437
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

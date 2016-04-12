@@ -1779,7 +1779,8 @@ bool processOnChangeConditionForSubscription
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  Restriction*                     resP
+  Restriction*                     resP,
+  const std::string&               fiwareCorrelator
 )
 {
   std::string                   err;
@@ -1827,7 +1828,7 @@ bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1838,7 +1839,7 @@ bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1869,7 +1870,8 @@ BSONArray processConditionVector
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
   Restriction*                     resP,
-  const std::string&               status
+  const std::string&               status,
+  const std::string&               fiwareCorrelator
 )
 {
   BSONArrayBuilder conds;
@@ -1904,7 +1906,8 @@ BSONArray processConditionVector
                                                    tenant,
                                                    xauthToken,
                                                    servicePathV,
-                                                   resP)))
+                                                   resP,
+                                                   fiwareCorrelator)))
       {
         *notificationDone = true;
       }
@@ -1960,7 +1963,8 @@ bool processAvailabilitySubscription
   const std::string&    subId,
   const std::string&    notifyUrl,
   Format                format,
-  const std::string&    tenant
+  const std::string&    tenant,
+  const std::string&    fiwareCorrelator
 )
 {
   std::string                       err;
@@ -1978,7 +1982,7 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, format);
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, format);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */

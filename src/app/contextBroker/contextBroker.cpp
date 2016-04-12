@@ -1592,7 +1592,7 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
   free(mode);
 }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -

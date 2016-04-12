@@ -148,6 +148,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -157,6 +158,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -166,6 +168,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E3?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -175,6 +178,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 217
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -213,6 +217,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 70
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -226,6 +231,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 []
@@ -236,6 +242,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -256,6 +263,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -276,6 +284,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 145
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -305,6 +314,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 145
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -334,6 +344,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 217
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -372,6 +383,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 217
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [

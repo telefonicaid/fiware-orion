@@ -117,6 +117,7 @@ orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 HTTP/1.1 200 OK
 Content-Length: 159
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -130,6 +131,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 577
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -165,6 +167,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 580
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -200,6 +203,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 572
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -235,6 +239,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 580
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -270,6 +275,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 576
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -305,6 +311,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 159
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -318,6 +325,7 @@ Date: REGEX(.*)
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: GET
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 --TEARDOWN--

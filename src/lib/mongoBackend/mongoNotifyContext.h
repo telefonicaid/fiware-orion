@@ -39,7 +39,8 @@ extern HttpStatusCode mongoNotifyContext
   NotifyContextResponse*           responseP,
   const std::string&               tenant,
   const std::string&               xauthToken,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  const std::string&               fiwareCorrelator = "no correlator"
 );
 
 #endif

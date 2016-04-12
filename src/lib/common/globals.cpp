@@ -126,17 +126,30 @@ void transactionIdSet(void)
 
 /* ****************************************************************************
 *
+* correlatorIdSet - 
+*/
+void correlatorIdSet(const char* corrId)
+{
+  strncpy(correlatorId, corrId, sizeof(correlatorId));
+}
+
+
+
+/* ****************************************************************************
+*
 * orionInit - 
 */
 void orionInit
-(OrionExitFunction  exitFunction,
+(
+  OrionExitFunction  exitFunction,
   const char*        version,
   SemOpType          reqPolicy,
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
   bool               _notifQueueStatistics,
-  bool _checkIdv1)
+  bool               _checkIdv1
+)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);

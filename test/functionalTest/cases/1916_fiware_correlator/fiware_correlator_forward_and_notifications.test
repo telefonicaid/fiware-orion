@@ -1,0 +1,371 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Test of Fiware Correlator forwarding and notifications
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB 0
+brokerStart CP1 0
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Make accumulator subscribe to E1/A1, in CB
+# 02. Create E1/A1 in CB, using correlator CORRELATOR1, which is notified to accumulator
+# 03. Create E2/A2 in CPR1
+# 04. Register E2/A2 for CPR1 in CB
+# 05. Make accumulator subscribe to E2/A2 in CPR1, using CORRELATOR2
+# 06. Update E2/A2 in CB, using correlator CORRELATOR3, provoking a forward and after that a notification to accumulator of E2/A2
+# 07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)
+#
+
+
+echo "01. Make accumulator subscribe to E1/A1, in CB"
+echo "=============================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E1"
+            }
+        ],
+        "condition": {
+            "attributes": [ "A1" ]
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:'$LISTENER_PORT'/notify",
+        "attributes": [ "A1" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create E1/A1 in CB, using correlator CORRELATOR1, which is notified to accumulator"
+echo "======================================================================================"
+payload='{
+  "id": "E1",
+  "A1": "A1 of E1 in CB"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --header "Fiware-Correlator: CORRELATOR1"
+echo
+echo
+
+
+echo "03. Create E2/A2 in CPR1"
+echo "========================"
+payload='
+{
+  "id": "E2",
+  "A2": "A2 of E2 in CPR1"
+}'
+orionCurl --url /v2/entities?options=keyValues --port $CP1_PORT --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Register E2/A2 for CPR1 in CB"
+echo "================================="
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "id": "E2"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "A2",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --url /v1/registry/registerContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "05. Make accumulator subscribe to E2/A2 in CPR1, using CORRELATOR2"
+echo "=================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E2"
+            }
+        ],
+        "condition": {
+            "attributes": [ "A2" ]
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:'$LISTENER_PORT'/notify",
+        "attributes": [ "A2" ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --port $CP1_PORT --payload "$payload" --json --header "Fiware-Correlator: CORRELATOR2"
+echo
+echo
+
+
+echo "06. Update E2/A2 in CB, using correlator CORRELATOR3, provoking a forward and after that a notification to accumulator of E2/A2"
+echo "==============================================================================================================================="
+payload='{
+  "contextElements": [
+    {
+      "id":   "E2",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "string",
+          "value": "E2/A2 via CB"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --header "Fiware-Correlator: CORRELATOR3"
+echo
+echo
+
+
+echo "07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)"
+echo "======================================================================================================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Make accumulator subscribe to E1/A1, in CB
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create E1/A1 in CB, using correlator CORRELATOR1, which is notified to accumulator
+======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=none
+Fiware-Correlator: CORRELATOR1
+Date: REGEX(.*)
+
+
+
+03. Create E2/A2 in CPR1
+========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Register E2/A2 for CPR1 in CB
+=================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+05. Make accumulator subscribe to E2/A2 in CPR1, using CORRELATOR2
+==================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: CORRELATOR2
+Date: REGEX(.*)
+
+
+
+06. Update E2/A2 in CB, using correlator CORRELATOR3, provoking a forward and after that a notification to accumulator of E2/A2
+===============================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 385
+Content-Type: application/json
+Fiware-Correlator: CORRELATOR3
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "none"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)
+=======================================================================================================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 476
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: CORRELATOR1
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : "A1 of E1 in CB"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 478
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: CORRELATOR2
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E2",
+        "attributes" : [
+          {
+            "name" : "A2",
+            "type" : "none",
+            "value" : "A2 of E2 in CPR1"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 476
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: CORRELATOR3
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E2",
+        "attributes" : [
+          {
+            "name" : "A2",
+            "type" : "string",
+            "value" : "E2/A2 via CB"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+accumulatorStop
+dbDrop CB
+dbDrop CP1

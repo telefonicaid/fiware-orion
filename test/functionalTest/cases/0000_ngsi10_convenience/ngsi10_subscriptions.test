@@ -82,6 +82,7 @@ orionCurl --url "/v1/contextSubscriptions/$SUB_ID" -X "DELETE2" --json
 HTTP/1.1 200 OK
 Content-Length: 109
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -94,6 +95,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -107,6 +109,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 122
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -120,6 +123,7 @@ Date: REGEX(.*)
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: PUT, DELETE
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 --TEARDOWN--

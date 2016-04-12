@@ -27,6 +27,7 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <uuid/uuid.h>
 
 #include <string>
 #include <map>
@@ -77,6 +78,20 @@ __thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
+
+
+
+/* ****************************************************************************
+*
+* correlatorGenerate - 
+*/
+static void correlatorGenerate(char* buffer)
+{
+  uuid_t uuid;
+
+  uuid_generate_time_safe(uuid);
+  uuid_unparse_lower(uuid, buffer);
+}
 
 
 
@@ -258,17 +273,18 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
-  if      (strcasecmp(key.c_str(), "User-Agent") == 0)      headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), "Host") == 0)            headerP->host           = value;
-  else if (strcasecmp(key.c_str(), "Accept") == 0)          headerP->accept         = value;
-  else if (strcasecmp(key.c_str(), "Expect") == 0)          headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), "Connection") == 0)      headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), "Content-Type") == 0)    headerP->contentType    = value;
-  else if (strcasecmp(key.c_str(), "Content-Length") == 0)  headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), "Origin") == 0)          headerP->origin         = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
-  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
-  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0) headerP->xforwardedFor  = value;
+  if      (strcasecmp(key.c_str(), "User-Agent") == 0)        headerP->userAgent      = value;
+  else if (strcasecmp(key.c_str(), "Host") == 0)              headerP->host           = value;
+  else if (strcasecmp(key.c_str(), "Accept") == 0)            headerP->accept         = value;
+  else if (strcasecmp(key.c_str(), "Expect") == 0)            headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), "Connection") == 0)        headerP->connection     = value;
+  else if (strcasecmp(key.c_str(), "Content-Type") == 0)      headerP->contentType    = value;
+  else if (strcasecmp(key.c_str(), "Content-Length") == 0)    headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "Origin") == 0)            headerP->origin         = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -930,6 +946,14 @@ static int connectionTreat
   if (ciP == NULL)
   {
     //
+    // First thing to do on a new connection, set correlator to N/A.
+    // After reading HTTP headers, the correlator id either changes due to encountering a 
+    // Fiware-Correlator HTTP Header, or, if no HTTP header with Fiware-Correlator is found,
+    // a new correlator is generated.
+    //
+    correlatorIdSet("N/A");
+
+    //
     // IP Address and port of caller
     //
     char            ip[32];
@@ -995,11 +1019,6 @@ static int connectionTreat
 
     ++reqNo;
 
-    //
-    // Transaction starts here
-    //
-    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
-
 
     //
     // URI parameters
@@ -1016,6 +1035,24 @@ static int connectionTreat
     {
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
     }
+
+    char correlator[CORRELATOR_ID_SIZE + 1];
+    if (ciP->httpHeaders.correlator == "")
+    {
+      correlatorGenerate(correlator);
+      ciP->httpHeaders.correlator = correlator;
+    }
+
+    correlatorIdSet(ciP->httpHeaders.correlator.c_str());
+
+    ciP->httpHeader.push_back("Fiware-Correlator");
+    ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+
+    //
+    // Transaction starts here
+    //
+    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+
 
     /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
     if (ciP->httpHeaders.xforwardedFor == "")
