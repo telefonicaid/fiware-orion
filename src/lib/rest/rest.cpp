@@ -1036,7 +1036,7 @@ static int connectionTreat
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
     }
 
-    char correlator[37];
+    char correlator[CORRELATOR_ID_SIZE + 1];
     if (ciP->httpHeaders.correlator == "")
     {
       correlatorGenerate(correlator);
