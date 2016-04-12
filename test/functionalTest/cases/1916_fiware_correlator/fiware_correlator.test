@@ -43,7 +43,7 @@ echo
 
 echo "02. version request with correlator, see same correlator in response"
 echo "===================================================================="
-orionCurl --url /version --json --header "Fiware-Correlator: OLD CORRELATOR"
+orionCurl --url /version --json --header "Fiware-Correlator: OLD_CORRELATOR"
 echo
 echo
 
@@ -74,7 +74,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
 Content-Type: application/json
-Fiware-Correlator: OLD CORRELATOR
+Fiware-Correlator: OLD_CORRELATOR
 Date: REGEX(.*)
 
 {
