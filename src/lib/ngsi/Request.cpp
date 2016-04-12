@@ -74,7 +74,8 @@ const char* requestType(RequestType rt)
   case Ngsi10ContextEntityTypesAttribute:           return "Ngsi10ContextEntityTypesAttribute";
   case Ngsi10SubscriptionsConvOp:                   return "Ngsi10SubscriptionsConvOp";
 
-  case LogRequest:                                  return "Log";
+  case LogTraceRequest:                             return "LogTrace";
+  case LogLevelRequest:                             return "LogLevel";
   case VersionRequest:                              return "Version";
   case StatisticsRequest:                           return "Statistics";
   case ExitRequest:                                 return "Exit";
@@ -119,6 +120,7 @@ const char* requestType(RequestType rt)
   case SubscriptionsRequest:                             return "SubscriptionsRequest";
   case IndividualSubscriptionRequest:                    return "IndividualSubscriptionRequest";
   case BatchQueryRequest:                                return "BatchQueryRequest";
+  case BatchUpdateRequest:                               return "BatchUpdateRequest";
   }
 
   return "";

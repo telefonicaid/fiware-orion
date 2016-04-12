@@ -28,6 +28,7 @@ SET (SOURCES
     Attribute.cpp
     Subscription.cpp
     BatchQuery.cpp
+    BatchUpdate.cpp
 )
 
 SET (HEADERS
@@ -38,6 +39,7 @@ SET (HEADERS
     Attribute.h
     Subscription.h
     BatchQuery.h
+    BatchUpdate.h
 )
 
 

@@ -50,15 +50,14 @@
 *
 * TAG_ADD - 
 */
-#define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, true)
-#define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outFormat, true)
+#define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outtrue)
+#define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outtrue)
 #define TAG_ADD_INTEGER(tag, value, comma)  valueTag(indent2, tag, value, ciP->outFormat, comma)
 
 
 static void resetStatistics(void)
 {
   noOfJsonRequests                                = -1;
-  noOfXmlRequests                                 = -1;
   noOfRegistrations                               = -1;
   noOfRegistrationErrors                          = -1;
   noOfRegistrationUpdates                         = -1;
@@ -115,7 +114,8 @@ static void resetStatistics(void)
   noOfContextEntitiesByEntityIdAndType              = -1;
   noOfEntityByIdAttributeByNameIdAndType            = -1;
 
-  noOfLogRequests                                 = -1;
+  noOfLogTraceRequests                            = -1;
+  noOfLogLevelRequests                            = -1;
   noOfVersionRequests                             = -1;
   noOfExitRequests                                = -1;
   noOfLeakRequests                                = -1;
@@ -124,6 +124,8 @@ static void resetStatistics(void)
   noOfRegisterResponses                           = -1;
 
   noOfSimulatedNotifications                      = -1;
+  noOfBatchQueryRequest                           = -1;
+  noOfBatchUpdateRequest                          = -1;
 
   QueueStatistics::reset();
 
@@ -157,8 +159,7 @@ std::string renderCounterStats(void)
 {
   JsonHelper js;
 
-  // FIXME: try to chose names closer to the ones used in API URLs
-  renderUsedCounter(&js, "xmlRequests",                               noOfXmlRequests);
+  // FIXME: try to chose names closer to the ones used in API URLs  
   renderUsedCounter(&js, "jsonRequests",                              noOfJsonRequests);
   renderUsedCounter(&js, "registrations",                             noOfRegistrations);
   renderUsedCounter(&js, "registrationUpdates",                       noOfRegistrationUpdates);
@@ -199,7 +200,10 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "attributeValueInstanceWithTypeAndId",       noOfAttributeValueInstanceWithTypeAndId);
   renderUsedCounter(&js, "contextEntitiesByEntityIdAndType",          noOfContextEntitiesByEntityIdAndType);
   renderUsedCounter(&js, "entityByIdAttributeByNameIdAndType",        noOfEntityByIdAttributeByNameIdAndType);
-  renderUsedCounter(&js, "logRequests", noOfLogRequests);
+  renderUsedCounter(&js, "batchQueryRequests",                        noOfBatchQueryRequest);
+  renderUsedCounter(&js, "batchUpdateRequests",                       noOfBatchUpdateRequest);
+  renderUsedCounter(&js, "logTraceRequests",                          noOfLogTraceRequests);
+  renderUsedCounter(&js, "logLevelRequests",                          noOfLogLevelRequests);
 
   //
   // The valgrind test suite uses REST GET /version to check that the broker is alive
@@ -262,20 +266,6 @@ std::string renderNotifQueueStats(void)
   return jh.str();
 }
 
-/* ****************************************************************************
-*
-* xmlUseError -
-*/
-static std::string xmlUseError(void)
-{
-  std::string out = "";
-
-  out += startTag("", "orion", "", XML, false, false, false);
-  out += valueTag("  ", "message", "XML not supported in statistics operations, use JSON", XML);
-  out += endTag("", "orion", XML, false, false, true, false);
-
-  return out;
-}
 
 /* ****************************************************************************
 *
@@ -289,10 +279,6 @@ std::string statisticsTreat
   ParseData*                 parseDataP
 )
 {
-  if (ciP->outFormat == XML)
-  {
-    return xmlUseError();
-  }
 
   JsonHelper js;
 
@@ -333,8 +319,9 @@ std::string statisticsTreat
 
   ciP->httpStatusCode = SccOk;
   return js.str();
-
 }
+
+
 
 /* ****************************************************************************
 *
@@ -349,10 +336,6 @@ std::string statisticsCacheTreat
   ParseData*                 parseDataP
 )
 {
-  if (ciP->outFormat == XML)
-  {
-    return xmlUseError();
-  }
 
   JsonHelper js;
 

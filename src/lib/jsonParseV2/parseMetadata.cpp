@@ -96,7 +96,14 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
     }
   }
 
+
+  if (!mP->typeGiven)
+  {
+    mP->type = DEFAULT_TYPE;
+  }
+
   return "OK";
+
 }
 
 
@@ -149,6 +156,11 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   {
     alarmMgr.badInput(clientIp, "bad type for EntityId::ContextAttribute::Metadata");
     return "invalid JSON type for attribute metadata value";
+  }
+
+  if (!mP->typeGiven)
+  {
+    mP->type = DEFAULT_TYPE;
   }
 
   return "OK";

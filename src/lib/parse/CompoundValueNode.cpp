@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
+#include "parse/forbiddenChars.h"
 
 #include "orionTypes/OrionValueType.h"
 #include "rest/ConnectionInfo.h"
@@ -575,13 +576,13 @@ void CompoundValueNode::show(const std::string& indent)
 *
 * Encountered errors are saved in the 'error' field of the root of the tree (rootP->error).
 */
-void CompoundValueNode::check(void)
+std::string CompoundValueNode::check(void)
 {
   if (valueType == orion::ValueTypeVector)
   {
     if (childV.size() == 0)
     {
-      return;
+      return "OK";
     }
 
     for (uint64_t ix = 1; ix < childV.size(); ++ix)
@@ -592,7 +593,7 @@ void CompoundValueNode::check(void)
           std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
 
         alarmMgr.badInput(clientIp, rootP->error);
-        return;
+        return rootP->error;
       }
     }
   }
@@ -600,7 +601,7 @@ void CompoundValueNode::check(void)
   {
     if (childV.size() == 0)
     {
-      return;
+      return "OK";
     }
 
     for (uint64_t ix = 0; ix < childV.size() - 1; ++ix)
@@ -612,22 +613,32 @@ void CompoundValueNode::check(void)
           rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
           alarmMgr.badInput(clientIp, rootP->error);
 
-          return;
+          return rootP->error;
         }
       }
     }
   }
   else
   {
-    // No check made for Strings
-    return;
+    if (forbiddenChars(stringValue.c_str()))
+    {
+      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      return "Invalid characters in attribute value";
+    }
   }
 
   // 'recursively' call the check method for all children
+  std::string res;
+
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
-    childV[ix]->check();
+    res = childV[ix]->check();
+    if (res !="OK")
+    {
+      return res;
+    }
   }
+  return "OK";
 }
 
 
@@ -636,11 +647,11 @@ void CompoundValueNode::check(void)
 *
 * render -
 */
-std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const std::string& indent)
+std::string CompoundValueNode::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  tagName   = (container->valueType == orion::ValueTypeVector)? "item" : name;
+  std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
   if (ciP->apiVersion == "v2")
   {
@@ -650,73 +661,73 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
   if (valueType == orion::ValueTypeString)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag(indent, tagName, stringValue, format, jsonComma, container->valueType == orion::ValueTypeVector);
+    out = valueTag1(indent, key, stringValue, jsonComma, container->valueType == orion::ValueTypeVector);
   }
   else if (valueType == orion::ValueTypeNumber)
   {
     LM_T(LmtCompoundValueRender, ("I am a number (%s)", name.c_str()));
-    out = valueTag(indent, tagName, toString(numberValue), format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag1(indent, key, toString(numberValue), jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
     LM_T(LmtCompoundValueRender, ("I am a bool (%s)", name.c_str()));
-    out = valueTag(indent, tagName, boolValue? "true" : "false", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag1(indent, key, boolValue? "true" : "false", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if (valueType == orion::ValueTypeNone)
   {
     LM_T(LmtCompoundValueRender, ("I am NULL (%s)", name.c_str()));
-    out = valueTag(indent, tagName, "null", format, jsonComma, container->valueType == orion::ValueTypeVector, true);
+    out = valueTag1(indent, key, "null", jsonComma, container->valueType == orion::ValueTypeVector, true);
   }
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += startTag(indent, tagName, tagName, format, true, container->valueType == orion::ValueTypeObject, true);
+    out += startTag2(indent, key, true, container->valueType == orion::ValueTypeObject);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, format, indent + "  ");
+      out += childV[ix]->render(ciP, indent + "  ");
     }
 
-    out += endTag(indent, tagName, format, jsonComma, true, true);
+    out += endTag(indent, jsonComma, true, true);
   }
   else if ((valueType == orion::ValueTypeVector) && (container == this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, format, indent);
+      out += childV[ix]->render(ciP, indent);
     }
   }
   else if ((valueType == orion::ValueTypeObject) && (container->valueType == orion::ValueTypeVector))
   {
     LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
-    out += startTag(indent, "item", "", format, false, false);
+    out += startTag2(indent, "", false, false);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(ciP, format, indent + "  ");
+      out += childV[ix]->render(ciP, indent + "  ");
     }
 
-    out += endTag(indent, "item", format, jsonComma, false, true);
+    out += endTag(indent, jsonComma, false, true);
   }
   else if (valueType == orion::ValueTypeObject)
   {
     if (rootP != this)
     {
-      LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
-      out += startTag(indent, tagName, tagName, format, false, true);
+      LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));     
+      out += startTag2(indent, key, false, true);
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, format, indent + "  ");
+        out += childV[ix]->render(ciP, indent + "  ");
       }
 
-      out += endTag(indent, tagName, format, jsonComma, false, true);
+      out += endTag(indent, jsonComma, false, true);
     }
     else
     {
       LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(ciP, format, indent);
+        out += childV[ix]->render(ciP, indent);
       }
     }
   }
@@ -734,7 +745,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  tagName   = (container->valueType == orion::ValueTypeVector)? "item" : name;
+  std::string  key       = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
   // No "comma after" if toplevel
   if (container == this)
@@ -751,7 +762,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     }
     else
     {
-      out = JSON_STR(tagName) + ":" + JSON_STR(stringValue);
+      out = JSON_STR(key) + ":" + JSON_STR(stringValue);
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -763,7 +774,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     }
     else
     {
-      out = JSON_STR(tagName) + ":" + JSON_NUMBER(toString(numberValue));
+      out = JSON_STR(key) + ":" + JSON_NUMBER(toString(numberValue));
     }
   }
   else if (valueType == orion::ValueTypeBoolean)
@@ -776,7 +787,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     }
     else
     {
-      out = JSON_STR(tagName) + ":" + JSON_BOOL(boolValue);
+      out = JSON_STR(key) + ":" + JSON_BOOL(boolValue);
     }
   }
   else if (valueType == orion::ValueTypeNone)
@@ -789,7 +800,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     }
     else
     {
-      out = JSON_STR(tagName) + ":" + "null";
+      out = JSON_STR(key) + ":" + "null";
     }
   }
   else if ((valueType == orion::ValueTypeVector) && (container == this))

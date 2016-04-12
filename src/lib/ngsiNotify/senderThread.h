@@ -43,6 +43,7 @@
 */
 typedef struct SenderThreadParams
 {
+  std::string     subId;
   std::string     ip;
   unsigned short  port;
   std::string     protocol;

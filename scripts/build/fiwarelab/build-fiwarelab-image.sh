@@ -131,7 +131,7 @@ sudo /etc/init.d/mongod start
 # Set FIWARE repository
 FIWARE_REPO=$(mktemp)
 cat > $FIWARE_REPO <<EOF
-[testbed-fi-ware]
+[testbed-fiware]
 name=Fiware Repository
 baseurl=http://repositories.lab.fiware.org/repo/rpm/x86_64/
 gpgcheck=0

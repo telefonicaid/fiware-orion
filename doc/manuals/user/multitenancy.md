@@ -28,7 +28,7 @@ which case the header is not present), e.g.:
     Content-Length: 725
     User-Agent: orion/0.13.0
     Host: 127.0.0.1:9977
-    Accept: application/xml, application/json
+    Accept: application/json
     Fiware-Service: t_02
     Content-Type: application/json
 

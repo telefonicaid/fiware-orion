@@ -35,12 +35,10 @@ brokerStart CB
 # 03. Create an entity E3 of type T, with attributes A3=33,A4=34,A5=35
 #
 # 04. POST /v2/op/query, with E.* and in a scope q:A1==11, see E/T
-# 05. POST /v2/op/query, with E.* and in a scope q:type, see all 3 entities
-# 06. POST /v2/op/query, with E.* and in a scope q:!type, see NO entities
-# 07. Create an entity E5 without type, with attribute A5=45
-# 08. Create an entity E5 of type T4, with attribute A5=45
-# 09. POST /v2/op/query, with E.*, and with scopes q:type and q=A5==45, see E5/T4 only
-# 10. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/<notype> only
+# 05. Create an entity E5 without type, with attribute A5=45
+# 06. Create an entity E5 of type T4, with attribute A5=45 and attribute B
+# 07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4 and E5/none
+# 08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see NO entities
 #
 
 
@@ -100,38 +98,7 @@ echo
 echo
 
 
-
-echo "05. POST /v2/op/query, with E.* and in a scope q:type, see all 3 entities"
-echo "========================================================================="
-payload='{
-  "scopes": [
-    {
-      "type": "FIWARE::StringQuery",
-      "value": "type"
-    }
-  ]
-}'
-orionCurl --url /v2/op/query --payload "$payload" --json
-echo
-echo
-
-
-echo "06. POST /v2/op/query, with E.* and in a scope q:!type, see NO entities"
-echo "======================================================================="
-payload='{
-  "scopes": [
-    {
-      "type": "FIWARE::StringQuery",
-      "value": "!type"
-    }
-  ]
-}'
-orionCurl --url /v2/op/query --payload "$payload" --json
-echo
-echo
-
-
-echo "07. Create an entity E5 without type, with attribute A5=45"
+echo "05. Create an entity E5 without type, with attribute A5=45"
 echo "=========================================================="
 payload='{
   "id": "E5",
@@ -142,20 +109,21 @@ echo
 echo
 
 
-echo "08. Create an entity E5 of type T4, with attribute A5=45"
-echo "========================================================"
+echo "06. Create an entity E5 of type T4, with attribute A5=45 and attribute B"
+echo "========================================================================"
 payload='{
   "id": "E5",
   "type": "T4",
-  "A5": 45
+  "A5": 45,
+  "B": "just a mark"
 }'
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
 
 
-echo "09. POST /v2/op/query, with E.*, and with scopes q:type and q=A5==45, see E5/T4 only"
-echo "===================================================================================="
+echo "07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4"
+echo "============================================================================"
 payload='{
   "entities": [
     {
@@ -165,7 +133,7 @@ payload='{
   "scopes": [
     {
       "type": "FIWARE::StringQuery",
-      "value": "type"
+      "value": "B"
     },
     {
       "type": "FIWARE::StringQuery",
@@ -178,8 +146,8 @@ echo
 echo
 
 
-echo "10. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/<notype> only"
-echo "======================================================================================"
+echo "08. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/none"
+echo "============================================================================="
 payload='{
   "entities": [
     {
@@ -189,7 +157,7 @@ payload='{
   "scopes": [
     {
       "type": "FIWARE::StringQuery",
-      "value": "!type"
+      "value": "!B"
     },
     {
       "type": "FIWARE::StringQuery",
@@ -208,7 +176,7 @@ echo
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T
 Date: REGEX(.*)
 
 
@@ -217,7 +185,7 @@ Date: REGEX(.*)
 ==============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E
+Location: /v2/entities/E?type=T2
 Date: REGEX(.*)
 
 
@@ -226,7 +194,7 @@ Date: REGEX(.*)
 ====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T
 Date: REGEX(.*)
 
 
@@ -234,7 +202,7 @@ Date: REGEX(.*)
 04. POST /v2/op/query, with E.* and in a scope q:A1==11, see E/T
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 161
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -242,17 +210,17 @@ Date: REGEX(.*)
     {
         "A1": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 11
         },
         "A4": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 14
         },
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 15
         },
         "id": "E",
@@ -261,101 +229,28 @@ Date: REGEX(.*)
 ]
 
 
-05. POST /v2/op/query, with E.* and in a scope q:type, see all 3 entities
-=========================================================================
-HTTP/1.1 200 OK
-Content-Length: 421
-Content-Type: application/json
-Date: REGEX(.*)
-
-[
-    {
-        "A1": {
-            "metadata": {},
-            "type": null,
-            "value": 11
-        },
-        "A4": {
-            "metadata": {},
-            "type": null,
-            "value": 14
-        },
-        "A5": {
-            "metadata": {},
-            "type": null,
-            "value": 15
-        },
-        "id": "E",
-        "type": "T"
-    },
-    {
-        "A2": {
-            "metadata": {},
-            "type": null,
-            "value": 22
-        },
-        "A5": {
-            "metadata": {},
-            "type": null,
-            "value": 25
-        },
-        "id": "E",
-        "type": "T2"
-    },
-    {
-        "A3": {
-            "metadata": {},
-            "type": null,
-            "value": 33
-        },
-        "A4": {
-            "metadata": {},
-            "type": null,
-            "value": 34
-        },
-        "A5": {
-            "metadata": {},
-            "type": null,
-            "value": 35
-        },
-        "id": "E3",
-        "type": "T"
-    }
-]
-
-
-06. POST /v2/op/query, with E.* and in a scope q:!type, see NO entities
-=======================================================================
-HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Date: REGEX(.*)
-
-[]
-
-
-07. Create an entity E5 without type, with attribute A5=45
+05. Create an entity E5 without type, with attribute A5=45
 ==========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5
+Location: /v2/entities/E5?type=none
 Date: REGEX(.*)
 
 
 
-08. Create an entity E5 of type T4, with attribute A5=45
-========================================================
+06. Create an entity E5 of type T4, with attribute A5=45 and attribute B
+========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E5
+Location: /v2/entities/E5?type=T4
 Date: REGEX(.*)
 
 
 
-09. POST /v2/op/query, with E.*, and with scopes q:type and q=A5==45, see E5/T4 only
-====================================================================================
+07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4
+============================================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -363,8 +258,13 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 45
+        },
+        "B": {
+            "metadata": {},
+            "type": "none",
+            "value": "just a mark"
         },
         "id": "E5",
         "type": "T4"
@@ -372,10 +272,10 @@ Date: REGEX(.*)
 ]
 
 
-10. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/<notype> only
-======================================================================================
+08. POST /v2/op/query, with E.* with scopes q:!type and q=A5==45, see E5/none
+=============================================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -383,11 +283,11 @@ Date: REGEX(.*)
     {
         "A5": {
             "metadata": {},
-            "type": null,
+            "type": "none",
             "value": 45
         },
         "id": "E5",
-        "type": null
+        "type": "none"
     }
 ]
 

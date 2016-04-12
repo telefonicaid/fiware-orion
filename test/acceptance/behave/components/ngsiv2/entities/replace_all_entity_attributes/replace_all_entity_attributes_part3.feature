@@ -29,6 +29,9 @@
 
 
 Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<entity_id> plus payload
+  Queries parameters:
+  tested: options=keyValues
+  pending: type
   As a context broker user
   I would like to replace attributes by entity ID using NGSI v2
   So that I can manage and use them in my scripts
@@ -47,6 +50,73 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
   Setup: stop ContextBroker
 
   # --------------------- attribute metadata value  ------------------------------------
+
+  @attribute_metadata_value_replace_wo_attr_value @BUG_1789
+  Scenario:  replace attributes by entity ID using NGSI v2 with new attribute metadata values without attribute value nor metadata type
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_metadata_value_replace |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "1" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter       | value     |
+      | attributes_name | pressure  |
+      | metadatas_name  | very_cold |
+      | metadatas_value | 45        |
+    When replace attributes by ID "room" if it exists and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+
+  @attribute_metadata_value_replace_wo_attr_value @BUG_1789
+  Scenario:  replace attributes by entity ID using NGSI v2 with new attribute metadata values without attribute value but with metadata type
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_metadata_value_replace |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "1" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter       | value     |
+      | attributes_name | pressure  |
+      | metadatas_name  | very_cold |
+      | metadatas_value | 45        |
+      | metadatas_type  | nothing   |
+    When replace attributes by ID "room" if it exists and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
 
   @attribute_metadata_value_replace_without_meta_type @BUG_1220
   Scenario Outline:  replace attributes by entity ID using NGSI v2 with several attribute metadata values without attribute metadata type
@@ -529,9 +599,9 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
     When replace attributes by ID "room_1" if it exists and with "keyValues" mode
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value             |
-      | error       | BadRequest        |
-      | description | not a JSON object |
+      | parameter   | value                                                            |
+      | error       | BadRequest                                                       |
+      | description | attribute must be a JSON object, unless keyValues option is used |
 
   @qp_options_key_value_attr_names_duplicated @BUG_1433
   Scenario:  replace attributes by entity ID if it exists using NGSI v2 with options=keyvalues query parameter and keyValues format

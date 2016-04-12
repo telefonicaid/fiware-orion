@@ -10,7 +10,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libmicrohttpd: 0.9.48 (from source)
 * libcurl: 7.19.7
 * Mongo Driver: legacy-1.0.7 (from source)
-* rapidjson: 1.0.2
+* rapidjson: 1.0.2 (from source)
 * libwebsockets: 1.6.3 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)

@@ -32,57 +32,14 @@ brokerStart CB
 #
 # Standard operation /v1/updateContext with compound attribute values:
 #
-# 01. POST /v1/updateContext with compound attribute value <a>1</a> in XML
-# 02. POST /v1/queryContext to see the compound in XML
-# 03. POST /v1/updateContext with compound attribute value { "a": "3" } in JSON
-# 04. POST /v1/queryContext to see the compound in JSON
+# 01. POST /v1/updateContext with compound attribute value { "a": "3" } in JSON
+# 02. POST /v1/queryContext to see the compound in JSON
 #
 
-echo "01. POST /v1/updateContext with compound attribute value <a>1</a> in XML"
-echo "========================================================================"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>compound</type>
-          <contextValue>
-            <a>1</a>
-          </contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
 
 
-echo "02. GET  /v1/queryContext to see the compound in XML"
-echo "===================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url /v1/queryContext --payload "$payload"
-echo
-echo
-
-
-echo "03. POST /v1/updateContext with compound attribute value { \"a\": \"3\" } in JSON"
-echo "========================================================================="
+echo "01. POST /v1/updateContext with compound attribute value { \"a\": \"3\" } in JSON"
+echo "============================================================================="
 payload='{
   "contextElements": [
     {
@@ -99,14 +56,14 @@ payload='{
       ]
     }
   ],
-  "updateAction": "UPDATE"
+  "updateAction": "APPEND"
 }'
 orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 
-echo "04. GET  /v1/queryContext to see the compound in JSON"
+echo "02. GET  /v1/queryContext to see the compound in JSON"
 echo "====================================================="
 payload='{
   "entities": [
@@ -122,74 +79,8 @@ echo
 
 
 --REGEXPECT--
-01. POST /v1/updateContext with compound attribute value <a>1</a> in XML
-========================================================================
-HTTP/1.1 200 OK
-Content-Length: 622
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
-
-
-02. GET  /v1/queryContext to see the compound in XML
-====================================================
-HTTP/1.1 200 OK
-Content-Length: 656
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue>
-              <a>1</a>
-            </contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-
-
-03. POST /v1/updateContext with compound attribute value { "a": "3" } in JSON
-=========================================================================
+01. POST /v1/updateContext with compound attribute value { "a": "3" } in JSON
+=============================================================================
 HTTP/1.1 200 OK
 Content-Length: 384
 Content-Type: application/json
@@ -219,7 +110,7 @@ Date: REGEX(.*)
 }
 
 
-04. GET  /v1/queryContext to see the compound in JSON
+02. GET  /v1/queryContext to see the compound in JSON
 =====================================================
 HTTP/1.1 200 OK
 Content-Length: 421

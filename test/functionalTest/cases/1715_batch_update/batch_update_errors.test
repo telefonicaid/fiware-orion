@@ -1,0 +1,273 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+V2 batch update errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# ALL these tests test error-conditions and the response MUST be an error
+#
+# 01. Batch Update without payload
+# 02. Batch Update with empty payload
+# 03. Batch Update with invalid JSON payload
+# 04. Batch Update without 'actionType' (which is mandatory)
+# 05. Batch Update without 'entities' (which is mandatory)
+# 06. Batch Update with unrecognized item 'foo'
+# 07. Batch Update with empty entity vector
+# 08. Batch Update with entity without 'id'
+# 09. Batch Update with entity with unknown field (and no options=keyValues)
+#
+
+echo "01. Batch Update without payload"
+echo "================================"
+orionCurl --url /v2/op/update -X POST --json
+echo
+echo
+
+
+echo "02. Batch Update with empty payload"
+echo "==================================="
+orionCurl --url /v2/op/update --payload "{}" -X POST --json
+echo
+echo
+
+
+echo "03. Batch Update with invalid JSON payload"
+echo "=========================================="
+orionCurl --url /v2/op/update --payload "invalid JSON payload" --json
+echo
+echo
+
+
+echo "04. Batch Update without 'actionType' (which is mandatory)"
+echo "=========================================================="
+payload='{
+  "entities": [
+    {
+      "id": "E",
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Batch Update without 'entities' (which is mandatory)"
+echo "========================================================"
+payload='{
+  "actionType": "UPDATE"
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Batch Update with unrecognized item 'foo'"
+echo "============================================="
+payload='{
+  "actionType": "UPDATE",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T"
+    }
+  ],
+  "foo": 6
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Batch Update with empty entity vector"
+echo "========================================="
+payload='{
+  "actionType": "UPDATE",
+  "entities": [
+  ],
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Batch Update with entity without 'id'"
+echo "========================================="
+payload='{
+  "actionType": "UPDATE",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+echo "09. Batch Update with entity with unknown field (and no options=keyValues)"
+echo "=========================================================================="
+payload='{
+  "actionType": "UPDATE",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T",
+      "foo": 9
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch Update without payload
+================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+02. Batch Update with empty payload
+===================================
+HTTP/1.1 400 Bad Request
+Content-Length: 52
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "empty payload",
+    "error": "BadRequest"
+}
+
+
+03. Batch Update with invalid JSON payload
+==========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer",
+    "error": "ParseError"
+}
+
+
+04. Batch Update without 'actionType' (which is mandatory)
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 99
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Invalid JSON payload, mandatory field /actionType/ not found",
+    "error": "BadRequest"
+}
+
+
+05. Batch Update without 'entities' (which is mandatory)
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 97
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Invalid JSON payload, mandatory field /entities/ not found",
+    "error": "BadRequest"
+}
+
+
+06. Batch Update with unrecognized item 'foo'
+=============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 80
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Unrecognized field in JSON payload: /foo/",
+    "error": "BadRequest"
+}
+
+
+07. Batch Update with empty entity vector
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Errors found in incoming JSON buffer",
+    "error": "ParseError"
+}
+
+
+08. Batch Update with entity without 'id'
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "nor /id/ nor /idPattern/ present",
+    "error": "BadRequest"
+}
+
+
+09. Batch Update with entity with unknown field (and no options=keyValues)
+==========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "attribute must be a JSON object, unless keyValues option is used",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

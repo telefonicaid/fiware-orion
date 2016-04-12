@@ -22,14 +22,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     ws.cpp
-    connection_manager.cpp
     parser.cpp
+    constants.cpp
+    wsNotify.cpp
 )
 
 SET (HEADERS
     ws.h
-    connection_manager.h
     parser.h
+    constants.h
+    wsNotify.h
 )
 
 

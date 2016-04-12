@@ -24,7 +24,9 @@
 */
 
 #include "ws.h"
-#include "connection_manager.h"
+#include "constants.h"
+#include "parser.h"
+#include "wsNotify.h"
 
 #include "rest/RestService.h"
 
@@ -32,9 +34,16 @@
 #include "logMsg/traceLevels.h"
 #include "rest/RestService.h"
 
+#include "common/limits.h"
+
+#include "ngsi10/UnsubscribeContextRequest.h"
+#include "ngsi10/UnsubscribeContextResponse.h"
+#include "mongoBackend/mongoUnsubscribeContext.h"
+
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <vector>
 
 #include <pthread.h>
 
@@ -52,11 +61,43 @@ struct _orion_websocket
 // Private struct for persistent data
 typedef struct
 {
-  unsigned cid;
+  // SubId
+  std::vector<std::string> notify;
+  // Teanat for each subId
+  std::vector<std::string> tenant;
   char *message;
   char *request;
   int index;
 }data;
+
+static bool isSubscription
+(
+ const std::vector<std::string>& headName,
+ const std::vector<std::string>& headValue,
+ std::string& subId
+)
+{
+  for (unsigned i = 0; i < headName.size(); ++i)
+  {
+    if (headName[i] != "Location")
+      continue;
+
+    size_t pos = headValue[i].find("subscriptions");
+    if (pos == std::string::npos)
+      return false;
+
+    pos = headValue[i].find_last_of('/');
+    if (pos == std::string::npos)
+      return false;
+
+    char buff[MAX_LENGTH_SUBID + 1];
+    headValue[i].copy(buff, MAX_LENGTH_SUBID, pos + 1);
+    buff[MAX_LENGTH_SUBID] = 0;
+    subId = std::string(buff);
+    return true;
+  }
+  return false;
+}
 
 static int wsCallback(lws * ws,
                       enum lws_callback_reasons reason,
@@ -71,24 +112,25 @@ static int wsCallback(lws * ws,
   {
     case LWS_CALLBACK_ESTABLISHED:
     {
-      int cid = connection_manager_get_cid();
-
-      if (cid == -1)
-      {
-        LM_E(("No more cid available!"));
-        break;
-      }
-
-      dat->cid = cid;
+      dat->notify.clear();
+      dat->tenant.clear();
       dat->request = NULL;
       dat->index = 0;
-      LM_I(("Connecction id: %d", dat->cid));
       break;
     }
     case LWS_CALLBACK_CLOSED:
     {
-      connection_manager_remove(dat->cid);
-      dat->cid = -1;
+      removeSenders(dat->notify);
+
+      // Remove all subscriptions from DB
+      for (unsigned i = 0; i < dat->notify.size(); ++i)
+      {
+        UnsubscribeContextRequest req;
+        UnsubscribeContextResponse rsp;
+        req.subscriptionId.set(dat->notify[i]);
+        mongoUnsubscribeContext(&req, &rsp, dat->tenant[i]);
+      }
+
       break;
     }
 
@@ -100,7 +142,6 @@ static int wsCallback(lws * ws,
 
       unsigned char *buff = (unsigned char *) malloc(size);
       unsigned char *p = &buff[LWS_SEND_BUFFER_PRE_PADDING];
-
       sprintf((char*)p, "%s", dat->message);
       lws_write(ws, p, strlen(dat->message), LWS_WRITE_TEXT);
       free(buff);
@@ -123,8 +164,25 @@ static int wsCallback(lws * ws,
       {
         dat->request[dat->index] = 0;
 
-        ConnectionInfo *ci = connection_manager_get(dat->cid, dat->request);
-        dat->message = strdup((restService(ci, orionServices)).c_str());
+        ConnectionInfo *ci = new ConnectionInfo("v2", JSON, true);
+        std::string url;
+        std::string verb;
+        std::string payload;
+        ws_parser_parse(dat->request, ci, url, verb, payload, ci->httpHeaders);
+        ci->modify(url, verb, payload);
+
+        const char *restMsg = restService(ci, orionServices).c_str();
+        dat->message = strdup(ws_parser_message(restMsg, ci->httpHeaders, ci->httpHeader, ci->httpHeaderValue, (int)ci->httpStatusCode));
+
+        std::string subId;
+        if (isSubscription(ci->httpHeader, ci->httpHeaderValue, subId))
+        {
+          addSender(subId, ws);
+          dat->notify.push_back(subId);
+          dat->tenant.push_back(ci->tenant);
+        }
+
+        delete ci;
         free(dat->request);
         dat->request = NULL;
         dat->index = 0;
@@ -138,19 +196,6 @@ static int wsCallback(lws * ws,
   return 0;
 }
 
-static struct lws_protocols protocols[] = {
-    {
-        "orion-ws",
-        wsCallback,
-        sizeof(data),
-        128,
-        1,
-        NULL
-    },
-    {
-        NULL, NULL, 0, 0, 0, 0
-    }
-};
 
 pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
@@ -171,7 +216,7 @@ void *runWS(void *ptr)
     pthread_mutex_unlock(&mtx);
 
     pthread_mutex_lock(&mtx);
-    lws_service(ws->ctx, 50);
+    lws_service(ws->ctx, WSConstants::Pooling);
     pthread_mutex_unlock(&mtx);
   }
   return 0;
@@ -179,8 +224,22 @@ void *runWS(void *ptr)
 
 orion_websocket *orion_websocket_new(RestService *serv)
 {
+  static struct lws_protocols protocols[] = {
+    {
+      WSConstants::ProtocolName.c_str(),
+      wsCallback,
+      sizeof(data),
+      WSConstants::DataSize,
+      1,
+      NULL
+    },
+    {
+      NULL, NULL, 0, 0, 0, 0
+    }
+  };
+
   struct lws_context_creation_info info = {
-    9010,
+    WSConstants::Port,
     NULL,
     protocols,
     lws_get_internal_extensions(),

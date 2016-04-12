@@ -1,0 +1,1199 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+/ngsi10 URL Acceptance Test
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+echo "1.1. POST /v1/updateContext"
+echo "==========================="
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="T" isPattern="false">
+        <id>EID</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>A1T</type>
+          <contextValue>a1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url /v1/updateContext --payload "${payload}"
+echo
+echo
+
+
+echo "1.2. NOP /v1/updateContext"
+echo "=========================="
+orionCurl --url /v1/updateContext --payload "${payload}" -X NOP
+echo
+echo
+
+
+echo "2.1. POST /v1/queryContext"
+echo "=========================="
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="T" isPattern="false">
+      <id>EID</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+    <attribute>A2</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url /v1/queryContext --payload "${payload}"
+echo
+echo
+
+
+echo "2.2. NOP /v1/queryContext"
+echo "========================="
+orionCurl --url /v1/queryContext --payload "${payload}" -X NOP
+echo
+echo
+
+
+echo "3.1. POST /v1/subscribeContext"
+echo "=============================="
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="T" isPattern="false">
+      <id>EID</id>
+    </entityId>
+  </entityIdList>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT5H</duration>
+</subscribeContextRequest>'
+OUT=$(orionCurl --url /v1/subscribeContext --payload "${payload}")
+echo "$OUT"
+SUB_ID=$(echo "$OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$')
+echo
+echo
+
+
+echo "3.2. NOP /v1/subscribeContext"
+echo "============================="
+orionCurl --url /v1/subscribeContext --payload "${payload}" -X NOP
+echo
+echo
+
+
+echo "4.1. POST /v1/updateContextSubscription"
+echo "======================================="
+payload='<?xml version="1.0"?>
+<updateContextSubscriptionRequest>
+  <duration>PT10M</duration>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>A</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+</updateContextSubscriptionRequest>'
+orionCurl --url /v1/updateContextSubscription --payload "${payload}"
+echo
+echo
+
+
+echo "4.2. NOP /v1/updateContextSubscription"
+echo "======================================"
+orionCurl --url /v1/updateContextSubscription --payload "${payload}" -X NOP
+echo
+echo
+
+
+echo "5.1. POST /v1/unsubscribeContext"
+echo "================================"
+payload='<?xml version="1.0"?>
+<unsubscribeContextRequest>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextRequest>'
+orionCurl --url /v1/unsubscribeContext --payload "${payload}"
+echo
+echo
+
+
+echo "5.2. NOP /v1/unsubscribeContext"
+echo "==============================="
+orionCurl --url /v1/unsubscribeContext --payload "${payload}" -X NOP
+echo
+echo
+
+
+echo "6.1. GET /v1/contextEntities/EID"
+echo "================================"
+orionCurl --url /v1/contextEntities/EID
+echo
+echo
+
+
+echo "6.2. PUT /v1/contextEntities/EID"
+echo "================================"
+payload='<?xml version="1.0"?>
+<updateContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>A1T</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>'
+orionCurl --url /v1/contextEntities/EID --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "6.3. POST /v1/contextEntities/EID"
+echo "================================="
+payload='<?xml version="1.0"?>
+<appendContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>A1T</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url /v1/contextEntities/EID --payload "${payload}"
+echo
+echo
+
+
+echo "6.4. DELETE /v1/contextEntities/EID"
+echo "==================================="
+orionCurl --url /v1/contextEntities/EID -X DELETE
+echo
+echo
+
+
+echo "6.5. NOP /v1/contextEntities/EID"
+echo "================================"
+payload='<?xml version="1.0"?>'
+orionCurl --url /v1/contextEntities/EID -X NOP
+echo
+echo
+
+
+
+echo "7.1. GET /v1/contextEntities/EID/attributes"
+echo "==========================================="
+orionCurl --url /v1/contextEntities/EID/attributes
+echo
+echo
+
+
+echo "7.2. PUT /v1/contextEntities/EID/attributes"
+echo "==========================================="
+payload='<?xml version="1.0"?>
+<updateContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>A1T</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>'
+orionCurl --url /v1/contextEntities/EID/attributes --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "7.3. POST /v1/contextEntities/EID/attributes"
+echo "============================================"
+payload='<?xml version="1.0"?>
+<appendContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>A1T</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url /v1/contextEntities/EID/attributes --payload "${payload}"
+echo
+echo
+
+
+echo "7.4. DELETE /v1/contextEntities/EID/attributes"
+echo "=============================================="
+orionCurl --url /v1/contextEntities/EID/attributes -X DELETE
+echo
+echo
+
+
+echo "7.5. NOP /v1/contextEntities/EID/attributes"
+echo "==========================================="
+orionCurl --url /v1/contextEntities/EID/attributes -X NOP
+echo
+echo
+
+
+
+echo "8.1. GET /v1/contextEntities/EID/attributes/A1"
+echo "=============================================="
+orionCurl --url /v1/contextEntities/EID/attributes/A1
+echo
+echo
+
+
+echo "8.2. PUT /v1/contextEntities/EID/attributes/A1"
+echo "=============================================="
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
+  <type>T</type>
+  <contextValue>10</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>ID</name>
+      <type>none</type>
+      <value>left</value>
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>'
+orionCurl --url /v1/contextEntities/EID/attributes/A1 --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "8.3. GET /v1/contextEntities/EID/attributes/A1"
+echo "=============================================="
+orionCurl --url /v1/contextEntities/EID/attributes/A1
+echo
+echo
+
+
+echo "8.4. POST /v1/contextEntities/EID/attributes/A1"
+echo "==============================================="
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
+  <type>T</type>
+  <contextValue>10</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>ID</name>
+      <type>none</type>
+      <value>left</value>
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>'
+orionCurl --url /v1/contextEntities/EID/attributes/A1 --payload "${payload}"
+echo
+echo
+
+
+echo "8.5. GET /v1/contextEntities/EID/attributes/A1"
+echo "=============================================="
+orionCurl --url /v1/contextEntities/EID/attributes/A1
+echo
+echo
+
+
+echo "8.6. DELETE /v1/contextEntities/EID/attributes/A1"
+echo "================================================="
+orionCurl --url /v1/contextEntities/EID/attributes/A1 -X DELETE
+echo
+echo
+
+
+echo "8.7. NOP /v1/contextEntities/EID/attributes/A1"
+echo "=============================================="
+orionCurl --url /v1/contextEntities/EID/attributes/A1 -X NOP
+echo
+echo
+
+
+echo "9.1. GET /v1/contextEntities/EID/attributes/A1/left"
+echo "==================================================="
+orionCurl --url /v1/contextEntities/EID/attributes/A1/left
+echo
+echo
+
+
+echo "9.2. PUT /v1/contextEntities/EID/attributes/A1/left"
+echo "==================================================="
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
+  <type>T</type>
+  <contextValue>10</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>ID</name>
+      <type>none</type>
+      <value>left</value>
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>'
+orionCurl --url /v1/contextEntities/EID/attributes/A1/left --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "9.3. DELETE /v1/contextEntities/EID/attributes/A1/left"
+echo "======================================================"
+orionCurl --url /v1/contextEntities/EID/attributes/A1/left -X DELETE
+echo
+echo
+
+
+echo "9.4. NOP /v1/contextEntities/EID/attributes/A1/left"
+echo "==================================================="
+orionCurl --url /v1/contextEntities/EID/attributes/A1/left -X NOP
+echo
+echo
+
+
+
+echo "10.1. GET /v1/contextEntityTypes/T"
+echo "=================================="
+orionCurl --url /v1/contextEntityTypes/T
+echo
+echo
+
+
+echo "10.2. NOP /v1/contextEntityTypes/T"
+echo "=================================="
+orionCurl --url /v1/contextEntityTypes/T -X NOP
+echo
+echo
+
+
+
+echo "11.1. GET /v1/contextEntityTypes/typeName/attributes"
+echo "===================================================="
+orionCurl --url /v1/contextEntityTypes/typeName/attributes
+echo
+echo
+
+
+echo "11.2. NOP /v1/contextEntityTypes/typeName/attributes"
+echo "===================================================="
+orionCurl --url /v1/contextEntityTypes/typeName/attributes -X NOP
+echo
+echo
+
+
+
+echo "12.1. GET /v1/contextEntityTypes/typeName/attributes/A1"
+echo "======================================================="
+orionCurl --url /v1/contextEntityTypes/typeName/attributes/A1
+echo
+echo
+
+
+echo "12.2. NOP /v1/contextEntityTypes/typeName/attributes/A1"
+echo "======================================================="
+orionCurl --url /v1/contextEntityTypes/typeName/attributes/A1 -X NOP
+echo
+echo
+
+
+
+echo "13.1. POST /v1/contextSubscriptions"
+echo "==================================="
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="true">
+      <id>OfficeRoom.*</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+    <attribute>lightstatus</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT5H</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>A</condValue>
+      </condValueList>
+      <restriction>restriction</restriction>
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+OUT=$(orionCurl --url /v1/contextSubscriptions --payload "${payload}")
+echo "$OUT"
+SUB_ID=$(echo "$OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$')
+echo
+echo
+
+
+echo "13.2. NOP /v1/contextSubscriptions"
+echo "=================================="
+orionCurl --url /v1/contextSubscriptions -X NOP
+echo
+echo
+
+
+
+echo "14.1. PUT /v1/contextSubscriptions/SUB_ID"
+echo "========================================="
+payload='<?xml version="1.0"?>
+<updateContextSubscriptionRequest>
+  <duration>PT10M</duration>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>A</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+</updateContextSubscriptionRequest>'
+orionCurl --url /v1/contextSubscriptions/$SUB_ID --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "14.2. DELETE /v1/contextSubscriptions/SUB_ID"
+echo "============================================"
+orionCurl --url /v1/contextSubscriptions/$SUB_ID -X DELETE
+echo
+echo
+
+
+echo "14.3. NOP /v1/contextSubscriptions/SUB_ID"
+echo "========================================="
+orionCurl --url /v1/contextSubscriptions/SUB_ID -X NOP
+echo
+echo
+
+
+--REGEXPECT--
+1.1. POST /v1/updateContext
+===========================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T" isPattern="false">
+          <id>EID</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>A1T</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+1.2. NOP /v1/updateContext
+==========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+2.1. POST /v1/queryContext
+==========================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T" isPattern="false">
+          <id>EID</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>A1T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+2.2. NOP /v1/queryContext
+=========================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+3.1. POST /v1/subscribeContext
+==============================
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT5H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+
+3.2. NOP /v1/subscribeContext
+=============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+4.1. POST /v1/updateContextSubscription
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 211
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextSubscriptionResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT10M</duration>
+  </subscribeResponse>
+</updateContextSubscriptionResponse>
+
+
+4.2. NOP /v1/updateContextSubscription
+======================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+5.1. POST /v1/unsubscribeContext
+================================
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<unsubscribeContextResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</unsubscribeContextResponse>
+
+
+5.2. NOP /v1/unsubscribeContext
+===============================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+6.1. GET /v1/contextEntities/EID
+================================
+HTTP/1.1 200 OK
+Content-Length: 450
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="T" isPattern="false">
+      <id>EID</id>
+    </entityId>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>A1</name>
+        <type>A1T</type>
+        <contextValue>a1</contextValue>
+      </contextAttribute>
+    </contextAttributeList>
+  </contextElement>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextElementResponse>
+
+
+6.2. PUT /v1/contextEntities/EID
+================================
+HTTP/1.1 200 OK
+Content-Length: 486
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>A1T</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</updateContextElementResponse>
+
+
+6.3. POST /v1/contextEntities/EID
+=================================
+HTTP/1.1 200 OK
+Content-Length: 557
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <entityId type="T" isPattern="false">
+    <id>EID</id>
+  </entityId>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>A1T</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+
+
+6.4. DELETE /v1/contextEntities/EID
+===================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+6.5. NOP /v1/contextEntities/EID
+================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+7.1. GET /v1/contextEntities/EID/attributes
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 316
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>EID</id>
+    </entityId>
+  </contextElement>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity id: /EID/</details>
+  </statusCode>
+</contextElementResponse>
+
+
+7.2. PUT /v1/contextEntities/EID/attributes
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 198
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextElementResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>EID</details>
+  </errorCode>
+</updateContextElementResponse>
+
+
+7.3. POST /v1/contextEntities/EID/attributes
+============================================
+HTTP/1.1 200 OK
+Content-Length: 556
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>EID</id>
+  </entityId>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>A1T</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+
+
+7.4. DELETE /v1/contextEntities/EID/attributes
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+7.5. NOP /v1/contextEntities/EID/attributes
+===========================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+8.1. GET /v1/contextEntities/EID/attributes/A1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList/>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity id: /EID/</details>
+  </statusCode>
+</contextAttributeResponse>
+
+
+8.2. PUT /v1/contextEntities/EID/attributes/A1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 127
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>404</code>
+  <reasonPhrase>No context element found</reasonPhrase>
+  <details>EID</details>
+</statusCode>
+
+
+8.3. GET /v1/contextEntities/EID/attributes/A1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList/>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity id: /EID/</details>
+  </statusCode>
+</contextAttributeResponse>
+
+
+8.4. POST /v1/contextEntities/EID/attributes/A1
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+8.5. GET /v1/contextEntities/EID/attributes/A1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 496
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>T</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>
+
+
+8.6. DELETE /v1/contextEntities/EID/attributes/A1
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 220
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>472</code>
+  <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
+  <details>action: DELETE - entity: [EID, ] - offending attribute: A1 - attribute not found</details>
+</statusCode>
+
+
+8.7. NOP /v1/contextEntities/EID/attributes/A1
+==============================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+9.1. GET /v1/contextEntities/EID/attributes/A1/left
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 496
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>T</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>
+
+
+9.2. PUT /v1/contextEntities/EID/attributes/A1/left
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+9.3. DELETE /v1/contextEntities/EID/attributes/A1/left
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+9.4. NOP /v1/contextEntities/EID/attributes/A1/left
+===================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+10.1. GET /v1/contextEntityTypes/T
+==================================
+HTTP/1.1 200 OK
+Content-Length: 210
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type /T/ non-existent</details>
+  </errorCode>
+</queryContextResponse>
+
+
+10.2. NOP /v1/contextEntityTypes/T
+==================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET
+Date: REGEX(.*)
+
+
+
+11.1. GET /v1/contextEntityTypes/typeName/attributes
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 217
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type /typeName/ non-existent</details>
+  </errorCode>
+</queryContextResponse>
+
+
+11.2. NOP /v1/contextEntityTypes/typeName/attributes
+====================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET
+Date: REGEX(.*)
+
+
+
+12.1. GET /v1/contextEntityTypes/typeName/attributes/A1
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 224
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type/attribute::name pair not found</details>
+  </errorCode>
+</queryContextResponse>
+
+
+12.2. NOP /v1/contextEntityTypes/typeName/attributes/A1
+=======================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET
+Date: REGEX(.*)
+
+
+
+13.1. POST /v1/contextSubscriptions
+===================================
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT5H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+
+13.2. NOP /v1/contextSubscriptions
+==================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
+
+
+14.1. PUT /v1/contextSubscriptions/SUB_ID
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 211
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextSubscriptionResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT10M</duration>
+  </subscribeResponse>
+</updateContextSubscriptionResponse>
+
+
+14.2. DELETE /v1/contextSubscriptions/SUB_ID
+============================================
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<unsubscribeContextResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</unsubscribeContextResponse>
+
+
+14.3. NOP /v1/contextSubscriptions/SUB_ID
+=========================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: PUT, DELETE
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

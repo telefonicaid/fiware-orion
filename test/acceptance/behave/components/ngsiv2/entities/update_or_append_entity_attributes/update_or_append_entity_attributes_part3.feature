@@ -375,6 +375,73 @@ Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/
 
   # --------------------- attribute metadata value  ------------------------------------
 
+  @metadata_value_update_wo_attribute_value @BUG_1789
+  Scenario:  update an attribute by entity ID using NGSI v2 with several attribute metadata values without attribute value nor metadata type
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_metadata_value_update |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter       | value       |
+      | attributes_name | temperature |
+      | metadatas_name  | very_hot_0  |
+      | metadatas_value | cold        |
+    When update or append attributes by ID "room_1" and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+
+  @metadata_value_update_wo_attribute_value @BUG_1789
+  Scenario:  update an attribute by entity ID using NGSI v2 with several attribute metadata values without attribute value but with metadata type
+    Given  a definition of headers
+      | parameter          | value                      |
+      | Fiware-Service     | test_metadata_value_update |
+      | Fiware-ServicePath | /test                      |
+      | Content-Type       | application/json           |
+   # These properties below are used in create request
+    And properties to entities
+      | parameter        | value       |
+      | entities_type    | house       |
+      | entities_id      | room        |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | attributes_type  | celsius     |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    # These properties below are used in update request
+    And properties to entities
+      | parameter       | value       |
+      | attributes_name | temperature |
+      | metadatas_name  | very_hot_0  |
+      | metadatas_value | cold        |
+      | metadatas_type  | nothing     |
+    When update or append attributes by ID "room_1" and with "normalized" mode
+    Then verify that receive an "No Content" http code
+    And verify that an entity is updated in mongo
+
   @metadata_value_update_wo_meta_type @BUG_1220
   Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata values without attribute metadata type
     Given  a definition of headers

@@ -63,13 +63,12 @@ typedef struct ContextAttribute
                                                       // It means attribute found either locally or remotely in providing application
 
   bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists
-  std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
   bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
   ~ContextAttribute();
   ContextAttribute();
-  ContextAttribute(ContextAttribute* caP);
+  ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
   ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
@@ -94,7 +93,6 @@ typedef struct ContextAttribute
 
   std::string  check(ConnectionInfo*     ciP,
                      RequestType         requestType,
-                     Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);

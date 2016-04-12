@@ -87,21 +87,21 @@ echo
 
 echo "04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes"
 echo "======================================================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance=13500&geometry=point&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:13500&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "05. Query inside 15 kms radius from Madrid center -> Madrid, Alcobendas, Leganes"
 echo "================================================================================"
-orionCurl --url '/v2/entities?georel=near;maxDistance=15000&geometry=point&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;maxDistance:15000&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
 
 echo "06. Query in 13.5 kms radius outside Madrid center -> Alcobendas"
 echo "================================================================"
-orionCurl --url '/v2/entities?georel=near;minDistance=13500&geometry=point&coords=40.418889,-3.691944' --json
+orionCurl --url '/v2/entities?georel=near;minDistance:13500&geometry=point&coords=40.418889,-3.691944' --json
 echo
 echo
 
@@ -110,7 +110,7 @@ echo
 =========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Madrid
+Location: /v2/entities/Madrid?type=City
 Date: REGEX(.*)
 
 
@@ -119,7 +119,7 @@ Date: REGEX(.*)
 =============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Alcobendas
+Location: /v2/entities/Alcobendas?type=City
 Date: REGEX(.*)
 
 
@@ -128,7 +128,7 @@ Date: REGEX(.*)
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/Leganes
+Location: /v2/entities/Leganes?type=City
 Date: REGEX(.*)
 
 

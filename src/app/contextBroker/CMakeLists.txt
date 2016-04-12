@@ -34,7 +34,6 @@ SET (STATIC_LIBS
     rest
     jsonParse
     jsonParseV2
-    xmlParse
     apiTypesV2
     convenience
     ngsi9

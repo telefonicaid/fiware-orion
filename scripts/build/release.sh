@@ -67,7 +67,7 @@ DATE=$(LANG=C date +"%a %b %d %Y")
 export dateLine="$DATE Fermin Galan <fermin.galanmarquez@telefonica.com> ${NEW_VERSION}-${BROKER_RELEASE}"
 
 
-# Modify rpm/SPECS/contextBroker.spec only when step to a non-deve release
+# Modify rpm/SPECS/contextBroker.spec only when step to a non-dev release
 if [ "$BROKER_RELEASE" != "dev" ]
 then
     #
@@ -153,6 +153,26 @@ mv /tmp/version.h              src/app/contextBroker/version.h
 rm -rf CHANGES_NEXT_RELEASE
 touch CHANGES_NEXT_RELEASE
 
+# Adjust Readthedocs documentation badge. Note that the procedure is not symmetric (like in version.h), as
+# dev release sets 'latest' and not 'X.Y.Z-next"
+if [ "$BROKER_RELEASE" != "dev" ]
+then
+  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.org\/en\/latest\/?badge=latest)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$NEW_VERSION)](http:\/\/fiware-orion.readthedocs.org\/en\/$NEW_VERSION\/?badge=$NEW_VERSION)/" README.md > /tmp/README.md
+else
+  sed "s/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=$currentVersion)](http:\/\/fiware-orion.readthedocs.org\/en\/$currentVersion\/?badge=$currentVersion)/(https:\/\/readthedocs.org\/projects\/fiware-orion\/badge\/?version=latest)](http:\/\/fiware-orion.readthedocs.org\/en\/latest\/?badge=latest)/" README.md > /tmp/README.md
+fi
+mv /tmp/README.md README.md
+
+# Adjust Dockerfile GIT_REV_ORION. Note that the procedure is not symmetric (like in version.h), as
+# dev release sets 'develop' and not 'X.Y.Z-next"
+if [ "$BROKER_RELEASE" != "dev" ]
+then
+  sed "s/ENV GIT_REV_ORION develop/ENV GIT_REV_ORION release\/$NEW_VERSION/" docker/Dockerfile > /tmp/Dockerfile
+else
+  sed "s/ENV GIT_REV_ORION release\/$currentVersion/ENV GIT_REV_ORION develop/" docker/Dockerfile > /tmp/Dockerfile
+fi
+mv /tmp/Dockerfile docker/Dockerfile
+
 #
 # Do the git stuff only if we are in develop branch
 #
@@ -164,6 +184,8 @@ then
     git add test/functionalTest/cases/0000_cli/version.test
     git add test/functionalTest/cases/0000_version_operation/version_via_rest.test
     git add CHANGES_NEXT_RELEASE
+    git add README.md
+    git add docker/Dockerfile
     git commit -m "Step: $currentVersion -> $NEW_VERSION"
     git push origin develop
     # We do the tag only and merge to master only in the case of  non "dev" release

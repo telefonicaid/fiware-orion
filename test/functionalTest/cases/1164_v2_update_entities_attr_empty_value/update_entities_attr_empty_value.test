@@ -63,8 +63,8 @@ echo
 echo
 
 
-echo "04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged"
-echo "====================================================="
+echo "04. GET /v2/entities/E1/attrs/A1, to see A1 null"
+echo "================================================"
 orionCurl --url /v2/entities/E1/attrs/A1 --json
 echo
 echo
@@ -75,7 +75,7 @@ echo
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
 Date: REGEX(.*)
 
 
@@ -83,13 +83,13 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1/attrs/A1
 ================================
 HTTP/1.1 200 OK
-Content-Length: 37
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": null,
+    "type": "none",
     "value": 0
 }
 
@@ -102,17 +102,17 @@ Date: REGEX(.*)
 
 
 
-04. GET /v2/entities/E1/attrs/A1, to see A1 unchanged
-=====================================================
+04. GET /v2/entities/E1/attrs/A1, to see A1 null
+================================================
 HTTP/1.1 200 OK
-Content-Length: 37
+Content-Length: 42
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "metadata": {},
-    "type": null,
-    "value": 0
+    "type": "none",
+    "value": null
 }
 
 

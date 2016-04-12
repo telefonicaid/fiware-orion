@@ -182,70 +182,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   utExit();
 }
 
-/* ****************************************************************************
-*
-* ce1_En1_At0_Ok_XML -
-*/
-TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_XML)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
 
-  utInit();
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T1");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Invoke the function in mongoBackend library */
-  uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
-  ms = mongoRegisterContext(&req, &res, uriParams);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().toString();
-  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
-  EXPECT_STREQ("XML", reg.getStringField("format"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-
-  std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
-  EXPECT_EQ(0, attrs.size());
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  utExit();
-}
 
 /* ****************************************************************************
 *
@@ -271,7 +208,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_JSON)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
   ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
@@ -2334,9 +2270,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", JSON))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", JSON))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -2400,9 +2336,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
   expectedNcar2.subscriptionId.set("51307b66f481db11bf860002");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", JSON))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", JSON))
           .Times(1);
   setNotifier(notifierMock);
 
@@ -2465,9 +2401,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", JSON))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", JSON))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -2632,7 +2568,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     EXPECT_EQ("Database Error (collection: utest.registrations "
               "- update(): <{ _id: ObjectId('",s1);
     EXPECT_EQ("') },{ _id: ObjectId('", s2);
-    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] }> "
+    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"JSON\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] }> "
               "- exception: boom!!)", s3);
 
     /* Restore real DB connection */

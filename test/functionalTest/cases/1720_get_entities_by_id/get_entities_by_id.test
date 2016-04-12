@@ -91,7 +91,7 @@ echo
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/vehicle1
+Location: /v2/entities/vehicle1?type=car
 Date: REGEX(.*)
 
 
@@ -100,7 +100,7 @@ Date: REGEX(.*)
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/vehicle2
+Location: /v2/entities/vehicle2?type=car
 Date: REGEX(.*)
 
 
@@ -109,7 +109,7 @@ Date: REGEX(.*)
 ==========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/vehicle3
+Location: /v2/entities/vehicle3?type=car
 Date: REGEX(.*)
 
 

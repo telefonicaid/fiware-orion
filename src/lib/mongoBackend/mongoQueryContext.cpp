@@ -277,6 +277,7 @@ HttpStatusCode mongoQueryContext
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
+  std::map<std::string, bool>&         options,
   long long*                           countP,
   const std::string&                   apiVersion
 )
@@ -320,6 +321,8 @@ HttpStatusCode mongoQueryContext
                        countP,
                        &badInput,
                        sortOrderList,
+                       options[DATE_CREATED],
+                       options[DATE_MODIFIED],
                        apiVersion);
 
     if (badInput)
@@ -350,11 +353,7 @@ HttpStatusCode mongoQueryContext
           processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
         }
       }
-      else
-      {
-        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 
@@ -369,11 +368,7 @@ HttpStatusCode mongoQueryContext
           processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
         }
       }
-      else
-      {
-        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 
@@ -388,11 +383,7 @@ HttpStatusCode mongoQueryContext
           fillContextProviders(rawCerV, crrV);
         }
       }
-      else
-      {
-        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 
@@ -408,11 +399,7 @@ HttpStatusCode mongoQueryContext
           addContextProviders(rawCerV, crrV, limitReached);
         }
       }
-      else
-      {
-        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-        alarmMgr.dbError(err);
-      }
+
       crrV.release();
     }
 

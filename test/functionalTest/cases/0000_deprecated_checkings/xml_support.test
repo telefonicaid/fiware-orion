@@ -1,0 +1,98 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+XML support removed
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Operation request with XML payload, see error
+# 02. Operation requesting XML as response payload, see error
+#
+
+echo "01. Operation request with XML payload, see error"
+echo "================================================="
+url=/v1/contextEntities/E01/attributes
+payload='<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type></type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "${payload}"
+echo
+echo
+
+
+echo "02. Operation requesting XML as response payload, see error"
+echo "==========================================================="
+url=/v1/contextEntities/E01
+orionCurl --url "$url"
+echo
+echo
+
+
+--REGEXPECT--
+01. Operation request with XML payload, see error
+=================================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 156
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: application/xml",
+        "reasonPhrase": "Unsupported Media Type"
+    }
+}
+
+
+02. Operation requesting XML as response payload, see error
+===========================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 187
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "406",
+        "details": "acceptable MIME types: application/json. Accept header in request: application/xml",
+        "reasonPhrase": "Not Acceptable"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

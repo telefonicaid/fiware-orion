@@ -88,24 +88,18 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
-    And create entity group with "1" entities in "normalized" mode
-    And verify that receive several "Created" http code
-    And properties to entities
-      | parameter        | value       |
-      | entities_type    | home        |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-    And create entity group with "1" entities in "normalized" mode
+    And create entity group with "3" entities in "normalized" mode
+      | entity | prefix |
+      | type   | true   |
     And verify that receive several "Created" http code
     When get an entity by ID "room"
       | parameter | value       |
       | attrs     | temperature |
     Then verify that receive an "Conflict" http code
     And verify an error response
-      | parameter   | value                                                          |
-      | error       | TooManyResults                                                 |
-      | description | There is more than one entity with that id. Refine your query. |
+      | parameter   | value                                                   |
+      | error       | TooManyResults                                          |
+      | description | More than one matching entity. Please refine your query |
 
     # ------------------------ Service ----------------------------------------------
 
@@ -159,7 +153,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
 
-  @service_error
+  @service_error @BUG_1873
   Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value     |
@@ -552,6 +546,7 @@ Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
       | random=100000           |
       | random=1000000          |
 
+  @compound_with_metadata.row<row.id>
   @compound_with_metadata @BUG_1106
   Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with metadatas (compound, vector, boolean, etc)
     Given  a definition of headers

@@ -27,9 +27,36 @@
 #define WS_PARSER_H
 
 #include <vector>
+#include <map>
 #include <string>
 
 class HttpHeaders;
-void ws_parser_parse(const char *msg, std::string &url, std::string &verb, std::string &payload, HttpHeaders &head);
+class ConnectionInfo;
+
+void ws_parser_parse
+(
+  const char*      msg,
+  ConnectionInfo*  ciP,
+  std::string&     url,
+  std::string&     verb,
+  std::string&     payload,
+  HttpHeaders&     head
+);
+
+const char *ws_parser_message
+(
+ const std::string&  msg,
+ const HttpHeaders&  head,
+ const std::vector<std::string> headName,
+ const std::vector<std::string> headValue,
+ int                 statusCode
+);
+
+const char *ws_parser_notify
+(
+ const std::string& subId,
+ const std::map<std::string, std::string>& headers,
+ const std::string& data
+);
 
 #endif

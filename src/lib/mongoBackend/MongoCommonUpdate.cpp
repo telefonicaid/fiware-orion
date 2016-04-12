@@ -38,6 +38,7 @@
 #include "common/sem.h"
 #include "common/statistics.h"
 #include "common/errorMessages.h"
+#include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -310,7 +311,7 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
 {
 
   // Metadata is identified by name, type is not part of identity any more
-  return  getStringField(md1, ENT_ATTRS_MD_NAME) == getStringField(md2, ENT_ATTRS_MD_NAME);
+  return  getStringFieldF(md1, ENT_ATTRS_MD_NAME) == getStringFieldF(md2, ENT_ATTRS_MD_NAME);
 
 }
 
@@ -335,11 +336,11 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
   // If type exists in both metadata elments, check if they are the same
   if (md1TypeExist && md2TypeExist)
   {
-    if (getField(md1, ENT_ATTRS_MD_TYPE).type() != getField(md2, ENT_ATTRS_MD_TYPE).type())
+    if (getFieldF(md1, ENT_ATTRS_MD_TYPE).type() != getFieldF(md2, ENT_ATTRS_MD_TYPE).type())
     {
       return false;
     }
-    switch (getField(md1, ENT_ATTRS_MD_TYPE).type())
+    switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
     {
       /* FIXME not yet, issue #1068 Support array and object in metadata value
       case Object:
@@ -352,47 +353,47 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
       */
 
     case NumberDouble:
-      if (getField(md1, ENT_ATTRS_MD_TYPE).Number() != getField(md2, ENT_ATTRS_MD_TYPE).Number())
+      if (getFieldF(md1, ENT_ATTRS_MD_TYPE).Number() != getFieldF(md2, ENT_ATTRS_MD_TYPE).Number())
       {
         return false;
       }
       break;
 
     case Bool:
-      if (getBoolField(md1, ENT_ATTRS_MD_TYPE) != getBoolField(md2, ENT_ATTRS_MD_TYPE))
+      if (getBoolFieldF(md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
     case String:
-      if (getStringField(md1, ENT_ATTRS_MD_TYPE) != getStringField(md2, ENT_ATTRS_MD_TYPE))
+      if (getStringFieldF(md1, ENT_ATTRS_MD_TYPE) != getStringFieldF(md2, ENT_ATTRS_MD_TYPE))
       {
         return false;
       }
       break;
 
     case jstNULL:
-      if (!md2.getField(ENT_ATTRS_MD_TYPE).isNull())
+      if (!getFieldF(md2, ENT_ATTRS_MD_TYPE).isNull())
       {
         return false;
       }
       break;
 
     default:
-      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getField(md1, ENT_ATTRS_MD_TYPE).type()));
+      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldF(md1, ENT_ATTRS_MD_TYPE).type()));
       return false;
       break;
     }
   }
 
   // declared types are equal. Same value ?
-  if (getField(md1, ENT_ATTRS_MD_VALUE).type() != getField(md2, ENT_ATTRS_MD_VALUE).type())
+  if (getFieldF(md1, ENT_ATTRS_MD_VALUE).type() != getFieldF(md2, ENT_ATTRS_MD_VALUE).type())
   {
     return false;
   }
 
-  switch (getField(md1, ENT_ATTRS_MD_VALUE).type())
+  switch (getFieldF(md1, ENT_ATTRS_MD_VALUE).type())
   {
     /* FIXME not yet
     case Object:
@@ -405,19 +406,19 @@ static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
     */
 
     case NumberDouble:
-      return getField(md1, ENT_ATTRS_MD_VALUE).Number() == getField(md2, ENT_ATTRS_MD_VALUE).Number();
+      return getFieldF(md1, ENT_ATTRS_MD_VALUE).Number() == getFieldF(md2, ENT_ATTRS_MD_VALUE).Number();
 
     case Bool:
-      return getBoolField(md1, ENT_ATTRS_MD_VALUE) == getBoolField(md2, ENT_ATTRS_MD_VALUE);
+      return getBoolFieldF(md1, ENT_ATTRS_MD_VALUE) == getBoolFieldF(md2, ENT_ATTRS_MD_VALUE);
 
     case String:
-      return getStringField(md1, ENT_ATTRS_MD_VALUE) == getStringField(md2, ENT_ATTRS_MD_VALUE);
+      return getStringFieldF(md1, ENT_ATTRS_MD_VALUE) == getStringFieldF(md2, ENT_ATTRS_MD_VALUE);
 
     case jstNULL:
-      return md2.getField(ENT_ATTRS_MD_VALUE).isNull();
+      return getFieldF(md2, ENT_ATTRS_MD_VALUE).isNull();
 
     default:
-      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getField(md1, ENT_ATTRS_MD_VALUE).type()));
+      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", getFieldF(md1, ENT_ATTRS_MD_VALUE).type()));
       return false;
   }
 
@@ -504,7 +505,7 @@ bool attributeTypeAbsent(ContextAttribute* caP)
 *
 * changedAttr -
 */
-bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
+bool attrValueChanges(BSONObj& attr, ContextAttribute* caP, std::string apiVersion)
 {
   /* Not finding the attribute field at MongoDB is consideres as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -514,12 +515,12 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 
   /* No value in the request means that the value stays as it was before, so it is not
    * a change */
-  if (caP->valueType == ValueTypeNone)
+  if (caP->valueType == ValueTypeNone && apiVersion !="v2")
   {
     return false;
   }
 
-  switch (getField(attr, ENT_ATTRS_VALUE).type())
+  switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
   {
     case Object:
     case Array:
@@ -528,19 +529,19 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       return true;
 
     case NumberDouble:
-      return caP->valueType != ValueTypeNumber || caP->numberValue != getField(attr, ENT_ATTRS_VALUE).Number();
+      return caP->valueType != ValueTypeNumber || caP->numberValue != getFieldF(attr, ENT_ATTRS_VALUE).Number();
 
     case Bool:
-      return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolField(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
 
     case String:
-      return caP->valueType != ValueTypeString || caP->stringValue != getStringField(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
 
     case jstNULL:
       return caP->valueType != ValueTypeNone;
 
     default:
-      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
       return false;
   }
 }
@@ -549,26 +550,32 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 *
 * appendMetadata -
 */
-void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP)
+void appendMetadata(BSONArrayBuilder* mdVBuilder, const Metadata* mdP, bool useDefaultType)
 {
-  if (mdP->type != "")
+  std::string type =  mdP->type;
+  if (!mdP->typeGiven && useDefaultType)
   {
+    type = DEFAULT_TYPE;
+  }
+  if (type != "")
+  {
+
     switch (mdP->valueType)
     {
     case orion::ValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
 
     case orion::ValueTypeNumber:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
       return;
 
     case orion::ValueTypeBoolean:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
 
     case orion::ValueTypeNone:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << BSONNULL));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << type << ENT_ATTRS_MD_VALUE << BSONNULL));
       return;
 
     default:
@@ -624,26 +631,26 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   else
   {
     /* Slightly different treatment, depending on attribute value type in DB (string, number, boolean, vector or object) */
-    switch (getField(attr, ENT_ATTRS_VALUE).type())
+    switch (getFieldF(attr, ENT_ATTRS_VALUE).type())
     {
       case Object:
-        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.append(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).embeddedObject());
         break;
 
       case Array:
-        ab.appendArray(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).embeddedObject());
+        ab.appendArray(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).embeddedObject());
         break;
 
       case NumberDouble:
-        ab.append(ENT_ATTRS_VALUE, getField(attr, ENT_ATTRS_VALUE).Number());
+        ab.append(ENT_ATTRS_VALUE, getFieldF(attr, ENT_ATTRS_VALUE).Number());
         break;
 
       case Bool:
-        ab.append(ENT_ATTRS_VALUE, getBoolField(attr, ENT_ATTRS_VALUE));
+        ab.append(ENT_ATTRS_VALUE, getBoolFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case String:
-        ab.append(ENT_ATTRS_VALUE, getStringField(attr, ENT_ATTRS_VALUE));
+        ab.append(ENT_ATTRS_VALUE, getStringFieldF(attr, ENT_ATTRS_VALUE));
         break;
 
       case jstNULL:
@@ -651,7 +658,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getField(attr, ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
     }
   }
 
@@ -664,7 +671,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   {
     if (attr.hasField(ENT_ATTRS_TYPE))
     {
-      ab.append(ENT_ATTRS_TYPE, getStringField(attr, ENT_ATTRS_TYPE));
+      ab.append(ENT_ATTRS_TYPE, getStringFieldF(attr, ENT_ATTRS_TYPE));
     }
   }
 
@@ -682,7 +689,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
       continue;
     }
 
-    appendMetadata(&mdVBuilder, mdP);
+    appendMetadata(&mdVBuilder, mdP, apiVersion == "v2");
   }
 
   /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
@@ -691,7 +698,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
   if (attr.hasField(ENT_ATTRS_MD))
   {
-    mdV = getField(attr, ENT_ATTRS_MD).embeddedObject();
+    mdV = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
@@ -701,7 +708,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
       if (!hasMetadata(md.name, md.type, caP))
       {
-        appendMetadata(&mdVBuilder, &md);
+        appendMetadata(&mdVBuilder, &md, apiVersion == "v2");
       }
     }
   }
@@ -717,7 +724,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getIntField(attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getIntFieldF(attr, ENT_ATTRS_CREATION_DATE));
   }
 
   /* It was an actual update? */
@@ -733,9 +740,9 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-      actualUpdate = (attrValueChanges(attr, caP) ||
+      actualUpdate = (attrValueChanges(attr, caP, apiVersion) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
-                                             getStringField(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
+                                             getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
   }
   else
@@ -757,7 +764,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntField(attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getIntFieldF(attr, ENT_ATTRS_MODIFICATION_DATE));
     }
   }
 
@@ -775,7 +782,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 * If there is no custom metadata, then it returns false (true otherwise).
 *
 */
-static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttribute* ca)
+static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttribute* ca, bool useDefaultType)
 {
   BSONArrayBuilder  mdToAdd;
 
@@ -785,7 +792,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, const ContextAttr
 
     if (!isNotCustomMetadata(md->name))
     {
-      appendMetadata(&mdToAdd, md);
+      appendMetadata(&mdToAdd, md, useDefaultType);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                       md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
     }
@@ -850,14 +857,23 @@ static bool updateAttribute
     BSONObjBuilder newAttr;
 
     int now = getCurrentTime();
-    newAttr.appendElements(BSON(ENT_ATTRS_TYPE << caP->type <<
-                                ENT_ATTRS_CREATION_DATE << now <<
-                                ENT_ATTRS_MODIFICATION_DATE << now));
+
+    if (!caP->typeGiven && (apiVersion == "v2"))
+    {
+      newAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+    }
+    else
+    {
+      newAttr.append(ENT_ATTRS_TYPE, caP->type);
+    }
+    newAttr.append(ENT_ATTRS_CREATION_DATE, now);
+    newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
+
     valueBson(caP, newAttr);
 
     /* Custom metadata */
     BSONObj mdV;
-    if (contextAttributeCustomMetadataToBson(mdV, caP));
+    if (contextAttributeCustomMetadataToBson(mdV, caP, apiVersion == "v2"));
     {
       newAttr.appendArray(ENT_ATTRS_MD, mdV);
     }
@@ -873,9 +889,8 @@ static bool updateAttribute
     }
 
     BSONObj newAttr;
-    BSONObj attr = getField(attrs, effectiveName).embeddedObject();
+    BSONObj attr = getFieldF(attrs, effectiveName).embeddedObject();
     actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
-
     if (actualUpdate)
     {
       const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
@@ -933,12 +948,19 @@ static bool appendAttribute
   valueBson(caP, ab);
 
   /* 2. Type */
-  ab.append(ENT_ATTRS_TYPE, caP->type);
+  if ((apiVersion == "v2") && !caP->typeGiven)
+  {
+    ab.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+  }
+  else
+  {
+    ab.append(ENT_ATTRS_TYPE, caP->type);
+  }
 
   /* 3. Metadata */
   BSONObj mdV;
 
-  if (contextAttributeCustomMetadataToBson(mdV, caP))
+  if (contextAttributeCustomMetadataToBson(mdV, caP, apiVersion == "v2"))
   {
       ab.appendArray(ENT_ATTRS_MD, mdV);
   }
@@ -1263,6 +1285,7 @@ static bool addTriggeredSubscriptions_withCache
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
+    cSubP->notifyFormat = JSON;
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1409,7 +1432,6 @@ static bool addTriggeredSubscriptions_noCache
   DBClientBase* connection = getMongoConnection();
   if (collectionQuery(connection, collection, query, &cursor, &errorString) != true)
   {
-    alarmMgr.dbError(errorString);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     releaseMongoConnection(connection);
     return false;
@@ -1422,17 +1444,17 @@ static bool addTriggeredSubscriptions_noCache
   {
     BSONObj     sub;
     std::string err;
-    if (!nextSafeOrError(cursor, &sub, &err))
+    if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
-    BSONElement  idField  = sub.getField("_id");
+    BSONElement  idField  = getFieldF(sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get
+    // Now, if 'getFieldF(sub, "_id")' is not found, if we continue, calling OID() on it, then we get
     // an exception and the broker crashes.
     //
     if (idField.eoo() == true)
@@ -1466,25 +1488,25 @@ static bool addTriggeredSubscriptions_noCache
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLong(sub, CSUB_THROTTLING)       : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLong(sub, CSUB_LASTNOTIFICATION) : -1;
+      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
+      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringField(sub, CSUB_FORMAT)) : XML,
-          getStringField(sub, CSUB_REFERENCE),          
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CSUB_FORMAT)) : JSON,
+          getStringFieldF(sub, CSUB_REFERENCE),
           subToAttributeList(sub), "", "");
 
       if (sub.hasField(CSUB_EXPR))
       {
-        BSONObj expr = getObjectField(sub, CSUB_EXPR);
+        BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
 
-        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringField(expr, CSUB_EXPR_Q)      : "";
-        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringField(expr, CSUB_EXPR_GEOREL) : "";
-        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringField(expr, CSUB_EXPR_GEOM)   : "";
-        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringField(expr, CSUB_EXPR_COORDS) : "";
+        std::string q        = expr.hasField(CSUB_EXPR_Q)      ? getStringFieldF(expr, CSUB_EXPR_Q)      : "";
+        std::string georel   = expr.hasField(CSUB_EXPR_GEOREL) ? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+        std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
+        std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
 
         trigs->fillExpression(q, georel, geometry, coords);
       }
@@ -1599,17 +1621,6 @@ static bool processOnChangeConditionForUpdateContext
 
 /* ****************************************************************************
 *
-* processOntimeIntervalCondition -
-*/
-void processOntimeIntervalCondition(const std::string& subId, int interval, const std::string& tenant)
-{
-  getNotifier()->createIntervalThread(subId, interval, tenant);
-}
-
-
-
-/* ****************************************************************************
-*
 * matchExpression
 */
 static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
@@ -1698,7 +1709,7 @@ static bool processSubscriptions
         BSONObj query  = BSON("_id" << OID(mapSubId));
         BSONObj update = BSON("$set" <<
                               BSON(CSUB_LASTNOTIFICATION << rightNow) <<
-                              "$inc" << BSON(CSUB_COUNT << 1));
+                              "$inc" << BSON(CSUB_COUNT << (long long) 1));
         
         ret = collectionUpdate(getSubscribeContextCollectionName(tenant), query, update, false, err);
       }
@@ -1841,7 +1852,8 @@ static unsigned int howManyAttrs(BSONObj& attrs, std::string& attrName)
 static void updateAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
-  ContextAttribute*       targetAttr
+  ContextAttribute*       targetAttr,
+  bool                    useDefaultType
 )
 {
   /* Try to find the attribute in the notification CER */
@@ -1897,7 +1909,7 @@ static void updateAttrInNotifyCer
         /* If the attribute in target attr was not found, then it has to be added*/
         if (!matchMd)
         {
-          Metadata* newMdP = new Metadata(targetMdP);
+          Metadata* newMdP = new Metadata(targetMdP, useDefaultType);
           caP->metadataVector.push_back(newMdP);
         }
       }
@@ -1907,7 +1919,7 @@ static void updateAttrInNotifyCer
   }
 
   /* Reached this point, it means that it is a new attribute (APPEND case) */
-  ContextAttribute* caP = new ContextAttribute(targetAttr);
+  ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
   notifyCerP->contextElement.contextAttributeVector.push_back(caP);
 }
 
@@ -1962,7 +1974,7 @@ static bool updateContextAttributeItem
   {
     // Attribute was found
     entityModified = actualUpdate || entityModified;
-    updateAttrInNotifyCer(notifyCerP, targetAttr);
+    updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
   }
   else
   {
@@ -2108,7 +2120,7 @@ static bool appendContextAttributeItem
 
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
   entityModified = actualUpdate || entityModified;
-  updateAttrInNotifyCer(notifyCerP, targetAttr);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   /* Check aspects related with location */
   std::string locationString = targetAttr->getLocation(apiVersion);
@@ -2458,6 +2470,7 @@ static bool createEntity
 (
   EntityId*                        eP,
   const ContextAttributeVector&    attrsV,
+  int                              now,
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
@@ -2490,7 +2503,6 @@ static bool createEntity
     return false;
   }
 
-  int               now = getCurrentTime();
   BSONObjBuilder    attrsToAdd;
   BSONArrayBuilder  attrNamesToAdd;
 
@@ -2499,9 +2511,17 @@ static bool createEntity
     std::string     attrId = attrsV[ix]->getId();
     BSONObjBuilder  bsonAttr;
 
-    bsonAttr.appendElements(BSON(ENT_ATTRS_TYPE << attrsV[ix]->type <<
-                                 ENT_ATTRS_CREATION_DATE << now <<
-                                 ENT_ATTRS_MODIFICATION_DATE << now));
+    if (!attrsV[ix]->typeGiven && (apiVersion == "v2"))
+    {
+      bsonAttr.append(ENT_ATTRS_TYPE, DEFAULT_TYPE);
+    }
+    else
+    {
+      bsonAttr.append(ENT_ATTRS_TYPE, attrsV[ix]->type);
+    }
+
+    bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
+    bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
     valueBson(attrsV[ix], bsonAttr);
 
@@ -2518,7 +2538,7 @@ static bool createEntity
 
     /* Custom metadata */
     BSONObj mdV;
-    if (contextAttributeCustomMetadataToBson(mdV, attrsV[ix]))
+    if (contextAttributeCustomMetadataToBson(mdV, attrsV[ix], apiVersion == "v2"))
     {
       bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
     }
@@ -2527,26 +2547,37 @@ static bool createEntity
     attrNamesToAdd.append(attrsV[ix]->name);
   }
 
-  BSONObj bsonId;
+  BSONObjBuilder bsonId;
 
-  if (servicePathV.size() == 0)
+  bsonId.append(ENT_ENTITY_ID, eP->id);
+
+  if (eP->type == "")
   {
-    LM_T(LmtServicePath, ("Empty service path"));
-    bsonId = (eP->type == "")? BSON(ENT_ENTITY_ID << eP->id) :
-      BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
+    if (apiVersion == "v2")
+    {
+      // NGSIv2 uses default entity type
+      bsonId.append(ENT_ENTITY_TYPE, DEFAULT_TYPE);
+    }
   }
   else
   {
-    LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
+    bsonId.append(ENT_ENTITY_TYPE, eP->type);
+  }
 
-    bsonId = (eP->type == "")?
-      BSON(ENT_ENTITY_ID << eP->id << ENT_SERVICE_PATH << servicePathV[0]) :
-      BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
+  if (servicePathV.size() > 0)
+  {
+    LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
+    bsonId.append(ENT_SERVICE_PATH, servicePathV[0]);
+  }
+  else
+  {
+    LM_T(LmtServicePath, ("Empty service path string, using default servicepath"));
+    bsonId.append(ENT_SERVICE_PATH, DEFAULT_SERVICE_PATH);
   }
 
   BSONObjBuilder insertedDoc;
 
-  insertedDoc.append("_id", bsonId);
+  insertedDoc.append("_id", bsonId.obj());
   insertedDoc.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
   insertedDoc.append(ENT_ATTRS, attrsToAdd.obj());
   insertedDoc.append(ENT_CREATION_DATE, now);
@@ -2743,11 +2774,11 @@ static void updateEntity
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-  BSONElement        idField           = getField(r, "_id");
+  BSONObj            idField           = getFieldF(r, "_id").embeddedObject();
 
-  std::string        entityId          = getStringField(idField.embeddedObject(), ENT_ENTITY_ID);
-  std::string        entityType        = getStringField(idField.embeddedObject(), ENT_ENTITY_TYPE);
-  std::string        entitySPath       = getStringField(idField.embeddedObject(), ENT_SERVICE_PATH);
+  std::string        entityId          = getStringFieldF(idField, ENT_ENTITY_ID);
+  std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
+  std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
@@ -2755,7 +2786,8 @@ static void updateEntity
   cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
   /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
-  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0) {
+  if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0)
+  {
     LM_T(LmtServicePath, ("Removing entity"));
     removeEntity(entityId, entityType, cerP, tenant, entitySPath);
     responseP->contextElementResponseVector.push_back(cerP);
@@ -2767,7 +2799,7 @@ static void updateEntity
    * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
    * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
    * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-  BSONObj           attrs     = getField(r, ENT_ATTRS).embeddedObject();
+  BSONObj           attrs     = getFieldF(r, ENT_ATTRS).embeddedObject();
   BSONObjBuilder    toSet;
   BSONObjBuilder    toUnset;
   BSONArrayBuilder  toPush;
@@ -2786,13 +2818,13 @@ static void updateEntity
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc = getObjectField(r, ENT_LOCATION);
+    BSONObj loc = getObjectFieldF(r, ENT_LOCATION);
 
-    locAttr     = getStringField(loc, ENT_LOCATION_ATTRNAME);
+    locAttr     = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
 
     // FIXME P10: this only works for "Point" locations. NGSIv2 allows other types.
-    coordLong   = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[0].Double();
-    coordLat    = getField(getObjectField(loc, ENT_LOCATION_COORDS), "coordinates").Array()[1].Double();
+    coordLong   = getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").Array()[0].Double();
+    coordLat    = getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").Array()[1].Double();
   }
 
   //
@@ -2829,6 +2861,11 @@ static void updateEntity
   AttributeList emptyAttrL;
   ContextElementResponse* notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
+  // The hasField() check is needed as the entity could have been created with very old Orion version not
+  // supporting modification/creation dates
+  notifyCerP->contextElement.creDate = r.hasField(ENT_CREATION_DATE)     ? getIntOrLongFieldAsLongF(r, ENT_CREATION_DATE)     : -1;
+  notifyCerP->contextElement.modDate = r.hasField(ENT_MODIFICATION_DATE) ? getIntOrLongFieldAsLongF(r, ENT_MODIFICATION_DATE) : -1;
+
   if (!processContextAttributeVector(ceP,
                                      action,
                                      subsToNotify,
@@ -2853,7 +2890,19 @@ static void updateEntity
     // in only one place
     //
     searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-    responseP->contextElementResponseVector.push_back(cerP);
+
+    if (!(attributeAlreadyExistsError && (strcasecmp(action.c_str(), "append_strict") == 0)))
+    {
+      // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
+      // processContextElement() function so we need to skip this addition or we will get duplicated
+      // CER
+      responseP->contextElementResponseVector.push_back(cerP);
+    }
+    else
+    {
+      delete cerP;
+    }
+
     releaseTriggeredSubscriptions(subsToNotify);
 
     notifyCerP->release();
@@ -2861,13 +2910,14 @@ static void updateEntity
 
     return;
   }
-
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
   if (strcasecmp(action.c_str(), "replace") != 0)
   {
-    toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+    int now = getCurrentTime();
+    toSet.append(ENT_MODIFICATION_DATE, now);
+    notifyCerP->contextElement.modDate = now;
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
@@ -2895,7 +2945,10 @@ static void updateEntity
   if (strcasecmp(action.c_str(), "replace") == 0)
   {
     // toSet: { A1: { ... }, A2: { ... } }
-    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << getCurrentTime()));
+    int now = getCurrentTime();
+    updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << now));
+
+    notifyCerP->contextElement.modDate = now;
   }
   else
   {
@@ -3007,7 +3060,6 @@ static bool contextElementPreconditionsCheck
   const std::string&      apiVersion
 )
 {
-
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
 
@@ -3095,7 +3147,7 @@ void processContextElement
   if (!contextElementPreconditionsCheck(ceP, responseP, action, apiVersion))
   {
     return; // Error already in responseP
-  }
+  } 
 
   /* Find entities (could be several, in the case of no type or isPattern=true) */
   const std::string  idString          = "_id." ENT_ENTITY_ID;
@@ -3163,14 +3215,14 @@ void processContextElement
       return;
     }
 
-    // This is the cae of POST /v2/entities, in order to check that entity doesn't previously exist
+    // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
         return;
     }
 
-    // This is the cae of POST /v2/entities/<id>, in order to check that entity previously exist
+    // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPENDORUPDATE))
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity does not exist");
@@ -3214,20 +3266,20 @@ void processContextElement
   while (moreSafe(cursor))
   {
     BSONObj r;
-    if (!nextSafeOrError(cursor, &r, &err))
+    if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      LM_E(("Runtime Error (exception in nextSafe(): %s", err.c_str()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    BSONElement idField = getField(r, "_id");
+    BSONElement idField = getFieldF(r, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'r.getField("_id")' is not found, if we continue, calling embeddedObject() on it, then we get
+    // Now, if 'getFieldF(r, "_id")' is not found, if we continue, calling embeddedObject() on it, then we get
     // an exception and the broker crashes.
     //
     if (idField.eoo() == true)
@@ -3273,7 +3325,7 @@ void processContextElement
      * which sets the ServicePath for the entity.
      */
 
-    /* Creating the common par of the response that doesn't depend on the case */
+    /* Creating the common part of the response that doesn't depend on the case */
     ContextElementResponse* cerP = new ContextElementResponse();
 
     cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
@@ -3314,9 +3366,11 @@ void processContextElement
     }
     else   /* APPEND or APPEND_STRICT */
     {
-      std::string errReason, errDetail;
+      std::string  errReason;
+      std::string  errDetail;
+      int          now = getCurrentTime();
 
-      if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV, apiVersion))
+      if (!createEntity(enP, ceP->contextAttributeVector, now, &errDetail, tenant, servicePathV, apiVersion))
       {
         cerP->statusCode.fill(SccInvalidParameter, errDetail);
       }
@@ -3351,7 +3405,10 @@ void processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP);
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == "v2");
+
+        notifyCerP->contextElement.creDate = now;
+        notifyCerP->contextElement.modDate = now;
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
@@ -3368,7 +3425,6 @@ void processContextElement
   if (attributeAlreadyExistsError == true)
   {
     std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
-
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
   }
 

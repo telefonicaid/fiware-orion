@@ -26,6 +26,8 @@
 #include <map>
 
 #include "common/string.h"
+#include "common/globals.h"
+#include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -33,15 +35,19 @@
 /* ****************************************************************************
 *
 * validOptions - 
+*
+* Text definitions OPT_* found in common/globals.h
 */
 static const char* validOptions[] = 
 {
-  "count",
-  "normalized",
-  "values",
-  "keyValues",
-  "text",
-  "append"
+  OPT_COUNT,
+  OPT_NORMALIZED,
+  OPT_VALUES,
+  OPT_KEY_VALUES,
+  OPT_APPEND,
+  OPT_UNIQUE_VALUES,
+  OPT_DATE_CREATED,
+  OPT_DATE_MODIFIED
 };
 
 
@@ -62,7 +68,6 @@ static bool isValidOption(std::string item)
 
   return false;
 }
-
 
 
 /* ****************************************************************************
@@ -88,6 +93,13 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 
     ciP->uriParamOptions[vec[ix]] = true;
   }
+
+  //
+  // Check of invalid combinations
+  //
+  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_VALUES])        return -1;
+  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_UNIQUE_VALUES]) return -1;
+  if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] && ciP->uriParamOptions[OPT_VALUES])        return -1;
 
   return 0;
 }
@@ -140,10 +152,9 @@ ConnectionInfo::ConnectionInfo(const std::string &_api, Format _format, bool _ws
     httpHeaders.contentLength = 0;
     httpHeaders.servicePath = "/";
 
-    uriParam["details"] = "off";
-    uriParam["limit"] = "20";
-    uriParam["notifyFormat"] = "JSON";
-    uriParam["offset"] = "0";
+    uriParam[URI_PARAM_PAGINATION_DETAILS] = "off";
+    uriParam[URI_PARAM_PAGINATION_LIMIT] = "20";
+    uriParam[URI_PARAM_PAGINATION_OFFSET] = "0";
   }
 
 }
@@ -151,7 +162,7 @@ ConnectionInfo::ConnectionInfo(const std::string &_api, Format _format, bool _ws
 ConnectionInfo::ConnectionInfo(Format _outFormat):
   connection             (NULL),
   verb                   (NOVERB),
-  inFormat               (XML),
+  inFormat               (JSON),
   outFormat              (_outFormat),
   payload                (NULL),
   payloadSize            (0),
@@ -170,8 +181,8 @@ ConnectionInfo::ConnectionInfo(Format _outFormat):
 ConnectionInfo::ConnectionInfo(const std::string &_url, const std::string &_method, const std::string &_version, MHD_Connection* _connection):
   connection             (_connection),
   verb                   (NOVERB),
-  inFormat               (XML),
-  outFormat              (XML),
+  inFormat               (JSON),
+  outFormat              (JSON),
   url                    (_url),
   method                 (_method),
   version                (_version),
@@ -199,7 +210,12 @@ ConnectionInfo::~ConnectionInfo()
   servicePathV.clear();
 }
 
-void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload, const HttpHeaders &head)
+/* ****************************************************************************
+*
+* modify - Modify a ConnectionInfo using the given parameters
+*/
+
+void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, const std::string &_payload)
 {
   url = _url;
   method = _verb;
@@ -207,12 +223,10 @@ void ConnectionInfo::modify(const std::string &_url, const std::string &_verb, c
   verb = strToVerb(_verb);
   servicePathV.clear();
 
-  if (head.gotHeaders)
-  {
-    httpHeaders = head;
-    servicePath = head.servicePath;
-    servicePathV.push_back(head.servicePath);
-  }
+  tenant = httpHeaders.tenant;
+  tenantFromHttpHeader = httpHeaders.tenant;
+  servicePath = httpHeaders.servicePath;
+  servicePathV.push_back(httpHeaders.servicePath);
 
   if (payload)
   {

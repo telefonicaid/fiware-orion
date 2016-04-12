@@ -35,6 +35,7 @@
 #include "common/wsStrip.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include "orion_websocket/constants.h"
 
 
 /* ****************************************************************************
@@ -242,6 +243,10 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     return false;
   }
 
+ if (url == WSConstants::Scheme)
+ {
+    return true;
+ }
 
   /* http://some.host.com/my/path
    *      ^^             ^  ^

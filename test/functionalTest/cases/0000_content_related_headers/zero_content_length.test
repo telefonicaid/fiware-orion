@@ -29,18 +29,17 @@ brokerStart CB
 
 --SHELL--
 
-curl localhost:${CB_PORT}/v1/registry/registerContext --header "Content-Length: 0" -X POST 2> /dev/null | xmllint --format -
+curl localhost:${CB_PORT}/v1/registry/registerContext --header "Content-Length: 0" -X POST 2> /dev/null | python -mjson.tool
 
 --REGEXPECT--
-<?xml version="1.0"?>
-<registerContextResponse>
-  <registrationId>000000000000000000000000</registrationId>
-  <errorCode>
-    <code>411</code>
-    <reasonPhrase>Length Required</reasonPhrase>
-    <details>Zero/No Content-Length in PUT/POST/PATCH request</details>
-  </errorCode>
-</registerContextResponse>
+{
+    "errorCode": {
+        "code": "411",
+        "details": "Zero/No Content-Length in PUT/POST/PATCH request",
+        "reasonPhrase": "Length Required"
+    },
+    "registrationId": "000000000000000000000000"
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

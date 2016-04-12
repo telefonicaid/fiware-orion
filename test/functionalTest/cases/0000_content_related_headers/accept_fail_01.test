@@ -31,34 +31,32 @@ brokerStart CB
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
 url="/v1/queryContext"
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
 
-orionCurl --url "$url" --payload "${payload}" --out " "
+orionCurl --url "$url" --payload "${payload}" --out " " --json
 
 # Example of payload from file:
 # echo $payload > payload_file
 # orionCurl --url "$url" --payload payload_file --out " "
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

@@ -25,8 +25,7 @@ echo "Make a registration"
 ../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 #FIXME P10: recover this
-#echo "ONTIMEINTERVAL-subscribe on temperature and lightstatus for ConferenceRoom and OfficeRoom"
-#../manual/cbTest.sh scr ../manual/ngsi10.subscribeContextRequest.ontimeinterval.valid.xml
+#../manual/cbTest.sh scr ../manual/ngsi10.subscribeContextRequest.onchange.valid.xml
 
 echo "Sleep a little to give the broker time to send two notifications"
 sleep 21

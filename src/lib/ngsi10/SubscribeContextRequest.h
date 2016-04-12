@@ -60,8 +60,8 @@ typedef struct SubscribeContextRequest
   int                    restrictions;
 
   SubscribeContextRequest(): expires(-1), restrictions(0) {}
-  std::string  render(RequestType requestType, Format format, const std::string& indent);
-  std::string  check(ConnectionInfo* ciP, RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string  render(RequestType requestType, const std::string& indent);
+  std::string  check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         release(void);
 

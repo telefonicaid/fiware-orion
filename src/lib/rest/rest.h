@@ -75,7 +75,11 @@ extern char            restAllowedOrigin[64];
 */
 typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 
-
+/* ****************************************************************************
+*
+* uriParamPush -
+*/
+int uriParamPush(ConnectionInfo *ciP, const char* ckey, const char* val);
 
 /* ****************************************************************************
 *
@@ -96,8 +100,7 @@ extern void restInit
    const char*         _allowedOrigin     = NULL,
    const char*         _httpsKey          = NULL,
    const char*         _httpsCert         = NULL,
-   RestServeFunction   _serveFunction     = NULL,
-   bool                _acceptTextXml     = false
+   RestServeFunction   _serveFunction     = NULL
 );
 
 #endif

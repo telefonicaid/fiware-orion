@@ -43,18 +43,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "serviceRoutines/postUpdateContext.h"
-#include "xmlParse/xmlRequest.h"
-
-
-
-/* ****************************************************************************
-*
-* xmlPayloadClean -
-*/
-static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
-{
-  return (char*) strstr(payload, payloadWord);
-}
 
 
 
@@ -110,16 +98,8 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 * 6. 'Fix' StatusCode
 * 7. Freeing memory
 *
-*
-* FIXME P5: The function 'updateForward' is implemented to pick the format (XML or JSON) based on the
-*           count of the Format for all the participating attributes. If we have more attributes 'preferring'
-*           XML than JSON, the forward is done in XML, etc. This is all OK.
-*           What is not OK is that the Accept HTTP header is set to the same format as the Content-Type HTTP Header.
-*           While this is acceptable, it is not great. As the broker understands both XML and JSON, we could send
-*           the forward message with an Acceot header of XML/JSON and then at reading the response, instead of 
-*           throwing away the HTTP headers, we could read the "Content-Type" and do the parse according the Content-Type.
 */
-static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP, Format format)
+static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP)
 {
   std::string      ip;
   std::string      protocol;
@@ -151,23 +131,12 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string  payload;
   char*        cleanPayload;
 
-  ciP->outFormat  = format;
+  ciP->outFormat  = JSON;
 
   TIMED_RENDER(payload = upcrP->render(ciP, UpdateContext, ""));
 
   ciP->outFormat  = outFormat;
   cleanPayload    = (char*) payload.c_str();
-
-  if (format == XML)
-  {
-    if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<updateContextRequest>")) == NULL)
-    {
-      LM_E(("Runtime Error (error rendering forward-request)"));
-      upcrsP->errorCode.fill(SccContextElementNotFound, "");
-      return;
-    }
-  }
-
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -177,7 +146,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string     resource     = prefix + "/updateContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
-  std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
+  std::string     mimeType     = "application/json";
   std::string     out;
   int             r;
 
@@ -214,14 +183,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string  s;
   std::string  errorMsg;
 
-  if (format == XML)
-  {
-    cleanPayload = xmlPayloadClean(out.c_str(), "<updateContextResponse>");
-  }
-  else
-  {
-    cleanPayload = jsonPayloadClean(out.c_str());
-  }
+  cleanPayload = jsonPayloadClean(out.c_str());
 
   if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
   {
@@ -248,14 +210,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   parseData.upcrs.res.errorCode.fill(SccOk);
 
-  if (format == XML)
-  {
-    s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
-  }
-  else
-  {
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL);
-  }
+  s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL);
 
   if (s != "OK")
   {
@@ -316,6 +271,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     int noOfFounds    = 0;
     int noOfNotFounds = 0;
+
     for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
       if (cerP->contextElement.contextAttributeVector[aIx]->found == true)
@@ -546,6 +502,7 @@ std::string postUpdateContext
   }
 
 
+
   //
   // 04. mongoBackend doesn't give us the values of the attributes.
   //     So, here we have to do a search inside the initial UpdateContextRequest to fill in all the
@@ -640,18 +597,6 @@ std::string postUpdateContext
         }
 
         //
-        // 3. Increase the correct format counter
-        //
-        if (aP->providingApplication.getFormat() == XML)
-        {
-          reqP->xmls++;
-        }
-        else
-        {
-          reqP->jsons++;
-        }
-
-        //
         // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
         //    If not found, add one (to the ContextElementVector of the UpdateContextRequest).
         //
@@ -691,9 +636,8 @@ std::string postUpdateContext
     }
 
     UpdateContextResponse upcrs;
-    Format                format = requestV[ix]->format();
 
-    updateForward(ciP, requestV[ix], &upcrs, format);
+    updateForward(ciP, requestV[ix], &upcrs);
 
     //
     // Add the result from the forwarded update to the total response in 'response'

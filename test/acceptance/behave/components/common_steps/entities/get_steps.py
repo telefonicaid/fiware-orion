@@ -73,7 +73,7 @@ def get_an_attribute_by_id(context, attribute_name, entity_id):
     :param entity_id: id of the entity
     """
     __logger__.debug("getting an attribute by id...")
-    context.resp = context.cb.list_an_attribute_by_id(attribute_name, entity_id)
+    context.resp = context.cb.list_an_attribute_by_id(context, attribute_name, entity_id)
     __logger__.info("...returned an attribute by id")
 
 
@@ -105,9 +105,9 @@ def get_an_attribute_value_by_id_and_attribute_name_if_it_exists(context, entity
     :param entity_id: id of the entity
     :param attribute_name: name of the attribute
     """
-    __logger__.debug("getting an attribute value by id...")
-    context.resp = context.cb.list_an_attribute_by_id(attribute_name, entity_id, "value")
-    __logger__.info("...returned an attribute value by id")
+    __logger__.debug("getting an attribute value by id and attribute name...")
+    context.resp = context.cb.list_an_attribute_by_id(context, attribute_name, entity_id, "value")
+    __logger__.info("...returned an attribute value by id and attribute name")
 
 
 @step(u'get entity types')

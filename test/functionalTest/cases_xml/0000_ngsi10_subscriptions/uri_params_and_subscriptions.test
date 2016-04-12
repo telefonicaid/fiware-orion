@@ -1,0 +1,573 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+URI params and subscriptions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 31,60
+accumulatorStart localhost $LISTENER_PORT
+
+--SHELL--
+
+# 0. URI params for orionCurl
+
+echo "1. Subscribe to E/attr1 giving notifyFormat=XML"
+echo "==============================================="
+url="/v1/subscribeContext?notifyFormat=XML"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Test" isPattern="false">
+      <id>E</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>attr1</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT1H</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>attr1</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "2. Subscribe to E/attr2 giving notifyFormat=JSON"
+echo "================================================"
+url="/v1/subscribeContext?notifyFormat=JSON"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Test" isPattern="false">
+      <id>E</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>attr2</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT1H</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>attr2</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "3. Subscribe to E/attr3 without notifyFormat and with Accept=application/xml"
+echo "============================================================================"
+url="/v1/subscribeContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Test" isPattern="false">
+      <id>E</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>attr3</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT1H</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>attr3</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+echo "4. Subscribe to E/attr4 without notifyFormat and with Accept=application/json"
+echo "============================================================================="
+url="/v1/subscribeContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Test" isPattern="false">
+      <id>E</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>attr4</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT1H</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>attr4</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload" --in "application/xml" --out "application/json"
+echo
+echo
+
+
+echo "5. Update all four attributes"
+echo "============================="
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Test" isPattern="false">
+        <id>E</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>attr1</name>
+          <type>test</type>
+          <contextValue>x1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+url="/v1/updateContext"
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Test" isPattern="false">
+        <id>E</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>attr2</name>
+          <type>test</type>
+          <contextValue>x2</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+url="/v1/updateContext"
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Test" isPattern="false">
+        <id>E</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>attr3</name>
+          <type>test</type>
+          <contextValue>x3</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+url="/v1/updateContext"
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Test" isPattern="false">
+        <id>E</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>attr4</name>
+          <type>test</type>
+          <contextValue>x4</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+url="/v1/updateContext"
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "6. Dump the accumulator and find 4 notifications"
+echo "================================================"
+#    - E1/attr1 in XML
+#    - E1/attr2 in JSON
+#    - E1/attr3 in XML
+#    - E1/attr4 in JSON
+accumulatorDump
+
+
+--REGEXPECT--
+1. Subscribe to E/attr1 giving notifyFormat=XML
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+
+2. Subscribe to E/attr2 giving notifyFormat=JSON
+================================================
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+
+3. Subscribe to E/attr3 without notifyFormat and with Accept=application/xml
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+
+4. Subscribe to E/attr4 without notifyFormat and with Accept=application/json
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+5. Update all four attributes
+=============================
+HTTP/1.1 200 OK
+Content-Length: 623
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>attr1</name>
+            <type>test</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+HTTP/1.1 200 OK
+Content-Length: 623
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>attr2</name>
+            <type>test</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+HTTP/1.1 200 OK
+Content-Length: 623
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>attr3</name>
+            <type>test</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+HTTP/1.1 200 OK
+Content-Length: 623
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>attr4</name>
+            <type>test</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+6. Dump the accumulator and find 4 notifications
+================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 720
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>attr1</name>
+            <type>test</type>
+            <contextValue>x1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 466
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Test",
+        "isPattern" : "false",
+        "id" : "E",
+        "attributes" : [
+          {
+            "name" : "attr2",
+            "type" : "test",
+            "value" : "x2"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 720
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>attr3</name>
+            <type>test</type>
+            <contextValue>x3</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 466
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Test",
+        "isPattern" : "false",
+        "id" : "E",
+        "attributes" : [
+          {
+            "name" : "attr4",
+            "type" : "test",
+            "value" : "x4"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+--TEARDOWN--
+brokerStop CB
+accumulatorStop ${LISTENER_PORT}
+dbDrop CB

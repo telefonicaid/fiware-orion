@@ -38,8 +38,8 @@
 */
 std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  bool         keyValues  = ciP->uriParamOptions["keyValues"];
-  std::string  renderMode = (keyValues == true)? "keyValues" : "normalized";
+  bool         keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
+  std::string  renderMode = (keyValues == true)? RENDER_MODE_KEY_VALUES : RENDER_MODE_NORMALIZED;
 
   if (pcontextAttribute)
   {

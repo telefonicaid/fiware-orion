@@ -172,7 +172,7 @@ bool AlarmManager::dbError(const std::string& details)
   {
     if (dbErrorLogAlways)
     {
-      LM_W(("Repeated Database Error: %s", details.c_str()));
+      LM_E(("Repeated Database Error: %s", details.c_str()));
     }
 
     return false;

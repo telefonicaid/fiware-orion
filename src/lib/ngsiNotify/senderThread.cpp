@@ -29,6 +29,8 @@
 #include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
 
+#include "orion_websocket/constants.h"
+#include "orion_websocket/wsNotify.h"
 
 
 /* ****************************************************************************
@@ -61,19 +63,32 @@ void* startSenderThread(void* p)
       std::string  out;
       int          r;
 
-      r = httpRequestSend(params->ip,
-                          params->port,
-                          params->protocol,
-                          params->verb,
-                          params->tenant,
-                          params->servicePath,
-                          params->xauthToken,
-                          params->resource,
-                          params->content_type,
-                          params->content,
-                          true,
-                          NOTIFICATION_WAIT_MODE,
-                          &out);
+      if (params->protocol == WSConstants::Scheme)
+      {
+        std::map<std::string, std::string> headers;
+        headers.insert(std::make_pair("Fiware-Service",     params->tenant));
+        headers.insert(std::make_pair("Fiware-ServicePath", params->servicePath));
+        headers.insert(std::make_pair("X-AuthToken",        params->xauthToken));
+
+        // callback to WS library
+        r = sendNotifyContextRequestWs(params->subId, headers, params->content);
+      }
+      else
+      {
+        r = httpRequestSend(params->ip,
+                            params->port,
+                            params->protocol,
+                            params->verb,
+                            params->tenant,
+                            params->servicePath,
+                            params->xauthToken,
+                            params->resource,
+                            params->content_type,
+                            params->content,
+                            true,
+                            NOTIFICATION_WAIT_MODE,
+                            &out);
+      }
 
       if (r == 0)
       {

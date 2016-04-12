@@ -82,7 +82,8 @@ typedef enum RequestType
   AppendContextElement,
   UpdateContextAttribute,
 
-  LogRequest = 51,
+  LogTraceRequest = 51,
+  LogLevelRequest,
   VersionRequest,
   ExitRequest,
   LeakRequest,
@@ -94,7 +95,7 @@ typedef enum RequestType
   RtContextElementResponse,
   RtContextAttributeResponse,
 
-  EntityTypes = 61,
+  EntityTypes = 62,
   AttributesForEntityType,
   RtEntityTypesResponse,
   RtAttributesForEntityTypeResponse,
@@ -122,6 +123,7 @@ typedef enum RequestType
   SubscriptionsRequest,
   IndividualSubscriptionRequest,
   BatchQueryRequest,
+  BatchUpdateRequest,
 
   InvalidRequest = 100
 } RequestType;

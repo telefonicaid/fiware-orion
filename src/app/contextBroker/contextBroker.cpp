@@ -76,7 +76,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
@@ -92,7 +91,6 @@
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
-#include "ngsiNotify/onTimeIntervalThread.h"
 #include "ngsiNotify/QueueNotifier.h"
 #include "ngsiNotify/QueueWorkers.h"
 #include "ngsiNotify/senderThread.h"
@@ -141,6 +139,7 @@
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
 #include "serviceRoutines/badVerbAllFive.h"
+#include "serviceRoutines/badVerbPutOnly.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -198,6 +197,8 @@
 #include "serviceRoutinesV2/deleteSubscription.h"
 #include "serviceRoutinesV2/patchSubscription.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
+#include "serviceRoutinesV2/postBatchUpdate.h"
+#include "serviceRoutinesV2/logLevelTreat.h"
 
 #include "orion_websocket/ws.h"
 
@@ -478,6 +479,10 @@ static const char* validLogLevels[] =
 #define BQR_COMPS_V2            3, { "v2", "op", "query" }
 #define BQR_COMPS_WORD          ""
 
+#define BUR                     BatchUpdateRequest
+#define BUR_COMPS_V2            3, { "v2", "op", "update" }
+#define BUR_COMPS_WORD          ""
+
 //
 // NGSI9
 //
@@ -686,7 +691,7 @@ static const char* validLogLevels[] =
 //
 // Log, version, statistics ...
 //
-#define LOG                LogRequest
+#define LOG                LogTraceRequest
 #define LOGT_COMPS_V0      2, { "log", "trace"                           }
 #define LOGTL_COMPS_V0     3, { "log", "trace",      "*"                 }
 #define LOG2T_COMPS_V0     2, { "log", "traceLevel"                      }
@@ -701,6 +706,14 @@ static const char* validLogLevels[] =
 #define STAT_COMPS_V1        3, { "v1", "admin", "statistics"              }
 #define STAT_CACHE_COMPS_V0  2, { "cache", "statistics"                    }
 #define STAT_CACHE_COMPS_V1  4, { "v1", "admin", "cache", "statistics"     }
+
+
+
+//
+// LogLevel
+//
+#define LOGLEVEL           LogLevelRequest
+#define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
 
@@ -765,7 +778,10 @@ static const char* validLogLevels[] =
   { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetDeletePatchOnly}, \
                                                                                                        \
   { "POST",   BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          postBatchQuery           }, \
-  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }
+  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }, \
+                                                                                                       \
+  { "POST",   BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          postBatchUpdate          }, \
+  { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
 
 
 
@@ -1093,6 +1109,10 @@ static const char* validLogLevels[] =
   { "*", INV, INV10_COMPS,   "", badNgsi10Request }, \
   { "*", INV, INV_ALL_COMPS, "", badRequest       }
 
+#define LOGLEVEL_REQUESTS_V2                                                         \
+  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", logLevelTreat                      }, \
+  { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
+
 
 
 /* ****************************************************************************
@@ -1109,8 +1129,6 @@ static const char* validLogLevels[] =
 *
 * This is the default service vector, that is used if the broker is started without the -ngsi9 option
 */
-
-
 RestService restServiceV[] =
 {
   API_V2,
@@ -1131,6 +1149,7 @@ RestService restServiceV[] =
   STAT_CACHE_REQUESTS_V0,
   STAT_CACHE_REQUESTS_V1,
   VERSION_REQUESTS,
+  LOGLEVEL_REQUESTS_V2,
 
 #ifdef DEBUG
   EXIT_REQUESTS,
@@ -1261,16 +1280,6 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
-  //
-  // Cancel all threads to avoid false leaks in valgrind
-  //
-  std::vector<std::string> dbs;
-  getOrionDatabases(dbs);
-  for (unsigned int ix = 0; ix < dbs.size(); ++ix)
-  {
-    destroyAllOntimeIntervalThreads(dbs[ix]);
-  }
-
   exit(code);
 }
 
@@ -1351,21 +1360,7 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
   /* Set notifier object (singleton) */
   setNotifier(pNotifier);
 
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
-  recoverOntimeIntervalThreads("");
-  if (multitenant)
-  {
-    /* We get tenant database names and recover ontime interval threads on each one */
-    std::vector<std::string> orionDbs;
-    getOrionDatabases(orionDbs);
-    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
-    {
-      std::string orionDb = orionDbs[ix];
-      std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-      recoverOntimeIntervalThreads(tenant);
-    }
-  }
-
+  /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
 }
 
@@ -1638,6 +1633,7 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("remove builtin", "--silent");
   paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
@@ -1670,14 +1666,6 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
-
-  // Argument consistency check (--silent AND -logLevel)
-  if (paIsSet(argC, argV, "--silent") && paIsSet(argC, argV, "-logLevel"))
-  {
-    printf("incompatible options: --silent cannot be used at the same time as -logLevel\n");
-    paUsage();
-    exit(1);
-  }
 
   // Argument consistency check (-t AND NOT -logLevel)
   if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))

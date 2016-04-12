@@ -51,7 +51,7 @@ ContextRegistration::ContextRegistration()
 *
 * ContextRegistration::render -
 */
-std::string ContextRegistration::render(Format format, const std::string& indent, bool comma, bool isInVector)
+std::string ContextRegistration::render(const std::string& indent, bool comma, bool isInVector)
 {
   std::string out = "";
   std::string tag = "contextRegistration";
@@ -62,12 +62,12 @@ std::string ContextRegistration::render(Format format, const std::string& indent
   // the problem with the JSON commas disappear. All fields will have 'comma set to true'.
   // All, except providingApplication of course :-)
   //
-  out += startTag(indent, tag, format, isInVector == false);
-  out += entityIdVector.render(format, indent + "  ", true);
-  out += contextRegistrationAttributeVector.render(format, indent + "  ", true);
-  out += registrationMetadataVector.render(format, indent + "  ", true);
-  out += providingApplication.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format, comma);
+  out += startTag1(indent, tag, isInVector == false);
+  out += entityIdVector.render(indent + "  ", true);
+  out += contextRegistrationAttributeVector.render(indent + "  ", true);
+  out += registrationMetadataVector.render(indent + "  ", true);
+  out += providingApplication.render(indent + "  ", false);
+  out += endTag(indent, comma);
 
   return out;
 }
@@ -82,7 +82,6 @@ std::string ContextRegistration::check
 (
   ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -90,22 +89,22 @@ std::string ContextRegistration::check
 {
   std::string res;
 
-  if ((res = entityIdVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = entityIdVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = contextRegistrationAttributeVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextRegistrationAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = registrationMetadataVector.check(ciP, requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = registrationMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = providingApplication.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = providingApplication.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
