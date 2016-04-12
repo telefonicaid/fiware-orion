@@ -1,0 +1,255 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Broker without -multservice must notify without regard to service-path
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create a subcription to catch everything, for accumulator
+# 02. Create entity without service-path
+# 03. Create entity with empty service-path
+# 04. Create entity with service-path /abc
+# 05. Dump accelerator, see three notifications
+#
+
+echo "01. Create a subcription to catch everything, for accumulator"
+echo "============================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*"
+            }
+        ],
+        "condition": {
+            "attributes": [ ]
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:'$LISTENER_PORT'/notify",
+        "attributes": [ ]
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create entity without service-path"
+echo "======================================"
+payload='{
+  "id": "E2",
+  "A2": 2
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Create entity with empty service-path"
+echo "========================================="
+payload='{
+  "id": "E3",
+  "A3": 3
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --servicePath ""
+echo
+echo
+
+
+echo "04. Create entity with service-path /abc"
+echo "========================================"
+payload='{
+  "id": "E4",
+  "A4": 4
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json --servicePath "/abc"
+echo
+echo
+
+
+echo "05. Dump accelerator, see three notifications"
+echo "============================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subcription to catch everything, for accumulator
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create entity without service-path
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create entity with empty service-path
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create entity with service-path /abc
+========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Dump accelerator, see three notifications
+=============================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 461
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E2",
+        "attributes" : [
+          {
+            "name" : "A2",
+            "type" : "none",
+            "value" : 2
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 461
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E3",
+        "attributes" : [
+          {
+            "name" : "A3",
+            "type" : "none",
+            "value" : 3
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /abc
+Content-Length: 461
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E4",
+        "attributes" : [
+          {
+            "name" : "A4",
+            "type" : "none",
+            "value" : 4
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

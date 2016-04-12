@@ -168,8 +168,9 @@ typedef struct SubCache
 *
 * subCache - 
 */
-static SubCache  subCache       = { NULL, NULL, 0 };
-bool             subCacheActive = false;
+static SubCache  subCache            = { NULL, NULL, 0 };
+bool             subCacheActive      = false;
+bool             subCacheMultitenant = false;
 
 
 
@@ -177,9 +178,11 @@ bool             subCacheActive = false;
 *
 * subCacheInit - 
 */
-void subCacheInit(void)
+void subCacheInit(bool multitenant)
 {
   LM_T(LmtSubCache, ("Initializing subscription cache"));
+
+  subCacheMultitenant = multitenant;
 
   subCache.head   = NULL;
   subCache.tail   = NULL;
@@ -352,12 +355,14 @@ static bool subMatch
     return false;
   }
 
-  if (servicePathMatch(cSubP, (char*) servicePath) == false)
+  if (subCacheMultitenant == true)  // Broker has started with -multiservice option
   {
-    LM_T(LmtSubCacheMatch, ("No match due to servicePath"));
-    return false;
+    if (servicePathMatch(cSubP, (char*) servicePath) == false)
+    {
+      LM_T(LmtSubCacheMatch, ("No match due to servicePath"));
+      return false;
+    }
   }
-
 
   //
   // If ONCHANGE and one of the attribute names in the scope vector
