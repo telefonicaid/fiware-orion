@@ -117,7 +117,7 @@ extern volatile SubCacheState  subCacheState;
 *
 * subCacheInit - 
 */
-extern void subCacheInit(void);
+extern void subCacheInit(bool multitenant = false);
 
 
 

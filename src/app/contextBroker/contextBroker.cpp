@@ -1758,7 +1758,7 @@ int main(int argC, char* argV[])
 
   if (noCache == false)
   {
-    subCacheInit();
+    subCacheInit(mtenant);
 
     if (subCacheInterval == 0)
     {
