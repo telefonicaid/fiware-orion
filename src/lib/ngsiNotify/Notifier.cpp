@@ -178,23 +178,6 @@ void Notifier::sendNotifyContextAvailabilityRequest
     std::string content_type = "application/json";
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
-#ifdef SEND_BLOCKING
-    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, fiwareCorrelator, true, NOTIFICATION_WAIT_MODE);
-
-    if (r == 0)
-    {
-      statisticsUpdate(NotifyContextSent, format);
-      QueueStatistics::incSentOK();
-      alarmMgr.notificationErrorReset(url);
-    }
-    else
-    {
-      QueueStatistics::incSentError();
-      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");      
-    }
-#endif
-
-#ifdef SEND_IN_NEW_THREAD
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
 
@@ -216,5 +199,4 @@ void Notifier::sendNotifyContextAvailabilityRequest
       return;
     }
     pthread_detach(tid);
-#endif
 }
