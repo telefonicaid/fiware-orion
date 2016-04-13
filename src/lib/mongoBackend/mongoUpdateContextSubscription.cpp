@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -56,8 +57,9 @@ HttpStatusCode mongoUpdateContextSubscription
     const std::string&                  tenant,
     const std::string&                  xauthToken,
     const std::vector<std::string>&     servicePathV,
+    const std::string&                  fiwareCorrelator,
     std::string                         version
-    )
+)
 { 
   bool          reqSemTaken;
 
@@ -109,7 +111,8 @@ HttpStatusCode mongoUpdateContextSubscription
    */
   BSONObjBuilder newSub;
 
-  if (version != "v2") {
+  if (version != "v2")
+  {
     /* Entities, attribute list and reference are not updatable, so they are appended directly */
     newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
     newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
@@ -130,7 +133,7 @@ HttpStatusCode mongoUpdateContextSubscription
     newSub.append(CSUB_REFERENCE, ref);
 
     // Entities
-    if (requestP->entityIdVector.size() >0)
+    if (requestP->entityIdVector.size() > 0)
     {
       /* Build entities array */
       BSONArrayBuilder entities;
@@ -157,7 +160,7 @@ HttpStatusCode mongoUpdateContextSubscription
       newSub.appendArray(CSUB_ENTITIES, getFieldF(sub, CSUB_ENTITIES).Obj());
     }
 
-    //Attributes
+    // Attributes
     if (requestP->attributeList.size() > 0)
     {
       /* Build attributes array */
@@ -171,38 +174,31 @@ HttpStatusCode mongoUpdateContextSubscription
     {
       newSub.appendArray(CSUB_ATTRS, getFieldF(sub, CSUB_ATTRS).Obj());
     }
-
   }
 
-  /* Duration update */
-  long long expiration = -1;
-
-  if (requestP->expires != -1) //v2
+  /* Expiration */
+  long long expiration = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION) : -1;
+  if (version == "v1")
   {
-    expiration = requestP->expires;
+    // Based on duration
+    if (!requestP->duration.isEmpty())
+    {
+      expiration = getCurrentTime() + requestP->duration.parse();
+    }
   }
-  else
+  else // v2
   {
-    expiration = getCurrentTime() + requestP->duration.parse();
+    // Based on expires
+    if (requestP->expires > 0)
+    {
+      expiration = requestP->expires;
+    }
   }
-
-  if (requestP->duration.isEmpty() && requestP->expires ==-1)
-  {
-    //
-    // No duration in incoming request => "inherit" expirationDate from 'old' subscription
-    //
-    long long expirationTime = sub.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION) : -1;
-
-    newSub.append(CSUB_EXPIRATION, expirationTime);
-  }
-  else
-  {
-    newSub.append(CSUB_EXPIRATION, expiration);
-    LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
-  }
+  newSub.append(CSUB_EXPIRATION, expiration);
+  LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
 
   /* ServicePath update */
-  newSub.append(CSUB_SERVICE_PATH, (servicePathV.size() == 0)? "" : servicePathV[0]);
+  newSub.append(CSUB_SERVICE_PATH, servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0]);
 
   /* Throttling update */
   if (!requestP->throttling.isEmpty())
@@ -231,13 +227,66 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
+
+  //
+  // StringFilter in Scope?
+  //
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+  // If so, set it as string filter to the sub-cache item
+  //
+  StringFilter*  stringFilterP = NULL;
+
+  for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+  {
+    if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+    }
+  }
+  
+
+  /* Description */
+  if (requestP->descriptionProvided)
+  {
+    // Note that in the case of description "" the field is deleted
+    if (requestP->description != "")
+    {
+      newSub.append(CSUB_DESCRIPTION, requestP->description);
+    }
+  }
+  else
+  {
+    // Pass-through of the current subscription
+    if (sub.hasField(CSUB_DESCRIPTION))
+    {
+      newSub.append(CSUB_DESCRIPTION, getStringFieldF(sub, CSUB_DESCRIPTION));
+    }
+  }
+
+  /* Adding status */
+  std::string status;
+  if (requestP->status != "")
+  {
+    status = requestP->status;
+  }
+  else
+  {
+    // Note this code will make that subscriptions not using status field (typically, legacy
+    // subscriptions from pre-1.1.0 versions) will get status 'active' first time they get
+    // updated (either the status field is included in that update or not)
+    status = sub.hasField(CSUB_STATUS) ? getStringFieldF(sub, CSUB_STATUS) : STATUS_ACTIVE;
+  }
+  newSub.append(CSUB_STATUS, status);
+
+
   /* Notify conditions */
   bool notificationDone = false;
-  if (requestP->notifyConditionVector.size() == 0) {
+  if (requestP->notifyConditionVector.size() == 0)
+  {
     newSub.appendArray(CSUB_CONDITIONS, getFieldF(sub, CSUB_CONDITIONS).embeddedObject());
   }
-  else {
-
+  else
+  {
       /* Build conditions array (including side-effect notifications and threads creation)
        * In order to do so, we have to create and EntityIdVector and AttributeList from sub
        * document, given the processConditionVector() signature */
@@ -245,12 +294,12 @@ HttpStatusCode mongoUpdateContextSubscription
        AttributeList attrL;
        if (version == "v1")
        {
-         enV = subToEntityIdVector(sub);
+         enV   = subToEntityIdVector(sub);
          attrL = subToAttributeList(sub);
        }
        else // v2
        {
-         // In v2 entities and attribute are updatable (as part of subject or notification) wo
+         // In v2 entities and attribute are updatable (as part of subject or notification) so
          // we have to check in order to know if we get the attribute from the request or from
          // the subscription
          if (requestP->entityIdVector.size() > 0)
@@ -282,7 +331,10 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
-                                                requestP->expression.q);
+                                                &requestP->restriction,
+                                                status,
+                                                fiwareCorrelator);
+
 
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
@@ -292,7 +344,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
 
-  // Expresssion
+  // Expression
   if (requestP->expression.isSet)
   {
     /* Build expression */
@@ -438,17 +490,19 @@ HttpStatusCode mongoUpdateContextSubscription
   char* servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
-
+  
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,
                                           servicePath,
                                           lastNotificationTime,
                                           expiration,
+                                          status,
                                           requestP->expression.q,
                                           requestP->expression.geometry,
                                           requestP->expression.coords,
-                                          requestP->expression.georel);
+                                          requestP->expression.georel,
+                                          stringFilterP);
 
   if (cSubP != NULL)
   {

@@ -39,15 +39,6 @@
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
 
-/* ****************************************************************************
-*
-* emptyServicePathV -
-*
-* Empty vector of service paths, sent to mongoSubscribeContext during tests.
-*/
-static std::vector<std::string> emptyServicePathV;
-
-
 
 /* ****************************************************************************
 *
@@ -297,7 +288,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -315,7 +306,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -382,7 +373,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -402,7 +393,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -471,7 +462,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -492,7 +483,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -565,7 +556,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -584,7 +575,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -652,7 +643,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -676,7 +667,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -753,7 +744,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -774,7 +765,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -847,7 +838,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -867,7 +858,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -938,7 +929,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -960,7 +951,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1033,7 +1024,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1056,7 +1047,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1133,7 +1124,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1154,7 +1145,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1226,7 +1217,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1251,7 +1242,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1330,7 +1321,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1353,7 +1344,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1441,7 +1432,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1459,7 +1450,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1538,7 +1529,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1556,7 +1547,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */    
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1632,7 +1623,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1652,7 +1643,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1731,7 +1722,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1751,7 +1742,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1844,7 +1835,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1864,7 +1855,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1957,7 +1948,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1977,7 +1968,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2063,7 +2054,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2083,7 +2074,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2169,7 +2160,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2189,7 +2180,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2287,7 +2278,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2307,7 +2298,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2405,7 +2396,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2425,7 +2416,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2506,7 +2497,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2527,7 +2518,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2612,7 +2603,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2633,7 +2624,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2719,7 +2710,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2738,7 +2729,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2815,7 +2806,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2838,7 +2829,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2923,7 +2914,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2946,7 +2937,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3031,7 +3022,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3054,7 +3045,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3139,7 +3130,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3160,7 +3151,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3242,7 +3233,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3265,7 +3256,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3362,7 +3353,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3382,7 +3373,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3469,7 +3460,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3491,7 +3482,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3584,7 +3575,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3607,7 +3598,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3704,7 +3695,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3725,7 +3716,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3813,7 +3804,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3838,7 +3829,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3931,7 +3922,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3954,7 +3945,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4031,7 +4022,7 @@ TEST(mongoSubscribeContext, defaultDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4048,7 +4039,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4119,7 +4110,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4140,7 +4131,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4152,7 +4143,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     std::string s2 = res.subscribeError.errorCode.details.substr(69+24, res.subscribeError.errorCode.details.size()-69-24);
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], status: \"active\", conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], "
               "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
               "- exception: boom!!)", s2);
 

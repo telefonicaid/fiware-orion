@@ -30,10 +30,6 @@ brokerStart CB
 --SHELL--
 
 #
-# This test is DISABLED as the current MHD version has a bug that converts '+' in the URL into SPACE.
-# The issue #1675 is to fix this and this test is to be enabled (and completed) when 1675 is fixed.
-#
-#
 # 01. Create an entity E1 with attribute A1
 # 02. Create an entity E2 with attribute A1
 # 03. Create an entity E3 with attribute A3
@@ -119,6 +115,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -128,6 +125,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -137,6 +135,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E3?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -146,6 +145,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 214
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -184,6 +184,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 143
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -213,6 +214,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 []
@@ -223,6 +225,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 72
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -243,6 +246,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 143
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [

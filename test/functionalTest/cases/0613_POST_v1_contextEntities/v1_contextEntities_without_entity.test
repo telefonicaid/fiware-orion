@@ -1,0 +1,293 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+/ngsi10 URL Acceptance Test
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v1/contextEntities without entityId in JSON payload and see it fail
+# 02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail
+#
+# 03. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
+# 04. POST /v1/contextEntities/EID without entityId in JSON payload OK
+#
+# 05. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
+# 06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
+#
+
+
+echo "01. POST /v1/contextEntities without entityId in JSON payload and see it fail"
+echo "============================================================================="
+payload='{
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities --payload "${payload}"  --json
+echo
+echo
+
+
+echo "02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail"
+echo "======================================================================================"
+payload='{
+    "id": "EID2",
+    "type": "ET",
+    "isPattern": "false",
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities/EID --payload "${payload}" --json
+echo
+echo
+
+
+echo "03. POST /v1/contextEntities with entityId:id=EID in JSON payload OK"
+echo "===================================================================="
+payload='{
+    "id": "EID",
+    "type": "ET",
+    "isPattern": "false",
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities --payload "${payload}"  --json
+echo
+echo
+
+
+echo "04. POST /v1/contextEntities/EID without entityId in JSON payload OK"
+echo "===================================================================="
+payload='{
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities/EID --payload "${payload}"  --json
+echo
+echo
+
+
+echo "05. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail"
+echo "==============================================================================================="
+payload='{
+    "id": "EID",
+    "type": "ET",
+    "isPattern": "false",
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"  --json
+echo
+echo
+
+
+echo "06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK"
+echo "=============================================================================="
+payload='{
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"  --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v1/contextEntities without entityId in JSON payload and see it fail
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 148
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "invalid request: mandatory entityId::id missing", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 140
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "entityId::id differs in URL and payload", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+03. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "type": "A1T", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "id": "EID", 
+    "isPattern": "false", 
+    "type": "ET"
+}
+
+
+04. POST /v1/contextEntities/EID without entityId in JSON payload OK
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "type": "A1T", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "id": "EID", 
+    "isPattern": "false", 
+    "type": "ET"
+}
+
+
+05. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 132
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "invalid payload: unknown fields", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 313
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "type": "A1T", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "id": "E1", 
+    "isPattern": "false", 
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

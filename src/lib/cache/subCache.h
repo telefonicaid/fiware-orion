@@ -94,6 +94,7 @@ struct CachedSubscription
   int64_t                     throttling;
   int64_t                     expirationTime;
   int64_t                     lastNotificationTime;
+  std::string                 status;
   int64_t                     count;
   Format                      notifyFormat;
   char*                       reference;
@@ -116,7 +117,7 @@ extern volatile SubCacheState  subCacheState;
 *
 * subCacheInit - 
 */
-extern void subCacheInit(void);
+extern void subCacheInit(bool multitenant = false);
 
 
 
@@ -175,6 +176,8 @@ extern void subCacheItemInsert
   Format                    notifyFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
+  StringFilter*             stringFilterP,
+  const std::string&        status,
   const std::string&        q,
   const std::string&        geometry,
   const std::string&        coords,

@@ -55,7 +55,7 @@ std::string postNotifyContext
   NotifyContextResponse  ncr;
   std::string            answer;
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV));
+  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr, ciP->tenant, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
   TIMED_RENDER(answer = ncr.render(NotifyContext, ""));
 
   return answer;

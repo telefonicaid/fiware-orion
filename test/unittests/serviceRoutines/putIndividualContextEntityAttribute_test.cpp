@@ -52,6 +52,8 @@ static RestService rs[] =
 TEST(putIndividualContextEntityAttribute, json)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes/temperature",  "PUT", "1.1");
+  ci.servicePathV.push_back("");
+
   const char*    infile      = "ngsi10.updateContextAttributeRequest.putAttribute.valid.json";
   const char*    outfile     = "ngsi10.updateContextAttributeResponse.notFound.valid.json";
   std::string    out;

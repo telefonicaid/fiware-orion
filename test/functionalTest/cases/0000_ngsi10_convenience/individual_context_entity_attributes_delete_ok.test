@@ -1,0 +1,138 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Convenience Individual Context Entity - DELETE OK
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "+++++ 1. create an entity +++++"
+url="/v1/contextEntities/entity01"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "+++++ 2. lookup the entity +++++"
+orionCurl --url "/v1/contextEntities/entity01" --json
+
+echo "+++++ 3. delete the entity +++++"
+orionCurl --url "/v1/contextEntities/entity01/attributes" -X "DELETE" --json
+
+echo "+++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++"
+orionCurl --url "/v1/contextEntities/entity01" --json
+
+--REGEXPECT--
++++++ 1. create an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 329
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "entity01",
+    "isPattern": "false",
+    "type": ""
+}
++++++ 2. lookup the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 293
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "temperature",
+                "type": "degree",
+                "value": "10"
+            }
+        ],
+        "id": "entity01",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
++++++ 3. delete the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
++++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++
+HTTP/1.1 200 OK
+Content-Length: 230
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "id": "entity01",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /entity01/",
+        "reasonPhrase": "No context element found"
+    }
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

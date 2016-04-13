@@ -98,7 +98,6 @@ std::string postIndividualContextEntity
   std::string                   answer;
   std::string                   out;
 
-
   //
   // 01. Check that total input in consistent and correct
   //

@@ -131,7 +131,7 @@ std::string EntityTypeResponse::toJson(ConnectionInfo* ciP)
   out += JSON_STR("attrs") + ":";
 
   out += "{";
-  out += entityType.contextAttributeVector.toJson(false, true, "normalized");
+  out += entityType.contextAttributeVector.toJsonTypes();
   out += "}";  
 
   out += "," + JSON_STR("count") + ":" + countV;

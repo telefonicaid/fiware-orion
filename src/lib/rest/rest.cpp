@@ -27,6 +27,7 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <uuid/uuid.h>
 
 #include <string>
 #include <map>
@@ -82,7 +83,21 @@ static unsigned int              threadPoolSize;
 
 /* ****************************************************************************
 *
-* uriArgumentReceive - 
+* correlatorGenerate - 
+*/
+static void correlatorGenerate(char* buffer)
+{
+  uuid_t uuid;
+
+  uuid_generate_time_safe(uuid);
+  uuid_unparse_lower(uuid, buffer);
+}
+
+
+
+/* ****************************************************************************
+*
+* uriArgumentReceive -
 */
 static int uriArgumentReceive(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
@@ -193,7 +208,7 @@ static int uriArgumentReceive(void* cbDataP, MHD_ValueKind kind, const char* cke
       ciP->uriParamTypes.push_back(val);
     }
   }
-  else
+  else if (key != URI_PARAM_Q)  // FIXME P1: possible more known options here ...
   {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
   }
@@ -267,17 +282,18 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
-  if      (strcasecmp(key.c_str(), "User-Agent") == 0)      headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), "Host") == 0)            headerP->host           = value;
-  else if (strcasecmp(key.c_str(), "Accept") == 0)          headerP->accept         = value;
-  else if (strcasecmp(key.c_str(), "Expect") == 0)          headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), "Connection") == 0)      headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), "Content-Type") == 0)    headerP->contentType    = value;
-  else if (strcasecmp(key.c_str(), "Content-Length") == 0)  headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), "Origin") == 0)          headerP->origin         = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
-  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
-  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0) headerP->xforwardedFor  = value;
+  if      (strcasecmp(key.c_str(), "User-Agent") == 0)        headerP->userAgent      = value;
+  else if (strcasecmp(key.c_str(), "Host") == 0)              headerP->host           = value;
+  else if (strcasecmp(key.c_str(), "Accept") == 0)            headerP->accept         = value;
+  else if (strcasecmp(key.c_str(), "Expect") == 0)            headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), "Connection") == 0)        headerP->connection     = value;
+  else if (strcasecmp(key.c_str(), "Content-Type") == 0)      headerP->contentType    = value;
+  else if (strcasecmp(key.c_str(), "Content-Length") == 0)    headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "Origin") == 0)            headerP->origin         = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -567,6 +583,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     return 0;
   }
 
+  if (servicePath[0] == 0)
+  {
+    // Special case, corresponding to default service path
+    return 0;
+  }
+
+
   if (servicePath[0] != '/')
   {
     OrionError e(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
@@ -663,7 +686,8 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   if (servicePaths == 0)
   {
-    /* In this case the result is a 0 length vector */
+    /* In this case the result is a vector with an empty string */
+    ciP->servicePathV.push_back("");
     return 0;
   }
 
@@ -800,72 +824,6 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 
 /* ****************************************************************************
 *
-* defaultServicePath
-*
-* Returns a default servicePath (to be used in the case Fiware-servicePath header
-* is not found in the request) depending on the RequestCheck
-*/
-std::string defaultServicePath(const char* url, const char* method)
-{
-  /* Look for standard operation (based on the URL). Given that some operations are
-   * a substring of other, we search first for the longest ones
-   *
-   *  updateContextAvailabilitySubscription
-   *  unsubscribeContextAvailability
-   *  subscribeContextAvailability
-   *  discoverContextAvailability
-   *  updateContextSubscription
-   *  unsubscribeContext
-   *  subscribeContext
-   *  registerContext
-   *  updateContext
-   *  queryContext
-   *
-   * Note that in the case of unsubscribeContext and unsubscribeContextAvailability doesn't
-   * actually use a servicePath, but we also provide a default in that case for the sake of
-   * completeness
-   */
-
-  //
-  // FIXME P5: this strategy can be improved taking into account full URL. Otherwise, it is
-  // ambiguous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
-  // highly improbable that the user uses entities which id (or type) match the name of a
-  // standard operation.
-  // Also, if we wait (if we can) until we know what service it is, this whole string-search will come for free
-  // Don't think strcasestr is a 'simple' function ...
-  //
-  if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "notifyContextAvailability") != NULL)             return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "notifyContext") != NULL)                         return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_RECURSIVE;
-
-  /* Look for convenience operation. Subscription-related operations are special, all the other depend on
-   * the method
-   */
-  if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
-
-  if (strcasecmp(method, "POST")   == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "PUT")    == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "GET")    == 0)                                return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasecmp(method, "PATCH")  == 0)                                return DEFAULT_SERVICE_PATH;
-
-  return DEFAULT_SERVICE_PATH;
-}
-
-
-
-/* ****************************************************************************
-*
 * apiVersionGet - 
 *
 * This function returns the version of the API for the incoming message,
@@ -919,6 +877,7 @@ static std::string apiVersionGet(const char* path)
 * Call 2: *con_cls != NULL  AND  *upload_data_size != 0
 * Call 3: *con_cls != NULL  AND  *upload_data_size == 0
 */
+static int reqNo       = 1;
 static int connectionTreat
 (
    void*            cls,
@@ -933,11 +892,18 @@ static int connectionTreat
 {
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
-  static int             reqNo       = 1;
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {
+    //
+    // First thing to do on a new connection, set correlator to N/A.
+    // After reading HTTP headers, the correlator id either changes due to encountering a 
+    // Fiware-Correlator HTTP Header, or, if no HTTP header with Fiware-Correlator is found,
+    // a new correlator is generated.
+    //
+    correlatorIdSet("N/A");
+
     //
     // IP Address and port of caller
     //
@@ -1004,11 +970,6 @@ static int connectionTreat
 
     ++reqNo;
 
-    //
-    // Transaction starts here
-    //
-    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
-
 
     //
     // URI parameters
@@ -1021,10 +982,24 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-    if (!ciP->httpHeaders.servicePathReceived)
+
+    char correlator[CORRELATOR_ID_SIZE + 1];
+    if (ciP->httpHeaders.correlator == "")
     {
-      ciP->httpHeaders.servicePath = defaultServicePath(url, method);
+      correlatorGenerate(correlator);
+      ciP->httpHeaders.correlator = correlator;
     }
+
+    correlatorIdSet(ciP->httpHeaders.correlator.c_str());
+
+    ciP->httpHeader.push_back("Fiware-Correlator");
+    ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+
+    //
+    // Transaction starts here
+    //
+    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+
 
     /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
     if (ciP->httpHeaders.xforwardedFor == "")

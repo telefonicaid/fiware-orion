@@ -71,17 +71,49 @@ Fields:
     of the following fields:
     -   **attrName**: the attribute name that identifies the geographic
         location in the attrs array
-    -   **coords**: a GJSON of type "Point", containing the longitude
-        and latitude, in that order.
-        -   *Note*: you may wonder why the coordinates are stored in the
-            coords duple as longitude-latitude and in the opposite order
-            in the [geo-location
-            API](../user/geolocation.md).
-            This is due to the internal [MongoDB geolocation
-            functionality](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
-            which uses longitude-latitude order. However, other systems
-            closer to users (e.g. Google Maps) use latitude-longitude
-            format, so we have used the latter for the API.
+    -   **coords**: a GJSON representing the location of the entity. See
+        below for more details.
+
+Regarding `location.coords` in can use several formats:
+
+* Representing a point (the one used by NGSIv1 and NGSIv2 geo:point):
+
+```
+{
+  "type": "Point",
+  "coordinates": [ -3.691944, 40.418889 ]
+}
+```
+
+* Representing a line (the one used by NGSIv2 geo:line):
+
+```
+{
+  "type": "LineString",
+  "coordinates": [ [ 10, 0], [0, 10] ]
+}
+```
+
+* Representing a polygon (the one used by NGSIv2 geo:box and NGSIv2 geo:polygon):
+
+```
+{
+  "type": "Polygon",
+  "coordinates": [ [ [ 10, 0], [0, 10], [0, 0], [10, 0] ] ]
+}
+```
+
+* Finally, `location.coords` could hold an arbitrary JSON object, representing a location
+  in [GeoJSON](http://www.macwright.org/2015/03/23/geojson-second-bite.html) format. Arbitrary
+  GeoJSON can be used with the geo:json attribute type and it is up to the user to introduce
+  a valid object. Note that the three above cases are actually GeoJSON representation for
+  "fixed" cases.
+
+Note that coordinate pairs use the longitude-latitude order, which is opposite to the order used
+in the [geo-location API](../user/geolocation.md). This is due to the internal
+[MongoDB geolocation implementation](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
+(which is based in GeoJSON) uses longitude-latitude order. However, other systems closer
+to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the API.
 
 Example document:
 
@@ -228,7 +260,9 @@ Fields:
     queries by subscription IDs are very fast (as there is an automatic
     default index in \_id).
 -   **servicePath**: related with [the service
-    path](../user/service_path.md) functionality.
+    path](../user/service_path.md) functionality. This is the service path
+    associated to the query "encapsulated" by the subscription. Default
+    is `/#`.
 -   **expiration**: this is the timestamp on which the
     subscription expires. This is calculated using the duration
     parameter included in the subscribeContext operation (basically, sum
@@ -249,9 +283,11 @@ Fields:
     to be sent or not when updates come. It may be composed of the following
     fields: q, georel, geometry and/or coords (optional)
 -   **count**: the number of notifications sent associated to
-    the subscription.
--   **format**: the format to use to send notification, either "XML" or "JSON".
-    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
+    the subscription.   
+-   **format**: the format to use to send notification, currently "JSON"
+    meaning JSON notifications in NGSIv1 format.
+-   **status**: either `active` (for active subscriptions) or `inactive (for inactive subscriptions).
+-   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 
 Example document:
 
@@ -286,7 +322,9 @@ Example document:
                 "coords" : "",
                 "georel" : ""
         },
-        "format" : "JSON"
+        "format" : "JSON",
+        "description": "this is an example subscription",
+        "status" : "active"
 }
 ```
 [Top](#top)
@@ -317,8 +355,8 @@ Fields:
     notification sent associated to a given subscription.
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notification, either "XML" or "JSON".
-    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
+-   **format**: the format to use to send notification, currently "JSON"
+    meaning JSON notifications in NGSIv1 format.
 
 Example document:
 

@@ -28,10 +28,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-
 #include "parse/forbiddenChars.h"
 
-/************************************
+
+
+/* ****************************************************************************
 *
 * commonForbidden
 */
@@ -51,6 +52,8 @@ inline static bool commonForbidden(char c)
   }
   return false;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -82,13 +85,16 @@ bool forbiddenChars(const char* s, const char* exceptions)
   return false;
 }
 
+
+
 /* ****************************************************************************
 *
 * forbiddenIdChars -
 */
 bool forbiddenIdChars(const std::string& api, const char* s, const char* exceptions)
 {
-  if (api == "v1" && !checkIdv1) {
+  if (api == "v1" && !checkIdv1)
+  {
     return forbiddenChars(s, exceptions);  // old behavior
   }
 

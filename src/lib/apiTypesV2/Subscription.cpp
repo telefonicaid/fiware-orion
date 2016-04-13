@@ -29,6 +29,7 @@
 #include <sstream>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "common/JsonHelper.h"
 
 namespace ngsiv2
@@ -43,6 +44,10 @@ std::string Subscription::toJson()
   JsonHelper jh;
 
   jh.addString("id", this->id);
+  if (this->description != "")
+  {
+    jh.addString("description", this->description);
+  }
   if (this->expires > 0)
   {    
     jh.addDate("expires", this->expires);
@@ -110,16 +115,14 @@ std::string Condition::toJson()
 
   jh.addRaw("attributes", vectorToJson(this->attributes));
 
-  {
-    JsonHelper jhe;
+  JsonHelper jhe;
 
-    jhe.addString("q", this->expression.q);
-    jhe.addString("geometry", this->expression.geometry);
-    jhe.addString("coords", this->expression.coords);
-    jhe.addString("georel", this->expression.georel);
-
-    jh.addRaw("expression", jhe.str());
-  }
+  jhe.addString("q", this->expression.q);
+  jhe.addString("geometry", this->expression.geometry);
+  jhe.addString("coords", this->expression.coords);
+  jhe.addString("georel", this->expression.georel);
+  
+  jh.addRaw("expression", jhe.str());
 
   return jh.str();
 }

@@ -635,7 +635,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 1)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("You cannot use more than one location attribute when creating an entity [see Orion user manual]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("You cannot use more than one geo location attribute when creating an entity [see Orion user manual]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -745,7 +745,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("coordinate format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
+    EXPECT_EQ("geo coordinates format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -966,7 +966,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E1, T1] - offending attribute: A5 - attempt to define a location attribute [A5] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E1, T1] - offending attribute: A5 - attempt to define a geo location attribute [A5] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1076,7 +1076,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - error parsing location attribute, value: /erroneous/", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - error parsing location attribute for new attribute: geo coordinates format error [see Orion user manual]: erroneous", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1291,7 +1291,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A1 - error parsing location attribute, value: /invalid/", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A1 - error parsing location attribute: geo coordinates format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1401,7 +1401,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A2 - attempt to define a location attribute [A2] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A2 - attempt to define a geo location attribute [A2] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

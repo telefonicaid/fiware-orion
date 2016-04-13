@@ -29,6 +29,7 @@ brokerStart CB
 
 --SHELL--
 
+#
 # Inspired by 0000_ngsi10_geolocation_query tests
 #
 # 01. Create entity corresponding to Madrid
@@ -37,6 +38,7 @@ brokerStart CB
 # 04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes
 # 05. Query inside 15 kms radius from Madrid center  -> Madrid, Alcobendas, Leganes
 # 06. Query in 13.5 kms radius outside Madrid center -> Alcobendas
+#
 
 echo "01. Create entity corresponding to Madrid"
 echo "========================================="
@@ -175,6 +177,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/Madrid?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -184,6 +187,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/Alcobendas?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -193,6 +197,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/Leganes?type=City
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -202,6 +207,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1163
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -265,6 +271,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1734
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -353,6 +360,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 603
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

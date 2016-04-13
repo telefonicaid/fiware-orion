@@ -1,0 +1,821 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST Subscriptions V2 Errors wrong types
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/subscriptions (id is not a string)
+# 02. POST /v2/subscriptions (idPattern is not an string)
+# 03. POST /v2/subscriptions (type is not an string)
+# 04. POST /v2/subscriptions (subject is not an object)
+# 05. POST /v2/subscriptions (notification is not an object)
+# 06. POST /v2/subscriptions (expires is not a string)
+# 07. POST /v2/subscriptions (subject entities is not an array)
+# 08. POST /v2/subscriptions (condition is not an object)
+# 09. POST /v2/subscriptions (condition attributes is not an array)
+# 10. POST /v2/subscriptions (expression is not an object)
+# 11. POST /v2/subscriptions (q is not a string)
+# 12. POST /v2/subscriptions (georel is not a string)
+# 13. POST /v2/subscriptions (geometry is not a string)
+# 14. POST /v2/subscriptions (coords is not a string)
+# 15. POST /v2/subscriptions (notification attributes is not an array)
+# 16. POST /v2/subscriptions (callback is not a string)
+# 17. POST /v2/subscriptions (throttling is not an integer)
+
+echo "01. POST /v2/subscriptions (id is not a string)"
+echo "==============================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id" : { "x":"y"}
+            }
+        ],
+        "condition": {
+            "attributes": [ ],
+            "expression": {
+               "q": "temperature>40"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "02. POST /v2/subscriptions (idPattern is not an string)"
+echo "======================================================="
+payload='
+{
+    "subject": {
+        "entities": [{"idPattern": {"x":1}}],
+        "condition": {
+            "attributes": [ ],
+            "expression": {
+               "q": "temperature>40"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "03. POST /v2/subscriptions (type is not an string)"
+echo "=================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": "two",
+                "type": { "x": "y"}
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature" ],
+            "expression": {
+               "q": "temperature>40"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+echo "04. POST /v2/subscriptions (subject is not an object)"
+echo "====================================================="
+payload='
+{
+    "subject": 0,
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "05. POST /v2/subscriptions (notification is not an object)"
+echo "=========================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": [{}],
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+echo "06. POST /v2/subscriptions (expires is not a string)"
+echo "===================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": ["1991-04-05T14:00:00.00Z"]
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "07. POST /v2/subscriptions (subject entities is not an array)"
+echo "============================================================="
+payload='
+{
+    "subject": {
+        "entities":
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ,
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "08. POST /v2/subscriptions (condition is not an object)"
+echo "======================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition":  13.3
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "09. POST /v2/subscriptions (condition attributes is not an array)"
+echo "================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": 0,
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "10. POST /v2/subscriptions (expression is not an object)"
+echo "========================================================"
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "type": "Room"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature" ],
+            "expression": "t<3"
+         }
+    },
+    "notification": {
+        "callback": "localhost 1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 5
+    },
+    "expires": "2050-04-05T14:00:00.00Z"
+}
+
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "11. POST /v2/subscriptions (q is not a string)"
+echo "=============================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": {},
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "12. POST /v2/subscriptions (georel is not a string)"
+echo "==================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": null
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "13. POST /v2/subscriptions (geometry is not a string)"
+echo "====================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": 1.1,
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "14. POST /v2/subscriptions (coords is not a string)"
+echo "==================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": [-40.4,-3.5],
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "15. POST /v2/subscriptions (notification attributes is not an array)"
+echo "===================================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": "temperature",
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "16. POST /v2/subscriptions (callback is not a string)"
+echo "====================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": {"url": "http://localhost:1234"},
+        "attributes": ["temperature", "humidity"],
+        "throttling": 2
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+echo "17. POST /v2/subscriptions (throttling is not an integer)"
+echo "========================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+               "id": "xxx",
+               "type": "special"
+            }
+        ],
+        "condition": {
+            "attributes": [ "temperature", "pression", "humidity" ],
+            "expression": {
+               "q": "temperature>40",
+               "geometry": "point",
+               "coords": "-40.4,-3.5",
+               "georel": "near;minDistance=5000"
+            }
+         }
+    },
+    "notification": {
+        "callback": "http://localhost:1234",
+        "attributes": ["temperature", "humidity"],
+        "throttling": [2.5]
+    },
+    "expires": "1991-04-05T14:00:00.00Z"
+}
+'
+orionCurl --url /v2/subscriptions --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/subscriptions (id is not a string)
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "subject entities element id is not a string",
+    "error": "BadRequest"
+}
+
+
+02. POST /v2/subscriptions (idPattern is not an string)
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "subject entities element idPattern is not a string",
+    "error": "BadRequest"
+}
+
+
+03. POST /v2/subscriptions (type is not an string)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "subject entities element type is not a string",
+    "error": "BadRequest"
+}
+
+
+04. POST /v2/subscriptions (subject is not an object)
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "subject is not an object",
+    "error": "BadRequest"
+}
+
+
+05. POST /v2/subscriptions (notification is not an object)
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "notitication is not an object",
+    "error": "BadRequest"
+}
+
+
+06. POST /v2/subscriptions (expires is not a string)
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 62
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "expires is not a string",
+    "error": "BadRequest"
+}
+
+
+07. POST /v2/subscriptions (subject entities is not an array)
+=============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 71
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "subject entities is not an array",
+    "error": "BadRequest"
+}
+
+
+08. POST /v2/subscriptions (condition is not an object)
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "condition is not an object",
+    "error": "BadRequest"
+}
+
+
+09. POST /v2/subscriptions (condition attributes is not an array)
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "attributes is not an array",
+    "error": "BadRequest"
+}
+
+
+10. POST /v2/subscriptions (expression is not an object)
+========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 66
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "expression is not an object",
+    "error": "BadRequest"
+}
+
+
+11. POST /v2/subscriptions (q is not a string)
+==============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 56
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "q is not a string",
+    "error": "BadRequest"
+}
+
+
+12. POST /v2/subscriptions (georel is not a string)
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "georel is not a string",
+    "error": "BadRequest"
+}
+
+
+13. POST /v2/subscriptions (geometry is not a string)
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geometry is not a string",
+    "error": "BadRequest"
+}
+
+
+14. POST /v2/subscriptions (coords is not a string)
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "coords is not a string",
+    "error": "BadRequest"
+}
+
+
+15. POST /v2/subscriptions (notification attributes is not an array)
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 65
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "attributes is not an array",
+    "error": "BadRequest"
+}
+
+
+16. POST /v2/subscriptions (callback is not a string)
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 64
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "callback is not an string",
+    "error": "BadRequest"
+}
+
+
+17. POST /v2/subscriptions (throttling is not an integer)
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "throttling is not an int",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

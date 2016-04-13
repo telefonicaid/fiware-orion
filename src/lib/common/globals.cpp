@@ -126,17 +126,30 @@ void transactionIdSet(void)
 
 /* ****************************************************************************
 *
+* correlatorIdSet - 
+*/
+void correlatorIdSet(const char* corrId)
+{
+  strncpy(correlatorId, corrId, sizeof(correlatorId));
+}
+
+
+
+/* ****************************************************************************
+*
 * orionInit - 
 */
 void orionInit
-(OrionExitFunction  exitFunction,
+(
+  OrionExitFunction  exitFunction,
   const char*        version,
   SemOpType          reqPolicy,
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
   bool               _notifQueueStatistics,
-  bool _checkIdv1)
+  bool               _checkIdv1
+)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -430,4 +443,28 @@ int64_t parse8601Time(const std::string& s)
     return -1;
   }
   return (int64_t) timegm(&tm);
+}
+
+
+
+/* ****************************************************************************
+*
+* orderCoordsForBox
+*
+* It return false in the case of a 'degenerate' box
+*
+*/
+bool orderCoordsForBox(double* minLat, double* maxLat, double* minLon, double* maxLon, double lat1, double lat2, double lon1, double lon2)
+{
+  if ((lat1 == lat2) || (lon1 == lon2))
+  {
+    return false;
+  }
+
+  *minLat = (lat1 < lat2)? lat1 : lat2;
+  *maxLat = (lat1 > lat2)? lat1 : lat2;
+  *minLon = (lon1 < lon2)? lon1 : lon2;
+  *maxLon = (lon1 > lon2)? lon1 : lon2;
+
+  return true;
 }

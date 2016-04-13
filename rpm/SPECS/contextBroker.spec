@@ -35,8 +35,8 @@ Packager:   Fermín Galán <fermin.galanmarquez@telefonica.com>
 URL:        http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, logrotate
-Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel, boost-devel
+Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, logrotate, libuuid
+Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel, boost-devel, libuuid-devel
 Requires(pre): shadow-utils
 
 %description
@@ -176,7 +176,7 @@ fi
 - Fix: check for metadatas with empty name (Issue #1438)
 - Fix: accepting backslash-slash in JSON v1 payload (Issue #1852)
 - Fix: PATCH /v2/entities correct interpretaion of null value and missing type in payload
-. Fix: PATCH /v2/entities missing value field (Issue #1789)
+- Fix: PATCH /v2/entities missing value field (Issue #1789)
 - Fix: GET /v2/entities/id/attrs/name/value for type date (Issue #1885)
 - Fix: PUT /v2/entities/id/attrs/name/value forbidden chars (JSON) (Issue #1905)
 - Fix: PUT /v2/entities/id/attrs/name/value changing type to 'none' (text/plain) (Issue #1904)

@@ -29,62 +29,63 @@ brokerStart CB 200-255
 
 --SHELL--
 echo "=== 1. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/traceLevel" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 2. PUT trace level"
-orionCurl --url "/log/traceLevel/5-10" -X "PUT" 2> /dev/null
+orionCurl --url "/log/traceLevel/5-10" -X "PUT" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 3. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/traceLevel" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 4. POST trace level"
-orionCurl --url "/log/traceLevel/101-102,105" -X "POST" --include 2> /dev/null
+orionCurl --url "/log/traceLevel/101-102,105" -X "POST" --json --include 2> /dev/null
 echo
 echo
 
 
 echo "=== 5. PUT trace level"
-orionCurl --url "/log/traceLevel/19,21-25" -X "PUT" 2> /dev/null
+orionCurl --url "/log/traceLevel/19,21-25" -X "PUT" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 6. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/traceLevel" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 7. DELETE trace level"
-curl localhost:${CB_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
+#curl localhost:${CB_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
 # FIXME: Y U NO orionCurl --url "/log/traceLevel/23" -X "DELETE" 2> /dev/null ?
+orionCurl --url "/log/traceLevel/23" -X "DELETE" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 8. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/traceLevel" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 9. DELETE trace level"
-orionCurl --url "/log/traceLevel" -X "DELETE" 2> /dev/null
+orionCurl --url "/log/traceLevel" -X "DELETE" --json 2> /dev/null
 echo
 echo
 
 
 echo "=== 10. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/traceLevel" --json 2> /dev/null
 echo
 echo
 
@@ -93,7 +94,7 @@ echo
 === 1. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 73
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -107,7 +108,7 @@ Date: REGEX(.*)
 === 2. PUT trace level
 HTTP/1.1 200 OK
 Content-Length: 70
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -121,7 +122,7 @@ Date: REGEX(.*)
 === 3. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 70
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -143,7 +144,7 @@ Date: REGEX(.*)
 === 5. PUT trace level
 HTTP/1.1 200 OK
 Content-Length: 74
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -157,7 +158,7 @@ Date: REGEX(.*)
 === 6. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 75
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -179,7 +180,7 @@ Date: REGEX(.*)
 === 8. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 82
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -193,7 +194,7 @@ Date: REGEX(.*)
 === 9. DELETE trace level
 HTTP/1.1 200 OK
 Content-Length: 86
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -207,7 +208,7 @@ Date: REGEX(.*)
 === 10. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 71
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

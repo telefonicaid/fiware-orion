@@ -1,0 +1,397 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forbidden characters in Input
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# Forbidden chars: < > " ' = ; ( )
+#
+# 01. Intent to register an entity with '<' as part of entity::id
+# 02. Intent to discover an entity with '>' as part of entity::type
+# 03. Intent to register an entity with '=' as part of providingApplication
+# 04. Intent to ngsi9-subscribe to an entity with "'" as part of an attribute::name
+# 05. Intent to query an entity with  ';' as part of a scopeType
+# 06. Intent to update an entity with '(' as part of contextAttribute::type
+# 07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
+# 08: Intent to subscribe to an entity with ')' as part of reference
+#
+
+
+echo "01. Intent to register an entity with '<' as part of entity::id"
+echo "==============================================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "Room",
+         "isPattern": "false",
+         "id": "Room<1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "temperature",
+        "type": "centigrade",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://mysensors.com/Rooms"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Intent to discover an entity with '>' as part of entity::type"
+echo "================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Roo>m",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ]
+}'
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Intent to register an entity with '=' as part of providingApplication"
+echo "========================================================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "Room",
+         "isPattern": "false",
+         "id": "Room1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "temperature",
+        "type": "centigrade",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "pa=http://mysensors.com/Rooms"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name"
+echo "==============================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "tempera'"'"'ture"
+  ],
+  "reference": "http://10.1.1.1:80/test/interfaceNotification",
+  "duration": "PT1M"
+}'
+orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Intent to query an entity with  ';' as part of a scopeType"
+echo "=============================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
+      {
+        "type" : "st1;st2",
+        "value" : "sv1"
+      },
+      {
+        "type" : "st2",
+        "value" : "sv2"
+      }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Intent to update an entity with '(' as part of contextAttribute::type"
+echo "========================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "deg(ree",
+          "value": "20"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value"
+echo "=============================================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": {
+            "x1" : "1(2",
+            "x2" : "2",
+            "x3" : "3"
+          }
+        }
+      ],
+      "attributeDomainName" : "ATTR_DOMAIN_NAME"
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08: Intent to subscribe to an entity with ')' as part of reference"
+echo "=================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "lightstatus"
+  ],
+  "reference": "http://10.1.1.1:80/test/interface)Notification",
+  "duration": "PT1M"
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Intent to register an entity with '<' as part of entity::id
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "registrationId": "000000000000000000000000"
+}
+
+
+02. Intent to discover an entity with '>' as part of entity::type
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+03. Intent to register an entity with '=' as part of providingApplication
+=========================================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "registrationId": "000000000000000000000000"
+}
+
+
+04. Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "subscriptionId": "000000000000000000000000"
+}
+
+
+05. Intent to query an entity with  ';' as part of a scopeType
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "Illegal value for JSON field",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+06. Intent to update an entity with '(' as part of contextAttribute::type
+=========================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+08: Intent to subscribe to an entity with ')' as part of reference
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "400", 
+            "details": "Illegal value for JSON field", 
+            "reasonPhrase": "Bad Request"
+        }
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

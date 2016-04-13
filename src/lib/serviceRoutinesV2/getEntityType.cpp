@@ -56,7 +56,7 @@ std::string getEntityType
   std::string         entityTypeName = compV[2];
   std::string         answer;
 
-  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam));
+  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
   TIMED_RENDER(answer = response.toJson(ciP));
 
   response.release();

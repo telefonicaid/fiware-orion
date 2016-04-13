@@ -58,7 +58,7 @@ orionCurl --url "$url" --payload "$payload"
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 290
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

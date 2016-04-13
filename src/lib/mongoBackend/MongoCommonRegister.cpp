@@ -35,6 +35,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoCommonRegister.h"
@@ -65,7 +66,8 @@ static bool processSubscriptions
   const EntityIdVector&                 triggerEntitiesV,
   map<string, TriggeredSubscription*>&  subs,
   std::string&                          err,
-  const std::string&                    tenant
+  const std::string&                    tenant,
+  const std::string&                    fiwareCorrelator
 )
 {
   bool ret = true;
@@ -81,7 +83,8 @@ static bool processSubscriptions
                                          mapSubId,
                                          trigs->reference,
                                          trigs->format,
-                                         tenant))
+                                         tenant,
+                                         fiwareCorrelator))
     {
       LM_T(LmtMongo, ("Notification failure"));
       ret = false;
@@ -304,7 +307,8 @@ HttpStatusCode processRegisterContext
   OID*                      id,
   const std::string&        tenant,
   const std::string&        servicePath,
-  const std::string&        format
+  const std::string&        format,
+  const std::string&        fiwareCorrelator
 )
 {
   std::string err;
@@ -332,7 +336,7 @@ HttpStatusCode processRegisterContext
   }
   reg.append("_id", oid);
   reg.append(REG_EXPIRATION, expiration);
-  reg.append(REG_SERVICE_PATH, servicePath);
+  reg.append(REG_SERVICE_PATH, servicePath == "" ? DEFAULT_SERVICE_PATH_UPDATES : servicePath);
   reg.append(REG_FORMAT, format);
 
 
@@ -419,7 +423,7 @@ HttpStatusCode processRegisterContext
   // Send notifications for each one of the subscriptions accumulated by
   // previous addTriggeredSubscriptions() invocations
   //
-  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant);
+  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant, fiwareCorrelator);
 
   // Fill the response element
   responseP->duration = requestP->duration;

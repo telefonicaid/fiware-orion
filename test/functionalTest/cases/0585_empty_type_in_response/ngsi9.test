@@ -1,0 +1,342 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI9 Empty Entity Type Check
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Register an entity with type Room and id Room
+# 02. Discover with convop GET /v1/registry/contextEntities/Room
+# 03. Discover with convop GET /v1/registry/contextEntities/Room/attributes/temperature
+# 04. Discover with convop GET /v1/registry/contextEntityTypes/Room
+# 05. Discover with convop GET /v1/registry/contextEntityTypes/Room/attributes/temperature
+# 06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room
+# 07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature
+#
+
+echo "01. Register an entity with type Room and id Room"
+echo "================================================="
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "Room"
+        },
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "OfficeRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:1028/application"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Discover with convop GET /v1/registry/contextEntities/Room"
+echo "=============================================================="
+orionCurl --url /v1/registry/contextEntities/Room --json
+echo
+echo
+
+
+echo "03. Discover with convop GET /v1/registry/contextEntities/Room/attributes/temperature"
+echo "====================================================================================="
+orionCurl --url /v1/registry/contextEntities/Room/attributes/temperature --json
+echo
+echo
+
+
+echo "04. Discover with convop GET /v1/registry/contextEntityTypes/Room"
+echo "================================================================="
+orionCurl --url /v1/registry/contextEntityTypes/Room --json
+echo
+echo
+
+
+echo "05. Discover with convop GET /v1/registry/contextEntityTypes/Room/attributes/temperature"
+echo "========================================================================================"
+orionCurl --url /v1/registry/contextEntityTypes/Room/attributes/temperature --json
+echo
+echo
+
+echo "06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room"
+echo "==========================================================================="
+orionCurl --url /v1/registry/contextEntities/type/Room/id/Room --json
+echo
+echo
+
+
+echo "07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature"
+echo "=================================================================================================="
+orionCurl --url /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Register an entity with type Room and id Room
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+02. Discover with convop GET /v1/registry/contextEntities/Room
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 474
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+03. Discover with convop GET /v1/registry/contextEntities/Room/attributes/temperature
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 474
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+04. Discover with convop GET /v1/registry/contextEntityTypes/Room
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 595
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }, 
+                    {
+                        "id": "OfficeRoom", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+05. Discover with convop GET /v1/registry/contextEntityTypes/Room/attributes/temperature
+========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 595
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }, 
+                    {
+                        "id": "OfficeRoom", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 474
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 474
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

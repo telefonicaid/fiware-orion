@@ -111,7 +111,7 @@ accumulatorDump
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 167
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -122,7 +122,7 @@ Date: REGEX(.*)
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -133,7 +133,7 @@ Date: REGEX(.*)
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -147,7 +147,7 @@ Content-Length: 839
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-Content-Type: application/xml
+Content-Type: application/json
 
 <notifyContextAvailabilityRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>

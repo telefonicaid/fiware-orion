@@ -59,6 +59,7 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
+#include "rest/StringFilter.h"
 
 using namespace mongo;
 using std::auto_ptr;
@@ -493,7 +494,6 @@ void ensureLocationIndex(const std::string& tenant)
 }
 
 
-
 /* ****************************************************************************
 *
 * matchEntity -
@@ -548,6 +548,7 @@ bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
   }
   return false;
 }
+
 
 /* ****************************************************************************
 *
@@ -628,66 +629,62 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
    *
    * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
    *
-   */
+   */  
 
-  std::string servicePathValue = "";
-
-  if (servicePath.size() > 0)
+  // Note that by construction servicePath vector must have at least one element. Note that the
+  // case in which first element is "" is special, it means that the SP were not provided and
+  // we have to apply the default
+  if (servicePath[0] == "")
   {
-    bool nullAdded = false;
+    LM_T(LmtServicePath, ("Service Path JSON string: '{$in: [ /^\\/.*/, null] }'"));
+    return fromjson("{$in: [ /^\\/.*/, null] }");
+  }
 
-    servicePathValue += "{ $in: [ ";
+  std::string servicePathValue = "{ $in: [ ";
+  bool nullAdded = false;
 
-    for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
+  for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
+  {
+
+    //
+    // Add "null" in the following service path cases: / or /#. In order to avoid adding null
+    // several times, the nullAdded flag is used
+    //
+    if (!nullAdded && ((servicePath[ix] == "/") || (servicePath[ix] == "/#")))
     {
-
-      //
-      // Add "null" in the following service path cases: / or /#. In order to avoid adding null
-      // several times, the nullAdded flag is used
-      //
-      if (!nullAdded && ((servicePath[ix] == "/") || (servicePath[ix] == "/#")))
-      {
-        servicePathValue += "null, ";
-        nullAdded = true;
-      }
-
-      char path[SERVICE_PATH_MAX_TOTAL * 2];
-      slashEscape(servicePath[ix].c_str(), path, sizeof(path));
-
-      if (path[strlen(path) - 1] == '#')
-      {
-        /* Remove '\/#' trailing part of the string */
-        int l = strlen(path);
-
-        path[l - 3] = 0;
-        servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
-      }
-      else
-      {
-        servicePathValue += std::string("/^") + path + "$/";
-      }
-
-      /* Prepare concatenation for next token in regex */
-      if (ix < servicePath.size() - 1)
-      {
-        servicePathValue += std::string(", ");
-      }
+      servicePathValue += "null, ";
+      nullAdded = true;
     }
 
-    servicePathValue += " ] }";
-    LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
+    char path[SERVICE_PATH_MAX_TOTAL * 2];
+    slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+
+    if (path[strlen(path) - 1] == '#')
+    {
+      /* Remove '\/#' trailing part of the string */
+      int l = strlen(path);
+
+      path[l - 3] = 0;
+      servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
+    }
+    else
+    {
+      servicePathValue += std::string("/^") + path + "$/";
+    }
+
+    /* Prepare concatenation for next token in regex */
+    if (ix < servicePath.size() - 1)
+    {
+      servicePathValue += std::string(", ");
+    }
   }
-  else
-  {
-    /* In this case, servicePath match any path, including the case of "null" */
-    servicePathValue = "{$in: [ /^\\/.*/, null] }";
-  }
+
+  servicePathValue += " ] }";
+  LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
 
   return fromjson(servicePathValue);
+
 }
-
-
-
 
 /* *****************************************************************************
 *
@@ -871,938 +868,9 @@ static bool processAreaScopeV2(const Scope* scoP, BSONObj &areaQuery)
 }
 
 
-#define OPR_EXIST     "EXISTS"
-#define OPR_NOT_EXIST "NOT EXIST"
-
-
-
-/* ****************************************************************************
-*
-* rangeIsDates - are both values in a range expressing dates?
-*/
-static bool rangeIsDates(char* rangeFrom, char* rangeTo, double* fromP, double* toP)
-{
-  double fromSeconds = 0;
-  double toSeconds   = 0;
-
-  if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
-  {
-    *fromP = fromSeconds;
-    *toP   = toSeconds;
-
-    return true;
-  }
-
-  return false;
-}
-
-
-
 /* *****************************************************************************
 *
-* matchFilter -
-*
-* Returns true if cerP match the "q token" based filter expressed in the parameters,
-* false otherwise.
-*
-*/
-static bool matchFilter
-(
-  char*                      left,
-  const std::string&         opr,
-  char*                      right,
-  char*                      rangeFrom,
-  char*                      rangeTo,
-  const std::vector<char*>&  valVector,
-  ContextElementResponse*    cerP,
-  int64_t                    seconds
-)
-{
-  /* First, look for unary operators */
-  if ((opr == OPR_EXIST) || (opr == OPR_NOT_EXIST))
-  {   
-    ContextAttribute* ca = cerP->contextElement.getAttribute(right);
-    bool exist = (ca != NULL);
-
-    /* This could be re-written as exist ^ (opr == OPR_NOT_EXIST) but the code
-     * would be harder to follow */
-    if (opr == OPR_EXIST)
-    {
-      return exist;
-    }
-    else   // opr == OPR_NOT_EXIST
-    {
-      return !exist;
-    }
-  }
-
-  /* For binary operators, the left side is the name of the attribute to check or the dateCreated/dateModified special keywords */
-  orion::ValueType valueType;
-  double           numberValue;
-  std::string      stringValue;
-
-  if (left == std::string(DATE_CREATED))
-  {
-    valueType   = orion::ValueTypeNumber;
-    numberValue = cerP->contextElement.creDate;
-  }
-  else if (left == std::string(DATE_MODIFIED))
-  {
-    valueType   = orion::ValueTypeNumber;
-    numberValue = cerP->contextElement.modDate;
-  }
-  else
-  {
-    ContextAttribute* caP = cerP->contextElement.getAttribute(left);
-
-    /* If the attribute does't exist, no need to go further: filter fails */
-    if (caP == NULL)
-    {
-      return false;
-    }
-
-    valueType   = caP->valueType;
-    numberValue = caP->numberValue;
-    stringValue = caP->stringValue;
-  }
-
-  if (opr == "==")
-  {
-    if (std::string(rangeFrom) != "")
-    {
-      double from;
-      double to;
-
-      //
-      // Ranges can only be used on numbers and dates
-      //
-      if ((rangeIsDates(rangeFrom, rangeTo, &from, &to) == false) && 
-          ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false)))
-      {
-        return false;
-      }
-
-      return ((valueType == orion::ValueTypeNumber) && (numberValue >= from) && (numberValue <= to));
-    }
-    else if (valVector.size() > 0)
-    {
-      // the attribute value has to match at least one of the elements in the vector (OR)
-      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-      {
-        double d;
-
-        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
-        {
-          // number
-          if ((valueType == orion::ValueTypeNumber) && (numberValue == d))
-          {
-            return true;
-          }
-        }
-        else
-        {
-          // string
-          if ((valueType == orion::ValueTypeString) && (stringValue == valVector[ix]))
-          {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-    else
-    {
-      double d;
-      bool   isDate = false;
-
-      // Single value
-      if ((std::string(right) == "DATE") && (seconds != -1))
-      {
-        d      = seconds;
-        isDate = true;
-      }
-
-      if (isDate || str2double(right, &d))
-      {
-        // number
-        return ((valueType == orion::ValueTypeNumber) && (numberValue == d));
-      }
-      else
-      {
-        // string
-        return ((valueType == orion::ValueTypeString) && (stringValue == right));
-      }
-    }
-  }
-  else if (opr == "!=")
-  {
-    if (std::string(rangeFrom) != "")
-    {
-      double from;
-      double to;
-
-      //
-      // Ranges can only be used on numbers and dates
-      //
-      double fromSeconds;
-      double toSeconds;
-
-      if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
-      {
-        from = fromSeconds;
-        to   = toSeconds;
-      }
-      else if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
-      {
-        return false;
-      }
-
-      return ((valueType == orion::ValueTypeNumber) && ((numberValue < from) || (numberValue > to)));
-    }
-    else if (valVector.size() > 0)
-    {
-      // the attribute value has not to match any of the elements in the vector (AND)
-      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-      {
-        double d;
-
-        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
-        {
-          // number
-          if ((valueType == orion::ValueTypeNumber) && (numberValue == d))
-          {
-            return false;
-          }
-        }
-        else
-        {
-          // string
-          if ((valueType == orion::ValueTypeString) && (stringValue == valVector[ix]))
-          {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    else
-    {
-      double d;
-      bool   isDate = false;
-
-      // Single value
-      if ((std::string(right) == "DATE") && (seconds != -1))
-      {
-        d      = seconds;
-        isDate = true;
-      }
-
-      if (isDate || str2double(right, &d))
-      {
-        // number
-        return !((valueType == orion::ValueTypeNumber) && (numberValue == d));
-      }
-      else
-      {
-        // string
-        return !((valueType == orion::ValueTypeString) && (stringValue == right));
-      }
-    }
-  }
-  else if (opr == ">")
-  {
-    double d;    
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d      = seconds;     
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-
-    return ((valueType == orion::ValueTypeNumber) && (numberValue > d));
-  }
-  else if (opr == "<")
-  {
-    double d;
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d = seconds;
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-
-    return ((valueType == orion::ValueTypeNumber) && (numberValue < d));
-  }
-  else if (opr == ">=")
-  {
-    double d;
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d = seconds;
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-
-    return ((valueType == orion::ValueTypeNumber) && (numberValue >= d));
-  }
-  else if (opr == "<=")
-  {
-    double d;
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d = seconds;
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-
-    return ((valueType == orion::ValueTypeNumber) && (numberValue <= d));
-  }
-  else
-  {
-    LM_E(("Runtime Error (unknown query operator: %s)", opr.c_str()));
-    return false;
-  }
-}
-
-
-
-/* *****************************************************************************
-*
-* addBsonFilter -
-*
-* Add a BSON filter based on a "q token".
-*
-*/
-static bool addBsonFilter
-(
-  char*                      left,
-  const std::string&         opr,
-  char*                      right,
-  char*                      rangeFrom,
-  char*                      rangeTo,
-  const std::vector<char*>&  valVector,
-  std::vector<BSONObj>&      filters,
-  int64_t                    seconds
-)
-{
-  std::string    k;
-  if (left == std::string(DATE_CREATED))
-  {
-    k = ENT_CREATION_DATE;
-  }
-  else if (left == std::string(DATE_MODIFIED))
-  {
-    k = ENT_MODIFICATION_DATE;
-  }
-  else
-  {
-    k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
-  }
-  BSONObjBuilder bob;
-  BSONObjBuilder bb;
-  BSONObjBuilder bb2;
-  BSONObj        f;
-
-  //
-  // The right-hand-side can enter in 3 different ways (params to this function):
-  //   - right                normal case
-  //   - valVector            as a vector of values, in the case of 'X==a,b,c'
-  //   - rangeFrom/rangeTo    as two values when '..' is used to denote a range
-  //
-  // To check that 'the right hand side is empty', we need to make sure all these three
-  // 'different ways' are empty.
-  //
-  // rangeFrom and rangeTo are treated separately, just in case some day we'd want to use 
-  // some construction with only upper/lower limit.
-  //
-  if (((right == NULL) || (*right == 0)) && 
-      (valVector.size() == 0) && 
-      ((rangeFrom == NULL) || (*rangeFrom == 0)) && 
-      ((rangeTo == NULL) || (*rangeTo == 0)))
-  {
-    return false;
-  }
-
-  if (opr == "==")
-  {
-    if (std::string(rangeFrom) != "")
-    {
-      double from;
-      double to;
-
-      if ((rangeIsDates(rangeFrom, rangeTo, &from, &to) == false) && 
-          ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false)))
-      {
-        return false;
-      }
-
-      bb.append("$gte", from).append("$lte", to);
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else if (valVector.size() > 0)
-    {
-      BSONArrayBuilder ba;
-
-      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-      {
-        double d;
-
-        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
-        {
-          // number
-          ba.append(d);
-        }
-        else
-        {
-          // string
-          ba.append(valVector[ix]);
-        }
-      }
-
-      bb.append("$in", ba.arr());
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else
-    {
-      double d;
-      bool   isDate = false;
-
-      if ((std::string(right) == "DATE") && (seconds != -1))
-      {
-        d      = seconds;
-        isDate = true;
-      }
-
-      // Single value
-      if (isDate || str2double(right, &d))
-      {
-        // number
-        bb.append("$in", BSON_ARRAY(d));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (*right == '\'')  // Forced string
-      {
-        ++right;
-        if (right[strlen(right) - 1] != '\'')
-        {
-          alarmMgr.badInput(clientIp, "invalid expression - no ending single-quote in forced string");
-          return false;
-        }
-        right[strlen(right) - 1] = 0;
-
-        bb.append("$in", BSON_ARRAY(right));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else
-      {
-        if (strcmp(right, "true") == 0)
-        {
-          bb.append("$in", BSON_ARRAY(true));
-        }
-        else if (strcmp(right, "false") == 0)
-        {
-          bb.append("$in", BSON_ARRAY(false));
-        }
-        else // string
-        {
-          bb.append("$in", BSON_ARRAY(right));
-        }
-
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-    }
-  }
-  else if (opr == "!=")
-  {
-    if (std::string(rangeFrom) != "")
-    {
-      double from;
-      double to;
-      double fromSeconds = 0;
-      double toSeconds   = 0;
-
-      if (((fromSeconds = parse8601Time(rangeFrom)) != -1) && ((toSeconds = parse8601Time(rangeTo)) != -1))
-      {
-        from = fromSeconds;
-        to   = toSeconds;
-      }
-      else if ((str2double(rangeFrom, &from) == false) || (str2double(rangeTo, &to) == false))
-      {
-        return false;
-      }
-
-      bb.append("$gte", from).append("$lte", to);
-      bb2.append("$exists", true).append("$not", bb.obj());
-      bob.append(k, bb2.obj());
-      f = bob.obj();
-    }
-    else if (valVector.size() > 0)
-    {
-      BSONArrayBuilder ba;
-
-      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
-      {
-        double d;
-
-        if (((d = parse8601Time(valVector[ix])) != -1) || (str2double(valVector[ix], &d)))
-        {
-          // number
-          ba.append(d);
-        }
-        else
-        {
-          // string
-          ba.append(valVector[ix]);
-        }
-      }
-
-      bb.append("$exists", true).append("$nin", ba.arr());
-      bob.append(k, bb.obj());
-      f = bob.obj();
-    }
-    else
-    {
-      double d;
-      bool   isDate = false;
-
-      if ((std::string(right) == "DATE") && (seconds != -1))
-      {
-        d      = seconds;
-        isDate = true;
-      }
-
-      // Single value
-      if (isDate || str2double(right, &d))
-      {
-        // number
-        bb.append("$exists", true).append("$nin", BSON_ARRAY(d));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else if (*right == '\'')  // Forced string
-      {
-        ++right;
-        if (right[strlen(right) - 1] != '\'')
-        {
-          alarmMgr.badInput(clientIp, "invalid expression - no ending single-quote in forced string");
-          return false;
-        }
-        right[strlen(right) - 1] = 0;
-
-
-        bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-      else
-      {
-        if (strcmp(right, "true") == 0)
-        {
-          bb.append("$exists", true).append("$nin", BSON_ARRAY(true));
-        }
-        else if (strcmp(right, "false") == 0)
-        {
-          bb.append("$exists", true).append("$nin", BSON_ARRAY(false));
-        }
-        else // string
-        {
-          bb.append("$exists", true).append("$nin", BSON_ARRAY(right));
-        }
-
-        bob.append(k, bb.obj());
-        f = bob.obj();
-      }
-    }
-  }
-  else if (opr == ">")
-  {
-    double d;
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d = seconds;
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-    
-    bb.append("$gt", d);
-    bob.append(k, bb.obj());
-    f = bob.obj();
-  }
-  else if (opr == "<")
-  {
-    double d;
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d = seconds;
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-    
-    bb.append("$lt", d);
-    bob.append(k, bb.obj());
-    f = bob.obj();
-  }
-  else if (opr == ">=")
-  {
-    double d;
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d = seconds;
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-
-    bb.append("$gte", d);
-    bob.append(k, bb.obj());
-    f = bob.obj();
-  }
-  else if (opr == "<=")
-  {
-    double d;
-
-    if ((std::string(right) == "DATE") && (seconds != -1))
-    {
-      d = seconds;
-    }
-    else if (str2double(right, &d) == false)
-    {
-      return false;
-    }
-
-    bb.append("$lte", d);
-    bob.append(k, bb.obj());
-    f = bob.obj();
-  }
-  else if (opr == OPR_EXIST)
-  {
-    k = std::string(ENT_ATTRS) + "." + right;
-
-    bb.append("$exists", true);
-    bob.append(k, bb.obj());
-    f = bob.obj();
-  }
-  else if (opr == OPR_NOT_EXIST)
-  {
-    k = std::string(ENT_ATTRS) + "." + right;
-    bb.append("$exists", false);
-    bob.append(k, bb.obj());
-    f = bob.obj();
-  }
-  else
-  {
-    std::string details = std::string("unknown query operator: /") + opr + "/";
-    alarmMgr.badInput(clientIp, details);
-    return false;
-  }
-
-  filters.push_back(f);
-  return true;
-}
-
-/* ****************************************************************************
-*
-* qStringFilters -
-*
-* FIXME P9: this function currently abuses of the std::string() wrapping for char* in order to
-* make comparisons work. An smarter solution could be developed.
-*
-* FIXME P7: actually, this functions behaviour depends on the presence of the cerP parameter, in particular
-*
-* - if cerP is NULL, then the output of this function is a set of BSON filters (in the filters vector) to
-*   be applied on MongoDB. The return value is not used. This is the typical use for queryContext and derived
-*   operations
-* - if cerP is not NULL, then the filters are evaluated in memory on the cerP. The return value is used to
-*   specify if cerP match the filter or not. The filters parameter is not used (although the caller needs to
-*   provide it in order to conform with function signature).
-*
-* I don't like too much to have a function with two quite parallel behaviours in the same logic. Probably a
-* smarter design would be to divide this function in two parts: one focused on string parsing and the other one
-* focused on applying filters to each different system (either in memory or as BSON).
-*
-*/
-bool qStringFilters(const std::string& in, std::vector<BSONObj> &filters, ContextElementResponse* cerP)
-{
-  //
-  // Initial Sanity check (of the entire string)
-  // - Not empty
-  // - Not just a single ';'
-  // - Not two ';' in a row
-  //
-  if ((in == "")  || 
-      (in == ";") ||
-      (strstr(in.c_str(), ";;") != NULL))
-  {
-    return false;
-  }
-
-  char* str         = strdup(in.c_str());
-  char* toFree      = str;
-  char* s;
-  char* saver;
-  bool  rightHandSideMandatory = true;
-  bool  leftHandSideMandatory  = true;
-  bool  retval                 = true;
-
-  while ((s = strtok_r(str, ";", &saver)) != NULL)
-  {
-    char*               left;
-    char*               op;
-    char*               right     = NULL;
-    char*               rangeFrom = (char*) "";
-    char*               rangeTo   = (char*) "";
-    std::vector<char*>  valVector;
-
-    s = wsStrip(s);
-
-    //
-    // Rudimentary sanity checks (of *this* part of 'q')
-    //
-    // 1. If the 'q-part' is empty, error
-    // 2. If a range is present, the op MUST be either '==' OR '!=' 
-    //
-    if (*s == 0)
-    {
-      free(toFree);
-      return false;
-    }
-    else if (strstr(s, "..") != NULL)
-    {
-      if ((strstr(s, "==") == NULL) && (strstr(s, "!=") == NULL))
-      {
-        free(toFree);
-        return false;
-      }
-    }
-
-    left = s;
-    if ((op = (char*) strstr(s, "==")) != NULL)
-    {
-      *op = 0;
-
-      right = &op[2];
-      op    = (char*) "==";
-    }
-    else if ((op = (char*) strstr(s, "!=")) != NULL)
-    {
-      *op = 0;
-
-      right = &op[2];
-      op    = (char*) "!=";
-    }
-    else if ((op = (char*) strstr(s, ">=")) != NULL)
-    {
-      *op = 0;
-
-      right = &op[2];
-      op    = (char*) ">=";
-    }
-    else if ((op = (char*) strstr(s, "<=")) != NULL)
-    {
-      *op = 0;
-
-      right = &op[2];
-      op    = (char*) "<=";
-    }
-    else if ((op = (char*) strstr(s, "<")) != NULL)
-    {
-      *op = 0;
-
-      right = &op[1];
-      op    = (char*) "<";
-    }
-    else if ((op = (char*) strstr(s, ">")) != NULL)
-    {
-      *op = 0;
-
-      right = &op[1];
-      op    = (char*) ">";
-    }
-    else if (s[0] == '!')
-    {
-      left  = (char*) "";
-      op    = (char*) OPR_NOT_EXIST;
-      right = wsStrip(&s[1]);
-      leftHandSideMandatory = false;
-    }
-    else
-    {
-      left  = (char*) "";
-      op    = (char*) OPR_EXIST;
-      right = wsStrip(s);
-      leftHandSideMandatory = false;
-    }
-
-    left  = wsStrip(left);
-    right = wsStrip(right);
-
-    //
-    // Sanity check for left-hand and right-hand non-empty
-    //
-    if ((rightHandSideMandatory == true) && (*right == 0))
-    {
-      free(toFree);
-      return false;
-    }
-
-    if ((leftHandSideMandatory == true) && (*left == 0))
-    {
-      free(toFree);
-      return false;
-    }
-
-    std::string opr = op;
-
-    if ((opr == "==") || (opr == "!="))
-    {
-      char* del;
-
-      //
-      // 1.  range?   A..B
-      // 2.  list?    A,B,C
-      // 2.1 if list, check single quotes
-      //
-
-      if ((del = strstr(right, "..")) != NULL)
-      {
-        *del = 0;
-        rangeFrom = right;
-        rangeTo   = &del[2];
-
-        right     = (char*) "";
-        rangeFrom = wsStrip(rangeFrom);
-        rangeTo   = wsStrip(rangeTo);
-      }
-      else if ((del = strstr(right, ",")) != NULL)
-      {
-        char* start         = right;
-        char* cP            = right;
-        bool  insideQuotes  = false;
-        bool  done          = false;
-
-        while (done == false)
-        {
-          if (*cP == '\'')
-          {
-            insideQuotes = (insideQuotes == true)? false : true;
-          }
-          else if ((*cP == ',') || (*cP == 0))
-          {
-            // 1. If end-of-string reached, then this is the last loop
-            if (*cP == 0)
-            {
-              done = true;
-            }
-
-
-            if (!insideQuotes)
-            {
-              //
-              // If we are inside single-quotes, then do nothing, just advance the char pointer (++cP)
-              // If not inside queotes, we are on a comma, so a new value is to be pushed onto the value vector.
-              //
-
-              // 2. Remove beginning quote, if there is one
-              if (*start == '\'')
-              {
-                *start = 0;
-                ++start;
-              }
-
-              // 3. Null-out the comma
-              *cP = 0;
-
-              // 4. Remove trailing quote, if there
-              if (cP[-1] == '\'')
-              {
-                cP[-1] = 0;
-              }
-
-              // 5. Push the value onto the vector of values
-              valVector.push_back(wsStrip(start));
-
-              // 6. Make point start to the beginning of the next value
-              start = &cP[1];
-            }
-          }
-
-          ++cP;
-        }
-
-        right = (char*) "";
-      }
-    }
-
-    str = NULL;  // So that strtok_r continues eating the initial string
-
-    //
-    // Is the right-hand-side a DATE?
-    // If so, convert it to unix seconds since epoch
-    //
-    int64_t seconds = -1;
-
-    if (right != NULL)
-    {
-      if ((seconds = parse8601Time(right)) != -1)
-      {
-        right = (char*) "DATE";  // value of the date is passed in 'seconds'
-      }
-    }
-
-
-    /* Build the BSON filter (or evaluate on cerP) */
-    if (cerP == NULL)
-    {
-      if (addBsonFilter(left, opr, right, rangeFrom, rangeTo, valVector, filters, seconds) == false)
-      {
-        retval = false;
-        break;
-      }
-    }
-    else
-    {
-      if (!matchFilter(left, opr, right, rangeFrom, rangeTo, valVector, cerP, seconds))
-      {
-        retval = false;
-        break;
-      }
-    }
-  }
-
-  free(toFree);
-
-  return retval;
-}
-
-
-/* *****************************************************************************
-*
-* addFilterScopes -
+* addFilterScope -
 */
 static void addFilterScope(const Scope* scoP, std::vector<BSONObj> &filters)
 {
@@ -1887,7 +955,6 @@ bool entitiesQuery
   const std::string&               apiVersion
 )
 {
-
   /* Query structure is as follows
    *
    * {
@@ -1939,14 +1006,14 @@ bool entitiesQuery
 
   for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
   {
-    const Scope* sco = res.scopeVector[ix];
+    const Scope* scopeP = res.scopeVector[ix];
 
-    if (sco->type.find(SCOPE_FILTER) == 0)
+    if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
       // FIXME P5: NGSI "v1" filter, probably to be removed in the future
-      addFilterScope(sco, filters);
+      addFilterScope(scopeP, filters);
     }
-    else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED || sco->type == FIWARE_LOCATION_V2)
+    else if (scopeP->type == FIWARE_LOCATION || scopeP->type == FIWARE_LOCATION_DEPRECATED || scopeP->type == FIWARE_LOCATION_V2)
     {
       geoScopes++;
       if (geoScopes > 1)
@@ -1958,13 +1025,13 @@ bool entitiesQuery
         BSONObj areaQuery;
 
         bool result;
-        if (sco->type == FIWARE_LOCATION_V2)
+        if (scopeP->type == FIWARE_LOCATION_V2)
         {
-          result = processAreaScopeV2(sco, areaQuery);
+          result = processAreaScopeV2(scopeP, areaQuery);
         }
         else // FIWARE Location NGSIv1 (legacy)
         {
-          result = processAreaScope(sco, areaQuery);
+          result = processAreaScope(scopeP, areaQuery);
         }
 
         if (result)
@@ -1974,23 +1041,16 @@ bool entitiesQuery
         }
       }
     }
-    else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
+    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      // FIXME P4: Once issue #1705 is implemented, this check can be removed.
-      if (qStringFilters(sco->value, filters) != true)
+      for (unsigned int ix = 0; ix < scopeP->stringFilter.mongoFilters.size(); ++ix)
       {
-        if (badInputP)  // Bad Input reported by higher level
-        {
-          *badInputP = true;
-          *err       = "invalid query expression";
-        }
-
-        return false;
+        finalQuery.appendElements(scopeP->stringFilter.mongoFilters[ix]);
       }
     }
     else
     {
-      std::string details = std::string("unknown scope type '") + sco->type + "', ignoring";
+      std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
       alarmMgr.badInput(clientIp, details);
     }
   }
@@ -2718,26 +1778,18 @@ bool processOnChangeConditionForSubscription
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               qFilter
+  Restriction*                     resP,
+  const std::string&               fiwareCorrelator
 )
 {
   std::string                   err;
   NotifyContextRequest          ncr;
-  Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
-  /* Include scopes for entitiesQuery() if q filter is not empty */
-  if (qFilter != "")
-  {
-    Scope* sc = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qFilter);
-    res.scopeVector.push_back(sc);
-  }
-
-  if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, true, tenant, servicePathV))
+  if (!entitiesQuery(enV, attrL, *resP, &rawCerV, &err, true, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
-    res.release();
 
     return false;
   }
@@ -2760,11 +1812,10 @@ bool processOnChangeConditionForSubscription
       ContextElementResponseVector  allCerV;
       AttributeList                 emptyList;
 
-      if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
+      if (!entitiesQuery(enV, emptyList, *resP, &rawCerV, &err, false, tenant, servicePathV))
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
-        res.release();
 
         return false;
       }
@@ -2776,10 +1827,9 @@ bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
         allCerV.release();
         ncr.contextElementResponseVector.release();
-        res.release();
 
         return true;
       }
@@ -2788,16 +1838,14 @@ bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
       ncr.contextElementResponseVector.release();
-      res.release();
 
       return true;
     }
   }
 
   ncr.contextElementResponseVector.release();
-  res.release();
 
   return false;
 }
@@ -2820,7 +1868,9 @@ BSONArray processConditionVector
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
-  const std::string&               qFilter
+  Restriction*                     resP,
+  const std::string&               status,
+  const std::string&               fiwareCorrelator
 )
 {
   BSONArrayBuilder conds;
@@ -2845,16 +1895,18 @@ BSONArray processConditionVector
                         CSUB_CONDITIONS_VALUE << condValues.arr()
                         ));
 
-      if (processOnChangeConditionForSubscription(enV,
-                                                  attrL,
-                                                  &(nc->condValueList),
-                                                  subId,
-                                                  url,
-                                                  format,
-                                                  tenant,
-                                                  xauthToken,
-                                                  servicePathV,
-                                                  qFilter))
+      if ((status == STATUS_ACTIVE) &&
+          (processOnChangeConditionForSubscription(enV,
+                                                   attrL,
+                                                   &(nc->condValueList),
+                                                   subId,
+                                                   url,
+                                                   format,
+                                                   tenant,
+                                                   xauthToken,
+                                                   servicePathV,
+                                                   resP,
+                                                   fiwareCorrelator)))
       {
         *notificationDone = true;
       }
@@ -2910,12 +1962,14 @@ bool processAvailabilitySubscription
   const std::string&    subId,
   const std::string&    notifyUrl,
   Format                format,
-  const std::string&    tenant
+  const std::string&    tenant,
+  const std::string&    fiwareCorrelator
 )
 {
   std::string                       err;
   NotifyContextAvailabilityRequest  ncar;
-  const std::vector<std::string>    servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
+  std::vector<std::string>          servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
+  servicePathV.push_back("");                      // While this gets implemented, "" default is used.
 
   if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
   {
@@ -2928,7 +1982,7 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, format);
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, format);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */

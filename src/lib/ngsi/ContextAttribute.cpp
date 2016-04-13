@@ -41,7 +41,202 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 
+#include "mongo/client/dbclient.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoBackend/dbFieldEncoding.h"
+
+using namespace mongo;
 using namespace orion;
+
+/* ****************************************************************************
+*
+* Forward declarations
+*/
+static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b);
+
+
+
+/* ****************************************************************************
+*
+* compoundValueBson (for arrays) -
+*/
+static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONArrayBuilder& b)
+{
+  for (unsigned int ix = 0; ix < children.size(); ++ix)
+  {
+    CompoundValueNode* child = children[ix];
+
+    if (child->valueType == ValueTypeString)
+    {
+      b.append(child->stringValue);
+    }
+    else if (child->valueType == ValueTypeNumber)
+    {
+      b.append(child->numberValue);
+    }
+    else if (child->valueType == ValueTypeBoolean)
+    {
+      b.append(child->boolValue);
+    }
+    else if (child->valueType == ValueTypeNone)
+    {
+      b.appendNull();
+    }
+    else if (child->valueType == ValueTypeVector)
+    {
+      BSONArrayBuilder ba;
+
+      compoundValueBson(child->childV, ba);
+      b.append(ba.arr());
+    }
+    else if (child->valueType == ValueTypeObject)
+    {
+      BSONObjBuilder bo;
+
+      compoundValueBson(child->childV, bo);
+      b.append(bo.obj());
+    }
+    else
+    {
+      LM_E(("Runtime Error (Unknown type in compound value)"));
+    }
+  }
+}
+
+
+/* ****************************************************************************
+*
+* compoundValueBson -
+*/
+static void compoundValueBson(std::vector<CompoundValueNode*> children, BSONObjBuilder& b)
+{
+  for (unsigned int ix = 0; ix < children.size(); ++ix)
+  {
+    CompoundValueNode* child = children[ix];
+
+    std::string effectiveName = dbDotEncode(child->name);
+
+    if (child->valueType == ValueTypeString)
+    {
+      b.append(effectiveName, child->stringValue);
+    }
+    else if (child->valueType == ValueTypeNumber)
+    {
+      b.append(effectiveName, child->numberValue);
+    }
+    else if (child->valueType == ValueTypeBoolean)
+    {
+      b.append(effectiveName, child->boolValue);
+    }
+    else if (child->valueType == ValueTypeNone)
+    {
+      b.appendNull(effectiveName);
+    }
+    else if (child->valueType == ValueTypeVector)
+    {
+      BSONArrayBuilder ba;
+
+      compoundValueBson(child->childV, ba);
+      b.append(effectiveName, ba.arr());
+    }
+    else if (child->valueType == ValueTypeObject)
+    {
+      BSONObjBuilder bo;
+
+      compoundValueBson(child->childV, bo);
+      b.append(effectiveName, bo.obj());
+    }
+    else
+    {
+      LM_E(("Runtime Error (Unknown type in compound value)"));
+    }
+  }
+}
+
+/* ****************************************************************************
+*
+* ContextAttribute::bsonAppendAttrValue -
+*
+*/
+void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr) const
+{
+  switch(valueType)
+  {
+    case ValueTypeString:
+      bsonAttr.append(ENT_ATTRS_VALUE, stringValue);
+      break;
+
+    case ValueTypeNumber:
+      bsonAttr.append(ENT_ATTRS_VALUE, numberValue);
+      break;
+
+    case ValueTypeBoolean:
+      bsonAttr.append(ENT_ATTRS_VALUE, boolValue);
+      break;
+
+    case ValueTypeNone:
+      bsonAttr.appendNull(ENT_ATTRS_VALUE);
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+  }
+}
+
+
+/* ****************************************************************************
+*
+* ContextAttribute::valueBson -
+*
+* Used to render attribute value to BSON, appended into the bsonAttr builder
+*/
+void ContextAttribute::valueBson(BSONObjBuilder& bsonAttr) const
+{
+  if (compoundValueP == NULL)
+  {
+    bsonAppendAttrValue(bsonAttr);
+  }
+  else
+  {
+    if (compoundValueP->valueType == ValueTypeVector)
+    {
+      BSONArrayBuilder b;
+      compoundValueBson(compoundValueP->childV, b);
+      bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
+    }
+    else if (compoundValueP->valueType == ValueTypeObject)
+    {
+      BSONObjBuilder b;
+
+      compoundValueBson(compoundValueP->childV, b);
+      bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
+    }
+    else if (compoundValueP->valueType == ValueTypeString)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->stringValue);
+    }
+    else if (compoundValueP->valueType == ValueTypeNumber)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->numberValue);
+    }
+    else if (compoundValueP->valueType == ValueTypeBoolean)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.append(ENT_ATTRS_VALUE, compoundValueP->boolValue);
+    }
+    else if (compoundValueP->valueType == ValueTypeNone)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.appendNull(ENT_ATTRS_VALUE);
+    }
+    else
+    {
+      LM_E(("Runtime Error (Unknown type in compound value)"));
+    }
+  }
+}
 
 
 
@@ -322,7 +517,7 @@ std::string ContextAttribute::getLocation(const std::string& apiVersion) const
   }
   else // v2
   {
-    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON))
+    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
     {
       return LOCATION_WGS84;
     }
@@ -561,15 +756,11 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode, RequestType requestType)
+std::string ContextAttribute::toJson(bool isLastElement, const std::string& renderMode, RequestType requestType)
 {
   std::string  out;
 
-  if (types == true)
-  {
-    out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
-  }
-  else if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_KEY_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
+  if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_KEY_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
   {
     out = (renderMode == RENDER_MODE_KEY_VALUES)? JSON_STR(name) + ":" : "";
 

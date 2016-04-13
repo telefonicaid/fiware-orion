@@ -34,6 +34,7 @@
 #include "common/string.h"
 #include "common/statistics.h"
 #include "alarmMgr/alarmMgr.h"
+#include "rest/StringFilter.h"
 
 #include "cache/subCache.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -107,6 +108,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getFieldF(sub, CSUB_STATUS).String().c_str()         : "active";
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -221,10 +223,12 @@ int mongoSubCacheItemInsert
   const char*         servicePath,
   int                 lastNotificationTime,
   long long           expirationTime,
+  const std::string&  status,
   const std::string&  q,
   const std::string&  geometry,
   const std::string&  coords,
-  const std::string&  georel
+  const std::string&  georel,
+  StringFilter*       stringFilterP
 )
 {
   //
@@ -315,11 +319,17 @@ int mongoSubCacheItemInsert
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
+  cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->next                  = NULL;
+
+  if (stringFilterP != NULL)
+  {
+    cSubP->expression.stringFilter = *stringFilterP;
+  }
 
   LM_T(LmtSubCache, ("set lastNotificationTime to %lu for '%s' (from DB)", cSubP->lastNotificationTime, cSubP->subscriptionId));
 
@@ -376,7 +386,6 @@ int mongoSubCacheItemInsert
 
   return 0;
 }
-
 
 
 
@@ -466,8 +475,11 @@ void mongoSubCacheUpdate(const std::string& tenant, const std::string& subId, lo
 
   if (lastNotificationTime != 0)
   {
-    // Update lastNotificationTime
-    condition = BSON("_id" << OID(subId) << CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime));
+    // Update lastNotificationTime    
+    condition = BSON("_id" << OID(subId) << "$or" << BSON_ARRAY(
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$lt" << lastNotificationTime)) <<
+                       BSON(CSUB_LASTNOTIFICATION << BSON("$exists" << false)))
+                    );
     update    = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << lastNotificationTime));
 
     if (collectionUpdate(collection, condition, update, false, &err) != true)

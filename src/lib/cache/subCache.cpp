@@ -33,6 +33,7 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
+#include "alarmMgr/alarmMgr.h"
 
 using std::map;
 
@@ -167,8 +168,9 @@ typedef struct SubCache
 *
 * subCache - 
 */
-static SubCache  subCache       = { NULL, NULL, 0 };
-bool             subCacheActive = false;
+static SubCache  subCache            = { NULL, NULL, 0 };
+bool             subCacheActive      = false;
+bool             subCacheMultitenant = false;
 
 
 
@@ -176,9 +178,11 @@ bool             subCacheActive = false;
 *
 * subCacheInit - 
 */
-void subCacheInit(void)
+void subCacheInit(bool multitenant)
 {
   LM_T(LmtSubCache, ("Initializing subscription cache"));
+
+  subCacheMultitenant = multitenant;
 
   subCache.head   = NULL;
   subCache.tail   = NULL;
@@ -331,24 +335,30 @@ static bool subMatch
   const std::vector<std::string>&  attrV
 )
 {
-  if ((cSubP->tenant == NULL) || (tenant == NULL) || (cSubP->tenant[0] == 0) || (tenant[0] == 0))
+  //
+  // Check to filter out due to tenant - only valid if Broker has started with -multiservice option
+  //
+  if (subCacheMultitenant == true)
   {
-    if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
+    if ((cSubP->tenant == NULL) || (tenant == NULL) || (cSubP->tenant[0] == 0) || (tenant[0] == 0))
     {
-      LM_T(LmtSubCacheMatch, ("No match due to tenant I"));
-      return false;
-    }
+      if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
+      {
+        LM_T(LmtSubCacheMatch, ("No match due to tenant I"));
+        return false;
+      }
 
-    if ((tenant != NULL) && (tenant[0] != 0))
+      if ((tenant != NULL) && (tenant[0] != 0))
+      {
+        LM_T(LmtSubCacheMatch, ("No match due to tenant II"));
+        return false;
+      }
+    }
+    else if (strcmp(cSubP->tenant, tenant) != 0)
     {
-      LM_T(LmtSubCacheMatch, ("No match due to tenant II"));
+      LM_T(LmtSubCacheMatch, ("No match due to tenant III"));
       return false;
     }
-  }
-  else if (strcmp(cSubP->tenant, tenant) != 0)
-  {
-    LM_T(LmtSubCacheMatch, ("No match due to tenant III"));
-    return false;
   }
 
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
@@ -663,6 +673,8 @@ void subCacheItemInsert
   Format                    notifyFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
+  StringFilter*             stringFilterP,
+  const std::string&        status,
   const std::string&        q,
   const std::string&        geometry,
   const std::string&        coords,
@@ -715,10 +727,16 @@ void subCacheItemInsert
   cSubP->notifyFormat          = notifyFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = (notificationDone == true)? 1 : 0;
+  cSubP->status                = status;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
+
+  if (stringFilterP != NULL)
+  {
+    cSubP->expression.stringFilter = *stringFilterP;  // Object copy
+  }
 
   LM_T(LmtSubCache, ("inserting a new sub in cache (%s). lastNotifictionTime: %lu", cSubP->subscriptionId, cSubP->lastNotificationTime));
 
@@ -993,8 +1011,8 @@ void subCacheRefresh(void)
 */
 typedef struct CachedSubSaved
 {
-  long long  lastNotificationTime;
-  long long  count;
+  long long    lastNotificationTime;
+  long long    count;
 } CachedSubSaved;
 
 
@@ -1045,7 +1063,7 @@ void subCacheSync(void)
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
 
-    savedSubV[cSubP->subscriptionId]= cssP;
+    savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
   }
 

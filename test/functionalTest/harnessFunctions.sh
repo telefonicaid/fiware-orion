@@ -948,8 +948,8 @@ function orionCurl()
     elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
     elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
     elif [ "$1" == "--origin" ]; then          _origin='--header "Origin: '${2}'"'; shift;
-    elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header $2"; shift;
-    elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header $2"; shift;
+    elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header \"$2\""; shift;
+    elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header \"$2\""; shift;
     elif [ "$1" == "--in" ]; then              _in="$2"; shift;
     elif [ "$1" == "--out" ]; then             _out="$2"; shift;
     elif [ "$1" == "--json" ]; then            _in='json'; _out='json'; payloadCheckFormat='json'

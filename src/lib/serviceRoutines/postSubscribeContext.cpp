@@ -35,6 +35,7 @@
 #include "ngsi10/SubscribeContextResponse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/postSubscribeContext.h"
 
 
@@ -49,8 +50,6 @@
 * Payload In:  SubscribeContextRequest
 * Payload Out: SubscribeContextResponse
 *
-* URI parameters
-*   - notifyFormat=XXX    (used by mongoBackend)
 */
 std::string postSubscribeContext
 (
@@ -82,7 +81,7 @@ std::string postSubscribeContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
   TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
 
   parseDataP->scr.res.release();

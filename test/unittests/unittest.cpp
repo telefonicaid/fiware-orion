@@ -73,14 +73,6 @@ std::map<std::string, std::string> uriParams;
 */
 std::map<std::string, bool> options;
 
-
-
-/* ****************************************************************************
-*
-* servicePathV - 
-*/
-std::vector<std::string> servicePathV;
-
  
 
 /* ****************************************************************************
@@ -142,6 +134,7 @@ void utInit(void)
   // Resetting servicePathVector
   //
   servicePathVector.clear();
+  servicePathVector.push_back("");
 
   // Init subs cache (this initialization is overridden in tests that use csubs)
   subCacheInit();

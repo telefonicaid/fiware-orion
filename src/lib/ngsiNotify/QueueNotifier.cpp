@@ -59,7 +59,7 @@ int QueueNotifier::start()
 *
 * QueueNotifier::sendNotifyContextRequest -
 */
-void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format)
+void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format, const std::string& fiwareCorrelator)
 {
   ConnectionInfo ci;
 
@@ -121,17 +121,18 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   std::string content_type = "application/json";
 
   SenderThreadParams* params = new SenderThreadParams();
-  params->ip            = host;
-  params->port          = port;
-  params->protocol      = protocol;
-  params->verb          = "POST";
-  params->tenant        = tenant;
-  params->servicePath   = spathList;
-  params->xauthToken    = xauthToken;
-  params->resource      = uriPath;
-  params->content_type  = content_type;
-  params->content       = payload;
-  params->format        = format;
+  params->ip               = host;
+  params->port             = port;
+  params->protocol         = protocol;
+  params->verb             = "POST";
+  params->tenant           = tenant;
+  params->servicePath      = spathList;
+  params->xauthToken       = xauthToken;
+  params->resource         = uriPath;
+  params->content_type     = content_type;
+  params->content          = payload;
+  params->format           = format;
+  params->fiwareCorrelator = fiwareCorrelator;
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
   clock_gettime(CLOCK_REALTIME, &params->timeStamp);

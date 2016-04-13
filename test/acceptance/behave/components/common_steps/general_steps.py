@@ -28,6 +28,8 @@ from behave import step
 from iotqatools.helpers_utils import *
 from iotqatools.cb_v2_utils import CB
 from iotqatools.mongo_utils import Mongo
+from iotqatools.remote_log_utils import Remote_Log
+from iotqatools.fabric_utils import FabricSupport
 
 from tools.properties_config import Properties  # methods in properties class
 from tools.NGSI_v2 import NGSI
@@ -139,6 +141,27 @@ def delete_database_in_mongo(context):
     mongo.drop_database()
     mongo.disconnect()
     __logger__.info("...Database \"%s\" is deleted" % database_name)
+
+
+@step(u'check in log, label "([^"]*)" and message "([^"]*)"')
+def check_in_log_label_and_text(context, label, text):
+    """
+    Verify in log file if a label with a message exists
+    :param step:
+    :param label: label to find
+    :param text: text to find (begin since the end)
+    """
+    __logger__.debug("Looking for in log the \"%s\" label and the \"%s\" text...")
+    props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
+    remote_log = Remote_Log(file="%s/contextBroker.log" % props_cb_env["CB_LOG_FILE"], fabric=context.my_fab)
+    line = remote_log.find_line(label,text)
+    assert line != None, " ERROR - the \"%s\" label and the \"%s\" text do not exist in the log"
+    __logger__.info("log line: \n%s" %line)
+    ngsi = NGSI()
+    ngsi.verify_log(context, line)
+    __logger__.info("...confirmed traces in log")
+
+
 
 # ------------------------------------- validations ----------------------------------------------
 
@@ -296,8 +319,9 @@ def verify_headers_in_response(context):
     """
     verify headers in response
     Ex:
-      | parameter      | value      |
-      | x-total-counts | <entities> |
+          | parameter      | value                |
+          | x-total-counts | 5                    |
+          | location       | /v2/subscriptions/.* |
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     __logger__.debug("Verifying headers in response...")

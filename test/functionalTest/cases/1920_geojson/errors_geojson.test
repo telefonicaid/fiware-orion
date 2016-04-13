@@ -1,0 +1,691 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Errors related with geo:json
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# Inspired by 0000_ngsi10_geolocation_query tests
+# (all steps include a 'b' sub-step to check entity)
+#
+# 01. Create entity with geo:json attribute with string value -> fail
+# 02. Create entity with geo:json attribute with array value -> fail
+# 03. Create entity with two geo:json -> fail
+# 04. Create entity with one geo:json (attr1) -> OK
+# 05. Update attr1 geo:json attribute -> OK
+# 06. Append a new geo:json attribute (attr2) -> fail
+# 07. Remove the geo:json attribute (attr1) -> OK
+# 08. Append a new geo:json attribute (attr2) -> OK
+# 09. Change attribute type to no-geo:json (attr2) -> OK
+# 10. Append new geo:json attribute (attr3) -> OK
+# 11. Change attr2 type to geo:json again -> fail
+#
+
+echo "01. Create entity with geo:json attribute with string value -> fail"
+echo "==================================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": "10, 10",
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "01b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "02. Create entity with geo:json attribute with array value -> fail"
+echo "=================================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": [ 10, 10 ],
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. Create entity with two geo:json -> fail"
+echo "==========================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [3, 4], [6, 6], [3, 7], [3, 4] ] ]
+    },
+    "type": "geo:json"
+  },
+  "attr2": {
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [ 2, 2], [7, 7] ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "04. Create entity with one geo:json (attr1) -> OK"
+echo "================================================="
+payload='{
+  "id": "E1",
+  "attr1": {
+    "value": {
+      "type": "Polygon",
+      "coordinates": [ [ [2, 1], [4, 3], [5, -1], [2, 1] ] ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. Update attr1 geo:json attribute -> OK"
+echo "========================================="
+payload='{
+  "attr1": {
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [ 0, 0], [1, 1] ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X PATCH --json
+echo
+echo
+
+
+echo "05b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "06. Append a new geo:json attribute (attr2) -> fail"
+echo "==================================================="
+payload='{
+  "attr2": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ 2, 2 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "06b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "07. Remove the geo:json attribute (attr1) -> OK"
+echo "==============================================="
+orionCurl --url /v2/entities/E1/attrs/attr1 -X DELETE --json
+echo
+echo
+
+
+echo "07b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "08. Append a new geo:json attribute (attr2) -> OK"
+echo "================================================="
+payload='{
+  "attr2": {
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [ 4, 4], [-2, -2] ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "08b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "09. Change attribute type to no-geo:json (attr2) -> OK"
+echo "======================================================"
+payload='{
+  "attr2": {
+    "value": "foo",
+    "type": "no-geopoint"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "09b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "10. Append new geo:json attribute (attr3) -> OK"
+echo "==============================================="
+payload='{
+  "attr3": {
+    "value": {
+      "type": "Point",
+      "coordinates": [ 8, 8 ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "10b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "11. Change attr2 type to geo:json again -> fail"
+echo "==============================================="
+payload='{
+  "attr2": {
+    "value": {
+      "type": "LineString",
+      "coordinates": [ [ -6, 4], [3, 0] ]
+    },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E1 --payload "$payload" -X POST --json
+echo
+echo
+
+
+echo "11b. Check entity"
+echo "================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with geo:json attribute with string value -> fail
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geo:json needs an object as value",
+    "error": "BadRequest"
+}
+
+
+01b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+02. Create entity with geo:json attribute with array value -> fail
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "geo:json needs an object as value",
+    "error": "BadRequest"
+}
+
+
+02b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+03. Create entity with two geo:json -> fail
+===========================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+03b. Check entity
+=================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+04. Create entity with one geo:json (attr1) -> OK
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                [
+                    [
+                        2,
+                        1
+                    ],
+                    [
+                        4,
+                        3
+                    ],
+                    [
+                        5,
+                        -1
+                    ],
+                    [
+                        2,
+                        1
+                    ]
+                ]
+            ],
+            "type": "Polygon"
+        }
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+05. Update attr1 geo:json attribute -> OK
+=========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 125
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    1,
+                    1
+                ]
+            ],
+            "type": "LineString"
+        }
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+06. Append a new geo:json attribute (attr2) -> fail
+===================================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+06b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 125
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attr1": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    1,
+                    1
+                ]
+            ],
+            "type": "LineString"
+        }
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+07. Remove the geo:json attribute (attr1) -> OK
+===============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 25
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "E1",
+    "type": "none"
+}
+
+
+08. Append a new geo:json attribute (attr2) -> OK
+=================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 127
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                [
+                    4,
+                    4
+                ],
+                [
+                    -2,
+                    -2
+                ]
+            ],
+            "type": "LineString"
+        }
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+09. Change attribute type to no-geo:json (attr2) -> OK
+======================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+10. Append new geo:json attribute (attr3) -> OK
+===============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 171
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                8,
+                8
+            ],
+            "type": "Point"
+        }
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+11. Change attr2 type to geo:json again -> fail
+===============================================
+HTTP/1.1 413 Request Entity Too Large
+Content-Length: 96
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "No more than one geo-location attribute allowed",
+    "error": "NoResourcesAvailable"
+}
+
+
+11b. Check entity
+=================
+HTTP/1.1 200 OK
+Content-Length: 171
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "attr2": {
+        "metadata": {},
+        "type": "no-geopoint",
+        "value": "foo"
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                8,
+                8
+            ],
+            "type": "Point"
+        }
+    },
+    "id": "E1",
+    "type": "none"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

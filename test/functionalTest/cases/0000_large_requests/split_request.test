@@ -1,0 +1,312 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Split Request
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+url="/v1/registry/registerContext"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "cra1",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra2",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra3",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra4",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra5",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra6",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra7",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra8",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra9",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra10",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra11",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra12",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra13",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra14",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra15",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra16",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra17",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra18",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra19",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra20",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra21",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra22",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra23",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra24",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra25",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra26",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra27",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra28",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra29",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra30",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra31",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra32",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra33",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra34",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra35",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra36",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra37",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra38",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra39",
+          "type": "string",
+          "isDomain": "false"
+        },
+        {
+          "name": "cra40",
+          "type": "string",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:1028/application"
+    }
+  ],
+  "duration": "PT1H"
+}'
+
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "++++++++++++++++++++"
+
+url="/v1/registry/discoverContextAvailability"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "cra1"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+--REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 477
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "cra1",
+                        "type": "string"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

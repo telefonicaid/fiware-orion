@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
+#include "common/defaultValues.h"
 #include "common/Format.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
@@ -53,11 +54,12 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
-  const std::vector<std::string>&      servicePathV
+  const std::vector<std::string>&      servicePathV,
+  const std::string&                   fiwareCorrelator
 )
 {
-    std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];    
-    bool               reqSemTaken           = false;    
+    std::string servicePath = servicePathV[0] == ""? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+    bool        reqSemTaken = false;
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
@@ -105,11 +107,14 @@ HttpStatusCode mongoSubscribeContext
       sub.append(CSUB_THROTTLING, throttling);
     }
 
-    if (servicePath != "")
-    {
-      sub.append(CSUB_SERVICE_PATH, servicePath);
-    }
+    /* ServicePath (note that it cannot be empty, by construction) */
+    sub.append(CSUB_SERVICE_PATH, servicePath);
 
+    /* Description */
+    if (requestP->description != "")
+    {
+      sub.append(CSUB_DESCRIPTION, requestP->description);
+    }
     
     /* Build entities array */
     BSONArrayBuilder entities;
@@ -133,10 +138,32 @@ HttpStatusCode mongoSubscribeContext
 
     /* Build attributes array */
     BSONArrayBuilder attrs;
-    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList[ix]);
+    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
+    {
+      attrs.append(requestP->attributeList[ix]);
     }
     sub.append(CSUB_ATTRS, attrs.arr());
+
+
+    //
+    // StringFilter in Scope?
+    //
+    // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+    // If so, set it as string filter to the sub-cache item
+    //
+    StringFilter*  stringFilterP = NULL;
+
+    for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+    {
+      if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+      {
+        stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+      }
+    }
+
+    /* Adding status */
+    std::string status = requestP->status == ""?  STATUS_ACTIVE : requestP->status;
+    sub.append(CSUB_STATUS, status);
 
     /* Build conditions array (including side-effect notifications and threads creation) */
     bool notificationDone = false;
@@ -149,7 +176,10 @@ HttpStatusCode mongoSubscribeContext
                                              tenant,
                                              xauthToken,
                                              servicePathV,
-                                             requestP->expression.q);
+                                             &requestP->restriction,
+                                             status,
+                                             fiwareCorrelator);
+
     sub.append(CSUB_CONDITIONS, conds);
 
     /* Build expression */
@@ -183,6 +213,7 @@ HttpStatusCode mongoSubscribeContext
       return SccOk;
     }
 
+
     //
     // 3. Create Subscription for the cache
     //
@@ -200,6 +231,8 @@ HttpStatusCode mongoSubscribeContext
                        JSON,
                        notificationDone,
                        lastNotificationTime,
+                       stringFilterP,
+                       status,
                        requestP->expression.q,
                        requestP->expression.geometry,
                        requestP->expression.coords,

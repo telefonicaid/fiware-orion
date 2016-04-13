@@ -30,6 +30,8 @@
 #include "ngsi/Request.h"
 #include "common/Format.h"
 #include "orionTypes/areas.h"
+#include "rest/StringFilter.h"
+
 
 
 /* ****************************************************************************
@@ -67,9 +69,11 @@ typedef struct Scope
   orion::Line         line;
   orion::Box          box;
   orion::Georel       georel;
+  StringFilter        stringFilter;
 
   Scope();
   Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
+  Scope(Scope* scopeP);
 
   int          fill(const std::string&  apiVersion,
                     const std::string&  geometry,

@@ -109,6 +109,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/8787GHY?type=Car
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -118,6 +119,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 55
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -132,6 +134,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 52
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -146,6 +149,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 45
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -160,6 +164,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 81
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

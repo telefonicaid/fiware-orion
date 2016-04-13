@@ -1,0 +1,292 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+tenant names with upper and lowercase letters in URL
+
+--SHELL-INIT--
+dbInit CB
+dbInit ${CB_DB_NAME} case
+dbInit ${CB_DB_NAME} Case
+dbInit ${CB_DB_NAME} CASE
+
+brokerStart CB 0 IPV4 -multiservice
+
+--SHELL--
+
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
+        }
+      ],
+      "providingApplication": "http://localhost:1028/application"
+    }
+  ],
+  "duration": "PT1H"
+}'
+
+# 1. Registering an entity with tenant in upper-case
+echo "1: ++++++++++"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "CASE" --json
+echo
+echo
+
+
+# 2. Registering another entity with same tenant but in mixed-case
+echo "2: ++++++++++"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "Case" --json
+echo
+echo
+
+
+# 3. Registering another entity with same tenant but in lower-case
+echo "3: ++++++++++"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "case" --json
+echo
+echo
+
+
+# 4. Discovering all three registrations with tenant in upper-case
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ]
+}'
+echo "4: ++++++++++"
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "CASE" --json
+echo
+echo
+
+
+# 5. Discovering all three registrations with tenant in mixed-case
+echo "5: ++++++++++"
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "Case" --json
+echo
+echo
+
+
+# 6. Discovering all three registrations with tenant in lower-case
+echo "6: ++++++++++"
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --tenant "case" --json
+
+
+--REGEXPECT--
+1: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+2: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+3: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+4: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 884
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        },
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        },
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+5: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 884
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        },
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        },
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+6: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 884
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        },
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        },
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "ConferenceRoom",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+--TEARDOWN--
+
+brokerStop CB
+dbDrop CB
+dbDrop ${CB_DB_NAME} case
+dbDrop ${CB_DB_NAME} Case
+dbDrop ${CB_DB_NAME} CASE

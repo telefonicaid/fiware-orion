@@ -167,6 +167,7 @@ int httpRequestSendWithCurl
    const std::string&     resource,
    const std::string&     orig_content_type,
    const std::string&     content,
+   const std::string&     fiwareCorrelation,
    bool                   useRush,
    bool                   waitForResponse,
    std::string*           outP,
@@ -370,6 +371,11 @@ int httpRequestSendWithCurl
   headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
   outgoingMsgSize += content_type.size() + 14; // from "Content-type: "
 
+  // Fiware-Correlator
+  std::string correlation = "Fiware-Correlator: " + fiwareCorrelation;
+  headers = curl_slist_append(headers, correlation.c_str());
+  outgoingMsgSize += correlation.size();
+
 
   // Check if total outgoing message size is too big
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
@@ -491,6 +497,7 @@ int httpRequestSend
    const std::string&     resource,
    const std::string&     orig_content_type,
    const std::string&     content,
+   const std::string&     fiwareCorrelation,
    bool                   useRush,
    bool                   waitForResponse,
    std::string*           outP,
@@ -523,6 +530,7 @@ int httpRequestSend
                                      resource,
                                      orig_content_type,
                                      content,
+                                     fiwareCorrelation,
                                      useRush,
                                      waitForResponse,
                                      outP,

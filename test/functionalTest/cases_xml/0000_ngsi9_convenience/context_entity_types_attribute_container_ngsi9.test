@@ -72,7 +72,7 @@ orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes" -X "DELETE"
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 185
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -85,7 +85,7 @@ Date: REGEX(.*)
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
@@ -96,7 +96,7 @@ Date: REGEX(.*)
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 902
-Content-Type: application/xml
+Content-Type: application/json
 Date: REGEX(.*)
 
 <?xml version="1.0"?>

@@ -63,7 +63,7 @@ payload='
         "attributes": ["temperature", "humidity"],
         "throttling": 5
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -167,6 +167,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -176,10 +177,11 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 415
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "expires": "2016-04-05T14:00:00.00Z",
+    "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attributes": [
@@ -218,6 +220,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -227,6 +230,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 442
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -271,6 +275,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -280,6 +285,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 440
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

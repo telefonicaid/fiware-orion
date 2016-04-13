@@ -1,0 +1,134 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+HTTPS simple test
+
+--SHELL-INIT--
+dbInit CB
+${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+extraParams="-https -key /tmp/harnessTest.key -cert /tmp/harnessTest.pem"
+
+export BROKER_AWAIT_SLEEP_TIME=6
+brokerStart CB 0-255 IPV4 "$extraParams"
+unset BROKER_AWAIT_SLEEP_TIME
+
+--SHELL--
+#
+# Register a Sensor of temperature
+#
+echo "+++ 1: Register a Sensor of temperature"
+url="/v1/registry/registerContext"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Sensor",
+          "isPattern": "false",
+          "id": "Sensor5"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://kz.org"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem" --json
+
+echo
+echo
+
+#
+# Discovery
+#
+echo "+++ 2: Discover the Sensor of temperature"
+url="/v1/registry/discoverContextAvailability"
+payload='{
+  "entities": [
+    {
+      "type": "Sensor",
+      "isPattern": "false",
+      "id": "Sensor5"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem" --json
+
+
+--REGEXPECT--
++++ 1: Register a Sensor of temperature
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
++++ 2: Discover the Sensor of temperature
+HTTP/1.1 200 OK
+Content-Length: 453
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Sensor5",
+                        "isPattern": "false",
+                        "type": "Sensor"
+                    }
+                ],
+                "providingApplication": "http://kz.org"
+            }
+        }
+    ]
+}
+--TEARDOWN--
+brokerStop CB
+rm -f /tmp/harnessTest.key /tmp/harnessTest.pem
+dbDrop CB
