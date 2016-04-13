@@ -23,6 +23,7 @@
 
 import sys
 import json
+# pip install websocket-client
 import websocket
 
 msg = 0;
