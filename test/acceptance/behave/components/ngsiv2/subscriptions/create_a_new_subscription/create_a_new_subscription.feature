@@ -105,7 +105,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
     And verify an error response
       | parameter   | value                                              |
       | error       | RequestEntityTooLarge                              |
-      | description | payload size: 1048577, max size supported: 1048576 |
+      | description | payload size: 1048580, max size supported: 1048576 |
 
   @length_required
   Scenario:  try to create a new subscription using NGSI v2 wihout payload
