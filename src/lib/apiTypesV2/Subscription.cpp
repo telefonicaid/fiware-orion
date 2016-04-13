@@ -31,6 +31,7 @@
 
 #include "logMsg/logMsg.h"
 #include "common/JsonHelper.h"
+#include "common/globals.h"
 
 namespace ngsiv2
 {
@@ -48,7 +49,7 @@ std::string Subscription::toJson()
   {
     jh.addString("description", this->description);
   }
-  if (this->expires > 0)
+  if (this->expires != PERMANENT_SUBS_DATETIME)
   {    
     jh.addDate("expires", this->expires);
   }

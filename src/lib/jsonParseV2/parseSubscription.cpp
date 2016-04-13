@@ -179,24 +179,29 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       return oe.render(ciP, "");
     }
 
-    int64_t eT = parse8601Time(expires.GetString());
+    int64_t eT = -1;
 
-    if (eT == -1)
+    if (expires.GetStringLength() == 0)
     {
-      OrionError oe(SccBadRequest, "expires has an invalid format");
+        eT = PERMANENT_SUBS_DATETIME;
+    }
+    else
+    {
+      eT = parse8601Time(expires.GetString());
+      if (eT == -1)
+      {
+        OrionError oe(SccBadRequest, "expires has an invalid format");
 
-      alarmMgr.badInput(clientIp, "expires has an invalid format");
-      return oe.render(ciP, "");
+        alarmMgr.badInput(clientIp, "expires has an invalid format");
+        return oe.render(ciP, "");
+      }
     }
 
     destination->expires = eT;
   }
   else if (!update)
   {
-    OrionError oe(SccBadRequest, "no expiration for subscription specified");
-
-    alarmMgr.badInput(clientIp, "no expires specified");
-    return oe.render(ciP, "");
+    destination->expires = PERMANENT_SUBS_DATETIME;
   }
 
   // Status field

@@ -135,6 +135,15 @@ typedef enum Ngsiv2Flavour
 
 
 /* ****************************************************************************
+ * Future date to represent permanent subscriptions.
+ * High enough to make the subscription "permanent" but leaving room for
+ * some (sloppy) increments, without causing overflow and accidental subscription
+ * inactivation.
+ *
+*/
+#define PERMANENT_SUBS_DATETIME ((int64_t) 9e18)
+
+/* ****************************************************************************
 *
 * useful macros
 */
