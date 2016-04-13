@@ -971,6 +971,9 @@ class NGSI:
         assert len(curs_list) == 1, " ERROR - the subscription doc from is not the expected: %s" % str(len(curs_list))
         curs = curs_list[0]
         __logger__.debug("subscription to verify: %s" % str(curs))
+        for item in subscription_context:   # used to remove quotes when are using raw mode
+            if item != "condition_expression":
+                subscription_context[item] = remove_quote(subscription_context[item])
         # entities field and its sub-fields
         for e in range(int(subscription_context["subject_entities_number"])):
             # entities - idPattern
@@ -988,6 +991,7 @@ class NGSI:
                     assert curs["entities"][e]["id"] == subscription_context["subject_id"], \
                         u' ERROR - the id field "%s" is not stored correctly' % subscription_context["subject_id"]
             # entities - type
+            if subscription_context["subject_type"] == EMPTY: subscription_context["subject_type"] = None
             if subscription_context["subject_type"] is not None:
                 if subscription_context["subject_entities_prefix"] == "type" and subscription_context["subject_entities_number"] > 1:
                     assert curs["entities"][e]["type"] == "%s_%s" % (subscription_context["subject_type"], str(e)), \
@@ -1003,7 +1007,7 @@ class NGSI:
             __logger__.info("type in the \"conditions\" field are verified successfully")
             # conditions - attributes
             for a in range(int(subscription_context["condition_attributes_number"])):
-                if int(subscription_context["condition_attributes_number"]) > 0:
+                if int(subscription_context["condition_attributes_number"]) > 1:
                     condition_attr =  "%s_%s" % (subscription_context["condition_attributes"], str(a))
                 else:
                     condition_attr = subscription_context["condition_attributes"]
@@ -1015,6 +1019,8 @@ class NGSI:
             exp_op = subscription_context["condition_expression"].split("&")
             for op in exp_op:
                 exp_split = op.split(">>>")
+                for i in range(len(exp_split)):   # used to remove quotes when are using raw mode
+                    exp_split[i] = remove_quote(exp_split[i])
                 assert exp_split[1] == curs["expression"][exp_split[0]], \
                     u' ERROR - the "%s" key does not match with the expected value: %s' % (exp_split[0], exp_split[1])
         else:
@@ -1038,18 +1044,19 @@ class NGSI:
             assert int(curs["expiration"]) == int(ts_expires), u' ERROR - the expiration "%s" is not the expected' % str(curs["expiration"])
             __logger__.info("expiration field is verified successfully")
         # service path field
+            ALL_SERVICE_PATHS = u'/#'
             if FIWARE_SERVICE_PATH_HEADER in headers:
                 if headers[FIWARE_SERVICE_PATH_HEADER] == EMPTY:
-                    service_path = "/"
+                    service_path = ALL_SERVICE_PATHS
                 else:
                     service_path = headers[FIWARE_SERVICE_PATH_HEADER]
             else:
-                service_path = "/"
-            assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected' % curs["servicePath"]
+                service_path = ALL_SERVICE_PATHS
+            assert curs["servicePath"] == service_path, u' ERROR the servicePath field "%s" is not the expected "%s"' % (curs["servicePath"], service_path)
             __logger__.info("servicePath field is verified successfully")
         # attrs field
         for a in range(int(subscription_context["notification_attributes_number"])):
-            if int(subscription_context["notification_attributes_number"]) > 0:
+            if int(subscription_context["notification_attributes_number"]) > 1:
                 condition_attr =  "%s_%s" % (subscription_context["notification_attributes"], str(a))
             else:
                 condition_attr = subscription_context["notification_attributes"]

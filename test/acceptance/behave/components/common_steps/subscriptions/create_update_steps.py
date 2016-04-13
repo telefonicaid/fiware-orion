@@ -62,6 +62,16 @@ def create_a_new_subscription(context):
     context.resp = context.cb.create_subscription()
     __logger__.info("...Created an new subscription")
 
+@step(u'create a new subscription in raw mode')
+def create_a_new_subscription(context):
+    """
+    create an subscription with the properties loaded in the "properties to subcriptions" step in raw mode
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Creating an new subscription in raw mode...")
+    context.resp = context.cb.create_subscription_in_raw_mode()
+    __logger__.info("...Created an new subscription in raw mode")
+
 
 #  -------------------- verifications -----------------------------------------------------
 @step(u'verify that the subscription is stored in mongo')
