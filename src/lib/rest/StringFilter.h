@@ -146,6 +146,9 @@ public:
   bool                      matchEquals(ContextAttribute* caP);
   bool                      matchGreaterThan(ContextAttribute* caP);
   bool                      matchLessThan(ContextAttribute* caP);
+
+private:
+  bool                      compatibleType(ContextAttribute* caP);
 };
 
 
