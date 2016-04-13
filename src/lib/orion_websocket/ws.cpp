@@ -136,14 +136,25 @@ static int wsCallback(lws * ws,
 
     case LWS_CALLBACK_SERVER_WRITEABLE:
     {
-      size_t size = strlen(dat->message) +
+      int msg_size = strlen(dat->message);
+      size_t size = msg_size +
                     LWS_SEND_BUFFER_PRE_PADDING +
                     LWS_SEND_BUFFER_POST_PADDING;
 
       unsigned char *buff = (unsigned char *) malloc(size);
       unsigned char *p = &buff[LWS_SEND_BUFFER_PRE_PADDING];
       sprintf((char*)p, "%s", dat->message);
-      lws_write(ws, p, strlen(dat->message), LWS_WRITE_TEXT);
+
+      int written = 0;
+      int bytes = 0;
+
+      while (written < msg_size)
+      {
+        bytes = lws_write(ws, p + written, msg_size - bytes, LWS_WRITE_TEXT);
+        if (bytes == -1)
+          LM_E(("Runtime Error (cannot send response)"));
+        written += bytes;
+      }
       free(buff);
       free(dat->message);
       break;
