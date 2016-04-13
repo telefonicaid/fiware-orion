@@ -22,13 +22,14 @@
 
 
 import sys
+import json
 import websocket
 
 msg = 0;
 
 def on_message(ws, message):
-    print message
-
+    parsed = json.loads(message.replace("'", "\""))
+    print json.dumps(parsed, indent=4, sort_keys=True)
     global msg
     msg -= 1
     if (msg == 0):
