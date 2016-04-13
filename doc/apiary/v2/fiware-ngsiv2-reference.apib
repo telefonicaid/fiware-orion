@@ -516,7 +516,7 @@ The list of operators (and the format of the values they use) is as follows:
       `black` will match, while entities which `color` is set to `white` will not match.
     + A range, specified as a minimum and maximum separated by `..`. It matches if
       the value is in the interval between the minimum and the maximum (both included). It can only be used
-      with attributes which contain dates (ISO8601 format) or numbers. E.g. `temperature==10..20` matchs if the
+      with attributes which contain dates (ISO8601 format), numbers or strings. E.g. `temperature==10..20` matchs if the
       temperature is greater or equal than 10 and lower or equal than 20.
 + **Unequal**: `!=`. It accepts the following values:
       + The value is a single element, e.g. `temperature!=40`. It matches entities whose attribute
@@ -526,24 +526,24 @@ The list of operators (and the format of the values they use) is as follows:
       to `black` will not match, while entities whose `color` is set to `white`will match.
       + A range, specified as a minimum and maximum separated by `..`. It matches
       if the value is not in the interval between the minimum and the maximum (both included). It can only
-      be used with attributes which contain dates (ISO8601 format) or numbers. E.g. `temperature!=10..20` matches if
+      be used with attributes which contain dates (ISO8601 format), numbers or strings. E.g. `temperature!=10..20` matches if
       the temperature is lower than 10 or greater than 20 (it will not match if the tempeature is 10 or the
       temperature is 20).
 + **Greater than**: `>`. The value is a single element, e.g. `temperature>40`. It
   matches entities which attribute value is strictly greater than that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 + **Less than**: `<`. The value is a single element, e.g. `temperature<40`. It
   matches entities which attribute value is strictly less than that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 + **Greater or equal than**: `>=`. The value is a single element, e.g. `temperature>=40`.
   It matches entities which attribute value is greater than or equal to that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 + **Less or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
   matches entities which attribute value is less than or equal to that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 
 In the case of equal or unequal, if the value to match include a `,`, you can use simple quote
