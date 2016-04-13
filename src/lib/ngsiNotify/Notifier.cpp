@@ -39,15 +39,6 @@
 
 /* ****************************************************************************
 *
-* Select 'method' to send notifications - only one can be uncommented
-*/
-//#define SEND_BLOCKING
-#define SEND_IN_NEW_THREAD
-
-
-
-/* ****************************************************************************
-*
 * ~Notifier -
 */
 Notifier::~Notifier (void)
@@ -121,42 +112,6 @@ void Notifier::sendNotifyContextRequest
     /* Set Content-Type */
     std::string content_type = "application/json";
 
-#ifdef SEND_BLOCKING
-    int r;
-
-    r = httpRequestSend(host,
-                        port,
-                        protocol,
-                        "POST",
-                        tenant,
-                        spathList,
-                        xauthToken,
-                        uriPath,
-                        content_type,
-                        payload,
-                        fiwareCorrelator,
-                        true,
-                        NOTIFICATION_WAIT_MODE);
-
-    char portV[STRING_SIZE_FOR_INT];
-    snprintf(portV, sizeof(portV), "%d", port);
-    std::string url = host + ":" + portV + params->resource;
-
-    if (r == 0)
-    {
-      statisticsUpdate(NotifyContextSent, format);
-      QueueStatistics::incSentOK();
-      alarmMgr.notificationErrorReset(url);
-    }
-    else
-    {
-      QueueStatistics::incSentError();
-      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");
-    }
-
-#endif
-
-#ifdef SEND_IN_NEW_THREAD
     /* Send the message (no wait for response), in a separate thread to avoid blocking */
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
@@ -182,7 +137,6 @@ void Notifier::sendNotifyContextRequest
       return;
     }
     pthread_detach(tid);
-#endif
 }
 
 
@@ -224,23 +178,6 @@ void Notifier::sendNotifyContextAvailabilityRequest
     std::string content_type = "application/json";
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
-#ifdef SEND_BLOCKING
-    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, fiwareCorrelator, true, NOTIFICATION_WAIT_MODE);
-
-    if (r == 0)
-    {
-      statisticsUpdate(NotifyContextSent, format);
-      QueueStatistics::incSentOK();
-      alarmMgr.notificationErrorReset(url);
-    }
-    else
-    {
-      QueueStatistics::incSentError();
-      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");      
-    }
-#endif
-
-#ifdef SEND_IN_NEW_THREAD
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
 
@@ -262,5 +199,4 @@ void Notifier::sendNotifyContextAvailabilityRequest
       return;
     }
     pthread_detach(tid);
-#endif
 }

@@ -1111,6 +1111,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
@@ -1183,6 +1184,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home/#");
 
   /* Invoke the function in mongoBackend library */
@@ -1376,6 +1378,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home2/#");
 
   /* Invoke the function in mongoBackend library */
@@ -1651,6 +1654,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
@@ -1735,6 +1739,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home/#");
 
   /* Invoke the function in mongoBackend library */
@@ -1940,6 +1945,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home2/#");
 
   /* Invoke the function in mongoBackend library */
@@ -2000,6 +2006,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternTypeFail)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E3", "T", "false");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home/kz");
 
   /* Invoke the function in mongoBackend library */
@@ -2036,6 +2043,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternTypeOk)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E3", "T", "false");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home/fg");
 
   /* Invoke the function in mongoBackend library */
@@ -2084,6 +2092,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E3", "", "false");
   req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
   servicePathVector.push_back("/home/fg/#");
 
   /* Invoke the function in mongoBackend library */
@@ -2200,6 +2209,8 @@ TEST(mongoQueryContextRequest, queryWithSeveralServicePaths)
 */
 TEST(mongoQueryContextRequest, query1Ent0Attr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2212,7 +2223,6 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -2240,6 +2250,8 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2251,6 +2263,8 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
 */
 TEST(mongoQueryContextRequest, query1Ent1Attr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2285,6 +2299,8 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2297,6 +2313,8 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
 */
 TEST(mongoQueryContextRequest, queryNEnt0Attr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2352,7 +2370,9 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
-    res.contextElementResponseVector.release();    
+    res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2364,6 +2384,8 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
 */
 TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2403,6 +2425,8 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2415,6 +2439,9 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
 */
 TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
 {
+
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;  
@@ -2466,6 +2493,8 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2478,6 +2507,8 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
 */
 TEST(mongoQueryContextRequest, queryNEntNAttr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2493,8 +2524,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
     req.attributeList.push_back("A1");
     req.attributeList.push_back("A3");
 
-    /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
+    /* Invoke the function in mongoBackend library */    
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -2531,6 +2561,8 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2542,6 +2574,8 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
 */
 TEST(mongoQueryContextRequest, query1Ent0AttrFail)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2566,6 +2600,8 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2577,6 +2613,8 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
 */
 TEST(mongoQueryContextRequest, query1Ent1AttrFail)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2589,8 +2627,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A3");
 
-    /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
+    /* Invoke the function in mongoBackend library */    
     ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
@@ -2603,6 +2640,8 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 
@@ -2615,6 +2654,8 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
 */
 TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2640,6 +2681,8 @@ TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2651,6 +2694,8 @@ TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
 */
 TEST(mongoQueryContextRequest, query1EntWA1Attr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2684,6 +2729,8 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2696,6 +2743,8 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
 */
 TEST(mongoQueryContextRequest, queryNEntWA0Attr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2746,6 +2795,8 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2757,6 +2808,8 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
 */
 TEST(mongoQueryContextRequest, queryNEntWA1Attr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2793,6 +2846,8 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2810,6 +2865,8 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
 */
 TEST(mongoQueryContextRequest, queryNoType)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2868,6 +2925,8 @@ TEST(mongoQueryContextRequest, queryNoType)
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2877,6 +2936,8 @@ TEST(mongoQueryContextRequest, queryNoType)
 */
 TEST(mongoQueryContextRequest, queryIdMetadata)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2922,6 +2983,8 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -2931,6 +2994,8 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
 */
 TEST(mongoQueryContextRequest, queryCustomMetadata)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -2972,6 +3037,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 
@@ -2982,6 +3049,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
 */
 TEST(mongoQueryContextRequest, queryCustomMetadataNative)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3032,6 +3101,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadataNative)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 
@@ -3049,6 +3120,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadataNative)
 */
 TEST(mongoQueryContextRequest, queryPattern0Attr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3100,6 +3173,8 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3111,6 +3186,8 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
 */
 TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3145,6 +3222,8 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3157,6 +3236,8 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
 */
 TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3203,6 +3284,8 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3215,6 +3298,8 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
 */
 TEST(mongoQueryContextRequest, queryPatternNAttr)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3265,6 +3350,8 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3276,6 +3363,8 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
 */
 TEST(mongoQueryContextRequest, queryPatternFail)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3298,6 +3387,7 @@ TEST(mongoQueryContextRequest, queryPatternFail)
     EXPECT_EQ("", res.errorCode.details);
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3311,6 +3401,8 @@ TEST(mongoQueryContextRequest, queryPatternFail)
 */
 TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3376,6 +3468,8 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3394,6 +3488,8 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
 */
 TEST(mongoQueryContextRequest, queryNoTypePattern)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3475,6 +3571,8 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3484,6 +3582,8 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
 */
 TEST(mongoQueryContextRequest, queryIdMetadataPattern)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3556,6 +3656,8 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3565,6 +3667,8 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
 */
 TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3625,6 +3729,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3637,6 +3743,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
 */
 TEST(mongoQueryContextRequest, queryNativeTypes)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3711,9 +3819,10 @@ TEST(mongoQueryContextRequest, queryNativeTypes)
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -3723,6 +3832,8 @@ TEST(mongoQueryContextRequest, queryNativeTypes)
 */
 TEST(mongoQueryContextRequest, mongoDbQueryFail)
 {
+    utInit();
+
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -3760,6 +3871,6 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     /* Restore real DB connection */
     setMongoConnectionForUnitTest(connectionDb);
 
-    /* Release mock */
     delete connectionMock;
+    utExit();
 }

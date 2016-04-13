@@ -62,14 +62,6 @@ extern std::map<std::string, bool> options;
 
 /* ****************************************************************************
 *
-* servicePathV - 
-*/
-extern std::vector<std::string> servicePathV;
-
- 
-
-/* ****************************************************************************
-*
 * servicePathVector - 
 */
 extern std::vector<std::string> servicePathVector;

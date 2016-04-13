@@ -58,8 +58,8 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   fiwareCorrelator
 )
 {
-    std::string        servicePath           = (servicePathV.size() == 0)? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
-    bool               reqSemTaken           = false;    
+    std::string servicePath = servicePathV[0] == ""? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+    bool        reqSemTaken = false;
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 

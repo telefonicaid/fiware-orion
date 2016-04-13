@@ -2256,6 +2256,8 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
 */
 TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
 {
+  utInit();
+
   HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
@@ -2307,8 +2309,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
+  delete timerMock;
+  utExit();
 }
 
 /* ****************************************************************************
@@ -2317,6 +2320,8 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
 */
 TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
 {
+  utInit();
+
   HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
@@ -2375,8 +2380,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
+  delete timerMock;
+  utExit();
 }
 
 /* ****************************************************************************
@@ -2385,6 +2391,8 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
 */
 TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
 {
+  utInit();
+
   HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
@@ -2440,9 +2448,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
-
+  delete timerMock;
+  utExit();
 }
 
 /* ****************************************************************************

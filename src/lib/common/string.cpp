@@ -687,7 +687,7 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
 std::string servicePathCheck(const char* servicePath)
 {
   if (servicePath  == NULL)      return "No Service Path";
-  if (*servicePath == 0)         return "Empty Service Path";
+  if (*servicePath == 0)         return "OK";   // Special case, default service path
 
   //
   // A service-path contains only alphanumeric characters, plus underscore

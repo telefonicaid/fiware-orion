@@ -62,16 +62,11 @@ HttpStatusCode mongoRegisterContext
   const std::string&                   servicePath
 )
 {
-    std::string        sPath         = servicePath;    
     bool               reqSemTaken;    
 
     reqSemTake(__FUNCTION__, "ngsi9 register request", SemWriteOp, &reqSemTaken);
 
-    // Default value for service-path is "/"
-    if (sPath == "")
-    {
-      sPath = DEFAULT_SERVICE_PATH_UPDATES;
-    }
+    std::string sPath = servicePath == "" ? DEFAULT_SERVICE_PATH_UPDATES : servicePath;
 
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
