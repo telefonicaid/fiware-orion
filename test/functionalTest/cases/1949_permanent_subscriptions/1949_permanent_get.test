@@ -73,6 +73,46 @@ echo
 echo
 
 
+echo "03. PATCH /v2/subscriptions (with expires)"
+echo "=========================================="
+payload='
+{
+
+    "expires": "1982-06-14T17:15:00.00Z"
+}
+'
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "04. GET /v2/subscriptions/ID (with expires field)"
+echo "================================================="
+orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+echo
+echo
+
+
+echo "05. PATCH /v2/subscriptions (w/o expires)"
+echo "========================================="
+payload='
+{
+
+    "expires": ""
+}
+'
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" --json -X PATCH
+echo
+echo
+
+
+echo "04. GET /v2/subscriptions/ID (w/o expires field)"
+echo "================================================="
+orionCurl --url "/v2/subscriptions/${idSubscription}" --json
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /v2/subscriptions (w/o expires field)
 ==============================================
@@ -86,6 +126,109 @@ Date: REGEX(.*)
 
 02. GET /v2/subscriptions/ID (w/o expires field)
 ================================================
+HTTP/1.1 200 OK
+Content-Length: 379
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+03. PATCH /v2/subscriptions (with expires)
+==========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/subscriptions/ID (with expires field)
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 416
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "expires": "1982-06-14T17:15:00.00Z",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attributes": [
+            "humidity",
+            "temperature"
+        ],
+        "callback": "http://localhost:1234",
+        "throttling": 5
+    },
+    "status": "expired",
+    "subject": {
+        "condition": {
+            "attributes": [
+                "temperature"
+            ],
+            "expression": {
+                "coords": "-40.4,-3.5",
+                "geometry": "point",
+                "georel": "near;minDistance=5000",
+                "q": "temperature>40"
+            }
+        },
+        "entities": [
+            {
+                "id": "",
+                "idPattern": ".*",
+                "type": "Room"
+            }
+        ]
+    }
+}
+
+
+05. PATCH /v2/subscriptions (w/o expires)
+=========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/subscriptions/ID (w/o expires field)
+=================================================
 HTTP/1.1 200 OK
 Content-Length: 379
 Content-Type: application/json
