@@ -152,7 +152,9 @@ static int wsCallback(lws * ws,
       {
         bytes = lws_write(ws, p + written, msg_size - bytes, LWS_WRITE_TEXT);
         if (bytes == -1)
+        {
           LM_E(("Runtime Error (cannot send response)"));
+        }
         written += bytes;
       }
       free(buff);
