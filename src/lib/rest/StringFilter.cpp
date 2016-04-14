@@ -684,7 +684,7 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 */
 bool StringFilterItem::compatibleType(ContextAttribute* caP)
 {
-  if ((caP->valueType == orion::ValueTypeNumber) && ((valueType == SfvtNumber) || (valueType!= SfvtDate)))
+  if ((caP->valueType == orion::ValueTypeNumber) && ((valueType == SfvtNumber) || (valueType == SfvtDate)))
   {
     return true;
   }
