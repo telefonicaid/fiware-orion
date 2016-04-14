@@ -69,7 +69,7 @@ void Notifier::sendNotifyContextRequest
   const std::string&     tenant,
   const std::string&     xauthToken,
   const std::string&     fiwareCorrelator,
-  Format                 format
+  const std::string&     notifyFormat
 )
 {
     ConnectionInfo ci;
@@ -103,8 +103,17 @@ void Notifier::sendNotifyContextRequest
       spathList = "";
     }
     
-    ci.outFormat = format;
-    std::string payload = ncr->render(&ci, NotifyContext, "");
+    ci.outFormat = JSON;
+    std::string payload = ncr->toJson(&ci, notifyFormat);
+
+    if (notifyFormat == "JSON")
+    {
+      payload = ncr->render(&ci, NotifyContext, "");
+    }
+    else
+    {
+      payload = ncr->toJson(&ci, notifyFormat);
+    }
 
     /* Parse URL */
     std::string  host;
@@ -135,6 +144,7 @@ void Notifier::sendNotifyContextRequest
                         content_type,
                         payload,
                         fiwareCorrelator,
+                        notifyFormat,
                         true,
                         NOTIFICATION_WAIT_MODE);
 
@@ -144,7 +154,7 @@ void Notifier::sendNotifyContextRequest
 
     if (r == 0)
     {
-      statisticsUpdate(NotifyContextSent, format);
+      statisticsUpdate(NotifyContextSent, JSON);
       QueueStatistics::incSentOK();
       alarmMgr.notificationErrorReset(url);
     }
@@ -170,7 +180,8 @@ void Notifier::sendNotifyContextRequest
     params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payload;
-    params->format           = format;
+    params->format           = JSON;
+    params->notifyFormat     = notifyFormat;
     params->fiwareCorrelator = fiwareCorrelator;
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
@@ -225,11 +236,11 @@ void Notifier::sendNotifyContextAvailabilityRequest
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
 #ifdef SEND_BLOCKING
-    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, fiwareCorrelator, true, NOTIFICATION_WAIT_MODE);
+    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, fiwareCorrelator, "JSON", true, NOTIFICATION_WAIT_MODE);
 
     if (r == 0)
     {
-      statisticsUpdate(NotifyContextSent, format);
+      statisticsUpdate(NotifyContextSent, JSON);
       QueueStatistics::incSentOK();
       alarmMgr.notificationErrorReset(url);
     }

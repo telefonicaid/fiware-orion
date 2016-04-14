@@ -81,7 +81,7 @@ static bool processSubscriptions
                                          trigs->attrL,
                                          mapSubId,
                                          trigs->reference,
-                                         trigs->format,
+                                         JSON,
                                          tenant,
                                          fiwareCorrelator))
     {
@@ -272,7 +272,7 @@ static bool addTriggeredSubscriptions
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CASUB_FORMAT)) : JSON,
+        "JSON",
         getStringFieldF(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 

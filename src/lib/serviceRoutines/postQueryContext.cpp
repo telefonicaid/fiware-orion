@@ -133,6 +133,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                       mimeType,
                       payload,
                       ciP->httpHeaders.correlator,
+                      "",
                       false,
                       true,
                       &out,

@@ -62,6 +62,10 @@ extern std::string postSubscriptions
     return answer;
   }
 
+  if (parseDataP->scr.res.attrsFormat == "")
+  {
+    parseDataP->scr.res.attrsFormat = "NGSIv2-NORMALIZED";
+  }
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
 
   parseDataP->scr.res.release();

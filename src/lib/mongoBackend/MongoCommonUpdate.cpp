@@ -1016,11 +1016,13 @@ static bool addTriggeredSubscriptions_withCache
   std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
+  LM_W(("KZ: In addTriggeredSubscriptions_withCache"));
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
+  LM_W(("KZ: In addTriggeredSubscriptions_withCache. subVec.size: %lu", subVec.size()));
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
     CachedSubscription* cSubP = subVec[ix];
@@ -1029,6 +1031,7 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->expirationTime < now)
     {
       LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
+      LM_W(("KZ: skipping - EXPIRED"));
       continue;
     }
 
@@ -1036,13 +1039,14 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->status == STATUS_INACTIVE)
     {
       LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
+      LM_W(("KZ: skipping - INACTIVE"));
       continue;
     }
 
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
-    cSubP->notifyFormat = JSON;
+    LM_W(("KZ: Notification Format: %s", cSubP->notifyFormat.c_str()));
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1056,6 +1060,7 @@ static bool addTriggeredSubscriptions_withCache
                            now,
                            now - cSubP->lastNotificationTime,
                            cSubP->throttling));
+        LM_W(("KZ: skipping - THROTTLING"));
         continue;
       }
       else
@@ -1080,6 +1085,7 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->throttling));
     }
 
+    LM_W(("KZ: accepting sub"));
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->notifyFormat,
@@ -1253,7 +1259,7 @@ static bool addTriggeredSubscriptions_noCache
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CSUB_FORMAT)) : JSON,
+          sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "JSON",
           getStringFieldF(sub, CSUB_REFERENCE),
           subToAttributeList(sub), "", "");
 
@@ -1341,7 +1347,7 @@ static bool processOnChangeConditionForUpdateContext
   const AttributeList&             attrL,
   std::string                      subId,
   std::string                      notifyUrl,
-  Format                           format,
+  const std::string&               notifyFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator
@@ -1392,7 +1398,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
   return true;
 }
 
@@ -1459,7 +1465,7 @@ static bool processSubscriptions
                                                  trigs->attrL,
                                                  mapSubId,
                                                  trigs->reference,
-                                                 trigs->format,
+                                                 trigs->notifyFormat,
                                                  tenant,
                                                  xauthToken,
                                                  fiwareCorrelator))
@@ -2065,6 +2071,7 @@ static bool processContextAttributeVector
   /* Add triggered ONCHANGE subscriptions */
   std::string err;
 
+  LM_W(("KZ: calling addTriggeredSubscriptions with %lu subsToNotify", subsToNotify.size()));
   if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);

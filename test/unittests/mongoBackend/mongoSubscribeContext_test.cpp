@@ -1441,7 +1441,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1538,7 +1538,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1632,7 +1632,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1731,7 +1731,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1844,7 +1844,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1957,7 +1957,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2063,7 +2063,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2169,7 +2169,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2287,7 +2287,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2405,7 +2405,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2506,7 +2506,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2612,7 +2612,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2719,7 +2719,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2815,7 +2815,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2923,7 +2923,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3031,7 +3031,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3139,7 +3139,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3242,7 +3242,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3362,7 +3362,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3469,7 +3469,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3584,7 +3584,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3704,7 +3704,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3813,7 +3813,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3931,7 +3931,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", "JSON"))
             .Times(1);
     setNotifier(notifierMock);
 

@@ -1775,7 +1775,7 @@ bool processOnChangeConditionForSubscription
   ConditionValueList*              condValues,
   const std::string&               subId,
   const std::string&               notifyUrl,
-  Format                           format,
+  const std::string&               notifyFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -1828,7 +1828,7 @@ bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1839,7 +1839,7 @@ bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1865,7 +1865,7 @@ BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  Format                           format,
+  const std::string&               notifyFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -1902,7 +1902,7 @@ BSONArray processConditionVector
                                                    &(nc->condValueList),
                                                    subId,
                                                    url,
-                                                   format,
+                                                   notifyFormat,
                                                    tenant,
                                                    xauthToken,
                                                    servicePathV,
@@ -1982,7 +1982,7 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, format);
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, JSON);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */

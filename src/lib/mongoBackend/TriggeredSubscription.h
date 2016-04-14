@@ -27,7 +27,6 @@
 */
 
 #include <string>
-#include "common/Format.h"
 #include "ngsi/AttributeList.h"
 #include "rest/StringFilter.h"
 
@@ -52,7 +51,7 @@ class TriggeredSubscription
  public:
   long long     throttling;
   long long     lastNotification;
-  Format        format;
+  std::string   notifyFormat;
   std::string   reference;
   AttributeList attrL;
   std::string   cacheSubId;
@@ -69,13 +68,13 @@ class TriggeredSubscription
 
   TriggeredSubscription(long long           _throttling,
                         long long           _lastNotification,
-                        Format              _format,
+                        const std::string&  _notifyFormat,
                         const std::string&  _reference,
                         const AttributeList& _attrL,
                         const std::string&  _cacheSubId,
                         const char*         _tenant);
 
-  TriggeredSubscription(Format               _format,
+  TriggeredSubscription(const std::string&   _notifyFormat,
                         const std::string&   _reference,
                         const AttributeList& _attrL);
 

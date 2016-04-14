@@ -801,6 +801,17 @@ function accumulator3Count()
   fi
 }
 
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorReset - 
+#
+function accumulatorReset()
+{
+  curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+}
+
+
 # ------------------------------------------------------------------------------
 #
 # valgrindSleep
@@ -1296,6 +1307,7 @@ export -f accumulator3Dump
 export -f accumulatorCount
 export -f accumulator2Count
 export -f accumulator3Count
+export -f accumulatorReset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd

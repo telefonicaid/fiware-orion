@@ -45,7 +45,7 @@ public:
                                           const std::string&    tenant,
                                           const std::string&    xauthToken,
                                           const std::string&    fiwareCorrelator,
-                                          Format                format   = JSON);
+                                          const std::string&    notifyFormat = "NGSIv2-NORMALIZED");
 
     virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                       const std::string&                url,

@@ -54,11 +54,12 @@ typedef struct SubscribeContextRequest
   NotifyConditionVector  notifyConditionVector;  // Optional
   Throttling             throttling;             // Optional
   int64_t                expires;
-  SubscriptionExpression expression;             // Only used by NGSIv2 subscription
 
-  std::string            description;            // Only used by NGSIv2 subscription
-  bool                   descriptionProvided;    // Only used by NGSIv2 subscription
-  std::string            status;                 // Only used by NGSIv2 subscription
+  SubscriptionExpression expression;             // Only used by NGSIv2 subscriptions
+  std::string            description;            // Only used by NGSIv2 subscriptions
+  bool                   descriptionProvided;    // Only used by NGSIv2 subscriptions
+  std::string            status;                 // Only used by NGSIv2 subscriptions
+  std::string            attrsFormat;            // Only used by NGSIv2 subscriptions
 
   /* The number of restrictions */
   int                    restrictions;

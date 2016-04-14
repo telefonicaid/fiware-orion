@@ -29,6 +29,8 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -55,6 +57,43 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   out += endTag(indent);
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* NotifyContextRequest::toJson -
+*/
+std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, const std::string& notifyFormat)
+{
+  if (notifyFormat == "JSON")
+  {
+    return render(ciP, NotifyContext, "");
+  }
+
+
+  //
+  // Now, v2 rendering of Notifications ...
+  //
+  if (notifyFormat == "NGSIv2-NORMALIZED")
+  {
+    return "{ \"orion\": \"NGSIv2-NORMALIZED rendering not implemented\"}\n";
+  }
+  else if (notifyFormat == "NGSIv2-KEYVALUES")
+  {
+    return "{ \"orion\": \"NGSIv2-KEYVALUES rendering not implemented\"}\n";
+  }
+  else if (notifyFormat == "NGSIv2-VALUES")
+  {
+    return "{ \"orion\": \"NGSIv2-VALUES rendering not implemented\"}\n";
+  }
+
+  std::string details = std::string("Invalid notification format: '") + notifyFormat + "'";
+  OrionError oe(SccBadRequest, details);
+  alarmMgr.badInput(clientIp, details);
+
+  return oe.render(ciP, "");
 }
 
 

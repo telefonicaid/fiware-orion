@@ -172,7 +172,7 @@ HttpStatusCode mongoSubscribeContext
                                              requestP->attributeList, oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             JSON,
+                                             requestP->attrsFormat,
                                              tenant,
                                              xauthToken,
                                              servicePathV,
@@ -202,7 +202,8 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, "JSON");
+    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", requestP->attrsFormat.c_str()));
+    sub.append(CSUB_FORMAT, requestP->attrsFormat);
 
     /* Insert document in database */
     std::string err;
@@ -228,7 +229,7 @@ HttpStatusCode mongoSubscribeContext
                        oidString.c_str(),
                        expiration,
                        throttling,
-                       JSON,
+                       requestP->attrsFormat,
                        notificationDone,
                        lastNotificationTime,
                        stringFilterP,

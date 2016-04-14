@@ -60,6 +60,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   Document                  document;
   SubscribeContextRequest*  destination;
 
+  LM_W(("KZ: In parseSubscription"));
   document.Parse(ciP->payload);
 
   if (update)
@@ -223,6 +224,33 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     }
 
     destination->status = statusString;
+  }
+
+
+  // attrsFormat field
+  if (document.HasMember("attrsFormat"))
+  {
+    const Value& attrsFormat = document["attrsFormat"];
+
+    if (!attrsFormat.IsString())
+    {
+      OrionError oe(SccBadRequest, "attrsFormat is not a string");
+
+      alarmMgr.badInput(clientIp, "attrsFormat is not a string");
+      return oe.render(ciP, "");
+    }
+
+    std::string attrsFormatString = attrsFormat.GetString();
+
+    if ((attrsFormatString != "NGSIv2-NORMALIZED") && (attrsFormatString != "NGSIv2-KEYVALUES") && (attrsFormatString != "NGSIv2-VALUES"))
+    {
+      OrionError oe(SccBadRequest, "invalid attrsFormat (accepted values: NGSIv2-NORMALIZED, NGSIv2-KEYVALUES, NGSIv2-VALUES)");
+
+      alarmMgr.badInput(clientIp, "invalid attrsFormat (accepted values: NGSIv2-NORMALIZED, NGSIv2-KEYVALUES, NGSIv2-VALUES)");
+      return oe.render(ciP, "");
+    }
+
+    destination->attrsFormat = attrsFormatString;
   }
 
   return "OK";

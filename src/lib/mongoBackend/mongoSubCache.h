@@ -61,7 +61,8 @@ extern int mongoSubCacheItemInsert
   const std::string&  geometry,
   const std::string&  coords,
   const std::string&  georel,
-  StringFilter*       stringFilterP
+  StringFilter*       stringFilterP,
+  const std::string&  notifyFormat
 );
 
 

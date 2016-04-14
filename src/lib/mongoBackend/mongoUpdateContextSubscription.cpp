@@ -327,7 +327,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 requestP->subscriptionId.get(),
                                                 getStringFieldF(sub, CSUB_REFERENCE).c_str(),
                                                 &notificationDone,
-                                                JSON,
+                                                requestP->attrsFormat,
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
@@ -425,7 +425,17 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
   /* Adding format to use in notifications */
-  newSub.append(CSUB_FORMAT, std::string(formatToString(JSON)));
+  if (requestP->attrsFormat != "")
+  {
+    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", requestP->attrsFormat.c_str()));
+    newSub.append(CSUB_FORMAT, requestP->attrsFormat);
+  }
+  else
+  {
+    std::string format = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "JSON";
+    LM_W(("KZ: CSUB_FORMAT untouched - keeping the old (%s)", format.c_str()));
+    newSub.append(CSUB_FORMAT, format);
+  }
 
   /* Update document in MongoDB */
   BSONObj  newSubObject = newSub.obj();
@@ -502,7 +512,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                           requestP->expression.geometry,
                                           requestP->expression.coords,
                                           requestP->expression.georel,
-                                          stringFilterP);
+                                          stringFilterP,
+                                          requestP->attrsFormat);
 
   if (cSubP != NULL)
   {

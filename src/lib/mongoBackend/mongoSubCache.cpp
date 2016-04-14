@@ -94,7 +94,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               formatString  = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "JSON";
+  std::string               notifyFormat  = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "JSON";  // NGSIv1 JSON is 'default' (for old db-content)
   std::vector<BSONElement>  eVec          = getFieldF(sub, CSUB_ENTITIES).Array();
   std::vector<BSONElement>  attrVec       = getFieldF(sub, CSUB_ATTRS).Array();
   std::vector<BSONElement>  condVec       = getFieldF(sub, CSUB_CONDITIONS).Array();
@@ -104,7 +104,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getFieldF(sub, CSUB_SERVICE_PATH).String().c_str() : "/");
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)?    getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
-  cSubP->notifyFormat          = stringToFormat(formatString);
+  cSubP->notifyFormat          = notifyFormat;
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       : 0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
@@ -228,7 +228,8 @@ int mongoSubCacheItemInsert
   const std::string&  geometry,
   const std::string&  coords,
   const std::string&  georel,
-  StringFilter*       stringFilterP
+  StringFilter*       stringFilterP,
+  const std::string&  notifyFormat
 )
 {
   //
@@ -296,7 +297,6 @@ int mongoSubCacheItemInsert
   //
   // 03. Extract data from mongo sub
   //
-  std::string               formatString  = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "JSON";
   std::vector<BSONElement>  attrVec       = getFieldF(sub, CSUB_ATTRS).Array();
   std::vector<BSONElement>  condVec       = getFieldF(sub, CSUB_CONDITIONS).Array();
 
@@ -313,7 +313,7 @@ int mongoSubCacheItemInsert
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
-  cSubP->notifyFormat          = stringToFormat(formatString);
+  cSubP->notifyFormat          = notifyFormat;
   cSubP->reference             = strdup(sub.hasField(CSUB_REFERENCE)? getFieldF(sub, CSUB_REFERENCE).String().c_str() : "NO REF");  // Mandatory
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->expirationTime        = expirationTime;
