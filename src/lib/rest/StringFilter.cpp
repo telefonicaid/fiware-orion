@@ -55,9 +55,11 @@ StringFilterItem::~StringFilterItem()
 {
   stringList.clear();
   numberList.clear();
+
   if (patternValueToBeFreed == true)
   {
     regfree(&patternValue);
+    patternValueToBeFreed = false;
   }
 }
 
@@ -890,6 +892,7 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
     }
 
     str = NULL;  // So that strtok_r continues eating the initial string
+    item.patternValueToBeFreed = false;
   }
 
   free(toFree);
