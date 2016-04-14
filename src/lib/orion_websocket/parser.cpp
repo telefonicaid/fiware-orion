@@ -160,7 +160,7 @@ const char *ws_parser_message
    * and add status code (3) and the final null character
    */
   char *json = (char *) malloc(strlen(tmpl) - 6 + strlen(headers) + msg.size() + 3 + 1);
-  sprintf(json, tmpl, headers, msg.c_str(), statusCode);
+  sprintf(json, tmpl, headers, msg.empty() ? "\"\"" : msg.c_str(), statusCode);
 
   return json;
 }
