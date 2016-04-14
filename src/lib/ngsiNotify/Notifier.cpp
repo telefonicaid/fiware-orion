@@ -182,7 +182,7 @@ void Notifier::sendNotifyContextRequest
     params->content_type     = content_type;
     params->content          = payload;
     params->format           = JSON;
-    params->notifyFormat     = notifyFormat;
+    params->notifyFormat     = notificationFormatToString(notifyFormat);
     params->fiwareCorrelator = fiwareCorrelator;
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));

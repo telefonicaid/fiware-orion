@@ -378,6 +378,7 @@ int httpRequestSendWithCurl
   outgoingMsgSize += correlation.size();
 
   // Notify Format
+  LM_W(("KZ: notifyFormat == '%s'", notifyFormat.c_str()));
   if ((notifyFormat != "") && (notifyFormat != "JSON"))
   {
     std::string nFormat = "X-Ngsiv2-AttrsFormat: " + notifyFormat;
