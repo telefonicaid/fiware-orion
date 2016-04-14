@@ -81,7 +81,7 @@ pip install --upgrade -r requirements.txt --allow-all-external
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
     properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see [properties.json.base](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#propertiesjsonbase))
     README.md:                           this file, a brief explication about this framework to test
-    feature_files_structure.md           this file, a brief explication about the feature files structure
+    feature_files_structure.md           a brief explication about the feature files structure
     requirement.txt:                     external library, necessary install before to execute test (see [Quick way](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#quick-way) section)
     behave_all.py                        execute all features in a given directory and its subdirectories
 
