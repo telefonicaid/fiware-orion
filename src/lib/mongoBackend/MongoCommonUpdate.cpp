@@ -39,6 +39,7 @@
 #include "common/statistics.h"
 #include "common/errorMessages.h"
 #include "common/defaultValues.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -1046,7 +1047,7 @@ static bool addTriggeredSubscriptions_withCache
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
-    LM_W(("KZ: Notification Format: %s", cSubP->notifyFormat.c_str()));
+    LM_W(("KZ: Notification Format: %s", notificationFormatToString(cSubP->notifyFormat)));
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1252,14 +1253,16 @@ static bool addTriggeredSubscriptions_noCache
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      long long throttling       = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
-      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+      long long           throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
+      long long           lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+      std::string         notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "";
+      NotificationFormat  notifyFormat       = stringToNotificationFormat(notifyFormatString);
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
           lastNotification,
-          sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "JSON",
+          notifyFormat,
           getStringFieldF(sub, CSUB_REFERENCE),
           subToAttributeList(sub), "", "");
 
@@ -1347,7 +1350,7 @@ static bool processOnChangeConditionForUpdateContext
   const AttributeList&             attrL,
   std::string                      subId,
   std::string                      notifyUrl,
-  const std::string&               notifyFormat,
+  NotificationFormat               notifyFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator

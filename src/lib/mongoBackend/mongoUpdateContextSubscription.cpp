@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "common/defaultValues.h"
+#include "common/NotificationFormat.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -425,10 +426,10 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
   /* Adding format to use in notifications */
-  if (requestP->attrsFormat != "")
+  if (requestP->attrsFormat != NGSI_NO_NOTIFICATION_FORMAT)
   {
-    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", requestP->attrsFormat.c_str()));
-    newSub.append(CSUB_FORMAT, requestP->attrsFormat);
+    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", notificationFormatToString(requestP->attrsFormat)));
+    newSub.append(CSUB_FORMAT, notificationFormatToString(requestP->attrsFormat));
   }
   else
   {

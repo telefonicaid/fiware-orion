@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsiNotify/QueueStatistics.h"
@@ -59,7 +60,7 @@ int QueueNotifier::start()
 *
 * QueueNotifier::sendNotifyContextRequest -
 */
-void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& notifyFormat, const std::string& fiwareCorrelator)
+void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, NotificationFormat notifyFormat, const std::string& fiwareCorrelator)
 {
   ConnectionInfo ci;
 

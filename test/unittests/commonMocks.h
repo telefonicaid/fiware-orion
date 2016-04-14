@@ -28,6 +28,7 @@
 #include "gmock/gmock.h"
 #include "mongo/client/dbclient.h"
 #include "common/globals.h"
+#include "common/NotificationFormat.h"
 #include "mongoBackend/MongoGlobal.h"
 
 using ::testing::_;
@@ -160,11 +161,11 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD6(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, const std::string& notifyFormat));
+    MOCK_METHOD6(sendNotifyContextRequest, void(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat));
     MOCK_METHOD5(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, Format f));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, const std::string& notifyFormat)
+    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat)
     {
       LM_W(("KZ: In parent_sendNotifyContextRequest"));
       return Notifier::sendNotifyContextRequest(ncr, url, tenant, xauthToken, fiwareCorrelator, notifyFormat);

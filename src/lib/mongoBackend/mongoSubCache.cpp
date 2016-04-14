@@ -33,6 +33,7 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "common/statistics.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/StringFilter.h"
 
@@ -94,11 +95,11 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  std::string               notifyFormat  = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "JSON";  // NGSIv1 JSON is 'default' (for old db-content)
-  std::vector<BSONElement>  eVec          = getFieldF(sub, CSUB_ENTITIES).Array();
-  std::vector<BSONElement>  attrVec       = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec       = getFieldF(sub, CSUB_CONDITIONS).Array();
-
+  std::string               notifyFormatString = sub.hasField(CSUB_FORMAT)? getFieldF(sub, CSUB_FORMAT).String() : "JSON";  // NGSIv1 JSON is 'default' (for old db-content)
+  std::vector<BSONElement>  eVec               = getFieldF(sub, CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  attrVec            = getFieldF(sub, CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condVec            = getFieldF(sub, CSUB_CONDITIONS).Array();
+  NotificationFormat        notifyFormat       = stringToNotificationFormat(notifyFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
   cSubP->subscriptionId        = strdup(idField.OID().toString().c_str());
@@ -229,7 +230,7 @@ int mongoSubCacheItemInsert
   const std::string&  coords,
   const std::string&  georel,
   StringFilter*       stringFilterP,
-  const std::string&  notifyFormat
+  NotificationFormat  notifyFormat
 )
 {
   //

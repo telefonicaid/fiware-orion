@@ -1,5 +1,5 @@
-#ifndef NOTIFIER_H
-#define NOTIFIER_H
+#ifndef SRC_LIB_NGSINOTIFY_NOTIFIER_H_
+#define SRC_LIB_NGSINOTIFY_NOTIFIER_H_
 
 /*
 *
@@ -25,33 +25,37 @@
 *
 * Author: Fermin Galan
 */
-
 #include <map>
 #include <pthread.h>
 
+#include "common/NotificationFormat.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
+#include "ngsiNotify/ThreadData.h"
 
-#include "ThreadData.h"
 
-class Notifier {
 
+/* ****************************************************************************
+*
+* Notifier -
+*/
+class Notifier
+{
 public:
-   
-    virtual ~Notifier(void);
+  virtual ~Notifier(void);
 
-    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr,
-                                          const std::string&    url,
-                                          const std::string&    tenant,
-                                          const std::string&    xauthToken,
-                                          const std::string&    fiwareCorrelator,
-                                          const std::string&    notifyFormat = "NGSIv2-NORMALIZED");
+  virtual void sendNotifyContextRequest(NotifyContextRequest* ncr,
+                                        const std::string&    url,
+                                        const std::string&    tenant,
+                                        const std::string&    xauthToken,
+                                        const std::string&    fiwareCorrelator,
+                                        NotificationFormat    notifyFormat = NGSI_V2_NORMALIZED);
 
-    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
-                                                      const std::string&                url,
-                                                      const std::string&                tenant,
-                                                      const std::string&                fiwareCorrelator,
-                                                      Format                            format           = JSON);
+  virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
+                                                    const std::string&                url,
+                                                    const std::string&                tenant,
+                                                    const std::string&                fiwareCorrelator,
+                                                    Format                            format           = JSON);
 };
 
-#endif
+#endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

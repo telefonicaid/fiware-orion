@@ -41,6 +41,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/statistics.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -1775,7 +1776,7 @@ bool processOnChangeConditionForSubscription
   ConditionValueList*              condValues,
   const std::string&               subId,
   const std::string&               notifyUrl,
-  const std::string&               notifyFormat,
+  NotificationFormat               notifyFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -1865,7 +1866,7 @@ BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  const std::string&               notifyFormat,
+  NotificationFormat               notifyFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,

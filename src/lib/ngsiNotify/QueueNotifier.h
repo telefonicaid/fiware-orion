@@ -26,30 +26,34 @@
 *
 * Author: Orion dev team
 */
-
-
-#include "common/SyncQOverflow.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/SyncQOverflow.h"
+#include "common/NotificationFormat.h"
 #include "ngsiNotify/Notifier.h"
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/QueueWorkers.h"
+
 
 // default queue size
 #define DEFAULT_NOTIF_QS 100
 // default number of threads
 #define DEFAULT_NOTIF_TN 10
 
+
+
 /* ****************************************************************************
 *
-* class QueueNotifier-
+* class QueueNotifier -
 */
 class QueueNotifier : public Notifier
 {
 public:
   QueueNotifier(size_t queueSize, int numThreads);
-  void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& notifyFormat, const std::string& fiwareCorrelator);
+  void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, NotificationFormat notifyFormat, const std::string& fiwareCorrelator);
   int start();
+
 private:
  SyncQOverflow<SenderThreadParams*> queue;
  QueueWorkers workers;

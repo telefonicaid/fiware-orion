@@ -26,6 +26,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/NotificationFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -65,9 +66,12 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
 *
 * NotifyContextRequest::toJson -
 */
-std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, const std::string& notifyFormat)
+std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat)
 {
-  if (notifyFormat == "JSON")
+  //
+  // First, v1 rendering of notification?
+  //
+  if (notifyFormat == NGSI_V1_JSON)
   {
     return render(ciP, NotifyContext, "");
   }
@@ -76,22 +80,21 @@ std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, const std::string&
   //
   // Now, v2 rendering of Notifications ...
   //
-  if (notifyFormat == "NGSIv2-NORMALIZED")
+  if (notifyFormat == NGSI_V2_NORMALIZED)
   {
     return "{ \"orion\": \"NGSIv2-NORMALIZED rendering not implemented\"}\n";
   }
-  else if (notifyFormat == "NGSIv2-KEYVALUES")
+  else if (notifyFormat == NGSI_V2_KEYVALUES)
   {
     return "{ \"orion\": \"NGSIv2-KEYVALUES rendering not implemented\"}\n";
   }
-  else if (notifyFormat == "NGSIv2-VALUES")
+  else if (notifyFormat == NGSI_V2_VALUES)
   {
     return "{ \"orion\": \"NGSIv2-VALUES rendering not implemented\"}\n";
   }
 
-  std::string details = std::string("Invalid notification format: '") + notifyFormat + "'";
-  OrionError oe(SccBadRequest, details);
-  alarmMgr.badInput(clientIp, details);
+  OrionError oe(SccBadRequest, "Invalid notification format");
+  alarmMgr.badInput(clientIp, "Invalid notification format");
 
   return oe.render(ciP, "");
 }

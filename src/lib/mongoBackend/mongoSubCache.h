@@ -30,6 +30,7 @@
 #include <regex.h>
 
 #include "mongo/client/dbclient.h"
+#include "common/NotificationFormat.h"
 #include "rest/StringFilter.h"
 
 using namespace mongo;
@@ -62,7 +63,7 @@ extern int mongoSubCacheItemInsert
   const std::string&  coords,
   const std::string&  georel,
   StringFilter*       stringFilterP,
-  const std::string&  notifyFormat
+  NotificationFormat  notifyFormat
 );
 
 

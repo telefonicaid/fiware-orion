@@ -27,6 +27,7 @@
 */
 #include <string>
 
+#include "common/NotificationFormat.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Originator.h"
@@ -46,7 +47,7 @@ typedef struct NotifyContextRequest
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
   std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string   toJson(ConnectionInfo* ciP, const std::string& notifyFormat);
+  std::string   toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat);
   std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);

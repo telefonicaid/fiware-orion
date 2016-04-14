@@ -28,6 +28,7 @@
 #include "common/string.h"
 #include "common/statistics.h"
 #include "common/limits.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi10/NotifyContextRequest.h"
@@ -69,7 +70,7 @@ void Notifier::sendNotifyContextRequest
   const std::string&     tenant,
   const std::string&     xauthToken,
   const std::string&     fiwareCorrelator,
-  const std::string&     notifyFormat
+  NotificationFormat     notifyFormat
 )
 {
     ConnectionInfo ci;
@@ -106,7 +107,7 @@ void Notifier::sendNotifyContextRequest
     ci.outFormat = JSON;
     std::string payload = ncr->toJson(&ci, notifyFormat);
 
-    if (notifyFormat == "JSON")
+    if (notifyFormat == NGSI_V1_JSON)
     {
       payload = ncr->render(&ci, NotifyContext, "");
     }
@@ -144,7 +145,7 @@ void Notifier::sendNotifyContextRequest
                         content_type,
                         payload,
                         fiwareCorrelator,
-                        notifyFormat,
+                        notificationFormatToString(notifyFormat),
                         true,
                         NOTIFICATION_WAIT_MODE);
 

@@ -35,6 +35,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoCommonRegister.h"
@@ -272,7 +273,7 @@ static bool addTriggeredSubscriptions
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        "JSON",
+        sub.hasField(CASUB_FORMAT)? stringToNotificationFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_JSON,  // FIXME PR: hard to decide a default NotificationFormat ... JSON or NGSI_V2_NORMALIZED ?
         getStringFieldF(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 

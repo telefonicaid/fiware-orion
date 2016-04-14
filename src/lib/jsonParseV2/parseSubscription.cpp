@@ -240,9 +240,10 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       return oe.render(ciP, "");
     }
 
-    std::string attrsFormatString = attrsFormat.GetString();
+    std::string         attrsFormatString = attrsFormat.GetString();
+    NotificationFormat  nFormat           = stringToNotificationFormat(attrsFormatString, true);
 
-    if ((attrsFormatString != "NGSIv2-NORMALIZED") && (attrsFormatString != "NGSIv2-KEYVALUES") && (attrsFormatString != "NGSIv2-VALUES"))
+    if (nFormat == NGSI_NO_NOTIFICATION_FORMAT)
     {
       OrionError oe(SccBadRequest, "invalid attrsFormat (accepted values: NGSIv2-NORMALIZED, NGSIv2-KEYVALUES, NGSIv2-VALUES)");
 
@@ -250,7 +251,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       return oe.render(ciP, "");
     }
 
-    destination->attrsFormat = attrsFormatString;
+    destination->attrsFormat = nFormat;
   }
 
   return "OK";
