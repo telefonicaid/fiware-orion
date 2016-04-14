@@ -39,6 +39,13 @@
 using namespace mongo;
 
 
+/* ****************************************************************************
+*
+* StringFilterItem::StringFilterItem -
+*/
+StringFilterItem::StringFilterItem() : patternValueToBeFreed(false) {}
+
+
 
 /* ****************************************************************************
 *
@@ -48,6 +55,10 @@ StringFilterItem::~StringFilterItem()
 {
   stringList.clear();
   numberList.clear();
+  if (patternValueToBeFreed == true)
+  {
+    regfree(&patternValue);
+  }
 }
 
 
@@ -81,6 +92,16 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
       *errorStringP = std::string("values of type /") + valueTypeName() + "/ not supported for operator /" + opName() + "/";
       return false;
     }
+  }
+
+  if (op == SfopMatchPattern)
+  {
+    if (regcomp(&patternValue, stringValue.c_str(), 0) != 0)
+    {
+      *errorStringP = std::string("error compiling filter regex: '") + stringValue + "'";
+      return false;
+    }
+    patternValueToBeFreed = true;
   }
 
   return true;
@@ -396,6 +417,7 @@ bool StringFilterItem::valueGet
 * - Valid operators:
 *     - Binary operators
 *       ==         Translates to EQUALS
+*       ~=         Translates to MATCH PATTERN
 *       !=         Translates to NOT EQUAL
 *       >          Translates to GT
 *       <          Translates to LT
@@ -469,6 +491,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   char* opP = NULL;
 
   if      ((opP = strstr(s, "==")) != NULL)  { op  = SfopEquals;              rhs = &opP[2];        }
+  else if ((opP = strstr(s, "~=")) != NULL)  { op  = SfopMatchPattern;        rhs = &opP[2];        }
   else if ((opP = strstr(s, "!=")) != NULL)  { op  = SfopDiffers;             rhs = &opP[2];        }
   else if ((opP = strstr(s, "<=")) != NULL)  { op  = SfopLessThanOrEqual;     rhs = &opP[2];        }
   else if ((opP = strstr(s, "<"))  != NULL)  { op  = SfopLessThan;            rhs = &opP[1];        }
@@ -497,7 +520,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP)
   }
   if (forbiddenChars(lhs, ""))
   {
-    *errorStringP = "invalid character found in URI param /q/";
+    *errorStringP = "invalid character found in URI param /q/";  // fix this (and others)
     free(toFree);
     return false;
   }
@@ -554,6 +577,7 @@ const char* StringFilterItem::opName(void)
   case SfopGreaterThanOrEqual:  return "GreaterThanOrEqual";
   case SfopLessThan:            return "LessThan";
   case SfopLessThanOrEqual:     return "LessThanOrEqual";
+  case SfopMatchPattern:        return "MatchPattern";
   }
 
   return "InvalidOperator";
@@ -580,6 +604,7 @@ const char* StringFilterItem::valueTypeName(void)
   case SfvtNumberList:          return "NumberList";
   case SfvtDateList:            return "DateList";
   case SfvtStringList:          return "StringList";
+  case SfvtPattern:             return "Pattern";  // maybe not needed at the end
   }
 
   return "InvalidValueType";
@@ -677,6 +702,25 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 
   return true;
 }
+
+
+
+/* ****************************************************************************
+*
+* StringFilterItem::matchPattern -
+*/
+bool StringFilterItem::matchPattern(ContextAttribute* caP)
+{
+  // pattern evaluation only make sense for string attributes
+  if (caP->valueType != orion::ValueTypeString)
+  {
+    return false;
+  }
+
+  return (regexec(&patternValue, caP->stringValue.c_str(), 0, NULL, 0) == 0);
+}
+
+
 
 /* ****************************************************************************
 *
@@ -1078,7 +1122,18 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
-    }
+
+    case SfopMatchPattern:
+      if (itemP->valueType != SfvtString)
+      {
+        // Pattern filter only makes sense with string value
+        continue;
+      }
+      bb.append("$regex", itemP->stringValue);
+      bob.append(k, bb.obj());
+      f = bob.obj();
+      break;
+    }             
 
     mongoFilters.push_back(f);
   }
@@ -1186,6 +1241,10 @@ bool StringFilter::match(ContextElementResponse* cerP)
       {
         return false;
       }
+      break;
+
+    case SfopMatchPattern:
+      return itemP->matchPattern(caP);
       break;
     }
   }

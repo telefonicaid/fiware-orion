@@ -77,6 +77,8 @@ EntityInfo::EntityInfo(const std::string& _entityId, const std::string& _entityT
 
   if (isPattern)
   {
+    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
+    // in order to see how it works
     regcomp(&entityIdPattern, _entityId.c_str(), 0);
     entityIdPatternToBeFreed = true;
   }
