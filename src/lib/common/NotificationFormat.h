@@ -57,7 +57,7 @@ typedef enum NotificationFormat
 *
 * notificationFormatToString - 
 */
-extern const char* notificationFormatToString(NotificationFormat format);
+extern const char* notificationFormatToString(NotificationFormat format, bool noDefault = true);
 
 
 

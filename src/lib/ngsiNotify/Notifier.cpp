@@ -134,6 +134,7 @@ void Notifier::sendNotifyContextRequest
 #ifdef SEND_BLOCKING
     int r;
 
+    LM_W(("KZ: notifyFormat == %d (%s)", notifyFormat, notificationFormatToString(notifyFormat)));
     r = httpRequestSend(host,
                         port,
                         protocol,
@@ -168,6 +169,8 @@ void Notifier::sendNotifyContextRequest
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
+    LM_W(("KZ: notifyFormat to senderThread == %d (%s)", notifyFormat, notificationFormatToString(notifyFormat)));
+
     /* Send the message (no wait for response), in a separate thread to avoid blocking */
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();

@@ -122,6 +122,8 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   /* Set Content-Type */
   std::string content_type = "application/json";
 
+  LM_W(("KZ: notifyFormat == %d (%s)", notifyFormat, notificationFormatToString(notifyFormat, false)));
+
   SenderThreadParams* params = new SenderThreadParams();
   params->ip               = host;
   params->port             = port;
@@ -134,7 +136,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   params->content_type     = content_type;
   params->content          = payload;
   params->format           = JSON;
-  params->notifyFormat     = notificationFormatToString(notifyFormat);
+  params->notifyFormat     = notificationFormatToString(notifyFormat, false);
   params->fiwareCorrelator = fiwareCorrelator;
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
