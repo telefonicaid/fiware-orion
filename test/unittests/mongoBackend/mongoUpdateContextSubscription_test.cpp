@@ -1868,6 +1868,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
