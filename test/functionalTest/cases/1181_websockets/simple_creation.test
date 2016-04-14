@@ -1,0 +1,120 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST Entities V2 WS
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. POST /v2/entities
+# 02. GET /v2/entities
+#
+host='ws://localhost:9010'
+protocol='ngsiv2-json'
+
+echo "01. POST /v2/entities"
+echo "===================="
+payloadPost='{
+  "verb" : "POST",
+  "url" : "/v2/entities",
+  "params" : {"options" : "keyValues"},
+  "payload" : {"type": "T1", "id": "E1","temp": 1}
+}'
+
+orionWS.py $host $protocol "$payloadPost"
+echo
+echo
+
+
+echo "02. GET /v2/entities/E1"
+echo "======================="
+payloadGet='{
+  "verb" : "GET",
+  "url" : "/v2/entities/E1"
+}'
+
+orionWS.py $host $protocol "$payloadGet"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities
+====================
+{
+    "headers": {
+        "Location": "/v2/entities/E1?type=T1", 
+        "accept": "*/*", 
+        "contentType": "application/json", 
+        "expect": "", 
+        "host": "", 
+        "origin": "", 
+        "servicePath": "/", 
+        "tenant": "", 
+        "userAgent": "orionWS/0.1", 
+        "xauthToken": "", 
+        "xforwardedFor": ""
+    }, 
+    "message": "", 
+    "status": "201"
+}
+Connection closed
+
+
+02. GET /v2/entities/E1
+=======================
+{
+    "headers": {
+        "accept": "*/*", 
+        "contentType": "", 
+        "expect": "", 
+        "host": "", 
+        "origin": "", 
+        "servicePath": "/", 
+        "tenant": "", 
+        "userAgent": "orionWS/0.1", 
+        "xauthToken": "", 
+        "xforwardedFor": ""
+    }, 
+    "message": {
+        "id": "E1", 
+        "temp": {
+            "metadata": {}, 
+            "type": "none", 
+            "value": 1
+        }, 
+        "type": "T1"
+    }, 
+    "status": "200"
+}
+Connection closed
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+
