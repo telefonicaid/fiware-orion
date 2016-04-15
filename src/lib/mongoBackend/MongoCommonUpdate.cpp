@@ -2074,7 +2074,6 @@ static bool processContextAttributeVector
   /* Add triggered ONCHANGE subscriptions */
   std::string err;
 
-  LM_W(("KZ: calling addTriggeredSubscriptions with %lu subsToNotify", subsToNotify.size()));
   if (!addTriggeredSubscriptions(entityId, entityType, modifiedAttrs, subsToNotify, err, tenant, servicePathV))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);

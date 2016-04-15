@@ -64,6 +64,9 @@ HttpStatusCode mongoUpdateContextSubscription
 { 
   bool          reqSemTaken;
 
+  LM_W(("KZ: In mongoUpdateContextSubscription: requestP->attrsFormat == %s", notificationFormatToString(requestP->attrsFormat)));
+
+  
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request", SemWriteOp, &reqSemTaken);
 
   /* Look for document */
@@ -425,18 +428,28 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
-  /* Adding format to use in notifications */
+
+  //
+  // Adding format to use in notifications
+  //
+  std::string         notifyFormatString  = "";
+  NotificationFormat  notifyFormat        = NGSI_NO_NOTIFICATION_FORMAT;
+
   if (requestP->attrsFormat != NGSI_NO_NOTIFICATION_FORMAT)
   {
-    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", notificationFormatToString(requestP->attrsFormat)));
-    newSub.append(CSUB_FORMAT, notificationFormatToString(requestP->attrsFormat));
+    notifyFormat       = requestP->attrsFormat;
+    notifyFormatString = notificationFormatToString(notifyFormat);
+    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", notifyFormatString.c_str()));
+    newSub.append(CSUB_FORMAT, notifyFormatString.c_str());
   }
   else
   {
-    std::string format = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "JSON";
-    LM_W(("KZ: CSUB_FORMAT untouched - keeping the old (%s)", format.c_str()));
-    newSub.append(CSUB_FORMAT, format);
+    notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "JSON";  // If not in database, "JSON" is the default value
+    notifyFormat       = stringToNotificationFormat(notifyFormatString, false);
+    LM_W(("KZ: CSUB_FORMAT untouched - keeping the old (%s)", notifyFormatString.c_str()));
+    newSub.append(CSUB_FORMAT, notifyFormatString);
   }
+
 
   /* Update document in MongoDB */
   BSONObj  newSubObject = newSub.obj();
@@ -501,7 +514,8 @@ HttpStatusCode mongoUpdateContextSubscription
   char* servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
-  
+
+  LM_W(("KZ: Calling mongoSubCacheItemInsert with notifyFormat == %s", notificationFormatToString(notifyFormat)));
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,
@@ -514,7 +528,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                           requestP->expression.coords,
                                           requestP->expression.georel,
                                           stringFilterP,
-                                          requestP->attrsFormat);
+                                          notifyFormat);
 
   if (cSubP != NULL)
   {

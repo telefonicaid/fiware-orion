@@ -180,6 +180,17 @@ std::string jsonTreat
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
+  if (reqP != NULL)
+  {
+    if (reqP->type == SubscribeContext)
+    {
+      parseDataP->scr.res.attrsFormat = NGSI_V1_JSON;
+    }
+    else if (reqP->type == UpdateContextSubscription)
+    {
+      parseDataP->ucsr.res.attrsFormat = NGSI_V1_JSON;
+    }
+  }
 
   //
   // FIXME P4 #1862:
