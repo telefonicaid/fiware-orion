@@ -1,0 +1,490 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+/v1/ ALL Entities without filter
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 0. Query all entities using convop /v1/contextEntities
+# 1. APPEND entity E1, type T1 with attribute A1
+# 2. APPEND entity E2, WITHOUT TYPE and with attribute A2
+# 3. APPEND entity E2, type T2 with attribute A2
+# 4. APPEND entity E3, type T3 with attribute A3
+# 5. APPEND entity E4, type T3 with attribute A4
+# 6. Query all entities using convop /v1/contextEntities?entity::type=T1
+# 7. Query all entities using convop /v1/contextEntities?entity::type=T2
+# 8. Query all entities using convop /v1/contextEntities?entity::type=T3
+#
+
+echo "0. Query all entities using convop /v1/contextEntities"
+echo "======================================================"
+orionCurl --url /v1/contextEntities
+echo
+echo
+
+
+echo "1. APPEND entity E1, type T1 with attribute A1"
+echo "=============================================="
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="T1" isPattern="false">
+        <id>E1</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>A1T</type>
+          <contextValue>a1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url /v1/updateContext --payload "${payload}"
+echo
+echo
+
+
+echo "2. APPEND entity E2, WITHOUT TYPE and with attribute A2"
+echo "======================================================="
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="" isPattern="false">
+        <id>E2</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A2</name>
+          <type>A2T</type>
+          <contextValue>a1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url /v1/updateContext --payload "${payload}"
+echo
+echo
+
+
+echo "3. APPEND entity E2, type T2 with attribute A2"
+echo "=============================================="
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="T2" isPattern="false">
+        <id>E2</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A2</name>
+          <type>A2T</type>
+          <contextValue>a1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url /v1/updateContext --payload "${payload}"
+echo
+echo
+
+
+echo "4. APPEND entity E3, type T3 with attribute A3"
+echo "=============================================="
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="T3" isPattern="false">
+        <id>E3</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A3</name>
+          <type>A3T</type>
+          <contextValue>a1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url /v1/updateContext --payload "${payload}"
+echo
+echo
+
+
+echo "5. APPEND entity E4, type T3 with attribute A4"
+echo "=============================================="
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="T3" isPattern="false">
+        <id>E4</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A4</name>
+          <type>A4T</type>
+          <contextValue>a1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url /v1/updateContext --payload "${payload}"
+echo
+echo
+
+
+echo "6. Query all entities using convop /v1/contextEntities?entity::type=T1"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T1
+echo
+echo
+
+
+echo "7. Query all entities using convop /v1/contextEntities?entity::type=T2"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T2
+echo
+echo
+
+
+echo "8. Query all entities using convop /v1/contextEntities?entity::type=T3"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T3
+echo
+echo
+
+
+--REGEXPECT--
+0. Query all entities using convop /v1/contextEntities
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+
+
+1. APPEND entity E1, type T1 with attribute A1
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>A1T</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+2. APPEND entity E2, WITHOUT TYPE and with attribute A2
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 616
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="" isPattern="false">
+          <id>E2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A2</name>
+            <type>A2T</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+3. APPEND entity E2, type T2 with attribute A2
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T2" isPattern="false">
+          <id>E2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A2</name>
+            <type>A2T</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+4. APPEND entity E3, type T3 with attribute A3
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T3" isPattern="false">
+          <id>E3</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A3</name>
+            <type>A3T</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+5. APPEND entity E4, type T3 with attribute A4
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T3" isPattern="false">
+          <id>E4</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A4</name>
+            <type>A4T</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+6. Query all entities using convop /v1/contextEntities?entity::type=T1
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>A1T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+7. Query all entities using convop /v1/contextEntities?entity::type=T2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 618
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T2" isPattern="false">
+          <id>E2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A2</name>
+            <type>A2T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+8. Query all entities using convop /v1/contextEntities?entity::type=T3
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 1140
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T3" isPattern="false">
+          <id>E3</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A3</name>
+            <type>A3T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T3" isPattern="false">
+          <id>E4</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A4</name>
+            <type>A4T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

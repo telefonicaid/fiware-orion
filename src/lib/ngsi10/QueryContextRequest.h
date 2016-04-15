@@ -38,6 +38,14 @@
 
 /* ****************************************************************************
 *
+* Forward types - instead of including in header file ...
+*/
+class BatchQuery;
+
+
+
+/* ****************************************************************************
+*
 * QueryContextRequest - 
 */
 typedef struct QueryContextRequest
@@ -51,9 +59,9 @@ typedef struct QueryContextRequest
 
   QueryContextRequest();
   QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName);
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, AttributeList& attributeList);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& attributeList);
 
-  std::string   render(RequestType requestType, Format format, const std::string& indent);
+  std::string   render(RequestType requestType, const std::string& indent);
   std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);
@@ -63,6 +71,8 @@ typedef struct QueryContextRequest
                      const std::string&  isPattern,
                      EntityTypeInfo      typeInfo,
                      const std::string&  attributeName);
+  void          fill(BatchQuery* bqP);
+
 } QueryContextRequest;
 
 #endif

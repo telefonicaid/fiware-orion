@@ -45,7 +45,18 @@ unsigned int QueryContextResponseVector::size(void)
   return vec.size();
 }
 
-
+/* ****************************************************************************
+*
+* QueryContextResponseVector::operator[] -
+*/
+QueryContextResponse*  QueryContextResponseVector::operator[](unsigned int ix) const
+{
+   if (ix < vec.size())
+   {
+      return vec[ix];
+   }
+   return NULL;
+}
 
 /* ****************************************************************************
 *
@@ -55,8 +66,6 @@ void QueryContextResponseVector::push_back(QueryContextResponse* item)
 {
   vec.push_back(item);
 }
-
-
 
 /* ****************************************************************************
 *
@@ -81,10 +90,10 @@ void QueryContextResponseVector::release(void)
 */
 void QueryContextResponseVector::present(void)
 {
-  LM_F(("Presenting QueryContextResponseVector of %d QueryContextResponses", vec.size()));
+  LM_T(LmtPresent, ("Presenting QueryContextResponseVector of %d QueryContextResponses", vec.size()));
   for (unsigned int qcrIx = 0; qcrIx < vec.size(); ++qcrIx)
   {
-    LM_F(("QueryContextResponse %d:", qcrIx));
+    LM_T(LmtPresent, ("QueryContextResponse %d:", qcrIx));
 
     for (unsigned int eIx = 0; eIx < vec[qcrIx]->contextElementResponseVector.size(); ++eIx)
     {
@@ -92,11 +101,16 @@ void QueryContextResponseVector::present(void)
       EntityId*               eP   = &ceP->entityId;
 
 
-      LM_F(("  entity %0d: { '%s', '%s', '%s' }", eIx, eP->id.c_str(),  eP->type.c_str(),  eP->isPattern.c_str()));
+      LM_T(LmtPresent, ("  entity %0d: { '%s', '%s', '%s' }", 
+			eIx, eP->id.c_str(),  
+			eP->type.c_str(),  
+			eP->isPattern.c_str()));
       for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
       {
         ContextAttribute* aP = ceP->contextAttributeVector[aIx];
-        LM_F(("  attribute %02d: %s: %s", aIx, aP->name.c_str(), aP->toStringValue().c_str()));
+        LM_T(LmtPresent, ("  attribute %02d: %s: %s", 
+			  aIx, aP->name.c_str(), 
+        aP->getValue().c_str()));
       }
     }
 

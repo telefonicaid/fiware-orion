@@ -27,6 +27,12 @@
 
 #include "common/string.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
+#include "logMsg/traceLevels.h"
+
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -36,20 +42,9 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/postQueryContext.h"
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
-
-
-
-/* ****************************************************************************
-*
-* xmlPayloadClean -
-*/
-static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
-{
-  return (char*) strstr(payload, payloadWord);
-}
 
 
 
@@ -79,33 +74,27 @@ static char* jsonPayloadClean(const char* payload)
 * 6. 'Fix' StatusCode
 * 7. Freeing memory
 *
-*
-* FIXME P5: The function 'queryForward' is implemented to pick the format (XML or JSON) based on the
-*           count of the Format for all the participating attributes. If we have more attributes 'preferring'
-*           XML than JSON, the forward is done in XML, etc. This is all OK.
-*           What is not OK is that the Accept HTTP header is set to the same format as the Content-Type HTTP Header.
-*           While this is acceptable, it is not great. As the broker understands both XML and JSON, we could send
-*           the forward message with an Acceot header of XML/JSON and then at reading the response, instead of 
-*           throwing away the HTTP headers, we could read the "Content-Type" and do the parse according the Content-Type.
 */
-static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format format, QueryContextResponse* qcrsP)
+static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
 {
   std::string     ip;
   std::string     protocol;
   int             port;
   std::string     prefix;
-  std::string     answer;
-
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
   if (parseUrl(qcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    LM_W(("Bad Input (invalid providing application '%s')", qcrP->contextProvider.c_str()));
+    std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
+      
+    alarmMgr.badInput(clientIp, details);
+
+    //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
-
+    //
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
@@ -114,50 +103,49 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   //
   // 2. Render the string of the request we want to forward
   //
-  std::string  payload = qcrP->render(QueryContext, format, "");
-  char*        cleanPayload = (char*) payload.c_str();;
+  std::string  payload;
+  TIMED_RENDER(payload = qcrP->render(QueryContext, ""));
 
-  if (format == XML)
-  {
-    if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<queryContextRequest>")) == NULL)
-    {
-      LM_E(("Runtime Error (error rendering forward-request)"));
-      qcrsP->errorCode.fill(SccContextElementNotFound, "");
-      return;
-    }
-  }
+  char* cleanPayload = (char*) payload.c_str();;
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
-  std::string     out;
   std::string     verb         = "POST";
   std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
-  std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
+  std::string     mimeType     = "application/json";
+  std::string     out;
+  int             r;
 
-  out = httpRequestSend(ip,
-                        port,
-                        protocol,
-                        verb,
-                        tenant,
-                        servicePath,
-                        ciP->httpHeaders.xauthToken,
-                        resource,
-                        mimeType,
-                        payload,
-                        false,
-                        true,
-                        mimeType);
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
 
-  if ((out == "error") || (out == ""))
+  r = httpRequestSend(ip,
+                      port,
+                      protocol,
+                      verb,
+                      tenant,
+                      servicePath,
+                      ciP->httpHeaders.xauthToken,
+                      resource,
+                      mimeType,
+                      payload,
+                      ciP->httpHeaders.correlator,
+                      false,
+                      true,
+                      &out,
+                      mimeType);
+
+  if (r != 0)
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
+    qcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding query");
     LM_W(("Runtime Error (error forwarding 'Query' to providing application)"));
     return;
   }
+
+  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
 
 
   //
@@ -166,14 +154,8 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   std::string  s;
   std::string  errorMsg;
 
-  if (format == XML)
-  {
-    cleanPayload = xmlPayloadClean(out.c_str(), "<queryContextResponse>");
-  }
-  else
-  {
-    cleanPayload = jsonPayloadClean(out.c_str());
-  }
+
+  cleanPayload = jsonPayloadClean(out.c_str());
 
   if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
   {
@@ -198,14 +180,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   ciP->verb   = POST;
   ciP->method = "POST";
 
-  if (format == XML)
-  {
-    s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
-  }
-  else
-  {
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
-  }
+  s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
 
   if (s != "OK")
   {
@@ -326,7 +301,25 @@ std::string postQueryContext
   // 01. Call mongoBackend/mongoQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
-  ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP);
+
+  TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
+                                                      qcrsP,
+                                                      ciP->tenant,
+                                                      ciP->servicePathV,
+                                                      ciP->uriParam,
+                                                      ciP->uriParamOptions,
+                                                      countP,
+                                                      ciP->apiVersion));
+
+  if (qcrsP->errorCode.code == SccBadRequest)
+  {
+    // Bad Input detected by Mongo Backend - request ends here !
+    OrionError oe(qcrsP->errorCode);
+
+    TIMED_RENDER(answer = oe.render(ciP, ""));
+    qcrP->release();
+    return answer;
+  }
 
 
   //
@@ -355,7 +348,8 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    answer = qcrsP->render(ciP, QueryContext, "");
+    TIMED_RENDER(answer = qcrsP->render(ciP, QueryContext, ""));
+
     qcrP->release();
     return answer;
   }
@@ -446,21 +440,6 @@ std::string postQueryContext
       {
         requestP = new QueryContextRequest(aP->providingApplication.get(), eP, aP->name);
         requestV.push_back(requestP);
-
-        //
-        // requestV maintains counters of the formats each added item is supposed to be in.
-        // Before the forward is done, these counters (one for XML and one for JSON) are examined
-        // and a format is chosen.
-        //
-        if (aP->providingApplication.format == XML)
-        {
-          requestV.xmls++;
-        }
-        else if (aP->providingApplication.format == JSON)
-        {
-          requestV.jsons++;
-        }
-
       }
       else
       {
@@ -515,7 +494,7 @@ std::string postQueryContext
 
     qP = new QueryContextResponse();
     qP->errorCode.fill(SccOk);
-    queryForward(ciP, requestV[fIx], requestV.format(), qP);
+    queryForward(ciP, requestV[fIx], qP);
 
     //
     // Now, each ContextElementResponse of qP should be tested to see whether there
@@ -526,7 +505,8 @@ std::string postQueryContext
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
   bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-  answer = responseV.render(ciP, "", details, qcrsP->errorCode.details);
+  TIMED_RENDER(answer = responseV.render(ciP, "", details, qcrsP->errorCode.details));
+
 
   //
   // Time to cleanup.

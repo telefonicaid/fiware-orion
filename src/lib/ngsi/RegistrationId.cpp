@@ -42,7 +42,6 @@
 std::string RegistrationId::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -86,7 +85,7 @@ void RegistrationId::set(const std::string& value)
 *
 * RegistrationId::get -
 */
-std::string RegistrationId::get(void)
+std::string RegistrationId::get(void) const
 {
   return string;
 }
@@ -101,11 +100,13 @@ void RegistrationId::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sRegistrationId: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sRegistrationId: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo RegistrationId\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo RegistrationId\n", indent.c_str()));
   }
 }
 
@@ -115,7 +116,7 @@ void RegistrationId::present(const std::string& indent)
 *
 * RegistrationId::render -
 */
-std::string RegistrationId::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string RegistrationId::render(RequestType requestType, const std::string& indent, bool comma)
 {
   if (string == "")
   {
@@ -130,7 +131,7 @@ std::string RegistrationId::render(RequestType requestType, Format format, const
     }
   }
 
-  return valueTag(indent, "registrationId", string, format, comma);
+  return valueTag1(indent, "registrationId", string, comma);
 }
 
 

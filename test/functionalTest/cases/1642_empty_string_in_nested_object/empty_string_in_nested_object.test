@@ -1,0 +1,167 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Empty string in nested object of entity
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v1/updateContext with empty string in nested object
+# 02. GET /v1/contextEntities/E1
+#
+
+echo "01. POST /v1/updateContext with empty string in nested object"
+echo "============================================================="
+payload='{
+    "contextElements": [
+        {
+            "type": "MyEntity",
+            "isPattern": "false",
+            "id": "E1",
+            "attributes": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": "test"
+                },
+                {
+                    "name": "empty",
+                    "type": "string",
+                    "value": ""
+                },
+                {
+                    "name" : "objectWithEmptyString",
+                    "type" : "T",
+                    "value" : [{
+                        "key": ""
+                    }]
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. GET /v1/contextEntities/E1"
+echo "=============================="
+orionCurl --url /v1/contextEntities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v1/updateContext with empty string in nested object
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 624
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "value": ""
+                    },
+                    {
+                        "name": "empty",
+                        "type": "string",
+                        "value": ""
+                    },
+                    {
+                        "name": "objectWithEmptyString",
+                        "type": "T",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "MyEntity"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. GET /v1/contextEntities/E1
+==============================
+HTTP/1.1 200 OK
+Content-Length: 539
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "empty",
+                "type": "string",
+                "value": ""
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "value": "test"
+            },
+            {
+                "name": "objectWithEmptyString",
+                "type": "T",
+                "value": [
+                    {
+                        "key": ""
+                    }
+                ]
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": "MyEntity"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -31,10 +31,10 @@ brokerStart CB
 
 #
 # 01. OK: Send a request with one valid option (count)
-# 02. OK: Send a request with two valid options (count + normalized)
+# 02. OK: Send a request with two valid options (count + keyValues)
 # 03. Error: Send a request with one invalid option (canonical)
-# 04. OK: Send a request with ALL valid options (count, normalized, values & text)
-# 05. Error: Send a request with ALL valid options and ONE invalid
+# 04. OK: Send a request with MANY valid options (count, keyValues, append)
+# 05. Error: Send a request with MANY valid options and ONE invalid
 # 06. Error: Test an arbitrary API v2 path
 #
 
@@ -45,9 +45,9 @@ echo
 echo
 
 
-echo "02. OK: Send a request with two valid options (count + normalized)"
-echo "=================================================================="
-orionCurl --url /v2/entities?options=count,normalized --json --payload '{ "id": "ID2", "type": "type" }'
+echo "02. OK: Send a request with two valid options (count + keyValues)"
+echo "================================================================="
+orionCurl --url /v2/entities?options=count,keyValues --json --payload '{ "id": "ID2", "type": "type" }'
 echo
 echo
 
@@ -59,16 +59,16 @@ echo
 echo
 
 
-echo "04. OK: Send a request with ALL valid options (count, normalized, values & text)"
-echo "================================================================================"
-orionCurl --url '/v2/entities?options=count,normalized,values,text' --json --payload '{ "id": "ID4", "type": "type" }'
+echo "04. OK: Send a request with MANY valid options (count, keyValues, append)"
+echo "========================================================================="
+orionCurl --url '/v2/entities?options=count,keyValues,append' --json --payload '{ "id": "ID4", "type": "type" }'
 echo
 echo
 
 
-echo "05. Error: Send a request with ALL valid options and ONE invalid"
-echo "================================================================"
-orionCurl --url '/v2/entities?options=count,normalized,values,text,BAD' --json --payload '{ "id": "ID5", "type": "type" }'
+echo "05. Error: Send a request with MANY valid options and ONE invalid"
+echo "================================================================="
+orionCurl --url '/v2/entities?options=count,keyValues,values,append,BAD' --json --payload '{ "id": "ID5", "type": "type" }'
 echo
 echo
 
@@ -85,16 +85,18 @@ echo
 ====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/ID
+Location: /v2/entities/ID?type=type
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-02. OK: Send a request with two valid options (count + normalized)
-==================================================================
+02. OK: Send a request with two valid options (count + keyValues)
+=================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/ID2
+Location: /v2/entities/ID2?type=type
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -104,6 +106,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -112,20 +115,22 @@ Date: REGEX(.*)
 }
 
 
-04. OK: Send a request with ALL valid options (count, normalized, values & text)
-================================================================================
+04. OK: Send a request with MANY valid options (count, keyValues, append)
+=========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/ID4
+Location: /v2/entities/ID4?type=type
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
-05. Error: Send a request with ALL valid options and ONE invalid
-================================================================
+05. Error: Send a request with MANY valid options and ONE invalid
+=================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -139,6 +144,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 139
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

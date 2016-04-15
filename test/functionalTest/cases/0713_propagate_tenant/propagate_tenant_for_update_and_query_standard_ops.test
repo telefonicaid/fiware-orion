@@ -26,10 +26,10 @@ Propagate Tenant for Update and Query Requests
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
-dbInit ftest-t1
-dbInit ftest-t2
-dbInit ftest_cp1-t1
-dbInit ftest_cp1-t2
+dbInit CB t1
+dbInit CB t2
+dbInit CP1 t1
+dbInit CP1 t2
 
 brokerStart CB  0 IPV4 -multiservice
 brokerStart CP1 0 IPV4 -multiservice
@@ -262,6 +262,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 382
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -293,6 +294,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 382
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -324,6 +326,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -337,6 +340,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -350,6 +354,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 382
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -381,6 +386,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 382
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -412,6 +418,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 387
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -443,6 +450,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 387
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -474,6 +482,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 94
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -489,7 +498,8 @@ brokerStop CB
 brokerStop CP1
 dbDrop CB
 dbDrop CP1
-dbDrop ftest-t1
-dbDrop ftest-t2
-dbDrop ftest_cp1-t1
-dbDrop ftest_cp1-t2
+dbDrop CB t1
+dbDrop CB t2
+dbDrop CP1 t1
+dbDrop CP1 t2
+

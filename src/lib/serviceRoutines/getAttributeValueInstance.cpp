@@ -27,6 +27,9 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -109,7 +112,7 @@ std::string getAttributeValueInstance
   //
   if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)  
   {
-    ContextElementResponse* cerP = parseDataP->qcrs.res.contextElementResponseVector.get(0);
+    ContextElementResponse* cerP = parseDataP->qcrs.res.contextElementResponseVector[0];
 
     //
     // FIXME P4: as long as mongoQueryContext() signature is based on NGSI standard operations and that
@@ -122,9 +125,9 @@ std::string getAttributeValueInstance
     //
     for (unsigned int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
     {
-      if (cerP->contextElement.contextAttributeVector.get(i)->getId() == metaIdValue)
+      if (cerP->contextElement.contextAttributeVector[i]->getId() == metaIdValue)
       {
-        response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector.get(i));
+        response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector[i]);
       }
     }
 
@@ -152,7 +155,7 @@ std::string getAttributeValueInstance
 
 
   // 5. Render the ContextAttributeResponse
-  answer = response.render(ciP, IndividualContextEntityAttribute, "");
+  TIMED_RENDER(answer = response.render(ciP, IndividualContextEntityAttribute, ""));
 
 
   // 6. Cleanup and return result

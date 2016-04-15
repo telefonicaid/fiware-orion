@@ -39,20 +39,24 @@
 *
 * render - 
 */
-std::string ConditionValueList::render(Format format, const std::string& indent, bool comma)
+std::string ConditionValueList::render(const std::string& indent, bool comma)
 {
   std::string  out = "";
   std::string  tag = "condValueList";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
-  out += startTag(indent, tag, tag, format, true, true);
+  out += startTag2(indent, tag, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += valueTag(indent + "  ", "condValue", "", vec[ix], format, ix != vec.size() - 1);
+  {
+    out += valueTag2(indent + "  ", "", vec[ix], ix != vec.size() - 1);
+  }
 
-  out += endTag(indent, tag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -66,7 +70,6 @@ std::string ConditionValueList::render(Format format, const std::string& indent,
 std::string ConditionValueList::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -89,10 +92,12 @@ std::string ConditionValueList::check
 */
 void ConditionValueList::present(const std::string& indent)
 {
-  LM_F(("%sConditionValue List",    indent.c_str()));
+  LM_T(LmtPresent, ("%sConditionValue List",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    LM_F(("%s  %s", indent.c_str(), vec[ix].c_str()));
+    LM_T(LmtPresent, ("%s  %s", 
+		      indent.c_str(), 
+		      vec[ix].c_str()));
 }
 
 
@@ -132,11 +137,16 @@ unsigned int ConditionValueList::size(void)
 
 /* ****************************************************************************
 *
-* ConditionValueList::get - 
+* ConditionValueList::operator
 */
-std::string ConditionValueList::get(int ix)
+std::string ConditionValueList::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+
+  return "";
 }
 
 

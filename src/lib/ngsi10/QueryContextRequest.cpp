@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
@@ -35,6 +36,7 @@
 #include "ngsi10/QueryContextRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
+#include "apiTypesV2/BatchQuery.h"
 
 
 
@@ -76,7 +78,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, AttributeList& _attributeList)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const AttributeList& _attributeList)
 {
   contextProvider = _contextProvider;
 
@@ -93,7 +95,7 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::render - 
 */
-std::string QueryContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string QueryContextRequest::render(RequestType requestType, const std::string& indent)
 {
   std::string   out                      = "";
   std::string   tag                      = "queryContextRequest";
@@ -102,11 +104,11 @@ std::string QueryContextRequest::render(RequestType requestType, Format format, 
   bool          commaAfterAttributeList  = restrictionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
-  out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render(format,  indent + "  ", commaAfterAttributeList);
-  out += restriction.render(format,    indent + "  ", restrictions, false);
-  out += endTag(indent, tag, format);
+  out += startTag1(indent, tag, false);
+  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
+  out += attributeList.render( indent + "  ", commaAfterAttributeList);
+  out += restriction.render(   indent + "  ", restrictions, false);
+  out += endTag(indent);
 
   return out;
 }
@@ -126,11 +128,11 @@ std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestT
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
-           ((res = attributeList.check(QueryContext,  ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
-           ((res = restriction.check(QueryContext,    ciP->outFormat, indent, predetectedError, restrictions)) != "OK"))
+  else if (((res = entityIdVector.check(ciP, QueryContext, indent, predetectedError, 0))            != "OK") ||
+           ((res = attributeList.check(QueryContext,  indent, predetectedError, 0))            != "OK") ||
+           ((res = restriction.check(QueryContext,    indent, predetectedError, restrictions)) != "OK"))
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
   }
   else
@@ -216,4 +218,33 @@ void QueryContextRequest::fill
   {
     attributeList.push_back(attributeName);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::fill - 
+*
+* NOTE
+* If the incoming bqP->entities.vec is empty, then one almighty entity::id is 
+* added to the QueryContextRequest::entityIdVector, namely, idPattern .* with empty type,
+* matching ALL entities.
+*
+*/
+void QueryContextRequest::fill(BatchQuery* bqP)
+{
+  if (bqP->entities.vec.size() != 0)
+  {
+    entityIdVector.fill(bqP->entities.vec);
+  }
+  else
+  {
+    EntityId* eP = new EntityId(".*", "", "true");
+    entityIdVector.push_back(eP);
+  }
+
+  attributeList.fill(bqP->attributeV.attributeV);
+  restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
+  bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP
 }

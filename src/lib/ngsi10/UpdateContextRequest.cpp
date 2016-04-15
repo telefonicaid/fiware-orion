@@ -31,6 +31,7 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
@@ -47,9 +48,7 @@
 * UpdateContextRequest::UpdateContextRequest - 
 */
 UpdateContextRequest::UpdateContextRequest()
-{
-  xmls  = 0;
-  jsons = 0;
+{ 
 }
 
 
@@ -58,45 +57,10 @@ UpdateContextRequest::UpdateContextRequest()
 *
 * UpdateContextRequest::UpdateContextRequest - 
 */
-UpdateContextRequest::UpdateContextRequest(const std::string _contextProvider, EntityId* eP)
+UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, EntityId* eP)
 {
   contextProvider = _contextProvider;
   contextElementVector.push_back(new ContextElement(eP));
-
-  xmls  = 0;
-  jsons = 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::init - 
-*/
-void UpdateContextRequest::init(void)
-{
-  xmls  = 0;
-  jsons = 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::format - 
-*/
-Format UpdateContextRequest::format(void)
-{
-  if (xmls > jsons)
-  {
-    return XML;
-  }
-  else if (jsons > xmls)
-  {
-    return JSON;
-  }
-
-  return DEFAULT_FORMAT;
 }
 
 
@@ -113,10 +77,10 @@ std::string UpdateContextRequest::render(ConnectionInfo* ciP, RequestType reques
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
   out += contextElementVector.render(ciP, UpdateContext, indent + "  ", true);
-  out += updateActionType.render(ciP->outFormat, indent + "  ", false);
-  out += endTag(indent, tag, ciP->outFormat, false);
+  out += updateActionType.render(indent + "  ", false);
+  out += endTag(indent, false);
 
   return out;
 }
@@ -138,8 +102,8 @@ std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType request
     return response.render(ciP, UpdateContext, indent);
   }
 
-  if (((res = contextElementVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") || 
-      ((res = updateActionType.check(requestType,     ciP->outFormat, indent, predetectedError, counter)) != "OK"))
+  if (((res = contextElementVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK") ||
+      ((res = updateActionType.check(requestType,     indent, predetectedError, counter)) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
     return response.render(ciP, UpdateContext, indent);
@@ -312,7 +276,7 @@ void UpdateContextRequest::fill
     }
     else if (mP->stringValue != metaID)
     {
-      LM_W(("Bad Input (metaID differs in URI and payload"));
+      alarmMgr.badInput(clientIp, "metaID differs in URI and payload");
     }
   }
 
@@ -345,15 +309,50 @@ void UpdateContextRequest::fill
 (
   const std::string&   entityId,
   ContextAttribute*    attributeP,
-  const std::string&   _updateActionType
+  const std::string&   _updateActionType,
+  const std::string&   type
 )
 {
-  ContextElement*   ceP = new ContextElement(entityId, "", "false");
+  ContextElement*   ceP = new ContextElement(entityId, type, "false");
   ContextAttribute* aP  = new ContextAttribute(attributeP);
 
   ceP->contextAttributeVector.push_back(aP);
   contextElementVector.push_back(ceP);
   updateActionType.set(_updateActionType);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*
+* Instead of copying the attributes, the created ContextElements will just point to
+* the already existing ContextAttributes and the original vector is then cleared to
+* avoid any double-free problems.
+*/
+void UpdateContextRequest::fill
+(
+  Entities*           entities,
+  const std::string&  _updateActionType
+)
+{
+  updateActionType.set(_updateActionType);
+
+  for (unsigned int eIx = 0; eIx < entities->vec.size(); ++eIx)
+  {
+    Entity*           eP  = entities->vec[eIx];
+    ContextElement*   ceP = new ContextElement(eP->id, eP->type, eP->isPattern);
+
+    for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
+    {
+      // NOT copying the attribute, just pointing to it - original vector is then cleared
+      ceP->contextAttributeVector.push_back(eP->attributeVector[aIx]);
+    }
+
+    eP->attributeVector.vec.clear();  // original vector is cleared
+    contextElementVector.push_back(ceP);
+  }
 }
 
 

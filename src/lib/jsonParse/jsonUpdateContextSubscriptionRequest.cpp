@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "orionTypes/areas.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "parse/nullTreat.h"
@@ -52,9 +53,10 @@ static std::string duration(const std::string& path, const std::string& value, P
   parseDataP->ucsr.res.duration.set(value);
 
   // The failure is postponed until the 'check' step to not miss the subscriptionId
-  if ((s = parseDataP->ucsr.res.duration.check(UpdateContextSubscription, JSON, "", "", 0)) != "OK")
+  if ((s = parseDataP->ucsr.res.duration.check(UpdateContextSubscription, "", "", 0)) != "OK")
   {
-    LM_W(("Bad Input (error parsing duration '%s': %s)", parseDataP->ucsr.res.duration.get().c_str(), s.c_str()));
+    std::string details = std::string("error parsing duration '") + parseDataP->ucsr.res.duration.get() + "': " + s;
+    alarmMgr.badInput(clientIp, details);
   }
 
   return "OK";
@@ -468,7 +470,7 @@ void jsonUcsrRelease(ParseData* parseDataP)
 std::string jsonUcsrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
   std::string s;
-  s = parseDataP->ucsr.res.check(UpdateContextSubscription, ciP->outFormat, "", parseDataP->errorString, 0);
+  s = parseDataP->ucsr.res.check(UpdateContextSubscription, "", parseDataP->errorString, 0);
   return s;
 }
 
@@ -482,7 +484,7 @@ void jsonUcsrPresent(ParseData* parseDataP)
 {
   printf("jsonUcsrPresent\n");
 
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

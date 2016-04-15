@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "rest/ConnectionInfo.h"
@@ -87,12 +91,12 @@ std::string postContextEntitiesByEntityIdAndType
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.registrationId.set("000000000000000000000000");
 
-    answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
+    TIMED_RENDER(answer = response.render(ContextEntitiesByEntityIdAndType, ""));
 
     parseDataP->rpr.res.release();
 
@@ -100,12 +104,12 @@ std::string postContextEntitiesByEntityIdAndType
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
-    LM_W(("Bad Input non-matching entity::types in URL"));
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.registrationId.set("000000000000000000000000");
 
-    answer = response.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
+    TIMED_RENDER(answer = response.render(ContextEntitiesByEntityIdAndType, ""));
 
     parseDataP->rpr.res.release();
 

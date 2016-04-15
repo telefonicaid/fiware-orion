@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -90,16 +94,18 @@ std::string getNgsi10ContextEntityTypesAttribute
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
-    answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, "");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
     parseDataP->qcr.res.release();
     return answer;
   }
   else if ((typeNameFromUriParam != typeName) && (typeNameFromUriParam != ""))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    LM_W(("Bad Input non-matching entity::types in URL"));
-    answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, "");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
     parseDataP->qcr.res.release();
     return answer;
   }
@@ -117,7 +123,8 @@ std::string getNgsi10ContextEntityTypesAttribute
   if (parseDataP->qcrs.res.errorCode.code == SccContextElementNotFound)
   {
     parseDataP->qcrs.res.errorCode.details = "entityId::type/attribute::name pair not found";
-    answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, "");
+
+    TIMED_RENDER(answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, ""));
   }
 
 

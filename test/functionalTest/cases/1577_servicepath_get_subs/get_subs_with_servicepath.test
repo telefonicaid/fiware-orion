@@ -1,0 +1,315 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Subscriptions V2
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Create 2 subscriptions for 2 servicepaths
+# 02. GET /v2/subscriptions for 1 servicepath
+# 03. GET /v2/subscriptions for /#
+# 04. GET /v2/subscriptions for inexistent servicepath
+#
+
+echo "01. Create 2 subscriptions for 2 servicepaths"
+echo "============================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "temperature",
+        "timestamp"
+      ]
+    }
+  ],
+  "throttling": "PT5S"
+}'
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json  --tenant VALENCIA --servicePath /Valencia/basuras
+echo
+echo
+
+payload='{
+  "entities": [
+    {
+      "type": "Car",
+      "isPattern": "false",
+      "id": "MyCar"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OtherCar"
+    }
+  ],
+  "attributes": [
+    "speed",
+    "location"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "speed"
+      ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json --servicePath /Valencia/parques
+echo
+echo
+
+echo "02. GET /v2/subscriptions for 1 servicepath"
+echo "==========================================="
+orionCurl --url /v2/subscriptions?options=count --json --servicePath /Valencia/parques
+echo
+echo
+
+
+echo "03. GET /v2/subscriptions for /#"
+echo "================================"
+orionCurl --url /v2/subscriptions?options=count --json --servicePath /#
+echo
+echo
+
+
+echo "04. GET /v2/subscriptions for inexistent servicepath"
+echo "===================================================="
+orionCurl --url /v2/subscriptions?options=count --json --servicePath /Sebastopol/submarinos
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 2 subscriptions for 2 servicepaths
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT5S"
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. GET /v2/subscriptions for 1 servicepath
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 396
+Content-Type: application/json
+X-Total-Count: 1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [
+                "speed",
+                "location"
+            ],
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify"
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "speed"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "georel": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "MyCar",
+                    "idPattern": "",
+                    "type": "Car"
+                },
+                {
+                    "id": "OtherCar",
+                    "idPattern": "",
+                    "type": "Room"
+                }
+            ]
+        }
+    }
+]
+
+
+03. GET /v2/subscriptions for /#
+================================
+HTTP/1.1 200 OK
+Content-Length: 855
+Content-Type: application/json
+X-Total-Count: 2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [
+                "temperature",
+                "occupancy",
+                "lightstatus"
+            ],
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify",
+            "throttling": 5
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "temperature",
+                    "timestamp"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "georel": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "ConferenceRoom",
+                    "idPattern": "",
+                    "type": "Room"
+                },
+                {
+                    "id": "OfficeRoom",
+                    "idPattern": "",
+                    "type": "Room"
+                }
+            ]
+        }
+    },
+    {
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [
+                "speed",
+                "location"
+            ],
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify"
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "speed"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "georel": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "MyCar",
+                    "idPattern": "",
+                    "type": "Car"
+                },
+                {
+                    "id": "OtherCar",
+                    "idPattern": "",
+                    "type": "Room"
+                }
+            ]
+        }
+    }
+]
+
+
+04. GET /v2/subscriptions for inexistent servicepath
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+X-Total-Count: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

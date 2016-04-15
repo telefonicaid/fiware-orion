@@ -55,17 +55,17 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
   std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if (entity.id != "")
   {
-    out += entity.render(ciP->outFormat, indent + "  ");
+    out += entity.render(indent + "  ");
   }
 
-  out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
+  out += attributeDomainName.render(indent + "  ", true);
   out += contextAttributeVector.render(ciP, requestType, indent + "  ");
-  out += domainMetadataVector.render(ciP->outFormat, indent + "  ");
-  out += endTag(indent, tag, ciP->outFormat);
+  out += domainMetadataVector.render(indent + "  ");
+  out += endTag(indent);
 
   return out;
 }
@@ -79,7 +79,7 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
 * FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
 *           in its place:
 -
-*   else if ((res = attributeDomainName.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
+*   else if ((res = attributeDomainName.check(AppendContextElement, indent, predetectedError, counter)) != "OK")
 *   {
 *     response.errorCode.fill(SccBadRequest, res):
 *   }
@@ -96,17 +96,16 @@ std::string AppendContextElementRequest::check
 {
   AppendContextElementResponse  response;
   std::string                   res;
-  Format                        fmt = ciP->outFormat;
 
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(ciP, AppendContextElement, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  else if ((res = domainMetadataVector.check(ciP, AppendContextElement, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }

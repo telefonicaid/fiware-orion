@@ -39,6 +39,8 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsiNotify/Notifier.h"
+#include "alarmMgr/alarmMgr.h"
+#include "logSummary/logSummary.h"
 
 #include "unittest.h"
 
@@ -67,8 +69,8 @@ unsigned int  cprForwardLimit       = 1000;
 bool          noCache               = false;
 char          fwdHost[64];
 char          notificationMode[64];
-unsigned int  connectionMemory      = 64;
-
+bool          simulatedNotification;
+int           lsPeriod             = 0;
 
 
 /* ****************************************************************************
@@ -110,7 +112,9 @@ int main(int argC, char** argV)
     paParse(paArgs, 1, argV, 1, false);
 
   LM_M(("Init tests"));
-  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false);
+  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
+  alarmMgr.init(false);
+  logSummaryInit(&lsPeriod);
   setupDatabase();
 
   LM_M(("Run all tests"));

@@ -32,12 +32,13 @@ brokerStart CB
 #
 # 01. POST /v2/entities to create E1/T1/A1=0
 # 02. PATCH /v2/entities/E1 (A2 unknown)
-
+# 03. GET /v2/entities/E1
+#
 
 echo "01. POST /v2/entities to create E1/T1/A1=0"
 echo "=========================================="
 payload='{ "id": "E1", "type": "T1", "A1": 0 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -45,16 +46,25 @@ echo
 echo "02. PATCH /v2/entities/E1 (A2 unknown)"
 echo "======================================"
 payload='{ "A2": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH 
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
+
+
+echo "03. GET /v2/entities/E1"
+echo "======================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
 
 --REGEXPECT--
 01. POST /v2/entities to create E1/T1/A1=0
 ==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -64,11 +74,31 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "No context element found",
     "error": "NotFound"
+}
+
+
+03. GET /v2/entities/E1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 0
+    },
+    "id": "E1",
+    "type": "T1"
 }
 
 

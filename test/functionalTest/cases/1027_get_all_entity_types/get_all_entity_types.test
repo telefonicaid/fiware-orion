@@ -127,16 +127,18 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{}
+[]
 
 
 02. Create E1/T1/A1+A2
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -144,30 +146,37 @@ Date: REGEX(.*)
 03. GET /v2/types and get a non-empty list
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 71
+Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "T1": {
+[
+    {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T1"
     }
-}
+]
 
 
 04. Create E2/T2/A1+A3
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E2
+Location: /v2/entities/E2?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -176,7 +185,8 @@ Date: REGEX(.*)
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E3
+Location: /v2/entities/E3?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -184,52 +194,69 @@ Date: REGEX(.*)
 06. GET /v2/types and get a list of three types, each with one entity and two attributes
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 212
+Content-Length: 251
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "T1": {
+[
+    {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T1"
     },
-    "T2": {
+    {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A3": {
-                "type": "Bool"
+                "types": [
+                    "Bool"
+                ]
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T2"
     },
-    "T3": {
+    {
         "attrs": {
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             },
             "A4": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T3"
     }
-}
+]
 
 
 07. Create E4/T3/A4+A3
 ======================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E4
+Location: /v2/entities/E4?type=T3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -237,49 +264,67 @@ Date: REGEX(.*)
 08. GET /v2/types and get a list of three types, T3 now has three attributes and two entities
 =============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 233
+Content-Length: 275
 Content-Type: application/json
-X-Total-Count: 4
+X-Total-Count: 3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-{
-    "T1": {
+[
+    {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T1"
     },
-    "T2": {
+    {
         "attrs": {
             "A1": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             },
             "A3": {
-                "type": "Bool"
+                "types": [
+                    "Bool"
+                ]
             }
         },
-        "count": 1
+        "count": 1,
+        "type": "T2"
     },
-    "T3": {
+    {
         "attrs": {
             "A2": {
-                "type": "Int"
+                "types": [
+                    "Int"
+                ]
             },
             "A3": {
-                "type": "Bool"
+                "types": [
+                    "Bool"
+                ]
             },
             "A4": {
-                "type": "String"
+                "types": [
+                    "String"
+                ]
             }
         },
-        "count": 2
+        "count": 2,
+        "type": "T3"
     }
-}
+]
 
 
 --TEARDOWN--

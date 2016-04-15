@@ -32,263 +32,19 @@ brokerStart CB 0-255
 #
 # Forbidden chars: < > " ' = ; ( )
 #
-# 01. XML:  Intent to register an entity with '<' as part of entity::id
-# 02. XML:  Intent to discover an entity with '>' as part of entity::type
-# 03. XML:  Intent to register an entity with '=' as part of providingApplication
-# 04. XML:  Intent to ngsi9-subscribe to an entity with "'" as part of an attribute::name
-# 05. XML:  Intent to query an entity with  ';' as part of a scopeType
-# 06. XML:  Intent to update an entity with '(' as part of contextAttribute::type
-# 07. XML:  Intent to update an entity with '(' as part of a value in compound contextAttribute::value
-# 08. XML:  Intent to subscribe to an entity with ')' as part of reference
-# 11. JSON: Intent to register an entity with '<' as part of entity::id
-# 12. JSON: Intent to discover an entity with '>' as part of entity::type
-# 13. JSON: Intent to register an entity with '=' as part of providingApplication
-# 14. JSON: Intent to ngsi9-subscribe to an entity with "'" as part of an attribute::name
-# 15. JSON: Intent to query an entity with  ';' as part of a scopeType
-# 16. JSON: Intent to update an entity with '(' as part of contextAttribute::type
-# 17. JSON: Intent to update an entity with '(' as part of a value in compound contextAttribute::value
-# 18: JSON: Intent to subscribe to an entity with ')' as part of reference
+# 01. Intent to register an entity with '<' as part of entity::id
+# 02. Intent to discover an entity with '>' as part of entity::type
+# 03. Intent to register an entity with '=' as part of providingApplication
+# 04. Intent to ngsi9-subscribe to an entity with "'" as part of an attribute::name
+# 05. Intent to query an entity with  ';' as part of a scopeType
+# 06. Intent to update an entity with '(' as part of contextAttribute::type
+# 07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
+# 08: Intent to subscribe to an entity with ')' as part of reference
 #
 
 
-echo "01. XML:  Intent to register an entity with '<' as part of entity::id"
-echo "====================================================================="
-#INVALID_XML
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<registerContextRequest>
-  <contextRegistrationList>
-    <contextRegistration>
-      <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>Conference<Room</id>
-        </entityId>
-      </entityIdList>
-      <contextRegistrationAttributeList>
-        <contextRegistrationAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <isDomain>false</isDomain>
-        </contextRegistrationAttribute>
-      </contextRegistrationAttributeList>
-    </contextRegistration>
-  </contextRegistrationList>
-  <duration>PT1H</duration>
-</registerContextRequest>'
-orionCurl --url /v1/registry/registerContext --payload "${payload}"
-echo
-echo
-
-
-echo "02. XML:  Intent to discover an entity with '>' as part of entity::type"
-echo "======================================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<discoverContextAvailabilityRequest>
-  <entityIdList>
-    <entityId type="Ro>om" isPattern="false">
-      <id>ConferenceRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-    <attribute>pressure</attribute>
-  </attributeList>
-</discoverContextAvailabilityRequest>'
-orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}"
-echo
-echo
-
-
-echo "03. XML:  Intent to register an entity with '=' as part of providingApplication"
-echo "==============================================================================="
-#INVALID_XML
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<registerContextRequest>
-  <contextRegistrationList>
-    <contextRegistration>
-      <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>Conference<Room</id>
-        </entityId>
-      </entityIdList>
-      <contextRegistrationAttributeList>
-        <contextRegistrationAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <isDomain>false</isDomain>
-        </contextRegistrationAttribute>
-      </contextRegistrationAttributeList>
-    </contextRegistration>
-  </contextRegistrationList>
-  <duration>PT1H</duration>
-  <providingApplication>pa=http://a.b.c/d</providingApplication>
-</registerContextRequest>'
-orionCurl --url /v1/registry/registerContext --payload "${payload}"
-echo
-echo
-
-
-echo "04. XML:  Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name"
-echo "====================================================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<subscribeContextAvailabilityRequest>
-  <entityIdList>
-    <entityId type="Room">
-      <id>ConferenceRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temper'"'"'ature</attribute>
-  </attributeList>
-  <reference>http://10.1.1.1:80/test/interfaceNotification</reference>
-  <duration>PT1M</duration>
-</subscribeContextAvailabilityRequest>'
-orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload"
-echo
-echo
-
-
-echo "05. XML:  Intent to query an entity with  ';' as part of a scopeType"
-echo "===================================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>ConferenceRoom</id>   
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-    <attribute>occupancy</attribute>
-    <attribute>lightstatus</attribute>
-  </attributeList>
-  <restriction>
-    <attributeExpression>Attribute Expression</attributeExpression>
-    <scope>
-      <operationScope>
-        <scopeType>st1;st2</scopeType>
-        <scopeValue>sv1</scopeValue>
-      </operationScope>
-      <operationScope>
-        <scopeType>st2</scopeType>
-        <scopeValue>sv2</scopeValue>
-      </operationScope>
-    </scope>
-  </restriction>
-</queryContextRequest>'
-orionCurl --url /v1/queryContext --payload "$payload"
-echo
-echo
-
-
-echo "06. XML:  Intent to update an entity with '(' as part of contextAttribute::type"
-echo "==============================================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Room" isPattern="false">
-        <id>ConferenceRoom</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>de(gree</type>
-          <contextValue>c23</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
-
-
-echo "07. XML:  Intent to update an entity with '(' as part of a value in compound contextAttribute::value"
-echo "===================================================================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Room" isPattern="false">
-        <id>ConferenceRoom</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue>NADA</contextValue>
-        </contextAttribute>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue>
-            <level1>
-              <value>1(1</value>
-              <level2>
-                <value>2</value>
-              </level2>
-            </level1>
-          </contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
-
-
-echo "08. XML:  Intent to subscribe to an entity with ')' as part of reference"
-echo "==============================================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>ConferenceRoom</id>   
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-    <attribute>lightstatus</attribute>
-  </attributeList>
-  <reference>http://127.0.0.1:1028)</reference>
-  <duration>P5Y</duration>
-  <restriction>
-    <attributeExpression>testRestriction</attributeExpression>
-    <scope>
-      <operationScope>
-        <scopeType>scope1</scopeType>
-        <scopeValue>sval1</scopeValue>
-      </operationScope>
-      <operationScope>
-        <scopeType>scope2</scopeType>
-        <scopeValue>sval2</scopeValue>
-      </operationScope>
-    </scope>
-  </restriction>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>temperature</condValue>
-        <condValue>lightstatus</condValue>
-      </condValueList>
-      <restriction>restriction</restriction>
-    </notifyCondition>
-  </notifyConditions>
-  <throttling>PT1S</throttling>
-</subscribeContextRequest>'
-orionCurl --url /v1/subscribeContext --payload "$payload"
-echo
-echo
-
-
-echo "11. JSON: Intent to register an entity with '<' as part of entity::id"
-echo "====================================================================="
+echo "01. Intent to register an entity with '<' as part of entity::id"
+echo "==============================================================="
 payload='{
   "contextRegistrations": [
   {
@@ -316,8 +72,8 @@ echo
 echo
 
 
-echo "12. JSON: Intent to discover an entity with '>' as part of entity::type"
-echo "======================================================================="
+echo "02. Intent to discover an entity with '>' as part of entity::type"
+echo "================================================================="
 payload='{
   "entities": [
     {
@@ -332,8 +88,8 @@ echo
 echo
 
 
-echo "13. JSON: Intent to register an entity with '=' as part of providingApplication"
-echo "==============================================================================="
+echo "03. Intent to register an entity with '=' as part of providingApplication"
+echo "========================================================================="
 payload='{
   "contextRegistrations": [
   {
@@ -361,9 +117,8 @@ echo
 echo
 
 
-
-echo "14. JSON: Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name"
-echo "======================================================================================="
+echo "04. Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name"
+echo "==============================================================================="
 payload='{
   "entities": [
     {
@@ -382,8 +137,9 @@ orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload" -
 echo
 echo
 
-echo "15. JSON: Intent to query an entity with  ';' as part of a scopeType"
-echo "===================================================================="
+
+echo "05. Intent to query an entity with  ';' as part of a scopeType"
+echo "=============================================================="
 payload='{
   "entities": [
     {
@@ -419,8 +175,8 @@ echo
 echo
 
 
-echo "16. JSON: Intent to update an entity with '(' as part of contextAttribute::type"
-echo "==============================================================================="
+echo "06. Intent to update an entity with '(' as part of contextAttribute::type"
+echo "========================================================================="
 payload='{
   "contextElements": [
     {
@@ -443,8 +199,8 @@ echo
 echo
 
 
-echo "17. JSON: Intent to update an entity with '(' as part of a value in compound contextAttribute::value"
-echo "===================================================================================================="
+echo "07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value"
+echo "=============================================================================================="
 payload='{
   "contextElements": [
     {
@@ -472,8 +228,8 @@ echo
 echo
 
 
-echo "18: JSON: Intent to subscribe to an entity with ')' as part of reference"
-echo "========================================================================"
+echo "08: Intent to subscribe to an entity with ')' as part of reference"
+echo "=================================================================="
 payload='{
   "entities": [
     {
@@ -495,146 +251,12 @@ echo
 
 
 --REGEXPECT--
-01. XML:  Intent to register an entity with '<' as part of entity::id
-=====================================================================
-HTTP/1.1 200 OK
-Content-Length: 126
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>XML Parse Error</details>
-</orionError>
-
-
-02. XML:  Intent to discover an entity with '>' as part of entity::type
-=======================================================================
-HTTP/1.1 200 OK
-Content-Length: 227
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Illegal value for XML attribute</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>
-
-
-03. XML:  Intent to register an entity with '=' as part of providingApplication
-===============================================================================
-HTTP/1.1 200 OK
-Content-Length: 126
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>XML Parse Error</details>
-</orionError>
-
-
-04. XML:  Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name
-=====================================================================================
-HTTP/1.1 200 OK
-Content-Length: 289
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<subscribeContextAvailabilityResponse>
-  <subscriptionId>000000000000000000000000</subscriptionId>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Illegal value for XML attribute</details>
-  </errorCode>
-</subscribeContextAvailabilityResponse>
-
-
-05. XML:  Intent to query an entity with  ';' as part of a scopeType
-====================================================================
-HTTP/1.1 200 OK
-Content-Length: 197
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Illegal value for XML attribute</details>
-  </errorCode>
-</queryContextResponse>
-
-
-06. XML:  Intent to update an entity with '(' as part of contextAttribute::type
-===============================================================================
-HTTP/1.1 200 OK
-Content-Length: 199
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Illegal value for XML attribute</details>
-  </errorCode>
-</updateContextResponse>
-
-
-07. XML:  Intent to update an entity with '(' as part of a value in compound contextAttribute::value
-====================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 199
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Illegal value for XML attribute</details>
-  </errorCode>
-</updateContextResponse>
-
-
-08. XML:  Intent to subscribe to an entity with ')' as part of reference
-===============================================================================
-HTTP/1.1 200 OK
-Content-Length: 254
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>Illegal value for XML attribute</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>
-
-
-11. JSON: Intent to register an entity with '<' as part of entity::id
-=====================================================================
+01. Intent to register an entity with '<' as part of entity::id
+===============================================================
 HTTP/1.1 200 OK
 Content-Length: 178
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -647,11 +269,12 @@ Date: REGEX(.*)
 }
 
 
-12. JSON: Intent to discover an entity with '>' as part of entity::type
-=======================================================================
+02. Intent to discover an entity with '>' as part of entity::type
+=================================================================
 HTTP/1.1 200 OK
 Content-Length: 129
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -663,11 +286,12 @@ Date: REGEX(.*)
 }
 
 
-13. JSON: Intent to register an entity with '=' as part of providingApplication
-===============================================================================
+03. Intent to register an entity with '=' as part of providingApplication
+=========================================================================
 HTTP/1.1 200 OK
 Content-Length: 178
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -680,11 +304,12 @@ Date: REGEX(.*)
 }
 
 
-14. JSON: Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name
-=======================================================================================
+04. Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name
+===============================================================================
 HTTP/1.1 200 OK
 Content-Length: 178
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -697,11 +322,12 @@ Date: REGEX(.*)
 }
 
 
-15. JSON: Intent to query an entity with  ';' as part of a scopeType
-====================================================================
+05. Intent to query an entity with  ';' as part of a scopeType
+==============================================================
 HTTP/1.1 200 OK
 Content-Length: 129
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -713,11 +339,12 @@ Date: REGEX(.*)
 }
 
 
-16. JSON: Intent to update an entity with '(' as part of contextAttribute::type
-===============================================================================
+06. Intent to update an entity with '(' as part of contextAttribute::type
+=========================================================================
 HTTP/1.1 200 OK
 Content-Length: 129
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -729,11 +356,12 @@ Date: REGEX(.*)
 }
 
 
-17. JSON: Intent to update an entity with '(' as part of a value in compound contextAttribute::value
-====================================================================================================
+07. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
+==============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 129
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -745,11 +373,12 @@ Date: REGEX(.*)
 }
 
 
-18: JSON: Intent to subscribe to an entity with ')' as part of reference
-========================================================================
+08: Intent to subscribe to an entity with ')' as part of reference
+==================================================================
 HTTP/1.1 200 OK
 Content-Length: 166
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

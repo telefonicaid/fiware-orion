@@ -109,8 +109,7 @@ echo
 
 echo "09. GET /v2/entities/E1 with ALL illegal char in URI param 'q' - ok"
 echo "==================================================================="
-#orionCurl --url "/v2/entities/E2?q=a<>=>()\'\""  --json
-orionCurl --url '/v2/entities/E2?q=a<>\"()=;'\'  --json
+orionCurl --url '/v2/entities/E2?q=a==<>\"()=;'\'  --json
 echo
 echo
 
@@ -121,6 +120,7 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -134,6 +134,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -147,6 +148,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -160,6 +162,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -173,6 +176,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -186,6 +190,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -199,6 +204,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -212,6 +218,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -225,6 +232,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

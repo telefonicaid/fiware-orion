@@ -24,13 +24,11 @@
 */
 #include "rapidjson/document.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseAttributeValue.h"
-#include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
 
 using namespace rapidjson;
@@ -43,94 +41,36 @@ using namespace rapidjson;
 */
 std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 {
-  Document   document;
-  OrionError oe;
+  Document    document;
+  OrionError  oe;
 
   document.Parse(ciP->payload);
 
   if (document.HasParseError())
   {
-    LM_W(("Bad Input (JSON parse error)"));
-    oe.fill(SccBadRequest, "Errors found in incoming JSON buffer");
+    alarmMgr.badInput(clientIp, "JSON parse error");
+    oe.reasonPhrase = ERROR_STRING_PARSERROR;
+    oe.details      = "Errors found in incoming JSON buffer";
     ciP->httpStatusCode = SccBadRequest;;
     return oe.render(ciP, "");
   }
 
 
-  if (!document.IsObject())
+  if (!document.IsObject() && !document.IsArray())
   {
-    LM_E(("Bad Input (JSON Parse Error)"));
-    oe.fill(SccBadRequest, "Error parsing incoming JSON buffer");
+    alarmMgr.badInput(clientIp, "JSON parse error");
+    oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value");
     ciP->httpStatusCode = SccBadRequest;;
+
     return oe.render(ciP, "");
   }
 
+  caP->valueType  = (document.IsObject())? orion::ValueTypeObject : orion::ValueTypeVector;
+  parseContextAttributeCompoundValueStandAlone(document, caP, caP->valueType);
 
-  if (!document.HasMember("value"))
+  if (!caP->typeGiven)
   {
-    LM_W(("Bad Input (No attribute value specified"));
-    oe.fill(SccBadRequest, "no attribute value specified");
-    ciP->httpStatusCode = SccBadRequest;;
-    return oe.render(ciP, "");
-  }
-
-
-  for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
-  {
-    std::string name   = iter->name.GetString();
-    std::string type   = jsonParseTypeNames[iter->value.GetType()];
-
-    if (name != "value")
-    {
-      LM_W(("Bad Input (unexpected JSON field - accepting only 'value'"));
-      oe.fill(SccBadRequest, "unexpected JSON field - accepting only /value/");
-      ciP->httpStatusCode = SccBadRequest;;
-      return oe.render(ciP, "");
-    }
-
-
-    if (type == "String")
-    {
-      caP->valueType   = orion::ValueTypeString;
-      caP->stringValue = iter->value.GetString();
-    }
-    else if (type == "Number")
-    {
-      caP->numberValue  = iter->value.GetDouble();
-      caP->valueType    = orion::ValueTypeNumber;
-    }
-    else if (type == "True")
-    {
-      caP->boolValue    = true;
-      caP->valueType    = orion::ValueTypeBoolean;
-    }
-    else if (type == "False")
-    {
-      caP->boolValue    = false;
-      caP->valueType    = orion::ValueTypeBoolean;
-    }
-    else if (type == "Array")
-    {
-      caP->valueType    = orion::ValueTypeVector;
-
-      std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
-      if (r != "OK")
-      {
-        LM_W(("Bad Input (json error in ContextAttributeObject::Vector"));
-        return "json error in ContextAttributeObject::Vector";
-      }
-    }
-    else if (type == "Object")
-    {
-      caP->valueType    = orion::ValueTypeObject;
-
-      std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
-      if (r != "OK")
-      {
-        LM_W(("Bad Input (json error in ContextAttributeObject::Object"));
-        return "json error in ContextAttributeObject::Object";
-      }
-    }
+    caP->type = DEFAULT_TYPE;
   }
 
   return "OK";

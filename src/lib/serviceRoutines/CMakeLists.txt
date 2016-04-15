@@ -67,7 +67,8 @@ badVerbGetPostDeleteOnly.cpp
 badVerbGetOnly.cpp
 badVerbGetDeleteOnly.cpp
 badVerbPutDeleteOnly.cpp
-badVerbGetPutDeleteOnly
+badVerbGetPutDeleteOnly.cpp
+badVerbPutOnly.cpp
 badNgsi9Request.cpp
 badNgsi10Request.cpp
 badRequest.cpp
@@ -141,6 +142,8 @@ badVerbGetPostDeleteOnly.h
 badVerbGetOnly.h
 badVerbGetDeleteOnly.h
 badVerbPutDeleteOnly.h
+badVerbGetPutDeleteOnly.h
+badVerbPutOnly.h
 badNgsi9Request.h
 badNgsi10Request.h
 badRequest.h

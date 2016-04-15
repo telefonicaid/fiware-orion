@@ -41,32 +41,34 @@ brokerStart CB
 
 echo "01. Register an entity with type Room and id Room"
 echo "================================================="
-payload='<?xml version="1.0"?>
-<registerContextRequest>
-  <contextRegistrationList>
-    <contextRegistration>
-      <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>Room</id>
-        </entityId>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-      </entityIdList>
-      <contextRegistrationAttributeList>
-        <contextRegistrationAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <isDomain>false</isDomain>
-        </contextRegistrationAttribute>
-      </contextRegistrationAttributeList>
-      <providingApplication>http://localhost:1028/application</providingApplication>
-    </contextRegistration>
-  </contextRegistrationList>
-  <duration>PT1H</duration>
-  <registrationId></registrationId>
-</registerContextRequest>'
-orionCurl --url /v1/registry/registerContext --payload "$payload"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "Room"
+        },
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "OfficeRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:1028/application"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
 echo
 echo
 
@@ -116,15 +118,15 @@ echo
 01. Register an entity with type Room and id Room
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/xml
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
 
 
 02. Discover with convop GET /v1/registry/contextEntities/Room
@@ -132,6 +134,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 474
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -164,6 +167,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 474
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -196,6 +200,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 595
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -233,6 +238,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 595
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -270,6 +276,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 474
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -302,6 +309,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 474
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

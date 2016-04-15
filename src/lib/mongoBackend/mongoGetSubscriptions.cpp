@@ -22,18 +22,22 @@
 *
 * Author: Orion dev team
 */
+#include <string>
 
-#include "common/sem.h"
+#include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/sem.h"
+#include "common/statistics.h"
+#include "common/idCheck.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
-
-#include "mongo/client/dbclient.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
+#include "cache/subCache.h"
 
 using namespace ngsiv2;
 
@@ -45,8 +49,20 @@ using namespace ngsiv2;
 */
 static void setSubscriptionId(Subscription* s, const BSONObj& r)
 {
-  s->id = getField(r, "_id").OID().toString();
+  s->id = getFieldF(r, "_id").OID().toString();
 }
+
+
+
+/* ****************************************************************************
+*
+* setDescription -
+*/
+static void setDescription(Subscription* s, const BSONObj& r)
+{
+  s->description = r.hasField(CSUB_DESCRIPTION) ? getStringFieldF(r, CSUB_DESCRIPTION) : "";
+}
+
 
 
 /* ****************************************************************************
@@ -56,13 +72,13 @@ static void setSubscriptionId(Subscription* s, const BSONObj& r)
 static void setSubject(Subscription* s, const BSONObj& r)
 {
   // Entities
-  std::vector<BSONElement> ents = getField(r, CSUB_ENTITIES).Array();
+  std::vector<BSONElement> ents = getFieldF(r, CSUB_ENTITIES).Array();
   for (unsigned int ix = 0; ix < ents.size(); ++ix)
   {
     BSONObj ent           = ents[ix].embeddedObject();
-    std::string id        = getStringField(ent, CSUB_ENTITY_ID);
-    std::string type      = ent.hasField(CSUB_ENTITY_TYPE) ? getStringField(ent, CSUB_ENTITY_TYPE) : "";
-    std::string isPattern = getStringField(ent, CSUB_ENTITY_ISPATTERN);
+    std::string id        = getStringFieldF(ent, CSUB_ENTITY_ID);
+    std::string type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
+    std::string isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
 
     EntID en;
     if (isFalse(isPattern))
@@ -79,14 +95,14 @@ static void setSubject(Subscription* s, const BSONObj& r)
   }
 
   // Condition
-  std::vector<BSONElement> conds = getField(r, CSUB_CONDITIONS).Array();
+  std::vector<BSONElement> conds = getFieldF(r, CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < conds.size(); ++ix)
   {
     BSONObj cond = conds[ix].embeddedObject();
     // The ONCHANGE check is needed, as a subscription could mix different conditions types in DB
-    if (std::string(getStringField(cond, CSUB_CONDITIONS_TYPE)) == "ONCHANGE")
+    if (std::string(getStringFieldF(cond, CSUB_CONDITIONS_TYPE)) == ON_CHANGE_CONDITION)
     {
-      std::vector<BSONElement> condValues = getField(cond, CSUB_CONDITIONS_VALUE).Array();
+      std::vector<BSONElement> condValues = getFieldF(cond, CSUB_CONDITIONS_VALUE).Array();
       for (unsigned int jx = 0; jx < condValues.size(); ++jx)
       {
         std::string attr = condValues[jx].String();
@@ -94,11 +110,19 @@ static void setSubject(Subscription* s, const BSONObj& r)
       }
     }
   }
+  if (r.hasField(CSUB_EXPR)) {
+    mongo::BSONObj expression = getFieldF(r, CSUB_EXPR).Obj();
+    std::string    q          = getFieldF(expression, CSUB_EXPR_Q).String();
+    std::string    geo        = getFieldF(expression, CSUB_EXPR_GEOM).String();
+    std::string    coords     = getFieldF(expression, CSUB_EXPR_COORDS).String();
+    std::string    georel     = getFieldF(expression, CSUB_EXPR_GEOREL).String();
 
-  // Note that current DB model is based on NGSIv1 and doesn't consider expressions. Thus
-  // subject.condition.expression cannot be filled. The implemetion will be enhanced once
-  // the DB model gets defined
-  // TBD
+    s->subject.condition.expression.q = q;
+    s->subject.condition.expression.geometry = geo;
+    s->subject.condition.expression.coords = coords;
+    s->subject.condition.expression.georel = georel;
+  }
+
 }
 
 
@@ -106,43 +130,74 @@ static void setSubject(Subscription* s, const BSONObj& r)
 *
 * setNotification -
 */
-static void setNotification(Subscription* s, const BSONObj& r)
+static void setNotification(Subscription* s, const BSONObj& r, const std::string& tenant)
 {
   // Attributes
-  std::vector<BSONElement> attrs = getField(r, CSUB_ATTRS).Array();
+  std::vector<BSONElement> attrs = getFieldF(r, CSUB_ATTRS).Array();
   for (unsigned int ix = 0; ix < attrs.size(); ++ix)
   {
     std::string attr = attrs[ix].String();
+
     s->notification.attributes.push_back(attr);
   }
 
-  // Callback
-  s->notification.callback = getStringField(r, CSUB_REFERENCE);
+  s->notification.callback         = getStringFieldF(r, CSUB_REFERENCE);
+  s->notification.throttling       = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
+  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
+  s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
 
-  // Throttling
-  s->notification.throttling = r.hasField(CSUB_THROTTLING)? getField(r, CSUB_THROTTLING).numberLong() : -1;
+  //
+  // Check values from subscription cache, update object from cache-values if necessary
+  //
+  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), s->id.c_str());
+  if (cSubP)
+  {
+    if (cSubP->lastNotificationTime > s->notification.lastNotification)
+    {
+      s->notification.lastNotification = cSubP->lastNotificationTime;
+    }
 
-  // Last Notification
-  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION) ? getField(r, CSUB_LASTNOTIFICATION).numberLong() : -1;
+    if (cSubP->count != 0)
+    {
+      //
+      // First, compensate for -1 in 'timesSent'
+      //
+      if (s->notification.timesSent == -1)
+      {
+        s->notification.timesSent = 0;
+      }
 
-  // Count
-  s->notification.timesSent = r.hasField(CSUB_COUNT) ? getField(r, CSUB_COUNT).numberLong() : -1;
+      s->notification.timesSent += cSubP->count;
+    }
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* setExpires -
+* setStatus -
 */
-static void setExpires(Subscription* s, const BSONObj& r)
+static void setStatus(Subscription* s, const BSONObj& r)
 {
-  // Last Notification
-  s->expires = r.hasField(CSUB_EXPIRATION) ? getField(r, CSUB_EXPIRATION).numberLong() : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : -1;
 
+  //
   // Status
-  // FIXME P10: use a enum for this
-  s->status = s->expires > getCurrentTime() ? "active" : "expired";
+  // FIXME P10: use an enum for active/inactive/expired
+  //
+  // NOTE:
+  //   if the field CSUB_EXPIRATION is not present in the subscription, then the default
+  //   value of "-1 == never expires" is used.
+  //
+  if ((s->expires > getCurrentTime()) || (s->expires == -1))
+  {
+    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
+  }
+  else
+  {
+    s->status = "expired";
+  }
 }
 
 
@@ -157,6 +212,7 @@ void mongoListSubscriptions
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
+  const std::string&                   servicePath,
   int                                  limit,
   int                                  offset,
   long long*                           count
@@ -174,45 +230,61 @@ void mongoListSubscriptions
   std::auto_ptr<DBClientCursor>  cursor;
   std::string                    err;
   std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
-  Query                          q     = Query(BSON(conds << "ONCHANGE"));
+  Query                          q;
+
+  if (!servicePath.empty() && servicePath != "/#")
+  {
+    q = Query(BSON(CSUB_SERVICE_PATH << servicePath << conds << ON_CHANGE_CONDITION));
+  }
+  else
+  {
+    q = Query(BSON(conds << ON_CHANGE_CONDITION));
+  }
 
   q.sort(BSON("_id" << 1));
 
-  if (!collectionRangedQuery(getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, count, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionRangedQuery(connection, getSubscribeContextCollectionName(tenant), q, limit, offset, &cursor, count, &err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  while (cursor->more())
+  unsigned int docs = 0;
+  while (moreSafe(cursor))
   {
-    BSONObj r;
-    try
+    BSONObj r;    
+
+    if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       continue;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    Subscription s;
+    Subscription  s;
+
     setSubscriptionId(&s, r);
     setSubject(&s, r);
-    setNotification(&s, r);
-    setExpires(&s, r);
+    setStatus(&s, r);
+    setNotification(&s, r, tenant);
+
     subs->push_back(s);
   }
+  releaseMongoConnection(connection);
 
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
   *oe = OrionError(SccOk);
   return;
 }
+
 
 
 /* ****************************************************************************
@@ -228,48 +300,60 @@ void mongoGetSubscription
   const std::string&                  tenant
 )
 {
-  bool  reqSemTaken = false;
+  bool         reqSemTaken = false;
+  std::string  err;
+  OID          oid;
+  StatusCode   sc;
+
+  if (safeGetSubId(idSub, &oid, &sc) == false)
+  {
+    *oe = OrionError(sc);
+    return;
+  }
 
   reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Get Subscription"));
 
   std::auto_ptr<DBClientCursor>  cursor;
-  std::string                    err;
-  BSONObj                        q     = BSON("_id" << OID(idSub));
+  BSONObj                        q     = BSON("_id" << oid);
 
-  if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);
     return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
-  if (cursor->more())
+  unsigned int n = 0;
+  if (moreSafe(cursor))
   {
-    BSONObj r;
-    try
+    BSONObj r;    
+    if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      releaseMongoConnection(connection);
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), q.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
-      *oe = OrionError(SccReceiverInternalError, std::string("Assertion exception in nextSafe(): ") + e.what());
+      *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", n, r.toString().c_str()));
 
     setSubscriptionId(sub, r);
+    setDescription(sub, r);
     setSubject(sub, r);
-    setNotification(sub, r);
-    setExpires(sub, r);
+    setNotification(sub, r, tenant);
+    setStatus(sub, r);
 
-    if (cursor->more())
+    if (moreSafe(cursor))
     {
+      releaseMongoConnection(connection);
       // Ooops, we expect only one
       LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
@@ -279,11 +363,13 @@ void mongoGetSubscription
   }
   else
   {
+    releaseMongoConnection(connection);
     LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccSubscriptionIdNotFound);
     return;
   }
+  releaseMongoConnection(connection);
 
   reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
   *oe = OrionError(SccOk);

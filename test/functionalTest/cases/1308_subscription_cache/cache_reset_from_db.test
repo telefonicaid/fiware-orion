@@ -25,8 +25,8 @@ Possible Bug in Subscription Cache when reloading from database
 
 --SHELL-INIT--
 dbInit CB
-dbInit ftest-t1
-dbInit ftest-t2
+dbInit CB t1
+dbInit CB t2
 brokerStart CB 0-255 IPv4 -multiservice -subCacheIval 5
 accumulatorStart localhost $LISTENER_PORT
 accumulatorStart localhost $LISTENER2_PORT
@@ -129,7 +129,7 @@ payload='{
   "id": "s01",
   "A": 4
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -140,7 +140,7 @@ payload='{
   "id": "s11",
   "A": 5
 }'
-orionCurl --url /v2/entities --payload "$payload" --json --tenant t1
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json --tenant t1
 echo
 echo
 
@@ -151,7 +151,7 @@ payload='{
   "id": "s21",
   "A": 6
 }'
-orionCurl --url /v2/entities --payload "$payload" --json --tenant t2
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json --tenant t2
 echo
 echo
 
@@ -189,7 +189,7 @@ echo "==========================="
 payload='{
   "A": 11
 }'
-orionCurl --url /v2/entities/s01 --payload "$payload" --json
+orionCurl --url '/v2/entities/s01?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -199,7 +199,7 @@ echo "=============================="
 payload='{
   "A": 12
 }'
-orionCurl --url /v2/entities/s11 --payload "$payload" --json --tenant t1
+orionCurl --url '/v2/entities/s11?options=keyValues' --payload "$payload" --json --tenant t1
 echo
 echo
 
@@ -209,7 +209,7 @@ echo "=============================="
 payload='{
   "A": 13
 }'
-orionCurl --url /v2/entities/s21 --payload "$payload" --json --tenant t2
+orionCurl --url '/v2/entities/s21?options=keyValues' --payload "$payload" --json --tenant t2
 echo
 echo
 
@@ -241,6 +241,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -256,6 +257,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -271,6 +273,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -285,7 +288,8 @@ Date: REGEX(.*)
 ===========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/s01
+Location: /v2/entities/s01?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -294,7 +298,8 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/s11
+Location: /v2/entities/s11?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -303,7 +308,8 @@ Date: REGEX(.*)
 ==============================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/s21
+Location: /v2/entities/s21?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -311,11 +317,12 @@ Date: REGEX(.*)
 07. Dump accumulator1 - see s01/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -323,14 +330,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s01",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 4.000000
+            "type" : "none",
+            "value" : 4
           }
         ]
       },
@@ -347,12 +354,13 @@ Content-Type: application/json; charset=utf-8
 08. Dump accumulator2 - see s11/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t1
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -360,14 +368,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s11",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 5.000000
+            "type" : "none",
+            "value" : 5
           }
         ]
       },
@@ -384,12 +392,13 @@ Content-Type: application/json; charset=utf-8
 09. Dump accumulator3 - see s21/A
 =================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t2
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -397,14 +406,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s21",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 6.000000
+            "type" : "none",
+            "value" : 6
           }
         ]
       },
@@ -424,27 +433,27 @@ Content-Type: application/json; charset=utf-8
 
 11. Update s01/A w/o tenant
 ===========================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s01
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
 12. Update s11/A for tenant t1
 ==============================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s11
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
 13. Update s21/A for tenant t2
 ==============================
-HTTP/1.1 201 Created
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/s21
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -452,11 +461,12 @@ Date: REGEX(.*)
 14. Dump accumulator1 - see s01/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -464,14 +474,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s01",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 4.000000
+            "type" : "none",
+            "value" : 4
           }
         ]
       },
@@ -484,11 +494,12 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -496,14 +507,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s01",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 11.000000
+            "type" : "none",
+            "value" : 11
           }
         ]
       },
@@ -520,12 +531,13 @@ Content-Type: application/json; charset=utf-8
 15. Dump accumulator2 - see s11/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t1
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -533,14 +545,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s11",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 5.000000
+            "type" : "none",
+            "value" : 5
           }
         ]
       },
@@ -553,12 +565,13 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t1
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -566,14 +579,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s11",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 12.000000
+            "type" : "none",
+            "value" : 12
           }
         ]
       },
@@ -590,12 +603,13 @@ Content-Type: application/json; charset=utf-8
 16. Dump accumulator3 - see s21/A, creation+update
 ==================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 461
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t2
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -603,14 +617,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s21",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 6.000000
+            "type" : "none",
+            "value" : 6
           }
         ]
       },
@@ -623,12 +637,13 @@ Content-Type: application/json; charset=utf-8
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Fiware-Service: t2
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -636,14 +651,14 @@ Content-Type: application/json; charset=utf-8
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "",
+        "type" : "none",
         "isPattern" : "false",
         "id" : "s21",
         "attributes" : [
           {
             "name" : "A",
-            "type" : "",
-            "value" : 13.000000
+            "type" : "none",
+            "value" : 13
           }
         ]
       },
@@ -663,5 +678,5 @@ accumulatorStop $LISTENER_PORT
 accumulatorStop $LISTENER2_PORT
 accumulatorStop $LISTENER3_PORT
 dbDrop CB
-dbDrop ftest-t1
-dbDrop ftest-t2
+dbDrop CB t1
+dbDrop CB t2

@@ -30,75 +30,73 @@ brokerStart CB
 --SHELL--
 echo "+++++ 1. create an entity +++++"
 url="/v1/contextEntities/entity01"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<appendContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 2. lookup the entity +++++"
-orionCurl --url "/v1/contextEntities/entity01"
+orionCurl --url "/v1/contextEntities/entity01" --json
 
 --REGEXPECT--
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 573
-Content-Type: application/xml
+Content-Length: 329
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="" isPattern="false">
-    <id>entity01</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "entity01",
+    "isPattern": "false",
+    "type": ""
+}
 +++++ 2. lookup the entity +++++
 HTTP/1.1 200 OK
-Content-Length: 466
-Content-Type: application/xml
+Content-Length: 293
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextElementResponse>
-  <contextElement>
-    <entityId type="" isPattern="false">
-      <id>entity01</id>
-    </entityId>
-    <contextAttributeList>
-      <contextAttribute>
-        <name>temperature</name>
-        <type>degree</type>
-        <contextValue>10</contextValue>
-      </contextAttribute>
-    </contextAttributeList>
-  </contextElement>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</contextElementResponse>
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "temperature",
+                "type": "degree",
+                "value": "10"
+            }
+        ],
+        "id": "entity01",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

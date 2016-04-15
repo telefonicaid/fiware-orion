@@ -41,7 +41,10 @@ typedef enum AreaType
 {
   NoArea,
   CircleType,
-  PolygonType
+  PolygonType,
+  PointType,
+  LineType,
+  BoxType
 } AreaType;
 
 
@@ -53,20 +56,61 @@ typedef enum AreaType
 class Point
 {
  private:
-  ::std::string _latitude;
-  ::std::string _longitude;
+  bool    valid;
+  double  lat;
+  double  lon;
 
  public:
   Point();
   Point(::std::string latitude, ::std::string longitude);
+  Point(double _lat, double _lon);
 
   void   fill(Point* p);
-  double latitude(void);
-  double longitude(void);
+  double latitude(void) const;
+  double longitude(void) const;
+  void   latitudeSet(double latitude);
   void   latitudeSet(::std::string latitude);
+  void   longitudeSet(double longitude);
   void   longitudeSet(::std::string longitude);
+  bool   equals(Point* p);
+
   ::std::string latitudeString(void);
   ::std::string longitudeString(void);
+};
+
+
+
+/* ****************************************************************************
+*
+* Line -
+*/
+class Line
+{
+
+public:
+  ::std::vector<Point*> pointList;
+
+  Line();  
+  void pointAdd(Point* p);
+  void release(void);
+};
+
+
+
+/* ****************************************************************************
+*
+* Box -
+*/
+class Box
+{
+public:
+  Point lowerLeft;
+  Point upperRight;
+
+  Box();
+  Box(Point* lowerLeftP, Point* upperRightP);
+
+  void fill(Point* lowerLeftP, Point* upperRightP);
 };
 
 
@@ -83,11 +127,11 @@ class Circle
 
  public:
   Point          center;
-  bool           inverted(void);
-  double         radius(void);
+  bool           inverted(void) const;
+  double         radius(void) const;
 
-  ::std::string  radiusString(void);
-  ::std::string  invertedString(void);
+  ::std::string  radiusString(void) const;
+  ::std::string  invertedString(void) const;
   void           radiusSet(::std::string radius);
   void           radiusSet(float _radius);
   void           invertedSet(::std::string inverted);
@@ -108,12 +152,31 @@ class Polygon
 
  public:
   ::std::vector<Point*> vertexList;
-  bool                  inverted(void);
+  bool                  inverted(void) const;
   void                  invertedSet(::std::string inverted);
   void                  invertedSet(bool inverted);
-  ::std::string         invertedString(void);
+  ::std::string         invertedString(void) const;
   void                  vertexAdd(Point* p);
   void                  release(void);
+};
+
+
+
+/* ****************************************************************************
+*
+* Georel - 
+*/
+class Georel
+{
+public:
+  Georel();
+
+  void         fill(Georel* georelP);         
+  int          parse(const char* in, std::string* errorString);
+
+  std::string  type;
+  double       maxDistance;
+  double       minDistance;
 };
 
 
@@ -126,7 +189,7 @@ class Geometry
 {
 public:
   Geometry();
-  int          parse(const char* in, std::string* errorString);
+  int          parse(const std::string& apiVersion, const char* in, std::string* errorString);
 
   std::string  areaType;
   float        radius;

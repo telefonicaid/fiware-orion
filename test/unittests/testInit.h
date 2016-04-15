@@ -29,7 +29,7 @@
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
 
 /* Collection names used for testing */
 #define DBPREFIX                    "utest"
@@ -39,11 +39,11 @@
 #define SUBSCRIBECONTEXTAVAIL_COLL  DBPREFIX ".casubs"
 
 /* Some useful macros to avoid to long and verbose lines in asserts */
-#define RES_CNTX_REG(i)         res.responseVector.get(i)->contextRegistration
-#define RES_CNTX_REG_ATTR(i, j) res.responseVector.get(i)->contextRegistration.contextRegistrationAttributeVector.get(j)
-#define RES_CER(i)              res.contextElementResponseVector.get(i)->contextElement
-#define RES_CER_STATUS(i)       res.contextElementResponseVector.get(i)->statusCode
-#define RES_CER_ATTR(i, j)      res.contextElementResponseVector.get(i)->contextElement.contextAttributeVector.get(j)
+#define RES_CNTX_REG(i)         res.responseVector[i]->contextRegistration
+#define RES_CNTX_REG_ATTR(i, j) res.responseVector[i]->contextRegistration.contextRegistrationAttributeVector[j]
+#define RES_CER(i)              res.contextElementResponseVector[i]->contextElement
+#define RES_CER_STATUS(i)       res.contextElementResponseVector[i]->statusCode
+#define RES_CER_ATTR(i, j)      res.contextElementResponseVector[i]->contextElement.contextAttributeVector[j]
 
 #define C_STR_FIELD(b, f)       getStringField(b, f).c_str()
 

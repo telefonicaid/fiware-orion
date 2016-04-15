@@ -55,69 +55,58 @@ orionCurl --url "$url" --payload "$payload" --json
 
 echo "2: ++++++++++ Create the entity attribute with vector value ++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>compound</type>
-          <contextValue type="vector">
-             <item>22</item>
-             <item>
-               <x type="vector">
-                 <item>x1</item>
-                 <item>x2</item>
-               </x>
-               <y>3</y>
-             </item>
-             <item type="vector">
-               <item>z1</item>
-               <item>z2</item>
-             </item>
-          </contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+    "contextElements": [
+        {
+            "type": "T",
+            "isPattern": "false",
+            "id": "E",
+            "attributes": [
+            {
+                "name": "att",
+                "type": "compound",
+                "value": [
+                   "22",
+                   {
+                      "x": [ "x1", "x2" ],
+                      "y": "3"
+                   },
+                   [ "z1", "z2" ]
+                ]
+            }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "3: ++++++++++ Update the entity attribute with object value ++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>compound</type>
-          <contextValue>
-             <x>
-               <x1>a</x1>
-               <x2>b</x2>
-             </x>
-             <y type="vector">
-                <item>y1</item>
-                <item>y2</item>
-             </y>
-          </contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>UPDATE</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+    "contextElements": [
+        {
+            "type": "T",
+            "isPattern": "false",
+            "id": "E",
+            "attributes": [
+            {
+                "name": "att",
+                "type": "compound",
+                "value": {
+                   "x": {
+                      "x1": "a",
+                      "x2": "b"
+                   },
+                   "y": [ "y1", "y2" ]
+                }
+            }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 #Get accumulated data
 accumulatorDump
@@ -128,6 +117,7 @@ accumulatorDump
 HTTP/1.1 200 OK
 Content-Length: 109
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -138,68 +128,69 @@ Date: REGEX(.*)
 }
 2: ++++++++++ Create the entity attribute with vector value ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 622
-Content-Type: application/xml
+Content-Length: 384
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 3: ++++++++++ Update the entity attribute with object value ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 622
-Content-Type: application/xml
+Content-Length: 384
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 720
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -243,8 +234,9 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 651
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",

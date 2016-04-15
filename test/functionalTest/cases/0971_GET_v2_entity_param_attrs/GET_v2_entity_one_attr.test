@@ -94,6 +94,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 841
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -102,37 +103,37 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "speed", 
-                        "type": "number", 
+                        "name": "speed",
+                        "type": "number",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "brand", 
-                        "type": "string", 
+                        "name": "brand",
+                        "type": "string",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "plateCountry", 
-                        "type": "", 
+                        "name": "plateCountry",
+                        "type": "",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "madeInCountry", 
-                        "type": "", 
+                        "name": "madeInCountry",
+                        "type": "",
                         "value": ""
-                    }, 
+                    },
                     {
-                        "name": "model", 
-                        "type": "myString", 
+                        "name": "model",
+                        "type": "myString",
                         "value": ""
                     }
-                ], 
-                "id": "8787GHY", 
-                "isPattern": "false", 
+                ],
+                "id": "8787GHY",
+                "isPattern": "false",
                 "type": "Car"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -143,16 +144,18 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY?attrs=speed
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 83
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "id": "8787GHY", 
+    "id": "8787GHY",
     "speed": {
-        "type": "number", 
+        "metadata": {},
+        "type": "number",
         "value": "150"
-    }, 
+    },
     "type": "Car"
 }
 
@@ -160,14 +163,20 @@ Date: REGEX(.*)
 03. GET /v2/entities/8787GHY?attrs=speed,plateCountry
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 89
+Content-Length: 141
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "id": "8787GHY",
-    "plateCountry": "ES",
+    "plateCountry": {
+        "metadata": {},
+        "type": "none",
+        "value": "ES"
+    },
     "speed": {
+        "metadata": {},
         "type": "number",
         "value": "150"
     },

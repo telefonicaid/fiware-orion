@@ -49,3 +49,26 @@ Required" response. This is due to the way the underlying HTTP library
 (microhttpd) works, see details in [this email thread in the microhttpd
 mailing
 list](http://lists.gnu.org/archive/html/libmicrohttpd/2014-01/msg00063.html).
+
+## Entity fields length limitation
+
+Due to limitations at MongoDB layer, the length of entity ID, type and servicePath has to follow the following rule.
+
+    length(id) + length(type) + length(servicePath) + 10 < 1024
+
+Otherwise, we will get an error at entity creation time.
+
+## Duration format
+
+[ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations) may adopt several formats. The following
+constrains applies to the one that Orion supports in the NGSIv1 API (NGSIv2 doesn't uses ISO801 durations):
+
+* P[n]Y[n]M[n]DT[n]H[n]M[n]S is supported (P[n]W format is not supported)
+* Decimal fractions are supported for seconds (S), but not in other elements.
+
+## Entity fields size limitation
+
+Due to underlying DB limitations (see details [here](https://github.com/telefonicaid/fiware-orion/issues/1289)),
+the combined size (sum) of entity id, entity type and entity service path cannot exceed 1014 characters (this is not a typo, 
+it corresponds to 1024 minus 10, details in the aforementioned link ;). If you attemp to overpass the limit you will get 
+a 400 BadRequest "Too long entity id/type/servicePath combination" error.

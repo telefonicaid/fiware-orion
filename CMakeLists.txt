@@ -48,14 +48,18 @@ execute_process(COMMAND            sh ../scripts/build/osDistro.sh
 execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
                 OUTPUT_VARIABLE    RAPIDXML_VERSION)
 
+# TRACES: To remove LM_T
+#           [ and 15 log macros more, of which only LM_T is used by the broker.
+#             The important ones: LM_W, LM_E, LM_X, LM_I are all kept as is ]
+#         comment the following line
 add_definitions(-DLM_ON)
+
 add_definitions(-fPIC)
-# add_definitions(-fstack-check -fstack-protector)
 add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types
 #set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
-set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -g -Werror -fno-var-tracking-assignments")
+set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -fno-var-tracking-assignments")
 
 #
 # Platform checks
@@ -75,10 +79,23 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
     MESSAGE("cmake: DEBUG compilation")
     add_definitions(-DDEBUG -DDEBUG_$ENV{USER} -DDEBUG_${USER})
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
+    #
+    # Note that stack protection is activated only in debug compilation.
+    # This is due that this directive makes the compiler introduce code at the beginning/end of each functions,
+    # so it has a pretty big impact on performance
+    #
+    # Our unit tests don't pass the compilation with "stack protection", so we turn it off using
+    # remove_definitions().
+    #
+    add_definitions(-fstack-check -fstack-protector)
     if (COVERAGE)
         MESSAGE("cmake: Coverage compilation")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+        # LM_T macros introduce condition branchs which are not never traversed. Removing LM_T macros doesn't have 
+        # any impact in line coverage but removes "noise" in condition coverage, thus making coverage reports more useful
+        remove_definitions(-DLM_ON)
+        # Removing LM_T macros make that some variables get unused, thus -Wno-unused-variable have to be used
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -fprofile-arcs -ftest-coverage")
         set (CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
     endif (COVERAGE)
 
@@ -89,7 +106,6 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 else (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
     MESSAGE("cmake: RELEASE compilation")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
     if (STRICT)
         MESSAGE("cmake: Strict compilation")
@@ -168,9 +184,11 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/parse)
   ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
-  ADD_SUBDIRECTORY(src/lib/xmlParse)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
+  ADD_SUBDIRECTORY(src/lib/cache)
+  ADD_SUBDIRECTORY(src/lib/alarmMgr)
+  ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")

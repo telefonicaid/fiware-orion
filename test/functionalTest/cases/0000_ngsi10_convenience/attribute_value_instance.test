@@ -31,261 +31,258 @@ brokerStart CB
 
 echo "0: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/left
-payload='<updateContextAttributeRequest>
-  <type>Room</type>
-  <contextValue>10</contextValue>
-  <metadata>
-    <contextMetadata>
-      <name>ID</name>
-      <type>none</type>
-      <value>left</value>
-    </contextMetadata>
-  </metadata>
-</updateContextAttributeRequest>'
-orionCurl -X "PUT" --url "$url" --payload "${payload}" 
+payload='{
+   "type": "Room",
+   "value" : "10",
+   "metadatas": [
+     {
+       "name": "ID",
+       "type": "none",
+       "value": "left"
+     }
+   ]
+}'
+orionCurl -X "PUT" --url "$url" --payload "${payload}" --json
 
 echo "1: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/left
-orionCurl --url "$url"
+orionCurl --url "$url" --json
 
 echo "2: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes
-payload='<appendContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type></type>
-      <contextValue>10</contextValue>
-      <metadata>
-        <contextMetadata>
-          <name>ID</name>
-          <type>none</type>
-          <value>left</value>
-        </contextMetadata>
-      </metadata>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+  "attributes" : [
+    {
+      "name" : "A1",
+      "value" : "10",
+      "metadatas": [
+        {
+          "name": "ID",
+          "type": "none",
+          "value": "left"
+        }
+      ]
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 
 echo "3: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/left
-payload='<updateContextAttributeRequest>
-  <type>Room</type>
-  <contextValue>10</contextValue>
-  <metadata>
-    <contextMetadata>
-      <name>ID</name>
-      <type>none</type>
-      <value>left</value>
-    </contextMetadata>
-  </metadata>
-</updateContextAttributeRequest>'
-orionCurl --url "$url" --payload "${payload}" -X "PUT"
+payload='{
+   "type": "Room",
+   "value" : "10",
+   "metadatas": [
+     {
+       "name": "ID",
+       "type": "none",
+       "value": "left"
+     }
+   ]
+}'
+orionCurl --url "$url" --payload "${payload}" -X "PUT" --json
 
 echo "4: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/left
-orionCurl --url "$url"
+orionCurl --url "$url" --json
 
 echo "5: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/left
-payload='<updateContextAttributeRequest>
-  <type>Room</type>
-  <contextValue>10</contextValue>
-  <metadata>
-    <contextMetadata>
-      <name>ID</name>
-      <type>none</type>
-      <value>left</value>
-    </contextMetadata>
-  </metadata>
-</updateContextAttributeRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+   "type": "Room",
+   "value" : "10",
+   "metadatas": [
+     {
+       "name": "ID",
+       "type": "none",
+       "value": "left"
+     }
+   ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 
 echo "6: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/right
-payload='<updateContextAttributeRequest>
-  <type>Room</type>
-  <contextValue>10</contextValue>
-  <metadata>
-    <contextMetadata>
-      <name>ID</name>
-      <type>none</type>
-      <value>left</value>
-    </contextMetadata>
-  </metadata>
-</updateContextAttributeRequest>'
-orionCurl --url "$url" --payload "${payload}" -X "PUT"
+payload='{
+   "type": "Room",
+   "value" : "10",
+   "metadatas": [
+     {
+       "name": "ID",
+       "type": "none",
+       "value": "left"
+     }
+   ]
+}'
+orionCurl --url "$url" --payload "${payload}" -X "PUT" --json
 
 echo "7: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/right
-orionCurl --url "$url" -X "DELETE"
+orionCurl --url "$url" -X "DELETE" --json
 
 echo "8: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/left
-orionCurl --url "$url" -X "DELETE"
+orionCurl --url "$url" -X "DELETE" --json
 
 echo "9: ++++++++++++++++++++"
 url=/v1/contextEntities/E01/attributes/A1/left
-orionCurl --url "$url"
+orionCurl --url "$url" --json
 
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 127
-Content-Type: application/xml
+Content-Length: 89
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>E01</details>
-</statusCode>
+{
+    "code": "404",
+    "details": "E01",
+    "reasonPhrase": "No context element found"
+}
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 253
-Content-Type: application/xml
+Content-Length: 131
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextAttributeResponse>
-  <contextAttributeList/>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: /E01/</details>
-  </statusCode>
-</contextAttributeResponse>
+{
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /E01/",
+        "reasonPhrase": "No context element found"
+    }
+}
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 755
-Content-Type: application/xml
+Content-Length: 469
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="" isPattern="false">
-    <id>E01</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type/>
-          <contextValue/>
-          <metadata>
-            <contextMetadata>
-              <name>ID</name>
-              <type>string</type>
-              <value>left</value>
-            </contextMetadata>
-          </metadata>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "metadatas": [
+                        {
+                            "name": "ID",
+                            "type": "string",
+                            "value": "left"
+                        }
+                    ],
+                    "name": "A1",
+                    "type": "",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E01",
+    "isPattern": "false",
+    "type": ""
+}
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/xml
+Content-Length: 46
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
-</statusCode>
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 499
-Content-Type: application/xml
+Content-Length: 306
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextAttributeResponse>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>Room</type>
-      <contextValue>10</contextValue>
-      <metadata>
-        <contextMetadata>
-          <name>ID</name>
-          <type>string</type>
-          <value>left</value>
-        </contextMetadata>
-      </metadata>
-    </contextAttribute>
-  </contextAttributeList>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</contextAttributeResponse>
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "ID",
+                    "type": "string",
+                    "value": "left"
+                }
+            ],
+            "name": "A1",
+            "type": "Room",
+            "value": "10"
+        }
+    ],
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
 5: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: GET, PUT, DELETE
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 170
-Content-Type: application/xml
+Content-Length: 132
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>unmatching metadata ID value URI/payload: /right/ vs /left/</details>
-</statusCode>
+{
+    "code": "400",
+    "details": "unmatching metadata ID value URI/payload: /right/ vs /left/",
+    "reasonPhrase": "Bad Request"
+}
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 220
-Content-Type: application/xml
+Content-Length: 182
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>472</code>
-  <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-  <details>action: DELETE - entity: [E01, ] - offending attribute: A1 - attribute not found</details>
-</statusCode>
+{
+    "code": "472",
+    "details": "action: DELETE - entity: [E01, ] - offending attribute: A1 - attribute not found",
+    "reasonPhrase": "request parameter is invalid/not allowed"
+}
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/xml
+Content-Length: 46
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
-</statusCode>
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 253
-Content-Type: application/xml
+Content-Length: 131
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextAttributeResponse>
-  <contextAttributeList/>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: /E01/</details>
-  </statusCode>
-</contextAttributeResponse>
+{
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /E01/",
+        "reasonPhrase": "No context element found"
+    }
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

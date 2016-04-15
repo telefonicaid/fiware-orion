@@ -34,10 +34,10 @@ brokerStart CB
 # a compound attribute value for "POST /v1/notifyContext"
 #
 # 01. POST /v1/notifyContext with compound attribute value using JSON
-# 02. POST /v1/notifyContext with compound attribute value using XML
 #
 
 echo "01. POST /v1/notifyContext with compound attribute value using JSON"
+echo "==================================================================="
 payload='{
   "subscriptionId": "012345678901234567890123",
   "originator": "localhost",
@@ -69,45 +69,13 @@ echo
 echo
 
 
-
-echo "02. POST /v1/notifyContext with compound attribute value using XML"
-payload='<?xml version="1.0"?>
-<notifyContextRequest>
-  <subscriptionId>012345678901234567890123</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>XXX</type>
-            <contextValue>
-              <a>1</a>
-            </contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>'
-orionCurl --url /v1/notifyContext --payload "$payload" 
-echo
-echo
-
-
 --REGEXPECT--
 01. POST /v1/notifyContext with compound attribute value using JSON
+===================================================================
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -116,21 +84,6 @@ Date: REGEX(.*)
         "reasonPhrase": "OK"
     }
 }
-
-
-02. POST /v1/notifyContext with compound attribute value using XML
-HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<notifyContextResponse>
-  <responseCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </responseCode>
-</notifyContextResponse>
 
 
 --TEARDOWN--

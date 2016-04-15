@@ -25,13 +25,19 @@
 #include <string>
 #include <vector>
 
+#include "common/clockFunctions.h"
+#include "common/statistics.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "alarmMgr/alarmMgr.h"
 #include "jsonParseV2/parseEntity.h"
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseAttributeValue.h"
+#include "jsonParseV2/parseSubscription.h"
+#include "jsonParseV2/parseBatchQuery.h"
+#include "jsonParseV2/parseBatchUpdate.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 
 
@@ -40,9 +46,23 @@
 *
 * jsonRequestTreat - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP)
+std::string jsonRequestTreat
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RequestType                requestType,
+  JsonDelayedRelease*        releaseP,
+  std::vector<std::string>&  compV
+)
 {
-  std::string answer;
+  std::string      answer;
+  struct timespec  start;
+  struct timespec  end;
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &start);
+  }
 
   switch (requestType)
   {
@@ -78,10 +98,17 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 
   case EntityAttributeRequest:
     releaseP->attribute = &parseDataP->attr.attribute;
+    releaseP->attribute->name = compV[4];
     answer = parseContextAttribute(ciP, &parseDataP->attr.attribute);
     if (answer != "OK")
     {
       return answer;
+    }
+
+    if ((answer = parseDataP->attr.attribute.check(ciP, EntityAttributeRequest, "", "", 0)) != "OK")
+    {
+      OrionError error(SccBadRequest, answer);
+      return error.render(ciP, "");
     }
     break;
 
@@ -94,10 +121,57 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     }
     break;
 
+  case SubscriptionsRequest:
+    answer = parseSubscription(ciP, parseDataP, releaseP);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    
+    if ((answer = parseDataP->scr.res.check(ciP, SubscribeContext, "", "", 0)) != "OK")
+    {
+      alarmMgr.badInput(clientIp, "invalid subscription");
+      return answer;
+    }
+    break;
+
+  case IndividualSubscriptionRequest:
+    answer = parseSubscription(ciP, parseDataP, releaseP, true);  // NOTE: partial == true
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    break;
+
+  case BatchQueryRequest:
+    answer = parseBatchQuery(ciP, &parseDataP->bq.res);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    break;
+
+  case BatchUpdateRequest:
+    answer = parseBatchUpdate(ciP, &parseDataP->bu.res);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+
+    break;
+
   default:
-    answer = "Request Treat function not implemented";
+    OrionError error(SccNotImplemented, "Request Treat function not implemented");
+    answer = error.render(ciP, "");
+    ciP->httpStatusCode = SccNotImplemented;
     break;
   }
   
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &end);
+    clock_difftime(&end, &start, &threadLastTimeStat.jsonV2ParseTime);
+  }
+
   return answer;
 }

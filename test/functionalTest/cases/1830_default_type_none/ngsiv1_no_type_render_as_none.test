@@ -1,0 +1,182 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Rendering default type in NGSIv2 for entity/attribute/metadata created using NGSIv1
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create entity E using NGSIv1 without type in entity, attribute and metadata
+# 02. Get entity using NGSIv1 operation
+# 03. Get entity using NGSIv2 operation
+#
+
+
+echo "01. Create entity E using NGSIv1 without type in entity, attribute and metadata"
+echo "==============================================================================="
+payload='{
+    "contextElements": [
+        {
+            "isPattern": "false",
+            "id": "E",
+            "attributes": [
+                {
+                    "name": "A",
+                    "value": "foo",
+                    "metadatas": [
+                      {
+                        "name": "M",
+                        "value": "bar"
+                      }
+                    ]
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Get entity using NGSIv1 operation"
+echo "====================================="
+orionCurl --url /v1/contextEntities/E --json
+echo
+echo
+
+
+echo "03. Get entity using NGSIv2 operation"
+echo "====================================="
+orionCurl --url /v2/entities/E --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E using NGSIv1 without type in entity, attribute and metadata
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 539
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "M",
+                                "type": "",
+                                "value": "bar"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": ""
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Get entity using NGSIv1 operation
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 409
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "metadatas": [
+                    {
+                        "name": "M",
+                        "type": "",
+                        "value": "bar"
+                    }
+                ],
+                "name": "A",
+                "type": "",
+                "value": "foo"
+            }
+        ],
+        "id": "E",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+03. Get entity using NGSIv2 operation
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "A": {
+        "metadata": {
+            "M": {
+                "type": "none",
+                "value": "bar"
+            }
+        },
+        "type": "none",
+        "value": "foo"
+    },
+    "id": "E",
+    "type": "none"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

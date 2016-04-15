@@ -26,6 +26,8 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -65,13 +67,12 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 *
 * ContextRegistrationAttribute::render -
 */
-std::string ContextRegistrationAttribute::render(Format format, const std::string& indent, bool comma)
+std::string ContextRegistrationAttribute::render(const std::string& indent, bool comma)
 {
-  std::string xmlTag   = "contextRegistrationAttribute";
-  std::string jsonTag  = "registrationAttribute";
-  std::string out      = "";
+  std::string key = "registrationAttribute";
+  std::string out = "";
 
-  metadataVector.tagSet("metadata");
+  metadataVector.keyNameSet("metadata");
 
   //
   // About JSON commas:
@@ -80,12 +81,12 @@ std::string ContextRegistrationAttribute::render(Format format, const std::strin
   // The only doubt here is whether isDomain should have the comma or not,
   // that depends on whether the metadataVector is empty or not.
   //
-  out += startTag(indent, xmlTag, jsonTag, format, false, false);
-  out += valueTag(indent + "  ", "name",     name, format, true);
-  out += valueTag(indent + "  ", "type",     type, format, true);
-  out += valueTag(indent + "  ", "isDomain", isDomain, format, metadataVector.size() != 0);
-  out += metadataVector.render(format, indent + "  ");
-  out += endTag(indent, xmlTag, format, comma);
+  out += startTag2(indent, key, false, false);
+  out += valueTag1(indent + "  ", "name",     name, true);
+  out += valueTag1(indent + "  ", "type",     type, true);
+  out += valueTag1(indent + "  ", "isDomain", isDomain, metadataVector.size() != 0);
+  out += metadataVector.render(indent + "  ");
+  out += endTag(indent, comma);
 
   return out;
 }
@@ -98,14 +99,13 @@ std::string ContextRegistrationAttribute::render(Format format, const std::strin
 */
 std::string ContextRegistrationAttribute::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
 )
 {
-  std::string errorString;
 
   if (name == "")
   {
@@ -123,7 +123,7 @@ std::string ContextRegistrationAttribute::check
   }
 
   std::string res;
-  if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
@@ -139,10 +139,18 @@ std::string ContextRegistrationAttribute::check
 */
 void ContextRegistrationAttribute::present(int ix, const std::string& indent)
 {
-  LM_F(("%sAttribute %d:\n",    indent.c_str(), ix));
-  LM_F(("%s  Name:       %s\n", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:       %s\n", indent.c_str(), type.c_str()));
-  LM_F(("%s  isDomain:   %s\n", indent.c_str(), isDomain.c_str()));
+  LM_T(LmtPresent, ("%sAttribute %d:\n",    
+		    indent.c_str(), 
+		    ix));
+  LM_T(LmtPresent, ("%s  Name:       %s\n", 
+		    indent.c_str(), 
+		    name.c_str()));
+  LM_T(LmtPresent, ("%s  Type:       %s\n", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%s  isDomain:   %s\n", 
+		    indent.c_str(), 
+		    isDomain.c_str()));
 
   metadataVector.present("Attribute", indent + "  ");
 }

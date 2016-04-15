@@ -28,6 +28,8 @@ from behave import step
 from iotqatools.helpers_utils import *
 from iotqatools.cb_v2_utils import CB
 from iotqatools.mongo_utils import Mongo
+from iotqatools.remote_log_utils import Remote_Log
+from iotqatools.fabric_utils import FabricSupport
 
 from tools.properties_config import Properties  # methods in properties class
 from tools.NGSI_v2 import NGSI
@@ -46,7 +48,7 @@ status_codes = {'OK': 200,
                 'Bad Request': 400,
                 'unauthorized': 401,
                 'Not Found': 404,
-                'Bad Method': 405,
+                'Method not allowed': 405,
                 'Not Acceptable': 406,
                 'Conflict': 409,
                 'Length Required': 411,
@@ -100,6 +102,18 @@ def send_a_statistics_request(context):
     __logger__.info("..Sent a statistics request correctly")
 
 
+@step(u'send a cache statistics request')
+def send_a_cache_statistics_request(context):
+    """
+    send a cache statistics request
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Sending a statistics request...")
+    context.props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
+    context.cb = CB(protocol=context.props_cb_env["CB_PROTOCOL"], host=context.props_cb_env["CB_HOST"], port=context.props_cb_env["CB_PORT"])
+    context.resp = context.cb.get_cache_statistics_request()
+    __logger__.info("..Sent a statistics request correctly")
+
 @step(u'delete database in mongo')
 def delete_database_in_mongo(context):
     """
@@ -108,28 +122,50 @@ def delete_database_in_mongo(context):
     """
     fiware_service_header = u'Fiware-Service'
     orion_prefix = u'orion'
-    database_name = EMPTY
+    database_name = orion_prefix
     props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
               password=props_mongo["MONGO_PASS"])
     headers = context.cb.get_headers()
-    __logger__.debug("Deleting database in mongo...")
+
     if fiware_service_header in headers:
-        if headers[fiware_service_header] == EMPTY:
-            database_name = orion_prefix
-        elif headers[fiware_service_header].find(".") < 0:
-            database_name = "%s-%s" % (orion_prefix, headers[fiware_service_header])
-    else:
-        database_name = orion_prefix
-    if database_name != EMPTY:
-        mongo.connect(database_name.lower())
-        mongo.drop_database()
-        mongo.disconnect()
-        __logger__.info("...Database \"%s\" is deleted" % database_name.lower())
+        if headers[fiware_service_header] != EMPTY:
+           if headers[fiware_service_header].find(".") < 0:
+               database_name = "%s-%s" % (database_name, headers[fiware_service_header].lower())
+           else:
+               postfix = headers[fiware_service_header].lower()[0:headers[fiware_service_header].find(".")]
+               database_name = "%s-%s" % (database_name, postfix)
+
+    __logger__.debug("Deleting database \"%s\" in mongo..." % database_name)
+    mongo.connect(database_name)
+    mongo.drop_database()
+    mongo.disconnect()
+    __logger__.info("...Database \"%s\" is deleted" % database_name)
+
+
+@step(u'check in log, label "([^"]*)" and message "([^"]*)"')
+def check_in_log_label_and_text(context, label, text):
+    """
+    Verify in log file if a label with a message exists
+    :param step:
+    :param label: label to find
+    :param text: text to find (begin since the end)
+    """
+    __logger__.debug("Looking for in log the \"%s\" label and the \"%s\" text...")
+    props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
+    remote_log = Remote_Log(file="%s/contextBroker.log" % props_cb_env["CB_LOG_FILE"], fabric=context.my_fab)
+    line = remote_log.find_line(label,text)
+    assert line != None, " ERROR - the \"%s\" label and the \"%s\" text do not exist in the log" % (label, text)
+    __logger__.info("log line: \n%s" %line)
+    ngsi = NGSI()
+    ngsi.verify_log(context, line)
+    __logger__.info("...confirmed traces in log")
+
+
 
 # ------------------------------------- validations ----------------------------------------------
 
-@step(u'verify that receive an "([^"]*)" http code')
+@step(u'verify that receive a.? "([^"]*)" http code')
 def verify_that_receive_an_http_code(context, http_code):
     """
     verify that receive an http code
@@ -168,27 +204,30 @@ def verify_entry_point(context, url, value):
 
 
 @step(u'verify statistics "([^"]*)" field does exists')
-def verify_stat_fields(context, field):
+def verify_stat_fields(context, field_to_test):
     """
-    verify statistics fields in response.
-    Ex:
-            {
-              "orion" : {
-                    "xmlRequests" : "5",
-                    "versionRequests" : "1",
-                    "statisticsRequests" : "2",
-                    "uptime_in_secs" : "364",
-                    "measuring_interval_in_secs" : "364"
-              }
-            }
+    verify statistics and cache statistics fields in response.
+    Ex: /statistics
+     {
+        "uptime_in_secs":2,
+        "measuring_interval_in_secs":2
+     }
+       /cache/statistics
+     {
+        "ids":"",
+        "refresh":1,
+        "inserts":0,
+        "removes":0,
+        "updates":0,
+        "items":0
+     }
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
-    :param field: field to verify if it does exists
+    :param field_to_test: field to verify if it does exists
     """
-    __logger__.debug("Verifying statistics field: %s does exists..." % field)
+    __logger__.debug("Verifying statistics field: %s does exists..." % field_to_test)
     resp_dict = convert_str_to_dict(context.resp.text, "JSON")
-    assert "orion" in resp_dict, "ERROR - orion field does no exist in statistics response"
-    assert field in resp_dict["orion"], "ERROR - %s field does no exist in statistics response" % field
-    __logger__.info("...Verified that statistics field %s is correct" % field)
+    assert field_to_test in resp_dict.keys(), "ERROR - \"%s\" field does no exist in statistics response" % field_to_test
+    __logger__.info("...Verified that statistics field %s is correct" % field_to_test)
 
 
 @step(u'verify version "([^"]*)" field does exists')
@@ -273,3 +312,19 @@ def verify_error_message(context):
     for i in range(int(entities_context["entities_number"])):
         ngsi.verify_error_response(context, context.resp_list[i])
     __logger__.info("...Verified that error message is the expected in all entities ")
+
+
+@step(u'verify headers in response')
+def verify_headers_in_response(context):
+    """
+    verify headers in response
+    Ex:
+          | parameter      | value                |
+          | x-total-counts | 5                    |
+          | location       | /v2/subscriptions/.* |
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    """
+    __logger__.debug("Verifying headers in response...")
+    ngsi = NGSI()
+    ngsi.verify_headers_response(context)
+    __logger__.info("...Verified headers in response")

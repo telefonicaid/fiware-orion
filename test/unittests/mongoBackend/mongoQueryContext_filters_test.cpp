@@ -59,18 +59,16 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - greaterThan_d
 * - greaterThanOrEqual_n
 * - greaterThanOrEqual_d
-* - lesserThan_n
-* - lesserThan_d
-* - lesserThanOrEqual_n
-* - lesserThanOrEqual_d
+* - lessThan_n
+* - lessThan_d
+* - lessThanOrEqual_n
+* - lessThanOrEqual_d
 * - insideRange_n
 * - insideRange_d
 * - outsideRange_n
 * - outsideRange_d
 * - withAttribute
 * - withoutAttribute
-* - withEntityType
-* - withoutEntityType
 *
 * Special test cases
 *
@@ -271,14 +269,20 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en(".*", "T", "true");
-    Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running");
+    EntityId     en(".*", "T", "true");
+    Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running");
+    std::string  errorString;
+    bool         b;
+
+    b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+    EXPECT_EQ("", errorString);
+    EXPECT_EQ(true, b);
+
     req.entityIdVector.push_back(&en);
     req.restriction.scopeVector.push_back(&sc);
-
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -294,9 +298,6 @@ TEST(mongoQueryContextRequest_filters, equalToOne_s)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -314,14 +315,21 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==27");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -336,9 +344,6 @@ TEST(mongoQueryContextRequest_filters, equalToOne_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -367,14 +372,21 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running,error");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running,error");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -391,9 +403,6 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -411,14 +420,21 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==31,17.8,22");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==31,17.8,22");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -434,9 +450,6 @@ TEST(mongoQueryContextRequest_filters, equalToMulti_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -465,14 +478,21 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -489,9 +509,6 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_s)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -509,14 +526,21 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=31");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=31");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -534,9 +558,6 @@ TEST(mongoQueryContextRequest_filters, unequalToOne_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -565,14 +586,21 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running,error");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S!=running,error");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -581,16 +609,13 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_s)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
+  /* Only entity IDs are checked (we have a bunch of tests in other places to check the query response itself */
   ASSERT_EQ(2, res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
   EXPECT_EQ("E5", RES_CER(1).entityId.id);
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -608,14 +633,21 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=24,26.5,28");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=24,26.5,28");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -632,9 +664,6 @@ TEST(mongoQueryContextRequest_filters, unequalToMany_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -663,14 +692,21 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N>26");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N>26");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -687,9 +723,6 @@ TEST(mongoQueryContextRequest_filters, greaterThan_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -718,14 +751,21 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=27");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -741,9 +781,6 @@ TEST(mongoQueryContextRequest_filters, greaterThanOrEqual_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -759,10 +796,10 @@ TEST(mongoQueryContextRequest_filters, DISABLED_greaterThanOrEqual_d)
 
 /* ****************************************************************************
 *
-* lesserThan_n -
+* lessThan_n -
 *
 */
-TEST(mongoQueryContextRequest_filters, lesserThan_n)
+TEST(mongoQueryContextRequest_filters, lessThan_n)
 {
   HttpStatusCode         ms;
   QueryContextRequest   req;
@@ -772,14 +809,21 @@ TEST(mongoQueryContextRequest_filters, lesserThan_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N<27");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N<27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -796,17 +840,14 @@ TEST(mongoQueryContextRequest_filters, lesserThan_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
 *
-* lesserThan_d-
+* lessThan_d-
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_lesserThan_d)
+TEST(mongoQueryContextRequest_filters, DISABLED_lessThan_d)
 {
   // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
   EXPECT_EQ(1, 2);
@@ -814,10 +855,10 @@ TEST(mongoQueryContextRequest_filters, DISABLED_lesserThan_d)
 
 /* ****************************************************************************
 *
-* lesserThanOrEqual_n -
+* lessThanOrEqual_n -
 *
 */
-TEST(mongoQueryContextRequest_filters, lesserThanOrEqual_n)
+TEST(mongoQueryContextRequest_filters, lessThanOrEqual_n)
 {
   HttpStatusCode         ms;
   QueryContextRequest   req;
@@ -827,14 +868,21 @@ TEST(mongoQueryContextRequest_filters, lesserThanOrEqual_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N<=24");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N<=24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -850,17 +898,14 @@ TEST(mongoQueryContextRequest_filters, lesserThanOrEqual_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
 *
-* lesserThanOrEqual_d -
+* lessThanOrEqual_d -
 *
 */
-TEST(mongoQueryContextRequest_filters, DISABLED_lesserThanOrEqual_d)
+TEST(mongoQueryContextRequest_filters, DISABLED_lessThanOrEqual_d)
 {
   // FIXME to be completed during https://github.com/telefonicaid/fiware-orion/issues/1039 implementation
   EXPECT_EQ(1, 2);
@@ -881,14 +926,21 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==17..24");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==17..24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -904,9 +956,6 @@ TEST(mongoQueryContextRequest_filters, insideRange_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -935,14 +984,21 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "T", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=17..24");
+  EntityId     en(".*", "T", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N!=17..24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -959,9 +1015,6 @@ TEST(mongoQueryContextRequest_filters, outsideRange_n)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -990,14 +1043,21 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
   prepareDatabase(true);
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "+S");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1016,9 +1076,6 @@ TEST(mongoQueryContextRequest_filters, withAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1036,14 +1093,21 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
   prepareDatabase(true);
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "-S");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "!S");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1063,103 +1127,9 @@ TEST(mongoQueryContextRequest_filters, withoutAttribute)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
-/* ****************************************************************************
-*
-* withoutType -
-*
-*/
-TEST(mongoQueryContextRequest_filters, withEntityType)
-{
-  HttpStatusCode         ms;
-  QueryContextRequest   req;
-  QueryContextResponse  res;
 
-  /* Prepare database */
-  prepareDatabase(true);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "+type");
-  req.entityIdVector.push_back(&en);
-  req.restriction.scopeVector.push_back(&sc);
-
-  /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
-  EXPECT_EQ("", res.errorCode.details);
-
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
-  ASSERT_EQ(9, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("E3", RES_CER(2).entityId.id);
-  EXPECT_EQ("E4", RES_CER(3).entityId.id);
-  EXPECT_EQ("E5", RES_CER(4).entityId.id);
-  EXPECT_EQ("C1", RES_CER(5).entityId.id);
-  EXPECT_EQ("C2", RES_CER(6).entityId.id);
-  EXPECT_EQ("C3", RES_CER(7).entityId.id);
-  EXPECT_EQ("E6", RES_CER(8).entityId.id);
-
-  /* Release dynamic memory used by response (mongoBackend allocates it) */
-  res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-}
-
-/* ****************************************************************************
-*
-* withoutEntityType -
-*
-*/
-TEST(mongoQueryContextRequest_filters, withoutEntityType)
-{
-  HttpStatusCode         ms;
-  QueryContextRequest   req;
-  QueryContextResponse  res;
-
-  /* Prepare database */
-  prepareDatabase(true);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "-type");
-  req.entityIdVector.push_back(&en);
-  req.restriction.scopeVector.push_back(&sc);
-
-  /* Invoke the function in mongoBackend library */
-  servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
-  EXPECT_EQ("", res.errorCode.details);
-
-  /* Only entitie IDs are check (we have a bunch of tests in other places to check the query response itself */
-  ASSERT_EQ(2, res.contextElementResponseVector.size());
-  EXPECT_EQ("E7", RES_CER(0).entityId.id);
-  EXPECT_EQ("E8", RES_CER(1).entityId.id);
-
-  /* Release dynamic memory used by response (mongoBackend allocates it) */
-  res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
-}
 
 /* ****************************************************************************
 *
@@ -1176,14 +1146,21 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "colour=='black,white','red,blue'");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "colour=='black,white','red,blue'");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1199,9 +1176,6 @@ TEST(mongoQueryContextRequest_filters, stringsWithCommas)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1219,14 +1193,21 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running;N<27");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "S==running;N<27");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1241,9 +1222,6 @@ TEST(mongoQueryContextRequest_filters, cobingingSeveralFilters)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1261,14 +1239,21 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=17;N<=24");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N>=17;N<=24");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1284,9 +1269,6 @@ TEST(mongoQueryContextRequest_filters, repeatSameFilter)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -1304,14 +1286,21 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en(".*", "", "true");
-  Scope sc(SCOPE_TYPE_SIMPLE_QUERY, "N==16.99..24.1");
+  EntityId     en(".*", "", "true");
+  Scope        sc(SCOPE_TYPE_SIMPLE_QUERY, "N==16.99..24.1");
+  std::string  errorString;
+  bool         b;
+
+  b = sc.stringFilter.parse(sc.value.c_str(), &errorString);
+  EXPECT_EQ("", errorString);
+  EXPECT_EQ(true, b);
+
   req.entityIdVector.push_back(&en);
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
   servicePathVector.clear();
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1327,8 +1316,5 @@ TEST(mongoQueryContextRequest_filters, rangeWithDecimals)
 
   /* Release dynamic memory used by response (mongoBackend allocates it) */
   res.contextElementResponseVector.release();
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 }
 

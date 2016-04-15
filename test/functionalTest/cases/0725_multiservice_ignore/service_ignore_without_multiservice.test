@@ -25,9 +25,9 @@ Ignoring service header when not running in multiservice mode
 
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DATABASE_NAME}-foo
+dbInit ${CB_DB_NAME}-foo
 dbResetAll
-echo "show dbs" | mongo | grep ${CB_DATABASE_NAME} | awk '{ print $1 }'
+echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
 
 brokerStart CB 0-255 IPV4
 
@@ -35,25 +35,24 @@ brokerStart CB 0-255 IPV4
 echo "1. Create an entity using foo as tenant"
 echo "======================================="
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>compound</type>
-          <contextValue>03</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --tenant "foo"
+payload='{
+  "contextElements": [
+  {
+    "type": "Test",
+    "isPattern": "false",
+    "id": "E",
+    "attributes": [
+    {
+      "name": "att",
+      "type": "compound",
+      "value": "03"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --tenant "foo" --json
 echo
 echo
 
@@ -62,44 +61,44 @@ echo "====================================================="
 # In this case mongoCmd helper is not used, due to we don't have
 # a particular database for mongo command and the output could be
 # multiline in a general case
-echo "show dbs" | mongo | grep ${CB_DATABASE_NAME} | wc -l
-echo "show dbs" | mongo | grep ${CB_DATABASE_NAME}-foo | wc -l
+echo "show dbs" | mongo | grep ${CB_DB_NAME} | wc -l
+echo "show dbs" | mongo | grep ${CB_DB_NAME}-foo | wc -l
 # Next line was added in PR https://github.com/telefonicaid/fiware-orion/pull/1184/files#r37738638
 # in order to help us to detect where the ftest-ftest-ftest-... problem is. It could happen that
 # after fixing #1186 this is no longer needed, but let's keep it for a while as a "quarentine" measure...
-echo "show dbs" | mongo | grep ${CB_DATABASE_NAME} | awk '{ print $1 }'
+echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
 
 --REGEXPECT--
 1. Create an entity using foo as tenant
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 625
-Content-Type: application/xml
+Content-Length: 387
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 2. Check that the number of orion databases is just 1
@@ -113,4 +112,4 @@ brokerStop CB
 dbDrop CB
 
 # The following drop is in case the test failed and two databases were actually created
-dbDrop ${CB_DATABASE_NAME}-foo
+dbDrop ${CB_DB_NAME}-foo

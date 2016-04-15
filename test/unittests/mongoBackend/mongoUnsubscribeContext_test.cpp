@@ -78,10 +78,6 @@ static void prepareDatabase(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX1" << "AY1")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 100
                                                        ))
                         );
 
@@ -94,10 +90,6 @@ static void prepareDatabase(void) {
                         "conditions" << BSON_ARRAY(BSON(
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
-                                                       ) <<
-                                                   BSON(
-                                                       "type" << "ONTIMEINTERVAL" <<
-                                                       "value" << 200
                                                        ))
                         );
 
@@ -118,11 +110,7 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -145,8 +133,6 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     /* Check database (untouched) */
     DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -164,11 +150,7 @@ TEST(mongoUnsubscribeContext, unsubscribe)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
-            .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -194,9 +176,6 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
-
     /* Release mock */
     delete notifierMock;
 }
@@ -220,11 +199,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -234,7 +209,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object).
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -253,12 +228,14 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     // Without this sleep, this tests fails around 10% of the times (in Ubuntu 13.04)
     usleep(1000);
 
-    int count = connection->count(SUBSCRIBECONTEXT_COLL, BSONObj());
+    int count = connectionDb->count(SUBSCRIBECONTEXT_COLL, BSONObj());
 
     ASSERT_EQ(2, count);
 
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
     /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
 }
@@ -290,12 +267,8 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
-            .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
-            .Times(0);
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_,_))
+            .Times(0);   
     setNotifier(notifierMock);
 
     /* Forge the request (from "inside" to "outside") */
@@ -304,7 +277,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     /* Set MongoDB connection (prepare database first with the "actual" connection object).
      * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connectionDb = getMongoConnection();
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
@@ -322,10 +295,12 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
 
-    ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
+    ASSERT_EQ(2, connectionDb->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
 
-    /* Release mocks */
-    setMongoConnectionForUnitTest(NULL);
+    /* Restore real DB connection */
+    setMongoConnectionForUnitTest(connectionDb);
+
+    /* Release mocks */    
     delete notifierMock;
     delete connectionMock;
 }

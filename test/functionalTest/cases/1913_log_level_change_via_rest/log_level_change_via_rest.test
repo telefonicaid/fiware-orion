@@ -1,0 +1,221 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Change log-level via REST
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. POST /admin/log and see error 'method not allowed'
+# 02. PUT /admin/log and see error 'log level missing'
+# 03. PUT /admin/log?level= and see error 'Empty right-hand-side for URI param'
+# 04. PUT /admin/log?level=notValid and see error 'invalid log level'
+# 05. PUT /admin/log?level=ERROR and see it work
+# 06. PUT /admin/log?level=Info and see it work
+# 07. PUT /admin/log?level=warn and see it work
+# 08. PUT /admin/log?level=wArNiNg and see it work
+# 09. PUT /admin/log?level=Fatal and see it work
+# 10. PUT /admin/log?level=DEBUG and see it work
+#
+
+echo "01. POST /admin/log and see error 'method not allowed'"
+echo "======================================================"
+orionCurl --url /admin/log -X POST --json
+echo
+echo
+
+echo "02. PUT /admin/log and see error 'log level missing'"
+echo "===================================================="
+orionCurl --url /admin/log -X PUT --json 
+echo
+echo
+
+
+echo "03. PUT /admin/log?level= and see error 'Empty right-hand-side for URI param'"
+echo "============================================================================="
+orionCurl --url /admin/log?level= -X PUT --json
+echo
+echo
+
+
+echo "04. PUT /admin/log?level=notValid and see error 'invalid log level'"
+echo "==================================================================="
+orionCurl --url /admin/log?level=notValid -X PUT --json
+echo
+echo
+
+
+echo "05. PUT /admin/log?level=ERROR and see it work"
+echo "=============================================="
+orionCurl --url /admin/log?level=ERROR -X PUT --json
+echo
+echo
+
+
+echo "06. PUT /admin/log?level=Info and see it work"
+echo "============================================="
+orionCurl --url /admin/log?level=Info -X PUT --json
+echo
+echo
+
+
+echo "07. PUT /admin/log?level=warn and see it work"
+echo "============================================="
+orionCurl --url /admin/log?level=warn -X PUT --json
+echo
+echo
+
+
+echo "08. PUT /admin/log?level=wArNiNg and see it work"
+echo "================================================"
+orionCurl --url /admin/log?level=wArNiNg -X PUT --json
+echo
+echo
+
+
+echo "09. PUT /admin/log?level=Fatal and see it work"
+echo "=============================================="
+orionCurl --url /admin/log?level=Fatal -X PUT --json
+echo
+echo
+
+
+echo "10. PUT /admin/log?level=DEBUG and see it work"
+echo "=============================================="
+orionCurl --url /admin/log?level=DEBUG -X PUT --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /admin/log and see error 'method not allowed'
+======================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: PUT
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. PUT /admin/log and see error 'log level missing'
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 29
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "log level missing"
+}
+
+
+03. PUT /admin/log?level= and see error 'Empty right-hand-side for URI param'
+=============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Empty right-hand-side for URI param /level/",
+    "error": "BadRequest"
+}
+
+
+04. PUT /admin/log?level=notValid and see error 'invalid log level'
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 29
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid log level"
+}
+
+
+05. PUT /admin/log?level=ERROR and see it work
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. PUT /admin/log?level=Info and see it work
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. PUT /admin/log?level=warn and see it work
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. PUT /admin/log?level=wArNiNg and see it work
+================================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. PUT /admin/log?level=Fatal and see it work
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. PUT /admin/log?level=DEBUG and see it work
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

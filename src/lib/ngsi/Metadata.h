@@ -32,6 +32,8 @@
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
 
+#include "mongo/client/dbclient.h"
+
 
 
 /* ****************************************************************************
@@ -62,23 +64,25 @@ typedef struct Metadata
   std::string        stringValue;  // "value" as a String
   double             numberValue;  // "value" as a Number
   bool               boolValue;    // "value" as a Boolean
+  bool               typeGiven;    // Was 'type' part of the incoming payload?
 
   Metadata();
-  Metadata(Metadata* mP);
+  Metadata(Metadata* mP, bool useDefaultType = false);
   Metadata(const std::string& _name, const std::string& _type, const char* _value);
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
   Metadata(const std::string& _name, const std::string& _type, double _value);
   Metadata(const std::string& _name, const std::string& _type, bool _value);
+  Metadata(const mongo::BSONObj& mdB);
 
-  std::string  render(Format format, const std::string& indent, bool comma = false);
+  std::string  render(const std::string& indent, bool comma = false);
   std::string  toJson(bool isLastElement);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
-  std::string  toStringValue(void);
+  std::string  toStringValue(void) const;
 
-  std::string  check(RequestType         requestType,
-                     Format              format,
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);

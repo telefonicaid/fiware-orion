@@ -63,6 +63,7 @@ struct Condition
     std::string q;
     std::string geometry;
     std::string coords;
+    std::string georel;
   }                        expression;
   std::string toJson();
 };
@@ -81,6 +82,7 @@ struct Subject
 struct Subscription
 {
   std::string  id;
+  std::string  description;
   Subject      subject;
   long long    expires;
   std::string  status;

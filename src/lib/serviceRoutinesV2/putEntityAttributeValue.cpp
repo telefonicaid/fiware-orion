@@ -25,12 +25,16 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/errorMessages.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttributeValue.h"
-
+#include "rest/OrionError.h"
+#include "parse/forbiddenChars.h"
 
 
 /* ****************************************************************************
@@ -59,10 +63,31 @@ std::string putEntityAttributeValue
 {
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
+  std::string  type           = ciP->uriParam["type"];
+
+  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, attributeName.c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
 
   // 01. Fill in UpdateContextRequest with data from URI and payload
   parseDataP->av.attribute.name = attributeName;
-  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, "UPDATE");
+
+  std::string err = parseDataP->av.attribute.check(ciP,ciP->requestType,"","", 0);
+  if (err != "OK")
+  {
+    OrionError oe(SccBadRequest, err);
+    return oe.render(ciP, "");
+  }
+  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, "UPDATE", type);
 
 
   // 02. Call standard op postUpdateContext
@@ -78,6 +103,15 @@ std::string putEntityAttributeValue
     }
   }
 
+  if (ciP->httpStatusCode == SccConflict)
+  {
+    ErrorCode   ec("TooManyResults", MORE_MATCHING_ENT);
+    std::string answer;
+
+    TIMED_RENDER(answer = ec.toJson(true));
+
+    return answer;
+  }
 
   // 04. Prepare HTTP headers
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))

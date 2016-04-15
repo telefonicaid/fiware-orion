@@ -25,7 +25,7 @@ GET Subscriptions V2
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0
 
 --SHELL--
 
@@ -119,7 +119,7 @@ payload='{
   "type": "Car",
   "speed": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -137,6 +137,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -151,6 +152,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -164,9 +166,10 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?options=count
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 837
+Content-Length: 855
 Content-Type: application/json
 X-Total-Count: 2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -192,6 +195,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },
@@ -228,6 +232,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },
@@ -252,7 +257,8 @@ Date: REGEX(.*)
 ====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/MyCar
+Location: /v2/entities/MyCar?type=Car
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -260,8 +266,9 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 896
+Content-Length: 914
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -287,6 +294,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },
@@ -312,7 +320,7 @@ Date: REGEX(.*)
                 "speed",
                 "location"
             ],
-            "callback": "http://127.0.0.1:REGEX(\d+)/notify",            
+            "callback": "http://127.0.0.1:REGEX(\d+)/notify",
             "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
             "timesSent": 1
         },
@@ -325,6 +333,7 @@ Date: REGEX(.*)
                 "expression": {
                     "coords": "",
                     "geometry": "",
+                    "georel": "",
                     "q": ""
                 }
             },

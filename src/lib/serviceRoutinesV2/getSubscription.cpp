@@ -28,6 +28,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "apiTypesV2/Subscription.h"
 #include "common/JsonHelper.h"
 #include "common/string.h"
@@ -35,6 +38,9 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
+#include "common/idCheck.h"
+
+
 
 /* ****************************************************************************
 *
@@ -45,24 +51,32 @@
 */
 std::string getSubscription
 (
-    ConnectionInfo*            ciP,
-    int                        components,
-    std::vector<std::string>&  compV,
-    ParseData*                 parseDataP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 )
 {
-
   ngsiv2::Subscription sub;
   std::string          idSub = compV[2];
   OrionError           oe;
+  std::string          out;
+  std::string          err;
 
-  mongoGetSubscription(&sub, &oe,  idSub , ciP->uriParam, ciP->tenant);
+  if ((err = idCheck(idSub)) != "OK")
+  {
+    OrionError oe(SccBadRequest, err);
+    return oe.render(ciP, "Invalid subscription ID");
+  }
+
+  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
 
   if (oe.code != SccOk)
   {
-    return oe.render(ciP,"");
+    TIMED_RENDER(out = oe.render(ciP, "Invalid subscription ID"));
+    return out;
   }
 
-  return  sub.toJson();
+  TIMED_RENDER(out = sub.toJson());
+  return out;
 }
-

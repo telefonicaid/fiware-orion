@@ -49,7 +49,7 @@ brokerStart CB
 
 echo "01. PUT /v2/entities/E1/attrs/A1/value and see it fail"
 echo "======================================================"
-payload='{ "value": 1 }'
+payload='{ "a": 1 }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
@@ -58,7 +58,7 @@ echo
 echo "02. POST /v2/entities to create E1/A1=2"
 echo "======================================="
 payload='{ "id": "E1", "type": "T1", "A1": 2 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -72,8 +72,8 @@ echo
 
 echo "04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work"
 echo "==========================================================="
-payload='{ "value": 4 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='4'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -87,8 +87,8 @@ echo
 
 echo "06. PUT /v2/entities/E1/attrs/A1/value (=true)"
 echo "=============================================="
-payload='{ "value": true }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='true'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -102,8 +102,8 @@ echo
 
 echo "08. PUT /v2/entities/E1/attrs/A1/value (=false)"
 echo "==============================================="
-payload='{ "value": false }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='false'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -116,8 +116,8 @@ echo
 
 echo '10. PUT /v2/entities/E1/attrs/A1/value (="STRING")'
 echo "=================================================="
-payload='{ "value": "STRING" }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='"STRING"'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -131,7 +131,7 @@ echo
 
 echo "12. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])"
 echo "====================================================="
-payload='{ "value": [ 1, 2, 3 ] }'
+payload='[ 1, 2, 3 ]'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
@@ -146,7 +146,7 @@ echo
 
 echo '14. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })'
 echo "===================================================================="
-payload='{ "value":  { "a": 1, "b": 2, "c": 3 } }'
+payload='{ "a": 1, "b": 2, "c": 3 }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
@@ -164,6 +164,7 @@ echo
 ======================================================
 HTTP/1.1 404 Not Found
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -172,7 +173,8 @@ Date: REGEX(.*)
 =======================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -180,12 +182,17 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1 to see A1==2
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 37
+Content-Length: 68
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": 2.0,
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -195,6 +202,7 @@ Date: REGEX(.*)
 ===========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -202,12 +210,17 @@ Date: REGEX(.*)
 05. GET /v2/entities/E1 to see A1==4
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 37
+Content-Length: 68
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": 4.0,
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 4
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -217,6 +230,7 @@ Date: REGEX(.*)
 ==============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -224,12 +238,17 @@ Date: REGEX(.*)
 07. GET /v2/entities/E1 to see A1==true
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 33
+Content-Length: 71
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": true,
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": true
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -239,6 +258,7 @@ Date: REGEX(.*)
 ===============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -246,12 +266,17 @@ Date: REGEX(.*)
 09. GET /v2/entities/E1 to see A1==false
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 34
+Content-Length: 72
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": false,
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": false
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -261,6 +286,7 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -268,12 +294,17 @@ Date: REGEX(.*)
 11. GET /v2/entities/E1 to see A1=="STRING"
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 37
+Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": "STRING",
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": "STRING"
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -283,6 +314,7 @@ Date: REGEX(.*)
 =====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -290,16 +322,21 @@ Date: REGEX(.*)
 13. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 57
+Content-Length: 74
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": [
-        1.0,
-        2.0,
-        3.0
-    ],
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": [
+            1,
+            2,
+            3
+        ]
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -309,6 +346,7 @@ Date: REGEX(.*)
 ====================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -316,15 +354,20 @@ Date: REGEX(.*)
 15. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 86
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "A1": {
-        "a": 1.0,
-        "b": 2.0,
-        "c": 3.0
+        "metadata": {},
+        "type": "none",
+        "value": {
+            "a": 1,
+            "b": 2,
+            "c": 3
+        }
     },
     "id": "E1",
     "type": "T1"

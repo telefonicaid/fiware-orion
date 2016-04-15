@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "orionTypes/OrionValueType.h"
+#include "alarmMgr/alarmMgr.h"
 #include "ngsi/Metadata.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseMetadata.h"
@@ -48,11 +49,12 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
     {
       if (type != "String")
       {
-        LM_E(("Bad Input (ContextAttribute::Metadata::type must be a String)"));
+        alarmMgr.badInput(clientIp, "ContextAttribute::Metadata::type must be a String");
         return "invalid JSON type for attribute metadata type";
       }
 
-      mP->type = iter->value.GetString();
+      mP->type      = iter->value.GetString();
+      mP->typeGiven = true;
     }
     else if (name == "value")
     {
@@ -76,19 +78,32 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
         mP->valueType     = orion::ValueTypeBoolean;
         mP->boolValue     = false;
       }
+      else if (type == "Null")
+      {
+        mP->valueType     = orion::ValueTypeNone;
+      }
       else
       {
-        LM_E(("Bad Input (ContextAttribute::Metadata::type is '%s')", type.c_str()));
+        std::string details = std::string("ContextAttribute::Metadata::type is '") + type + "'";
+        alarmMgr.badInput(clientIp, details);
         return "invalid JSON type for attribute metadata value";
       }
     }
     else
     {
+      alarmMgr.badInput(clientIp, "invalid JSON field for attribute metadata");
       return "invalid JSON field for attribute metadata";
     }
   }
 
+
+  if (!mP->typeGiven)
+  {
+    mP->type = DEFAULT_TYPE;
+  }
+
   return "OK";
+
 }
 
 
@@ -133,10 +148,19 @@ std::string parseMetadata(const Value& val, Metadata* mP)
     mP->valueType    = orion::ValueTypeBoolean;
     mP->boolValue    = false;
   }
+  else if (type == "Null")
+  {
+    mP->valueType    = orion::ValueTypeNone;
+  }
   else
   {
-    LM_W(("Bad Input (bad type for EntityId::ContextAttribute::Metadata)"));
+    alarmMgr.badInput(clientIp, "bad type for EntityId::ContextAttribute::Metadata");
     return "invalid JSON type for attribute metadata value";
+  }
+
+  if (!mP->typeGiven)
+  {
+    mP->type = DEFAULT_TYPE;
   }
 
   return "OK";

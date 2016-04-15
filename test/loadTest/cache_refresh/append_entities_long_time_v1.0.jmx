@@ -21,7 +21,7 @@
  iot_support at tid dot es
 
  Author: Ivan Arias
- -->
+-->
 <jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Entities Appends Long Time Test Plan " enabled="true">
@@ -74,7 +74,7 @@
           </elementProp>
           <elementProp name="ENTITIES" elementType="Argument">
             <stringProp name="Argument.name">ENTITIES</stringProp>
-            <stringProp name="Argument.value">${__P(ENTITIES,10)}</stringProp>
+            <stringProp name="Argument.value">${__P(ENTITIES,1)}</stringProp>
             <stringProp name="Argument.desc">entities appends</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
@@ -134,9 +134,9 @@
       <hashTree/>
       <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="jp@gc - Throughput Shaping Timer" enabled="true">
         <collectionProp name="load_profile">
-          <collectionProp name="-2091358407">
-            <stringProp name="-917572305">${__P(TPS, 10)}</stringProp>
-            <stringProp name="-917572305">${__P(TPS, 10)}</stringProp>
+          <collectionProp name="-1370517191">
+            <stringProp name="663137417">${__P(TPS, 1)}</stringProp>
+            <stringProp name="663137417">${__P(TPS, 1)}</stringProp>
             <stringProp name="-910543600">${__P(TESTTIME, 60)}</stringProp>
           </collectionProp>
         </collectionProp>
@@ -227,10 +227,10 @@
       </hashTree>
       <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate Thread Group" enabled="true">
         <collectionProp name="ultimatethreadgroupdata">
-          <collectionProp name="49311075">
+          <collectionProp name="2135619125">
             <stringProp name="-1814363565">${__P(THREADS,1)}</stringProp>
             <stringProp name="0">0</stringProp>
-            <stringProp name="1629">30</stringProp>
+            <stringProp name="53">5</stringProp>
             <stringProp name="-910543600">${__P(TESTTIME, 60)}</stringProp>
             <stringProp name="1629">30</stringProp>
           </collectionProp>
@@ -256,6 +256,15 @@
             <boolProp name="CounterConfig.per_user">false</boolProp>
           </CounterConfig>
           <hashTree/>
+          <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="attribute value random" enabled="true">
+            <stringProp name="maximumValue">10000000000</stringProp>
+            <stringProp name="minimumValue">1</stringProp>
+            <stringProp name="outputFormat">00000000000</stringProp>
+            <boolProp name="perThread">false</boolProp>
+            <stringProp name="randomSeed"></stringProp>
+            <stringProp name="variableName">VALUE_RND</stringProp>
+          </RandomVariableConfig>
+          <hashTree/>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append context" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -272,7 +281,7 @@
               {&#xd;
                 &quot;name&quot;: &quot;temperature&quot;,&#xd;
                 &quot;type&quot;: &quot;celcius&quot;,&#xd;
-                &quot;value&quot;: &quot;${__Random(1,10000000)}&quot;&#xd;
+                &quot;value&quot;: &quot;${VALUE_RND}&quot;&#xd;
               }           &#xd;
             ]&#xd;
         }&#xd;

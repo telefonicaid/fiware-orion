@@ -32,28 +32,29 @@ brokerStart CB 0-255 IPV4 -rush localhost:$LISTENER_PORT
 echo "1. Subscribe to changes in  E/att" # reference will never be reached as it stops in the accumulator
 echo "+++++++++++++++++++++++++++++++++"
 url="/v1/subscribeContext"
-payload='<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="Test" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>att</attribute>
-  </attributeList>
-  <reference>http://128.1.2.3/notify</reference>
-  <duration>P99Y</duration>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>att</condValue>
-      </condValueList>          
-    </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+  "entities": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ],
+  "attributes": [
+    "att"
+  ],
+  "reference": "http://128.1.2.3/notify",
+  "duration": "P99Y",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "att"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 echo
 
@@ -61,25 +62,24 @@ echo
 echo "2. Update/Append E/att"
 echo "++++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>XXX</type>
-          <contextValue>02</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+  "contextElements": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "att",
+          "type": "XXX",
+          "value": "02"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 echo
 
@@ -93,85 +93,86 @@ accumulatorDump
 1. Subscribe to changes in  E/att
 +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/xml
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>P99Y</duration>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+    "subscribeResponse": {
+        "duration": "P99Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 
 
 2. Update/Append E/att
 ++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 620
-Content-Type: application/xml
+Content-Length: 382
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>XXX</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "XXX",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 3. Accumulator dump
 +++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 717
+Content-Length: 463
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 X-Relayer-Host: 128.1.2.3:80
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>XXX</type>
-            <contextValue>02</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Test",
+        "isPattern" : "false",
+        "id" : "E",
+        "attributes" : [
+          {
+            "name" : "att",
+            "type" : "XXX",
+            "value" : "02"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
 =======================================
 --TEARDOWN--
 brokerStop CB

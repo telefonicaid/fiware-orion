@@ -35,13 +35,16 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "common/defaultValues.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoCommonRegister.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
 
 using std::string;
 using std::map;
@@ -60,10 +63,11 @@ using std::auto_ptr;
 */
 static bool processSubscriptions
 (
-  EntityIdVector                        triggerEntitiesV,
+  const EntityIdVector&                 triggerEntitiesV,
   map<string, TriggeredSubscription*>&  subs,
   std::string&                          err,
-  const std::string&                    tenant
+  const std::string&                    tenant,
+  const std::string&                    fiwareCorrelator
 )
 {
   bool ret = true;
@@ -79,7 +83,8 @@ static bool processSubscriptions
                                          mapSubId,
                                          trigs->reference,
                                          trigs->format,
-                                         tenant))
+                                         tenant,
+                                         fiwareCorrelator))
     {
       LM_T(LmtMongo, ("Notification failure"));
       ret = false;
@@ -118,7 +123,7 @@ static bool addTriggeredSubscriptions
   for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix)
   {
     // FIXME: take into account subscriptions with no type
-    EntityId* enP = cr.entityIdVector.get(ix);
+    EntityId* enP = cr.entityIdVector[ix];
 
     // The registration of isPattern=true entities is not supported, so we don't include them here
     if (enP->isPattern == "false")
@@ -134,7 +139,7 @@ static bool addTriggeredSubscriptions
   BSONArrayBuilder attrA;
   for (unsigned int ix = 0; ix < cr.contextRegistrationAttributeVector.size(); ++ix)
   {
-    ContextRegistrationAttribute* craP = cr.contextRegistrationAttributeVector.get(ix);
+    ContextRegistrationAttribute* craP = cr.contextRegistrationAttributeVector[ix];
     attrA.append(craP->name);
   }
 
@@ -225,38 +230,41 @@ static bool addTriggeredSubscriptions
   auto_ptr<DBClientCursor> cursor;
   BSONObj                  query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
 
-  if (!collectionQuery(getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getSubscribeContextAvailabilityCollectionName(tenant), query, &cursor, &err))
   {
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    releaseMongoConnection(connection);
     return false;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* For each one of the subscriptions found, add it to the map (if not already there) */
-  while (cursor->more())
+  while (moreSafe(cursor))
   {
-    BSONObj sub;
-    try
+    BSONObj     sub;
+    std::string err;
+    if (!nextSafeOrErrorF(cursor, &sub, &err))
     {
-      sub = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
-    BSONElement idField = getField(sub, "_id");
+    BSONElement idField = getFieldF(sub, "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get
+    // Now, if 'getFieldF(sub, "_id")' is not found, if we continue, calling OID() on it, then we get
     // an exception and the broker crashes.
     //
     if (idField.eoo() == true)
     {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+      std::string details = std::string("error retrieving _id field in doc: '") + sub.toString() + "'";
+      alarmMgr.dbError(details);
       continue;
     }
+    alarmMgr.dbErrorReset();
 
     std::string subIdStr = idField.OID().toString();
 
@@ -265,13 +273,14 @@ static bool addTriggeredSubscriptions
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringField(sub, CASUB_FORMAT)) : XML,
-        getStringField(sub, CASUB_REFERENCE),
+        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CASUB_FORMAT)) : JSON,
+        getStringFieldF(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
   }
+  releaseMongoConnection(connection);
 
   return true;
 }
@@ -298,7 +307,8 @@ HttpStatusCode processRegisterContext
   OID*                      id,
   const std::string&        tenant,
   const std::string&        servicePath,
-  const std::string&        format
+  const std::string&        format,
+  const std::string&        fiwareCorrelator
 )
 {
   std::string err;
@@ -326,7 +336,7 @@ HttpStatusCode processRegisterContext
   }
   reg.append("_id", oid);
   reg.append(REG_EXPIRATION, expiration);
-  reg.append(REG_SERVICE_PATH, servicePath);
+  reg.append(REG_SERVICE_PATH, servicePath == "" ? DEFAULT_SERVICE_PATH_UPDATES : servicePath);
   reg.append(REG_FORMAT, format);
 
 
@@ -342,12 +352,12 @@ HttpStatusCode processRegisterContext
   BSONArrayBuilder contextRegistration;
   for (unsigned int ix = 0; ix < requestP->contextRegistrationVector.size(); ++ix)
   {
-    ContextRegistration* cr = requestP->contextRegistrationVector.get(ix);
+    ContextRegistration* cr = requestP->contextRegistrationVector[ix];
 
     BSONArrayBuilder entities;
     for (unsigned int jx = 0; jx < cr->entityIdVector.size(); ++jx)
     {
-      EntityId* en = cr->entityIdVector.get(jx);
+      EntityId* en = cr->entityIdVector[jx];
       triggerEntitiesV.push_back(en);
 
       if (en->type == "")
@@ -365,7 +375,7 @@ HttpStatusCode processRegisterContext
     BSONArrayBuilder attrs;
     for (unsigned int jx = 0; jx < cr->contextRegistrationAttributeVector.size(); ++jx)
     {
-      ContextRegistrationAttribute* cra = cr->contextRegistrationAttributeVector.get(jx);
+      ContextRegistrationAttribute* cra = cr->contextRegistrationAttributeVector[jx];
       attrs.append(BSON(REG_ATTRS_NAME << cra->name << REG_ATTRS_TYPE << cra->type << "isDomain" << cra->isDomain));
       LM_T(LmtMongo, ("Attribute registration: {name: %s, type: %s, isDomain: %s}",
                       cra->name.c_str(),
@@ -384,10 +394,10 @@ HttpStatusCode processRegisterContext
       BSON(
         REG_ENTITIES << entities.arr() <<
         REG_ATTRS << attrs.arr() <<
-        REG_PROVIDING_APPLICATION << requestP->contextRegistrationVector.get(ix)->providingApplication.get()));
+        REG_PROVIDING_APPLICATION << requestP->contextRegistrationVector[ix]->providingApplication.get()));
 
     LM_T(LmtMongo, ("providingApplication registration: %s",
-                    requestP->contextRegistrationVector.get(ix)->providingApplication.c_str()));
+                    requestP->contextRegistrationVector[ix]->providingApplication.c_str()));
 
     std::string err;
 
@@ -413,7 +423,7 @@ HttpStatusCode processRegisterContext
   // Send notifications for each one of the subscriptions accumulated by
   // previous addTriggeredSubscriptions() invocations
   //
-  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant);
+  processSubscriptions(triggerEntitiesV, subsToNotify, err, tenant, fiwareCorrelator);
 
   // Fill the response element
   responseP->duration = requestP->duration;

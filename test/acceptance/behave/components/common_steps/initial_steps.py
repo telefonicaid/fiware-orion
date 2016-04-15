@@ -35,8 +35,6 @@ from tools.properties_config import Properties  # methods in properties class
 CONTEXT_BROKER_ENV = u'context_broker_env'
 MONGO_ENV = u'mongo_env'
 properties_class = Properties()
-props_cb = properties_class.read_properties()[CONTEXT_BROKER_ENV]       # context broker properties dict
-props_mongo = properties_class.read_properties()[MONGO_ENV]             # mongo properties dict
 
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
@@ -47,7 +45,7 @@ def update_properties_file(context, properties_file, sudo_run):
     """
     update properties.py file from setting folder or jenkins console
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
-    :param properties_file: file to get data to update properties.py
+    :param properties_file: file to get data fron setting folder to update properties.json
     """
     __logger__.debug("Updating properties.json file...")
     properties_class.update_properties_json_file(properties_file, sudo_run)
@@ -60,7 +58,10 @@ def update_context_broker_config_file_and_restart_service(context):
     updating /etc/sysconfig/contextBroker file
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    global props_cb, props_mongo
+    props_cb = properties_class.read_properties()[CONTEXT_BROKER_ENV]       # context broker properties dict
     __logger__.debug(" Context Broker parameters:")
+    props_mongo = properties_class.read_properties()[MONGO_ENV]             # mongo properties dict
     for param in props_cb:
         __logger__.debug("   %s: %s" % (param, props_cb[param]))
     __logger__.debug(" Mongo parameters:")
@@ -83,6 +84,7 @@ def start_context_broker(context):
     start ContextBroker
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    global props_cb, props_mongo
     if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
         __logger__.debug("Starting contextBroker service...")
         context.my_fab.run("service contextBroker restart")
@@ -91,12 +93,11 @@ def start_context_broker(context):
         __logger__.debug("Starting contextBroker per command line interface...")
         props_cb["CB_EXTRA_OPS"] = props_cb["CB_EXTRA_OPS"].replace('"', "")
         # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
-        __logger__.debug("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
-            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
-             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
-        resp = context.my_fab.run("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
-            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
-             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        command = "contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %\
+                  (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
+                   props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"])
+        __logger__.debug("command: %s" % command)
+        resp = context.my_fab.run(command)
         __logger__.debug("output: %s" % repr(resp))
         __logger__.info("...Started contextBroker command line interface")
 
@@ -107,6 +108,7 @@ def stop_Context_broker(context):
     stop ContextBroker
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    global props_cb
     if context.configuration["CB_RUNNING_MODE"].upper() == "RPM":
         __logger__.debug("Stopping contextBroker service...")
         context.my_fab.run("service contextBroker stop")
@@ -124,6 +126,7 @@ def verify_context_broker_is_installed_successfully(context):
     verify contextBroker is started successfully
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    global props_cb
     __logger__.debug("Verifying if contextBroker is started successfully...")
     cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
     c = 0
@@ -146,6 +149,7 @@ def verify_mongo_is_installed_successfully(context):
     verify contextBroker is installed successfully
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    global props_mongo
     __logger__.debug("Verifying if mongo is installed successfully...")
     mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
                   password=props_mongo["MONGO_PASS"], version=props_mongo["MONGO_VERSION"],

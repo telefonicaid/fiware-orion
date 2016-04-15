@@ -25,14 +25,19 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 #include "common/string.h"
+#include "common/errorMessages.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
-
+#include "rest/OrionError.h"
+#include "parse/forbiddenChars.h"
 
 
 /* ****************************************************************************
@@ -58,20 +63,24 @@ std::string getEntity
   ParseData*                 parseDataP
 )
 {
-  using namespace std;
+   std::string attrs  = ciP->uriParam["attrs"];
+   std::string type   = ciP->uriParam["type"];
 
+   if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+   {
+     OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+     return oe.render(ciP, "");
+   }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
-  // optional parameter for attributes
-  string attrs = ciP->uriParam["attrs"];
+  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
   if (attrs != "")
   {
-    vector<string> attrsV;
+    std::vector<std::string> attrsV;
 
     stringSplit(attrs, ',', attrsV);
-    for (vector<string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    for (std::vector<std::string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
     {
       parseDataP->qcr.res.attributeList.push_back_if_absent(*it);
     }
@@ -86,7 +95,8 @@ std::string getEntity
 
   entity.fill(&parseDataP->qcrs.res);
 
-  string answer = entity.render(ciP, EntityResponse);
+  std::string answer;
+  TIMED_RENDER(answer = entity.render(ciP, EntityResponse));
 
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {

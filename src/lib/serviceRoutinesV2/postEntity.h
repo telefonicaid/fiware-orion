@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* postEntities - 
+* postEntity -
 */
 extern std::string postEntity
 (

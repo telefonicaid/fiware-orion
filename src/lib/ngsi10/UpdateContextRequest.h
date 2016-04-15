@@ -33,6 +33,7 @@
 #include "ngsi/UpdateActionType.h"
 #include "rest/ConnectionInfo.h"
 #include "apiTypesV2/Entity.h"
+#include "apiTypesV2/Entities.h"
 
 
 
@@ -56,16 +57,12 @@ typedef struct UpdateContextRequest
   UpdateActionType        updateActionType;      // Mandatory
 
   std::string             contextProvider;       // Not part of the payload - used internally only
-  int                     xmls;                  // Not part of the payload - used internally only
-  int                     jsons;                 // Not part of the payload - used internally only
 
   UpdateContextRequest();
-  UpdateContextRequest(const std::string _contextProvider, EntityId* eP);
+  UpdateContextRequest(const std::string& _contextProvider, EntityId* eP);
 
-  void               init(void);
-  Format             format(void);
   std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string        check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string        check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void               release(void);
   ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
 
@@ -96,7 +93,10 @@ typedef struct UpdateContextRequest
   void         fill(const Entity* entP, const std::string& _updateActionType);
   void         fill(const std::string&   entityId,
                     ContextAttribute*    attributeP,
-                    const std::string&   _updateActionType);
+                    const std::string&   _updateActionType,
+                    const std::string&   type = "");
+
+  void         fill(Entities* entities, const std::string& _updateActionType);
 } UpdateContextRequest;
 
 #endif

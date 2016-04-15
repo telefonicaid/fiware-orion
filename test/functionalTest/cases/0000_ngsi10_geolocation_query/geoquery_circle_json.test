@@ -208,6 +208,7 @@ orionCurl --url "$url" --payload "$payload" --json
 HTTP/1.1 200 OK
 Content-Length: 576
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -244,6 +245,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 580
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -280,6 +282,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 577
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -315,6 +318,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1157
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -375,6 +379,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 1725
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -460,6 +465,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 600
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

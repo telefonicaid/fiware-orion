@@ -41,7 +41,6 @@
 std::string Originator::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -93,11 +92,13 @@ void Originator::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sOriginator: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sOriginator: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo Originator", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo Originator", indent.c_str()));
   }
 }
 
@@ -107,14 +108,14 @@ void Originator::present(const std::string& indent)
 *
 * Originator::render -
 */
-std::string Originator::render(Format format, const std::string& indent, bool comma)
+std::string Originator::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "originator", string, format, comma);
+  return valueTag1(indent, "originator", string, comma);
 }
 
 

@@ -27,6 +27,7 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <uuid/uuid.h>
 
 #include <string>
 #include <map>
@@ -34,37 +35,23 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/limits.h"
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/globals.h"
 #include "common/defaultValues.h"
+#include "common/clockFunctions.h"
+#include "common/statistics.h"
+#include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 #include "rest/restReply.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "mongoBackend/MongoGlobal.h"  // MAX_SERVICE_NAME_LEN
-
-
-extern unsigned connectionMemory;
-
-/* ****************************************************************************
-*
-* IP - 
-*/
-#define  LOCAL_IP_V6  "::"
-#define  LOCAL_IP_V4  "0.0.0.0"
-
-
-
-/* ****************************************************************************
-*
-* PAYLOAD_SIZE - 
-*/
-#define PAYLOAD_SIZE       (64 * 1024 * 1024)
-#define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
-#define STATIC_BUFFER_SIZE (32 * 1024)
+#include "common/limits.h"  // SERVICE_NAME_MAX_LEN
 
 
 
@@ -75,19 +62,36 @@ extern unsigned connectionMemory;
 static RestService*              restServiceV          = NULL;
 static unsigned short            port                  = 0;
 static RestServeFunction         serveFunction         = NULL;
-static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
-unsigned short                   rushPort              = 0;
+unsigned short                   rushPort              = NO_PORT;
 char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
+__thread char                    clientIp[IP_LENGTH_MAX + 1];
+static unsigned int              connMemory;
+static unsigned int              maxConns;
+static unsigned int              threadPoolSize;
+
+
+
+/* ****************************************************************************
+*
+* correlatorGenerate - 
+*/
+static void correlatorGenerate(char* buffer)
+{
+  uuid_t uuid;
+
+  uuid_generate_time_safe(uuid);
+  uuid_unparse_lower(uuid, buffer);
+}
 
 
 
@@ -101,25 +105,15 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
-  if (key == URI_PARAM_NOTIFY_FORMAT)
+  if (val == NULL || *val == 0)
   {
-    if (strcasecmp(val, "xml") == 0)
-    {
-      value = "XML";
-    }
-    else if (strcasecmp(val, "json") == 0)
-    {
-      value = "JSON";
-    }
-    else
-    {
-      OrionError error(SccBadRequest, std::string("Bad notification format: /") + value + "/. Valid values: /XML/ and /JSON/");
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = error.render(ciP, "");
-      return MHD_YES;
-    }
+    OrionError error(SccBadRequest, std::string("Empty right-hand-side for URI param /") + ckey + "/");
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer         = error.render(ciP, "");
+    return MHD_YES;
   }
-  else if (key == URI_PARAM_PAGINATION_OFFSET)
+
+  if (key == URI_PARAM_PAGINATION_OFFSET)
   {
     char* cP = (char*) val;
 
@@ -201,8 +195,23 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       ciP->answer         = error.render(ciP, "");
     }
   }
-  else
+  else if (key == URI_PARAM_TYPE)
+  {
+    ciP->uriParam[URI_PARAM_TYPE] = value;
+
+    if (strstr(val, ","))  // More than ONE type?
+    {
+      uriParamTypesParse(ciP, val);
+    }
+    else
+    {
+      ciP->uriParamTypes.push_back(val);
+    }
+  }
+  else if (key != URI_PARAM_Q)  // FIXME P1: possible more known options here ...
+  {
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
+  }
 
   if (val != NULL)
   {
@@ -224,7 +233,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   //
   bool containsForbiddenChars = false;
 
-  if (key == "geometry")
+  if ((key == "geometry") || (key == "georel"))
   {
     containsForbiddenChars = forbiddenChars(val, "=;");
   }
@@ -239,7 +248,10 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
   if (containsForbiddenChars == true)
   {
+    std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
+
+    alarmMgr.badInput(clientIp, details);
 
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer         = error.render(ciP, "");
@@ -261,16 +273,18 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
-  if      (strcasecmp(key.c_str(), "User-Agent") == 0)      headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), "Host") == 0)            headerP->host           = value;
-  else if (strcasecmp(key.c_str(), "Accept") == 0)          headerP->accept         = value;
-  else if (strcasecmp(key.c_str(), "Expect") == 0)          headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), "Connection") == 0)      headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), "Content-Type") == 0)    headerP->contentType    = value;
-  else if (strcasecmp(key.c_str(), "Content-Length") == 0)  headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), "Origin") == 0)          headerP->origin         = value;
-  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
-  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
+  if      (strcasecmp(key.c_str(), "User-Agent") == 0)        headerP->userAgent      = value;
+  else if (strcasecmp(key.c_str(), "Host") == 0)              headerP->host           = value;
+  else if (strcasecmp(key.c_str(), "Accept") == 0)            headerP->accept         = value;
+  else if (strcasecmp(key.c_str(), "Expect") == 0)            headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), "Connection") == 0)        headerP->connection     = value;
+  else if (strcasecmp(key.c_str(), "Content-Type") == 0)      headerP->contentType    = value;
+  else if (strcasecmp(key.c_str(), "Content-Length") == 0)    headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "Origin") == 0)            headerP->origin         = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)    headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)      headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "X-Forwarded-For") == 0)   headerP->xforwardedFor  = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Correlator") == 0) headerP->correlator     = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
@@ -351,7 +365,6 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 
   free(copy);
 
-  bool xml  = false;
   bool json = false;
   bool text = true;
 
@@ -379,35 +392,26 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              { xml  = true; json = true; text=true;}
-     if (format == "*/xml")            xml  = true;
-     if (format == "application/*")    { xml  = true; json = true; }
-     if (format == "application/xml")  xml  = true;
-     if (format == "application/json") json = true;
-     if (format == "*/json")           json = true;
-     if (format == "text/plain")       text = true;
-     
-     if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
+     if (format == "*/*")              { json = true; text=true;}
+     if (format == "application/*")    { json = true; }
+     if (format == "application/json") { json = true; }
+     if (format == "*/json")           { json = true; }
+     if (format == "text/plain")       { text = true; }
 
      //
      // Resetting charset
      //
      if (charsetP != NULL)
-        *charsetP = "";
+     {
+       *charsetP = "";
+     }
   }
 
-  //
-  // API version 1 has XML as default format, v2 has JSON
-  //
   if (apiVersion == "v2")
   {
     if (json == true)
     {
       return JSON;
-    }
-    else if (xml == true)
-    {
-      return XML;
     }
     else if (text)
     {
@@ -416,18 +420,13 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
   }
   else
   {
-    if (xml == true)
-    {
-      return XML;
-    }
-    else if (json == true)
+    if (json == true)
     {
       return JSON;
     }
   }
 
-
-  LM_W(("Bad Input (no valid 'Accept-format' found)"));
+  alarmMgr.badInput(clientIp, "no valid 'Accept-format' found");
   return NOFORMAT;
 }
 
@@ -443,7 +442,6 @@ static void serve(ConnectionInfo* ciP)
 }
 
 
-
 /* ****************************************************************************
 *
 * requestCompleted -
@@ -456,18 +454,60 @@ static void requestCompleted
   MHD_RequestTerminationCode  toe
 )
 {
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+  ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
+  struct timespec  reqEndTime;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
   {
     free(ciP->payload);
   }
 
-  delete(ciP);
   *con_cls = NULL;
 
-  LM_TRANSACTION_END();  // Incoming REST request ends
+  lmTransactionEnd();  // Incoming REST request ends
+
+  if (timingStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &reqEndTime);
+    clock_difftime(&reqEndTime, &ciP->reqStartTime, &threadLastTimeStat.reqTime);
+  }  
+
+  delete(ciP);
+
+  //
+  // Statistics
+  //
+  // Flush this requests timing measures onto a global var to be read by "GET /statistics".
+  // Also, increment the accumulated measures.
+  //
+  if (timingStatistics)
+  {
+    timeStatSemTake(__FUNCTION__, "updating statistics");
+
+    memcpy(&lastTimeStat, &threadLastTimeStat, sizeof(lastTimeStat));
+
+    //
+    // "Fix" mongoBackendTime
+    //   Substract times waiting at mongo driver operation (in mongo[Read|Write|Command]WaitTime counters) so mongoBackendTime
+    //   contains at the end the time passed in our logic, i.e. a kind of "self-time" for mongoBackend
+    //
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoReadWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoWriteWaitTime);
+    clock_subtime(&threadLastTimeStat.mongoBackendTime, &threadLastTimeStat.mongoCommandWaitTime);
+
+    clock_addtime(&accTimeStat.jsonV1ParseTime,       &threadLastTimeStat.jsonV1ParseTime);
+    clock_addtime(&accTimeStat.jsonV2ParseTime,       &threadLastTimeStat.jsonV2ParseTime);
+    clock_addtime(&accTimeStat.mongoBackendTime,      &threadLastTimeStat.mongoBackendTime);
+    clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
+    clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
+    clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
+    clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
+    clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
+
+    timeStatSemGive(__FUNCTION__, "updating statistics");
+  }
 }
+
 
 
 /* ****************************************************************************
@@ -482,13 +522,12 @@ static int outFormatCheck(ConnectionInfo* ciP)
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
     ciP->httpStatusCode = SccNotAcceptable;
     ciP->answer = restErrorReplyGet(ciP,
-                                    XML,
                                     "",
                                     "OrionError",
                                     SccNotAcceptable,
-                                    std::string("acceptable MIME types: application/xml, application/json. Accept header in request: ") + ciP->httpHeaders.accept);
+                                    std::string("acceptable MIME types: application/json. Accept header in request: ") + ciP->httpHeaders.accept);
 
-    ciP->outFormat      = XML; // We use XML as default format
+    ciP->outFormat      = JSON; // We use JSON as default format
     ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
@@ -521,6 +560,11 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   // 4. Only alphanum and underscore allowed (just like in tenants)
   //    OR: Last component is EXACTLY '#'
   //
+  // About the constants 10 and 50, see common/limits.h:
+  //   - SERVICE_PATH_MAX_COMPONENTS
+  //   - SERVICE_PATH_MAX_LEVELS
+  //   - SERVICE_PATH_MAX_COMPONENT_LEN
+  //
   std::vector<std::string> compV;
   int                      components;
 
@@ -529,6 +573,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   {
     return 0;
   }
+
+  if (servicePath[0] == 0)
+  {
+    // Special case, corresponding to default service path
+    return 0;
+  }
+
 
   if (servicePath[0] != '/')
   {
@@ -539,7 +590,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   components = stringSplit(servicePath, '/', compV);
 
-  if (components > 10)
+  if (components > SERVICE_PATH_MAX_LEVELS)
   {
     OrionError e(SccBadRequest, "too many components in ServicePath");
     ciP->answer = e.render(ciP, "");
@@ -548,7 +599,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   for (int ix = 0; ix < components; ++ix)
   {
-    if (strlen(compV[ix].c_str()) > 50)
+    if (strlen(compV[ix].c_str()) > SERVICE_PATH_MAX_COMPONENT_LEN)
     {
       OrionError e(SccBadRequest, "component-name too long in ServicePath");
       ciP->answer = e.render(ciP, "");
@@ -617,7 +668,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   {
     OrionError e(SccBadRequest, "empty service path");
     ciP->answer = e.render(ciP, "");
-    LM_W(("Bad Input (empty service path)"));
+    alarmMgr.badInput(clientIp, "empty service path");
     return -1;
   }
 #endif
@@ -626,11 +677,12 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   if (servicePaths == 0)
   {
-    /* In this case the result is a 0 length vector */
+    /* In this case the result is a vector with an empty string */
+    ciP->servicePathV.push_back("");
     return 0;
   }
 
-  if (servicePaths > 10)
+  if (servicePaths > SERVICE_PATH_MAX_COMPONENTS)
   {
     OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
     ciP->answer = e.render(ciP, "");
@@ -670,7 +722,8 @@ int servicePathSplit(ConnectionInfo* ciP)
 *   so we don't want to use the default 200
 *
 * NOTE
-*   In version 2 of the protocol, we admit ONLY application/json
+*   In version 1 of the protocol, we admit ONLY application/json
+*   In version 2 of the protocol, we admit ONLY application/json and text/plain
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
@@ -678,9 +731,8 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
-  //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
-  //   4. Content-Type present but not supported
-  //   5. API version 2 and not 'application/json'
+  //   3. Content-Type present but not supported
+  //   4. API version 2 and not 'application/json' || text/plain
   //
 
 
@@ -696,37 +748,29 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
     ciP->httpStatusCode = SccUnsupportedMediaType;
 
     return 1;
   }
 
-
   // Case 3
-  if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+  if ((ciP->apiVersion == "v1") && (ciP->httpHeaders.contentType != "application/json"))
   {
-    return 0;
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    return 1;
   }
 
 
   // Case 4
-  if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-    return 1;
-  }
-
-
-  // Case 5
-  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json"))
-  {
-    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->answer = restErrorReplyGet(ciP, "", "OrionError", SccUnsupportedMediaType, details);
     ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
@@ -771,79 +815,31 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 
 /* ****************************************************************************
 *
-* defaultServicePath
-*
-* Returns a default servicePath (to be used in the case Fiware-servicePath header
-* is not found in the request) depending on the RequestCheck
-*/
-std::string defaultServicePath(const char* url, const char* method)
-{
-  /* Look for standard operation (based on the URL). Given that some operations are
-   * a substring of other, we search first for the longest ones
-   *
-   *  updateContextAvailabilitySubscription
-   *  unsubscribeContextAvailability
-   *  subscribeContextAvailability
-   *  discoverContextAvailability
-   *  updateContextSubscription
-   *  unsubscribeContext
-   *  subscribeContext
-   *  registerContext
-   *  updateContext
-   *  queryContext
-   *
-   * Note that in the case of unsubscribeContext and unsubscribeContextAvailability doesn't
-   * actually use a servicePath, but we also provide a default in that case for the sake of
-   * completeness
-   */
-
-  // FIXME P5: this strategy can be improved taking into account full URL. Otherwise, it is
-  // ambigous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
-  // highly improbable that the user uses entities which id (or type) match the name of a
-  // standard operation
-
-  // FIXME P5: unhardwire literals
-  if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "notifyContextAvailability") != NULL)             return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "notifyContext") != NULL)                         return DEFAULT_SERVICE_PATH;
-  if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_RECURSIVE;
-
-  /* Look for convenience operation. Subscription-related operations are special, all the other depend on
-   * the method
-   */
-  if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
-  if (strcasecmp(method, "POST") == 0)                                  return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "PUT") == 0)                                   return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
-  if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
-
-  LM_W(("Bad Input (cannot find default service path for: (%s, %s))", method, url));
-  return DEFAULT_SERVICE_PATH;
-}
-
-
-
-/* ****************************************************************************
-*
 * apiVersionGet - 
 *
 * This function returns the version of the API for the incoming message,
 * based on the URL.
 * If the URL starts with "/v2" then the request is considered API version 2.
+*
 * Otherwise, API version 1.
+*
+* Except ...
+* The new request to change the log level (not trace level), uses the
+* URL /admin/log, which DOES NOT start with '/v2', but as some render methods
+* depend on the apiVersion and we prefer the 'new render' from v2 for this
+* operation (see OrionError::render), we consider internally /admin/log to be part of v2.
+*
+* FIXME P2: instead of looking at apiVersion for rendering, perhaps we need
+*           some other algorithm, considering 'admin' requests as well ...
 */
 static std::string apiVersionGet(const char* path)
 {
   if ((path[1] == 'v') && (path[2] == '2'))
+  {
+    return "v2";
+  }
+
+  if (strcmp(path, "/admin/log") == 0)
   {
     return "v2";
   }
@@ -872,6 +868,7 @@ static std::string apiVersionGet(const char* path)
 * Call 2: *con_cls != NULL  AND  *upload_data_size != 0
 * Call 3: *con_cls != NULL  AND  *upload_data_size == 0
 */
+static int reqNo       = 1;
 static int connectionTreat
 (
    void*            cls,
@@ -886,11 +883,18 @@ static int connectionTreat
 {
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
-  static int             reqNo       = 1;
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {
+    //
+    // First thing to do on a new connection, set correlator to N/A.
+    // After reading HTTP headers, the correlator id either changes due to encountering a 
+    // Fiware-Correlator HTTP Header, or, if no HTTP header with Fiware-Correlator is found,
+    // a new correlator is generated.
+    //
+    correlatorIdSet("N/A");
+
     //
     // IP Address and port of caller
     //
@@ -898,15 +902,18 @@ static int connectionTreat
     unsigned short  port = 0;
 
     const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+
     if (mciP != NULL)
     {
-      struct sockaddr* addr = (struct sockaddr*)mciP->client_addr;
+      struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
+
       port = (addr->sa_data[0] << 8) + addr->sa_data[1];
       snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
                addr->sa_data[2] & 0xFF,
                addr->sa_data[3] & 0xFF,
                addr->sa_data[4] & 0xFF,
                addr->sa_data[5] & 0xFF);
+      snprintf(clientIp, sizeof(clientIp), "%s", ip);
     }
     else
     {
@@ -916,7 +923,23 @@ static int connectionTreat
 
 
     //
+    // Reset time measuring?
+    //
+    if (timingStatistics)
+    {
+      memset(&threadLastTimeStat, 0, sizeof(threadLastTimeStat));
+    }
+
+
+    //
     // ConnectionInfo
+    //
+    // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
+    // as long as it is properly cleaned up between calls.
+    // We would save the call to new/free for each and every request.
+    // Once we *really* look to scratch some efficiency, this change should be made.
+    //
+    // Also, is ciP->ip really used?
     //
     if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
     {
@@ -924,6 +947,13 @@ static int connectionTreat
       return MHD_NO;
     }
 
+    if (timingStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &ciP->reqStartTime);
+    }
+
+    LM_T(LmtRequest, (""));
+    LM_T(LmtRequest, ("--------------------- Serving request %s %s -----------------", method, url));
     *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port    = port;
     ciP->ip      = ip;
@@ -931,34 +961,55 @@ static int connectionTreat
 
     ++reqNo;
 
-    //
-    // Transaction starts here
-    //
-    LM_TRANSACTION_START("from", ip, port, url);  // Incoming REST request starts
-
 
     //
     // URI parameters
-    // 
-    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]      = DEFAULT_PARAM_NOTIFY_FORMAT;
+    //
+    // FIXME P1: We might not want to do all these assignments, they are not used in all requests ...
+    //           Once we *really* look to scratch some efficiency, this change should be made.
+    //     
     ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-    if (!ciP->httpHeaders.servicePathReceived)
+
+    char correlator[CORRELATOR_ID_SIZE + 1];
+    if (ciP->httpHeaders.correlator == "")
     {
-      ciP->httpHeaders.servicePath = defaultServicePath(url, method);
+      correlatorGenerate(correlator);
+      ciP->httpHeaders.correlator = correlator;
+    }
+
+    correlatorIdSet(ciP->httpHeaders.correlator.c_str());
+
+    ciP->httpHeader.push_back("Fiware-Correlator");
+    ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
+
+    //
+    // Transaction starts here
+    //
+    lmTransactionStart("from", ip, port, url);  // Incoming REST request starts
+
+
+    /* X-Forwared-For (used by a potential proxy on top of Orion) overrides ip */
+    if (ciP->httpHeaders.xforwardedFor == "")
+    {
+      lmTransactionSetFrom(ip);
+    }
+    else
+    {
+      lmTransactionSetFrom(ciP->httpHeaders.xforwardedFor.c_str());
     }
 
     ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
-    char tenant[MAX_SERVICE_NAME_LEN + 1];
+    char tenant[SERVICE_NAME_MAX_LEN + 1];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
     {
-      ciP->outFormat = XML; // XML is default output format
+      ciP->outFormat = JSON; // JSON is default output format
     }
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
@@ -967,6 +1018,7 @@ static int connectionTreat
   }
 
 
+  //
   // 2. Data gathering calls
   //
   // 2-1. Data gathering calls, just wait
@@ -974,70 +1026,80 @@ static int connectionTreat
   //
   if (dataLen != 0)
   {
-    if (dataLen == ciP->httpHeaders.contentLength)
+    //
+    // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+    // just silently "eat" the entire message
+    //
+    if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
     {
-      if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
-      {
-        if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-        {
-          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
-        }
-        else
-        {
-          ciP->payload = static_buffer;
-        }
+      *upload_data_size = 0;
+      return MHD_YES;
+    }
 
-        ciP->payloadSize = dataLen;
-        memcpy(ciP->payload, upload_data, dataLen);
-        ciP->payload[dataLen] = 0;
+    //
+    // First call with payload - use the thread variable "static_buffer" if possible,
+    // otherwise allocate a bigger buffer
+    //
+    // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
+    //           Once we *really* look to scratch some efficiency, this change should be made.
+    //
+    if (ciP->payloadSize == 0)  // First call with payload
+    {
+      if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+      {
+        ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
       }
       else
       {
-        char details[256];
-        snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
-
-        ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
-        ciP->httpStatusCode = SccRequestEntityTooLarge;
+        ciP->payload = static_buffer;
       }
-
-      // All payload received, acknowledge!
-      *upload_data_size = 0;
-    }
-    else
-    {
-      LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
     }
 
+    // Copy the chunk
+    LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+    memcpy(&ciP->payload[ciP->payloadSize], upload_data, dataLen);
+    
+    // Add to the size of the accumulated read buffer
+    ciP->payloadSize += *upload_data_size;
+
+    // Zero-terminate the payload
+    ciP->payload[ciP->payloadSize] = 0;
+
+    // Acknowledge the data and return
+    *upload_data_size = 0;
     return MHD_YES;
   }
 
+
+  //
   // 3. Finally, serve the request (unless an error has occurred)
   // 
-  // URL and headers checks are delayed to third MHD call 
+  // URL and headers checks are delayed to the "third" MHD call, as no 
+  // errors can be sent before all the request has been read
   //
-  
   if (urlCheck(ciP, ciP->url) == false)
   {
-    LM_W(("Bad Input (error in URI path)"));
+    alarmMgr.badInput(clientIp, "error in URI path");
     restReply(ciP, ciP->answer);
   }
 
   ciP->servicePath = ciP->httpHeaders.servicePath;
+  lmTransactionSetSubservice(ciP->servicePath.c_str());
 
   if (servicePathSplit(ciP) != 0)
   {
-    LM_W(("Bad Input (error in ServicePath http-header)"));
+    alarmMgr.badInput(clientIp, "error in ServicePath http-header");
     restReply(ciP, ciP->answer);
   }
 
   if (contentTypeCheck(ciP) != 0)
   {
-    LM_W(("Bad Input (invalid mime-type in Content-Type http-header)"));
+    alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
     restReply(ciP, ciP->answer);
   }
   else if (outFormatCheck(ciP) != 0)
   {
-    LM_W(("Bad Input (invalid mime-type in Accept http-header)"));
+    alarmMgr.badInput(clientIp, "invalid mime-type in Accept http-header");
     restReply(ciP, ciP->answer);
   }
   else
@@ -1047,39 +1109,43 @@ static int connectionTreat
 
   if (ciP->httpStatusCode != SccOk)
   {
-    LM_W(("Bad Input (error in URI parameters)"));
+    alarmMgr.badInput(clientIp, "error in URI parameters");
     restReply(ciP, ciP->answer);
     return MHD_YES;
-  }
-  LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+  }  
 
-  // Set default mime-type for notifications
-  if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
+  //
+  // Here, if the incoming request was too big, return error about it
+  //
+  if (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE)
   {
-    if (ciP->outFormat == XML)
-    {
-      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
-    }
-    else if (ciP->outFormat == JSON)
-    {
-      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
-    }
-    else
-    {
-      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
-    }
-    
-    LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+    char details[256];
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+    alarmMgr.badInput(clientIp, details);
+
+    ciP->answer         = restErrorReplyGet(ciP, "", ciP->url, SccRequestEntityTooLarge, details);
+    ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
 
-  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
+  //
+  // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with two exceptions.
+  //
+  // - Old log requests  (URL contains '/log/')
+  // - New log requests  (URL is exactly '/admin/log')
+  //
+  if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && 
+      (ciP->httpHeaders.contentLength == 0) && 
+      ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
   {
-    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
+    std::string errorMsg = restErrorReplyGet(ciP, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
+    alarmMgr.badInput(clientIp, errorMsg);
   }
   else if (ciP->answer != "")
   {
+    alarmMgr.badInput(clientIp, ciP->answer);
     restReply(ciP, ciP->answer);
   }
   else
@@ -1094,16 +1160,34 @@ static int connectionTreat
 /* ****************************************************************************
 *
 * restStart - 
+*
+* NOTE, according to MHD documentation, thread pool (MHD_OPTION_THREAD_POOL_SIZE) cannot be used
+* is conjunction with MHD_USE_THREAD_PER_CONNECTION.
+* However, we have seen that if the thread pool size is 0 (the case of NOT using thread pool), then
+* MHD_start_daemon is OK with it.
+*
+* From MHD documentation:
+* MHD_OPTION_THREAD_POOL_SIZE
+*   Number (unsigned int) of threads in thread pool. Enable thread pooling by setting this value to to something greater than 1.
+*   Currently, thread model must be MHD_USE_SELECT_INTERNALLY if thread pooling is enabled (MHD_start_daemon returns NULL for
+*   an unsupported thread model).
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
-  bool   mhdStartError = true;
-  size_t memoryLimit   = connectionMemory * 1024; // connectionMemory are kilobytes
+  bool      mhdStartError  = true;
+  size_t    memoryLimit    = connMemory * 1024; // Connection memory is expressed in kilobytes
+  MHD_FLAG  serverMode     = MHD_USE_THREAD_PER_CONNECTION;
 
   if (port == 0)
   {
     LM_X(1, ("Fatal Error (please call restInit before starting the REST service)"));
   }
+
+  if (threadPoolSize != 0)
+  {
+    serverMode = MHD_USE_SELECT_INTERNALLY;
+  }
+
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   { 
@@ -1119,7 +1203,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
+      mhdDaemon = MHD_start_daemon(serverMode | MHD_USE_SSL,
                                    htons(port),
                                    NULL,
                                    NULL,
@@ -1127,6 +1211,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                    MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1135,12 +1221,14 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY | MHD_USE_DEBUG
+      mhdDaemon = MHD_start_daemon(serverMode,
                                    htons(port),
                                    NULL,
                                    NULL,
                                    connectionTreat,                     NULL,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                   MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                   MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -1167,7 +1255,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
       LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
                                       NULL,
@@ -1175,6 +1263,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                       MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1182,12 +1272,14 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
-      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
+      mhdDaemon_v6 = MHD_start_daemon(serverMode | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
                                       NULL,
                                       connectionTreat,                     NULL,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
+                                      MHD_OPTION_CONNECTION_LIMIT,         maxConns,
+                                      MHD_OPTION_THREAD_POOL_SIZE,         threadPoolSize,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -1215,7 +1307,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 * restInit - 
 *
 * FIXME P5: add vector of the accepted content-types, instead of the bool
-*           argument _acceptTextXml that was added for iotAgent only.
 *           See Issue #256
 */
 void restInit
@@ -1225,26 +1316,30 @@ void restInit
   const char*         _bindAddress,
   unsigned short      _port,
   bool                _multitenant,
+  unsigned int        _connectionMemory,
+  unsigned int        _maxConnections,
+  unsigned int        _mhdThreadPoolSize,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _allowedOrigin,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
-  RestServeFunction   _serveFunction,
-  bool                _acceptTextXml
+  RestServeFunction   _serveFunction
 )
 {
   const char* key  = _httpsKey;
   const char* cert = _httpsCertificate;
 
-  port          = _port;
-  restServiceV  = _restServiceV;
-  ipVersionUsed = _ipVersion;
-  serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
-  acceptTextXml = _acceptTextXml;
-  multitenant   = _multitenant;
-  rushHost      = _rushHost;
-  rushPort      = _rushPort;
+  port             = _port;
+  restServiceV     = _restServiceV;
+  ipVersionUsed    = _ipVersion;
+  serveFunction    = (_serveFunction != NULL)? _serveFunction : serve;  
+  multitenant      = _multitenant;
+  connMemory       = _connectionMemory;
+  maxConns         = _maxConnections;
+  threadPoolSize   = _mhdThreadPoolSize;
+  rushHost         = _rushHost;
+  rushPort         = _rushPort;
 
   strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 

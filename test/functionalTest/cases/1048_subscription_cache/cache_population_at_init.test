@@ -158,18 +158,23 @@ echo
 echo
 
 
-echo "05. Statistics in XML"
-echo "====================="
-orionCurl --url /statistics
-echo
-echo
-
-
-echo "06. Statistics in JSON"
+echo "05. Statistics in JSON"
 echo "======================"
-orionCurl --url /statistics --json
+orionCurl --url /cache/statistics --json
 echo
 echo
+
+
+#
+# About
+#   "subCacheRefreshs": "REGEX((0|1))"
+# When the broker is started with -noCache, there are no refreshes performed
+#
+#
+# About:
+#  "REGEX((3|0))" and similar.  (sudden jump from 3 to 0)
+# This is to make the functest work when the broker is started with -noCache - no cache inserts etc are made ... 0
+#
 
 
 --REGEXPECT--
@@ -178,6 +183,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -194,6 +200,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -210,6 +217,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -227,48 +235,21 @@ Broker Stopped
 Broker Restarted
 
 
-05. Statistics in XML
-=====================
-HTTP/1.1 200 OK
-Content-Length: REGEX((492|494))
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <versionRequests>REGEX((0|1))</versionRequests>
-  <statisticsRequests>1</statisticsRequests>
-  <uptime_in_secs>REGEX(1?\d)</uptime_in_secs>
-  <measuring_interval_in_secs>REGEX(1?\d)</measuring_interval_in_secs>
-  <subCache>REGEX([0-9a-f, ]{76})</subCache>
-  <subCacheRefreshs>1</subCacheRefreshs>
-  <subCacheInserts>3</subCacheInserts>
-  <subCacheRemoves>0</subCacheRemoves>
-  <subCacheUpdates>0</subCacheUpdates>
-  <subCacheItems>3</subCacheItems>
-</orion>
-
-
-06. Statistics in JSON
+05. Statistics in JSON
 ======================
 HTTP/1.1 200 OK
-Content-Length: REGEX((391|393))
+Content-Length: REGEX(\d+)
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "orion": {
-        "measuring_interval_in_secs": "REGEX(1?\d)",
-        "statisticsRequests": "2",
-        "subCache": "REGEX([0-9a-f, ]{76})",
-        "subCacheInserts": "3",
-        "subCacheItems": "3",
-        "subCacheRefreshs": "1",
-        "subCacheRemoves": "0",
-        "subCacheUpdates": "0",
-        "uptime_in_secs": "REGEX(1?\d)",
-        "versionRequests": "REGEX((0|1))"
-    }
+    "ids": "REGEX([0-9a-f, ]{76})",
+    "inserts": REGEX((3|0)),
+    "items": REGEX((3|0)),
+    "refresh": REGEX((0|1)),
+    "removes": 0,
+    "updates": 0
 }
 
 

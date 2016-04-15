@@ -28,67 +28,98 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/statistics.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/safeBsonGet.h"
+#include "mongoBackend/dbFieldEncoding.h"
+#include "mongoBackend/safeMongo.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
 
 /* ****************************************************************************
 *
-* attributeType -
+* getAttributeTypes -
 *
 */
-static std::string attributeType
+static void getAttributeTypes
 (
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
-  const std::string                     entityType,
-  const std::string                     attrName
+  const std::string&                    entityType,
+  const std::string&                    attrName,
+  std::vector<std::string>*             attrTypes
 )
 {
   std::string  idType         = std::string("_id.")    + ENT_ENTITY_TYPE;
   std::string  idServicePath  = std::string("_id.")    + ENT_SERVICE_PATH;
-  std::string  attributeName  = std::string(ENT_ATTRS) + "." + attrName;
 
-  BSONObj query = BSON(idType        << entityType <<
-                       idServicePath << fillQueryServicePath(servicePathV) <<
-                       attributeName << BSON("$exists" << true));
+  BSONObj query;
+  if (entityType == "")
+  {
+    query = BSON("$or"         << BSON_ARRAY(BSON(idType << entityType) << BSON(idType << BSON("$exists" << false)) ) <<
+                 idServicePath << fillQueryServicePath(servicePathV) <<
+                 ENT_ATTRNAMES << attrName);
+  }
+  else
+  {
+    query = BSON(idType        << entityType <<
+                 idServicePath << fillQueryServicePath(servicePathV) <<
+                 ENT_ATTRNAMES << attrName);
+  }
 
   std::auto_ptr<DBClientCursor> cursor;
   std::string                   err;
 
-  if (!collectionQuery(getEntitiesCollectionName(tenant), query, &cursor, &err))
+  TIME_STAT_MONGO_READ_WAIT_START();
+  DBClientBase* connection = getMongoConnection();
+  if (!collectionQuery(connection, getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    return "";
+    releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    return;
   }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
 
-  while (cursor->more())
+  unsigned int  docs = 0;
+  while (moreSafe(cursor))
   {
     BSONObj r;
-    try
+    if (!nextSafeOrErrorF(cursor, &r, &err))
     {
-      r = cursor->nextSafe();
-    }
-    catch (const AssertionException &e)
-    {
-      // $err raised
-      LM_E(("Runtime Error (assertion exception in nextSafe(): %s", e.what()));
+      LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       continue;
     }
+    docs++;
+    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    /* Previous versions of this function used a simpler approach:
+     *
+     *   BSONObj attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
+     *   BSONObj attr  = getFieldF(attrs, attrName).embeddedObject();
+     *   attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+     *
+     * However, it doesn't work when the attribute used metadata ID
+     *
+     */
 
-    /* It could happen that different entities within the same entity type may have attributes with the same name
-     * but different types. In that case, one type (at random) is returned. A list could be returned but the
-     * NGSIv2 operations only allow to set one type */
-    BSONObj attrs = getField(r, ENT_ATTRS).embeddedObject();
-    BSONObj attr = getField(attrs, attrName).embeddedObject();
-    return getStringField(attr, ENT_ATTRS_TYPE);
+    BSONObj                attrs = getFieldF(r, ENT_ATTRS).embeddedObject();
+    std::set<std::string>  attrsSet;
+
+    attrs.getFieldNames(attrsSet);
+    for (std::set<std::string>::iterator i = attrsSet.begin(); i != attrsSet.end(); ++i)
+    {
+      std::string currentAttr = *i;
+      if (basePart(currentAttr) == attrName)
+      {
+        BSONObj attr = getFieldF(attrs, currentAttr).embeddedObject();
+        attrTypes->push_back(getStringFieldF(attr, ENT_ATTRS_TYPE));
+      }
+    }
+
   }
-
-  return "";
+  releaseMongoConnection(connection);
 }
 
 
@@ -122,10 +153,11 @@ static long long countEntities(const std::string& tenant, const std::vector<std:
 */
 HttpStatusCode mongoEntityTypes
 (
-  EntityTypeVectorResponse*                  responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams
+  EntityTypeVectorResponse*            responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams,
+  const std::string&                   apiVersion
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -212,7 +244,7 @@ HttpStatusCode mongoEntityTypes
   // Processing result to build response
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getField(result, "result").Array();
+  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
 
   if (resultsArray.size() == 0)
   {
@@ -230,14 +262,42 @@ HttpStatusCode mongoEntityTypes
    *
    * However, considering that the number of types will be small compared with the number of entities,
    * the current approach seems to be ok
+   *
+   * emptyEntityType is special: it must aggregate results for entity type "" and for entities without type.
+   * Is pre-created before starting processing results and destroyed if at the end it has not been used
+   * (i.e. pushed back into the vector)
+   *
    */
+
+  EntityType* emptyEntityType     = new EntityType("");
+  bool        emptyEntityTypeUsed = false;
+
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    EntityType*               entityType  = new EntityType(getStringField(resultItem, "_id"));
-    std::vector<BSONElement>  attrsArray  = getField(resultItem, "attrs").Array();
+    BSONObj                   resultItem  = resultsArray[ix].embeddedObject();    
+    std::vector<BSONElement>  attrsArray  = getFieldF(resultItem, "attrs").Array();
 
-    entityType->count = countEntities(tenant, servicePathV, entityType->type);
+
+    EntityType*               entityType;
+
+
+    // nullId true means that the "cumulative" entityType for both no-type and type "" has to be used. This happens
+    // when the results item has the field "" and at the same time the value of that field is JSON null or when
+    // the value of the field "_id" is ""
+    bool nullId = ((resultItem.hasField("")) && (getFieldF(resultItem, "").isNull())) || getFieldF(resultItem, "_id").isNull() || (getStringFieldF(resultItem, "_id") == "");
+
+    if (nullId)
+    {
+      entityType           = emptyEntityType;
+      emptyEntityTypeUsed  = true;
+    }
+    else
+    {
+      entityType = new EntityType(getStringFieldF(resultItem, "_id"));
+    }
+
+    /* Note we use += due to emptyEntityType accumulates */
+    entityType->count += countEntities(tenant, servicePathV, entityType->type);
 
     if (!attrsArray[0].isNull())
     {
@@ -251,14 +311,37 @@ HttpStatusCode mongoEntityTypes
 
         /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
          * This could be unefficient, specially if the number of attributes is large */
-        std::string attrType = attributeType(tenant, servicePathV, entityType->type , attrsArray[jx].str());
+        std::vector<std::string> attrTypes;
+        getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].str(), &attrTypes);
 
-        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrType, "");
-        entityType->contextAttributeVector.push_back(ca);
+        for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
+        {
+          ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrTypes[kx], "");
+          entityType->contextAttributeVector.push_back(ca);
+
+          // For backward compability, NGSIv1 only accepts one element
+          if (apiVersion == "v1")
+          {
+            break;
+          }
+        }
       }
     }
 
-    responseP->entityTypeVector.push_back(entityType);
+    // entityType corresponding to nullId case is skipped, as it is (eventually) added outside the for loop
+    if (!nullId)
+    {      
+      responseP->entityTypeVector.push_back(entityType);
+    }
+  }
+
+  if (emptyEntityTypeUsed)
+  {
+    responseP->entityTypeVector.push_back(emptyEntityType);
+  }
+  else
+  {
+    delete emptyEntityType;
   }
 
   char detailsMsg[256];
@@ -278,7 +361,7 @@ HttpStatusCode mongoEntityTypes
   {
     if (details)
     {      
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %d. Offset is %d", (int) resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
@@ -300,11 +383,12 @@ HttpStatusCode mongoEntityTypes
 */
 HttpStatusCode mongoAttributesForEntityType
 (
-  std::string                           entityType,
-  EntityTypeResponse*         responseP,
+  const std::string&                    entityType,
+  EntityTypeResponse*                   responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams
+  std::map<std::string, std::string>&   uriParams,
+  const std::string&                    apiVersion
 )
 {  
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -361,7 +445,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = getField(result, "result").Array();
+  std::vector<BSONElement> resultsArray = getFieldF(result, "result").Array();
 
   responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
 
@@ -375,26 +459,38 @@ HttpStatusCode mongoAttributesForEntityType
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONElement  idField    = resultsArray[ix].embeddedObject().getField("_id");
+    BSONElement  idField    = getFieldF(resultsArray[ix].embeddedObject(), "_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
-    // Now, if 'resultsArray[ix].embeddedObject().getField("_id")' is not found, if we continue,
+    // Now, if 'getFieldF(resultsArray[ix].embeddedObject(), "_id")' is not found, if we continue,
     // calling embeddedObject() on it, then we get an exception and the broker crashes.
     //
     if (idField.eoo() == true)
     {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
+      std::string details = std::string("error retrieving _id field in doc: '") + resultsArray[ix].embeddedObject().toString() + "'";
+      alarmMgr.dbError(details);
       continue;
     }
+    alarmMgr.dbErrorReset();
 
     /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
      * This could be unefficient, specially if the number of attributes is large */
-    std::string attrType = attributeType(tenant, servicePathV, entityType , idField.str());
+    std::vector<std::string> attrTypes;
+    getAttributeTypes(tenant, servicePathV, entityType , idField.str(), &attrTypes);
 
-    ContextAttribute*  ca = new ContextAttribute(idField.str(), attrType, "");
-    responseP->entityType.contextAttributeVector.push_back(ca);
+    for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
+    {
+      ContextAttribute*  ca = new ContextAttribute(idField.str(), attrTypes[kx], "");
+      responseP->entityType.contextAttributeVector.push_back(ca);
+
+      // For backward compability, NGSIv1 only accepts one element
+      if (apiVersion == "v1")
+      {
+        break;
+      }
+    }
   }
 
   char detailsMsg[256];
@@ -414,7 +510,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (details)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %d", (int) resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %zu. Offset is %u", resultsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else

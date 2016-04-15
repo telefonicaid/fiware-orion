@@ -30,8 +30,10 @@
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntity.h"
 #include "jsonParseV2/parseContextAttribute.h"
+#include "alarmMgr/alarmMgr.h"
 
 using namespace rapidjson;
+
 
 
 /* ****************************************************************************
@@ -47,6 +49,11 @@ using namespace rapidjson;
 *
 * In the case of /v2/entities/<eid>, the entityId of 'Entity* eP' is set in
 * the service routine postEntity.
+*
+* Also, if the URI param 'options' includes the value 'keyValues', then the
+* parse changes for compound values of attributes. If the value is a JSON object
+* then there is no looking inside to find the 'value' field, but the attribute is
+* always treated as a compound attribute.
 * 
 */
 std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
@@ -57,17 +64,17 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
   if (document.HasParseError())
   {
-    LM_W(("Bad Input (JSON parse error)"));
-    eP->errorCode.fill("ParseError", "Errors found in incoming JSON buffer");
-    ciP->httpStatusCode = SccBadRequest;;
+    alarmMgr.badInput(clientIp, "JSON parse error");
+    eP->errorCode.fill(ERROR_STRING_PARSERROR, "Errors found in incoming JSON buffer");
+    ciP->httpStatusCode = SccBadRequest;
     return eP->render(ciP, EntitiesRequest);
   }
 
 
   if (!document.IsObject())
   {
-    LM_E(("Bad Input (JSON Parse Error)"));
-    eP->errorCode.fill("ParseError", "Error parsing incoming JSON buffer");
+    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    eP->errorCode.fill(ERROR_STRING_PARSERROR, "Error parsing incoming JSON buffer");
     ciP->httpStatusCode = SccBadRequest;;
     return eP->render(ciP, EntitiesRequest);
   }
@@ -77,9 +84,31 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   {
     if (!document.HasMember("id"))
     {
-      LM_W(("Bad Input (No entity id specified"));
-      eP->errorCode.fill("ParseError", "no entity id specified");
-      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, "No entity id specified");
+      eP->errorCode.fill("BadRequest", "no entity id specified");
+      ciP->httpStatusCode = SccBadRequest;;
+
+      return eP->render(ciP, EntitiesRequest);
+    }
+  }
+
+
+  if (eidInURL == true)
+  {
+    if (document.HasMember("id"))
+    {
+      alarmMgr.badInput(clientIp, "entity id specified in payload");
+      eP->errorCode.fill("BadRequest", "entity id specified in payload");
+      ciP->httpStatusCode = SccBadRequest;;
+
+      return eP->render(ciP, EntitiesRequest);
+    }
+
+    if (document.HasMember("type"))
+    {
+      alarmMgr.badInput(clientIp, "entity type specified in payload");
+      eP->errorCode.fill("BadRequest", "entity type specified in payload");
+      ciP->httpStatusCode = SccBadRequest;;
 
       return eP->render(ciP, EntitiesRequest);
     }
@@ -91,18 +120,20 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     // research was made and "ObjectEmpty" was found. As the broker stopped crashing and complaints
     // about crashes with small docs and "Empty()" were found on the internet, we opted to use ObjectEmpty
     //
-    LM_W(("Bad Input (Empty payload)"));
-    eP->errorCode.fill("ParseError", "empty payload");
+    alarmMgr.badInput(clientIp, "Empty payload");
+    eP->errorCode.fill("BadRequest", "empty payload");
     ciP->httpStatusCode = SccBadRequest;
 
     return eP->render(ciP, EntitiesRequest);
   }
 
-
+  int membersFound = 0;
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
+
+    ++membersFound;
 
     if (name == "id")
     {
@@ -110,9 +141,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       {
         if (type != "String")
         {
-          LM_W(("Bad Input (invalid JSON type for entity id"));
-          eP->errorCode.fill("ParseError", "invalid JSON type for entity id");
-          ciP->httpStatusCode = SccBadRequest;
+          alarmMgr.badInput(clientIp, "invalid JSON type for entity id");
+          eP->errorCode.fill("BadRequest", "invalid JSON type for entity id");
+          ciP->httpStatusCode = SccBadRequest;;
 
           return eP->render(ciP, EntitiesRequest);
         }
@@ -121,9 +152,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       }
       else  // "id" is present in payload for /v2/entities/<eid> - not a valid payload
       {
-        LM_W(("Bad Input ('id' is not a valid attribute"));
-        eP->errorCode.fill("ParseError", "invalid input, 'id' as attribute");
-        ciP->httpStatusCode = SccBadRequest;
+        alarmMgr.badInput(clientIp, "'id' is not a valid attribute");
+        eP->errorCode.fill("BadRequest", "invalid input, 'id' as attribute");
+        ciP->httpStatusCode = SccBadRequest;;
 
         return eP->render(ciP, EntitiesRequest);
       }
@@ -132,16 +163,17 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     {
       if (type != "String")
       {
-        LM_W(("Bad Input (invalid JSON type for entity type"));
-        eP->errorCode.fill("ParseError", "invalid JSON type for entity type");
+        alarmMgr.badInput(clientIp, "invalid JSON type for entity type");
+        eP->errorCode.fill("BadRequest", "invalid JSON type for entity type");
         ciP->httpStatusCode = SccBadRequest;;
 
         return eP->render(ciP, EntitiesRequest);
       }
 
-      eP->type = iter->value.GetString();
+      eP->type      = iter->value.GetString();
+      eP->typeGiven = true;
     }
-    else
+    else  // attribute
     {
       ContextAttribute* caP = new ContextAttribute();
       
@@ -150,8 +182,8 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       std::string r = parseContextAttribute(ciP, iter, caP);
       if (r != "OK")
       {
-        LM_W(("Bad Input (parse error in context attribute)"));
-        eP->errorCode.fill("ParseError", r);
+        alarmMgr.badInput(clientIp, "parse error in context attribute");
+        eP->errorCode.fill("BadRequest", r);
         ciP->httpStatusCode = SccBadRequest;
 
         return eP->render(ciP, EntitiesRequest);
@@ -159,15 +191,28 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     }
   }
 
+  if (membersFound == 0)
+  {
+    eP->errorCode.fill("BadRequest", "empty payload");
+    ciP->httpStatusCode = SccBadRequest;
+    return eP->render(ciP, EntitiesRequest);
+  }
+
   if (eidInURL == false)
   {
     if (eP->id == "")
     {
-      LM_W(("Bad Input (empty entity id"));
-      eP->errorCode.fill("ParseError", "empty entity id");
-      ciP->httpStatusCode = SccBadRequest;;
+      alarmMgr.badInput(clientIp, "empty entity id");
+      eP->errorCode.fill("BadRequest", "empty entity id");
+      ciP->httpStatusCode = SccBadRequest;
+
       return eP->render(ciP, EntitiesRequest);
     }
+  }
+
+  if (!eP->typeGiven)
+  {
+    eP->type = DEFAULT_TYPE;
   }
 
   return "OK";

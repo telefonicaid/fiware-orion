@@ -40,27 +40,16 @@
 typedef struct QueryContextRequestVector
 {
   std::vector<QueryContextRequest*>  vec;
-  int                                xmls;
-  int                                jsons;
 
   QueryContextRequestVector();
 
-  Format                format(void);
   unsigned int          size(void);
   void                  push_back(QueryContextRequest* item);
   QueryContextRequest*  lookup(const std::string& contextProvider, EntityId* eP);
   void                  release(void);
   void                  present(void);
+  QueryContextRequest*  operator[](unsigned int ix) const;
 
-  QueryContextRequest*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-  }
 } QueryContextRequestVector;
 
 #endif  // SRC_LIB_ORIONTYPES_QUERYCONTEXTREQUESTVECTOR_H_

@@ -382,7 +382,7 @@ void jsonNcarRelease(ParseData* parseDataP)
 */
 std::string jsonNcarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncar.res.check(NotifyContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->ncar.res.check(ciP, NotifyContext, "", parseDataP->errorString, 0);
 }
 
 
@@ -396,6 +396,6 @@ void jsonNcarPresent(ParseData* parseDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
   parseDataP->ncar.res.present("");
 }

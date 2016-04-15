@@ -39,21 +39,21 @@
 *
 * MetadataVector::MetadataVector -
 */
-MetadataVector::MetadataVector(const std::string& _tag)
+MetadataVector::MetadataVector(const std::string& _keyName)
 {
   vec.clear();
-  tagSet(_tag);
+  keyNameSet(_keyName);
 }
 
 
 
 /* ****************************************************************************
 *
-* MetadataVector::tagSet -
+* MetadataVector::keyNameSet -
 */
-void MetadataVector::tagSet(const std::string& tagName)
+void MetadataVector::keyNameSet(const std::string& _keyName)
 {
-  tag = tagName;
+  keyName = _keyName;
 }
 
 
@@ -62,22 +62,22 @@ void MetadataVector::tagSet(const std::string& tagName)
 *
 * MetadataVector::render -
 */
-std::string MetadataVector::render(Format format, const std::string& indent, bool comma)
+std::string MetadataVector::render(const std::string& indent, bool comma)
 {
-  std::string out     = "";
-  std::string jsonTag = "metadatas";
+  std::string out = "";
+  std::string key = "metadatas";
 
   if (vec.size() == 0)
   {
     return "";
   }
 
-  out += startTag(indent, tag, jsonTag, format, true);
+  out += startTag2(indent, key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
   }
-  out += endTag(indent, tag, format, comma, true);
+  out += endTag(indent, comma, true);
 
 
   return out;
@@ -160,8 +160,8 @@ std::string MetadataVector::toJson(bool isLastElement)
 */
 std::string MetadataVector::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -171,7 +171,7 @@ std::string MetadataVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }
@@ -188,7 +188,11 @@ std::string MetadataVector::check
 */
 void MetadataVector::present(const std::string& metadataType, const std::string& indent)
 {
-  LM_F(("%s%lu %s Metadata%s", indent.c_str(), (uint64_t) vec.size(), metadataType.c_str(), (vec.size() == 1)? "" : "s"));
+  LM_T(LmtPresent, ("%s%lu %s Metadata%s", 
+		    indent.c_str(), 
+		    (uint64_t) vec.size(), 
+		    metadataType.c_str(), 
+		    (vec.size() == 1)? "" : "s"));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -211,20 +215,22 @@ void MetadataVector::push_back(Metadata* item)
 
 /* ****************************************************************************
 *
-* MetadataVector::get -
+* MetadataVector::operator[] -
 */
-Metadata* MetadataVector::get(int ix)
+Metadata* MetadataVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
-
-
 
 /* ****************************************************************************
 *
 * MetadataVector::size -
 */
-unsigned int MetadataVector::size(void)
+unsigned int MetadataVector::size(void) const
 {
   return vec.size();
 }
@@ -260,7 +266,7 @@ void MetadataVector::fill(MetadataVector* mvP)
 {
   for (unsigned int ix = 0; ix < mvP->size(); ++ix)
   {
-    Metadata* mP = new Metadata(mvP->get(ix));
+    Metadata* mP = new Metadata((*mvP)[ix]);
 
     push_back(mP);
   }

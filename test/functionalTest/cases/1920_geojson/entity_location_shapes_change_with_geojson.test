@@ -1,0 +1,586 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity location shape changes including GeoJSON
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# This test is based on entity_location_shape_changes.test under the #1038 case but
+# using GeoJSON for the line representation, i.e:
+#
+# none -> point -> line (GeoJSON) -> box -> polygon (triangle) -> none
+#
+# 01. Create entity, starting as no-location
+# 02. B1: nok, B2: nok, B3: nok, B4: nok
+# 03. Entity changes to point
+# 04. B1: ok, B2: nok, B3: nok, B4: nok
+# 05. Entity changes to line (using GeoJSON)
+# 06. B1: ok, B2: nok, B3: nok, B4: ok
+# 07. Entity changes to box
+# 08. B1: ok, B2: ok, B3: ok, B4: ok
+# 09. Entity changes to triangle
+# 10. B1: ok, B2: nok, B3: ok, B4: ok
+# 11. Entity changes to none
+# 12. B1: nok, B2: nok, B3: nok, B4: nok
+#
+
+echo "01. Create entity, starting as no-location"
+echo "=========================================="
+payload='{
+  "id": "A",
+  "type": "T",
+  "location": {
+    "value": "none",
+    "type": "no-location"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. B1: nok, B2: nok, B3: nok, B4: nok"
+echo "======================================"
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;6,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+echo
+echo
+
+
+echo "03. Entity changes to point"
+echo "==========================="
+payload='{
+  "value": "2, 2",
+  "type": "geo:point"
+}'
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+echo
+echo
+
+
+echo "04. B1: ok, B2: nok, B3: nok, B4: nok"
+echo "====================================="
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+echo
+echo
+
+
+echo "05. Entity changes to line (using GeoJSON)"
+echo "=========================================="
+payload='{
+  "value": {
+    "type": "LineString",
+    "coordinates": [ [ 2, 2], [7, 7] ]
+  },
+  "type": "geo:json"
+}'
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+echo
+echo
+
+
+echo "06. B1: ok, B2: nok, B3: nok, B4: ok"
+echo "===================================="
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+echo
+echo
+
+
+echo "07. Entity changes to box"
+echo "=========================="
+payload='{
+  "value": [ "2, 2", "7, 7" ],
+  "type": "geo:box"
+}'
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+echo
+echo
+
+
+echo "08. B1: ok, B2: ok, B3: ok, B4: ok"
+echo "=================================="
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+echo
+echo
+
+
+echo "09. Entity changes to triangle"
+echo "=============================="
+payload='{
+  "value": [ "2, 2", "7, 7", "7, 2", "2, 2" ],
+  "type": "geo:polygon"
+}'
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+echo
+echo
+
+
+echo "10. B1: ok, B2: nok, B3: ok, B4: ok"
+echo "==================================="
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+echo
+echo
+
+
+echo "11. Entity changes to none"
+echo "=========================="
+payload='{
+  "value": "foo",
+  "type": "no-location"
+}'
+orionCurl -X PUT --url /v2/entities/A/attrs/location --payload "$payload" --json
+echo
+echo
+
+
+echo "12. B1: nok, B2: nok, B3: nok, B4: nok"
+echo "======================================"
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,0;4,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=0,5;4,9' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,0;9,4' --json
+orionCurl --url '/v2/entities?georel=intersects&geometry=box&coords=5,5;9,9' --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity, starting as no-location
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/A?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. B1: nok, B2: nok, B3: nok, B4: nok
+======================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+03. Entity changes to point
+===========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. B1: ok, B2: nok, B3: nok, B4: nok
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 84
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "2, 2"
+        },
+        "type": "T"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+05. Entity changes to line (using GeoJSON)
+==========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. B1: ok, B2: nok, B3: nok, B4: ok
+====================================
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        2,
+                        2
+                    ],
+                    [
+                        7,
+                        7
+                    ]
+                ],
+                "type": "LineString"
+            }
+        },
+        "type": "T"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
+                        2,
+                        2
+                    ],
+                    [
+                        7,
+                        7
+                    ]
+                ],
+                "type": "LineString"
+            }
+        },
+        "type": "T"
+    }
+]
+
+
+07. Entity changes to box
+==========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. B1: ok, B2: ok, B3: ok, B4: ok
+==================================
+HTTP/1.1 200 OK
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:box",
+            "value": [
+                "2, 2",
+                "7, 7"
+            ]
+        },
+        "type": "T"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:box",
+            "value": [
+                "2, 2",
+                "7, 7"
+            ]
+        },
+        "type": "T"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:box",
+            "value": [
+                "2, 2",
+                "7, 7"
+            ]
+        },
+        "type": "T"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 91
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:box",
+            "value": [
+                "2, 2",
+                "7, 7"
+            ]
+        },
+        "type": "T"
+    }
+]
+
+
+09. Entity changes to triangle
+==============================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. B1: ok, B2: nok, B3: ok, B4: ok
+===================================
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": [
+                "2, 2",
+                "7, 7",
+                "7, 2",
+                "2, 2"
+            ]
+        },
+        "type": "T"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": [
+                "2, 2",
+                "7, 7",
+                "7, 2",
+                "2, 2"
+            ]
+        },
+        "type": "T"
+    }
+]
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "A",
+        "location": {
+            "metadata": {},
+            "type": "geo:polygon",
+            "value": [
+                "2, 2",
+                "7, 7",
+                "7, 2",
+                "2, 2"
+            ]
+        },
+        "type": "T"
+    }
+]
+
+
+11. Entity changes to none
+==========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. B1: nok, B2: nok, B3: nok, B4: nok
+======================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

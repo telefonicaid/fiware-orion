@@ -436,7 +436,7 @@ void jsonRcrRelease(ParseData* reqDataP)
 */
 std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rcr.res.check(RegisterContext, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->rcr.res.check(ciP, RegisterContext, "", reqData->errorString, 0);
 }
 
 
@@ -447,12 +447,12 @@ std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonRcrPresent(ParseData* reqDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent,("\n\n"));
 
   reqDataP->rcr.res.contextRegistrationVector.present("");
   reqDataP->rcr.res.duration.present("");

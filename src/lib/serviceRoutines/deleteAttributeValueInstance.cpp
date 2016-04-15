@@ -27,6 +27,9 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -82,7 +85,7 @@ std::string deleteAttributeValueInstance
   parseDataP->upcr.res.fill(entityId, entityType, "false", attributeName, metaId, "DELETE");
 
   // 03. Call postUpdateContext standard service routine
-  answer = postUpdateContext(ciP, components, compV, parseDataP);
+  postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 04. Translate UpdateContextResponse to StatusCode
@@ -90,7 +93,8 @@ std::string deleteAttributeValueInstance
 
 
   // 05. Cleanup and return result
-  answer = response.render(ciP->outFormat, "", false, false);
+  TIMED_RENDER(answer = response.render("", false, false));
+
   response.release();
   parseDataP->upcr.res.release();
 

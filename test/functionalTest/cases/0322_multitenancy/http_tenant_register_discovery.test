@@ -25,37 +25,37 @@ HTTP-Tenant registration and discovery
 
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DATABASE_NAME}-t_01
-dbInit ${CB_DATABASE_NAME}-t_02
+dbInit ${CB_DB_NAME} t_01
+dbInit ${CB_DB_NAME} t_02
 brokerStart CB 0-255 IPV4 -multiservice
 
 --SHELL--
 echo "1. Register entity E with HTTP-Tenant t_01"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 url="/v1/registry/registerContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Test" isPattern="false">
-            <id>E</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature01</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_01"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Test",
+          "isPattern": "false",
+          "id": "E"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature01",
+          "type": "degree",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:1028/application"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_01" --json
 echo
 echo
 
@@ -63,29 +63,29 @@ echo
 echo "2. Register entity E with HTTP-Tenant t_02"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 url="/v1/registry/registerContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Test" isPattern="false">
-            <id>E</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature02</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_02"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Test",
+          "isPattern": "false",
+          "id": "E"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature02",
+          "type": "degree",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:1028/application"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_02" --json
 echo
 echo
 
@@ -93,15 +93,16 @@ echo
 echo "3. Discover entity E with HTTP-Tenant t_01"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
 url="/v1/registry/discoverContextAvailability"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<discoverContextAvailabilityRequest>
-  <entityIdList>
-    <entityId type="Test" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</discoverContextAvailabilityRequest>'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_01"
+payload='{
+  "entities": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_01" --json
 echo
 echo
 
@@ -109,108 +110,113 @@ echo
 echo "4. Discover entity E with HTTP-Tenant t_02"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
 url="/v1/registry/discoverContextAvailability"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<discoverContextAvailabilityRequest>
-  <entityIdList>
-    <entityId type="Test" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</discoverContextAvailabilityRequest>'
-orionCurl --url "${url}" --payload "${payload}" --tenant "t_02"
+payload='{
+  "entities": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_02" --json
 
 --REGEXPECT--
 1. Register entity E with HTTP-Tenant t_01
 +++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/xml
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
 
 
 2. Register entity E with HTTP-Tenant t_02
 +++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/xml
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
 
 
 3. Discover entity E with HTTP-Tenant t_01
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 786
-Content-Type: application/xml
+Content-Length: 473
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Test" isPattern="false">
-            <id>E</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature01</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
-</discoverContextAvailabilityResponse>
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature01",
+                        "type": "degree"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "E",
+                        "isPattern": "false",
+                        "type": "Test"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
 
 
 4. Discover entity E with HTTP-Tenant t_02
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 786
-Content-Type: application/xml
+Content-Length: 473
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Test" isPattern="false">
-            <id>E</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature02</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
-</discoverContextAvailabilityResponse>
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature02",
+                        "type": "degree"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "E",
+                        "isPattern": "false",
+                        "type": "Test"
+                    }
+                ],
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
 --TEARDOWN--
 
 brokerStop CB
 dbDrop CB
-dbDrop ${CB_DATABASE_NAME}-t_01
-dbDrop ${CB_DATABASE_NAME}-t_02
+dbDrop ${CB_DB_NAME} t_01
+dbDrop ${CB_DB_NAME} t_02

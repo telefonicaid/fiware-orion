@@ -42,12 +42,8 @@ namespace orion
 *
 * The class fields:
 * -------------------------------------------------------------------------------
-* o name         When parsing an XML payload, each node in the tree has a tag.
-*                The name of the node is taken from the tag-name.
-*                When parsing a JSON payload, not necessarily all nodes have a
-*                tag, so 'name' can be empty.
-*                Also, when creating the tree from mongo BSON, there will often
-*                be no 'name', just like the case of JSON payload parsing.
+* o name         Note that not all nodes have a name, not in JSON payloads, nor when
+*                getting the info from mongo BSON
 *
 * o valueType    There are the following types of nodes: Vectors, Objects, Strings, Numbers and Bools
 *                The root node is somehow special, but is always either Vector or Object.
@@ -119,6 +115,7 @@ class CompoundValueNode
     int                 _level = -1
   );
 
+
   CompoundValueNode
   (
     CompoundValueNode*  _container,
@@ -129,6 +126,7 @@ class CompoundValueNode
     orion::ValueType    _type,
     int                 _level = -1
   );
+
 
   CompoundValueNode
   (
@@ -160,9 +158,9 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const char* _value);
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, double _value);
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
-  void                check(void);
+  std::string         check(void);
   std::string         finish(void);
-  std::string         render(ConnectionInfo* ciP, Format format, const std::string& indent);
+  std::string         render(ConnectionInfo* ciP, const std::string& indent);
   std::string         toJson(bool isLastElement);
 
   void                shortShow(const std::string& indent);
@@ -173,7 +171,6 @@ class CompoundValueNode
   bool                isString(void);
 
   const char*         cname(void);
-  const char*         cvalue(void);
   const char*         cpath(void);
 };
 

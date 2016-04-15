@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
 #include "ngsi/EntityId.h"
@@ -150,9 +151,11 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   reqDataP->scar.res.duration.set(value);
 
-  if ((s = reqDataP->scar.res.duration.check(SubscribeContextAvailability, JSON, "", "", 0)) != "OK")
+  if ((s = reqDataP->scar.res.duration.check(SubscribeContextAvailability, "", "", 0)) != "OK")
   {
-    LM_W(("Bad Input (error parsing duration '%s': %s)", reqDataP->scar.res.duration.get().c_str(), s.c_str()));
+    std::string details = std::string("error parsing duration '") + reqDataP->scar.res.duration.get() + "': " + s;
+    alarmMgr.badInput(clientIp, details);
+
     return s;
   }
 
@@ -295,7 +298,7 @@ void jsonScarRelease(ParseData* reqDataP)
 std::string jsonScarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
   std::string s;
-  s = reqData->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
+  s = reqData->scar.res.check(ciP, SubscribeContextAvailability, "", reqData->errorString, 0);
   return s;
 }
 
@@ -309,7 +312,7 @@ void jsonScarPresent(ParseData* reqDataP)
 {
   printf("jsonScarPresent\n");
 
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }

@@ -58,13 +58,15 @@ TEST(commonString, stringSplit)
 TEST(commonString, parseUrl)
 {
    bool         r;
-   std::string  url1 = "";
-   std::string  url2 = "http:/Bad";
-   std::string  url3 = "http:/XXX";
-   std::string  url4 = "http://";
-   std::string  url5 = "http://XXX:12:34";
-   std::string  url6 = "http://XXX:1234/path";
-   std::string  url7 = "http://XXX/path";
+   std::string  url1   = "";
+   std::string  url2   = "http:/Bad";
+   std::string  url3   = "http:/XXX";
+   std::string  url4   = "http://";
+   std::string  url5   = "http://XXX:12:34";
+   std::string  url51  = "http://http://XXX:1234/path";              // Per bug #1652
+   std::string  url52  = "http://XXXX:/path";                        // Per bug #1652
+   std::string  url6   = "http://XXX:1234/path";
+   std::string  url7   = "http://XXX/path";
    std::string  urlv61 = "http://20:12345:20:80";
    std::string  urlv62 = "http://20:20:20:20:20:20:20:20:20:20";
    std::string  urlv63 = "http://2001:DB8:2de::e13:80/path";
@@ -84,6 +86,10 @@ TEST(commonString, parseUrl)
    r = parseUrl(url4, host, port, path, protocol);
    EXPECT_FALSE(r);
    r = parseUrl(url5, host, port, path, protocol);
+   EXPECT_FALSE(r);
+   r = parseUrl(url51, host, port, path, protocol);
+   EXPECT_FALSE(r);
+   r = parseUrl(url52, host, port, path, protocol);
    EXPECT_FALSE(r);
 
    r = parseUrl(url6, host, port, path, protocol);
@@ -360,49 +366,6 @@ TEST(string, string2coords)
 
 /* ****************************************************************************
 *
-* coords2string - 
-*/
-TEST(string, coords2string)
-{
-  std::string s;
-
-  coords2string(&s, 0, 1, 0);
-  EXPECT_EQ("0, 1", s);
-
-  coords2string(&s, 0.123, 1.123, 3);
-  EXPECT_STREQ("0.123, 1.123", s.c_str());
-}
-
-/* ****************************************************************************
-*
-* coords2string -
-*/
-TEST(string, versionParse)
-{
-  bool r;
-  std::string bugFix;
-  int mayor, minor;
-
-  r = versionParse("2.4.5-rc", mayor, minor, bugFix);
-  EXPECT_TRUE(r);
-  EXPECT_EQ(2, mayor);
-  EXPECT_EQ(4, minor);
-  EXPECT_EQ("5-rc", bugFix);
-
-  r = versionParse("2.4", mayor, minor, bugFix);
-  EXPECT_TRUE(r);
-  EXPECT_EQ(2, mayor);
-  EXPECT_EQ(4, minor);
-  EXPECT_EQ("", bugFix);
-
-  r = versionParse("wrong version", mayor, minor, bugFix);
-  EXPECT_FALSE(r);
-}
-
-
-
-/* ****************************************************************************
-*
 * atoF - 
 */
 TEST(string, atoF)
@@ -489,4 +452,65 @@ TEST(string, atoF)
   d = atoF("2 24", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
+}
+
+
+
+/* ****************************************************************************
+*
+* str2double - 
+*/
+TEST(string, str2double)
+{
+  bool    b;
+  double  d;
+
+  b = str2double("a", &d);
+  EXPECT_FALSE(b);
+
+  b = str2double("99e99999999999999999999999999", &d);
+  EXPECT_FALSE(b);
+  
+  b = str2double("12.0a", &d);
+  EXPECT_FALSE(b);
+
+  //
+  // Different ways of ZERO
+  //
+  d = 14;
+  b = str2double("0.0000", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(0.0, d);
+
+  d = 14;
+  b = str2double("0", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(0.0, d);
+
+  d = 14;
+  b = str2double("0e23", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(0.0, d);
+
+  // OK to have spaces after number
+  d = 14;
+  b = str2double("12 ", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(12, d);
+
+  // But NOT OK to have spaces AND a number after the number
+  b = str2double("12 1", &d);
+  EXPECT_FALSE(b);
+
+  // Normal float
+  d = 14;
+  b = str2double("1.23", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(1.23, d);
+
+  // Normal integer
+  d = 14;
+  b = str2double("23", &d);
+  EXPECT_TRUE(b);
+  EXPECT_EQ(23, d);
 }

@@ -96,7 +96,7 @@ static void prepareDatabaseV1Subs(void) {
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("AX2" << "AY2")
                                                        )) <<
-                        "throttling" << 5.0
+                        "throttling" << 5
                         );
 
     BSONObj sub3 = BSON("_id" << OID(SUB_OID3) <<
@@ -106,15 +106,14 @@ static void prepareDatabaseV1Subs(void) {
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
                         "conditions" << BSON_ARRAY(BSON(
-                                                     "type" << "ONTIMEINTERVAL" <<
-                                                     "value" << 100
+                                                     "type" << "ONCHANGE" <<
+                                                     "value" << BSON_ARRAY("ZZ2" << "WW2")
                                                      ))
                         );
 
     connection->insert(SUBSCRIBECONTEXT_COLL, sub1);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
-
 }
 
 /* ****************************************************************************
@@ -131,14 +130,14 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Invoke the function in mongoBackend library */
   std::vector<Subscription> subs;
-  mongoListSubscriptions(&subs, &oe, uriParams, "", 20, 0, &count);
+  mongoListSubscriptions(&subs, &oe, uriParams, "", "/#", 20, 0, &count);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
   EXPECT_EQ("OK", oe.reasonPhrase);
   EXPECT_EQ("", oe.details);
 
-  ASSERT_EQ(2, subs.size());
+  ASSERT_EQ(3, subs.size());
   Subscription             s;
   std::vector<EntID>       ents;
   std::vector<std::string> attrs;
@@ -161,7 +160,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   attrs = s.notification.attributes;
   ASSERT_EQ(0, attrs.size());
   EXPECT_EQ("http://notify1.me", s.notification.callback);
-  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ(-1, s.notification.timesSent);
   EXPECT_EQ(-1, s.notification.lastNotification);
   EXPECT_EQ(-1, s.notification.throttling);
   EXPECT_EQ(10000000, s.expires);
@@ -190,6 +189,31 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   EXPECT_EQ(20000000, s.notification.lastNotification);
   EXPECT_EQ(5, s.notification.throttling);
   EXPECT_EQ(25000000, s.expires);
+
+  /* Subscription #3 */
+  s = subs[2];
+  EXPECT_EQ(SUB_OID3, s.id);
+  ents = s.subject.entities;
+  ASSERT_EQ(1, ents.size());
+  EXPECT_EQ("", ents[0].id);
+  EXPECT_EQ("T2", ents[0].type);
+  EXPECT_EQ("E.*", ents[0].idPattern);
+  attrs = s.subject.condition.attributes;
+  ASSERT_EQ(2, attrs.size());
+  EXPECT_EQ("ZZ2", attrs[0]);
+  EXPECT_EQ("WW2", attrs[1]);
+  EXPECT_EQ("", s.subject.condition.expression.q);
+  EXPECT_EQ("", s.subject.condition.expression.geometry);
+  EXPECT_EQ("", s.subject.condition.expression.coords);
+  attrs = s.notification.attributes;
+  ASSERT_EQ(2, attrs.size());
+  EXPECT_EQ("A1", attrs[0]);
+  EXPECT_EQ("A2", attrs[1]);
+  EXPECT_EQ("http://notify2.me", s.notification.callback);
+  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ(25000000, s.notification.lastNotification);
+  EXPECT_EQ(-1, s.notification.throttling);
+  EXPECT_EQ(20000000, s.expires);
 
 }
 

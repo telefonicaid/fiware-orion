@@ -30,6 +30,8 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "ngsi10/SubscribeContextRequest.h"
+#include "ngsi10/UpdateContextSubscriptionRequest.h"
 
 
 
@@ -39,13 +41,17 @@
 */
 typedef struct JsonDelayedRelease
 {
-  Entity*            entity;
-  ContextAttribute*  attribute;
+  Entity*                            entity;
+  ContextAttribute*                  attribute;
+  SubscribeContextRequest*           scrP;
+  UpdateContextSubscriptionRequest*  ucsrP;
 
   JsonDelayedRelease()
   {
-    entity    = NULL;
-    attribute = NULL;
+    entity     = NULL;
+    attribute  = NULL;
+    scrP       = NULL;
+    ucsrP      = NULL;
   }
 } JsonDelayedRelease;
 
@@ -54,6 +60,13 @@ typedef struct JsonDelayedRelease
 *
 * jsonRequestTreat - 
 */
-extern std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP);
+extern std::string jsonRequestTreat
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RequestType                requestType,
+  JsonDelayedRelease*        releaseP,
+  std::vector<std::string>&  compV
+);
 
 #endif  // SRC_LIB_JSONPARSEV2_JSONREQUESTTREAT_H_

@@ -47,7 +47,7 @@ function vMsg()
 #
 function usage()
 {
-  echo $0 "[-u (usage)] [-U (extended usage)] [-v (verbose)] [-fast (fast run)] [-loops <loops (10 by default)>] [-cb (dont't start the broker)] [-acc (dont't start the accumulator)]"
+  echo $0 "[-u (usage)] [-U (extended usage)] [-v (verbose)] [-fast (fast run)] [-loops <loops (10 by default)>] [-cb (don't start the broker)] [-acc (don't start the accumulator)]"
 
   if [ "$1" != "continue" ]
   then

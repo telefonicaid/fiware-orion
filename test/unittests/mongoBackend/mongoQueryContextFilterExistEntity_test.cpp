@@ -114,7 +114,7 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -148,8 +148,6 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
  
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -181,7 +179,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -202,9 +200,6 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -237,7 +232,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -258,10 +253,6 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
-
-
-  /* Release connection */
-  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }

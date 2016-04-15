@@ -14,9 +14,11 @@ trace the discussions checking the archives of the mailing list:
 https://lists.fiware.org/private/fiware-ngsi/ (list subscription
 required).
 
-Please check the following [FI-WARE Open Specification Legal Notice (implicit patents license)](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license)) to understand the rights to use this specification.
+Please check the following [FIWARE Open Specification Legal Notice (implicit patents license)]
+(http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_(implicit_patents_license))
+to understand the rights to use this document.
 
-# FIWARE-NGSI Simple API Root [/v2]
+# Group API Root
 
 This resource allows you to obtain a list of subresources published by the API:
 
@@ -25,7 +27,7 @@ This resource allows you to obtain a list of subresources published by the API:
 * subscriptions to deal with subscriptions to context changes
 * registrations to deal with context data by registering external providers
 
-## Retrieve the Entry Point [GET]
+### Retrieve entry points [GET /v2]
 
 + Response 200 (application/json)
 
@@ -36,42 +38,42 @@ This resource allows you to obtain a list of subresources published by the API:
             "registrations_url": "/v2/registrations"
         }
 
-## Listing context entities [/v2/entities{?type,id,idPattern,attrs,limit,offset,options}]
+# Group Entity Collection
 
-### List all entities [GET /v2/entities]
+## List all entities [/v2/entities]
+
+### Normalized mode [GET /v2/entities]
 
 + Response 200 (application/json)
 
-        [
+      [
          {
             "type": "Room",
             "id": "DC_S1_D41",
-            "temperature": 35.6
-         },
-         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
+            "temperature": {
+               "value": 35.6,
+               "type":  "urn:ogc:def:phenomenon:temperature",
+               "metadata": {
+                   "accuracy": {
+                       "type": "none",
+                       "value": 0.1
+                   }
+               }
+            }
          },
          {
             "type": "Car",
-            "id": "P-9873-K",
+            "id":   "abc345fg",
             "speed": {
-                "value": 100,
-                "type": "number",
-                "accuracy": 2,
-                "timestamp": {
-                    "value": "2015-06-04T07:20:27.378Z",
-                    "type": "date"
-                }
+                "value":    14.7,
+                "type":     "none",
+                "metadata": { }
             }
          }
-        ]
+      ]
 
-### List entities by id [GET /v2/entities{?id}]
 
-+ Parameters
-    + id: DC_S1_D41 (optional, string) - Only retrieve entities with this id
+### Key values mode [GET /v2/entities?options=keyValues]
 
 + Response 200 (application/json)
 
@@ -80,99 +82,15 @@ This resource allows you to obtain a list of subresources published by the API:
             "type": "Room",
             "id": "DC_S1_D41",
             "temperature": 35.6
-         }
-        ]
-
-### List all entities of an specific type [GET /v2/entities{?type}]
-
-+ Parameters
-    + type: Room (optional, string) - Only retrieve entities of this type
-
-+ Response 200 (application/json)
-
-        [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         },
-         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
-         }
-        ]
-
-### List entities by id list [GET /v2/entities{?id}]
-
-+ Parameters
-    + id: DC_S1_D41, Boe_Idearium (optional, string) - Id list with the entities to be retrieved
-
-+ Response 200 (application/json)
-
-        [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         },
-         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
-         }
-        ]
-
-
-### List entities by type list [GET /v2/entities{?type}]
-
-+ Parameters
-    + type: Room,Car (optional, string) - Type list
-
-+ Response 200 (application/json)
-
-        [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         },
-         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
          },
          {
             "type": "Car",
-            "id": "P-9873-K",
-            "speed": {
-                "value": 100,
-                "type": "number",
-                "accuracy": 2,
-                "timestamp": {
-                    "value": "2015-06-04T07:20:27.378Z",
-                    "type": "date"
-                }
-            }
+            "id": "abc345fg",
+            "speed": 14.7
          }
         ]
 
-### List all entities which id matches a pattern [GET /v2/entities{?idPattern}]
-
-+ Parameters
-    + idPattern: DC_* (optional, string) - Only retrieve entities which id matches this pattern.
-
-+ Response 200 (application/json)
-
-        [
-         {
-            "type": "Room",
-            "id": "DC_S1_D41",
-            "temperature": 35.6
-         }
-        ]
-
-### Paginate over a list of entities [GET /v2/entities{?limit,offset,options}]
+### Pagination [GET /v2/entities{?limit,offset,options}]
 
 + Parameters
     + options: count
@@ -184,40 +102,309 @@ This resource allows you to obtain a list of subresources published by the API:
     + Headers
 
             X-Total-Count: 30
-            Link: http://context.example.org/v2/entities?offset=4&limit=2; rel="next", http://context.example.org/v2/entities?offset=28&limit=2; rel="last", http://context.example.org/v2/entities?offset=0&limit=2; rel="first", http://context.example.org/v2/entities?offset=2&limit=2; rel="prev"
+            Link: http://example.org/v2/entities?offset=4&limit=2; rel="next", http://example.org/v2/entities?offset=28&limit=2; rel="last",
+            http://example.org/v2/entities?offset=0&limit=2; rel="first", http://example.org/v2/entities?offset=2&limit=2; rel="prev"
 
     + Body
 
-            [
-             {
-                "type": "Room",
-                "id": "DC_S1_D41",
-                "temperature": 35.6
-             },
-             {
-                "type": "Room",
-                "id": "Boe_Idearium",
-                "temperature": 22.5
-             }
-            ]
+      [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": {
+               "value": 35.6,
+               "type": "urn:ogc:def:phenomenon:temperature",
+               "metadata": {
+                   "accuracy": {
+                       "type":  "none",
+                       "value": 0.1
+                   }
+               }
+            }
+         },
+         {
+            "type": "Car",
+            "id": "abc345fg",
+            "speed": {
+                "value"   : 14.7,
+                "type"    : "none",
+                "metadata": { }
+            }
+         }
+      ]
 
-## Querying context [/v2/entities{?q,limit,offset,coords,geometry,attrs,options}]
+
+## Filter entities [/v2/entities{?id}]
+
+### By id [GET /v2/entities{?id,options}]
+
++ Parameters
+    + id: DC_S1_D41 (optional, string) - Only retrieve entities with this id
+    + options: keyValues (optional, string) - rendering options
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         }
+        ]
+
+### By type [GET /v2/entities{?type}]
+
++ Parameters
+    + type: Room (optional, string) - Only retrieve entities of this type
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": {
+               "value": 35.6,
+               "type": "urn:ogc:def:phenomenon:temperature",
+               "metadata": {
+                   "accuracy": {
+                       "type":  "none",
+                       "value": 0.1
+                   }
+               }
+            }
+         },
+         {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": {
+               "value": 22,
+               "type": "urn:ogc:def:phenomenon:temperature",
+               "metadata": { }
+            }
+         }
+        ]
+
+### By id list [GET /v2/entities{?id,options}]
+
++ Parameters
+    + id: DC_S1_D41, Boe_Idearium (optional, string) - Id list with the entities to be retrieved
+    + options: keyValues (optional, string) - rendering options
+    
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+         }
+        ]
 
 
-### Query Entities [GET /v2/entities{?q,limit,offset,coords,geometry,attrs,options}]
+### By type list [GET /v2/entities{?type}]
+
++ Parameters
+    + type: ParkingLot, StreetParking (optional, string) - Type list
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "ParkingLot",
+            "id": "P12345-A",
+            "name": {
+               "value":    "Marques de Pombal",
+               "type":     "string",
+               "metadata": { }
+            },
+            "availableSpotNumber": {
+              "value":    111,
+              "type":     "number",
+              "metadata": { }
+            },
+            "totalSpotNumber": {
+              "value":    250,
+              "type":     "number",
+              "metadata": { }
+            },
+            "lastEntrance": {
+               "value":    "2015-11-26T11:45:12.398Z",
+               "type":     "date",
+               "metadata": { }
+            },
+            "location": {
+              "type":  "geo:point",
+              "value": "40.6378754,-8.6370621",
+              "metadata": {
+                "crs": {
+                  "type":  "urn:ogc:def:crs",
+                  "value": "EPSG::4326"
+                }
+              } 
+            }
+         },
+         {
+            "type": "StreetParking",
+            "id": "A45678",
+            "availableSpotNumber": {
+              "value":     11,
+              "type":      "number",
+              "metadata": { }
+            },
+            "totalSpotNumber": {
+              "value":    20,
+              "type":     "number",
+              "metadata": { }
+            },
+            "location": {
+              "type": "geo:polygon",
+              "value": [
+                "40.64125502310924,-8.653267621994019",
+                "40.64123059990093,-8.652441501617432",
+                "40.64147483158176,-8.650263547897339",
+                "40.64125502310924,-8.653267621994019"
+              ],
+              "metadata": { } 
+            }
+         }
+        ]
+
+### By pattern matching [GET /v2/entities{?idPattern,options}]
+
++ Parameters
+    + idPattern: DC_.* (optional, string) - Only retrieve entities having a matching id.
+    + options: keyValues (optional, string) - rendering options
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         }
+        ]
+
+# Group Context Entity
+
+## Retrieve entity data [/v2/entities/{entityId}]
+
+### By Id [GET /v2/entities/{entityId}{?options}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity Id.
+    + options: keyValues (optional, string) - rendering options
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn_Welt",
+            "temperature": 21.7,
+            "humidity": 60
+        }
+
+### By Id. Not exists [GET /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity Id.
+
++ Response 404 (application/json)
+
+        {
+            "error": "NotFound",
+            "description": "There is no entity with such an id"
+        }
+
+### By id and type [GET /v2/entities/{entityId}{?type,options}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+    + type: Room (required, string) - Entity Type
+    + options: keyValues (optional, string) - rendering options
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+        }
+
+## Partial entity retrieval [/v2/entities/{entityId}{?attrs}]
+
+### One entity attribute [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrs: temperature (optional, string) - Attribute to be retrieved
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": {
+              "value":    22.7,
+              "type":     "urn:ogc:def:phenomenon:temperature",
+              "metadata": { }
+            }
+        }
+
+### One entity attribute. Not present [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrs: mistake (optional, string) - Attribute to be retrieved
+
++ Response 200 (application/json)
+
+        {
+           "type": "Room",
+           "id": "Boe_Idearium"
+        }
+
+### Several entity attributes [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: 'Bcn_Welt' (required, string) - Entity ID
+    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": {
+              "value": 22.7,
+              "type": "urn:ogc:def:phenomenon:temperature",
+              "metadata": { }
+            },
+            "humidity": {
+              "value": 60,
+              "type": "urn:x-ogc:def:phenomenon:OGC:Humidity",
+              "metadata": { }
+            }
+        }
+            
+# Group Query Context
+
+## Query Entities [/v2/entities{?q,type,limit,offset,georel,coords,geometry,attrs,options}]
+
+### Query by attribute content [GET /v2/entities{?q,limit,offset,attrs,options}]
 
 + Parameters
     + q: temperature==22.5;humidity==60 (optional, string) - General query parameter that allows
-    to filter by attribute content
-    + coords: 41.3763726, 2.1864475 (optional, string) - Coordinates. Comma separated values.
-    The number of values will depend on the 'geometry' attribute.
-    + geometry: circle;radius=10000 (optional, string) - It can be any type defined by the
-    GeoJSON spec or 'circle;radius=&lt;a radius&gt;'.
-    The 'exterior' modifier allows to indicate that the referred area is the outside
-    of the region, for instance, 'polygon;exterior'
+    to filter by attribute content. 
     + limit: 20 - Limit the number of results (optional, number) - Maximum number of results to return
     + attrs: seatsNumber (optional, string) - Attributes to be returned
-    + options: count (optional, string) - count indicates that the total number of records must be returned
+    + options: keyValues (optional, string) - query options (`keyValues` mode)
 
 + Response 200 (application/json)
 
@@ -229,39 +416,161 @@ This resource allows you to obtain a list of subresources published by the API:
          }
         ]
 
+### Query by distance to a certain point [GET /v2/entities{?type,coords,georel,geometry,options}]
 
-### Query Entities. No results [GET /v2/entities{?q,limit,coords,geometry,attrs}]
++ Parameters
+    + type: WeatherStation (optional, string) - Entity type requested.
+    + coords: 41.3763726, 2.1864475 (optional, string) - Coordinates of the reference point.
+    + geometry: point (optional, string) - Geometry (point, line, polygon) represented by the `coords` parameter. 
+    + georel: near;maxDistance:1000 (optional, string) - Geospatial relationship.
+    This example refers to those entities located at a maximum distance of 1000 meters from the reference point.
+    + options: keyValues (optional, string) - query options (`keyValues` mode)
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "WeatherStation",
+            "id": "AEMET-789",
+            "location": "43.5,-8.2"
+         }
+        ]
+
+
+### No results [GET /v2/entities{?q}]
+
++ Parameters
+    + q: temperature>45 (optional, string) - General query parameter that allows
+    to filter by attribute content
 
 + Response 200 (application/json)
 
         []
 
-## Creating entities [/v2/entities]
+# Group Provide Context
 
-### Create a new entity [POST /v2/entities]
+## Create a new entity [/v2/entities{?options}]
+
+### Normalized mode [POST /v2/entities]
 
 + Request (application/json)
 
         {
             "type": "Room",
             "id": "Bcn-Welt",
+            "temperature": {
+              "value": 21.7,
+              "metadata": {
+                 "unitCode": {
+                    "value": "CEL"
+                 }
+              }
+            },
+            "humidity": {
+              "value": 60    
+            },
+            "address": {
+              "value": {
+                "addressCountry":  "ES",
+                "addressLocality": "Barcelona",
+                "streetAddress":   "Diagonal 00"             
+              },
+              "type": "PostalAddress"
+            }
+        }
+      
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/Bcn-Welt?type=Room
+
+
+### keyValues mode [POST /v2/entities{?options}]
+
++ Parameters
+    + options: keyValues (optional, string) - operation options (`keyValues` mode)
+
++ Request (application/json)    
+
+        {
+            "type": "Room",
+            "id": "Bcn-Welt",
             "temperature": 21.7,
             "humidity": 60,
-            "location": {
-                "value":  "41.3763726, 2.1864475",
-                "type": "geo:point",
-                "crs": "WGS84"
-            },
+            "address": {
+              "addressCountry":  "ES",
+              "addressLocality": "Barcelona",
+              "streetAddress":   "Diagonal 00"
+            }  
         }
 
 + Response 201 (application/json)
 
     + Headers
 
-            Location: /v2/entities/Bcn-Welt
+            Location: /v2/entities/Bcn-Welt?type=Room
 
+### Georeferencing using simple location format [POST /v2/entities]
 
-### Create a new entity. Error [POST /v2/entities]
++ Request (application/json)
+
+        {
+           "id":   "AEMET-1351",
+           "type": "WeatherStation",
+           "address": {
+              "value": {
+                "addressCountry":  "ES",
+                "addressLocality": "Mañón",
+                "addressRegion":   "La Coruña"
+              }
+           },
+           "name": "Estaca de Bares",
+           "location": {              
+              "type":  "geo:point",
+              "value": "43.7861, -7.6847"
+            }
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/AEMET-1351?type=WeatherStation
+
+### Georeferencing using GeoJSON [POST /v2/entities]
+
++ Request (application/json)
+
+        {
+           "id":   "porto-AmbientArea-Boavista",
+           "type": "AmbientArea",
+           "name": "Boavista",
+           "location": {              
+              "type": "geo:json",
+              "value": {
+                 "type": "Polygon",
+                 "coordinates": [ [
+                    [ -8.633629796628234, 41.163854282188204 ],
+                    [ -8.630357419242978, 41.165230294132279 ],
+                    [ -8.627010741427831, 41.164981131496575 ],
+                    [ -8.637337472778501, 41.155229636824181 ],
+                    [ -8.637313461931976, 41.158014959877839 ],
+                    [ -8.636775456788547, 41.161148008811146 ],
+                    [ -8.633629796628234, 41.163854282188204 ]
+                 ] ]
+              }
+            }
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/porto-AmbientArea-Boavista?type=AmbientArea
+            
+            
+### Creation error. Already exists. [POST /v2/entities?options=keyValues]
 
 + Request (application/json)
 
@@ -279,93 +588,46 @@ This resource allows you to obtain a list of subresources published by the API:
         }
 
 
-## ContextEntity [/v2/entities/{entityId}]
+## Remove Entity [/v2/entities/{entityId}]
 
-### Retrieve all entity data by Id [GET /v2/entities/{entityId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity Id.
-
-+ Response 200 (application/json)
-
-        {
-            "type": "Room",
-            "id": "Bcn_Welt",
-            "temperature": 21.7,
-            "humidity": 60,
-            "location": {
-                "value":  "41.3763726, 2.1864475",
-                "type": "geo:point",
-                "crs": "WGS84"
-            }
-        }
-
-### Retrieve all entity data by Id. Not exists [GET /v2/entities/{entityId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity Id.
-
-+ Response 404 (application/json)
-
-        {
-            "error": "NotFound",
-            "description": "There is no entity with such an id"
-        }
-
-### Retrieve all entity data by id and type [GET /v2/entities/type/{entityType}/id/{entityId}]
+### By Id [DELETE /v2/entities/{entityId}]
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
 
-+ Response 200 (application/json)
++ Response 204
 
-        {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
-        }
 
-### Get one entity attribute [GET /v2/entities/{entityId}{?attrs}]
+## Manage entity attributes [/v2/entities/{entityId}{?options}]
+
+### Update. Normalized mode. [PATCH /v2/entities/{entityId}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrs: temperature (optional, string) - Attribute to be retrieved
 
-+ Response 200 (application/json)
++ Request (application/json)
 
-        {
-            "temperature": 21.7
-        }
+    + Body
 
-### Get one entity attribute. Not present [GET /v2/entities/{entityId}{?attrs}]
+            {
+                "temperature": {
+                  "value": 21.7,
+                  "metadata": {
+                    "unitCode": "CEL"
+                  }
+                },
+                "ambientNoise": {
+                  "value": 31.5
+                }
+            }
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrs: mistake (optional, string) - Attribute to be retrieved
++ Response 204
 
-+ Response 200 (application/json)
-
-        {
-        }
-
-### Get several entity attributes [GET /v2/entities/{entityId}{?attrs}]
-
-+ Parameters
-    + entityId: 'Bcn_Welt' (required, string) - Entity ID
-    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
-
-+ Response 200 (application/json)
-
-        {
-            "temperature": 21.7,
-            "humidity": 60,
-        }
-
-### Update entity attributes. [PATCH /v2/entities/{entityId}]
+### Update. keyValues mode. [PATCH /v2/entities/{entityId}{?options}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + options:  keyValues (optional, string) - operation options (`keyValues` mode)
 
 + Request (application/json)
 
@@ -379,10 +641,11 @@ This resource allows you to obtain a list of subresources published by the API:
 + Response 204
 
 
-### Update or append entity attributes. [POST /v2/entities/{entityId}]
+### Update or append. keyValues mode. [POST /v2/entities/{entityId}{?options}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + options:  keyValues (optional, string) - operation options (`keyValues` mode)
 
 + Request (application/json)
 
@@ -393,25 +656,19 @@ This resource allows you to obtain a list of subresources published by the API:
 
 + Response 204
 
-
-### Remove an entity[DELETE /v2/entities/{entityId}]
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-
-+ Response 204
-
-### Remove one or more entity attributes[DELETE /v2/entities/{entityId}{?attrs}]
+### Remove [DELETE /v2/entities/{entityId}{?attrs}]
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
-    + attrs: humidity, seatsNumber - Attributes
+    + attrs: humidity, seatsNumber - Attribute list
 
 + Response 204
 
-## Context Entity Attributes [/v2/entities/{entityId}/attrs]
+# Group Context Attributes
 
-### List all attributes [GET /v2/entities/{entityId}/attrs]
+## Attribute Collection [/v2/entities/{entityId}/attrs{?options}]
+
+### List all. Normalized Mode. [GET /v2/entities/{entityId}/attrs]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -419,77 +676,91 @@ This resource allows you to obtain a list of subresources published by the API:
 + Response 200 (application/json)
 
         {
-            "temperature": 21.7,
-            "humidity": 60,
+            "temperature": {
+               "type":     "number",
+               "value":    22.5,
+               "metadata": {
+                 "unitCode": {
+                    "type": "none",
+                    "value": "CEL"
+                 }
+               }
+            },
+            "humidity": {
+               "type": "number",
+               "value": 60,
+               "metadata": { }
+            },
             "location": {
-                "value":  "41.3763726, 2.1864475",
-                "type": "geo:point",
-                "crs": "WGS84"
+              "type": "geo:point",
+              "value": "41.3763726, 2.1864475",
+              "metadata": { }
             }
         }
 
-### Replace all attributes [PUT /v2/entities/{entityId}/attrs]
+
+### List all. keyValues Mode. [GET /v2/entities/{entityId}/attrs{?options}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
+    + options: keyValues (optional, string) - flags that payload is in `keyValues`mode.
+
++ Response 200 (application/json)
+
+        {
+            "temperature": 21.7,
+            "humidity":    60,
+            "location":    "41.3763726, 2.1864475"
+        }
+
+        
+### Replace all. keyValues mode [PUT /v2/entities/{entityId}/attrs{?options}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + options: keyValues (optional, string) - flags that payload is in `keyValues`mode.
 
 + Request (application/json)
 
         {
             "temperature": 21.7,
-            "relativeHumidity": {
-                "value": 60,
-                "accuracy": 1
-            },
             "seatsNumber": 12
         }
 
 + Response 200
+        
 
+## Single Attribute [/v2/entities/{entityId}/attrs/{attrName}]
 
-### Get a single attribute, including type and metadata values [GET /v2/entities/{entityId}/attrs/{attrName}]
+### Get [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: illuminance (required, string) - Attribute to be retrieved.
+    + attrName: illuminance (required, string) - Attribute name.
 
 + Response 200 (application/json)
 
         {
             "value": 300,
             "type": "number",
-            "accuracy": 1.0,
-            "unitCode": "LX"
+            "metadata": {
+              "accuracy": {
+                "value": 1.0,
+                "type": "number"
+              },
+              "unitCode": {
+                "value": "LX",
+                "type":  "none"
+              }
+            }
         }
 
-### Get an attribute value as text [GET /v2/entities/{entityId}/attrs/{attrName}/value{?options}]
+
+### Get. Not exists [GET /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-    + options: text (optional, string) - Indicates format as text
-
-+ Response 200 (text/plain)
-
-        300
-
-### Get an attribute value as JSON [GET /v2/entities/{entityId}/attrs/{attrName}/value]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-
-+ Response 200 (application/json)
-
-        {
-            "value": 300
-        }
-
-### Get an attribute. Not exists [GET /v2/entities/{entityId}/attrs/{attrName}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: mistake (required, string) - Attribute to be retrieved.
+    + attrName: mistake (required, string) - Attribute name.
 
 + Response 404 (application/json)
 
@@ -497,29 +768,85 @@ This resource allows you to obtain a list of subresources published by the API:
             "error": "NotFound",
             "description": "The entity does not have such an attribute"
         }
+        
 
-
-### Update an attribute [PUT /v2/entities/{entityId}/attrs/{attrName}]
+### Update [PUT /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute Name
+    + attrName: temperature (required, string) - Attribute name.
 
 + Request (application/json)
 
         {
             "value": 25.0,
-            "unitCode": "CEL"
+            "metadata": {
+               "unitCode": "CEL"
+            }
         }
 
 + Response 200
 
 
-### Update an attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+### Remove [DELETE /v2/entities/{entityId}/attrs/{attrName}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute Name
+    + attrName: temperature (required, string) - Attribute name.
+
++ Response 204
+        
+
+## Attribute Value [/v2/entities/{entityId}/attrs/{attrName}/value]
+
+### Get. As text [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
+    
++ Request
+
+  + Headers
+
+      Accept: text/plain
+
++ Response 200 (text/plain)
+
+        300
+
+
+### Get. As JSON [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
+
++ Response 200 (application/json)
+
+        {
+            "value": 300
+        }
+
+
+### Update. As Text [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
+
++ Request (text/plain)
+
+        25.0
+
++ Response 200
+
+
+### Update. As JSON [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute name.
 
 + Request (application/json)
 
@@ -530,16 +857,7 @@ This resource allows you to obtain a list of subresources published by the API:
 + Response 200
 
 
-### Remove an attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute Name
-
-+ Response 204
-
-
-## Context Entity Subscriptions [/v2/entities/{entityId}/subscriptions]
+# Group Subscriptions
 
 ### List all subscriptions present in the system [GET /v2/subscriptions]
 
@@ -706,7 +1024,7 @@ This resource allows you to obtain a list of subresources published by the API:
         }
 
 
-## Context Entity Registrations [/v2/registrations]
+# Group Registrations
 
 ### List all registrations present in the system [GET /v2/registrations]
 

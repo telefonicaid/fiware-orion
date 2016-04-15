@@ -42,15 +42,14 @@ typedef struct Throttling
   std::string   string;
   int64_t       seconds;
 
-  Throttling();
+  Throttling(): seconds(-1) {}
 
   void               set(const std::string& value);
   const std::string  get(void);
   bool               isEmpty(void);
-  std::string        render(Format format, const std::string& indent, bool comma);
+  std::string        render(const std::string& indent, bool comma);
 
   std::string        check(RequestType requestType,
-                           Format format,
                            const std::string& indent,
                            const std::string& predetectedError,
                            int counter);

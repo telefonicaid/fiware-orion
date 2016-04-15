@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
@@ -39,9 +40,8 @@
 */
 std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestType request, std::string indent)
 {
-  std::string out     = "";
-  std::string xmlTag  = "contextResponseList";
-  std::string jsonTag = "contextResponses";
+  std::string out = "";
+  std::string key = "contextResponses";
 
   if (vec.size() == 0)
   {
@@ -51,10 +51,12 @@ std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestT
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true);
+  out += startTag2(indent, key, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(ciP, request, indent + "  ");
-  out += endTag(indent, xmlTag, ciP->outFormat, false, true);
+  }
+  out += endTag(indent, false, true);
 
   return out;
 }
@@ -95,7 +97,7 @@ std::string ContextAttributeResponseVector::check
 */
 void ContextAttributeResponseVector::present(std::string indent)
 {
-  LM_F(("%lu ContextAttributeResponses", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu ContextAttributeResponses", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -118,13 +120,16 @@ void ContextAttributeResponseVector::push_back(ContextAttributeResponse* item)
 
 /* ****************************************************************************
 *
-* ContextAttributeResponseVector::get - 
+* ContextAttributeResponseVector::operator[] -
 */
-ContextAttributeResponse* ContextAttributeResponseVector::get(int ix)
+ContextAttributeResponse* ContextAttributeResponseVector::operator[](unsigned int ix) const
 {
-  return vec[ix];
+  if (ix < vec.size())
+  {
+    return vec[ix];
+  }
+  return NULL;
 }
-
 
 
 /* ****************************************************************************

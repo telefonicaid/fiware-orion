@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 201[3|4|5] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 201[3|4|5|6] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -81,8 +81,8 @@ def ignore(root, file):
     if 'BUILD_' in root or '.git' in root:
         return True
 
-    # PNG files in manuals are ignored
-    if 'manuals' in root and file.endswith('.png'):
+    # PNG files in manuals o functionalTest are ignored
+    if ('manuals' in root or 'functionalTest' in root) and file.endswith('.png'):
         return True
 
     # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed

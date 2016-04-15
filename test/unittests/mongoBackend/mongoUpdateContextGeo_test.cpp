@@ -167,9 +167,9 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -207,6 +207,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -243,13 +244,11 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_EQ(1360232700, a3.getIntField("creDate"));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
     EXPECT_STREQ("A3", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(4, coordY(ent));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -298,9 +297,9 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -338,6 +337,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -363,11 +363,10 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_EQ(1360232700, a5.getIntField("creDate"));
     EXPECT_EQ(1360232700, a5.getIntField("modDate"));
     EXPECT_STREQ("A5", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(-9, coordX(ent));
     EXPECT_EQ(8, coordY(ent));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -452,6 +451,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(-4, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
 
@@ -472,8 +472,6 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -570,8 +568,6 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -627,19 +623,19 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 1)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 1)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 1)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("You cannot use more than one location attribute when creating an entity [see Orion user manual]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("You cannot use more than one geo location attribute when creating an entity [see Orion user manual]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -674,6 +670,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -694,8 +691,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -745,12 +740,12 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("coordinate format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
+    EXPECT_EQ("geo coordinates format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -785,6 +780,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -805,8 +801,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -856,9 +850,9 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("only WGS84 are supported, found: gurugu", RES_CER_STATUS(0).details);
@@ -896,6 +890,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -916,8 +911,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -968,12 +961,12 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E1, T1] - offending attribute: A5 - attempt to define a location attribute [A5] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E1, T1] - offending attribute: A5 - attempt to define a geo location attribute [A5] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1008,6 +1001,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -1028,8 +1022,6 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1079,12 +1071,12 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - error parsing location attribute, value: [erroneous]", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - error parsing location attribute for new attribute: geo coordinates format error [see Orion user manual]: erroneous", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1119,6 +1111,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -1139,8 +1132,6 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1190,9 +1181,9 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - only WGS84 is supported for location, found: [gurugu]", RES_CER_STATUS(0).details);
@@ -1230,6 +1221,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -1250,8 +1242,6 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1301,7 +1291,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A1 - error parsing location attribute, value: <invalid>", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A1 - error parsing location attribute: geo coordinates format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1336,6 +1326,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -1356,8 +1347,6 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1407,12 +1396,12 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A2 - location nature of an attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A2 - attempt to define a geo location attribute [A2] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1447,6 +1436,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -1467,8 +1457,6 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1519,9 +1507,9 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector[0]->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector[0]->type);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector[0]->stringValue);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: DELETE - entity: [E1, T1] - offending attribute: A1 - location attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
@@ -1559,6 +1547,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    ASSERT_TRUE(ent.hasField("location"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
@@ -1579,7 +1568,5 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
-    /* Release connection */
-    setMongoConnectionForUnitTest(NULL);
     utExit();
 }

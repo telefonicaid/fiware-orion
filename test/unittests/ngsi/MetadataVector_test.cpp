@@ -37,35 +37,23 @@ TEST(MetadataVector, render)
   Metadata        m("Name", "Type", "Value");
   Metadata        m2("Name2", "Type2", "Value2");
   MetadataVector  mV("registrationMetadata");
-  const char*     outfile1 = "ngsi.metadataVector.render1.middle.xml";
-  const char*     outfile2 = "ngsi.metadataVector.render1.middle.json";
-  const char*     outfile3 = "ngsi.metadataVector.render2.middle.xml";
-  const char*     outfile4 = "ngsi.metadataVector.render3.middle.xml";
-  const char*     outfile5 = "ngsi.metadataVector.render3.middle.json";
+  const char*     outfile1 = "ngsi.metadataVector.render1.middle.json";
+  const char*     outfile2 = "ngsi.metadataVector.render3.middle.json";
   std::string     out;
 
   utInit();
 
   mV.push_back(&m);
 
-  out = mV.render(XML, "");
+  out = mV.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = mV.render(JSON, "");
+
+  mV.keyNameSet("metadata");
+
+  mV.push_back(&m2); 
+  out = mV.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  mV.tagSet("metadata");
-  out = mV.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  mV.push_back(&m2);
-  out = mV.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  out = mV.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

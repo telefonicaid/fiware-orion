@@ -24,33 +24,32 @@
 HTTP-Tenant update and query
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DATABASE_NAME}-t_03
-dbInit ${CB_DATABASE_NAME}-t_04
+dbInit ${CB_DB_NAME} t_03
+dbInit ${CB_DB_NAME} t_04
 brokerStart CB 0-255 IPV4 -multiservice
 
 --SHELL--
 echo "1. Update/append entity E with HTTP-Tenant t_03"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>compound</type>
-          <contextValue>03</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --tenant "t_03"
+payload='{
+  "contextElements": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "att",
+          "type": "compound",
+          "value": "03"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --tenant "t_03" --json
 echo
 echo
 
@@ -58,40 +57,41 @@ echo
 echo "2. Update/append entity E with HTTP-Tenant t_04"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>att</name>
-          <type>compound</type>
-          <contextValue>04</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --tenant "t_04"
+payload='{
+  "contextElements": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "att",
+          "type": "compound",
+          "value": "04"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --tenant "t_04" --json
 echo
 echo
+
 
 echo "3. Query entity E with HTTP-Tenant t_03"
 echo "++++++++++++++++++++++++++++++++++++++"
 url='/v1/queryContext'
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Test" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --tenant "t_03"
+payload='{
+  "entities": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --tenant "t_03" --json
 echo
 echo
 
@@ -99,147 +99,148 @@ echo
 echo "4. Query entity E with HTTP-Tenant t_04"
 echo "++++++++++++++++++++++++++++++++++++++"
 url='/v1/queryContext'
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Test" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --tenant "t_04"
+payload='{
+  "entities": [
+    {
+      "type": "Test",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --tenant "t_04" --json
 
 
 --REGEXPECT--
 1. Update/append entity E with HTTP-Tenant t_03
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 625
-Content-Type: application/xml
+Content-Length: 387
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 2. Update/append entity E with HTTP-Tenant t_04
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 625
-Content-Type: application/xml
+Content-Length: 387
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 3. Query entity E with HTTP-Tenant t_03
 ++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 625
-Content-Type: application/xml
+Content-Length: 389
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue>03</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": "03"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 4. Query entity E with HTTP-Tenant t_04
 ++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 625
-Content-Type: application/xml
+Content-Length: 389
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Test" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue>04</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att",
+                        "type": "compound",
+                        "value": "04"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "Test"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 --TEARDOWN--
 
 brokerStop CB
 dbDrop CB
-dbDrop ${CB_DATABASE_NAME}-t_03
-dbDrop ${CB_DATABASE_NAME}-t_04
+dbDrop ${CB_DB_NAME} t_03
+dbDrop ${CB_DB_NAME} t_04

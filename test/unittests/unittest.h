@@ -50,13 +50,13 @@ using ::testing::MatchesRegex;
 */
 extern std::map<std::string, std::string> uriParams;
 
- 
+
 
 /* ****************************************************************************
 *
-* servicePathV - 
+* options -
 */
-extern std::vector<std::string> servicePathV;
+extern std::map<std::string, bool> options;
 
  
 

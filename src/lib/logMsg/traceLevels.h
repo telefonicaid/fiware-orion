@@ -57,6 +57,7 @@ typedef enum TraceLevels
   LmtIpVersion,
   LmtCtxProviders,
   LmtRequest = 38,          // ONLY to be used in ONE place - incoming requests
+  LmtPayload,
 
   /* Parser (40-59) */
   LmtParse    = 40,
@@ -86,7 +87,6 @@ typedef enum TraceLevels
 
   /* MongoBackend (100-119) */
   LmtMongo = 100,
-  LmtMongoSubCache,
 
   /* Cleanup (120-139) */
   LmtDestructor = 120,
@@ -99,7 +99,6 @@ typedef enum TraceLevels
 
   /* Notifications (160-179) */
   LmtNotifier = 160,
-  LmtOntimeIntervalThreads,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,
@@ -108,17 +107,23 @@ typedef enum TraceLevels
   LmtClientOutputPayload = 183,  // Very important for harness test notification_different_sizes
   LmtPartialPayload,
   LmtClientOutputPayloadDump,
+  LmtCPrForwardRequestPayload,
+  LmtCPrForwardResponsePayload,
 
-  /* Semaphores (200-202) */
+  /* Semaphores (200-204) */
   LmtReqSem = 200,
   LmtMongoSem,
   LmtTransSem,
   LmtCacheSem,
+  LmtTimeStatSem,
 
-  /* Others (>=210) */
-  LmtCm = 210,
-  LmtIotaXmlReg,
-  LmtIotaXmlObs,
+  /* Cache (210 - 230) */
+  LmtSubCache = 210,
+  LmtSubCacheMatch,
+  LmtCacheSync,
+
+  /* Others (>=230) */
+  LmtCm = 230,
   LmtRush,
   LmtSoftError,
   LmtNotImplemented,

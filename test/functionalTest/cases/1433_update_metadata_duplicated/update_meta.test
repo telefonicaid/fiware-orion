@@ -1,0 +1,193 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update metadata changing type, not duplicated
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# Issue #1433 reports duplicated metada when updating metadata
+# Changing type caused to be view as a different element
+#
+# 01. Create a metadata
+# 02. GET the entity to make sure the creation worked
+# 03. Update metadata changing type
+# 04. GET the entity to make sure the update worked
+#
+
+echo "01. Create a metadata"
+echo "====================="
+payload='
+{
+    "type": "Room",
+    "id": "Room10",
+    "humidity": {
+        "value": 78
+    },
+    "temperature": {
+        "value": "celsius",
+        "type": "34",
+        "metadata": {
+            "house_flat_1": {
+                "type": "alarm",
+                "value": "hot"
+            },
+            "house_flat_0": {
+                "type": "alarm",
+                "value": "icy"
+            }
+        }
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. GET the entity to make sure the creation worked"
+echo "==================================================="
+orionCurl --url /v2/entities/Room10 --json
+echo
+echo
+
+
+echo "03. Update metadata changing type"
+echo "================================="
+payload='
+{
+    "value": "celsius",
+    "type": "34",
+    "metadata": {
+        "house_flat_1": {
+            "value": "5678"
+        },
+        "house_flat_0": {
+            "value": "1234"
+        }
+    }
+}'
+orionCurl --url /v2/entities/Room10/attrs/temperature --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "04. GET the entity to make sure the creation worked"
+echo "==================================================="
+orionCurl --url /v2/entities/Room10 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a metadata
+=====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/Room10?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. GET the entity to make sure the creation worked
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 232
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "humidity": {
+        "metadata": {},
+        "type": "none",
+        "value": 78
+    },
+    "id": "Room10",
+    "temperature": {
+        "metadata": {
+            "house_flat_0": {
+                "type": "alarm",
+                "value": "icy"
+            },
+            "house_flat_1": {
+                "type": "alarm",
+                "value": "hot"
+            }
+        },
+        "type": "34",
+        "value": "celsius"
+    },
+    "type": "Room"
+}
+
+
+03. Update metadata changing type
+=================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET the entity to make sure the creation worked
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 232
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "humidity": {
+        "metadata": {},
+        "type": "none",
+        "value": 78
+    },
+    "id": "Room10",
+    "temperature": {
+        "metadata": {
+            "house_flat_0": {
+                "type": "none",
+                "value": "1234"
+            },
+            "house_flat_1": {
+                "type": "none",
+                "value": "5678"
+            }
+        },
+        "type": "34",
+        "value": "celsius"
+    },
+    "type": "Room"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

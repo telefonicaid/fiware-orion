@@ -48,23 +48,18 @@ void setupDatabase(void)
     /* mongoStart is needed one time to create the connection pool */
     if (mongoStarted == false)
     {
+      /* In fact, the mongoStart() parameters related with the pool, e.g. pool size, are irrelevant, given that the connection
+       * creation is mocked under UNIT_TEST in the mongoBackend library */
       mongoStart("localhost", "", "", "", "", false, 0, 10);
       mongoStarted = true;
     }
 
     connection = getMongoConnection();
-    if (connection == NULL)
-    {
-      connection = mongoInitialConnectionGetForUnitTest();
-      setMongoConnectionForUnitTest(connection);
-    }
 
     connection->dropCollection(REGISTRATIONS_COLL);
     connection->dropCollection(ENTITIES_COLL);
     connection->dropCollection(SUBSCRIBECONTEXT_COLL);
-    connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
-
-    releaseMongoConnection(connection);
+    connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);    
 
     setDbPrefix(DBPREFIX);
     setRegistrationsCollectionName("registrations");
@@ -137,8 +132,8 @@ static bool equalContextAttribute(ContextAttribute* caExpected, ContextAttribute
     return false;
   }
 
-  LM_M(("caArg '%s', '%s', '%s'", caArg->name.c_str(), caArg->type.c_str(), caArg->toStringValue().c_str()));
-  LM_M(("caExpected '%s', '%s', '%s'", caExpected->name.c_str(), caExpected->type.c_str(), caExpected->toStringValue().c_str()));
+  LM_M(("caArg '%s', '%s', '%s'", caArg->name.c_str(), caArg->type.c_str(), caArg->getValue().c_str()));
+  LM_M(("caExpected '%s', '%s', '%s'", caExpected->name.c_str(), caExpected->type.c_str(), caExpected->getValue().c_str()));
 
   return true;
 }
@@ -159,8 +154,8 @@ static bool equalContextAttributeVector(ContextAttributeVector caExpectedV, Cont
     for (unsigned int ix = 0; ix < caArgV.size(); ++ix) {
         bool attributeMatch = false;
         for (unsigned int jx = 0; jx < caExpectedV.size(); ++jx) {
-            ContextAttribute* caArg = caArgV.get(ix);
-            ContextAttribute* caExpected = caExpectedV.get(jx);
+            ContextAttribute* caArg = caArgV[ix];
+            ContextAttribute* caExpected = caExpectedV[jx];
             LM_M(("%d == %d?", ix, jx));
             if (equalContextAttribute(caExpected, caArg)) {
                 LM_M(("attribute matches in ContextAttributeVector comparison, check next one..."));
@@ -196,8 +191,8 @@ static bool equalContextElementResponseVector(ContextElementResponseVector cerEx
     for (unsigned int ix = 0; ix < cerArgV.size(); ++ix) {
         bool entityMatch = false;
         for (unsigned int jx = 0; jx < cerExpectedV.size(); ++jx) {
-            ContextElementResponse* cerArg = cerArgV.get(ix);
-            ContextElementResponse* cerExpected = cerExpectedV.get(jx);
+            ContextElementResponse* cerArg = cerArgV[ix];
+            ContextElementResponse* cerExpected = cerExpectedV[jx];
             LM_M(("%d == %d?", ix, jx));
             if (!equalEntity(cerExpected->contextElement.entityId, cerArg->contextElement.entityId)) {
                 LM_M(("entity doesn't match in ContextElementResponseVector comparison, continue..."));
@@ -301,8 +296,8 @@ static bool equalContextRegistrationAttributeVector(ContextRegistrationAttribute
     for (unsigned int ix = 0; ix < craArgV.size(); ++ix) {
         bool contextRegistrationAttributeMatches = false;
         for (unsigned int jx = 0; jx < craExpectedV.size(); ++jx) {
-            ContextRegistrationAttribute* craArg = craArgV.get(ix);
-            ContextRegistrationAttribute* craExpected = craExpectedV.get(jx);
+            ContextRegistrationAttribute* craArg = craArgV[ix];
+            ContextRegistrationAttribute* craExpected = craExpectedV[jx];
             LM_M(("%d == %d?", ix, jx));
             if (equalContextRegistrationAttribute(craExpected, craArg)) {
                 LM_M(("context registration attribute matches in ContextRegistrationAttributeVector comparison, check next one..."));
@@ -339,8 +334,8 @@ static bool equalEntityIdVector(EntityIdVector enExpectedV, EntityIdVector enArg
     for (unsigned int ix = 0; ix < enArgV.size(); ++ix) {
         bool entityMatch = false;
         for (unsigned int jx = 0; jx < enExpectedV.size(); ++jx) {
-            EntityId enArg = *enArgV.get(ix);
-            EntityId enExpected = *enExpectedV.get(jx);
+            EntityId enArg = *enArgV[ix];
+            EntityId enExpected = *enExpectedV[jx];
             LM_M(("%d == %d?", ix, jx));
             if (equalEntity(enExpected, enArg)) {
                 LM_M(("entity matches in EntityIdVector comparison, check next one..."));
@@ -376,8 +371,8 @@ static bool equalContextRegistrationResponseVector(ContextRegistrationResponseVe
     for (unsigned int ix = 0; ix < crrArgV.size(); ++ix) {
         bool contextRegistrationMatch = false;
         for (unsigned int jx = 0; jx < crrExpectedV.size(); ++jx) {
-            ContextRegistration crArg = crrArgV.get(ix)->contextRegistration;
-            ContextRegistration crExpected = crrExpectedV.get(jx)->contextRegistration;
+            ContextRegistration crArg = crrArgV[ix]->contextRegistration;
+            ContextRegistration crExpected = crrExpectedV[jx]->contextRegistration;
             LM_M(("%d == %d?", ix, jx));
             if (!equalEntityIdVector(crExpected.entityIdVector, crArg.entityIdVector)) {
                 LM_M(("entity vector doesn't match in ContextRegistrationResponseVector comparison, continue..."));

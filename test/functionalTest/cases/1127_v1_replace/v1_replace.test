@@ -40,7 +40,7 @@ brokerStart CB
 echo "01. Create E1 with attr1"
 echo "========================"
 payload='{ "id": "E1", "type": "T1", "attr1": "1", "attr2": "2" }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -90,7 +90,8 @@ echo
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -98,13 +99,22 @@ Date: REGEX(.*)
 02. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 123
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": "1",
-    "attr2": "2",
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": "1"
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": "2"
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -115,6 +125,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 485
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -149,13 +160,22 @@ Date: REGEX(.*)
 04. Get E1 (attr3, attr4)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 123
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr3": "3",
-    "attr4": "4",
+    "attr3": {
+        "metadata": {},
+        "type": "none",
+        "value": "3"
+    },
+    "attr4": {
+        "metadata": {},
+        "type": "none",
+        "value": "4"
+    },
     "id": "E1",
     "type": "T1"
 }

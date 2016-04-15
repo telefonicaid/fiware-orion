@@ -51,7 +51,6 @@ ProvidingApplication::ProvidingApplication()
 std::string ProvidingApplication::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -126,11 +125,13 @@ void ProvidingApplication::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sProvidingApplication: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sProvidingApplication: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo ProvidingApplication\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo ProvidingApplication\n", indent.c_str()));
   }
 }
 
@@ -140,14 +141,14 @@ void ProvidingApplication::present(const std::string& indent)
 *
 * ProvidingApplication::render -
 */
-std::string ProvidingApplication::render(Format format, const std::string& indent, bool comma)
+std::string ProvidingApplication::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "providingApplication", string, format, comma);
+  return valueTag1(indent, "providingApplication", string, comma);
 }
 
 

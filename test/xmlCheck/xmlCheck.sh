@@ -256,9 +256,9 @@ then
   echo
 
   \rm Ngsi10_Operations.xsd Ngsi9_Operations.xsd Ngsi9_10_dataStructures.xsd 2> /dev/null
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi10_Operations.xsd
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_Operations.xsd
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_10_dataStructures.xsd
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fiware.org/scmrepos/svn/iot/trunk/schemes/Ngsi10_Operations.xsd
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fiware.org/scmrepos/svn/iot/trunk/schemes/Ngsi9_Operations.xsd
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fiware.org/scmrepos/svn/iot/trunk/schemes/Ngsi9_10_dataStructures.xsd
 
   if [ ! -f Ngsi10_Operations.xsd ] || [ ! -f Ngsi9_Operations.xsd ] || [ ! -f Ngsi9_10_dataStructures.xsd ]
   then

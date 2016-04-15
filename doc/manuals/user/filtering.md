@@ -5,6 +5,7 @@
 * [No-Existence type filter](#no-existence-type-filter)
 * [Entity type filter](#entity-type-filter)
 * [Geo-location filter](#geo-location-filter)
+* [Geo-location filter NGSIv2](#geo-location-filter-ngsiv2)
 * [String query filter](#string-filter)
     
 ## Introduction
@@ -140,9 +141,16 @@ operation filter.
 
 [Top](#top)
 
+## Geo-location filter NGSIv2
+
+The scope corresponding to this type is "FIWARE::Location::NGSIv2". It is
+described in detail in [the following section](geolocation.md#geo-located-queries-ngsiv2).
+
+[Top](#top)
+
 ## String filter
 
-The scope corresponding to this type is "FIWARE::StringFilter".
+The scope corresponding to this type is "FIWARE::StringQuery".
 
 ```
 ...
@@ -150,8 +158,8 @@ The scope corresponding to this type is "FIWARE::StringFilter".
         "restriction": {
             "scopes": [
                 {
-                    "type": "FIWARE::StringFilter",
-                    "value": "temperature<24;humidity==75..90;status=running"
+                    "type": "FIWARE::StringQuery",
+                    "value": "temperature<24;humidity==75..90;status==running"
                 }
             ]
         }
@@ -165,7 +173,7 @@ greater/less than, range or existence.
 There isn't any URL parameter correspondence for this filter in NGSI v1. In NGSI v2
 it corresponds to the `q` parameter:
 
-    curl 'localhost:1026/v2/entities?q=temperature<24;humidity==75..90;status=running'
+    curl 'localhost:1026/v2/entities?q=temperature<24;humidity==75..90;status==running'
 
 For a detailed syntax description of the `value` or `q` parameter, see [NGSIv2 specification
 document](http://telefonicaid.github.io/fiware-orion/api/v2/).

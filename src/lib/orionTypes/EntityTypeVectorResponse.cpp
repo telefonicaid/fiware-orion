@@ -26,13 +26,18 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
+
 
 
 /* ****************************************************************************
@@ -44,14 +49,16 @@ std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::str
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
 
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if (entityTypeVector.size() > 0)
+  {
     out += entityTypeVector.render(ciP, indent + "  ", true);
+  }
 
-  out += statusCode.render(ciP->outFormat, indent + "  ");
+  out += statusCode.render(indent + "  ");
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }
@@ -77,11 +84,13 @@ std::string EntityTypeVectorResponse::check
   }
   else if ((res = entityTypeVector.check(ciP, indent, predetectedError)) != "OK")
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
   return render(ciP, "");
 }
@@ -94,7 +103,9 @@ std::string EntityTypeVectorResponse::check
 */
 void EntityTypeVectorResponse::present(const std::string& indent)
 {
-  LM_F(("%s%d items in EntityTypeVectorResponse:\n", indent.c_str(), entityTypeVector.size()));
+  LM_T(LmtPresent,("%s%d items in EntityTypeVectorResponse:\n", 
+		  indent.c_str(), 
+		  entityTypeVector.size()));
 
   entityTypeVector.present(indent + "  ");
   statusCode.present(indent + "  ");
@@ -119,12 +130,11 @@ void EntityTypeVectorResponse::release(void)
 */
 std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
 {
-  std::string  out = "{";
+  std::string  out = "[";
 
   for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {
-    out += JSON_STR(entityTypeVector.vec[ix]->type) + ":";
-    out += entityTypeVector.vec[ix]->toJson(ciP);
+    out += entityTypeVector.vec[ix]->toJson(ciP, true);
 
     if (ix != entityTypeVector.vec.size() - 1)
     {
@@ -132,7 +142,7 @@ std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
     }
   }
 
-  out += "}";
+  out += "]";
 
   return out;
 }

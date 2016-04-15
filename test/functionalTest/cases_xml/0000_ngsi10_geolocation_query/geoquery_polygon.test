@@ -1,0 +1,736 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query test (polygon)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1: +++++++++ Point A +++++++++++"
+url="/v1/updateContext"
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Point" isPattern="false">
+        <id>A</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>location</name>
+          <type>coords</type>
+          <contextValue>3, 2</contextValue>
+          <metadata>
+            <contextMetadata>
+              <name>location</name>
+              <type>string</type>
+              <value>WGS84</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "2: +++++++++ Point B +++++++++++"
+url="/v1/updateContext"
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Point" isPattern="false">
+        <id>B</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>location</name>
+          <type>coords</type>
+          <contextValue>5, 5</contextValue>
+          <metadata>
+            <contextMetadata>
+              <name>location</name>
+              <type>string</type>
+              <value>WGS84</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "3: +++++++++ Point C +++++++++++"
+url="/v1/updateContext"
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Point" isPattern="false">
+        <id>C</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>location</name>
+          <type>coords</type>
+          <contextValue>7, 4</contextValue>
+          <metadata>
+            <contextMetadata>
+              <name>location</name>
+              <type>string</type>
+              <value>WGS84</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "4: ++++++++++ Rectangle in: A, B ++++++++++"
+url="/v1/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE::Location</scopeType>
+        <scopeValue>
+          <polygon>
+            <vertexList>
+              <vertex>
+                <latitude>0</latitude>
+                <longitude>0</longitude>
+              </vertex>
+              <vertex>
+                <latitude>0</latitude>
+                <longitude>6</longitude>
+              </vertex>
+              <vertex>
+                <latitude>6</latitude>
+                <longitude>6</longitude>
+              </vertex>
+              <vertex>
+                <latitude>6</latitude>
+                <longitude>0</longitude>
+              </vertex>
+            </vertexList>
+          </polygon>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "5: ++++++++++ Rectangle in: B, C ++++++++++"
+url="/v1/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE::Location</scopeType>
+        <scopeValue>
+          <polygon>
+            <vertexList>
+              <vertex>
+                <latitude>3</latitude>
+                <longitude>3</longitude>
+              </vertex>
+              <vertex>
+                <latitude>3</latitude>
+                <longitude>8</longitude>
+              </vertex>
+              <vertex>
+                <latitude>11</latitude>
+                <longitude>8</longitude>
+              </vertex>
+              <vertex>
+                <latitude>11</latitude>
+                <longitude>3</longitude>
+              </vertex>
+            </vertexList>
+          </polygon>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "6: ++++++++++ Triangle in: A ++++++++++"
+url="/v1/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE::Location</scopeType>
+        <scopeValue>
+          <polygon>
+            <vertexList>
+              <vertex>
+                <latitude>0</latitude>
+                <longitude>0</longitude>
+              </vertex>
+              <vertex>
+                <latitude>0</latitude>
+                <longitude>6</longitude>
+              </vertex>
+              <vertex>
+                <latitude>6</latitude>
+                <longitude>0</longitude>
+              </vertex>
+            </vertexList>
+          </polygon>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "7: ++++++++++ Rectangle out: A ++++++++++"
+url="/v1/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE::Location</scopeType>
+        <scopeValue>
+          <polygon>
+            <vertexList>
+              <vertex>
+                <latitude>3</latitude>
+                <longitude>3</longitude>
+              </vertex>
+              <vertex>
+                <latitude>3</latitude>
+                <longitude>8</longitude>
+              </vertex>
+              <vertex>
+                <latitude>11</latitude>
+                <longitude>8</longitude>
+              </vertex>
+              <vertex>
+                <latitude>11</latitude>
+                <longitude>3</longitude>
+              </vertex>
+            </vertexList>
+            <inverted>true</inverted>
+          </polygon>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "8: ++++++++++ Triangle out: B, C ++++++++++"
+url="/v1/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE::Location</scopeType>
+        <scopeValue>
+          <polygon>
+            <vertexList>
+              <vertex>
+                <latitude>0</latitude>
+                <longitude>0</longitude>
+              </vertex>
+              <vertex>
+                <latitude>0</latitude>
+                <longitude>6</longitude>
+              </vertex>
+              <vertex>
+                <latitude>6</latitude>
+                <longitude>0</longitude>
+              </vertex>
+            </vertexList>
+            <inverted>true</inverted>
+          </polygon>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+1: +++++++++ Point A +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 852
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>A</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+2: +++++++++ Point B +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 852
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>B</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+3: +++++++++ Point C +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 852
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>C</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+4: ++++++++++ Rectangle in: A, B ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1612
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>A</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>3, 2</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>B</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>5, 5</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+5: ++++++++++ Rectangle in: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1612
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>B</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>5, 5</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>C</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>7, 4</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+6: ++++++++++ Triangle in: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 854
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>A</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>3, 2</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+7: ++++++++++ Rectangle out: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 854
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>A</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>3, 2</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+8: ++++++++++ Triangle out: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1612
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>B</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>5, 5</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>C</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>7, 4</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WGS84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

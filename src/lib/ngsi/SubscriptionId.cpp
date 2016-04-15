@@ -64,7 +64,6 @@ SubscriptionId::SubscriptionId(const std::string& subId)
 std::string SubscriptionId::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -108,7 +107,7 @@ void SubscriptionId::set(const std::string& value)
 *
 * SubscriptionId::get -
 */
-std::string SubscriptionId::get(void)
+std::string SubscriptionId::get(void) const
 {
   return string;
 }
@@ -123,11 +122,13 @@ void SubscriptionId::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sSubscriptionId: %s\n", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sSubscriptionId: %s\n", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo SubscriptionId\n", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo SubscriptionId\n", indent.c_str()));
   }
 }
 
@@ -137,7 +138,7 @@ void SubscriptionId::present(const std::string& indent)
 *
 * SubscriptionId::render -
 */
-std::string SubscriptionId::render(RequestType container, Format format, const std::string& indent, bool comma)
+std::string SubscriptionId::render(RequestType container, const std::string& indent, bool comma)
 {
   std::string xString = string;
 
@@ -163,7 +164,7 @@ std::string SubscriptionId::render(RequestType container, Format format, const s
     }
   }
 
-  return valueTag(indent, "subscriptionId", xString, format, comma);
+  return valueTag1(indent, "subscriptionId", xString, comma);
 }
 
 

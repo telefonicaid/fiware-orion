@@ -34,6 +34,6 @@ def the_context_broker_started_with_multitenancy(step):
     :return:
     """
     if world.cb_config_to_start != 'multitenancy':
-        world.bin_parms = '-multiservice -t 0-255 -db acceptance'
+        world.bin_parms = '-multiservice  -t 0-255 -logLevel DEBUG -db acceptance'
         start_cb(world.bin_parms)
         world.cb_config_to_start = 'multitenancy'

@@ -87,14 +87,18 @@ function dMsg()
 }
 
 
-
+# ------------------------------------------------------------------------------
+#
+# dbInit - 
+#
 # ------------------------------------------------------------------------------
 #
 # dbInit - 
 #
 function dbInit()
 {
-  role=$1
+  role=$1  
+  tenant=$2
   
   host="${CB_DATABASE_HOST}"
   if [ "$host" == "" ]
@@ -108,32 +112,42 @@ function dbInit()
     port="27017"
   fi
   
-  db=$host:$port/$1
-
   dMsg initializing database;
 
   if [ "$role" == "CB" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CB_DATABASE_NAME} --quiet
+    baseDbName=${CB_DB_NAME}
   elif [ "$role" == "CP1" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DATABASE_NAME} --quiet
+    baseDbName=${CP1_DB_NAME}
   elif [ "$role" == "CP2" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP2_DATABASE_NAME} --quiet
+    baseDbName=${CP2_DB_NAME}
   elif [ "$role" == "CP3" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP3_DATABASE_NAME} --quiet
+    baseDbName=${CP3_DB_NAME}
   elif [ "$role" == "CP4" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP4_DATABASE_NAME} --quiet
+    baseDbName=${CP4_DB_NAME}
   elif [ "$role" == "CP5" ]
   then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CP5_DATABASE_NAME} --quiet
+    baseDbName=${CP5_DB_NAME}
   else
-    echo 'db.dropDatabase()' | mongo $db --quiet
+    baseDbName=$1
   fi
+
+  # If a tenant was provided, then we build the tenant DB, e.g. orion-ftest1
+  if [ $# == 2 ]
+  then 
+    db=$baseDbName-$tenant
+  else
+    db=$baseDbName
+  fi
+
+  dMsg "database to drop: <$db>" 
+  echo 'db.dropDatabase()' | mongo $host:$port/$db --quiet
 }
+
 
 
 # ------------------------------------------------------------------------------
@@ -142,17 +156,12 @@ function dbInit()
 #
 function dbDrop()
 {
-  db=$1
-
   if [ "$CB_DB_DROP" != "No" ]
   then
-    if [ "$db" != "" ]
-    then
-      dbInit $db
-    fi
+    # FIXME: Not sure if $@ should be better...
+    dbInit $*
   fi
 }
-
 
 
 # -----------------------------------------------------------------------------
@@ -247,6 +256,19 @@ function brokerStopAwait
 #
 # brokerStartAwait
 #
+# For some really strange reason, all functests fail under valgrind when executed by Jenkins
+# without the line:
+#
+#   echo "Broker started after $loopNo checks" >> /tmp/brokerStartCounter
+#
+# It also works with echo to /dev/null, but using a file we get some more information.
+#
+# As we only append (>>) to /tmp/brokerStartCounter in this file, /tmp/brokerStartCounter
+# is reset in testHarness.sh, using the command "date > tmp/brokerStartCounter".
+#
+# The reason we send information to a file is that in case the 100 loop is not enough in the future,
+# we will have that information in the file /tmp/brokerStartCounter 
+#
 function brokerStartAwait
 {
   if [ "$BROKER_AWAIT_SLEEP_TIME" != "" ]
@@ -261,7 +283,7 @@ function brokerStartAwait
   typeset -i loopNo
   typeset -i loops
   loopNo=0
-  loops=50
+  loops=100
 
   while [ $loopNo -lt $loops ]
   do
@@ -269,6 +291,7 @@ function brokerStartAwait
     if [ "$?" == "0" ]
     then
       vMsg The orion context broker has started, listening on port $port
+      echo "Broker started after $loopNo checks" >> /tmp/brokerStartCounter
       sleep 1
       break;
     fi
@@ -280,9 +303,10 @@ function brokerStartAwait
 
   sleep .5
 
-  # Check that CB started fine
-  curl -s localhost:${port}/version | grep version > /dev/null
+  # Check that CB started
+  curl -s localhost:${port}/version | grep version >> /tmp/brokerStartCounter
   result=$?
+  echo "result: $result" >> /tmp/brokerStartCounter
 }
 
 
@@ -303,7 +327,12 @@ function localBrokerStart()
   shift
   shift
 
-  extraParams=$*
+  if [ "$traceLevels" != "" ]
+  then
+    extraParams="-logLevel DEBUG "$*
+  else
+    extraParams=$*
+  fi
 
   IPvOption=""
   
@@ -332,32 +361,32 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
     port=$CP1_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
   elif [ "$role" == "CP2" ]
   then
     mkdir -p $CP2_LOG_DIR
     port=$CP2_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
   elif [ "$role" == "CP3" ]
   then
     mkdir -p $CP3_LOG_DIR
     port=$CP3_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
   elif [ "$role" == "CP4" ]
   then
     mkdir -p $CP4_LOG_DIR
     port=$CP4_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
   elif [ "$role" == "CP5" ]
   then
     mkdir -p $CP5_LOG_DIR
     port=$CP5_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
 
@@ -866,6 +895,7 @@ function dbInsertEntity()
 #   --xauthToken  <token>          (X-Auth token value)
 #   --origin      <origin>         (Origin in HTTP header)
 #   --noPayloadCheck               (don't check the payload)
+#   --payloadCheck <format>        (force specific treatment of payload)
 #   --header      <HTTP header>    (more headers)
 #   -H            <HTTP header>    (more headers)
 #   --verbose                      (verbose output)
@@ -900,6 +930,7 @@ function orionCurl()
   _json=''
   _urlParams=''
   _xauthToken=''
+  _payloadCheck=''
 
   #
   # Parsing parameters
@@ -913,11 +944,12 @@ function orionCurl()
     elif [ "$1" == "-X" ]; then                _method="-X $2"; shift;
     elif [ "$1" == "--payload" ]; then         _payload=$2; shift;
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck='on';
+    elif [ "$1" == "--payloadCheck" ]; then    _payloadCheck=$2; _noPayloadCheck='off'; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
     elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
     elif [ "$1" == "--origin" ]; then          _origin='--header "Origin: '${2}'"'; shift;
-    elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header $2"; shift;
-    elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header $2"; shift;
+    elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header \"$2\""; shift;
+    elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header \"$2\""; shift;
     elif [ "$1" == "--in" ]; then              _in="$2"; shift;
     elif [ "$1" == "--out" ]; then             _out="$2"; shift;
     elif [ "$1" == "--json" ]; then            _in='json'; _out='json'; payloadCheckFormat='json'
@@ -960,6 +992,7 @@ function orionCurl()
   if   [ "$_in"   == "application/json" ]; then _in='json';  fi
   if   [ "$_out"  == "application/xml" ];  then _out='xml';  fi
   if   [ "$_out"  == "application/json" ]; then _out='json'; fi
+  if   [ "$_out"  == "text/plain" ];       then _out='text'; fi
 
   if   [ "$_in"  == "xml" ];   then _inFormat='--header "Content-Type: application/xml"'
   elif [ "$_in"  == "json" ];  then _inFormat='--header "Content-Type: application/json"'
@@ -974,6 +1007,11 @@ function orionCurl()
   elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
   fi
 
+  if [ "$_payloadCheck" != "" ]
+  then
+    payloadCheckFormat=$_payloadCheck
+    _noPayloadCheck='off'
+  fi
 
   dMsg $_in: $_in
   dMsg _out: $_out
@@ -1015,6 +1053,7 @@ function orionCurl()
   then
     echo "Broker seems to have died ..."
   else
+    _responseHeaders=$(cat /tmp/httpHeaders.out)
     #
     # Remove "Connection: Keep-Alive" and "Connection: close" headers
     #
@@ -1041,15 +1080,19 @@ function orionCurl()
 
       if [ "$payloadCheckFormat" == xml ] || [ "$payloadCheckFormat" == "" ]
       then
-        vMsg Running xmllint tool for $_response
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #vMsg Running xmllint tool for $_response
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       elif [ "$payloadCheckFormat" == json ]
       then
         vMsg Running python tool for $_response
         echo $_response | python -mjson.tool
       else
-        vMsg Running xmllint tool for $_response
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #vMsg Running xmllint tool for $_response
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       fi
     fi
   fi
@@ -1218,13 +1261,17 @@ function coapCurl()
     then
       if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
       then
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       elif [ "$_outFormat" == application/json ]
       then
         vMsg "JSON check for:" $_response
         echo $_response | python -mjson.tool
       else
-        echo $_response | xmllint --format -
+        # FIXME P10: XML removal
+        #echo $_response | xmllint --format -
+        echo $_response | python -mjson.tool
       fi
     fi
   fi
@@ -1239,7 +1286,6 @@ export -f brokerStart
 export -f localBrokerStop
 export -f localBrokerStart
 export -f brokerStop
-export -f localBrokerStop
 export -f proxyCoapStart
 export -f proxyCoapStop
 export -f accumulatorStart

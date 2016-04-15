@@ -34,15 +34,15 @@ accumulatorStart
 # 01. PUT /v1/contextSubscriptions/1234567890 and see it fail
 # 02. PUT /v1/contextSubscriptions/123456789012345678901234 with 000000000000000000000000 in payload and see it fail
 # 03. PUT /v1/contextSubscriptions/123456789012345678901234 and see it fail
-# 04. Subscribe to E1/T1/A1+A2, in XML
+# 04. Subscribe to E1/T1/A1+A2
 # 05. Create E1/T1/A1+A2
-# 06. Dump accumulator, see E1/T1/A1+A2, in XML
-# 07. PUT /v1/contextSubscriptions/SUB_ID?notifyFormat=JSON, removing A2 from notifyConditions
-# 08. Dump accumulator, see two notifications, first one in XML, the second in JSON
-# 09. Update E1/T1/A1
+# 06. Dump accumulator, see E1/T1/A1+A2
+# 07. PUT /v1/contextSubscriptions/SUB_ID, removing A2 from notifyConditions
+# 08. Dump accumulator, see two notifications
+# 09. Update E1/T1/A2
 # 10. Dump accumulator, still the same two notifications
-# 11. Update E1/T1/A2
-# 12. Dump accumulator, see three notification, first one in XML, the rest in JSON
+# 11. Update E1/T1/A1
+# 12. Dump accumulator, see three notifications
 #
 
 echo "01. PUT /v1/contextSubscriptions/1234567890 and see it fail"
@@ -105,8 +105,8 @@ echo
 echo
 
 
-echo "04. Subscribe to E1/T1/A1+A2, in XML"
-echo "===================================="
+echo "04. Subscribe to E1/T1/A1+A2"
+echo "============================"
 payload='{
   "entities": [
     {
@@ -130,7 +130,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext?notifyFormat=XML --payload "$payload" --json
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 echo
 echo
@@ -164,15 +164,15 @@ echo
 echo
 
 
-echo "06. Dump accumulator, see E1/T1/A1+A2, in XML"
-echo "============================================="
+echo "06. Dump accumulator, see E1/T1/A1+A2"
+echo "====================================="
 accumulatorDump
 echo
 echo
 
 
-echo "07. PUT /v1/contextSubscriptions/SUB_ID?notifyFormat=JSON, removing A2 from notifyConditions"
-echo "============================================================================================"
+echo "07. PUT /v1/contextSubscriptions/SUB_ID, removing A2 from notifyConditions"
+echo "=========================================================================="
 payload='{
   "duration": "P1Y",
   "subscriptionId": "'$SUB_ID'",
@@ -186,13 +186,13 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextSubscriptions/$SUB_ID?notifyFormat=JSON --payload "$payload" --json -X PUT
+orionCurl --url /v1/contextSubscriptions/$SUB_ID --payload "$payload" --json -X PUT
 echo
 echo
 
 
-echo "08. Dump accumulator, see two notifications, first one in XML, the second in JSON"
-echo "================================================================================="
+echo "08. Dump accumulator, see two notifications"
+echo "==========================================="
 accumulatorDump
 echo
 echo
@@ -228,6 +228,9 @@ echo
 echo
 
 
+# Avoid throttling (1 second) for the subscription
+sleep 2
+
 echo "11. Update E1/T1/A1"
 echo "==================="
 payload='{
@@ -251,8 +254,8 @@ echo
 echo
 
 
-echo "12. Dump accumulator, see three notification, first one in XML, the rest in JSON"
-echo "================================================================================"
+echo "12. Dump accumulator, see three notifications"
+echo "============================================="
 accumulatorDump
 echo
 echo
@@ -264,6 +267,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 205
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -283,6 +287,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 284
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -302,6 +307,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 180
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -315,11 +321,12 @@ Date: REGEX(.*)
 }
 
 
-04. Subscribe to E1/T1/A1+A2, in XML
-====================================
+04. Subscribe to E1/T1/A1+A2
+============================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -336,6 +343,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 491
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -367,52 +375,54 @@ Date: REGEX(.*)
 }
 
 
-06. Dump accumulator, see E1/T1/A1+A2, in XML
-=============================================
+06. Dump accumulator, see E1/T1/A1+A2
+=====================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 879
+Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T1" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>string</type>
-            <contextValue>1</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A2</name>
-            <type>string</type>
-            <contextValue>2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T1",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "string",
+            "value" : "1"
+          },
+          {
+            "name" : "A2",
+            "type" : "string",
+            "value" : "2"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
 =======================================
 
 
-07. PUT /v1/contextSubscriptions/SUB_ID?notifyFormat=JSON, removing A2 from notifyConditions
-============================================================================================
+07. PUT /v1/contextSubscriptions/SUB_ID, removing A2 from notifyConditions
+==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -424,51 +434,53 @@ Date: REGEX(.*)
 }
 
 
-08. Dump accumulator, see two notifications, first one in XML, the second in JSON
-=================================================================================
+08. Dump accumulator, see two notifications
+===========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 879
+Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T1" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>string</type>
-            <contextValue>1</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A2</name>
-            <type>string</type>
-            <contextValue>2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T1",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "string",
+            "value" : "1"
+          },
+          {
+            "name" : "A2",
+            "type" : "string",
+            "value" : "2"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -507,6 +519,7 @@ Content-Type: application/json; charset=utf-8
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -536,48 +549,50 @@ Date: REGEX(.*)
 10. Dump accumulator, still the same two notifications
 ======================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 879
+Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T1" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>string</type>
-            <contextValue>1</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A2</name>
-            <type>string</type>
-            <contextValue>2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T1",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "string",
+            "value" : "1"
+          },
+          {
+            "name" : "A2",
+            "type" : "string",
+            "value" : "2"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -616,6 +631,7 @@ Content-Type: application/json; charset=utf-8
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -642,51 +658,53 @@ Date: REGEX(.*)
 }
 
 
-12. Dump accumulator, see three notification, first one in XML, the rest in JSON
-================================================================================
+12. Dump accumulator, see three notifications
+=============================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 879
+Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T1" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>string</type>
-            <contextValue>1</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A2</name>
-            <type>string</type>
-            <contextValue>2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T1",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "string",
+            "value" : "1"
+          },
+          {
+            "name" : "A2",
+            "type" : "string",
+            "value" : "2"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -722,8 +740,9 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 574
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",

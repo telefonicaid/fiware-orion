@@ -30,6 +30,8 @@ SET (SOURCES
     OrionError.cpp
     HttpStatusCode.cpp
     ConnectionInfo.cpp
+    StringFilter.cpp
+    errorAdaptation.cpp
 )
 
 SET (HEADERS
@@ -44,6 +46,8 @@ SET (HEADERS
     orionReply.h
     OrionError.h
     HttpStatusCode.h
+    StringFilter.h
+    errorAdaptation.h
 )
 
 

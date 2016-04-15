@@ -32,19 +32,19 @@ brokerStart CB
 #
 # 01. Create E1 with attr1
 # 02. Get E1 (only attr1)
-# 03. POST /v2/entities/E1 atribute 'attr2'
+# 03. POST /v2/entities/E1 attribute 'attr2'
 # 04. Get E1 (attr1, attr2)
-# 05. POST /v2/entities/E1?op=append atribute 'attr3'
+# 05. POST /v2/entities/E1?options=append attribute 'attr3'
 # 06. Get E1 (attr1, attr2, attr3)
-# 07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)
+# 07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)
 # 08. Get E1 (attr1, attr2, attr3, attr4)
-# 09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)
+# 09. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (attr4 already exists. error)
 # 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
 
 echo "01. Create E1 with attr1"
 echo "========================"
 payload='{ "id": "E1", "attr1": 1 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -56,10 +56,10 @@ echo
 echo
 
 
-echo "03. POST /v2/entities/E1 atribute 'attr2'"
-echo "========================================="
+echo "03. POST /v2/entities/E1 attribute 'attr2'"
+echo "=========================================="
 payload='{  "attr2": 2 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -71,10 +71,10 @@ echo
 echo
 
 
-echo "05. POST /v2/entities/E1?op=append atribute 'attr3'"
-echo "==================================================="
+echo "05. POST /v2/entities/E1?options=append attribute 'attr3'"
+echo "========================================================="
 payload='{  "attr3": 3 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=append,keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -86,25 +86,25 @@ echo
 echo
 
 
-echo "07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)"
-echo "=========================================================="
+echo "07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)"
+echo "==========================================================="
 payload='{  "attr3": 33, "attr4": 4 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
 echo
 echo
 
 
 echo "08. Get E1 (attr1, attr2, attr3, att4)"
-echo "======================================="
+echo "======================================"
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo "09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)"
-echo "======================================================================================="
+echo "09. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (attr4 already exists. error)"
+echo "============================================================================================="
 payload='{  "attr4": 44, "attr5": 5 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=append,keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -121,7 +121,8 @@ echo
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -129,21 +130,27 @@ Date: REGEX(.*)
 02. Get E1 (only attr1)
 =======================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "id": "E1",
+    "type": "none"
 }
 
 
-03. POST /v2/entities/E1 atribute 'attr2'
-=========================================
-HTTP/1.1 201 Created
+03. POST /v2/entities/E1 attribute 'attr2'
+==========================================
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -151,22 +158,32 @@ Date: REGEX(.*)
 04. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 45
+Content-Length: 121
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
+    "id": "E1",
+    "type": "none"
 }
 
 
-05. POST /v2/entities/E1?op=append atribute 'attr3'
-===================================================
-HTTP/1.1 201 Created
+05. POST /v2/entities/E1?options=append attribute 'attr3'
+=========================================================
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -174,48 +191,81 @@ Date: REGEX(.*)
 06. Get E1 (attr1, attr2, attr3)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 62
+Content-Length: 169
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "attr3": 3.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "none",
+        "value": 3
+    },
+    "id": "E1",
+    "type": "none"
 }
 
 
-07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)
-==========================================================
-HTTP/1.1 201 Created
+07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)
+===========================================================
+HTTP/1.1 204 No Content
 Content-Length: 0
-Location: /v2/entities/E1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
 
 08. Get E1 (attr1, attr2, attr3, att4)
-=======================================
+======================================
 HTTP/1.1 200 OK
-Content-Length: 80
+Content-Length: 218
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "attr3": 33.0,
-    "attr4": 4.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "none",
+        "value": 33
+    },
+    "attr4": {
+        "metadata": {},
+        "type": "none",
+        "value": 4
+    },
+    "id": "E1",
+    "type": "none"
 }
 
 
-09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)
-=======================================================================================
+09. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (attr4 already exists. error)
+=============================================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -227,17 +277,39 @@ Date: REGEX(.*)
 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 97
+Content-Length: 266
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 1.0,
-    "attr2": 2.0,
-    "attr3": 33.0,
-    "attr4": 4.0,
-    "attr5": 5.0,
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "none",
+        "value": 33
+    },
+    "attr4": {
+        "metadata": {},
+        "type": "none",
+        "value": 4
+    },
+    "attr5": {
+        "metadata": {},
+        "type": "none",
+        "value": 5
+    },
+    "id": "E1",
+    "type": "none"
 }
 
 

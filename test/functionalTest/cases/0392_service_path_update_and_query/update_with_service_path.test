@@ -46,811 +46,805 @@ brokerStart CB 0-255
 
 echo "+++++ 1.  Create an entity E, attr A=k for  ServicePath /home/kz"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>k</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "k"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz --json
 echo
 echo
 
 
 echo "+++++ 2.  Create an entity E, attr A=k1 for ServicePath /home/kz/01"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>k1</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "k1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01 --json
 echo
 echo
-
 
 
 echo "+++++ 3.  Create an entity E, attr A=k2 for ServicePath /home/kz/02"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>k2</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/02
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "k2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/02 --json
 echo
 echo
-
 
 
 echo "+++++ 4.  Create an entity E, attr A=k3 for ServicePath /home/kz/03"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>k3</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/03
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "k3"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/03 --json
 echo
 echo
-
 
 
 echo "+++++ 5.  Create an entity E, attr A=f for  ServicePath /home/fg"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>f</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "f"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg --json
 echo
 echo
 
 
 echo "+++++ 6.  Create an entity E, attr A=f1 for ServicePath /home/fg/01"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>f1</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "f1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01 --json
 echo
 echo
-
 
 
 echo "+++++ 7.  Create an entity E, attr A=f2 for ServicePath /home/fg/02"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>f2</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/02
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "f2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/02 --json
 echo
 echo
-
 
 
 echo "+++++ 8.  Create an entity E, attr A=f3 for ServicePath /home/fg/03"
 url=/v1/updateContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>attr</type>
-          <contextValue>f3</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/03
+payload='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "attr",
+          "value": "f3"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/03 --json
 echo
 echo
-
 
 
 echo "+++++ 9.  Query for entity E, attr A for  ServicePath /home/kz"
 url=/v1/queryContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz --json
 echo
 echo
 
 
 echo "+++++ 10. Query for entity E, attr A for  ServicePath /home/kz/01"
 url=/v1/queryContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/kz/01 --json
 echo
 echo
 
 
 echo "+++++ 11. Query for entity E, attr A for  ServicePath /home/fg"
 url=/v1/queryContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg --json
 echo
 echo
 
 
 echo "+++++ 12. Query for entity E, attr A for  ServicePath /home/fg/01"
 url=/v1/queryContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath /home/fg/01 --json
 echo
 echo
 
 
 echo "+++++ 13. Query for entity E, attr A for  ServicePath /home/#"
 url=/v1/queryContext
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath '/home/#'
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --servicePath '/home/#' --json
 echo
+echo
+
 
 --REGEXPECT--
 +++++ 1.  Create an entity E, attr A=k for  ServicePath /home/kz
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 2.  Create an entity E, attr A=k1 for ServicePath /home/kz/01
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 3.  Create an entity E, attr A=k2 for ServicePath /home/kz/02
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 4.  Create an entity E, attr A=k3 for ServicePath /home/kz/03
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 5.  Create an entity E, attr A=f for  ServicePath /home/fg
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 6.  Create an entity E, attr A=f1 for ServicePath /home/fg/01
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 7.  Create an entity E, attr A=f2 for ServicePath /home/fg/02
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 8.  Create an entity E, attr A=f3 for ServicePath /home/fg/03
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 378
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 9.  Query for entity E, attr A for  ServicePath /home/kz
 HTTP/1.1 200 OK
-Content-Length: 615
-Content-Type: application/xml
+Content-Length: 379
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "k"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 10. Query for entity E, attr A for  ServicePath /home/kz/01
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "k1"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 11. Query for entity E, attr A for  ServicePath /home/fg
 HTTP/1.1 200 OK
-Content-Length: 615
-Content-Type: application/xml
+Content-Length: 379
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "f"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 12. Query for entity E, attr A for  ServicePath /home/fg/01
 HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
+Content-Length: 380
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "f1"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
 +++++ 13. Query for entity E, attr A for  ServicePath /home/#
 HTTP/1.1 200 OK
-Content-Length: 4254
-Content-Type: application/xml
+Content-Length: 2814
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k3</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f3</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "k"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "k1"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "k2"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "k3"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "f"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "f1"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "f2"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "attr",
+                        "value": "f3"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
 
 --TEARDOWN--
 brokerStop CB

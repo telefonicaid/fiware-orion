@@ -27,13 +27,16 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoUnsubscribeContextAvailability.h"
+#include "mongoBackend/safeMongo.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
-
 #include "common/sem.h"
+
+
 
 /* ****************************************************************************
 *
@@ -60,31 +63,30 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   /* Look for document */
   BSONObj sub;
   OID     id;
-  try
+
+  if (!safeGetSubId(requestP->subscriptionId, &id, &(responseP->statusCode)))
   {
-    id = OID(requestP->subscriptionId.get());
-  }
-  catch (const AssertionException &e)
-  {
-      //
-      // This happens when OID format is wrong
-      // FIXME: this checking should be done at parsing stage, without progressing to
-      // mongoBackend. By the moment we can live this here, but we should remove in the future
-      // (odl issues #95)
-      //
-      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo assertion exception)", reqSemTaken);
-      responseP->statusCode.fill(SccContextElementNotFound);
-      LM_W(("Bad Input (invalid OID format)"));
-      return SccOk;
+    reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (safeGetSubId fail)", reqSemTaken);
+    if (responseP->statusCode.code == SccContextElementNotFound)
+    {
+      // FIXME: doubt: invalid OID format? Or, subscription not found?
+      std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
+      alarmMgr.badInput(clientIp, details);
+    }
+    else // SccReceiverInternalError
+    {
+      LM_E(("Runtime Error (exception getting OID: %s)", responseP->statusCode.details.c_str()));
+    }
+    return SccOk;
   }
 
   if (!collectionFindOne(getSubscribeContextAvailabilityCollectionName(tenant), BSON("_id" << id), &sub, &err))
   {
     reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    LM_E(("Database Error (%s)", responseP->statusCode.details.c_str()));
     return SccOk;
   }
+  alarmMgr.dbErrorReset();
 
   if (sub.isEmpty())
   {

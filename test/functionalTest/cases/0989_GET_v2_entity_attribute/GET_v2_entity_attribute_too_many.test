@@ -78,7 +78,8 @@ echo
 ===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -87,7 +88,8 @@ Date: REGEX(.*)
 ===============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -95,12 +97,13 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1/attrs/A0
 ================================
 HTTP/1.1 409 Conflict
-Content-Length: 105
+Content-Length: 98
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "There is more than one entity with that id. Refine your query.",
+    "description": "More than one matching entity. Please refine your query",
     "error": "TooManyResults"
 }
 

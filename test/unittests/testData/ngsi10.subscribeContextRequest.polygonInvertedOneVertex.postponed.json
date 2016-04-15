@@ -9,7 +9,7 @@
   "attributes": [
     "lightstatus"
   ],
-  "reference": "127.0.0.1",
+  "reference": "http://127.0.0.1",
   "duration": "P5Y",
   "restriction": {
     "attributeExpression": "testRestriction",
@@ -36,7 +36,7 @@
   },
   "notifyConditions": [
     {
-      "type": "ONTIMEINTERVAL",
+      "type": "ONCHANGE",
       "condValues": [
         "temperature",
         "lightstatus"

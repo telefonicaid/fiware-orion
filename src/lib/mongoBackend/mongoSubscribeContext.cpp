@@ -27,12 +27,15 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
+#include "common/defaultValues.h"
 #include "common/Format.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "mongoBackend/connectionOperations.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
@@ -51,54 +54,73 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
-  const std::vector<std::string>&      servicePathV
+  const std::vector<std::string>&      servicePathV,
+  const std::string&                   fiwareCorrelator
 )
 {
-    const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    Format             notifyFormat          = stringToFormat(notifyFormatAsString);
-    std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];    
-    bool               reqSemTaken           = false;
-
-    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
+    std::string servicePath = servicePathV[0] == ""? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0];
+    bool        reqSemTaken = false;
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
-    /* If expiration is not present, then use a default one */
-    if (requestP->duration.isEmpty()) {
-        requestP->duration.set(DEFAULT_DURATION);
+    //
+    // Calculate expiration (using the current time and the duration field in the request).
+    // If expiration is not present, use a default value
+    //
+    long long expiration = -1;
+    if (requestP->expires > 0)
+    {
+      expiration = requestP->expires;
     }
+    else
+    {
+      if (requestP->duration.isEmpty())
+      {
+        requestP->duration.set(DEFAULT_DURATION);
+      }
 
-    /* Calculate expiration (using the current time and the duration field in the request) */
-    long long expiration = getCurrentTime() + requestP->duration.parse();
+      expiration = getCurrentTime() + requestP->duration.parse();
+    }
     LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
 
     /* Create the mongoDB subscription document */
-    BSONObjBuilder sub;
-    OID oid;
+    BSONObjBuilder  sub;
+    OID             oid;
+
     oid.init();
+
     sub.append("_id", oid);
     sub.append(CSUB_EXPIRATION, expiration);
-    sub.append(CSUB_REFERENCE, requestP->reference.get());
+    sub.append(CSUB_REFERENCE,  requestP->reference.get());
+
 
     /* Throttling */
     long long throttling = 0;
-    if (!requestP->throttling.isEmpty())
+    if (requestP->throttling.seconds != -1)
+    {
+      throttling = (long long) requestP->throttling.seconds;
+      sub.append(CSUB_THROTTLING, throttling);
+    }
+    else if (!requestP->throttling.isEmpty())
     {
       throttling = (long long) requestP->throttling.parse();
       sub.append(CSUB_THROTTLING, throttling);
     }
 
-    if (servicePath != "")
-    {
-      sub.append(CSUB_SERVICE_PATH, servicePath);
-    }
+    /* ServicePath (note that it cannot be empty, by construction) */
+    sub.append(CSUB_SERVICE_PATH, servicePath);
 
+    /* Description */
+    if (requestP->description != "")
+    {
+      sub.append(CSUB_DESCRIPTION, requestP->description);
+    }
     
     /* Build entities array */
     BSONArrayBuilder entities;
     for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
     {
-        EntityId* en = requestP->entityIdVector.get(ix);
+        EntityId* en = requestP->entityIdVector[ix];
 
         if (en->type == "")
         {
@@ -116,10 +138,32 @@ HttpStatusCode mongoSubscribeContext
 
     /* Build attributes array */
     BSONArrayBuilder attrs;
-    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix) {
-        attrs.append(requestP->attributeList.get(ix));
+    for (unsigned int ix = 0; ix < requestP->attributeList.size(); ++ix)
+    {
+      attrs.append(requestP->attributeList[ix]);
     }
     sub.append(CSUB_ATTRS, attrs.arr());
+
+
+    //
+    // StringFilter in Scope?
+    //
+    // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in requestP->restriction.scopeVector?
+    // If so, set it as string filter to the sub-cache item
+    //
+    StringFilter*  stringFilterP = NULL;
+
+    for (unsigned int ix = 0; ix < requestP->restriction.scopeVector.size(); ++ix)
+    {
+      if (requestP->restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+      {
+        stringFilterP = &requestP->restriction.scopeVector[ix]->stringFilter;
+      }
+    }
+
+    /* Adding status */
+    std::string status = requestP->status == ""?  STATUS_ACTIVE : requestP->status;
+    sub.append(CSUB_STATUS, status);
 
     /* Build conditions array (including side-effect notifications and threads creation) */
     bool notificationDone = false;
@@ -128,18 +172,37 @@ HttpStatusCode mongoSubscribeContext
                                              requestP->attributeList, oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             notifyFormat,
+                                             JSON,
                                              tenant,
                                              xauthToken,
-                                             servicePathV);
+                                             servicePathV,
+                                             &requestP->restriction,
+                                             status,
+                                             fiwareCorrelator);
+
     sub.append(CSUB_CONDITIONS, conds);
-    if (notificationDone) {
-        sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
-        sub.append(CSUB_COUNT, 1);
+
+    /* Build expression */
+    BSONObjBuilder expression;
+
+    expression << CSUB_EXPR_Q << requestP->expression.q
+               << CSUB_EXPR_GEOM << requestP->expression.geometry
+               << CSUB_EXPR_COORDS << requestP->expression.coords
+               << CSUB_EXPR_GEOREL << requestP->expression.georel;
+    sub.append(CSUB_EXPR, expression.obj());
+
+    /* Last notification */
+    long long lastNotificationTime = 0;
+    if (notificationDone)
+    {
+      lastNotificationTime = (long long) getCurrentTime();
+
+      sub.append(CSUB_LASTNOTIFICATION, lastNotificationTime);
+      sub.append(CSUB_COUNT, (long long) 1);
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, notifyFormatAsString);
+    sub.append(CSUB_FORMAT, "JSON");
 
     /* Insert document in database */
     std::string err;
@@ -150,15 +213,31 @@ HttpStatusCode mongoSubscribeContext
       return SccOk;
     }
 
+
     //
     // 3. Create Subscription for the cache
     //
     std::string oidString = oid.toString();
 
-    LM_T(LmtMongoSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
+    LM_T(LmtSubCache, ("inserting a new sub in cache (%s)", oidString.c_str()));
 
     cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
-    mongoSubCacheItemInsert(tenant.c_str(), servicePath.c_str(), requestP, oidString.c_str(), expiration, throttling, notifyFormat);
+    subCacheItemInsert(tenant.c_str(),
+                       servicePath.c_str(),
+                       requestP,
+                       oidString.c_str(),
+                       expiration,
+                       throttling,
+                       JSON,
+                       notificationDone,
+                       lastNotificationTime,
+                       stringFilterP,
+                       status,
+                       requestP->expression.q,
+                       requestP->expression.geometry,
+                       requestP->expression.coords,
+                       requestP->expression.georel);
+
     cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);

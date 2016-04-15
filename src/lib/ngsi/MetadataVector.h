@@ -40,26 +40,30 @@ typedef struct MetadataVector
 {
   std::vector<Metadata*>  vec;
 
-  std::string             tag;        // Help variable for the 'render' method
+  std::string             keyName;        // Help variable for the 'render' method
 
-  MetadataVector(const std::string& _tag = "registrationMetadata");
+  MetadataVector(const std::string& _keyName = "registrationMetadata");
 
-  void          tagSet(const std::string& tagName);
-  std::string   render(Format format, const std::string& indent, bool comma = false);
-  std::string   toJson(bool isLastElement);
-  std::string   check(RequestType requestType,
-                      Format format,
+  void            keyNameSet(const std::string& key);
+  std::string     render(const std::string& indent, bool comma = false);
+  std::string     toJson(bool isLastElement);
+  std::string     check(ConnectionInfo* ciP,
+                      RequestType requestType,
                       const std::string& indent,
                       const std::string& predetectedError,
                       int counter);
 
-  void          present(const std::string& metadataType, const std::string& indent);
-  void          push_back(Metadata* item);
-  unsigned int  size(void);
-  Metadata*     get(int ix);
-  Metadata*     lookupByName(const std::string& _name);
-  void          release();
-  void          fill(MetadataVector* mV);
+  void            present(const std::string& metadataType, const std::string& indent);
+  void            push_back(Metadata* item);
+  unsigned int    size(void) const;
+  Metadata*       lookupByName(const std::string& _name);
+  void            release();
+  void            fill(MetadataVector* mV);
+ 
+  
+  Metadata* operator[](unsigned int ix) const;
+
+  
 } MetadataVector;
 
 #endif  // SRC_LIB_NGSI_METADATAVECTOR_H_

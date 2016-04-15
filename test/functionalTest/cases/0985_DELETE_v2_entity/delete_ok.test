@@ -42,9 +42,11 @@ payload='{
   "id": "E1",
   "type": "T1",
   "compattr": {
-    "string":  "1",
-    "number":  2,
-    "bool":    true
+    "value": {
+      "string":  "1",
+      "number":  2,
+      "bool":    true
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -61,7 +63,7 @@ echo
 
 echo "03. DELETE /v2/entities/E1"
 echo "=========================="
-orionCurl --url /v2/entities/E1 -X DELETE
+orionCurl --url /v2/entities/E1 -X DELETE --json
 echo
 echo
 
@@ -77,7 +79,8 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -85,15 +88,20 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 79
+Content-Length: 110
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "compattr": {
-        "bool": true,
-        "number": 2.0,
-        "string": "1"
+        "metadata": {},
+        "type": "none",
+        "value": {
+            "bool": true,
+            "number": 2,
+            "string": "1"
+        }
     },
     "id": "E1",
     "type": "T1"
@@ -104,6 +112,7 @@ Date: REGEX(.*)
 ==========================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -113,6 +122,7 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

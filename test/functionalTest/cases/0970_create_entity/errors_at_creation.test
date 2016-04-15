@@ -47,7 +47,7 @@ payload='{
   "type": "T1",
   "attr01": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -58,7 +58,7 @@ payload='{
   "id": "",
   "attr01": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -70,7 +70,7 @@ payload='{
   "type": "T1",
   "attr01": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -82,7 +82,7 @@ payload='{
   "type": "T1",
   "attr01": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -94,7 +94,7 @@ payload='{
   "type": false,
   "attr01": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -106,7 +106,7 @@ payload='{
   "type": 19,
   "attr01": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -118,7 +118,7 @@ payload='{
   "type": "WT",
   "": "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -130,7 +130,7 @@ payload='{
   "type": "WT",
   6: "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -142,7 +142,7 @@ payload='{
   "type": "WT",
   true: "1"
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -153,11 +153,12 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "no entity id specified", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -166,11 +167,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 54
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "empty entity id", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -179,11 +181,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 70
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity id", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -192,11 +195,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 70
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity id", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -205,11 +209,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 72
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity type", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -218,11 +223,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 72
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity type", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -231,11 +237,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "no 'name' for ContextAttribute", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -244,6 +251,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -257,6 +265,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

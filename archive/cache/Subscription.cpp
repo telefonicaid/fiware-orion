@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -428,33 +429,33 @@ void Subscription::release(void)
 */
 void Subscription::present(const std::string& prefix)
 {
-  LM_F(("%stenant:               %s", prefix.c_str(), tenant.c_str()));
-  LM_F(("%sservicePath:          %s", prefix.c_str(), servicePath.c_str()));
-  LM_F(("%ssubscriptionId:       %s", prefix.c_str(), subscriptionId.c_str()));
+  LM_T(LmtPresent, ("%stenant:               %s", prefix.c_str(), tenant.c_str()));
+  LM_T(LmtPresent, ("%sservicePath:          %s", prefix.c_str(), servicePath.c_str()));
+  LM_T(LmtPresent, ("%ssubscriptionId:       %s", prefix.c_str(), subscriptionId.c_str()));
 
-  LM_F(("%s%d items of EntityInfo:", prefix.c_str(), entityIdInfos.size()));
+  LM_T(LmtPresent, ("%s%d items of EntityInfo:", prefix.c_str(), entityIdInfos.size()));
   for (unsigned int ix = 0; ix < entityIdInfos.size(); ++ix)
   {
     entityIdInfos[ix]->present(prefix + "  ");
   }
 
-  LM_F(("%s%d attributes", prefix.c_str(), attributes.size()));
+  LM_T(LmtPresent, ("%s%d attributes", prefix.c_str(), attributes.size()));
   for (unsigned int ix = 0; ix < attributes.size(); ++ix)
   {
-    LM_F(("%s  %s", prefix.c_str(), attributes[ix].c_str()));
+    LM_T(LmtPresent, ("%s  %s", prefix.c_str(), attributes[ix].c_str()));
   }
 
 
-  LM_F(("%sthrottling:           %lu", prefix.c_str(), throttling));
-  LM_F(("%sexpirationTime:       %lu", prefix.c_str(), expirationTime));
+  LM_T(LmtPresent, ("%sthrottling:           %lu", prefix.c_str(), throttling));
+  LM_T(LmtPresent, ("%sexpirationTime:       %lu", prefix.c_str(), expirationTime));
   
   notifyConditionVector.present(prefix + "  ");
   restriction.present(prefix + "  ");
-  LM_F(("%sreference:            %s",  prefix.c_str(), reference.get().c_str()));
+  LM_T(LmtPresent, ("%sreference:            %s",  prefix.c_str(), reference.get().c_str()));
 
-  LM_F(("%slastNotificationTime: %lu",  prefix.c_str(), lastNotificationTime));
-  LM_F(("%spendingNotifications: %lu",  prefix.c_str(), pendingNotifications));
-  LM_F(("%snotification format:  %s",   prefix.c_str(), (format == XML)? "XML" : "JSON"));
+  LM_T(LmtPresent, ("%slastNotificationTime: %lu",  prefix.c_str(), lastNotificationTime));
+  LM_T(LmtPresent, ("%spendingNotifications: %lu",  prefix.c_str(), pendingNotifications));
+  LM_T(LmtPresent, ("%snotification format:  %s",   prefix.c_str(), (format == XML)? "XML" : "JSON"));
 }
 
 }

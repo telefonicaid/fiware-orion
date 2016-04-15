@@ -34,18 +34,15 @@ brokerStart CB
 # a compound attribute value for "PUT /v1/contextEntities/E/attributes/A":
 #
 # 01. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
-# 02. PUT /v1/contextEntities/E/attributes/A with compound attribute value using XML
 #
 # To assure the compounds work, we have to create the entity A with attribute E:
-# 03. POST /v1/updateContext to create Entity E, attribute A
-# 04. POST /v1/queryContext to make sure 03 worked
+# 02. POST /v1/updateContext to create Entity E, attribute A
+# 03. POST /v1/queryContext to make sure 03 worked
 #
 # Now we do the PUTs again:
 #
-# 05. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
-# 06. POST /v1/queryContext to make sure 05 worked
-# 07. PUT /v1/contextEntities/E/attributes/A with compound attribute value using XML
-# 08. POST /v1/queryContext to make sure 07 worked
+# 04. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
+# 05. POST /v1/queryContext to make sure 05 worked
 #
 
 
@@ -67,75 +64,45 @@ echo
 echo
 
 
-echo "02. PUT /v1/contextEntities/E/attributes/A with compound attribute value using XML"
-echo "=================================================================================="
-payload2='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextAttributeRequest>
-  <type>Room</type>
-  <contextValue>
-    <a>1</a>
-  </contextValue>
-  <metadata>
-    <contextMetadata>
-      <name>ID</name>
-      <type>none</type>
-      <value>253</value>
-    </contextMetadata>
-  </metadata>
-</updateContextAttributeRequest>'
-orionCurl --url /v1/contextEntities/E/attributes/A -X PUT --payload "$payload2"
-echo
-echo
-
-
-echo "03. POST /v1/updateContext to create Entity E, attribute A"
+echo "02. POST /v1/updateContext to create Entity E, attribute A"
 echo "=========================================================="
-payload3='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A</name>
-          <type>AT1</type>
-          <contextValue>3</contextValue>
-          <metadata>
-            <contextMetadata>
-              <name>ID</name>
-              <type>none</type>
-              <value>253</value>
-            </contextMetadata>
-          </metadata>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url /v1/updateContext --payload "$payload3"
+payload3='{
+  "contextElements": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E",
+      "attributes": [
+        {
+          "name": "A",
+          "type": "AT1",
+          "value": "3",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "none",
+              "value": "253"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload3" --json
 echo
 echo
 
 
-echo "04. POST /v1/queryContext to make sure 03 worked"
-echo "================================================"
-payload4='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url /v1/queryContext --payload "$payload4"
+echo "03. GET /v1/contextEntities/E to make sure 03 worked"
+echo "===================================================="
+orionCurl --url /v1/contextEntities/E --json
 echo
 echo
 
 
-echo "05. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON"
+echo "04. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON"
 echo "==================================================================================="
 payload5='{
   "type": "Room",
@@ -153,53 +120,9 @@ echo
 echo
 
 
-echo "06. POST /v1/queryContext to make sure 05 worked"
-echo "================================================"
-payload6='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url /v1/queryContext --payload "$payload6"
-echo
-echo
-
-
-echo "07. PUT /v1/contextEntities/E/attributes/A with compound attribute value using XML"
-echo "=================================================================================="
-payload7='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextAttributeRequest>
-  <type>Room</type>
-  <contextValue>
-    <a>7</a>
-  </contextValue>
-  <metadata>
-    <contextMetadata>
-      <name>ID</name>
-      <type>none</type>
-      <value>253</value>
-    </contextMetadata>
-  </metadata>
-</updateContextAttributeRequest>'
-orionCurl --url /v1/contextEntities/E/attributes/A -X PUT --payload "$payload7"
-echo
-echo
-
-
-echo "08. POST /v1/queryContext to make sure 07 worked"
-echo "================================================"
-payload8='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url /v1/queryContext --payload "$payload8"
+echo "05. GET /v1/contextEntities/E to make sure 05 worked"
+echo "===================================================="
+orionCurl --url /v1/contextEntities/E --json
 echo
 echo
 
@@ -210,6 +133,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 87
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -219,104 +143,86 @@ Date: REGEX(.*)
 }
 
 
-02. PUT /v1/contextEntities/E/attributes/A with compound attribute value using XML
-==================================================================================
-HTTP/1.1 200 OK
-Content-Length: 125
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>E</details>
-</statusCode>
-
-
-03. POST /v1/updateContext to create Entity E, attribute A
+02. POST /v1/updateContext to create Entity E, attribute A
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 830
-Content-Type: application/xml
+Content-Length: 550
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>AT1</type>
-            <contextValue/>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>253</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID",
+                                "type": "string",
+                                "value": "253"
+                            }
+                        ],
+                        "name": "A",
+                        "type": "AT1",
+                        "value": ""
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
-04. POST /v1/queryContext to make sure 03 worked
-================================================
+03. GET /v1/contextEntities/E to make sure 03 worked
+====================================================
 HTTP/1.1 200 OK
-Content-Length: 829
-Content-Type: application/xml
+Content-Length: 418
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>AT1</type>
-            <contextValue>3</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>253</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "metadatas": [
+                    {
+                        "name": "ID",
+                        "type": "string",
+                        "value": "253"
+                    }
+                ],
+                "name": "A",
+                "type": "AT1",
+                "value": "3"
+            }
+        ],
+        "id": "E",
+        "isPattern": "false",
+        "type": "T"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
 
 
-05. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
+04. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
 ===================================================================================
 HTTP/1.1 200 OK
 Content-Length: 46
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -325,100 +231,41 @@ Date: REGEX(.*)
 }
 
 
-06. POST /v1/queryContext to make sure 05 worked
-================================================
+05. GET /v1/contextEntities/E to make sure 05 worked
+====================================================
 HTTP/1.1 200 OK
-Content-Length: 865
-Content-Type: application/xml
+Content-Length: 447
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>Room</type>
-            <contextValue>
-              <a>5</a>
-            </contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>253</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-
-
-07. PUT /v1/contextEntities/E/attributes/A with compound attribute value using XML
-==================================================================================
-HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
-</statusCode>
-
-
-08. POST /v1/queryContext to make sure 07 worked
-================================================
-HTTP/1.1 200 OK
-Content-Length: 865
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>Room</type>
-            <contextValue>
-              <a>7</a>
-            </contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>253</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "metadatas": [
+                    {
+                        "name": "ID",
+                        "type": "string",
+                        "value": "253"
+                    }
+                ],
+                "name": "A",
+                "type": "Room",
+                "value": {
+                    "a": "5"
+                }
+            }
+        ],
+        "id": "E",
+        "isPattern": "false",
+        "type": "T"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
 
 
 --TEARDOWN--

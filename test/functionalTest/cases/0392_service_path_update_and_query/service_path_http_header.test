@@ -28,44 +28,42 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-
-
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ]
+}'
 echo "+++++ 0. OK"
-orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h0123456789012345678901234567890123456789012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h0123456789012345678901234567890123456789012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9 --json
 echo
 
 
 echo "+++++ 1. Path-Component more than 50 chars"
-orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h01234567890123456789012345678901234567890123456789
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h01234567890123456789012345678901234567890123456789 --json
 echo
 
 
 echo "+++++ 2. Too many levels in path"
-orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11 --json
 echo
 
 
 echo "+++++ 3: bad char in component"
-orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9' --json
 echo
 
 
 echo "+++++ 4: service path must start with a '/'"
-orionCurl --url /v1/queryContext --payload "$payload" --servicePath 'X'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath 'X' --json
 echo
 
 
 echo "+++++ 5: four service paths"
-orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4' --json
 echo
 
 
@@ -75,94 +73,102 @@ echo
 # the final grep -v '/#', to make this functional test work both as normal functest and under the valgrind suite.
 #
 echo "+++++ 6: service paths from log file"
-grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }' | grep -v '/#'
+grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $10 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }' | grep -v '/#'
 echo
 
 
 echo "+++++ 7: eleven service paths"
-orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4, /home/kz/5, /home/kz/6, /home/kz/7, /home/kz/88, /home/kz/9, /home/kz/10, /home/kz/11'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4, /home/kz/5, /home/kz/6, /home/kz/7, /home/kz/88, /home/kz/9, /home/kz/10, /home/kz/11' --json
 echo
 
 --REGEXPECT--
 +++++ 0. OK
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 
 +++++ 1. Path-Component more than 50 chars
 HTTP/1.1 200 OK
-Content-Length: 149
-Content-Type: application/xml
+Content-Length: 140
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>component-name too long in ServicePath</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "component-name too long in ServicePath",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 +++++ 2. Too many levels in path
 HTTP/1.1 200 OK
-Content-Length: 145
-Content-Type: application/xml
+Content-Length: 136
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>too many components in ServicePath</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "too many components in ServicePath",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 +++++ 3: bad char in component
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/xml
+Content-Length: 158
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>a component of ServicePath contains an illegal character</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "a component of ServicePath contains an illegal character",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 +++++ 4: service path must start with a '/'
 HTTP/1.1 200 OK
-Content-Length: 183
-Content-Type: application/xml
+Content-Length: 174
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Only /absolute/ Service Paths allowed [a service path must begin with /]</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "Only /absolute/ Service Paths allowed [a service path must begin with /]",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 +++++ 5: four service paths
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 
 +++++ 6: service paths from log file
  Service Path 0: '/h0123456789012345678901234567890123456789012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9'
@@ -177,16 +183,18 @@ Date: REGEX(.*)
 
 +++++ 7: eleven service paths
 HTTP/1.1 200 OK
-Content-Length: 177
-Content-Type: application/xml
+Content-Length: 168
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>too many service paths - a maximum of ten service paths is allowed</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "too many service paths - a maximum of ten service paths is allowed",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 --TEARDOWN--
 brokerStop CB

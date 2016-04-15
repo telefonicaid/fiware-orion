@@ -31,9 +31,8 @@
 
 /* ****************************************************************************
 *
-* Names of the URI parameters
+* Names of URI parameters
 */
-#define URI_PARAM_NOTIFY_FORMAT           "notifyFormat"
 #define URI_PARAM_PAGINATION_OFFSET       "offset"
 #define URI_PARAM_PAGINATION_LIMIT        "limit"
 #define URI_PARAM_PAGINATION_DETAILS      "details"
@@ -44,6 +43,13 @@
 #define URI_PARAM_ATTRIBUTES_FORMAT       "attributesFormat"
 #define URI_PARAM_ATTRIBUTE_FORMAT        "attributeFormat"
 #define URI_PARAM_OPTIONS                 "options"
+#define URI_PARAM_TYPE                    "type"
+#define URI_PARAM_SORTED                  "orderBy"
+#define URI_PARAM_Q                       "q"
+
+
+// URI parameters for 'admin' requests
+#define URI_PARAM_LEVEL                   "level"
 
 
 
@@ -54,11 +60,6 @@
 #define DEFAULT_PAGINATION_OFFSET       "0"
 #define DEFAULT_PAGINATION_OFFSET_INT   0
 
-#define DEFAULT_PAGINATION_LIMIT        "20"
-#define DEFAULT_PAGINATION_LIMIT_INT    20
-#define MAX_PAGINATION_LIMIT            "1000"
-
-#define DEFAULT_PARAM_NOTIFY_FORMAT     ""
 #define DEFAULT_PAGINATION_DETAILS      "off"
 
 #endif

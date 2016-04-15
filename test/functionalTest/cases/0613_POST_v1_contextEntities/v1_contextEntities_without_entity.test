@@ -32,18 +32,12 @@ brokerStart CB
 #
 # 01. POST /v1/contextEntities without entityId in JSON payload and see it fail
 # 02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail
-# 03. POST /v1/contextEntities without entityId in XML payload and see it fail
-# 04. POST /v1/contextEntities/EID with entityId:id=EID2 in XML payload and see it fail
-
-# 05. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
-# 06. POST /v1/contextEntities/EID without entityId in JSON payload OK
-# 07. POST /v1/contextEntities with entityId:id=EID in XML payload OK
-# 08. POST /v1/contextEntities/EID without entityId in XML payload OK
 #
-# 09. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
-# 10. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in XML payload and see it fail
-# 11. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
-# 12. POST /v1/contextEntities/type/T1/id/E1 without entityId in XML payload OK
+# 03. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
+# 04. POST /v1/contextEntities/EID without entityId in JSON payload OK
+#
+# 05. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
+# 06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
 #
 
 
@@ -82,44 +76,7 @@ echo
 echo
 
 
-echo "03. POST /v1/contextEntities without entityId in XML payload and see it fail"
-echo "============================================================================"
-payload='<?xml version="1.0"?>
-<appendContextElementRequest>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>A1T</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url /v1/contextEntities --payload "${payload}"
-echo
-echo
-
-
-echo "04. POST /v1/contextEntities/EID with entityId:id=EID2 in XML payload and see it fail"
-echo "====================================================================================="
-payload='<?xml version="1.0"?>
-<appendContextElementRequest>
-  <entityId type="ET" isPattern="false">
-    <id>EID2</id>
-  </entityId>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>A1T</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url /v1/contextEntities/EID --payload "${payload}"
-echo
-echo
-
-
-echo "05. POST /v1/contextEntities with entityId:id=EID in JSON payload OK"
+echo "03. POST /v1/contextEntities with entityId:id=EID in JSON payload OK"
 echo "===================================================================="
 payload='{
     "id": "EID",
@@ -138,7 +95,7 @@ echo
 echo
 
 
-echo "06. POST /v1/contextEntities/EID without entityId in JSON payload OK"
+echo "04. POST /v1/contextEntities/EID without entityId in JSON payload OK"
 echo "===================================================================="
 payload='{
     "attributes": [
@@ -154,44 +111,7 @@ echo
 echo
 
 
-echo "07. POST /v1/contextEntities with entityId:id=EID in XML payload OK"
-echo "===================================================================="
-payload='<?xml version="1.0"?>
-<appendContextElementRequest>
-  <entityId type="ET" isPattern="false">
-    <id>EID</id>
-  </entityId>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>A1T</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url /v1/contextEntities --payload "${payload}"
-echo
-echo
-
-
-echo "08. POST /v1/contextEntities/EID without entityId in XML payload OK"
-echo "==================================================================="
-payload='<?xml version="1.0"?>
-<appendContextElementRequest>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>A1T</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url /v1/contextEntities/EID --payload "${payload}"
-echo
-echo
-
-
-echo "09. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail"
+echo "05. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail"
 echo "==============================================================================================="
 payload='{
     "id": "EID",
@@ -210,26 +130,7 @@ echo
 echo
 
 
-echo "10. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in XML payload and see it fail"
-echo "=============================================================================================="
-payload='<?xml version="1.0"?>
-<appendContextElementRequest>
-  <entityId type="ET" isPattern="false">
-    <id>EID</id>
-  </entityId>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>A1T</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"
-echo
-echo
-
-echo "11. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK"
+echo "06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK"
 echo "=============================================================================="
 payload='{
     "attributes": [
@@ -245,29 +146,13 @@ echo
 echo
 
 
-echo "12. POST /v1/contextEntities/type/T1/id/E1 without entityId in XML payload OK"
-echo "============================================================================="
-payload='<?xml version="1.0"?>
-<appendContextElementRequest>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>A1T</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"
-echo
-echo
-
-
 --REGEXPECT--
 01. POST /v1/contextEntities without entityId in JSON payload and see it fail
 =============================================================================
 HTTP/1.1 200 OK
 Content-Length: 148
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -284,6 +169,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 140
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -295,45 +181,12 @@ Date: REGEX(.*)
 }
 
 
-03. POST /v1/contextEntities without entityId in XML payload and see it fail
-============================================================================
-HTTP/1.1 200 OK
-Content-Length: 229
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>invalid request: mandatory entityId::id missing</details>
-  </errorCode>
-</appendContextElementResponse>
-
-
-04. POST /v1/contextEntities/EID with entityId:id=EID2 in XML payload and see it fail
-=====================================================================================
-HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>entityId::id differs in URL and payload</details>
-  </errorCode>
-</appendContextElementResponse>
-
-
-05. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
+03. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
 ====================================================================
 HTTP/1.1 200 OK
 Content-Length: 314
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -358,11 +211,12 @@ Date: REGEX(.*)
 }
 
 
-06. POST /v1/contextEntities/EID without entityId in JSON payload OK
+04. POST /v1/contextEntities/EID without entityId in JSON payload OK
 ====================================================================
 HTTP/1.1 200 OK
 Content-Length: 314
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -387,71 +241,12 @@ Date: REGEX(.*)
 }
 
 
-07. POST /v1/contextEntities with entityId:id=EID in XML payload OK
-====================================================================
-HTTP/1.1 200 OK
-Content-Length: 558
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="ET" isPattern="false">
-    <id>EID</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>A1T</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
-
-
-08. POST /v1/contextEntities/EID without entityId in XML payload OK
-===================================================================
-HTTP/1.1 200 OK
-Content-Length: 558
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="ET" isPattern="false">
-    <id>EID</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>A1T</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
-
-
-09. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
+05. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
 ===============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 132
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -463,28 +258,12 @@ Date: REGEX(.*)
 }
 
 
-10. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in XML payload and see it fail
-==============================================================================================
-HTTP/1.1 200 OK
-Content-Length: 213
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>invalid payload: unknown fields</details>
-  </errorCode>
-</appendContextElementResponse>
-
-
-11. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
+06. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
 ==============================================================================
 HTTP/1.1 200 OK
 Content-Length: 313
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -507,36 +286,6 @@ Date: REGEX(.*)
     "isPattern": "false", 
     "type": "T1"
 }
-
-
-12. POST /v1/contextEntities/type/T1/id/E1 without entityId in XML payload OK
-=============================================================================
-HTTP/1.1 200 OK
-Content-Length: 557
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="T1" isPattern="false">
-    <id>E1</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>A1T</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
 
 
 --TEARDOWN--

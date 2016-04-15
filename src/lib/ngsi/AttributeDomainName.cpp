@@ -41,7 +41,6 @@
 std::string AttributeDomainName::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -99,11 +98,11 @@ void AttributeDomainName::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sAttributeDomainName: %s", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sAttributeDomainName: %s", indent.c_str(), string.c_str()));
   }
   else
   {
-    LM_F(("%sNo AttributeDomainName", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo AttributeDomainName", indent.c_str()));
   }
 }
 
@@ -113,14 +112,14 @@ void AttributeDomainName::present(const std::string& indent)
 *
 * AttributeDomainName::render - 
 */
-std::string AttributeDomainName::render(Format format, const std::string& indent, bool comma)
+std::string AttributeDomainName::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "attributeDomainName", string, format, comma);
+  return valueTag1(indent, "attributeDomainName", string, comma);
 }
 
 

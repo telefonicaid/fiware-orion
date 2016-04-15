@@ -80,7 +80,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - severalCprs1
 * - severalCprs2
 * - severalCprs3
-* - severalCprsFormat
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
@@ -434,7 +433,7 @@ static void prepareDatabaseSeveralCprs1(bool addGenericRegistry)
 * prepareDatabaseSeveralCprs2 -
 *
 */
-static void prepareDatabaseSeveralCprs2(bool withFormat = false)
+static void prepareDatabaseSeveralCprs2(void)
 {
 
   /* Set database */
@@ -543,15 +542,6 @@ static void prepareDatabaseSeveralCprs2(bool withFormat = false)
                         "contextRegistration" << BSON_ARRAY(cr5)
                         ));
 
-  if (withFormat)
-  {
-    reg1.appendElements(BSON("format" << "XML"));
-    reg2.appendElements(BSON("format" << "JSON"));
-    reg3.appendElements(BSON("format" << "XML"));
-    reg4.appendElements(BSON("format" << "JSON"));
-    reg5.appendElements(BSON("format" << "XML"));
-  }
-
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(REGISTRATIONS_COLL, reg1.obj());
   connection->insert(REGISTRATIONS_COLL, reg2.obj());
@@ -583,7 +573,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -605,19 +595,19 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -627,7 +617,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);  	
   utExit();
 }
 
@@ -655,7 +644,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   req.attributeList.push_back("A4");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -677,7 +666,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -687,9 +676,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -722,7 +709,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   req.attributeList.push_back("A1");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -744,7 +731,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -754,9 +741,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -784,7 +769,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   req.attributeList.push_back("A2");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -806,13 +791,13 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -822,9 +807,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -853,7 +836,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -875,25 +858,25 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -903,9 +886,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -934,7 +915,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -956,19 +937,19 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -978,9 +959,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1005,7 +984,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1016,9 +995,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -1046,7 +1023,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   req.attributeList.push_back("A5");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1061,9 +1038,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1097,7 +1072,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   req.entityIdVector.push_back(&en2);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1119,25 +1094,25 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   /* Context Element response # 1 */
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
@@ -1154,19 +1129,19 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1176,9 +1151,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1207,7 +1180,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   req.attributeList.push_back("A5");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1229,13 +1202,13 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1245,9 +1218,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1282,7 +1253,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   req.attributeList.push_back("A5");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1304,13 +1275,13 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1327,7 +1298,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1337,9 +1308,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1374,7 +1343,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   req.attributeList.push_back("A1");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1396,7 +1365,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr5.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1413,7 +1382,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1430,7 +1399,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -1440,9 +1409,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1474,7 +1441,7 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1496,19 +1463,19 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   /* Context Element response # 2 */
   EXPECT_EQ("E3", RES_CER(1).entityId.id);
@@ -1521,19 +1488,19 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1543,9 +1510,7 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1571,7 +1536,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   req.attributeList.push_back("A4");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1593,7 +1558,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1603,9 +1568,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1635,7 +1598,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   req.attributeList.push_back("A1");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1657,7 +1620,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1674,7 +1637,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1684,9 +1647,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1717,7 +1678,7 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   req.attributeList.push_back("A2");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1739,13 +1700,13 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1762,13 +1723,13 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1778,9 +1739,7 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1805,7 +1764,7 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1820,9 +1779,7 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1854,7 +1811,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   req.attributeList.push_back("A2");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1876,7 +1833,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1893,7 +1850,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1910,7 +1867,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -1927,7 +1884,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("", RES_CER_ATTR(3, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ("http://cr5.com", RES_CER_ATTR(3, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
@@ -1937,9 +1894,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1972,7 +1927,7 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   req.entityIdVector.push_back(&en2);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1994,25 +1949,25 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -2029,19 +1984,19 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(1, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(1, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -2058,19 +2013,19 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(2, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(2, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(2, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(2, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(2, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 2)->stringValue);
   EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(2, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(2, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -2080,9 +2035,7 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 
@@ -2122,7 +2075,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   req.attributeList.push_back("A6");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2150,39 +2103,37 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->stringValue);
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
 
   EXPECT_EQ("A6", RES_CER_ATTR(0, 5)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 5)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 5)->stringValue);
   EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(0, 5)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 5)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 5)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2221,7 +2172,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   req.attributeList.push_back("A6");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2249,33 +2200,31 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->stringValue);
   EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
-  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
+  EXPECT_EQ(JSON,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->stringValue);
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
-  setMongoConnectionForUnitTest(NULL);
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -2304,7 +2253,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, options);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2321,85 +2270,9 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
   ASSERT_EQ(2, RES_CER(0).providingApplicationList.size());
   EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0].get());
-  EXPECT_EQ(XML, RES_CER(0).providingApplicationList[0].getFormat());
-  EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplicationList[1].get());
-  EXPECT_EQ(XML, RES_CER(0).providingApplicationList[1].getFormat());
-
-  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
-
-  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("1", RES_CER_ATTR(0, 0)->stringValue);
-  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
-
-  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
-  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ("", RES_CER_ATTR(0, 1)->stringValue);
-  EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(0, 1)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
-
-  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
-  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
-  EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
-  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
-
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
-
-  setMongoConnectionForUnitTest(NULL);
-  utExit();
-
-}
-
-/* ****************************************************************************
-*
-* severalCprsFormat -
-*
-* Query:  E1 - <null>
-* Result: E1 - A1 - 1
-*              A2 - fwd CPR1 - JSON
-*              A3 - fwd CPR2 - XML
-*
-*         CPR vector: [CPR2-XML, CPR3-JSON]
-*/
-TEST(mongoContextProvidersQueryRequest, severalCprsFormat)
-{
-  HttpStatusCode        ms;
-  QueryContextRequest   req;
-  QueryContextResponse  res;
-
-  /* Prepare database */
-  utInit();
-  prepareDatabaseSeveralCprs2(true);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T", "false");
-  req.entityIdVector.push_back(&en);
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
-  EXPECT_EQ("", res.errorCode.details);
-
-  ASSERT_EQ(1, res.contextElementResponseVector.size());
-
-  /* Context Element response # 1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(2, RES_CER(0).providingApplicationList.size());
-  EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0].get());
   EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[0].getFormat());
   EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplicationList[1].get());
-  EXPECT_EQ(XML, RES_CER(0).providingApplicationList[1].getFormat());
+  EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[1].getFormat());
 
   ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
 
@@ -2419,14 +2292,12 @@ TEST(mongoContextProvidersQueryRequest, severalCprsFormat)
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->stringValue);
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("", RES_CER_STATUS(0).details);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
-  setMongoConnectionForUnitTest(NULL);  
-  
   utExit();
-
 }
+

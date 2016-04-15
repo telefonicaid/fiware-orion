@@ -38,12 +38,13 @@ brokerStart CB
 # 05. v1 APPEND_STRICT with attr2 -> fails
 # 06. Get entity (attr1, attr2)
 # 07. v1 APPEND_STRICT with attr2, attrs3 -> fails, but attr3 is added
-# 06. Get entity (attr1, attr2, attr3)
+# 08. Get entity (attr1, attr2, attr3)
+#
 
 echo "01. Create E1 with attr1"
 echo "========================"
 payload='{ "id": "E1", "type": "T1", "attr1": "1" }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -151,7 +152,8 @@ echo
 ========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -159,12 +161,17 @@ Date: REGEX(.*)
 02. Get E1 (only attr1)
 =======================
 HTTP/1.1 200 OK
-Content-Length: 35
+Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": "1",
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": "1"
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -175,6 +182,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 380
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -204,13 +212,22 @@ Date: REGEX(.*)
 04. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 123
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": "1",
-    "attr2": "2",
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": "1"
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": "2"
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -219,23 +236,13 @@ Date: REGEX(.*)
 05. v1 APPEND_STRICT with attr2 -> fails
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 550
+Content-Length: 342
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "contextResponses": [
-        {
-            "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
         {
             "contextElement": {
                 "id": "E1",
@@ -255,13 +262,22 @@ Date: REGEX(.*)
 06. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 47
+Content-Length: 123
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": "1",
-    "attr2": "2",
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": "1"
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": "2"
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -272,6 +288,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 690
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -313,14 +330,27 @@ Date: REGEX(.*)
 08. Get E1 (attr1, attr2, attr3)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 59
+Content-Length: 173
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": "1",
-    "attr2": "2",
-    "attr3": "3",
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": "1"
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": "2"
+    },
+    "attr3": {
+        "metadata": {},
+        "type": "none",
+        "value": "3"
+    },
     "id": "E1",
     "type": "T1"
 }

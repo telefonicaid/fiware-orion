@@ -61,7 +61,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -78,7 +78,8 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -86,43 +87,52 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 255
+Content-Length: 282
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "attr01": {
-        "objAndVecInVec": [
-            {
-                "a": 1.0, 
-                "b": "2", 
-                "c": true
-            }, 
-            [
-                1.0, 
-                2.0, 
-                3.0, 
-                4.0, 
-                5.0
-            ]
-        ]
-    }, 
-    "attr2": {
-        "objAndVecInObj": {
-            "nestedObj": {
-                "noa": 1.0, 
-                "nob": "2", 
-                "noc": true, 
-                "nod": false
-            }, 
-            "nestedVec": [
-                "nva", 
-                "nvb", 
-                "nvc"
+        "metadata": {},
+        "type": "none",
+        "value": {
+            "objAndVecInVec": [
+                {
+                    "a": 1,
+                    "b": "2",
+                    "c": true
+                },
+                [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ]
             ]
         }
-    }, 
-    "id": "E1", 
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": {
+            "objAndVecInObj": {
+                "nestedObj": {
+                    "noa": 1,
+                    "nob": "2",
+                    "noc": true,
+                    "nod": false
+                },
+                "nestedVec": [
+                    "nva",
+                    "nvb",
+                    "nvc"
+                ]
+            }
+        }
+    },
+    "id": "E1",
     "type": "T1"
 }
 

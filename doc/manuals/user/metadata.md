@@ -161,7 +161,7 @@ APPEND](append_and_delete.md#adding-and-removing-attributes-with-append-and-dele
 You can use any name for your custom metadata except for the ones used
 for some metadata names that are interpreted by Orion:
 
--   [ID](#Metadata_ID_for_attributes "wikilink")
+-   [ID](#metadata-id-for-attributes)
 -   [location](geolocation.md#Defining_location_attribute )
 -   creData (reserved for future use)
 -   modDate (reserved for future use)

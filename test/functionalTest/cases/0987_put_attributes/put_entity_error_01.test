@@ -36,7 +36,7 @@ brokerStart CB
 echo "01. Modify non-existing entity E1"
 echo "================================="
 payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -47,6 +47,7 @@ echo
 HTTP/1.1 404 Not Found
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

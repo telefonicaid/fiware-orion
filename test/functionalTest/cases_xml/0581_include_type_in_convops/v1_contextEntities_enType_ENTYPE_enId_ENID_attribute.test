@@ -1,0 +1,567 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+/v1/contextEntities ALL Entities with TYPE, ID and Attribute
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+# 02. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 with A1=12 in payload
+# 03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+#
+# 04. PUT /v1/contextEntities/type/T1/id/E2/attributes/A2 and see it fail
+#
+# 05. POST /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=12 in payload
+# 06. PUT /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=13 in payload
+# 07. GET /v1/contextEntities/type/T1/id/E1/attributes/A2 to see A2=13
+#
+# 08. POST /v1/contextEntities/type/T1/id/E2/attributes/A1 with A1=21 in payload
+# 09. POST /v1/contextEntities/type/T1/id/E2/attributes/A2 with A2=22 in payload
+# 10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+# 11. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+# 12. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+# 13. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+# 14. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+# 15. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 XML
+# 16. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1 XML
+# 17. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+#
+# NOTE/FIXME P9
+#   The attributes used must have an empty type for this test to work.
+#   The type of the attribute, together with its name and possibly ID metadata, is
+#   used to identify the attribute.
+#   As there conv ops include no type for the attribute and as this type is necessary,
+#   the only way to make them work is to use empty types for the attributes.
+#
+
+
+echo "01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
+echo "======================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+echo
+echo
+
+
+echo "02. POST /v1/contextEntities/type/T1/id/E1attributes/A1 with A1=12 in payload"
+echo "============================================================================="
+payload='{
+  "type": "",
+  "value": "12",
+  "metadatas": [
+    {
+      "name": "I",
+      "type": "none",
+      "value": "left"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" --json
+echo
+echo
+
+
+echo "03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
+echo "=========================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+echo
+echo
+
+
+echo "04. PUT /v1/contextEntities/type/T1/id/E2/attributes/A2 and see it fail"
+echo "======================================================================="
+payload='{
+  "type": "",
+  "value": "11",
+  "metadatas": [
+    {
+      "name": "I",
+      "type": "none",
+      "value": "left"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A2 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "05. POST /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=12 in payload"
+echo "=============================================================================="
+payload='{
+  "type": "",
+  "value": "12",
+  "metadatas": [
+    {
+      "name": "I",
+      "type": "none",
+      "value": "left"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload" --json
+echo
+echo
+
+
+echo "06. PUT /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=13 in payload"
+echo "============================================================================="
+payload='{
+  "type": "",
+  "value": "13",
+  "metadatas": [
+    {
+      "name": "I",
+      "type": "none",
+      "value": "left"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "07. GET /v1/contextEntities/type/T1/id/E1/attributes/A2 to see A2=13"
+echo "===================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A2 --json
+echo
+echo
+
+
+echo "08. POST /v1/contextEntities/type/T1/id/E2/attributes/A1 with A1=21 in payload"
+echo "=============================================================================="
+payload='{
+  "type": "",
+  "value": "21",
+  "metadatas": [
+    {
+      "name": "I",
+      "type": "none",
+      "value": "left"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A1 --payload "$payload" --json
+echo
+echo
+
+
+
+echo "09. POST /v1/contextEntities/type/T1/id/E2/attributes/A2 with A2=22 in payload"
+echo "=============================================================================="
+payload='{
+  "type": "",
+  "value": "22",
+  "metadatas": [
+    {
+      "name": "I",
+      "type": "none",
+      "value": "left"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E2/attributes/A2 --payload "$payload" --json
+echo
+echo
+
+
+echo "10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
+echo "=========================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+echo
+echo
+
+
+echo "11. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
+echo "============================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json -X DELETE
+echo
+echo
+
+
+echo "12. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
+echo "=========================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json -X DELETE
+echo
+echo
+
+
+echo "13. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
+echo "======================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+echo
+echo
+
+
+echo "14. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail"
+echo "======================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 -X NOP
+echo
+echo
+
+
+echo "15. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 XML"
+echo "============================================================"
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
+  <type>AT1</type>
+  <contextValue>11</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>I</name>
+      <type>none</type>
+      <value>left</value>
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload"
+echo
+echo
+
+
+echo "16. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1 XML"
+echo "==========================================================="
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
+  <type>AT1</type>
+  <contextValue>10</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>I</name>
+      <type>none</type>
+      <value>left</value>
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "17. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK"
+echo "=========================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "404", 
+        "details": "Entity-Attribute pair: /E1-A1/", 
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+02. POST /v1/contextEntities/type/T1/id/E1attributes/A1 with A1=12 in payload
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "I", 
+                    "type": "none", 
+                    "value": "left"
+                }
+            ], 
+            "name": "A1", 
+            "type": "", 
+            "value": "12"
+        }
+    ], 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+04. PUT /v1/contextEntities/type/T1/id/E2/attributes/A2 and see it fail
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 88
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "404", 
+    "details": "E2", 
+    "reasonPhrase": "No context element found"
+}
+
+
+05. POST /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=12 in payload
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+06. PUT /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=13 in payload
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+07. GET /v1/contextEntities/type/T1/id/E1/attributes/A2 to see A2=13
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "I", 
+                    "type": "none", 
+                    "value": "left"
+                }
+            ], 
+            "name": "A2", 
+            "type": "", 
+            "value": "13"
+        }
+    ], 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+08. POST /v1/contextEntities/type/T1/id/E2/attributes/A1 with A1=21 in payload
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+09. POST /v1/contextEntities/type/T1/id/E2/attributes/A2 with A2=22 in payload
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "I", 
+                    "type": "none", 
+                    "value": "left"
+                }
+            ], 
+            "name": "A1", 
+            "type": "", 
+            "value": "12"
+        }
+    ], 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+11. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+12. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 183
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "472", 
+    "details": "action: DELETE - entity: [E1, T1] - offending attribute: A1 - attribute not found", 
+    "reasonPhrase": "request parameter is invalid/not allowed"
+}
+
+
+13. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "404", 
+        "details": "Entity-Attribute pair: /E1-A1/", 
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+14. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
+=======================================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+15. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 XML
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+16. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1 XML
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+17. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 302
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "I", 
+                    "type": "none", 
+                    "value": "left"
+                }
+            ], 
+            "name": "A1", 
+            "type": "AT1", 
+            "value": "10"
+        }
+    ], 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

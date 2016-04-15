@@ -1,6 +1,12 @@
 #<a name="top"></a>Orion Context Broker
 
-[![license badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
+<!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
+     release.sh needs to be changed also -->
+
+[![License badge](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
+[![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion.readthedocs.org/en/latest/?badge=latest)
+[![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
+[![Support badge]( https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
 
 * [Introduction](#introduction)
 * [GEi overall description](#gei-overall-description)
@@ -38,7 +44,7 @@ For documentation previous to Orion 0.23.0 please check the manuals at FIWARE pu
 
 Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a part of the FIWARE platform.
 
-Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSI9/10 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. an interval of time has passed or the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this document.
+Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSI9/10 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this document.
 
 If this is your first contact with the Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
 
@@ -139,6 +145,8 @@ Please have a look to the section [on building the source code](doc/manuals/admi
 * Container-based deployment
   * [Docker](docker/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
+* [Contribution guidelines](doc/manuals/contribution_guidelines.md), especially important if you plan to contribute with code
+  to Orion Context Broker
 * [Deprecated features](doc/manuals/deprecated.md)
 
 [Top](#top)

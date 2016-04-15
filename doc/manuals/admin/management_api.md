@@ -1,10 +1,18 @@
 # Management REST interface
 
 Apart from the NGSI 9/10 interface, Orion Context Broker exposes a REST
-API for management that allows to change the trace and verbosity levels
-(which initial value is set using "-t" command line options).
+API for management that allows to change the log level and the trace levels
+(whose initial value is set using `-t` and `-logLevel` command line options).
 
-In order to manage the trace level:
+To change the log level:
+
+```
+curl --request PUT <host>:<port>/admin/log?level=<fatal|error|warning|warn|info|debug|none>
+```
+
+
+
+To manage the trace level:
 
 ```
 curl --request DELETE <host>:<port>/log/trace
@@ -17,66 +25,6 @@ curl --request PUT <host>:<port>/log/trace/t1-t2
 curl --request PUT <host>:<port>/log/trace/t1-t2,t3-t4
 ```
 
-'PUT-requests' overwrites the previous log settings. So, in order to ADD
+'PUT-requests' overwrite the previous log settings. So, in order to ADD
 a trace level, a GET /log/trace must be issued first and after that the
 complete trace string to be sent in the PUT request can be assembled.
-
-## Statistics
-
-The Orion context broker maintains a set of counters for the incoming
-messages and such. The information is accessed via REST, of course:
-
-```
-curl --header 'Accept: application/json' <host>:<port>/statistics
-```
-
-A sample *statistics* response:
-
-```
-{
-  "orion" : {
-    "jsonRequests" : "13",
-    "updates" : "13",
-    "versionRequests" : "1",
-    "statisticsRequests" : "2",
-    "subCacheLookups" : "1",
-    "uptime_in_secs" : "14470",
-    "measuring_interval_in_secs" : "14470"
-  }
-}
-```
-
-To reset the statistics, the verb DELETE is used:
-
-```
-curl -X DELETE --header 'Accept: application/json' <host>:<port>/statistics
-```
-
-Resetting the statistics counters yields the following response:
-
-```
-{
-  "orion" : {
-    "message" : "All statistics counter reset"
-  }
-}
-```
-
-There are a lot of counters, but only those that have been used since
-the last reset are included in the response to the *statistics*
-REST request.
-
-The `-mutexTimeStat` CLI parameter activates recording of waiting time in the different internal semaphores, e.g:
-
-```
-{
-  "orion" : {
-    ...
-    "requestSemaphoreWaitingTime" : "0.000000000",
-    "dbConnectionPoolWaitingTime" : "0.000000611",
-    "transactionSemaphoreWaitingTime" : "0.000000930",
-    "curlContextMutexWaitingTime" : "0.000000000",
-    ...
-  }
-}
-```

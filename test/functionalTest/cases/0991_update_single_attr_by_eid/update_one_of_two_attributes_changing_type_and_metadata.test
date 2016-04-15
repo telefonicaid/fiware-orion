@@ -43,7 +43,7 @@ brokerStart CB
 echo "01. POST /v2/entities to create E1/A1=1+A2=1"
 echo "============================================"
 payload='{ "id": "E1", "type": "T1", "A1": 1, "A2": 1 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -72,7 +72,7 @@ echo
 
 echo "05. PUT /v2/entities/E1/attrs/A1 with metadata m1 and m2"
 echo "========================================================"
-payload='{ "value": 5, "m1": 55, "m2": "55" }'
+payload='{ "value": 5, "metadata": { "m1": 55, "m2": "55" } }'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
 echo
 echo
@@ -105,7 +105,8 @@ echo
 ============================================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -113,13 +114,22 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1 to see A1==1 and A2==1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 113
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": 1.0,
-    "A2": 1.0,
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
+    "A2": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -129,6 +139,7 @@ Date: REGEX(.*)
 ==================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -136,13 +147,22 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 to see A1==3 and A2==1 (A2 untouched)
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 51
+Content-Length: 113
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "A1": 3.0,
-    "A2": 1.0,
+    "A1": {
+        "metadata": {},
+        "type": "none",
+        "value": 3
+    },
+    "A2": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -152,6 +172,7 @@ Date: REGEX(.*)
 ========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -159,17 +180,31 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 to see metadata m1 and m2
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 86
+Content-Length: 178
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "A1": {
-        "m1": 55.0,
-        "m2": "55",
-        "value": 5.0
+        "metadata": {
+            "m1": {
+                "type": "none",
+                "value": 55
+            },
+            "m2": {
+                "type": "none",
+                "value": "55"
+            }
+        },
+        "type": "none",
+        "value": 5
     },
-    "A2": 1.0,
+    "A2": {
+        "metadata": {},
+        "type": "none",
+        "value": 1
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -179,6 +214,7 @@ Date: REGEX(.*)
 ==========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -186,17 +222,28 @@ Date: REGEX(.*)
 08. GET /v2/entities/E1 to see A2::type == 'newtype'
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 110
+Content-Length: 185
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "A1": {
-        "m1": 55.0,
-        "m2": "55",
-        "value": 5.0
+        "metadata": {
+            "m1": {
+                "type": "none",
+                "value": 55
+            },
+            "m2": {
+                "type": "none",
+                "value": "55"
+            }
+        },
+        "type": "none",
+        "value": 5
     },
     "A2": {
+        "metadata": {},
         "type": "newtype",
         "value": "VAL"
     },

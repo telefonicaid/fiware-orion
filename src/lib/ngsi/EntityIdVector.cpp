@@ -31,28 +31,35 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+#include "apiTypesV2/EntityVector.h"
+
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Request.h"
+
 
 
 /* ****************************************************************************
 *
 * EntityIdVector::render -
 */
-std::string EntityIdVector::render(Format format, const std::string& indent, bool comma)
+std::string EntityIdVector::render(const std::string& indent, bool comma)
 {
-  std::string out     = "";
-  std::string xmlTag  = "entityIdList";
-  std::string jsonTag = "entities";
+  std::string out = "";
+  std::string key = "entities";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag2(indent, key, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
+  {
+    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1, true);
+  }
 
-  out += endTag(indent, xmlTag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -65,8 +72,8 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
 */
 std::string EntityIdVector::check
 (
-  RequestType         requestType,
-  Format              format,
+  ConnectionInfo*     ciP,
+  RequestType         requestType,  
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -81,7 +88,7 @@ std::string EntityIdVector::check
   {
     if (vec.size() == 0)
     {
-      LM_W(("Bad Input (mandatory entity list missing)"));
+      alarmMgr.badInput(clientIp, "mandatory entity list missing");
       return "No entities";
     }
   }
@@ -90,9 +97,9 @@ std::string EntityIdVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(ciP, requestType, indent, predetectedError, counter)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of EntityIds)"));
+      alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
       return res;
     }
   }
@@ -108,7 +115,7 @@ std::string EntityIdVector::check
 */
 void EntityIdVector::present(const std::string& indent)
 {
-  LM_F(("%lu EntityIds:\n", (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%lu EntityIds:\n", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -186,11 +193,15 @@ bool EntityIdVector::push_back_if_absent(EntityId* item)
 
 /* ****************************************************************************
 *
-* EntityIdVector::get -
+* EntityIdVector::operator[] -
 */
-EntityId* EntityIdVector::get(int ix)
+EntityId* EntityIdVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 
@@ -199,7 +210,7 @@ EntityId* EntityIdVector::get(int ix)
 *
 * EntityIdVector::size -
 */
-unsigned int EntityIdVector::size(void)
+unsigned int EntityIdVector::size(void) const
 {
   return vec.size();
 }
@@ -219,4 +230,22 @@ void EntityIdVector::release(void)
   }
 
   vec.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityIdVector::fill(EntityIdVector) -
+*
+*/
+void EntityIdVector::fill(EntityVector& _vec)
+{
+  for (unsigned int ix = 0; ix < _vec.size(); ++ix)
+  {
+    Entity*   entityP   = _vec[ix];
+    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern);
+
+    vec.push_back(entityIdP);
+  }
 }

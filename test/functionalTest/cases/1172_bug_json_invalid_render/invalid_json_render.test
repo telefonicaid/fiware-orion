@@ -1,0 +1,133 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Bugfix for problem with JSON invalid characters
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Update with \n in the JSON
+# 02. Query entity
+#
+
+echo "01. Update with \n in the JSON"
+echo "=============================="
+payload='{
+    "updateAction": "APPEND",
+    "contextElements": [
+        {
+            "id": "Bug2",
+            "isPattern": "false",
+            "type": "Bug",
+            "attributes": [
+                {
+                    "name": "foo",
+                    "type": "string",
+                    "value": "line1\nline2"
+                }
+            ]
+        }
+    ]
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+#curl --header 'Content-Type: application/json' --header 'Accept: application/json' localhost:9999/v1/updateContext -d "$payload"
+echo
+echo
+
+
+echo "02. Query entity"
+echo "================"
+orionCurl --url /v1/contextEntities/Bug2 --json
+#curl --header 'Accept: application/json' localhost:9999/v1/contextEntities/Bug2
+echo
+echo
+
+
+--REGEXPECT--
+01. Update with \n in the JSON
+==============================
+HTTP/1.1 200 OK
+Content-Length: 387
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "foo",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "Bug2",
+                "isPattern": "false",
+                "type": "Bug"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Query entity
+================
+HTTP/1.1 200 OK
+Content-Length: 294
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "foo",
+                "type": "string",
+                "value": "line1\nline2"
+            }
+        ],
+        "id": "Bug2",
+        "isPattern": "false",
+        "type": "Bug"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

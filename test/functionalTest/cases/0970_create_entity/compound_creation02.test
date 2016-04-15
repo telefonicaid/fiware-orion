@@ -55,7 +55,7 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -72,7 +72,8 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -80,48 +81,53 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 270
+Content-Length: 252
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "compattr": {
-        "a": "1", 
-        "b": 2.0, 
-        "c": true, 
-        "d": false, 
-        "e": {
-            "bvec": [
-                true, 
-                false, 
-                true, 
-                false, 
-                false
-            ], 
-            "f": 5.0, 
-            "g": "6", 
-            "h": true, 
-            "ivec": [
-                1.0, 
-                2.0, 
-                3.0, 
-                4.0, 
-                5.0
-            ], 
-            "obj": {
-                "oa": 1.0, 
-                "ob": false
-            }, 
-            "svec": [
-                "s0", 
-                "s1", 
-                "s2", 
-                "s3", 
-                "s4"
-            ]
+        "metadata": {},
+        "type": "none",
+        "value": {
+            "a": "1",
+            "b": 2,
+            "c": true,
+            "d": false,
+            "e": {
+                "bvec": [
+                    true,
+                    false,
+                    true,
+                    false,
+                    false
+                ],
+                "f": 5,
+                "g": "6",
+                "h": true,
+                "ivec": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ],
+                "obj": {
+                    "oa": 1,
+                    "ob": false
+                },
+                "svec": [
+                    "s0",
+                    "s1",
+                    "s2",
+                    "s3",
+                    "s4"
+                ]
+            }
         }
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 

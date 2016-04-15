@@ -31,24 +31,15 @@
 #include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "alarmMgr/alarmMgr.h"
 
-/* ****************************************************************************
-*
-* SubscribeContextRequest::SubscribeContextRequest
-*
-* Explicit constructor needed to initialize primitive types so they don't get
-* random values from the stack
-*/
-SubscribeContextRequest::SubscribeContextRequest()
-{
-  restrictions = 0;
-}
+
 
 /* ****************************************************************************
 *
 * SubscribeContextRequest::render - 
 */
-std::string SubscribeContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string SubscribeContextRequest::render(RequestType requestType, const std::string& indent)
 {
   std::string  out                             = "";
   std::string  tag                             = "subscribeContextRequest";
@@ -69,15 +60,15 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
   bool         commaAfterAttributeList         = referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
   bool         commaAfterEntityIdVector        = attributeListRendered || referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
 
-  out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
-  out += attributeList.render(format, indent2, commaAfterAttributeList);
-  out += reference.render(format, indent2, commaAfterReference);
-  out += duration.render(format, indent2, commaAfterDuration);
-  out += restriction.render(format, indent2, restrictions, commaAfterRestriction);
-  out += notifyConditionVector.render(format, indent2, commaAfterNotifyConditionVector);
-  out += throttling.render(format, indent2, commaAfterThrottling);
-  out += endTag(indent, tag, format);
+  out += startTag1(indent, tag, false);
+  out += entityIdVector.render(indent2, commaAfterEntityIdVector);
+  out += attributeList.render(indent2, commaAfterAttributeList);
+  out += reference.render(indent2, commaAfterReference);
+  out += duration.render(indent2, commaAfterDuration);
+  out += restriction.render(indent2, restrictions, commaAfterRestriction);
+  out += notifyConditionVector.render(indent2, commaAfterNotifyConditionVector);
+  out += throttling.render(indent2, commaAfterThrottling);
+  out += endTag(indent);
 
   return out;
 }
@@ -88,7 +79,7 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
 *
 * SubscribeContextRequest::check - 
 */
-std::string SubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -96,15 +87,17 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  if (((res = entityIdVector.check(SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
-      ((res = attributeList.check(SubscribeContext, format, indent, predetectedError, counter))         != "OK") ||      
-      ((res = duration.check(SubscribeContext, format, indent, predetectedError, counter))              != "OK") ||
-      ((res = restriction.check(SubscribeContext, format, indent, predetectedError, restrictions))      != "OK") ||
-      ((res = notifyConditionVector.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK") ||
-      ((res = throttling.check(SubscribeContext, format, indent, predetectedError, counter))            != "OK"))
+  if (((res = entityIdVector.check(ciP, SubscribeContext, indent, predetectedError, counter))        != "OK") ||
+      ((res = attributeList.check(SubscribeContext, indent, predetectedError, counter))         != "OK") ||
+      ((res = reference.check(SubscribeContext, indent, predetectedError, counter))             != "OK") ||
+      ((res = duration.check(SubscribeContext, indent, predetectedError, counter))              != "OK") ||
+      ((res = restriction.check(SubscribeContext, indent, predetectedError, restrictions))      != "OK") ||
+      ((res = notifyConditionVector.check(SubscribeContext, indent, predetectedError, counter)) != "OK") ||
+      ((res = throttling.check(SubscribeContext, indent, predetectedError, counter))            != "OK"))
   {
+    alarmMgr.badInput(clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.render(SubscribeContext, format, indent);
+    return response.render(SubscribeContext, indent);
   }
 
   return "OK";

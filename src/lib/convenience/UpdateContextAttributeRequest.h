@@ -46,13 +46,12 @@ typedef struct UpdateContextAttributeRequest
   std::string                contextValue;        // Mandatory  
   MetadataVector             metadataVector;      // Optional
 
-  orion::ValueType           valueType;           // Type of value: either string or none
-  std::string                typeFromXmlAttribute;
+  orion::ValueType           valueType;           // Type of value: either string or none  
   orion::CompoundValueNode*  compoundValueP;
 
   UpdateContextAttributeRequest();
-  std::string  render(ConnectionInfo* ciP, Format format, std::string indent);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
+  std::string  render(ConnectionInfo* ciP, std::string indent);
+  std::string  check(ConnectionInfo* ciP, RequestType requestType, std::string indent, std::string preError, int counter);
   void         present(std::string indent);
   void         release();
 } UpdateContextAttributeRequest;

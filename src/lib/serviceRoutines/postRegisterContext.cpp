@@ -32,15 +32,16 @@
 #include "common/Format.h"
 #include "common/string.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "serviceRoutines/postRegisterContext.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
-#include "xmlParse/xmlRequest.h"
-
-
 
 
 
@@ -66,26 +67,29 @@ std::string postRegisterContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    LM_W(("Bad Input (more than one service path for a registration)"));
+    alarmMgr.badInput(clientIp, "more than one service path for a registration");
     rcr.errorCode.fill(SccBadRequest, "more than one service path for notification");
-    answer = rcr.render(RegisterContext, ciP->outFormat, "");
+
+    TIMED_RENDER(answer = rcr.render(RegisterContext, ""));
+
     return answer;
   }
   else if (ciP->servicePathV.size() == 0)
   {
-    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH_UPDATES);
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
   if (res != "OK")
   {
     rcr.errorCode.fill(SccBadRequest, res);
-    answer = rcr.render(RegisterContext, ciP->outFormat, "");
+
+    TIMED_RENDER(answer = rcr.render(RegisterContext, ""));
     return answer;
   }
 
-  ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
-  answer = rcr.render(RegisterContext, ciP->outFormat, "");
+  TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->httpHeaders.correlator, ciP->tenant, ciP->servicePathV[0]));
+  TIMED_RENDER(answer = rcr.render(RegisterContext, ""));
 
   return answer;
 }

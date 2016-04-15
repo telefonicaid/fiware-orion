@@ -65,16 +65,17 @@
 #include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "mongoBackend/dbConstants.h"
+#include "cache/subCache.h"
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
 #include "parseArgs/paBuiltin.h"
 #include "parseArgs/paIsSet.h"
+#include "parseArgs/paUsage.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
@@ -86,10 +87,13 @@
 #include "common/globals.h"
 #include "common/Timer.h"
 #include "common/compileInfo.h"
+#include "common/SyncQOverflow.h"
 
 #include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
-#include "ngsiNotify/onTimeIntervalThread.h"
+#include "ngsiNotify/QueueNotifier.h"
+#include "ngsiNotify/QueueWorkers.h"
+#include "ngsiNotify/senderThread.h"
 #include "serviceRoutines/logTraceTreat.h"
 #include "serviceRoutines/getEntityTypes.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
@@ -135,6 +139,7 @@
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
 #include "serviceRoutines/badVerbAllFive.h"
+#include "serviceRoutines/badVerbPutOnly.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -167,6 +172,7 @@
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutinesV2/badVerbGetPutOnly.h"
+#include "serviceRoutinesV2/badVerbGetDeletePatchOnly.h"
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
@@ -187,9 +193,17 @@
 #include "serviceRoutinesV2/patchEntity.h"
 #include "serviceRoutinesV2/getAllSubscriptions.h"
 #include "serviceRoutinesV2/getSubscription.h"
+#include "serviceRoutinesV2/postSubscriptions.h"
+#include "serviceRoutinesV2/deleteSubscription.h"
+#include "serviceRoutinesV2/patchSubscription.h"
+#include "serviceRoutinesV2/postBatchQuery.h"
+#include "serviceRoutinesV2/postBatchUpdate.h"
+#include "serviceRoutinesV2/logLevelTreat.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
+#include "alarmMgr/alarmMgr.h"
+#include "logSummary/logSummary.h"
 
 using namespace orion;
 
@@ -237,13 +251,25 @@ long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
-bool            mutexTimeStat;
 int             writeConcern;
 unsigned int    cprForwardLimit;
 int             subCacheInterval;
 char            notificationMode[64];
+int             notificationQueueSize;
+int             notificationThreadNum;
 bool            noCache;
 unsigned int    connectionMemory;
+unsigned int    maxConnections;
+unsigned int    reqPoolSize;
+bool            simulatedNotification;
+bool            statCounters;
+bool            statSemWait;
+bool            statTiming;
+bool            statNotifQueue;
+int             lsPeriod;
+bool            relogAlarms;
+bool            strictIdv1;
+
 
 
 
@@ -254,8 +280,9 @@ unsigned int    connectionMemory;
 #define PIDPATH             _i "/tmp/contextBroker.pid"
 #define IP_ALL              _i "0.0.0.0"
 #define LOCALHOST           _i "localhost"
+#define ONE_MONTH_PERIOD    (3600 * 24 * 31)
 
-#define FG_DESC               "don't start as daemon"
+#define FG_DESC                "don't start as daemon"
 #define LOCALIP_DESC           "IP to receive new connections"
 #define PORT_DESC              "port to receive new connections"
 #define PIDPATH_DESC           "pid file path"
@@ -278,17 +305,40 @@ unsigned int    connectionMemory;
 #define DBPS_DESC              "database connection pool size"
 #define MAX_L                  900000
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
-#define MUTEX_TIMESTAT_DESC    "measure total semaphore waiting time"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
-#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|none)"
+#define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
 #define NO_CACHE               "disable subscription cache for lookups"
-#define CONN_MEMORY_DESC       "maximum memory size per connection in kilobytes"
+#define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
+#define MAX_CONN_DESC          "maximum number of simultaneous connections"
+#define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+#define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
+#define STAT_COUNTERS          "enable request/notification counters statistics"
+#define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
+#define STAT_TIMING            "enable request-time-measuring statistics"
+#define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
+#define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
+#define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
+#define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
+
+
+
 
 /* ****************************************************************************
 *
-* Parse arguments
+* paArgs - option vector for the Parse CLI arguments library
+*
+* NOTE
+*   A note about 'FD_SETSIZE - 4', the default and max value for '-maxConnections':
+*   [ taken from https://www.gnu.org/software/libmicrohttpd/manual/libmicrohttpd.html ]
+*
+*   MHD_OPTION_CONNECTION_LIMIT
+*     Maximum number of concurrent connections to accept.
+*     The default is FD_SETSIZE - 4 (the maximum number of file descriptors supported by 
+*     select minus four for stdin, stdout, stderr and the server socket). In other words,
+*    the default is as large as possible.
+*
 */
 PaArgument paArgs[] =
 {
@@ -317,18 +367,47 @@ PaArgument paArgs[] =
   { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
+  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },  
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",       allowedOrigin,     "ALLOWED_ORIGIN",    PaString, PaOpt, _i "",          PaNL,  PaNL,     ALLOWED_ORIGIN_DESC    },
   { "-cprForwardLimit",  &cprForwardLimit,  "CPR_FORWARD_LIMIT", PaUInt,   PaOpt, 1000,           0,     UINT_MAX, CPR_FORWARD_LIMIT_DESC },
-  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 10,             0,     3600,     SUB_CACHE_IVAL_DESC    },
-  { "-notificationMode", &notificationMode, "NOTIF_MODE",        PaString, PaOpt, _i "transient", PaNL,  PaNL,     NOTIFICATION_MODE_DESC },
+  { "-subCacheIval",     &subCacheInterval, "SUBCACHE_IVAL",     PaInt,    PaOpt, 60,             0,     3600,     SUB_CACHE_IVAL_DESC    },
   { "-noCache",          &noCache,          "NOCACHE",           PaBool,   PaOpt, false,          false, true,     NO_CACHE               },
-  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     UINT_MAX, CONN_MEMORY_DESC       },
+  { "-connectionMemory", &connectionMemory, "CONN_MEMORY",       PaUInt,   PaOpt, 64,             0,     1024,     CONN_MEMORY_DESC       },  
+  { "-maxConnections",   &maxConnections,   "MAX_CONN",          PaUInt,   PaOpt, FD_SETSIZE - 4, 0,     FD_SETSIZE - 4, MAX_CONN_DESC    },
+  { "-reqPoolSize",      &reqPoolSize,      "TRQ_POOL_SIZE",     PaUInt,   PaOpt, 0,              0,     1024,     REQ_POOL_SIZE          },
+
+  { "-notificationMode",      &notificationMode,      "NOTIF_MODE", PaString, PaOpt, _i "transient", PaNL,  PaNL, NOTIFICATION_MODE_DESC },
+  { "-simulatedNotification", &simulatedNotification, "DROP_NOTIF", PaBool,   PaOpt, false,          false, true, SIMULATED_NOTIF_DESC   },
+
+  { "-statCounters",   &statCounters,   "STAT_COUNTERS",    PaBool, PaOpt, false, false, true, STAT_COUNTERS     },
+  { "-statSemWait",    &statSemWait,    "STAT_SEM_WAIT",    PaBool, PaOpt, false, false, true, STAT_SEM_WAIT     },
+  { "-statTiming",     &statTiming,     "STAT_TIMING",      PaBool, PaOpt, false, false, true, STAT_TIMING       },
+  { "-statNotifQueue", &statNotifQueue, "STAT_NOTIF_QUEUE", PaBool, PaOpt, false, false, true, STAT_NOTIF_QUEUE  },
+
+  { "-logSummary",     &lsPeriod,       "LOG_SUMMARY_PERIOD", PaInt,PaOpt,   0,     0,     ONE_MONTH_PERIOD, LOG_SUMMARY_DESC },
+  { "-relogAlarms",    &relogAlarms,    "RELOG_ALARMS",       PaBool, PaOpt, false, false, true,             RELOGALARMS_DESC },
+
+  { "-strictNgsiv1Ids",  &strictIdv1, "CHECK_ID_V1",  PaBool, PaOpt, false, false, true, CHECK_v1_ID_DESC  },
 
   PA_END_OF_ARGS
+};
+
+
+
+/* ****************************************************************************
+*
+* validLogLevels - to pass to parseArgs library for validation of --logLevel 
+*/
+static const char* validLogLevels[] = 
+{
+  "NONE",
+  "ERROR",
+  "WARNING",
+  "INFO",
+  "DEBUG",
+  NULL
 };
 
 
@@ -353,6 +432,7 @@ PaArgument paArgs[] =
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
 */
+
 
 
 //
@@ -392,6 +472,14 @@ PaArgument paArgs[] =
 #define ISR                     IndividualSubscriptionRequest
 #define ISR_COMPS_V2            3, { "v2", "subscriptions", "*" }
 #define ISR_COMPS_WORD          ""
+
+#define BQR                     BatchQueryRequest
+#define BQR_COMPS_V2            3, { "v2", "op", "query" }
+#define BQR_COMPS_WORD          ""
+
+#define BUR                     BatchUpdateRequest
+#define BUR_COMPS_V2            3, { "v2", "op", "update" }
+#define BUR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -601,7 +689,7 @@ PaArgument paArgs[] =
 //
 // Log, version, statistics ...
 //
-#define LOG                LogRequest
+#define LOG                LogTraceRequest
 #define LOGT_COMPS_V0      2, { "log", "trace"                           }
 #define LOGTL_COMPS_V0     3, { "log", "trace",      "*"                 }
 #define LOG2T_COMPS_V0     2, { "log", "traceLevel"                      }
@@ -611,9 +699,19 @@ PaArgument paArgs[] =
 #define LOG2T_COMPS_V1     4, { "v1", "admin", "log", "traceLevel"       }
 #define LOG2TL_COMPS_V1    5, { "v1", "admin", "log", "traceLevel", "*"  }
 
-#define STAT               StatisticsRequest
-#define STAT_COMPS_V0      1, { "statistics"                             }
-#define STAT_COMPS_V1      3, { "v1", "admin", "statistics"              }
+#define STAT                 StatisticsRequest
+#define STAT_COMPS_V0        1, { "statistics"                             }
+#define STAT_COMPS_V1        3, { "v1", "admin", "statistics"              }
+#define STAT_CACHE_COMPS_V0  2, { "cache", "statistics"                    }
+#define STAT_CACHE_COMPS_V1  4, { "v1", "admin", "cache", "statistics"     }
+
+
+
+//
+// LogLevel
+//
+#define LOGLEVEL           LogLevelRequest
+#define LOGLEVEL_COMPS_V2  2, { "admin", "log"                           }
 
 
 
@@ -640,7 +738,7 @@ PaArgument paArgs[] =
 
 #define API_V2                                                                                         \
   { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
-  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbAllFour           }, \
+  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
   { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
@@ -669,10 +767,19 @@ PaArgument paArgs[] =
   { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
-  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }, \
+  { "POST",   SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          postSubscriptions        }, \
+  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
-  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetOnly           }
+  { "DELETE", ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          deleteSubscription       }, \
+  { "PATCH",  ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          patchSubscription        }, \
+  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetDeletePatchOnly}, \
+                                                                                                       \
+  { "POST",   BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          postBatchQuery           }, \
+  { "*",      BQR,          BQR_COMPS_V2,         BQR_COMPS_WORD,          badVerbPostOnly          }, \
+                                                                                                       \
+  { "POST",   BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          postBatchUpdate          }, \
+  { "*",      BUR,          BUR_COMPS_V2,         BUR_COMPS_WORD,          badVerbPostOnly          }
 
 
 
@@ -710,7 +817,7 @@ PaArgument paArgs[] =
 
 
 #define STANDARD_REQUESTS_V0                                                                             \
-  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
   { "*",      UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -726,7 +833,7 @@ PaArgument paArgs[] =
 
 
 #define STANDARD_REQUESTS_V1                                                                               \
-  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat) postUpdateContext             }, \
   { "*",      UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -826,7 +933,7 @@ PaArgument paArgs[] =
   { "PUT",    ICEAA, ICEAA_COMPS_V0,       ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
   { "POST",   ICEAA, ICEAA_COMPS_V0,       ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
   { "DELETE", ICEAA, ICEAA_COMPS_V0,       "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbGetPostDeleteOnly                  }, \
+  { "*",      ICEAA, ICEAA_COMPS_V0,       "",              badVerbAllFour                            }, \
                                                                                                          \
   { "GET",    AVI,   AVI_COMPS_V0,         "",              getAttributeValueInstance                 }, \
   { "PUT",    AVI,   AVI_COMPS_V0,         AVI_PUT_WORD,    putAttributeValueInstance                 }, \
@@ -868,7 +975,7 @@ PaArgument paArgs[] =
   { "PUT",    ICEAA, ICEAA_COMPS_V1,         ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
   { "POST",   ICEAA, ICEAA_COMPS_V1,         ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
   { "DELETE", ICEAA, ICEAA_COMPS_V1,         "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbGetPostDeleteOnly                  }, \
+  { "*",      ICEAA, ICEAA_COMPS_V1,         "",              badVerbAllFour                            }, \
                                                                                                            \
   { "GET",    AVI,   AVI_COMPS_V1,           "",              getAttributeValueInstance                 }, \
   { "PUT",    AVI,   AVI_COMPS_V1,           AVI_PUT_WORD,    putAttributeValueInstance                 }, \
@@ -893,12 +1000,13 @@ PaArgument paArgs[] =
                                                                                                            \
   { "GET",    ET,    ET_COMPS_V1,            "",              getEntityTypes                            }, \
   { "*",      ET,    ET_COMPS_V1,            "",              badVerbGetOnly                            }, \
+                                                                                                           \
   { "GET",    AFET,  AFET_COMPS_V1,          "",              getAttributesForEntityType                }, \
   { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
   { "POST",   ACE,   ACE_COMPS_V1,           ACE_POST_WORD,   postIndividualContextEntity               }, \
-  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
+  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetPostOnly                        }, \
                                                                                                            \
   { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
   { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
@@ -937,30 +1045,30 @@ PaArgument paArgs[] =
 #define LOG_REQUESTS_V0                                                              \
   { "GET",    LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGT_COMPS_V0,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGT_COMPS_V0,    "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGTL_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGTL_COMPS_V0,   "",  badVerbPutDeleteOnly                   }, \
   { "GET",    LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2T_COMPS_V0,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOG2T_COMPS_V0,   "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2TL_COMPS_V0,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbAllFour                         }
+  { "*",      LOG,  LOG2TL_COMPS_V0,  "",  badVerbPutDeleteOnly                   }
 
 #define LOG_REQUESTS_V1                                                              \
   { "GET",    LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGT_COMPS_V1,    "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOGTL_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOGTL_COMPS_V1,   "",  badVerbPutDeleteOnly                   }, \
   { "GET",    LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2T_COMPS_V1,   "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbAllFour                         }, \
+  { "*",      LOG,  LOG2T_COMPS_V1,   "",  badVerbGetDeleteOnly                   }, \
   { "PUT",    LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
   { "DELETE", LOG,  LOG2TL_COMPS_V1,  "",  logTraceTreat                          }, \
-  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbAllFour                         }
+  { "*",      LOG,  LOG2TL_COMPS_V1,  "",  badVerbPutDeleteOnly                   }
 
 #define STAT_REQUESTS_V0                                                             \
   { "GET",    STAT, STAT_COMPS_V0,    "",  statisticsTreat                        }, \
@@ -971,6 +1079,16 @@ PaArgument paArgs[] =
   { "GET",    STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
   { "DELETE", STAT, STAT_COMPS_V1,    "",  statisticsTreat                        }, \
   { "*",      STAT, STAT_COMPS_V1,    "",  badVerbGetDeleteOnly                   }
+
+#define STAT_CACHE_REQUESTS_V0                                                       \
+  { "GET",    STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
+  { "DELETE", STAT, STAT_CACHE_COMPS_V0,    "",  statisticsCacheTreat             }, \
+  { "*",      STAT, STAT_CACHE_COMPS_V0,    "",  badVerbGetDeleteOnly             }
+
+#define STAT_CACHE_REQUESTS_V1                                                       \
+  { "GET",    STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
+  { "DELETE", STAT, STAT_CACHE_COMPS_V1,    "",  statisticsCacheTreat             }, \
+  { "*",      STAT, STAT_CACHE_COMPS_V1,    "",  badVerbGetDeleteOnly             }
 
 #define VERSION_REQUESTS                                                             \
   { "GET",    VERS, VERS_COMPS,    "",  versionTreat                              }, \
@@ -989,6 +1107,10 @@ PaArgument paArgs[] =
   { "*", INV, INV10_COMPS,   "", badNgsi10Request }, \
   { "*", INV, INV_ALL_COMPS, "", badRequest       }
 
+#define LOGLEVEL_REQUESTS_V2                                                         \
+  { "PUT",   LOGLEVEL,  LOGLEVEL_COMPS_V2, "", logLevelTreat                      }, \
+  { "*",     LOGLEVEL,  LOGLEVEL_COMPS_V2, "", badVerbPutOnly                     }
+
 
 
 /* ****************************************************************************
@@ -1005,8 +1127,6 @@ PaArgument paArgs[] =
 *
 * This is the default service vector, that is used if the broker is started without the -ngsi9 option
 */
-
-
 RestService restServiceV[] =
 {
   API_V2,
@@ -1024,7 +1144,10 @@ RestService restServiceV[] =
   LOG_REQUESTS_V1,
   STAT_REQUESTS_V0,
   STAT_REQUESTS_V1,
+  STAT_CACHE_REQUESTS_V0,
+  STAT_CACHE_REQUESTS_V1,
   VERSION_REQUESTS,
+  LOGLEVEL_REQUESTS_V2,
 
 #ifdef DEBUG
   EXIT_REQUESTS,
@@ -1155,16 +1278,6 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
-  //
-  // Cancel all threads to avoid false leaks in valgrind
-  //
-  std::vector<std::string> dbs;
-  getOrionDatabases(dbs);
-  for (unsigned int ix = 0; ix < dbs.size(); ++ix)
-  {
-    destroyAllOntimeIntervalThreads(dbs[ix]);
-  }
-
   exit(code);
 }
 
@@ -1184,10 +1297,10 @@ void exitFunc(void)
 
 #ifdef DEBUG
   // Take mongo req-sem ?  
-  LM_T(LmtMongoSubCache, ("try-taking req semaphore"));
+  LM_T(LmtSubCache, ("try-taking req semaphore"));
   reqSemTryToTake();
-  LM_T(LmtMongoSubCache, ("calling mongoSubCacheDestroy"));
-  mongoSubCacheDestroy();
+  LM_T(LmtSubCache, ("calling subCacheDestroy"));
+  subCacheDestroy();
 #endif
 
   curl_context_cleanup();
@@ -1223,24 +1336,29 @@ const char* description =
 */
 static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
-  /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
 
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
-  recoverOntimeIntervalThreads("");
-  if (multitenant)
+  Notifier* pNotifier = NULL;
+
+  /* If we use a queue for notifications, start worker threads */
+  if (strcmp(notificationMode, "threadpool") == 0)
   {
-    /* We get tenant database names and recover ontime interval threads on each one */
-    std::vector<std::string> orionDbs;
-    getOrionDatabases(orionDbs);
-    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
+    QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
+    int rc = pQNotifier->start();
+    if (rc != 0)
     {
-      std::string orionDb = orionDbs[ix];
-      std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-      recoverOntimeIntervalThreads(tenant);
+      LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
     }
+    pNotifier = pQNotifier;
+  }
+  else
+  {
+    pNotifier = new Notifier();
   }
 
+  /* Set notifier object (singleton) */
+  setNotifier(pNotifier);
+
+  /* Set HTTP timeout */
   httpRequestInit(httpTimeout);
 }
 
@@ -1397,7 +1515,7 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 *
 * policyGet - 
 */
-static SemRequestType policyGet(std::string mutexPolicy)
+static SemOpType policyGet(std::string mutexPolicy)
 {
   if (mutexPolicy == "read")
   {
@@ -1422,16 +1540,67 @@ static SemRequestType policyGet(std::string mutexPolicy)
   return SemReadWriteOp;
 }
 
+/* ****************************************************************************
+*
+* notificationModeParse -
+*/
+static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
+{
+  char* mode;
+  char* first_colon;
+  int   flds_num;
 
+  errno = 0;
+  // notifModeArg is a char[64], pretty sure not a huge input to break sscanf
+  // cppcheck-suppress invalidscanf
+  flds_num = sscanf(notifModeArg, "%m[^:]:%d:%d", &mode, pQueueSize, pNumThreads);
+  if (errno != 0)
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: sscanf (%s)", strerror(errno)));
+  }
+  if (flds_num == 3 && strcmp(mode, "threadpool") == 0)
+  {
+    if (*pQueueSize <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid queue size (%d)", *pQueueSize));
+    }
+    if (*pNumThreads <= 0)
+    {
+      LM_X(1, ("Fatal Error parsing notification mode: invalid number of threads (%d)",*pNumThreads));
+    }
+  }
+  else if (flds_num == 1 && strcmp(mode, "threadpool") == 0)
+  {
+    *pQueueSize = DEFAULT_NOTIF_QS;
+    *pNumThreads = DEFAULT_NOTIF_TN;
+  }
+  else if (!(
+             flds_num == 1 &&
+             (strcmp(mode, "transient") == 0 || strcmp(mode, "persistent") == 0)
+             ))
+  {
+    LM_X(1, ("Fatal Error parsing notification mode: invalid mode (%s)", notifModeArg));
+  }
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
+  // get rid of params, if any, in notifModeArg
+  first_colon = strchr(notifModeArg, ':');
+  if (first_colon != NULL)
+  {
+    *first_colon = '\0';
+  }
+
+  free(mode);
+}
+
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | srv=SERVICE | subsrv=SUB_SERVICE | from=FROM_IP | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
 */
 int main(int argC, char* argV[])
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+
+  lmTransactionReset();
 
   uint16_t       rushPort = 0;
   std::string    rushHost = "";
@@ -1462,6 +1631,8 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-vvv");
   paConfig("remove builtin", "-vvvv");
   paConfig("remove builtin", "-vvvvv");
+  paConfig("remove builtin", "--silent");
+  paConfig("bool option with value as non-recognized option", NULL);
 
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
 
@@ -1478,6 +1649,8 @@ int main(int argC, char* argV[])
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
+  paConfig("valid log level strings",       validLogLevels);
+  paConfig("default value",                 "-logLevel", "WARNING");
 
 
   //
@@ -1491,6 +1664,14 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  // Argument consistency check (-t AND NOT -logLevel)
+  if ((paTraceV[0] != 0) && (strcmp(paLogLevel, "DEBUG") != 0))
+  {
+    printf("incompatible options: traceLevels cannot be used without setting -logLevel to DEBUG\n");
+    paUsage();
+    exit(1);
+  }
 
 #ifdef DEBUG_develenv
   //
@@ -1522,6 +1703,8 @@ int main(int argC, char* argV[])
     }
   }
 
+  notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum); // This should be called before contextBrokerInit()
+  LM_T(LmtNotifier, ("notification mode: '%s', queue size: %d, num threads %d", notificationMode, notificationQueueSize, notificationThreadNum));
   LM_I(("Orion Context Broker is running"));
 
   if (fg == false)
@@ -1553,12 +1736,19 @@ int main(int argC, char* argV[])
     ipVersion = IPV6;
   }
 
+
+  //
+  //  Where everything begins
+  //
+
   pidFile();
-  SemRequestType policy = policyGet(reqMutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
+  SemOpType policy = policyGet(reqMutexPolicy);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
+  alarmMgr.init(relogAlarms);
+  logSummaryInit(&lsPeriod);
 
   if (rush[0] != 0)
   {
@@ -1568,22 +1758,22 @@ int main(int argC, char* argV[])
 
   if (noCache == false)
   {
-    mongoSubCacheInit();
+    subCacheInit(mtenant);
 
     if (subCacheInterval == 0)
     {
       // Populate subscription cache from database
-      mongoSubCacheRefresh();
+      subCacheRefresh();
     }
     else
     {
       // Populate subscription cache AND start sub-cache-refresh-thread
-      mongoSubCacheStart();
+      subCacheStart();
     }
   }
   else
   {
-    LM_T(LmtMongoSubCache, ("noCache == false"));
+    LM_T(LmtSubCache, ("noCache == false"));
   }
 
   if (https)
@@ -1603,21 +1793,20 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, connectionMemory, maxConnections, reqPoolSize, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));
-
-  if (strcmp(notificationMode, "none") == 0)
+  if (simulatedNotification)
   {
-    LM_W(("notification mode 'none'"));
+    LM_W(("simulatedNotification is 'true', outgoing notifications won't be sent"));
   }
 
   while (1)

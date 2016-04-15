@@ -26,8 +26,10 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
+
 #include "common/string.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -41,7 +43,7 @@
 */
 QueryContextResponse::QueryContextResponse()
 {
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -53,7 +55,7 @@ QueryContextResponse::QueryContextResponse()
 QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
-  errorCode.tagSet("errorCode");
+  errorCode.keyNameSet("errorCode");
 }
 
 
@@ -124,7 +126,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   //
   // 02. render 
   //
-  out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag1(indent, tag, false);
 
   if (contextElementResponseVector.size() > 0)
   {
@@ -133,7 +135,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 
   if (errorCodeRendered == true)
   {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
 
 
@@ -147,10 +149,10 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.render(ciP->outFormat, indent + "  ");
+    out += errorCode.render(indent + "  ");
   }
 
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }
@@ -163,19 +165,21 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 */
 std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
-  std::string           res;
+  std::string  res;
 
   if (predetectedError != "")
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK")
   {
-    LM_W(("Bad Input (%s)", res.c_str()));
+    alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
   return render(ciP, QueryContext, indent);
 }
@@ -188,7 +192,7 @@ std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType request
 */
 void QueryContextResponse::present(const std::string& indent, const std::string& caller)
 {
-  LM_F(("QueryContextResponse presented by %s", caller.c_str()));
+  LM_T(LmtPresent, ("QueryContextResponse presented by %s", caller.c_str()));
   contextElementResponseVector.present(indent + "  ");
   errorCode.present(indent + "  ");
 }

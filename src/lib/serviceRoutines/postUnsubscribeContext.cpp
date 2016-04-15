@@ -25,6 +25,9 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
@@ -48,8 +51,8 @@ std::string postUnsubscribeContext
   UnsubscribeContextResponse  uncr;
   std::string                 answer;
 
-  ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant);
-  answer = uncr.render(UnsubscribeContext, ciP->outFormat, "");
+  TIMED_MONGO(ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
+  TIMED_RENDER(answer = uncr.render(UnsubscribeContext, ""));
 
   return answer;
 }

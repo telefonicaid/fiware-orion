@@ -92,6 +92,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 323
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -121,6 +122,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 324
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -150,6 +152,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 287
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -177,6 +180,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 286
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

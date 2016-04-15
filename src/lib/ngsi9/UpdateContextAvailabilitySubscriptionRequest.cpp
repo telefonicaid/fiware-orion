@@ -50,7 +50,7 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 *
 * UpdateContextAvailabilitySubscriptionRequest::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType requestType, const std::string& indent)
 {
   std::string   out                      = "";
   std::string   tag                      = "updateContextAvailabilitySubscriptionRequest";
@@ -64,13 +64,13 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType req
   bool          commaAfterAttributeList  = durationRendered || restrictionRendered || subscriptionRendered;
   bool          commaAfterEntityIdVector = attributeListRendered || durationRendered || restrictionRendered || subscriptionRendered;
 
-  out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent + "  ", commaAfterEntityIdVector);
-  out += attributeList.render(format,  indent + "  ", commaAfterAttributeList);
-  out += duration.render(format,       indent + "  ", commaAfterDuration);
-  out += restriction.render(format,    indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(UpdateContextAvailabilitySubscription, format, indent + "  ", commaAfterSubscriptionId);
-  out += endTag(indent, tag, format);
+  out += startTag1(indent, tag, false);
+  out += entityIdVector.render(indent + "  ", commaAfterEntityIdVector);
+  out += attributeList.render( indent + "  ", commaAfterAttributeList);
+  out += duration.render(      indent + "  ", commaAfterDuration);
+  out += restriction.render(   indent + "  ", restrictions, commaAfterRestriction);
+  out += subscriptionId.render(UpdateContextAvailabilitySubscription, indent + "  ", commaAfterSubscriptionId);
+  out += endTag(indent);
 
   return out;
 }
@@ -96,7 +96,7 @@ void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& in
 *
 * UpdateContextAvailabilitySubscriptionRequest::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                                    res;
   UpdateContextAvailabilitySubscriptionResponse  response;
@@ -107,18 +107,18 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requ
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))      != "OK") ||
-           ((res = attributeList.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))       != "OK") ||
-           ((res = duration.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))            != "OK") ||
-           ((res = restriction.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))         != "OK") ||
-           ((res = subscriptionId.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))      != "OK"))
+  else if (((res = entityIdVector.check(ciP, UpdateContextAvailabilitySubscription, indent, predetectedError, counter))      != "OK") ||
+           ((res = attributeList.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))       != "OK") ||
+           ((res = duration.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))            != "OK") ||
+           ((res = restriction.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))         != "OK") ||
+           ((res = subscriptionId.check(UpdateContextAvailabilitySubscription, indent, predetectedError, counter))      != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  return response.render(UpdateContextAvailabilitySubscription, format, indent, counter);
+  return response.render(UpdateContextAvailabilitySubscription, indent, counter);
 }
 
 

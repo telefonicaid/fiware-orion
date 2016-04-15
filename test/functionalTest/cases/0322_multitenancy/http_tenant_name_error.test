@@ -25,88 +25,89 @@ Erroneous tenant URL names
 
 --SHELL-INIT--
 dbInit CB
-dbInit ${CB_DATABASE_NAME}-01234567890123456789012345678901234567890123456789
-dbInit ${CB_DATABASE_NAME}-ngsi10
+dbInit ${CB_DB_NAME} 01234567890123456789012345678901234567890123456789
+dbInit ${CB_DB_NAME} ngsi10
 
 brokerStart CB 0 IPV4 -multiservice
 
 --SHELL--
-payload='<?xml version="1.0" encoding="UTF-8"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom</id>
-          </entityId>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>1110</value>
-              </contextMetadata>
-              <contextMetadata>
-                <name>cm2</name>
-                <type>string</type>
-                <value>XXX</value>
-              </contextMetadata>
-            </metadata>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <registrationMetadata>
-          <contextMetadata>
-            <name>ID</name>
-            <type>string</type>
-            <value>2212</value>
-          </contextMetadata>
-          <contextMetadata>
-            <name>ID2</name>
-            <type>string</type>
-            <value>212</value>
-          </contextMetadata>
-        </registrationMetadata>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>'
-
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
+        },
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "OfficeRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
+            },
+            {
+              "name": "cm2",
+              "type": "string",
+              "value": "XXX"
+            }
+          ]
+        }
+      ],
+      "metadatas": [
+        {
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
+        },
+        {
+          "name": "ID2",
+          "type": "string",
+          "value": "212"
+        }
+      ],
+      "providingApplication": "http://localhost:1028/application"
+    }
+  ],
+  "duration": "PT1H"
+}'
 URL="/v1/registry/registerContext"
 
 # 1. OK (50 chars in tenant name)
 echo "1: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --tenant "01234567890123456789012345678901234567890123456789"
+orionCurl --url $URL --payload "${payload}" --tenant "01234567890123456789012345678901234567890123456789" --json
 echo
 echo
 
 
 # 2. Long tenant name (51 chars in tenant name)
 echo "2: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --tenant "012345678901234567890123456789012345678901234567890"
+orionCurl --url $URL --payload "${payload}" --tenant "012345678901234567890123456789012345678901234567890" --json
 echo
 echo
 
 
 # 3. Bad character in tenant name
 echo "3: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --tenant "kz+fg"
+orionCurl --url $URL --payload "${payload}" --tenant "kz+fg" --json
 echo
 echo
 
 
 # 4. There are no reserved names in tenant name
 echo "4: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --tenant "ngsi10"
+orionCurl --url $URL --payload "${payload}" --tenant "ngsi10" --json
 echo
 echo
 
@@ -114,56 +115,60 @@ echo
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/xml
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
 
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
-Content-Type: application/xml
+Content-Length: 158
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "bad length - a tenant name can be max 50 characters long",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 252
-Content-Type: application/xml
+Content-Length: 188
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters</details>
-</orionError>
+{
+    "orionError": {
+        "code": "400",
+        "details": "bad character in tenant name - only underscore and alphanumeric characters are allowed",
+        "reasonPhrase": "Bad Request"
+    }
+}
 
 
 4: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/xml
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
 
 
 --TEARDOWN--
@@ -171,5 +176,5 @@ Date: REGEX(.*)
 brokerStop CB
 
 dbDrop CB
-dbDrop ${CB_DATABASE_NAME}-01234567890123456789012345678901234567890123456789
-dbDrop ${CB_DATABASE_NAME}-ngsi10
+dbDrop ${CB_DB_NAME} 01234567890123456789012345678901234567890123456789
+dbDrop ${CB_DB_NAME} ngsi10

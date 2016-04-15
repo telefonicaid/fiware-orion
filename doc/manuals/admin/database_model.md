@@ -71,70 +71,102 @@ Fields:
     of the following fields:
     -   **attrName**: the attribute name that identifies the geographic
         location in the attrs array
-    -   **coords**: a GJSON of type "Point", containing the longitude
-        and latitude, in that order.
-        -   *Note*: you may wonder why the coordinates are stored in the
-            coords duple as longitude-latitude and in the opposite order
-            in the [geo-location
-            API](../user/geolocation.md).
-            This is due to the internal [MongoDB geolocation
-            functionality](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
-            which uses longitude-latitude order. However, other systems
-            closer to users (e.g. Google Maps) use latitude-longitude
-            format, so we have used the latter for the API.
+    -   **coords**: a GJSON representing the location of the entity. See
+        below for more details.
+
+Regarding `location.coords` in can use several formats:
+
+* Representing a point (the one used by NGSIv1 and NGSIv2 geo:point):
+
+```
+{
+  "type": "Point",
+  "coordinates": [ -3.691944, 40.418889 ]
+}
+```
+
+* Representing a line (the one used by NGSIv2 geo:line):
+
+```
+{
+  "type": "LineString",
+  "coordinates": [ [ 10, 0], [0, 10] ]
+}
+```
+
+* Representing a polygon (the one used by NGSIv2 geo:box and NGSIv2 geo:polygon):
+
+```
+{
+  "type": "Polygon",
+  "coordinates": [ [ [ 10, 0], [0, 10], [0, 0], [10, 0] ] ]
+}
+```
+
+* Finally, `location.coords` could hold an arbitrary JSON object, representing a location
+  in [GeoJSON](http://www.macwright.org/2015/03/23/geojson-second-bite.html) format. Arbitrary
+  GeoJSON can be used with the geo:json attribute type and it is up to the user to introduce
+  a valid object. Note that the three above cases are actually GeoJSON representation for
+  "fixed" cases.
+
+Note that coordinate pairs use the longitude-latitude order, which is opposite to the order used
+in the [geo-location API](../user/geolocation.md). This is due to the internal
+[MongoDB geolocation implementation](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
+(which is based in GeoJSON) uses longitude-latitude order. However, other systems closer
+to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the API.
 
 Example document:
 
 ```
- {
-   "_id":
-       "id": "E1",
-       "type": "T1",
-       "servicePath": "/"
-   },
-   "attrs": {
-       "A1": {
-           "type": "TA1",
-           "value": "282",
-           "creDate" : 1389376081,
-           "modDate" : 1389376120,
-           "md" : [
-              { 
-                 "name" : "customMD1",
-                 "type" : "string",
-                 "value" : "AKAKA"
-              },
-              {
-                 "name" : "customMD2",
-                 "type" : "integer",
-                 "value" : "23232"
-              }
-           ]
-       },
-       "A2_ID101": {
-           "type": "TA2",
-           "value": "176",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
-       },
-       "position": {
-           "type": "location",
-           "value": "40.418889, -3.691944",
-           "creDate" : 1389376244,
-           "modDate" : 1389376244
-       }
-   },
-   "attrNames": [ "A1", "A2", "position" ],
-   "creDate": 1389376081,
-   "modDate": 1389376244,
-   "location": {
-       "attrName": "position",
-       "coords": {
-           "type": "Point",
-           "coordinates": [ -3.691944, 40.418889 ]
-       }
-   }
- }
+ {
+   "_id":
+       "id": "E1",
+       "type": "T1",
+       "servicePath": "/"
+   },
+   "attrs": {
+       "A1": {
+           "type": "TA1",
+           "value": "282",
+           "creDate" : 1389376081,
+           "modDate" : 1389376120,
+           "md" : [
+              { 
+                 "name" : "customMD1",
+                 "type" : "string",
+                 "value" : "AKAKA"
+              },
+              {
+                 "name" : "customMD2",
+                 "type" : "integer",
+                 "value" : "23232"
+              }
+           ]
+       },
+       "A2_ID101": {
+           "type": "TA2",
+           "value": "176",
+           "creDate" : 1389376244,
+           "modDate" : 1389376244
+       },
+       "position": {
+           "type": "location",
+           "value": "40.418889, -3.691944",
+           "creDate" : 1389376244,
+           "modDate" : 1389376244
+       }
+   },
+   "attrNames": [ "A1", "A2", "position" ],
+   "creDate": 1389376081,
+   "modDate": 1389376244,
+   "location": {
+       "attrName": "position",
+       "coords": {
+           "type": "Point",
+           "coordinates": [ -3.691944, 40.418889 ]
+       }
+   }
+ }
 ```
 [Top](#top)
 
@@ -178,40 +210,40 @@ Fields:
 Example document:
 
 ```
- {
-   "_id": ObjectId("5149f60cf0075f2fabca43da"),
-   "fwdRegId": "5149f60cf0075f241bca22f1",
-   "expiration": 1360232760,
-   "contextRegistration": [
-       {
-           "entities": [
-               {
-                   "id": "E1",
-                   "type": "T1",
-                   "isPattern": "false"
-               },
-               {
-                   "id": "E2",
-                   "type": "T2",
-                   "isPattern": "false"
-               }
-           ],
-           "attrs": [
-               {
-                   "name": "A1",
-                   "type": "TA1",
-                   "isDomain": "false"
-               },
-               {
-                   "name": "A2",
-                  "type": "TA2",
-                   "isDomain": "true"
-               }
-           ],
-           "providingApplication": "http://foo.bar/notif"
-      },
-  ]
- }
+ {
+   "_id": ObjectId("5149f60cf0075f2fabca43da"),
+   "fwdRegId": "5149f60cf0075f241bca22f1",
+   "expiration": 1360232760,
+   "contextRegistration": [
+       {
+           "entities": [
+               {
+                   "id": "E1",
+                   "type": "T1",
+                   "isPattern": "false"
+               },
+               {
+                   "id": "E2",
+                   "type": "T2",
+                   "isPattern": "false"
+               }
+           ],
+           "attrs": [
+               {
+                   "name": "A1",
+                   "type": "TA1",
+                   "isDomain": "false"
+               },
+               {
+                   "name": "A2",
+                  "type": "TA2",
+                   "isDomain": "true"
+               }
+           ],
+           "providingApplication": "http://foo.bar/notif"
+      },
+  ]
+ }
 ```
 [Top](#top)
 
@@ -228,14 +260,16 @@ Fields:
     queries by subscription IDs are very fast (as there is an automatic
     default index in \_id).
 -   **servicePath**: related with [the service
-    path](../user/service_path.md) functionality.
+    path](../user/service_path.md) functionality. This is the service path
+    associated to the query "encapsulated" by the subscription. Default
+    is `/#`.
 -   **expiration**: this is the timestamp on which the
     subscription expires. This is calculated using the duration
     parameter included in the subscribeContext operation (basically, sum
     "now" and duration) and will be recalculated when an
     updateContextSubscription is received (see [programmers
     guide](../user/duration.md)). For permanent subscriptions (allowed in NGSIv2)
-    it is set to -1.
+    an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
 -   **lastNotification**: the time when last notification was sent. This
     is updated each time a notification is sent, to avoid
     violating throttling.
@@ -244,50 +278,54 @@ Fields:
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type** and **isPattern**.
 -   **attrs**: an array of attribute names (strings) (optional).
--   **conditions**: a list of conditions that trigger notifications. The
-    two different cases currently supported are shown in the example
-    below (we think they're quite straightforward)
+-   **conditions**: a list of conditions that trigger notifications.
+-   **expression**: an expression used to evaluate if notifications has
+    to be sent or not when updates come. It may be composed of the following
+    fields: q, georel, geometry and/or coords (optional)
 -   **count**: the number of notifications sent associated to
-    the subscription.
--   **format**: the format to use to send notification, either "XML" or "JSON".
-    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
+    the subscription.   
+-   **format**: the format to use to send notification, currently "JSON"
+    meaning JSON notifications in NGSIv1 format.
+-   **status**: either `active` (for active subscriptions) or `inactive (for inactive subscriptions).
+-   **description** (optional field): a free text string describing the subscription. Maximum length is 1024.
 
 Example document:
 
 ```
- {
-   "_id": ObjectId("5149fd46f0075f83a4ca0300"),
-   "expiration": 1360236300,
-   "lastNotification": 1360232700,
-   "throttling": 10,
-   "reference": "http://notify.me",
-   "entities": [
-       {
-           "id": "E1",
-           "type": "T1",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-        "A1",
-        "A2"
-   ],
-   "conditions": [
-       {
-           "type": "ONTIMEINTERVAL",
-           "value": 60
-       },
-       {
-           "type": "ONCHANGE",
-           "value": [
-               "A1",
-               "A2"
-           ]
-       }
-   ],
-   "count": 27,
-   "format": "JSON"
- }
+{
+        "_id" : ObjectId("5697d4d123acbf5e794ab031"),
+        "expiration" : NumberLong(1459864800),
+        "reference" : "http://localhost:1234",
+        "servicePath" : "/",
+        "entities" : [
+                {
+                        "id" : ".*",
+                        "type" : "Room",
+                        "isPattern" : "true"
+                }
+        ],
+        "attrs" : [
+                "humidity",
+                "temperature"
+        ],
+        "conditions" : [
+                {
+                        "type" : "ONCHANGE",
+                        "value" : [
+                                "temperature "
+                        ]
+                }
+        ],
+        "expression" : {
+                "q" : "temperature>40",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "JSON",
+        "description": "this is an example subscription",
+        "status" : "active"
+}
 ```
 [Top](#top)
 
@@ -317,35 +355,35 @@ Fields:
     notification sent associated to a given subscription.
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notification, either "XML" or "JSON".
-    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
+-   **format**: the format to use to send notification, currently "JSON"
+    meaning JSON notifications in NGSIv1 format.
 
 Example document:
 
 ```
- {
-   "_id": ObjectId("51756c2220be8dc1b5f415ff"),
-   "expiration": 1360236300,
-   "reference": "`[`http://notify.me`](http://notify.me)`",
-   "entities": [
-       {
-           "id": "E5",
-           "type": "T5",
-           "isPattern": "false"
-       },
-       {
-           "id": "E6",
-           "type": "T6",
-           "isPattern": "false"
-       }
-   ],
-   "attrs": [
-       "A1",
-       "A2"
-   ],
-   "lastNotification" : 1381132312,
-   "count": 42,
-   "format": "JSON"
- }
+ {
+   "_id": ObjectId("51756c2220be8dc1b5f415ff"),
+   "expiration": 1360236300,
+   "reference": "`[`http://notify.me`](http://notify.me)`",
+   "entities": [
+       {
+           "id": "E5",
+           "type": "T5",
+           "isPattern": "false"
+       },
+       {
+           "id": "E6",
+           "type": "T6",
+           "isPattern": "false"
+       }
+   ],
+   "attrs": [
+       "A1",
+       "A2"
+   ],
+   "lastNotification" : 1381132312,
+   "count": 42,
+   "format": "JSON"
+ }
 ```
 [Top](#top)

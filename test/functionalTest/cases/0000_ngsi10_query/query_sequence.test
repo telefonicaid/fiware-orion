@@ -30,1036 +30,1052 @@ brokerStart CB
 --SHELL--
 echo "1: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "pressure",
+    "lightstatus"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 sleep 1.1
 
 echo "2: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "3: ++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Room" isPattern="false">
-        <id>OfficeRoom</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue>12</contextValue>
-          </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-    <contextElement>
-      <entityId type="Room" isPattern="false">
-        <id>ConferenceRoom</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue>14</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "12"
+        }
+      ]
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "14"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "4: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "pressure",
+    "lightstatus"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "5: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "6: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "pressure",
+    "lightstatus"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "7: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "8: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "9: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "pressure",
+    "lightstatus"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "10: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>kOfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "kOfficeRoom"
+    }
+  ],
+  "attributes": [
+    "pressure",
+    "lightstatus",
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "11: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="kRoom" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "kRoom",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "pressure",
+    "lightstatus",
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "12: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [ ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "13: ++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Room" isPattern="false">
-        <id>OfficeRoom</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>clima</type>
-          <contextValue>p2300</contextValue>
-        </contextAttribute>
-        <contextAttribute>
-          <name>lightstatus</name>
-          <type>light</type>
-          <contextValue>L23</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "pressure",
+          "type": "clima",
+          "value": "p2300"
+        },
+        {
+          "name": "lightstatus",
+          "type": "light",
+          "value": "L23"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "14: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-  </attributeList>  
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [ ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "15: ++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-              <name>pressure</name>
-              <type>clima</type>
-              <contextValue>p23</contextValue>
-            </contextAttribute>
-            <contextAttribute>
-              <name>lightstatus</name>
-              <type>light</type>
-              <contextValue>L23</contextValue>
-            </contextAttribute>
-          </contextAttributeList>
-        </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "pressure",
+          "type": "clima",
+          "value": "p23"
+        },
+        {
+          "name": "lightstatus",
+          "type": "light",
+          "value": "L23"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "16: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [ ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 sleep 1.1
 
 echo "17: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <entityId type="Room" isPattern="false">
-          <id>BadRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "BadRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "18.1: ++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom2</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-              <name>temperature</name>
-              <type>degree</type>
-              <contextValue>14</contextValue>
-            </contextAttribute>
-          </contextAttributeList>
-        </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom2",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "14"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 sleep 1.1
 
 echo "18.2: ++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom2</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-              <name>temperature</name>
-              <type>degree</type>
-              <contextValue>12</contextValue>
-            </contextAttribute>
-          </contextAttributeList>
-        </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom2",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "12"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "19: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="true">
-          <id>ConferenceRoom.*</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "true",
+      "id": "ConferenceRoom.*"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "20: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="true">
-          <id>ConferenceRoom.*</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "true",
+      "id": "ConferenceRoom.*"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "pressure",
+    "lightstatus"
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1186
-Content-Type: application/xml
+Content-Length: 776
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 640
-Content-Type: application/xml
+Content-Length: 404
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "12"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 644
-Content-Type: application/xml
+Content-Length: 408
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "14"
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1188
-Content-Type: application/xml
+Content-Length: 780
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "12"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "14"
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 640
-Content-Type: application/xml
+Content-Length: 404
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "12"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 13: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 805
-Content-Type: application/xml
+Content-Length: 514
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 14: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 983
-Content-Type: application/xml
+Content-Length: 641
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": "L23"
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": "p2300"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "12"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 15: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 809
-Content-Type: application/xml
+Content-Length: 518
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 16: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1872
-Content-Type: application/xml
+Content-Length: 1252
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p23</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": "L23"
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": "p2300"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "12"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": "L23"
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": "p23"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "14"
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 17: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 640
-Content-Type: application/xml
+Content-Length: 404
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "12"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 18.1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 645
-Content-Type: application/xml
+Content-Length: 407
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 18.2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 641
-Content-Type: application/xml
+Content-Length: 403
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 19: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1193
-Content-Type: application/xml
+Content-Length: 785
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "14"
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "14"
+                    }
+                ],
+                "id": "ConferenceRoom2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 20: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1534
-Content-Type: application/xml
+Content-Length: 1020
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p23</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": "L23"
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": "p23"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "14"
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "14"
+                    }
+                ],
+                "id": "ConferenceRoom2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

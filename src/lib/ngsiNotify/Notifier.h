@@ -36,20 +36,22 @@
 
 class Notifier {
 
-private:
-    /* This field is used to store the list of existing thread, ordered by subscrition ID
-     * (the key in the map). Note that each subscription can include several threads (one
-     * for each ONTIMEINTERVAL notific contition) so we are using a multimap */
-    std::multimap<std::string, ThreadData> threadsMap;
-
 public:
    
     virtual ~Notifier(void);
 
-    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format);
-    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr, const std::string& url, const std::string& tenant, Format format = XML);
-    virtual void createIntervalThread(const std::string& subId, int interval, const std::string& tenant);
-    virtual void destroyOntimeIntervalThreads(const std::string& subId);
+    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr,
+                                          const std::string&    url,
+                                          const std::string&    tenant,
+                                          const std::string&    xauthToken,
+                                          const std::string&    fiwareCorrelator,
+                                          Format                format   = JSON);
+
+    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
+                                                      const std::string&                url,
+                                                      const std::string&                tenant,
+                                                      const std::string&                fiwareCorrelator,
+                                                      Format                            format           = JSON);
 };
 
 #endif

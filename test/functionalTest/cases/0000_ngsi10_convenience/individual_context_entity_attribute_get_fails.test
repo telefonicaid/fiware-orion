@@ -29,24 +29,23 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. get an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes/attr01"
+orionCurl --url "/v1/contextEntities/entity01/attributes/attr01" --json
 
 --REGEXPECT--
 +++++ 1. get an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 258
-Content-Type: application/xml
+Content-Length: 136
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<contextAttributeResponse>
-  <contextAttributeList/>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: /entity01/</details>
-  </statusCode>
-</contextAttributeResponse>
+{
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /entity01/",
+        "reasonPhrase": "No context element found"
+    }
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

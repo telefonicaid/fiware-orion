@@ -26,7 +26,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
+#include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/ParseData.h"
@@ -35,13 +37,13 @@
 #include "rest/ConnectionInfo.h"
 
 
+
 namespace orion
 {
 /* ****************************************************************************
 *
 * compoundValueStart - 
 *
-* As commented in xmlParse.h
 * This function is called when the first compound node is encountered, so not
 * only must the root be created, but also the first node of the compound tree
 * must be taken care of. This is done by calling compoundValueMiddle.
@@ -82,11 +84,6 @@ void compoundValueStart
   //
   if (ciP->parseDataP->lastContextAttribute == NULL)
     orionExitFunction(1, "No pointer to last ContextAttribute");
-
-  if (ciP->parseDataP->lastContextAttribute->typeFromXmlAttribute == "vector")
-  {
-    ciP->compoundValueP->valueType = orion::ValueTypeVector;
-  }
 
   ciP->compoundValueVector.push_back(ciP->compoundValueP);
   LM_T(LmtCompoundValueAdd, ("Created new toplevel element"));
@@ -151,12 +148,12 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   {
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = std::string("compound value error: ") + status;
-    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
+    alarmMgr.badInput(clientIp, ciP->answer);
   }
 
   //
   // Give the root pointer of this Compound to the active ContextAttribute
-  // lastContextAttribute is set in the XML parsing routines, to point at the
+  // lastContextAttribute is set in the JSON v1 parsing routines, to point at the
   // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
   // owner of this compound value tree.
   //

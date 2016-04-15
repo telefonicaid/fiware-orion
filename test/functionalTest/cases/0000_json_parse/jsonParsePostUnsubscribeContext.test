@@ -55,7 +55,7 @@ payload='{
     "occupancy",
     "lightstatus"
   ],
-  "reference": "127.0.0.1",
+  "reference": "http://127.0.0.1",
   "duration": "P5Y",
   "restriction": {
     "attributeExpression": "testRestriction",
@@ -100,6 +100,7 @@ echo "4: ***********************************"
 HTTP/1.1 200 OK
 Content-Length: 206
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -114,6 +115,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 134
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -127,6 +129,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 122
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

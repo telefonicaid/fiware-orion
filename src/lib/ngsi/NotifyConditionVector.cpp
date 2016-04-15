@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/tag.h"
@@ -36,9 +37,19 @@
 
 /* ****************************************************************************
 *
+* NotifyConditionVector::NotifyConditionVector - 
+*/
+NotifyConditionVector::NotifyConditionVector()
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * NotifyConditionVector::render -
 */
-std::string NotifyConditionVector::render(Format format, const std::string& indent, bool comma)
+std::string NotifyConditionVector::render(const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "notifyConditions";
@@ -48,12 +59,12 @@ std::string NotifyConditionVector::render(Format format, const std::string& inde
     return "";
   }
 
-  out += startTag(indent, tag, tag, format, true, true);
+  out += startTag2(indent, tag, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(indent + "  ", ix != vec.size() - 1);
   }
-  out += endTag(indent, tag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -67,7 +78,6 @@ std::string NotifyConditionVector::render(Format format, const std::string& inde
 std::string NotifyConditionVector::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -77,7 +87,7 @@ std::string NotifyConditionVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(requestType, indent, predetectedError, counter)) != "OK")
     {
       return res;
     }
@@ -94,7 +104,9 @@ std::string NotifyConditionVector::check
 */
 void NotifyConditionVector::present(const std::string& indent)
 {
-  LM_F(("%s%lu NotifyConditions", indent.c_str(), (uint64_t) vec.size()));
+  LM_T(LmtPresent, ("%s%lu NotifyConditions", 
+		    indent.c_str(), 
+		    (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -117,11 +129,15 @@ void NotifyConditionVector::push_back(NotifyCondition* item)
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::get -
+* NotifyConditionVector::operator[] -
 */
-NotifyCondition* NotifyConditionVector::get(int ix)
+NotifyCondition* NotifyConditionVector::operator[] (unsigned int ix) const
 {
-  return vec[ix];
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 

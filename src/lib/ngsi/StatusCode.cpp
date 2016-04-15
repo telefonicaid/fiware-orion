@@ -28,11 +28,13 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
 #include "common/Format.h"
+#include "common/limits.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -49,7 +51,7 @@ StatusCode::StatusCode()
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = "statusCode";
+  keyName      = "statusCode";
 }
 
 
@@ -58,12 +60,12 @@ StatusCode::StatusCode()
 *
 * StatusCode::StatusCode -
 */
-StatusCode::StatusCode(const std::string& _tag)
+StatusCode::StatusCode(const std::string& _keyName)
 {
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = _tag;
+  keyName      = _keyName;
 }
 
 
@@ -72,12 +74,12 @@ StatusCode::StatusCode(const std::string& _tag)
 *
 * StatusCode::StatusCode -
 */
-StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag)
+StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName)
 {
   code          = _code;
   reasonPhrase  = httpStatusCodeString(code);
   details       = _details;
-  tag           = _tag;
+  keyName       = _keyName;
 }
 
 
@@ -86,7 +88,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 *
 * StatusCode::render -
 */
-std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showTag)
+std::string StatusCode::render(const std::string& indent, bool comma, bool showKey)
 {
   std::string  out  = "";
 
@@ -106,16 +108,16 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, tag, format, showTag);
-  out += valueTag(indent + "  ", "code", code, format, true);
-  out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
+  out += startTag1(indent, keyName, showKey);
+  out += valueTag(indent + "  ", "code", code, true);
+  out += valueTag1(indent + "  ", "reasonPhrase", reasonPhrase, details != "");
 
   if (details != "")
   {
-    out += valueTag(indent + "  ", "details", details, format, false);
+    out += valueTag1(indent + "  ", "details", details, false);
   }
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, comma);
 
   return out;
 }
@@ -142,7 +144,7 @@ std::string StatusCode::toJson(bool isLastElement)
     free(s);
   }
 
-  char codeV[16];
+  char codeV[STRING_SIZE_FOR_INT];
 
   snprintf(codeV, sizeof(codeV), "%d", code);
 
@@ -238,7 +240,6 @@ void StatusCode::fill(const struct UpdateContextResponse& ucrs)
 std::string StatusCode::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -265,10 +266,18 @@ std::string StatusCode::check
 */
 void StatusCode::present(const std::string& indent)
 {
-  LM_F(("%s%s:", indent.c_str(), tag.c_str()));
-  LM_F(("%s  Code:            %d",   indent.c_str(), code));
-  LM_F(("%s  ReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str()));
-  LM_F(("%s  Detail:          '%s'", indent.c_str(), details.c_str()));
+  LM_T(LmtPresent, ("%s%s:", 
+		    indent.c_str(), 
+        keyName.c_str()));
+  LM_T(LmtPresent, ("%s  Code:            %d",   
+		    indent.c_str(), 
+		    code));
+  LM_T(LmtPresent, ("%s  ReasonPhrase:    '%s'", 
+		    indent.c_str(), 
+		    reasonPhrase.c_str()));
+  LM_T(LmtPresent, ("%s  Detail:          '%s'", 
+		    indent.c_str(), 
+		    details.c_str()));
 }
 
 
@@ -282,16 +291,16 @@ void StatusCode::release(void)
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  tag          = "statusCode";
+  keyName      = "statusCode";
 }
 
 
 
 /* ****************************************************************************
 *
-* tagSet -
+* keyNameSet -
 */
-void StatusCode::tagSet(const std::string& _tag)
+void StatusCode::keyNameSet(const std::string& _keyName)
 {
-  tag = _tag;
+  keyName = _keyName;
 }

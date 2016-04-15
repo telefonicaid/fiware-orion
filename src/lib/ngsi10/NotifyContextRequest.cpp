@@ -48,11 +48,11 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   //   The only doubt here if whether originator should end in a comma.
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
-  out += startTag(indent, tag, ciP->outFormat, false);
-  out += subscriptionId.render(NotifyContext, ciP->outFormat, indent + "  ", true);
-  out += originator.render(ciP->outFormat, indent  + "  ", contextElementResponseVectorRendered);
+  out += startTag1(indent, tag, false);
+  out += subscriptionId.render(NotifyContext, indent + "  ", true);
+  out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
   out += contextElementResponseVector.render(ciP, NotifyContext, indent  + "  ", false);
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent);
 
   return out;
 }
@@ -72,9 +72,9 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))               != "OK") ||
-           ((res = originator.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))                   != "OK") ||
-           ((res = contextElementResponseVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK"))
+  else if (((res = subscriptionId.check(QueryContext, indent, predetectedError, 0))               != "OK") ||
+           ((res = originator.check(QueryContext, indent, predetectedError, 0))                   != "OK") ||
+           ((res = contextElementResponseVector.check(ciP, QueryContext, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
@@ -83,7 +83,7 @@ std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType request
     return "OK";
   }
 
-  return response.render(NotifyContext, ciP->outFormat, indent);
+  return response.render(NotifyContext, indent);
 }
 
 

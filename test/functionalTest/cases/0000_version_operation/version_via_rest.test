@@ -29,34 +29,15 @@ brokerStart CB
 
 --SHELL--
 # Note that we are assuming a fixed value of 0 for days, hours and minutes, assuming that this test
-# is executed in less than one minute
 echo "1: +++++++++++++++++++++++++++++"
-orionCurl --url "/version"
-
-
-echo "2: +++++++++++++++++++++++++++++"
 orionCurl --url "/version" --json
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <version>REGEX(.*)</version>
-  <uptime>REGEX(.*)</uptime>
-  <git_hash>REGEX(([0-9a-f]{40}|nogitversion))</git_hash>
-  <compile_time>REGEX(.*)</compile_time>
-  <compiled_by>REGEX(.*)</compiled_by>
-  <compiled_in>REGEX(.*)</compiled_in>
-</orion>
-2: +++++++++++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

@@ -1,0 +1,340 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Cache Throttling and Expiration After Sub-Update once the subscription has expired
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 38,101 IPv4 -multiservice -subCacheIval 5
+accumulatorStart
+
+--SHELL--
+
+#
+# 00. Create subscription for s0.* entities, attribute A, w/o tenant, with 'bad' duration and throttling
+# 01. Update the subscription, after it has expired, now setting duration to 10 secs and throttling 4 secs
+# 02. Create entity s01 w/ attr A w/o tenant
+# 03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+# 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+# 05. Wait 5 secs so that the throttling of 4 secs is OK
+# 06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
+# 07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+# 08. Wait 6 secs more, to make subscription expire
+# 09. Modify entity s01 w/ attr A w/o tenant - no notification as expired
+# 10. Dump accumulator - see two notifications
+#
+
+
+echo "00. Create subscription for s0.* entities, attribute A, w/o tenant, with 'bad' duration and throttling"
+echo "======================================================================================================"
+payload='{
+  "entities": [
+    {
+      "isPattern": "true",
+      "id": "s0.*"
+    }
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "PT1S",
+  "throttling": "P1M",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB_ID=$(echo "$_response" | grep subscriptionId |  awk -F ':' '{gsub(/[ \t",]+/, "", $2); print $2}' )
+echo
+echo
+
+
+echo "01. Update the subscription, after it has expired, now setting duration to 10 secs and throttling 4 secs"
+echo "========================================================================================================"
+sleep 2
+payload='{
+  "subscriptionId": "'$SUB_ID'",
+  "duration": "PT10S",
+  "throttling": "PT4S",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+echo
+echo
+
+
+
+echo "02. Create entity s01 w/ attr A w/o tenant"
+echo "=========================================="
+payload='{
+  "id": "s01",
+  "A": "03. Creation"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
+echo "============================================================================"
+payload='{ "A": "04. notification lost by throttling" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
+echo "============================================================================"
+payload='{ "A": "05. notification lost by throttling" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Wait 5 secs so that the throttling of 4 secs is OK"
+echo "======================================================"
+if [ "$VALGRIND" == "" ]
+then
+  sleep 5
+else
+  sleep 4
+fi
+echo
+echo
+
+
+echo "06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling"
+echo "================================================================================"
+payload='{ "A": "07. Modification" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
+echo "============================================================================"
+payload='{ "A": "08. notification lost by throttling" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Wait 6 secs more, to make subscription expire"
+echo "================================================="
+sleep 6
+echo
+echo
+
+
+echo "09. Modify entity s01 w/ attr A w/o tenant - no notification as expired"
+echo "======================================================================="
+payload='{ "A": "10. no notification as expired" }'
+orionCurl --url '/v2/entities/s01?options=keyValues' -X PUT --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Dump accumulator - see two notifications"
+echo "============================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+00. Create subscription for s0.* entities, attribute A, w/o tenant, with 'bad' duration and throttling
+======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1S",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "P1M"
+    }
+}
+
+
+01. Update the subscription, after it has expired, now setting duration to 10 secs and throttling 4 secs
+========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT10S",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT4S"
+    }
+}
+
+
+02. Create entity s01 w/ attr A w/o tenant
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/s01?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Wait 5 secs so that the throttling of 4 secs is OK
+======================================================
+
+
+06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
+================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
+============================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+08. Wait 6 secs more, to make subscription expire
+=================================================
+
+
+09. Modify entity s01 w/ attr A w/o tenant - no notification as expired
+=======================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Dump accumulator - see two notifications
+============================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 474
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "s01",
+        "attributes" : [
+          {
+            "name" : "A",
+            "type" : "none",
+            "value" : "03. Creation"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 478
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "s01",
+        "attributes" : [
+          {
+            "name" : "A",
+            "type" : "none",
+            "value" : "07. Modification"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

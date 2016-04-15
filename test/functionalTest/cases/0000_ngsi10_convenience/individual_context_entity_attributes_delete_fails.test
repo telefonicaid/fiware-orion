@@ -29,21 +29,21 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. delete an entity +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes" -X "DELETE"
+orionCurl --url "/v1/contextEntities/entity01/attributes" -X "DELETE" --json
 
 --REGEXPECT--
 +++++ 1. delete an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 132
-Content-Type: application/xml
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>entity01</details>
-</statusCode>
+{
+    "code": "404",
+    "details": "entity01",
+    "reasonPhrase": "No context element found"
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

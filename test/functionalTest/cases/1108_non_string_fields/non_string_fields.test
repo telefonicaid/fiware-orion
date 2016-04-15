@@ -81,7 +81,7 @@ echo "======================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "meta": { "type": false, "value": "STRING" } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": false, "value": "STRING" } } }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -93,7 +93,7 @@ echo "========================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "meta": { "type": "md", "value": [ 1, 2, 3 ] } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": [ 1, 2, 3 ] } } }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -105,7 +105,7 @@ echo "===================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "meta": { "type": "md", "value": 3, "invalid": true } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": 3, "invalid": true } } }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -118,11 +118,12 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 70
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity id",
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -131,11 +132,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 72
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity type",
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -144,11 +146,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for attribute type",
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -157,11 +160,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for attribute metadata type",
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -170,11 +174,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 85
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for attribute metadata value",
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -183,11 +188,12 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 80
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "description": "invalid JSON field for attribute metadata",
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 

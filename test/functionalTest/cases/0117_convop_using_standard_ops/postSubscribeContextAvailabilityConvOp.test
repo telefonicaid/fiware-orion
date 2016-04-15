@@ -36,23 +36,21 @@ accumulatorStart
 # 03. Dump accumulator to see NOTHING
 # 04. Register E1/T1
 # 05. Dump accumulator to see E1/T1
-# 06. Subscribe to E1/T1, forcing XML notifications (POST /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML)
-# 07. Dump accumulator to see E1/T1, one in JSON, one in XML
 #
 # FIXME: Once NGSI9 Subscriptions implement Restrictions 'exist=entity::type' and '!exist=entity::type'
-# 08. Subscribe to E2/<empty> (POST /v1/registry/contextAvailabilitySubscriptions?!exist=entity::type)
-# 09. Register E2/<empty>
-# 10. Register E2/T1
-# 11. Dump accumulator to see 'E2/<empty>' only
-# 12. Reset accumulator
-# 13. Subscribe to E2/<non-empty>
-# 14. Dump accumulator to see 'E2/T1' only
-# 15. Reset accumulator
-# 16. Subscribe to E2/<non-empty> (POST /v1/registry/contextAvailabilitySubscriptions?exist=entity::type)
-# 17. Dump accumulator to see 'E2/T1' only
-# 18. Reset accumulator
-# 19. Update E2/T1
-# 20. Dump accumulator to see one notification of 'E2/T1' only
+# 06. Subscribe to E2/<empty> (POST /v1/registry/contextAvailabilitySubscriptions?!exist=entity::type)
+# 07. Register E2/<empty>
+# 08. Register E2/T1
+# 09. Dump accumulator to see 'E2/<empty>' only
+# 10. Reset accumulator
+# 11. Subscribe to E2/<non-empty>
+# 12. Dump accumulator to see 'E2/T1' only
+# 13. Reset accumulator
+# 14. Subscribe to E2/<non-empty> (POST /v1/registry/contextAvailabilitySubscriptions?exist=entity::type)
+# 15. Dump accumulator to see 'E2/T1' only
+# 16. Reset accumulator
+# 17. Update E2/T1
+# 18. Dump accumulator to see one notification of 'E2/T1' only
 #
 
 echo "01. Subscribe to E1/T1 (POST /v1/registry/contextAvailabilitySubscriptions)"
@@ -142,36 +140,13 @@ echo
 echo
 
 
-echo "06. Subscribe to E1/T1, forcing XML notifications (POST /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML)"
-echo "======================================================================================================================="
-payload='{
-  "entities": [
-    {
-      "id":   "E1",
-      "type": "T1"
-    }
-  ],
-  "reference": "http://localhost:'$LISTENER_PORT'/notify",
-  "duration": "P5Y"
-}'
-orionCurl --url /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML --payload "$payload" --json
-echo
-echo
-
-
-echo "07. Dump accumulator to see E1/T1, one in JSON, one in XML"
-echo "=========================================================="
-accumulatorDump
-echo
-echo
-
-
 --REGEXPECT--
 01. Subscribe to E1/T1 (POST /v1/registry/contextAvailabilitySubscriptions)
 ===========================================================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -185,6 +160,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -202,6 +178,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -216,8 +193,9 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 497
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
+Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -243,85 +221,6 @@ Content-Type: application/json; charset=utf-8
     }
   ]
 }
-=======================================
-
-
-06. Subscribe to E1/T1, forcing XML notifications (POST /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML)
-=======================================================================================================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P5Y", 
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-
-
-07. Dump accumulator to see E1/T1, one in JSON, one in XML
-==========================================================
-POST http://localhost:REGEX(\d+)/notify
-Content-Length: 497
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/json; charset=utf-8
-
-{
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "contextRegistrationResponses" : [
-    {
-      "contextRegistration" : {
-        "entities" : [
-          {
-            "type" : "T1",
-            "isPattern" : "false",
-            "id" : "E1"
-          }
-        ],
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "string",
-            "isDomain" : "false"
-          }
-        ],
-        "providingApplication" : "http://kz.tid.es/abc"
-      }
-    }
-  ]
-}
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Content-Length: 815
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
-
-<notifyContextAvailabilityRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="T1" isPattern="false">
-            <id>E1</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>A1</name>
-            <type>string</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://kz.tid.es/abc</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
-</notifyContextAvailabilityRequest>
 =======================================
 
 

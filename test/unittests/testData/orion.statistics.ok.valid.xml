@@ -1,3 +1,3 @@
 <orion>
-  <message>All statistics counter reset</message>
+  <message>XML not supported in statistics operations, use JSON</message>
 </orion>

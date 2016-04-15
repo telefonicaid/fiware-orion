@@ -1,0 +1,1518 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSIv2 geo-queries as payload in NGSIv1 queryContext
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create point A (5, 5)
+# 02. Create point B (9, 5)
+# 03. Create point C (15, 5)
+# 04. Create point D (15, 15)
+# 05. Create point E (-4, 10)
+# 06. Query coveredBy point (5, 5) -> not supported
+# 07. Query coveredBy line (5, 5) (9, 5) -> not supported
+# 08. Query coveredBy box (-5, 0) (6, 11) -> A, E
+# 09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+# 10. Query intersects point (5, 5) -> A
+# 11. Query intersects line (5, 5) (9, 5) -> A, B
+# 12. Query intersects box (-5, 0) (6, 11) -> A, E
+# 13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+# 14. Query disjoint point (5, 5) -> B, C, D, E
+# 15. Query disjoint line (5, 5) (9, 5) -> C, D, E
+# 16. Query disjoint box (-5, 0) (6, 11) -> B, C, D
+# 17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
+# 18. Query equals point (15, 15) -> D
+# 19. Query equals line (5, 5) (9, 5) -> none
+# 20. Query equals box (-5, 0) (6, 11) -> none
+# 21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none
+#
+
+echo "01. Create point A (5, 5)"
+echo "========================="
+payload='{
+  "id": "A",
+  "type": "T",
+  "location": {
+    "value": "5, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Create point B (9, 5)"
+echo "========================="
+payload='{
+  "id": "B",
+  "type": "T",
+  "location": {
+    "value": "9, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Create point C (15, 5)"
+echo "=========================="
+payload='{
+  "id": "C",
+  "type": "T",
+  "location": {
+    "value": "15, 5",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Create point D (15, 15)"
+echo "==========================="
+payload='{
+  "id": "D",
+  "type": "T",
+  "location": {
+    "value": "15, 15",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Create point E (-4, 10)"
+echo "==========================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "location": {
+    "value": "-4, 10",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Query coveredBy point (5, 5) -> not supported"
+echo "================================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "coveredBy" ],
+        "geometry": "point",
+        "coords": [ [5, 5] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Query coveredBy line (5, 5) (9, 5) -> not supported"
+echo "======================================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "coveredBy" ],
+        "geometry": "line",
+        "coords": [ [5,5], [9, 5] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Query coveredBy box (-5, 0) (6, 11) -> A, E"
+echo "==============================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "coveredBy" ],
+        "geometry": "box",
+        "coords": [ [-5, 0], [6, 11] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
+echo "============================================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "coveredBy" ],
+        "geometry": "polygon",
+        "coords": [ [0, 0], [24, 0], [0, 20], [0, 0] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Query intersects point (5, 5) -> A"
+echo "======================================"
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "intersects" ],
+        "geometry": "point",
+        "coords": [ [5, 5] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Query intersects line (5, 5) (9, 5) -> A, B"
+echo "==============================================="
+#orionCurl --url '/v2/entities?georel=&geometry=line&coords=' --json
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "intersects" ],
+        "geometry": "line",
+        "coords": [ [5, 5], [9, 5] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "12. Query intersects box (-5, 0) (6, 11) -> A, E"
+echo "================================================"
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "intersects" ],
+        "geometry": "box",
+        "coords": [ [-5, 0], [6, 11] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C"
+echo "=============================================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "intersects" ],
+        "geometry": "polygon",
+        "coords": [ [0, 0], [24, 0], [0, 20], [0, 0] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "14. Query disjoint point (5, 5) -> B, C, D, E"
+echo "============================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "disjoint" ],
+        "geometry": "point",
+        "coords": [ [5, 5] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "15. Query disjoint line (5, 5) (9, 5) -> C, D, E"
+echo "================================================"
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "disjoint" ],
+        "geometry": "line",
+        "coords": [ [5, 5], [9, 5] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "16. Query disjoint box (-5, 0) (6, 11) -> B, C, D"
+echo "================================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "disjoint" ],
+        "geometry": "box",
+        "coords": [ [-5, 0], [6, 11] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E"
+echo "========================================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "disjoint" ],
+        "geometry": "polygon",
+        "coords": [ [0, 0], [24, 0], [0, 20], [0, 0] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "18. Query equals point (15, 15) -> D"
+echo "===================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "equals" ],
+        "geometry": "point",
+        "coords": [ [15, 15] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "19. Query equals line (5, 5) (9, 5) -> none"
+echo "==========================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "equals" ],
+        "geometry": "line",
+        "coords": [ [5, 5], [9, 5] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "20. Query equals box (-5, 0) (6, 11) -> none"
+echo "============================================"
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "equals" ],
+        "geometry": "box",
+        "coords": [ [-5, 0], [6, 11] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none"
+echo "======================================================="
+payload='{
+  "entities": [
+  {
+    "type": "T",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location::NGSIv2",
+      "value" : {
+        "georel": [ "equals" ],
+        "geometry": "polygon",
+        "coords": [ [0, 0], [24, 0], [0, 20], [0, 0] ]
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+--REGEXPECT--
+01. Create point A (5, 5)
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/A?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Create point B (9, 5)
+=========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/B?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. Create point C (15, 5)
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/C?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. Create point D (15, 15)
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/D?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. Create point E (-4, 10)
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. Query coveredBy point (5, 5) -> not supported
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 173
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "Query not supported: point geometry cannot be used with coveredBy georel",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+07. Query coveredBy line (5, 5) (9, 5) -> not supported
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 172
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400",
+        "details": "Query not supported: line geometry cannot be used with coveredBy georel",
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+08. Query coveredBy box (-5, 0) (6, 11) -> A, E
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "-4, 10"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 1662
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "9, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 5"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Query intersects point (5, 5) -> A
+======================================
+HTTP/1.1 200 OK
+Content-Length: 575
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+11. Query intersects line (5, 5) (9, 5) -> A, B
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 1118
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "9, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+12. Query intersects box (-5, 0) (6, 11) -> A, E
+================================================
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "-4, 10"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 1662
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "9, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 5"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+14. Query disjoint point (5, 5) -> B, C, D, E
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 2209
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "9, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 5"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 15"
+                    }
+                ],
+                "id": "D",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "-4, 10"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+15. Query disjoint line (5, 5) (9, 5) -> C, D, E
+================================================
+HTTP/1.1 200 OK
+Content-Length: 1666
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 5"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 15"
+                    }
+                ],
+                "id": "D",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "-4, 10"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+16. Query disjoint box (-5, 0) (6, 11) -> B, C, D
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 1664
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "9, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 5"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 15"
+                    }
+                ],
+                "id": "D",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 1122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 15"
+                    }
+                ],
+                "id": "D",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "-4, 10"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+18. Query equals point (15, 15) -> D
+====================================
+HTTP/1.1 200 OK
+Content-Length: 577
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WGS84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "geo:point",
+                        "value": "15, 15"
+                    }
+                ],
+                "id": "D",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+19. Query equals line (5, 5) (9, 5) -> none
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+20. Query equals box (-5, 0) (6, 11) -> none
+============================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

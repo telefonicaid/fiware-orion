@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. Modify non-existing entity E1"
 echo "================================="
 payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -55,8 +55,8 @@ echo
 
 echo "03. Create E1"
 echo "============="
-payload='{ "attr1": 3 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+payload='{ "id": "E1", "attr1": 3 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -71,7 +71,7 @@ echo
 echo "05. Modify E1"
 echo "============="
 payload='{ "attr1": 5 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -89,6 +89,7 @@ echo
 HTTP/1.1 404 Not Found
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -102,10 +103,11 @@ Date: REGEX(.*)
 HTTP/1.1 404 Not Found
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "The requested entity has not been found. Check type and id", 
+    "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
 }
 
@@ -114,7 +116,8 @@ Date: REGEX(.*)
 =============
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -122,13 +125,19 @@ Date: REGEX(.*)
 04. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 3.0, 
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 3
+    },
+    "id": "E1",
+    "type": "none"
 }
 
 
@@ -136,6 +145,7 @@ Date: REGEX(.*)
 =============
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -143,13 +153,19 @@ Date: REGEX(.*)
 06. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 5.0, 
-    "id": "E1"
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 5
+    },
+    "id": "E1",
+    "type": "none"
 }
 
 

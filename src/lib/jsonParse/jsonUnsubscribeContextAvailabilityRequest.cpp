@@ -88,7 +88,7 @@ void jsonUcarRelease(ParseData* parseDataP)
 */
 std::string jsonUcarCheck(ParseData* parseData, ConnectionInfo* ciP)
 {
-  return parseData->ucar.res.check(UnsubscribeContext, ciP->outFormat, "", parseData->errorString, 0);
+  return parseData->ucar.res.check(UnsubscribeContext, "", parseData->errorString, 0);
 }
 
 
@@ -99,10 +99,10 @@ std::string jsonUcarCheck(ParseData* parseData, ConnectionInfo* ciP)
 */
 void jsonUcarPresent(ParseData* parseDataP)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
     return;
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
 
   parseDataP->ucar.res.subscriptionId.present("");
 }

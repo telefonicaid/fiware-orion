@@ -40,11 +40,11 @@ payload='{
   "id": "E1",
   "type": "T1",
   "attr01": {
-    "type": "Compound Object",
+    "type": "Compound-Object",
     "value": { "a":"1", "b":2, "c": true }
   },
   "attr02": {
-    "type": "Compound Vector",
+    "type": "Compound-Vector",
     "value":  [ "a", "b", "c" ]
   }
 }'
@@ -65,7 +65,8 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -73,28 +74,31 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 157
+Content-Length: 178
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "attr01": {
-        "type": "Compound Object", 
+        "metadata": {},
+        "type": "Compound-Object",
         "value": {
-            "a": "1", 
-            "b": 2.0, 
+            "a": "1",
+            "b": 2,
             "c": true
         }
-    }, 
+    },
     "attr02": {
-        "type": "Compound Vector", 
+        "metadata": {},
+        "type": "Compound-Vector",
         "value": [
-            "a", 
-            "b", 
+            "a",
+            "b",
             "c"
         ]
-    }, 
-    "id": "E1", 
+    },
+    "id": "E1",
     "type": "T1"
 }
 

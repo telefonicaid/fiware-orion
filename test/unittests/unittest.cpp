@@ -26,7 +26,7 @@
 
 #include "unittest.h"
 #include "testInit.h"
-#include "mongoBackend/mongoSubCache.h"
+#include "cache/subCache.h"
 
 
 
@@ -69,9 +69,9 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
-* servicePathV - 
+* options -
 */
-std::vector<std::string> servicePathV;
+std::map<std::string, bool> options;
 
  
 
@@ -123,9 +123,8 @@ void utInit(void)
 
   //
   // URI parameters used for unit testing
-  //   Default mime type for notifications: application/xml
+  //   Default mime type for notifications: application/json
   //
-  uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
   uriParams[URI_PARAM_PAGINATION_OFFSET]   = DEFAULT_PAGINATION_OFFSET;
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = DEFAULT_PAGINATION_LIMIT;
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = DEFAULT_PAGINATION_DETAILS;
@@ -135,9 +134,10 @@ void utInit(void)
   // Resetting servicePathVector
   //
   servicePathVector.clear();
+  servicePathVector.push_back("");
 
-  // Init subs cache (this initialization is overriden in test that use csubs)
-  mongoSubCacheInit();
+  // Init subs cache (this initialization is overridden in tests that use csubs)
+  subCacheInit();
 }
 
 

@@ -67,11 +67,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
   LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
 
-  if (answer == "")
-    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
-  else
-    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
-
+  response = MHD_create_response_from_buffer(answer.length(), (void*) answer.c_str(), MHD_RESPMEM_MUST_COPY);
   if (!response)
   {
     LM_E(("Runtime Error (MHD_create_response_from_buffer FAILED)"));
@@ -85,11 +81,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
 
   if (answer != "")
   {
-    if (ciP->outFormat == XML)
-    {
-      MHD_add_response_header(response, "Content-Type", "application/xml");
-    }
-    else if (ciP->outFormat == JSON)
+    if (ciP->outFormat == JSON)
     {
       MHD_add_response_header(response, "Content-Type", "application/json");
     }
@@ -98,15 +90,15 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       MHD_add_response_header(response, "Content-Type", "text/plain");
     }
 
-    // At the present version, CORS is support only for GET requests
+    // At the present version, CORS is supported only for GET requests
     if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
     {
-      // If any origin is allowed the header is sent always with "any" as value
+      // If any origin is allowed, the header is sent always with "any" as value
       if (strcmp(restAllowedOrigin, "__ALL") == 0)
       {
         MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
       }
-      // If an specific origin is allowed the header is only sent if the origins match
+      // If a specific origin is allowed, the header is only sent if the origins match
       else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
       {
         MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
@@ -169,14 +161,14 @@ static std::string tagGet(const std::string& request)
 *
 * This function renders an error reply depending on the 'request' type.
 * Many responses have different syntax and especially the tag in the reply
-* differs (registerContextResponse, discoverContextAvailabilityResponse etc).
+* differs (registerContextResponse, discoverContextAvailabilityResponse, etc).
 *
 * Also, the function is called from more than one place, especially from 
 * restErrorReply, but also from where the payload type is matched against the request URL.
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& details)
+std::string restErrorReplyGet(ConnectionInfo* ciP, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& details)
 {
    std::string   tag = tagGet(request);
    StatusCode    errorCode(code, details, "errorCode");
@@ -187,32 +179,32 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    if (tag == "registerContextResponse")
    {
       RegisterContextResponse rcr("000000000000000000000000", errorCode);
-      reply =  rcr.render(RegisterContext, format, indent);
+      reply =  rcr.render(RegisterContext, indent);
    }
    else if (tag == "discoverContextAvailabilityResponse")
    {
       DiscoverContextAvailabilityResponse dcar(errorCode);
-      reply =  dcar.render(DiscoverContextAvailability, format, indent);
+      reply =  dcar.render(DiscoverContextAvailability, indent);
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
       SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
-      reply =  scar.render(SubscribeContextAvailability, format, indent);
+      reply =  scar.render(SubscribeContextAvailability, indent);
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")
    {
       UpdateContextAvailabilitySubscriptionResponse ucas(errorCode);
-      reply =  ucas.render(UpdateContextAvailabilitySubscription, format, indent, 0);
+      reply =  ucas.render(UpdateContextAvailabilitySubscription, indent, 0);
    }
    else if (tag == "unsubscribeContextAvailabilityResponse")
    {
       UnsubscribeContextAvailabilityResponse ucar(errorCode);
-      reply =  ucar.render(UnsubscribeContextAvailability, format, indent);
+      reply =  ucar.render(UnsubscribeContextAvailability, indent);
    }
    else if (tag == "notifyContextAvailabilityResponse")
    {
       NotifyContextAvailabilityResponse ncar(errorCode);
-      reply =  ncar.render(NotifyContextAvailability, format, indent);
+      reply =  ncar.render(NotifyContextAvailability, indent);
    }
 
    else if (tag == "queryContextResponse")
@@ -223,17 +215,17 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    else if (tag == "subscribeContextResponse")
    {
       SubscribeContextResponse scr(errorCode);
-      reply =  scr.render(SubscribeContext, format, indent);
+      reply =  scr.render(SubscribeContext, indent);
    }
    else if (tag == "updateContextSubscriptionResponse")
    {
       UpdateContextSubscriptionResponse ucsr(errorCode);
-      reply =  ucsr.render(UpdateContextSubscription, format, indent);
+      reply =  ucsr.render(UpdateContextSubscription, indent);
    }
    else if (tag == "unsubscribeContextResponse")
    {
       UnsubscribeContextResponse uncr(errorCode);
-      reply =  uncr.render(UnsubscribeContext, format, indent);
+      reply =  uncr.render(UnsubscribeContext, indent);
    }
    else if (tag == "updateContextResponse")
    {
@@ -243,12 +235,12 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    else if (tag == "notifyContextResponse")
    {
       NotifyContextResponse ncr(errorCode);
-      reply =  ncr.render(NotifyContext, format, indent);
+      reply =  ncr.render(NotifyContext, indent);
    }
    else if (tag == "StatusCode")
    {
      StatusCode sc(code, details);
-     reply = sc.render(format, indent);
+     reply = sc.render(indent);
    }
    else
    {

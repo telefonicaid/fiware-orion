@@ -53,13 +53,12 @@ class Duration
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(Format format, const std::string& indent, bool comma = true);
+  std::string   render(const std::string& indent, bool comma = true);
   int64_t       parse(void);
   void          present(const std::string& indent);
   void          release(void);
 
   std::string   check(RequestType         requestType,
-                      Format              format,
                       const std::string&  indent,
                       const std::string&  predetectedError,
                       int                 counter);

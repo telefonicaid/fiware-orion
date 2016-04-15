@@ -30,58 +30,47 @@ brokerStart CB
 --SHELL--
 echo "1: Append entity E1 with two different attributes A1 and A2, with compound values"
 url="/v1/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E1</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>test</type>
-          <contextValue>
-            <compound>
-              <a>1</a>
-              <b>2</b>
-              <c>3</c>
-            </compound>
-          </contextValue>
-        </contextAttribute>
-        <contextAttribute>
-          <name>A2</name>
-          <type>test</type>
-          <contextValue type="vector">
-            <item>a</item>
-            <item>b</item>
-            <item>c</item>
-          </contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --out json
+payload='{
+    "contextElements": [
+        {
+            "type": "Test",
+            "isPattern": "false",
+            "id": "E1",
+            "attributes": [
+            {
+                "name": "A1",
+                "type": "test",
+                "value": {
+                  "compound": {"a": "1", "b": "2", "c": "3" }
+                }
+            },
+            {
+                "name": "A2",
+                "type": "test",
+                "value": [ "a", "b", "c" ]
+            }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
 echo
 echo
 
 echo "2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2, with compound values"
 url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Test" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-    <attribute>A2</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json
+payload='{
+    "entities": [
+        {
+            "type": "Test",
+            "isPattern": "false",
+            "id": "E1"
+        }
+    ],
+    "attributes": [ "A1", "A2" ]
+}'
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --json
 echo
 echo
 
@@ -90,6 +79,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 489
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -125,6 +115,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 656
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

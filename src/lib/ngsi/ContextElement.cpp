@@ -78,8 +78,7 @@ ContextElement::ContextElement(const std::string& id, const std::string& type, c
 std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
-  std::string  xmlTag                           = "contextElement";
-  std::string  jsonTag                          = "contextElement";
+  std::string  key                              = "contextElement";
   bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
   bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
@@ -91,21 +90,40 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
   if (requestType == UpdateContext)
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+    out += startTag2(indent, key, false, false);
   }
   else
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    out += startTag2(indent, key, false, true);
   }
 
-  out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
+  out += entityId.render(indent + "  ", commaAfterEntityId, false);
+  out += attributeDomainName.render(indent + "  ", commaAfterAttributeDomainName);
   out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
-  out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
+  out += domainMetadataVector.render(indent + "  ", commaAfterDomainMetadataVector);
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+  out += endTag(indent, comma, false);
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::getAttribute
+*/
+ContextAttribute* ContextElement::getAttribute(std::string attrName)
+{
+  for (unsigned int ix = 0; ix < contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* ca = contextAttributeVector[ix];
+    if (ca->name == attrName)
+    {
+      return ca;
+    }
+  }
+  return NULL;
 }
 
 
@@ -116,8 +134,8 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 */
 std::string ContextElement::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -125,22 +143,22 @@ std::string ContextElement::check
 {
   std::string res;
 
-  if ((res = entityId.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = entityId.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = attributeDomainName.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = attributeDomainName.check(requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = contextAttributeVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
 
-  if ((res = domainMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  if ((res = domainMetadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     return res;
   }
@@ -172,11 +190,11 @@ void ContextElement::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    LM_F(("%sContext Element:", indent.c_str()));
+    LM_T(LmtPresent, ("%sContext Element:", indent.c_str()));
   }
   else
   {
-    LM_F(("%sContext Element %d:", indent.c_str(), ix));
+    LM_T(LmtPresent, ("%sContext Element %d:", indent.c_str(), ix));
   }
 
   entityId.present(indent + "  ", -1);
@@ -185,8 +203,13 @@ void ContextElement::present(const std::string& indent, int ix)
   domainMetadataVector.present("Domain", indent + "  ");
   for (unsigned int ix = 0; ix < providingApplicationList.size(); ++ix)
   {
-    LM_F(("%s  PA: %s (%s)", indent.c_str(), providingApplicationList[ix].get().c_str(), formatToString(providingApplicationList[ix].getFormat())));
-    LM_F(("%s  providingApplication: %s", indent.c_str(), providingApplicationList[ix].c_str()));
+    LM_T(LmtPresent, ("%s  PA: %s (%s)", 
+		      indent.c_str(), 
+		      providingApplicationList[ix].get().c_str(), 
+		      formatToString(providingApplicationList[ix].getFormat())));
+    LM_T(LmtPresent, ("%s  providingApplication: %s", 
+		      indent.c_str(), 
+		      providingApplicationList[ix].c_str()));
   }
 }
 
@@ -213,11 +236,11 @@ void ContextElement::fill(const struct ContextElement& ce)
 *
 * ContextElement::fill - 
 */
-void ContextElement::fill(ContextElement* ceP)
+void ContextElement::fill(ContextElement* ceP, bool useDefaultType)
 {
-  entityId.fill(&ceP->entityId);
+  entityId.fill(&ceP->entityId, useDefaultType);
   attributeDomainName.fill(ceP->attributeDomainName);
-  contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
+  contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector, useDefaultType);
   domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
   /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
    * safe to copy vectors of std::string using '=' */

@@ -26,6 +26,7 @@
 #include <map>
 
 #include "common/string.h"
+#include "common/globals.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -33,13 +34,19 @@
 /* ****************************************************************************
 *
 * validOptions - 
+*
+* Text definitions OPT_* found in common/globals.h
 */
 static const char* validOptions[] = 
 {
-  "count",
-  "normalized",
-  "values",
-  "text"
+  OPT_COUNT,
+  OPT_NORMALIZED,
+  OPT_VALUES,
+  OPT_KEY_VALUES,
+  OPT_APPEND,
+  OPT_UNIQUE_VALUES,
+  OPT_DATE_CREATED,
+  OPT_DATE_MODIFIED
 };
 
 
@@ -87,5 +94,30 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
     ciP->uriParamOptions[vec[ix]] = true;
   }
 
+  //
+  // Check of invalid combinations
+  //
+  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_VALUES])        return -1;
+  if (ciP->uriParamOptions[OPT_KEY_VALUES]    && ciP->uriParamOptions[OPT_UNIQUE_VALUES]) return -1;
+  if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] && ciP->uriParamOptions[OPT_VALUES])        return -1;
+
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* uriParamTypesParse - parse the URI param 'type' into uriParamTypes vector
+*/
+void uriParamTypesParse(ConnectionInfo* ciP, const char* value)
+{
+  std::vector<std::string> vec;
+
+  stringSplit(value, ',', vec);
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    ciP->uriParamTypes.push_back(vec[ix]);
+  }
 }

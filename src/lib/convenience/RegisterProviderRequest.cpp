@@ -32,6 +32,8 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "common/tag.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "convenience/RegisterProviderRequest.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/MetadataVector.h"
@@ -56,10 +58,9 @@ RegisterProviderRequest::RegisterProviderRequest()
 *
 * RegisterProviderRequest::render - 
 */
-std::string RegisterProviderRequest::render(Format format, std::string indent)
+std::string RegisterProviderRequest::render(std::string indent)
 {
   std::string  out                            = "";
-  std::string  xmlTag                         = "registerProviderRequest";
   bool         durationRendered               = duration.get() != "";
   bool         providingApplicationRendered   = providingApplication.get() != "";
   bool         registrationIdRendered         = registrationId.get() != "";
@@ -68,12 +69,12 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
   bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
   bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
 
-  out += startTag(indent, xmlTag, "", format, false, false);
-  out += metadataVector.render(format,       indent + "  ", commaAfterMetadataVector);
-  out += duration.render(format,             indent + "  ", commaAfterDuration);
-  out += providingApplication.render(format, indent + "  ", commaAfterProvidingApplication);
-  out += registrationId.render(RegisterContext, format,       indent + "  ", commaAfterRegistrationId);
-  out += endTag(indent, xmlTag, format, false);
+  out += startTag2(indent, "", false, false);
+  out += metadataVector.render(      indent + "  ", commaAfterMetadataVector);
+  out += duration.render(            indent + "  ", commaAfterDuration);
+  out += providingApplication.render(indent + "  ", commaAfterProvidingApplication);
+  out += registrationId.render(RegisterContext, indent + "  ", commaAfterRegistrationId);
+  out += endTag(indent, false);
 
   return out;
 }
@@ -86,11 +87,11 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
 */
 std::string RegisterProviderRequest::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  predetectedError,
-  int          counter
+  ConnectionInfo* ciP,
+  RequestType     requestType,  
+  std::string     indent,
+  std::string     predetectedError,
+  int             counter
 )
 {
   DiscoverContextAvailabilityResponse  response;
@@ -100,10 +101,10 @@ std::string RegisterProviderRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = metadataVector.check(requestType, format, indent, "", counter))  != "OK") ||
-           ((res = duration.check(requestType, format, indent, "", 0))              != "OK") ||
-           ((res = providingApplication.check(requestType, format, indent, "", 0))  != "OK") ||
-           ((res = registrationId.check(requestType, format, indent, "", 0))        != "OK"))
+  else if (((res = metadataVector.check(ciP, requestType, indent, "", counter))  != "OK") ||
+           ((res = duration.check(requestType, indent, "", 0))              != "OK") ||
+           ((res = providingApplication.check(requestType, indent, "", 0))  != "OK") ||
+           ((res = registrationId.check(requestType, indent, "", 0))        != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -112,9 +113,10 @@ std::string RegisterProviderRequest::check
     return "OK";
   }
 
-  LM_W(("Bad Input (RegisterProviderRequest Error: %s)", res.c_str()));
+  std::string details = std::string("RegisterProviderRequest Error: '") + res + "'";
+  alarmMgr.badInput(clientIp, details);
 
-  return response.render(DiscoverContextAvailability, format, indent);
+  return response.render(DiscoverContextAvailability, indent);
 }
 
 
@@ -125,12 +127,12 @@ std::string RegisterProviderRequest::check
 */
 void RegisterProviderRequest::present(std::string indent)
 {
-  LM_F(("%sRegisterProviderRequest:\n", indent.c_str()));
+  LM_T(LmtPresent, ("%sRegisterProviderRequest:\n", indent.c_str()));
   metadataVector.present("Registration", indent + "  ");
   duration.present(indent + "  ");
   providingApplication.present(indent + "  ");
   registrationId.present(indent + "  ");
-  LM_F(("\n"));
+  LM_T(LmtPresent, ("\n"));
 }
 
 

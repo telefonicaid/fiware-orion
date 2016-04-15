@@ -1,0 +1,209 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT /v2/entities/eid/attrs/attr
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. PUT /v2/entities/E1/attrs/A1 and see it fail
+# 02. POST /v2/entities, creating E1 with A1
+# 03. PUT /v2/entities/E1/attrs/A1 and see it work
+# 04. GET /v2/entities/E1/attrs/A1
+# 05. PUT /v2/entities/E1/attrs/A1 'old way - pre #1259' - metadatas not inside 'metadata: {}' - see it fail
+# 06. PUT /v2/entities/E1/attrs/A1 'new way - post #1259' - metadatas inside 'metadata: {}' - see it work
+# 07. GET /v2/entities/E1/attrs/A1 to see that 06 worked
+#
+
+echo "01. PUT /v2/entities/E1/attrs/A1 and see it fail"
+echo "================================================"
+payload='{
+  "value": 12
+}'
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "02. POST /v2/entities, creating E1 with A1"
+echo "=========================================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": "a1"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo "03. PUT /v2/entities/E1/attrs/A1 and see it work"
+echo "================================================"
+payload='{
+  "value": 12
+}'
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "04. GET /v2/entities/E1/attrs/A1"
+echo "================================"
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo "05. PUT /v2/entities/E1/attrs/A1 'old way - pre #1259' - metadatas not inside 'metadata: {}' - see it fail"
+echo "=========================================================================================================="
+payload='{
+  "value": 12,
+  "type": "AT1",
+  "m1":   1,
+  "m2":   "m2"
+}'
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "06. PUT /v2/entities/E1/attrs/A1 'new way - post #1259' - metadatas inside 'metadata: {}' - see it work"
+echo "======================================================================================================="
+payload='{
+  "value": 12,
+  "type": "AT1",
+  "metadata": {
+    "m1": 1,
+    "m2": "m2"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "07. GET /v2/entities/E1/attrs/A1 to see that 06 worked"
+echo "======================================================"
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. PUT /v2/entities/E1/attrs/A1 and see it fail
+================================================
+HTTP/1.1 404 Not Found
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. POST /v2/entities, creating E1 with A1
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. PUT /v2/entities/E1/attrs/A1 and see it work
+================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+04. GET /v2/entities/E1/attrs/A1
+================================
+HTTP/1.1 200 OK
+Content-Length: 40
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "metadata": {},
+    "type": "none",
+    "value": 12
+}
+
+
+05. PUT /v2/entities/E1/attrs/A1 'old way - pre #1259' - metadatas not inside 'metadata: {}' - see it fail
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 82
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "unrecognized property for context attribute",
+    "error": "BadRequest"
+}
+
+
+06. PUT /v2/entities/E1/attrs/A1 'new way - post #1259' - metadatas inside 'metadata: {}' - see it work
+=======================================================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+07. GET /v2/entities/E1/attrs/A1 to see that 06 worked
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 103
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "metadata": {
+        "m1": {
+            "type": "none",
+            "value": 1
+        },
+        "m2": {
+            "type": "none",
+            "value": "m2"
+        }
+    },
+    "type": "AT1",
+    "value": 12
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

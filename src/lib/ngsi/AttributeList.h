@@ -42,32 +42,26 @@ typedef struct AttributeList
 {
   std::vector<std::string>  attributeV;
 
-  void         fill(std::vector<std::string>);
-  std::string  render(Format format, const std::string& indent, bool comma = false);
+  void         fill(const std::vector<std::string>& aVec);
+  std::string  render(const std::string& indent, bool comma = false);
   void         present(const std::string& indent);
   void         release(void);
   bool         lookup(const std::string& attributeName);
   void         push_back(const std::string& attributeName);
   void         push_back_if_absent(const std::string& attributeName);
-  unsigned int size(void);
-  std::string  get(int ix);
-  void         clone(AttributeList& aList);
+  unsigned int size(void) const;
+  void         clone(const AttributeList& aList);
 
   std::string  check(RequestType         requestType,
-                     Format              format,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
 
-  std::string  operator[](unsigned int ix)
+  std::string  operator[](unsigned int ix)  const
   {
-    if (ix < attributeV.size())
-    {
-      return attributeV[ix];
-    }
-
-    return "";
+  return attributeV[ix];
   }
+  
 } AttributeList;
 
 #endif  // SRC_LIB_NGSI_ATTRIBUTELIST_H_

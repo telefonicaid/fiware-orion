@@ -25,6 +25,10 @@
 #include <string>
 #include <vector>
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "common/errorMessages.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -33,6 +37,8 @@
 #include "apiTypesV2/ErrorCode.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
+#include "parse/forbiddenChars.h"
+
 
 
 /* ****************************************************************************
@@ -60,9 +66,17 @@ std::string deleteEntity
 )
 {
   string  answer;
-  Entity* eP    = new Entity();
+  Entity* eP;
 
-  eP->id = compV[2];
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
+  eP       = new Entity();
+  eP->id   = compV[2];
+  eP->type = ciP->uriParam["type"];
 
   if (compV.size() == 5)  // Deleting an attribute
   {
@@ -70,6 +84,7 @@ std::string deleteEntity
     ca->name = compV[4];
     eP->attributeVector.push_back(ca);
   }
+
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "DELETE");
 
@@ -91,28 +106,31 @@ std::string deleteEntity
       OrionError oe;
 
       ciP->httpStatusCode = scc;
+
       if (scc == SccContextElementNotFound)
       {
-        oe.code = scc;
-        oe.reasonPhrase ="NotFound";
-        oe.details = "The requested entity has not been found. Check type and id";
+        oe.code          = scc;
+        oe.reasonPhrase  = "NotFound";
+        oe.details       = "The requested entity has not been found. Check type and id";
       }
       else if (scc == SccInvalidParameter)
       {
-        oe.code = SccContextElementNotFound;
-        oe.reasonPhrase ="NotFound";
-        oe.details = "Attribute not found";
-        ciP->httpStatusCode = SccContextElementNotFound; // We don't want a 472
+        oe.code              = SccContextElementNotFound;
+        oe.reasonPhrase      = "NotFound";
+        oe.details           = "Attribute not found";
+        ciP->httpStatusCode  = SccContextElementNotFound; // We don't want a 472
       }
       else
       {
-        oe.code = scc;
-        oe.reasonPhrase = sc.reasonPhrase;
+        oe.code          = scc;
+        oe.reasonPhrase  = sc.reasonPhrase;
       }
-      answer = oe.render(ciP, "");
+
+      TIMED_RENDER(answer = oe.render(ciP, ""));
 
       eP->release();
       delete eP;
+
       return answer;
     }
   }

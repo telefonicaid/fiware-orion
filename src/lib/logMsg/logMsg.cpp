@@ -53,6 +53,8 @@
 #include "logMsg/time.h"
 #include "logMsg/logMsg.h"      /* Own interface                             */
 
+#include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
+
 extern "C" pid_t gettid(void);
 
 
@@ -264,7 +266,7 @@ do                                                \
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
-#define F_LEN            128
+#define F_LEN            200
 #define TF_LEN           64
 #define INFO_LEN         512
 #define TMS_LEN          20
@@ -339,11 +341,14 @@ typedef struct Line
 *
 * globals
 */
-int             inSigHandler      = 0;
-char*           progName;                   /* needed for messages (and by lmLib) */
-char            progNameV[512];             /* where to store progName            */
-__thread char   transactionId[64] = "N/A";
-extern char*    progName;
+int             inSigHandler                      = 0;
+char*           progName;                         /* needed for messages (and by lmLib) */
+char            progNameV[512];                   /* where to store progName            */
+__thread char   transactionId[64]                 = "N/A";
+__thread char   correlatorId[64]                  = "N/A";
+__thread char   service[SERVICE_NAME_MAX_LEN + 1] = "N/A";
+__thread char   subService[101]                   = "N/A";   // Using SERVICE_PATH_MAX_TOTAL will be too much
+__thread char   fromIp[IP_LENGTH_MAX + 1]         = "N/A";
 
 
 
@@ -396,6 +401,7 @@ bool  lmWrites                     = false;
 bool  lmBug                        = false;
 bool  lmBuf                        = false;
 bool  lmFix                        = false;
+int   lmLevelMask                  = 0xFFFFFFFF;  /* All "masked in" by default */
 bool  lmAssertAtExit               = false;
 LmxFp lmxFp                        = NULL;
 bool  lmNoTracesToFileIfHookActive = false;
@@ -503,6 +509,91 @@ char* lmProgName(char* pn, int levels, bool pid, const char* extra)
   printf("pName: %s\n", pName);
 
   return pName;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskSet - 
+*/
+void lmLevelMaskSet(int levelMask)
+{
+  lmLevelMask = levelMask;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskSetString - 
+*/
+void lmLevelMaskSetString(char* level)
+{
+  if (strcasecmp(level, "NONE") == 0)
+  {
+    lmLevelMask = 0;
+  }
+  else if (strcasecmp(level, "ERROR") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+  }
+  else if (strcasecmp(level, "WARNING") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+  }
+  else if (strcasecmp(level, "INFO") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+  }
+  else if (strcasecmp(level, "VERBOSE") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+  }
+  else if (strcasecmp(level, "DEBUG") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+    lmLevelMask |= LogLevelDebug;
+  }
+  else if (strcasecmp(level, "TRACE") == 0)
+  {
+    lmLevelMask  = LogLevelExit;
+    lmLevelMask |= LogLevelError;
+    lmLevelMask |= LogLevelWarning;
+    lmLevelMask |= LogLevelInfo;
+    lmLevelMask |= LogLevelVerbose;
+    lmLevelMask |= LogLevelDebug;
+    lmLevelMask |= LogLevelTrace;
+  }
+  else if (strcasecmp(level, "ALL") == 0)
+  {
+    lmLevelMask  = 0xFFFFFFFF;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLevelMaskGet - 
+*/
+int lmLevelMaskGet(void)
+{
+  return lmLevelMask;
 }
 
 
@@ -881,10 +972,17 @@ static char* timeGet(int index, char* line, int lineSize)
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * timeStampGet -
+*
+* This function has been removed as the LM_S macro, formerly a 'timestamp macro'
+* has been removed for the Orion Context Broker implementation, to make room for
+* a new LM_S macro, the 'S' standing for 'Summary'.
+*
+* The function is kept in case the LM_S is taken back as a 'timestamp macro' for
+* some other project.
 */
 static char* timeStampGet(char* line, int len)
 {
@@ -896,7 +994,7 @@ static char* timeStampGet(char* line, int len)
 
   return line;
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -921,6 +1019,7 @@ const char* longTypeName(char type)
   case 'M':  return "DEBUG";
   case 'F':  return "DEBUG";
   case 'I':  return "INFO";
+  case 'S':  return "SUMMARY";
   }
 
   return "N/A";
@@ -981,6 +1080,22 @@ static char* lmLineFix
     else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
     {
       STRING_ADD(transactionId, 8);
+    }
+    else if (strncmp(&format[fi], "CORR_ID", 7) == 0)
+    {
+      STRING_ADD(correlatorId, 7);
+    }
+    else if (strncmp(&format[fi], "SERVICE", 7) == 0)
+    {
+      STRING_ADD(service, 7);
+    }
+    else if (strncmp(&format[fi], "SUB_SERVICE", 11) == 0)
+    {
+      STRING_ADD(subService, 11);
+    }
+    else if (strncmp(&format[fi], "FROM_IP", 7) == 0)
+    {
+      STRING_ADD(fromIp, 7);
     }
     else if (strncmp(&format[fi], "EXEC", 4) == 0)
     {
@@ -2098,11 +2213,22 @@ LmStatus lmOut
   bool         use_hook
 )
 {
+  INIT_CHECK();
+  POINTER_CHECK(text);
+
   int   i;
   char* line = (char*) calloc(1, LINE_MAX);
   int   sz;
   char* format = (char*) calloc(1, FORMAT_LEN + 1);
   char* tmP;
+
+  if ((line == NULL) || (format == NULL))
+  {
+    if (line   != NULL)   free(line);
+    if (format != NULL)   free(format);
+
+    return LmsNull;
+  }
 
   tmP = strrchr((char*) file, '/');
   if (tmP != NULL)
@@ -2118,10 +2244,6 @@ LmStatus lmOut
 
     return LmsOk;
   }
-
-  INIT_CHECK();
-  POINTER_CHECK(format);
-  POINTER_CHECK(text);
 
   memset(format, 0, FORMAT_LEN + 1);
 
@@ -2166,11 +2288,6 @@ LmStatus lmOut
       {
         snprintf(line, LINE_MAX, "%s\n%c", text, 0);
       }
-    }
-    else if (type == 'S')
-    {
-      char stampStr[128];
-      snprintf(line, LINE_MAX, "%s:%s", text, timeStampGet(stampStr, 128));
     }
     else
     {
@@ -2574,6 +2691,7 @@ LmStatus lmReopen(int index)
   if ((fd = open(tmpName, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1)
   {
     lseek(fds[index].fd, fdPos, SEEK_SET);
+    fclose(fP);
     return LmsOpen;
   }
 
@@ -2845,6 +2963,9 @@ typedef struct LineRemove
 */
 LmStatus lmClear(int index, int keepLines, int lastLines)
 {
+  INIT_CHECK();
+  INDEX_CHECK(index);
+
   LineRemove* lrV;
   void*       initialLrv;
   char*       line = (char*) calloc(1, LINE_MAX);
@@ -2861,11 +2982,11 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   int         fd;
   static int  headerLines = 4;
 
-  INIT_CHECK();
-  INDEX_CHECK(index);
+  POINTER_CHECK(line);
 
   if (logLines < (keepLines + lastLines))
   {
+    free(line);
     return LmsOk;
   }
 
@@ -2874,10 +2995,12 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     atLines += 1000;
     if (atLines > 20000)
     {
+      free(line);
       doClear = false;
       return LmsFopen;
     }
 
+    free(line);
     return LmsFopen;
   }
 
@@ -2888,6 +3011,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   if (lrV == NULL)
   {
     semGive();
+    free(line);
     return LmsMalloc;
   }
 
@@ -2970,6 +3094,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                                            \
   lrV = NULL;                              \
   unlink(tmpName);                         \
+  free(line);                              \
   semGive();                               \
                                            \
   return s;                                \
@@ -3019,6 +3144,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
       ++newLogLines;
       free(line);
+      line = NULL;
     }
   }
 
@@ -3044,6 +3170,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
   {
     fds[index].state = Free;
     semGive();
+    if (line) free(line);
     return LmsOpen;
   }
 
@@ -3051,7 +3178,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
   logLines = newLogLines;
   LOG_OUT(("Set logLines to %d", logLines));
-  free(line);
+  if (line) free(line);
 
   semGive();
   return LmsOk;
@@ -3195,6 +3322,7 @@ struct logMsg
   int  tLev;
   char stre[256];
   char transactionId[64];
+  char correlatorId[64];
   struct logMsg* next;
 };
 

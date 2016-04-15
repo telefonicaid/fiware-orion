@@ -25,15 +25,18 @@
 #include <string>
 #include <vector>
 
-#include "serviceRoutinesV2/getEntityAttribute.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
+#include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
-
-#include "apiTypesV2/Attribute.h"
-
+#include "serviceRoutinesV2/getEntityAttribute.h"
+#include "parse/forbiddenChars.h"
+#include "rest/OrionError.h"
 
 /* ****************************************************************************
 *
@@ -58,12 +61,24 @@ std::string getEntityAttribute
   ParseData*                 parseDataP
 )
 {
+  std::string  type   = ciP->uriParam["type"];
   std::string  answer;
   Attribute    attribute;
 
+  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
+
+  if (forbiddenIdChars(ciP->apiVersion, compV[4].c_str() , NULL))
+  {
+    OrionError oe(SccBadRequest, INVAL_CHAR_URI);
+    return oe.render(ciP, "");
+  }
 
   // 01. Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
 
   // 02. Call standard op postQueryContext
@@ -72,7 +87,9 @@ std::string getEntityAttribute
 
   // 03. Render entity attribute response
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
-  answer = attribute.render(ciP, EntityAttributeResponse);
+
+  TIMED_RENDER(answer = attribute.render(ciP, EntityAttributeResponse));
+
   if (attribute.errorCode.error == "TooManyResults")
   {
     ciP->httpStatusCode = SccConflict;
@@ -83,7 +100,7 @@ std::string getEntityAttribute
   }
   else
   {
-      // the same of the wrapped operation
+    // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
   }
 

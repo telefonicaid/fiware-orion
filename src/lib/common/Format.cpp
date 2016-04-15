@@ -40,8 +40,7 @@
 const char* formatToString(Format format)
 {
   switch (format)
-  {
-  case XML:      return "XML";
+  {  
   case JSON:     return "JSON";
   case TEXT:     return "TEXT";
   case HTML:     return "HTML";
@@ -59,11 +58,7 @@ const char* formatToString(Format format)
 */
 Format stringToFormat(const std::string& s)
 {
-  if (s == "XML")
-  {
-    return XML;
-  }
-  else if (s == "JSON")
+  if (s == "JSON")
   {
     return JSON;
   }
@@ -96,11 +91,10 @@ Format formatParse(const std::string& formatString, std::string* charsetP)
 
   std::string format(wsStrip(cP));
 
-  if      (format == "*/*")                               return XML;
-  else if (format == "application/xml")                   return XML;
-  else if (format == "text/xml")                          return XML;
+  if      (format == "*/*")                               return JSON;
   else if (format == "text/json")                         return JSON;
   else if (format == "application/json")                  return JSON;
+  else if (format == "text/plain")                        return TEXT;
 
-  return XML;
+  return JSON;
 }

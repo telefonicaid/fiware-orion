@@ -29,64 +29,46 @@ brokerStart CB 0-255 IPV4
 --SHELL--
 
 echo "0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Room" isPattern="false">
-        <id>ConferenceRoom</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>celsius</type>
-          <contextValue>0</contextValue>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>mmHg</type>
-          <contextValue>0</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url '/v1/updateContext' --payload "$payload"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "celsius",
+          "value": "0"
+        },
+        {
+          "name": "pressure",
+          "type": "mmHg",
+          "value": "0"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url '/v1/updateContext' --payload "$payload" --json
 echo
 echo
 
 
-echo "1. Listing of Entity Types. Response in XML"
-orionCurl --url '/v1/contextTypes'
-echo
-echo
-
-
-echo "2. Listing of Entity Types. Response in XML, with details=on"
-orionCurl --url '/v1/contextTypes?details=on'
-echo
-echo
-
-
-echo "3. Listing of Entity Types. Response in XML, with details=on and collapse=true"
-orionCurl --url '/v1/contextTypes?details=on&collapse=true'
-echo
-echo
-
-echo "4. Listing of Entity Types. Response in JSON"
+echo "1. Listing of Entity Types. Response in JSON"
 orionCurl --url '/v1/contextTypes' --json 
 echo
 echo
 
 
-echo "5. Listing of Entity Types. Response in JSON, with details=on"
+echo "2. Listing of Entity Types. Response in JSON, with details=on"
 orionCurl --url '/v1/contextTypes?details=on' --json 
 echo
 echo
 
 
-echo "6. Listing of Entity Types. Response in JSON, with details=on and collapse=true"
+echo "3. Listing of Entity Types. Response in JSON, with details=on and collapse=true"
 orionCurl --url '/v1/contextTypes?details=on&collapse=true' --json  
 echo
 echo
@@ -95,114 +77,45 @@ echo
 --REGEXPECT--
 0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
 HTTP/1.1 200 OK
-Content-Length: 810
-Content-Type: application/xml
+Content-Length: 519
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>celsius</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>mmHg</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "celsius",
+                        "value": ""
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "mmHg",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 
 
-1. Listing of Entity Types. Response in XML
-HTTP/1.1 200 OK
-Content-Length: 349
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<entityTypesResponse>
-  <typeEntities>
-    <entityType>
-      <name>Room</name>
-      <contextAttributeList>
-        <name>pressure</name>
-        <name>temperature</name>
-      </contextAttributeList>
-    </entityType>
-  </typeEntities>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</entityTypesResponse>
-
-
-2. Listing of Entity Types. Response in XML, with details=on
-HTTP/1.1 200 OK
-Content-Length: 381
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<entityTypesResponse>
-  <typeEntities>
-    <entityType>
-      <name>Room</name>
-      <contextAttributeList>
-        <name>pressure</name>
-        <name>temperature</name>
-      </contextAttributeList>
-    </entityType>
-  </typeEntities>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-    <details>Count: 1</details>
-  </statusCode>
-</entityTypesResponse>
-
-
-3. Listing of Entity Types. Response in XML, with details=on and collapse=true
-HTTP/1.1 200 OK
-Content-Length: 259
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<entityTypesResponse>
-  <typeEntities>
-    <entityType>
-      <name>Room</name>
-    </entityType>
-  </typeEntities>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-    <details>Count: 1</details>
-  </statusCode>
-</entityTypesResponse>
-
-
-4. Listing of Entity Types. Response in JSON
+1. Listing of Entity Types. Response in JSON
 HTTP/1.1 200 OK
 Content-Length: 200
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -222,10 +135,11 @@ Date: REGEX(.*)
 }
 
 
-5. Listing of Entity Types. Response in JSON, with details=on
+2. Listing of Entity Types. Response in JSON, with details=on
 HTTP/1.1 200 OK
 Content-Length: 228
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -246,10 +160,11 @@ Date: REGEX(.*)
 }
 
 
-6. Listing of Entity Types. Response in JSON, with details=on and collapse=true
+3. Listing of Entity Types. Response in JSON, with details=on and collapse=true
 HTTP/1.1 200 OK
 Content-Length: 154
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

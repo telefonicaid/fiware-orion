@@ -57,13 +57,6 @@ static std::string attributeType(const std::string& path, const std::string& val
 */
 static std::string attributeValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  //
-  // NOTE: UpdateContextAttributeRequest *is* an attribute, so no attributeP is
-  //       called for in UpdateContextAttributeData. However, in order to
-  //       save the 'typeFromXmlAttribute', a ContextAttribute has been added to 
-  //       UpdateContextAttributeData.
-  //
-  reqData->lastContextAttribute   = &reqData->upcar.attribute;
   reqData->upcar.res.valueType    = orion::ValueTypeString;
   reqData->upcar.res.contextValue = value;
 
@@ -107,6 +100,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
   reqData->upcar.metadataP->type = value;
+  reqData->upcar.metadataP->typeGiven = true;
   return "OK";
 }
 
@@ -171,7 +165,7 @@ void jsonUpcarRelease(ParseData* reqData)
 */
 std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcar.res.check(UpdateContextAttribute, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->upcar.res.check(ciP, UpdateContextAttribute, "", reqData->errorString, 0);
 }
 
 
@@ -182,12 +176,12 @@ std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUpcarPresent(ParseData* reqData)
 {
-  if (!lmTraceIsSet(LmtDump))
+  if (!lmTraceIsSet(LmtPresent))
   {
     return;
   }
 
-  LM_F(("\n\n"));
+  LM_T(LmtPresent, ("\n\n"));
   reqData->upcar.res.present("");
 }
 

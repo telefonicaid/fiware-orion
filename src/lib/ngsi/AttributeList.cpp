@@ -39,7 +39,7 @@
 *
 * AttributeList::fill - 
 */
-void AttributeList::fill(std::vector<std::string> aVec)
+void AttributeList::fill(const std::vector<std::string>& aVec)
 {
   for (unsigned int ix = 0; ix < aVec.size(); ++ix)
   {
@@ -53,23 +53,24 @@ void AttributeList::fill(std::vector<std::string> aVec)
 *
 * render - 
 */
-std::string AttributeList::render(Format format, const std::string& indent, bool comma)
+std::string AttributeList::render(const std::string& indent, bool comma)
 {
-  std::string  out     = "";
-  std::string  xmlTag  = "attributeList";
-  std::string  jsonTag = "attributes";
+  std::string  out = "";
+  std::string  key = "attributes";
 
   if (attributeV.size() == 0)
+  {
     return "";
+  }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true, false);
+  out += startTag2(indent, key, true, true);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, true);
+    out += valueTag1(indent + "  ", "attribute", attributeV[ix], ix != attributeV.size() - 1, true);
   }
 
-  out += endTag(indent, xmlTag, format, comma, true);
+  out += endTag(indent, comma, true);
 
   return out;
 }
@@ -83,7 +84,6 @@ std::string AttributeList::render(Format format, const std::string& indent, bool
 std::string AttributeList::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -106,11 +106,13 @@ std::string AttributeList::check
 */
 void AttributeList::present(const std::string& indent)
 {
-  LM_F(("%sAttribute List",    indent.c_str()));
+  LM_T(LmtPresent, ("%sAttribute List",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    LM_F(("%s  %s", indent.c_str(), attributeV[ix].c_str()));
+    LM_T(LmtPresent, ("%s  %s", 
+		      indent.c_str(), 
+		      attributeV[ix].c_str()));
   }
 }
 
@@ -175,21 +177,12 @@ void AttributeList::push_back_if_absent(const std::string& attributeName)
 *
 * AttributeList::size - 
 */
-unsigned int AttributeList::size(void)
+unsigned int AttributeList::size(void) const
 {
   return attributeV.size();
 }
 
 
-
-/* ****************************************************************************
-*
-* AttributeList::get - 
-*/
-std::string AttributeList::get(int ix)
-{
-  return attributeV[ix];
-}
 
 
 
@@ -197,7 +190,7 @@ std::string AttributeList::get(int ix)
 *
 * AttributeList::clone - 
 */
-void AttributeList::clone(AttributeList& aList)
+void AttributeList::clone(const AttributeList& aList)
 {
   for (unsigned int ix = 0; ix < aList.size(); ++ix)
   {

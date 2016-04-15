@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/Format.h"
@@ -43,7 +44,7 @@
 */
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
-  metadataVector.tagSet("metadata");
+  metadataVector.keyNameSet("metadata");
   compoundValueP = NULL;
   valueType = orion::ValueTypeNone;
 }
@@ -54,19 +55,19 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format format, std::string indent)
+std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, std::string indent)
 {
   std::string tag = "updateContextAttributeRequest";
   std::string out = "";
   std::string indent2 = indent + "  ";
   bool        commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag(indent, tag, format, false);
-  out += valueTag(indent2, "type", type, format, true);
+  out += startTag1(indent, tag, false);
+  out += valueTag1(indent2, "type", type, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent2, "contextValue", contextValue, format, true);
+    out += valueTag1(indent2, "contextValue", contextValue, true);
   }
   else
   {
@@ -77,13 +78,13 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(ciP, format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
+    out += startTag2(indent + "  ", "value", isCompoundVector, true);
+    out += compoundValueP->render(ciP, indent + "    ");
+    out += endTag(indent + "  ", commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(format, indent2);
-  out += endTag(indent, tag, format);
+  out += metadataVector.render(indent2);
+  out += endTag(indent);
 
   return out;
 }
@@ -96,31 +97,23 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
 */
 std::string UpdateContextAttributeRequest::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  predetectedError,
-  int          counter
+  ConnectionInfo* ciP,
+  RequestType     requestType,
+  std::string     indent,
+  std::string     predetectedError,
+  int             counter
 )
 {
   StatusCode       response;
   std::string      res;
 
-  if (format == (Format) 0)
-  {
-    format = XML;
-  }
-
-  if (format == JSON)
-  {
-    indent = "  ";
-  }
+  indent = "  ";
 
   if (predetectedError != "")
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  else if ((res = metadataVector.check(ciP, requestType, indent, predetectedError, counter)) != "OK")
   {
     response.fill(SccBadRequest, res);
   }
@@ -129,12 +122,9 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  std::string out = response.render(format, indent);
+  std::string out = response.render(indent);
 
-  if (format == JSON)
-  {
-    out = "{\n" + out + "}\n";
-  }
+  out = "{\n" + out + "}\n";
 
   return out;
 }
@@ -147,8 +137,12 @@ std::string UpdateContextAttributeRequest::check
 */
 void UpdateContextAttributeRequest::present(std::string indent)
 {
-  LM_F(("%stype:         %s", indent.c_str(), type.c_str()));
-  LM_F(("%scontextValue: %s", indent.c_str(), contextValue.c_str()));
+  LM_T(LmtPresent, ("%stype:         %s", 
+		    indent.c_str(), 
+		    type.c_str()));
+  LM_T(LmtPresent, ("%scontextValue: %s", 
+		    indent.c_str(), 
+		    contextValue.c_str()));
   metadataVector.present("ContextMetadata", indent);
 }
 

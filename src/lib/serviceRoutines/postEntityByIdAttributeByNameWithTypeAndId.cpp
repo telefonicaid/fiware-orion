@@ -28,6 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "rest/ConnectionInfo.h"
@@ -94,14 +98,16 @@ std::string postEntityByIdAttributeByNameWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->rcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
-    answer = parseDataP->rcrs.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, "");
+    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+
+    TIMED_RENDER(answer = parseDataP->rcrs.res.render(IndividualContextEntityAttributeWithTypeAndId, ""));
   }
   else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
   {
     parseDataP->rcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    LM_W(("Bad Input non-matching entity::types in URL"));
-    answer = parseDataP->rcrs.res.render(IndividualContextEntityAttributeWithTypeAndId, ciP->outFormat, "");
+    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+
+    TIMED_RENDER(answer = parseDataP->rcrs.res.render(IndividualContextEntityAttributeWithTypeAndId, ""));
   }
   else
   {

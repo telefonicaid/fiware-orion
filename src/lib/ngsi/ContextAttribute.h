@@ -44,6 +44,7 @@
 */
 typedef struct ContextAttribute
 {
+public:
   std::string     name;                    // Mandatory
   std::string     type;                    // Optional
   MetadataVector  metadataVector;          // Optional
@@ -63,12 +64,12 @@ typedef struct ContextAttribute
                                                       // It means attribute found either locally or remotely in providing application
 
   bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists
-  std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
+  bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
   ~ContextAttribute();
   ContextAttribute();
-  ContextAttribute(ContextAttribute* caP);
+  ContextAttribute(ContextAttribute* caP, bool useDefaultType = false);
   ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
@@ -76,26 +77,34 @@ typedef struct ContextAttribute
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
-  std::string  getId();
-  std::string  getLocation();
+  std::string  getId() const;
+  std::string  getLocation(const std::string& apiValue ="v1") const;
 
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
   std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement, bool types);
+  std::string  toJson(bool isLastElement, const std::string& renderMode, RequestType requestType = NoRequest);
+  std::string  toJsonAsValue(ConnectionInfo* ciP);
   void         present(const std::string& indent, int ix);
   void         release(void);
-  std::string  toString(void);
+  std::string  getName(void);
+
+  /* Used to render attribute value to BSON */
+  void valueBson(mongo::BSONObjBuilder& bsonAttr) const;
 
   /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
-  std::string  toStringValue(void);
+  std::string  getValue(void) const;
 
-  std::string  check(RequestType         requestType,
-                     Format              format,
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
   ContextAttribute* clone();
+
+private:
+  void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr) const;
+
 } ContextAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_

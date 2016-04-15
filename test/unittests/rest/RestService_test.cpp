@@ -92,7 +92,7 @@ TEST(RestService, payloadParse)
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
 
 
@@ -106,7 +106,7 @@ TEST(RestService, payloadParse)
   ci.payload      = (char*) "123";
   ci.payloadSize  = strlen(ci.payload);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, &jsonRelease, compV);
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, &jsonRelease, compV);
   EXPECT_EQ("Bad inFormat", out);
 
   utExit();
@@ -121,6 +121,8 @@ TEST(RestService, payloadParse)
 TEST(RestService, noSuchServiceAndNotFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
+  ci.servicePathV.push_back("");
+
   const char*    infile    = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
   const char*    outfile1  = "ngsi9.discoverContextAvailabilityRsponse.serviceNotRecognized.valid.json";
   const char*    outfile2  = "ngsi9.discoverContextAvailabilityRsponse.notFound.valid.json";

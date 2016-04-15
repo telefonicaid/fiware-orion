@@ -31,12 +31,12 @@ Release:   %{broker_release}
 License:   AGPLv3
 Group:     Applications/Engineering
 Vendor:     Telefónica I+D
-Packager:   Fermín Galán <fermin@tid.es>
+Packager:   Fermín Galán <fermin.galanmarquez@telefonica.com>
 URL:        http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, libcurl, logrotate
-Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, libcurl-devel, boost-devel
+Requires:  libstdc++, boost-thread, boost-filesystem, gnutls, libgcrypt, libcurl, logrotate, libuuid
+Buildrequires: gcc, cmake, gcc-c++, gnutls-devel, libgcrypt-devel, libcurl-devel, boost-devel, libuuid-devel
 Requires(pre): shadow-utils
 
 %description
@@ -164,6 +164,159 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Tue Mar 29 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 1.0.0-1
+- Add: new value for URI param 'options': unique - like 'values', but avoiding duplicates (Issue #1050)
+- Add: PUT /admin/log?level=XXX to change log level in run-time (Issue #1913)
+- Add: check min length for IDs in v2 (Issue #1836)
+- Fix: over-logging at error level due to not checking field existente in BSON objects
+- Fix: aggregating entities without type and type "" in same entry at GET entity types operation 
+- Fix: DB error relog done at ERROR level (previously it was using WARNING)
+- Fix: check for invalid chars in attribute type (Issue #1847, #1844)
+- Fix: check for field too long in attribute type (Issue #1845)
+- Fix: check for metadatas with empty name (Issue #1438)
+- Fix: accepting backslash-slash in JSON v1 payload (Issue #1852)
+- Fix: PATCH /v2/entities correct interpretaion of null value and missing type in payload
+- Fix: PATCH /v2/entities missing value field (Issue #1789)
+- Fix: GET /v2/entities/id/attrs/name/value for type date (Issue #1885)
+- Fix: PUT /v2/entities/id/attrs/name/value forbidden chars (JSON) (Issue #1905)
+- Fix: PUT /v2/entities/id/attrs/name/value changing type to 'none' (text/plain) (Issue #1904)
+- Hardening: use safeMongo get*Field() methods in places not previously using them (mainly in csubs cache library)
+- Remove: deprecated functionality related with ONTIMEINTERVAL subscriptions
+- Remove: XML support (deprecated functionality) (Issue #1862)
+
+* Mon Feb 29 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.28.0-1
+- Add: implemented new operation: POST /v2/op/query (Issue #1080)
+- Add: implemented new operation: POST /v2/op/update (Issue #1715)
+- Add: orderBy URI param in NGSIv2 queries to sort entities by attribute, entity dates or proximity (Issue #1103)
+- Add: orderBy URI param in NGSIv1 queries to sort entities by attribute or entity dates (Issue #1103)
+- Add: options=values mode for entity queries in NGSIV2 (Issue #1049)
+- Add: NGSIv2 URI param 'georel' (along with 'geometry' and 'coords') proper support (Issue #1677)
+- Add: scope FIWARE::Location::NGSIv2 to allow using NGSIv2 geo-queries also with NGSIv1 (Issue #1677)
+- Add: support for geo:point type as a way of specifying location attribute in NGSIv2 (Issue #1038)
+- Add: date support in attribute values and q filters (Issue #1039)
+- Add: dateCreated and dateModified options to get entity creation and modification times as "virtual" attributes (Issue #876)
+- Add: ?type param for GET entity in v2 (Issue #915, #972, #990, #998)
+- Add: ?type param for DELETE entity in v2 (Issue #986, #994)
+- Add: ?type param for PATCH entity in v2 (Issue #980)
+- Add: ?type param for POST entity in v2 (Issue #982, #984)
+- Add: ?type param for PUT entity in v2 (Issue #988, #992, #1000)
+- Add: ?type URL parameter in Location header upon entity creation in NGSIv2 (Issue #1765)
+- Fix: error level traces ignoring -logLevel NONE
+- Fix: wrong over-logging at error level updating attributes having metadata without type 
+- Fix: '+' supported in entity ids and names in URLs (Issue #1675)
+- Fix: libmicrohttpd 0.9.48 included in contextBroker as static lib (previous Orion versions used 0.9.22 as dynamic library) (Issue #1675)
+- Fix: list of attribute names in URI param 'type' (Issue #1749)
+- Fix: long servicepath component in NGSIv2 (Issue #1423, #1764, #1774)
+- Fix: syntax change in string query 'q' for exist and not-exist (Issue #1751)
+- Fix: sanity check for string query 'q' - detect 'left-hand-side missing' (Issue #1754)
+- Fix: more sanity checks for string query 'q' (q empty, parts of 'q' empty - parts of 'q' are separated by ';')
+- Fix: error message when updating attribute value for two entities with same id (Issue #1387)
+- Fix: bug causing false not-a-number when it really is a valid number (very very rarely)
+- Fix: not detecting forbidden chars in entityID for PATCH v2 (Issue #1782)
+- Fix: detect forbidden chars in entity ids and attr names in URI (Issue #1793)
+- Fix: segfault caused by parameter without value in query string (Issue #1805)
+- Fix: some of the operations reported an incorrect 'Allow' HTTP Header on Bad Verb, now fixed
+- Fix: Returning 422 InvalidModification instead of 404 NotFound when POSTing entity (Issue #1817)
+- Fix: using string "none" as default entity/attribute/metadata type in NGSIv2 (Issue #1830)
+- Hardening: sanity checks for numbers (Issue #1306)
+
+* Mon Feb 01 2016 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.27.0-1
+- Add: proper alarm management, including activation/deactivation in logs (Issue #1582)
+- Add: Enable log summary traces using -logSummary CLI (Issue #1585)
+- Add: New CLI parameter '-relogAlarms' to see ALL possible alarm-provoking failures in the log-file
+- Add: subscriptions triggered by modifications in any attribute without explicitly list them (aka ONANYCHANGE) (Issue #350)
+- Add: 'q' expression evaluation in NGSIv2 subscription (at subscription creation/update and update context times) (Issue #1316 and #1658)
+- Add: srv=, subsrv= and from= fields to log (Issue #1593)
+- Add: POST /v2/subscriptions operation (Issue #1316)
+- Add: DELETE /v2/subscriptions operation (Issue #1654)
+- Add: PATCH /v2/subscriptions/{subId} operation (Issue #1658)
+- Add: reset for notification counters in threadpool mode
+- Add: id fields checking for NGSIv2 API and (if -strictNgsiv1Ids is enabled) NGSIv1 API (#1601)
+- Fix: entity/attribute operations to align them with the last JSON representation format defined for NGSIv2 (Issue #1259)
+- Fix: avoid rendering invalid JSON characters in response payloads (Issue #1172)
+- Fix: avoid escaping / in callback field in GET /v2/subscriptions and GET /v2/subscriptions/<subId> operations
+- Fix: wrong accumulation in counter sentOK
+- Fix: more descriptive error messages for CPr update/query forward fail
+- Fix: avoid -g compiler flag in release build
+- Fix: supporting decimal values for seconds in ISO8601 strings (Issue #1617)
+- Fix: enforcing "http" or "https" schema and better detection of missing port at URLs parsing (Issue #1652)
+- Fix: fixed wrong interpretation of empty string keyvalues as empty objects in compounds (Issue #1642)
+- Fix: subscription service path is lost at update subscription time (Issue #1693)
+- Fix: Mongo driver migrated to legacy-1.0.7 (to get the fix for https://jira.mongodb.org/browse/CXX-699) (Issue #1568)
+
+* Wed Dec 09 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.1-1
+- Default -subIvalCache changed to 60 seconds
+- Add: servicePath header filtering in GET /v2/subscriptions operation (Issue #1557)
+- Add: New command-line-option '-logLevel <level>', levels: NONE, ERROR, WARNING, INFO, DEBUG (Issue #1583)
+
+* Tue Dec 01 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.26.0-1
+- Add: Add queue+threads for notifications (notificationMode thread:<queue size>:<num threads>) (Issue #1449)
+- Add: possibility to limit the maximum number of simultaneous connections, using the CLI option -maxConnections (Issue #1384)
+- Add: possibility to use thread pool for incoming connections, using CLI option -reqPoolSize (Issue #1384)
+- Add: Unpatterned subscriptions now also in subscription cache (Issue #1475)
+- Add: Built-in Timing/Profiling (Issue #1367)
+- Add: clearer statistics in GET /statistics and GET /cache/statistics operations
+- Add: Simulated/drop notifications mode is now orthogonal to -notificationMode (Issue #1505)
+- Add: finer-grain statistics switches: -statCounters, -statSemWait (old -mutexTimeStat), -statTiming and -statNotifQueue
+- Fix: avoid indirect usage of DB connections concurrently due to cursors (Issue #1558)
+- Fix: safer treatment of database fields lastNotification, expiration and throttling in 
+       the 'csub' collection, assuming that the field can be either int or long (it is always written as long)
+- Fix: number/bool correct rendering in NGSIv1 compound values
+- Fix: ONCHANGE notifications triggered by update context operation are filled avoiding querying entities collection (#881)
+- Fix: wrong notification values (duplicated) when triggering update context operations are too close (race condition)
+- Fix: A bug in the request reading logic that may cause unexpected Parse Errors or even SIGSEGVs
+- Fix: Semaphore releasing bug in unsubscribeContext when subscription ID is the empty string (Issue #1488)
+- Fix: Fixed an uptil now unknown bug with throttling
+- Fix: Only 1 query at csubs collection/cache is done per context element processing at updateContext (previously one query per attribute were done) (Issue #1475)
+- Fix: 'count' and 'lastNotificationTime' now maintained by subCache (and synched via DB) (Issue #1476)
+- Fix: updates including several attributes with the same name are now reported as InvalidModification (Issue #908)
+- Fix: no longer adding subscriptions from all tenants in the cache if broker isn't multitenant (Issue #1555)
+- Fix: resetting temporal counters at synching the subscription cache (Issue #1562)
+- Fix: using the text "too many sbuscriptions" at cache statistics operations in the case of too many results
+- Fix: crash due to subscription ID not conforming to supposed syntax in request "GET /v2/subscriptions/XXX" (Issue #1552)
+- Hardening: exhaustive try/catch (mainly at mongoBackend module) 
+- Deprecated: ONTIMEINTERVAL subscriptions
+
+* Mon Nov 02 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.25.0-1
+- Add: NGSIv2 operation GET /v2/subscriptions (#1126)
+- Add: NGSIv2 operation GET /v2/subscription/<id> (#1317)
+- Add: URI params 'geometry' and 'coords' for GET /v2/entities (#1177)
+- Add: CLI argument -notificationMode. Default mode is 'transient' (previous version used 'permanent' implicitly) (#1370)
+- Add: CLI argument -connectionMemory for connection memory limit. Default value is 64Kb (#1384)
+- Add: CLI argument -noCache to disable cache (recovering $where from 0.23.0 code base to search for subscriptions always in DB)
+- Add: githash in --version (#1363)
+- Add: contextBroker standard error log in RPM init script (#1175)
+- Fix: broken subscription cache (#1308), including the semaphore for subscription cache (#1401)
+- Fix: conv op to std op mapping wrongly using patterns in some GET operations (#1322)
+- Fix: using 'count' in all paginated queries in NGSIv2 (get entities list was missing) (#1041)
+- Fix: add charset=utf-8 for notifications (#1340)
+- Fix: incorrect 'details' field rendering (leading to illegal JSON) for error responses in some cases (#843)
+- Fix: escaping dot (.) in attrNames field in entities collection in DB (#1323)
+- Fix: compound attribute values support in CPr update forwarding (#1440)
+- Fix: traces to stdout only if CLI '-fg' is set (#1272)
+- Fix: avoid noisy error output in RPM init script (#309)
+- Fix: performance problem in NGSIv2 API due to uncontrolled log trace printing
+- Fix: trying to update several matching entities associated to the same ID in NGSIv2 API now returns in TooManyResults error (#1198)
+- Fix: more accurate text for details field in zero content-length error responses (#1203)
+- Fix: description text for parse errors in NGSIv2 JSON requests (#1200)
+- Fix: leftover whitespaces in NGSIv2 error names (#1199) 
+- Fix: clearer error on NGSIv2 entity attribute update, without value in payload (#1164)
+- Fix: changed  error code from 472 (Invalid Parameter) to 422 (Invalid Modification) in NGSIv1 in the case of missing attribute value (#1164)
+- Fix: return error response in NGSIv2 API when the combined length of id/type/servicePath exceeds (mongo) index key length limit (#1289)
+- Fix: error responses for NGSIv2 PATCH request on entity without payload (#1257)
+- Fix: clearer errors for 'entity not found' and 'conflict too many results' on NGSIv2 update PATCH (#1260)
+- Fix: update PATCH request with invalid service-path never returned a response (#1280)
+- Fix: error must be Not Found, when updating an unknown attribute of an existing entity on NGSIv2 update PATCH (#1278)
+- Fix: POST /v2/entities returns error if the entity to create already exists (#1158)
+- Fix: error description for PUT/POST/PATCH request with empty JSON object as payload in NGSIv2 (#1305)
+- Fix: improve error description in NGSIv2 PUT on entity, when entity is not found or there is a conflict due to many results (#1320)
+- Fix: empty/absent attribute value support, both in NGSIv1 and NGSIv2 (#1187, #1188 and #1358)
+- Hardening: mongoBackend checking for field existence and proper type to avoid broker crashes due to DB corruption (#136)
+- Hardening: safer input/ouput logic for csub documents in MongoDB and cache
+- Remove: proxyCoap binary from RPM (#1202)
+- Remove: deprecated command line arguments -ngsi9, -fwdHost and -fwdPort
+- Remove: deprecated functionality related with associations
+
 * Mon Sep 14 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.24.0-1
 - Add:  FIWARE::StringQuery scope, implementing filtering capabilities (equal, unqual, greater/less than, ranges, existence) (Issue #864)
 - Add:  APPEND_STRICT action type for POST /v1/updateContext operation
@@ -293,30 +446,30 @@ fi
 - Fix:  Service-Path is taken into account in 'GET /v1/contextTypes' and 'GET /v1/contextTypes/{entityType}' operations (Issue #676)
 
 * Fri Nov 28 2014 Fermin Galan <fermin@tid.es> 0.17.0-1 (FIWARE-4.1.2-1)
-Add: New convop: "POST /v1/contextEntities" (Issue #613).
-     Note also that AppendContextElementRequest has been added an EntityId field.
-Add: Convenience operations that respond with AppendContextElementResponse now get the
-     EntityId info included in the response.
-Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
-     The old name will be supported as well. (Issue #633)
-Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
-Add: "/" is used as implicit service path for entities. (Issue #646)
-Add: Queries without Fiware-ServicePath are resolved on "/#" implicitly (i.e. all the paths). (Issue #646)
-Fix: Attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
-Fix: Changed max-length of tenant names from 20 characters to 50.
-     Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)
-Fix: No longer responding with 'Service not found: $URL'. (Issue #619)
-Fix: Requests with payload containing forbidden characters are now rejected. (Issue #619)
-Fix: Fixed a bug that made the broker crash on problems with EntityId during XML-parse (in very rare situations).
-Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one is still supported to ensure backward compatibility. (Issue #627)
-Fix: Fixed a leak for each forwarding of messages to Context Providers.
-Fix: Changed max-length of service path elements from 10 characteres to 50. (Issue #649)
-Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
-Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
-Fix: Using 443 as default port for "https" notifications. (Issue #639)
-Fix: Fixed RPM package so PID file is stored in /var/run/contextBroker instead of /var/log/contextBroker. (Issue #612)
-Fix: Payload no longer accepts 'operator' as part of a Scope. (Issue #618)
-Fix: Made compound attribute values for for convenience operations (Issue #660)
+- Add: New convop: "POST /v1/contextEntities" (Issue #613).
+       Note also that AppendContextElementRequest has been added an EntityId field.
+- Add: Convenience operations that respond with AppendContextElementResponse now get the
+       EntityId info included in the response.
+- Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
+       The old name will be supported as well. (Issue #633)
+- Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
+- Add: "/" is used as implicit service path for entities. (Issue #646)
+- Add: Queries without Fiware-ServicePath are resolved on "/#" implicitly (i.e. all the paths). (Issue #646)
+- Fix: Attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
+- Fix: Changed max-length of tenant names from 20 characters to 50.
+       Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)
+- Fix: No longer responding with 'Service not found: $URL'. (Issue #619)
+- Fix: Requests with payload containing forbidden characters are now rejected. (Issue #619)
+- Fix: Fixed a bug that made the broker crash on problems with EntityId during XML-parse (in very rare situations).
+- Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one is still supported to ensure backward compatibility. (Issue #627)
+- Fix: Fixed a leak for each forwarding of messages to Context Providers.
+- Fix: Changed max-length of service path elements from 10 characteres to 50. (Issue #649)
+- Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
+- Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
+- Fix: Using 443 as default port for "https" notifications. (Issue #639)
+- Fix: Fixed RPM package so PID file is stored in /var/run/contextBroker instead of /var/log/contextBroker. (Issue #612)
+- Fix: Payload no longer accepts 'operator' as part of a Scope. (Issue #618)
+- Fix: Made compound attribute values for for convenience operations (Issue #660)
 
 * Mon Nov 03 2014 Fermin Galan <fermin@tid.es> 0.16.0-1 (FIWARE-4.1.1-1)
 - Add: Adding alternative (preferred) URLs: '/ngsi10' => '/v1' AND '/ngsi9' => '/v1/registry' (Issue #559)

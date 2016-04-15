@@ -30,141 +30,135 @@ brokerStart CB
 --SHELL--
 echo "+++++ 1. put an entity +++++"
 url="/v1/contextEntities/entity01"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-    <contextAttribute>
-      <name>pressure</name>
-      <type>clima</type>
-      <contextValue>p23</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</updateContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" -X "PUT"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    },
+    {
+      "name" : "pressure",
+      "type" : "clima",
+      "value" : "p23"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" -X "PUT" --json
 
 echo "+++++ 2. create the entity +++++"
 url="/v1/contextEntities/entity01"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<appendContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-    <contextAttribute>
-      <name>pressure</name>
-      <type>clima</type>
-      <contextValue>p23</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</updateContextElementRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    },
+    {
+      "name" : "pressure",
+      "type" : "clima",
+      "value" : "p23"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 3. put an entity +++++"
 url="/v1/contextEntities/entity01"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-    <contextAttribute>
-      <name>pressure</name>
-      <type>clima</type>
-      <contextValue>p23</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</updateContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" -X "PUT"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    },
+    {
+      "name" : "pressure",
+      "type" : "clima",
+      "value" : "p23"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" -X "PUT" --json
 
 
 --REGEXPECT--
 +++++ 1. put an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 203
-Content-Type: application/xml
+Content-Length: 122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextElementResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>entity01</details>
-  </errorCode>
-</updateContextElementResponse>
+{
+    "errorCode": {
+        "code": "404",
+        "details": "entity01",
+        "reasonPhrase": "No context element found"
+    }
+}
 +++++ 2. create the entity +++++
 HTTP/1.1 200 OK
-Content-Length: 729
-Content-Type: application/xml
+Content-Length: 432
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="" isPattern="false">
-    <id>entity01</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue/>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>clima</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                },
+                {
+                    "name": "pressure",
+                    "type": "clima",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "entity01",
+    "isPattern": "false",
+    "type": ""
+}
 +++++ 3. put an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 654
-Content-Type: application/xml
+Content-Length: 371
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextElementResponse>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue/>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>clima</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</updateContextElementResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                },
+                {
+                    "name": "pressure",
+                    "type": "clima",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

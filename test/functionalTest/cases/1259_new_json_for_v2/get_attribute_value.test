@@ -1,0 +1,530 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT Attribute Value
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. POST /v2/entities creating E1 A1=1
+# 02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
+# 03. GET /v2/entities/E1/attrs/A1/value as application/json: OK
+# 04. GET /v2/entities/E1/attrs/A1/value as text: OK
+# 05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
+# 06. GET /v2/entities/E1/attrs/A1/value as application/json: OK
+# 07. GET /v2/entities/E1/attrs/A1/value as text: OK
+# 08. PUT /v2/entities/E1/attrs/A1/value with TEXT String payload
+# 09. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+# 10. GET /v2/entities/E1/attrs/A1/value as text: OK
+# 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload 
+# 12. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+# 13. GET /v2/entities/E1/attrs/A1/value as text: OK
+# 14. PUT /v2/entities/E1/attrs/A1/value with TEXT Integer payload 123
+# 15. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+# 16. GET /v2/entities/E1/attrs/A1/value as text: OK
+# 17. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.14
+# 18. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+# 19. GET /v2/entities/E1/attrs/A1/value as text: OK
+# 20. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload -12.1
+# 21. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+# 22. GET /v2/entities/E1/attrs/A1/value as text: OK
+# 23. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.2e2
+# 24. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+# 25. GET /v2/entities/E1/attrs/A1/value as text: OK
+#
+
+echo '01. POST /v2/entities creating E1 A1=1'
+echo '======================================'
+payload='{ "id": "E1", "A1": 1 }'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo '02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload'
+echo '=================================================================='
+payload='{ "a": "1", "b": 2 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo '03. GET /v2/entities/E1/attrs/A1/value as application/json: OK'
+echo '=============================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '04. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text
+echo
+echo
+
+
+echo '05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload'
+echo '================================================================='
+payload='[ "a", "b", "c" ]'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo '06. GET /v2/entities/E1/attrs/A1/value as application/json: OK'
+echo '=============================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '07. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text
+echo
+echo
+
+
+echo '08. PUT /v2/entities/E1/attrs/A1/value with TEXT String payload'
+echo '==============================================================='
+payload='"STRING"'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text --out application/json
+echo
+echo
+
+
+echo '09. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR'
+echo '================================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '10. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text --noPayloadCheck
+echo
+echo
+
+
+echo '11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload'
+echo '================================================================'
+payload='true'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text --out application/json
+echo
+echo
+
+
+echo '12. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR'
+echo '================================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '13. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text --noPayloadCheck
+echo
+echo
+
+
+echo '14. PUT /v2/entities/E1/attrs/A1/value with TEXT Integer payload 123'
+echo '===================================================================='
+payload='123'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text --out application/json
+echo
+echo
+
+
+echo '15. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR'
+echo '================================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '16. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text --noPayloadCheck
+echo
+echo
+
+
+echo '17. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.14'
+echo '==================================================================='
+payload='3.14'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text --out application/json
+echo
+echo
+
+
+echo '18. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR'
+echo '================================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '19. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text --noPayloadCheck
+echo
+echo
+
+
+echo '20. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload -12.1'
+echo '===================================================================='
+payload='-12.1'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text --out application/json
+echo
+echo
+
+
+echo '21. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR'
+echo '================================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '22. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text --noPayloadCheck
+echo
+echo
+
+
+echo '23. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.2e2'
+echo '===================================================================='
+payload='3.2e2'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text --out application/json
+echo
+echo
+
+
+echo '24. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR'
+echo '================================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json
+echo
+echo
+
+
+echo '25. GET /v2/entities/E1/attrs/A1/value as text: OK'
+echo '=================================================='
+orionCurl --url /v2/entities/E1/attrs/A1/value --json --out text --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities creating E1 A1=1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
+==================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities/E1/attrs/A1/value as application/json: OK
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 15
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "a": "1",
+    "b": 2
+}
+
+
+04. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 15
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{"a":"1","b":2}
+
+
+05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
+=================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET /v2/entities/E1/attrs/A1/value as application/json: OK
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 13
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "a",
+    "b",
+    "c"
+]
+
+
+07. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 13
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+["a","b","c"]
+
+
+08. PUT /v2/entities/E1/attrs/A1/value with TEXT String payload
+===============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+09. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+=================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "accepted MIME types: text/plain",
+    "error": "NotAcceptable"
+}
+
+
+10. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 6
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+STRING
+
+
+11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload
+================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+=================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "accepted MIME types: text/plain",
+    "error": "NotAcceptable"
+}
+
+
+13. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+true
+
+
+14. PUT /v2/entities/E1/attrs/A1/value with TEXT Integer payload 123
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+15. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+=================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "accepted MIME types: text/plain",
+    "error": "NotAcceptable"
+}
+
+
+16. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 10
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+123.000000
+
+
+17. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.14
+===================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+18. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+=================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "accepted MIME types: text/plain",
+    "error": "NotAcceptable"
+}
+
+
+19. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 8
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+3.140000
+
+
+20. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload -12.1
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+21. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+=================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "accepted MIME types: text/plain",
+    "error": "NotAcceptable"
+}
+
+
+22. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 10
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+-12.100000
+
+
+23. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.2e2
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+24. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
+=================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 73
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "accepted MIME types: text/plain",
+    "error": "NotAcceptable"
+}
+
+
+25. GET /v2/entities/E1/attrs/A1/value as text: OK
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 10
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+320.000000
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

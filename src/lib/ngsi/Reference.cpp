@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/string.h"
 #include "ngsi/Request.h"
 #include "ngsi/Reference.h"
 
@@ -41,7 +42,6 @@
 std::string Reference::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -53,6 +53,17 @@ std::string Reference::check
     {
       return "Empty Reference";
     }
+  }
+
+  std::string  url = string;
+  std::string  host;
+  int          port;
+  std::string  path;
+  std::string  protocol;
+
+  if (parseUrl(url, host, port, path, protocol) == false)
+  {
+    return "Invalid URL";
   }
 
   return "OK";
@@ -101,11 +112,13 @@ void Reference::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sReference: %s", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sReference: %s", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo Reference", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo Reference", indent.c_str()));
   }
 }
 
@@ -115,14 +128,14 @@ void Reference::present(const std::string& indent)
 *
 * Reference::render -
 */
-std::string Reference::render(Format format, const std::string& indent, bool comma)
+std::string Reference::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "reference", string, format, comma);
+  return valueTag1(indent, "reference", string, comma);
 }
 
 

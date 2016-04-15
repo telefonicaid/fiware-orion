@@ -1,0 +1,175 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Service Path In Single ONCHANGE Notification
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -notificationMode threadpool:2:1
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Add ONCHANGE subscription to E.*/ET
+# 02. Create entity E1/ET 
+# 03. Query accumulator
+#
+
+echo "01. Add subscription to E.*/ET"
+echo "=============================="
+payload='{
+  "entities": [
+    {
+        "type": "ET",
+        "isPattern": "true",
+        "id": "E.*"
+    }
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A"
+        ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --json --payload "${payload}"
+echo
+echo
+
+
+echo "02. Create entity E1/ET"
+echo "======================="
+payload='{
+  "attributes" : [
+    {
+      "name" : "A",
+      "type" : "string",
+      "value" : "V"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/ET/id/E1 --payload "${payload}" --json
+echo
+echo
+
+
+echo "03. Query accumulator"
+echo "====================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Add subscription to E.*/ET
+==============================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create entity E1/ET
+=======================
+HTTP/1.1 200 OK
+Content-Length: 315
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E1",
+    "isPattern": "false",
+    "type": "ET"
+}
+
+
+03. Query accumulator
+=====================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 462
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "ET",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A",
+            "type" : "string",
+            "value" : "V"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

@@ -31,96 +31,92 @@ accumulatorStart :: ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/version" --host "[::1]" -g 2> /dev/null
+orionCurl --url "/version" --json --host "[::1]" -g 2> /dev/null
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/version" --host "127.0.0.1" -g 2> /dev/null
+orionCurl --url "/version" --json --host "127.0.0.1" -g 2> /dev/null
 
 echo "3: ++++++++++++++++++++"
 url="/v1/subscribeContext"
-payload='<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-    <attribute>lightstatus</attribute>
-  </attributeList>
-  <reference>http://::1:'${LISTENER2_PORT}'/notify</reference>
-  <duration>PT1H</duration>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>temperature</condValue>
-        <condValue>lightstatus</condValue>
-      </condValueList>          
-    </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>'
-
-SUB_ID_V6=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' |
-awk -F '<' '{print $1}' | grep -v '^$' )
-orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "lightstatus"
+  ],
+  "reference": "http://::1:'${LISTENER2_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "temperature",
+              "lightstatus"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json --host "[::1]" -g 2> /dev/null
 
 echo "4: ++++++++++++++++++++"
 url="/v1/subscribeContext"
-payload='<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-    <attribute>lightstatus</attribute>
-  </attributeList>
-  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
-  <duration>PT1H</duration>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>temperature</condValue>
-        <condValue>lightstatus</condValue>
-      </condValueList>
-    </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>'
-
-SUB_ID_V4=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-orionCurl --url "$url" --payload "$payload" --host "127.0.0.1" -g 2> /dev/null
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "lightstatus"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "temperature",
+              "lightstatus"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json --host "127.0.0.1" -g 2> /dev/null
 
 echo "5: ++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Room" isPattern="false">
-        <id>OfficeRoom</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>clima</type>
-          <contextValue>p2300</contextValue>
-        </contextAttribute>
-        <contextAttribute>
-          <name>lightstatus</name>
-          <type>light</type>
-          <contextValue>L23</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "pressure",
+          "type": "clima",
+          "value": "p2300"
+        },
+        {
+          "name": "lightstatus",
+          "type": "light",
+          "value": "L23"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json --host "[::1]" -g 2> /dev/null
 
 echo "6: ++++++++++++++++++++"
 #Get accumulated data
@@ -135,158 +131,164 @@ accumulatorDump
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
-Content-Type: application/xml
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orion>
-  <version>REGEX(.*)</version>
-  <uptime>REGEX(.*)</uptime>
-  <git_hash>REGEX(([0-9a-f]{40}|nogitversion))</git_hash>
-  <compile_time>REGEX(.*)</compile_time>
-  <compiled_by>REGEX(.*)</compiled_by>
-  <compiled_in>REGEX(.*)</compiled_in>
-</orion>
+{
+    "orion": {
+        "compile_time": "REGEX(.*)",
+        "compiled_by": "REGEX(.*)",
+        "compiled_in": "REGEX(.*)",
+        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
+        "uptime": "REGEX(.*)",
+        "version": "REGEX(.*)"
+    }
+}
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: REGEX(\d+)
-Content-Type: application/xml
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orion>
-  <version>REGEX(.*)</version>
-  <uptime>REGEX(.*)</uptime>
-  <git_hash>REGEX(([0-9a-f]{40}|nogitversion))</git_hash>
-  <compile_time>REGEX(.*)</compile_time>
-  <compiled_by>REGEX(.*)</compiled_by>
-  <compiled_in>REGEX(.*)</compiled_in>
-</orion>
+{
+    "orion": {
+        "compile_time": "REGEX(.*)",
+        "compiled_by": "REGEX(.*)",
+        "compiled_in": "REGEX(.*)",
+        "git_hash": "REGEX(([0-9a-f]{40}|nogitversion))",
+        "uptime": "REGEX(.*)",
+        "version": "REGEX(.*)"
+    }
+}
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/xml
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT1H</duration>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/xml
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT1H</duration>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 805
-Content-Type: application/xml
+Content-Length: 514
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 6: ++++++++++++++++++++
 POST http://::1:REGEX(\d+)/notify
-Content-Length: 737
+Content-Length: 483
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: ::1:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "lightstatus",
+            "type" : "light",
+            "value" : "L23"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
 =======================================
 7: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 737
+Content-Length: 483
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "lightstatus",
+            "type" : "light",
+            "value" : "L23"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
 =======================================
 --TEARDOWN--
 brokerStop CB

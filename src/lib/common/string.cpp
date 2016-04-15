@@ -28,10 +28,12 @@
 #include <string>
 #include <vector>
 
-#include "common/string.h"
-#include "common/wsStrip.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/string.h"
+#include "common/wsStrip.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -95,7 +97,6 @@ bool isIPv6(const std::string& in)
 {
   size_t      pos;
   std::string partip;
-  std::string resu;
   std::string staux = in;
   int         cont  = 0;
 
@@ -104,7 +105,6 @@ bool isIPv6(const std::string& in)
   {
     cont++;
     partip = staux.substr(0, pos+1);
-    resu  += partip;
 
     if (checkGroupIPv6(partip) == false)
     {
@@ -214,11 +214,25 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 
 /* ****************************************************************************
 *
-* parseUrl -
+* parseUrl - parse a URL and return its pieces
 *
 * Breaks a URL into pieces. It returns false if the string passed as first
 * argument is not a valid URL. Otherwise, it returns true.
 *
+* PARAMETERS
+*   - url
+*   - host
+*   - port
+*   - path
+*   - protocol
+*
+* RETURN VALUE
+*   parseUrl returns TRUE on successful operation, FALSE otherwise
+*
+* NOTE
+*   About the components in a URL: according to https://tools.ietf.org/html/rfc3986#section-3,
+*   the scheme component is mandatory, i.e. the 'http://' or 'https://' must be present,
+*   otherwise the URL is invalid. 
 */
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
@@ -228,11 +242,6 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     return false;
   }
 
-  /* First: split by the first '/' to get host:ip and path */
-  std::vector<std::string>  urlTokens;
-  int                       components = stringSplit(url, '/', urlTokens);
-
-  protocol = urlTokens[0];
 
   /* http://some.host.com/my/path
    *      ^^             ^  ^
@@ -241,6 +250,21 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
    *   0          2       3    4  position in urlTokens vector
    *   1  23             4  5     components
    */
+
+
+  /* First: split by the first '/' to get host:ip and path */
+  std::vector<std::string>  urlTokens;
+  int                       components = stringSplit(url, '/', urlTokens);
+
+  protocol = urlTokens[0];
+
+  //
+  // Ensuring the scheme is present
+  //
+  if ((protocol != "https:") && (protocol != "http:"))
+  {
+    return false;
+  }
 
   if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
   {
@@ -299,9 +323,15 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
     if (components == 2)
     {
+      /* Sanity check (corresponding to http://xxxx:/path) */
+      if (hostTokens[1].length() == 0)
+      {
+        return false;
+      }
+
       port = atoi(hostTokens[1].c_str());
     }
-    else
+    else  // port not given - using default ports
     {
       port = urlTokens[0] == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }
@@ -387,7 +417,8 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   char*  comma;
   char*  number1;
   char*  number2;
-  bool   ret = true;
+  double newLatitude;
+  double newLongitude;
 
   cP    = wsStrip(cP);
 
@@ -402,66 +433,32 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
   number1 = cP;
   number2 = comma;
-
   number1 = wsStrip(number1);
   number2 = wsStrip(number2);
 
-  std::string  err;
-  double       oldLatitude  = latitude;
-  double       oldLongitude = longitude;
-
-  latitude                  = atoF(number1, &err);
-
-  if (err.length() > 0)
+  if ((str2double(number1, &newLatitude) == false) || (newLatitude > 90) || (newLatitude < -90))
   {
-    latitude = oldLatitude;
-    LM_W(("Bad Input (bad latitude value in coordinate string '%s')", initial));
-    ret = false;
-  }
-  else
-  {
-    longitude = atoF(number2, &err);
+    std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
 
-    if (err.length() > 0)
-    {
-      /* Rollback latitude */
-      latitude = oldLatitude;
-      longitude = oldLongitude;
-      LM_W(("Bad Input (bad longitude value in coordinate string '%s')", initial));
-      ret = false;
-    }
+    free(initial);
+    return false;
   }
 
-  if ((latitude > 90) || (latitude < -90))
+  if ((str2double(number2, &newLongitude) == false) || (newLongitude > 180) || (newLongitude < -180))
   {
-    LM_W(("Bad Input (bad value for latitude '%s')", initial));
-    ret = false;
+    std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
+    alarmMgr.badInput(clientIp, details);
+
+    free(initial);
+    return false;
   }
-  else if ((longitude > 180) || (longitude < -180))
-  {
-    LM_W(("Bad Input (bad value for longitude '%s')", initial));
-    ret = false;
-  }
+
+  latitude  = newLatitude;
+  longitude = newLongitude;
 
   free(initial);
-  return ret;
-}
-
-
-
-/* ****************************************************************************
-*
-* coords2string - 
-*/
-void coords2string(std::string* s, double latitude, double longitude, int decimals)
-{
-  char buf[256];
-  char format[32];
-
-  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
-  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
-
-  *s = buf;
+  return true;
 }
 
 
@@ -662,7 +659,7 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
   {
     if (strncmp(&from[fromIx], oldString, oldLen) == 0)
     {
-      snprintf(to, toLen, "%s", newString);
+      strncat(to, newString, toLen - strlen(to));
       toIx   += newLen;
       fromIx += oldLen;
     }
@@ -690,7 +687,7 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
 std::string servicePathCheck(const char* servicePath)
 {
   if (servicePath  == NULL)      return "No Service Path";
-  if (*servicePath == 0)         return "Empty Service Path";
+  if (*servicePath == 0)         return "OK";   // Special case, default service path
 
   //
   // A service-path contains only alphanumeric characters, plus underscore
@@ -709,7 +706,9 @@ std::string servicePathCheck(const char* servicePath)
       ;
     else
     {
-      LM_W(("Bad Input (Bad Character '%c' in Service-Path)", *servicePath));
+      std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
+      alarmMgr.badInput(clientIp, details);
+
       return "Bad Character in Service-Path";
     }
 
@@ -751,14 +750,15 @@ std::string servicePathCheck(const char* servicePath)
 * It IS a double, but this function will say it is not, as it actually is not a valid double for
 * this computer as the computer cannot represent it as the C builtin type 'double' ... OK!
 */
-bool str2double(char* s, double* dP)
+bool str2double(const char* s, double* dP)
 {
-  char*   rest = s;
+  char*   rest = NULL;
   double  d;
 
+  errno = 0;
   d = strtod(s, &rest);
 
-  if ((rest == s) || (errno == ERANGE))
+  if ((rest == NULL) || (errno == ERANGE))
   {
     return false;
   }
@@ -780,4 +780,24 @@ bool str2double(char* s, double* dP)
   }
 
   return true;
+}
+
+
+
+/*****************************************************************************
+*
+* isodate2str -
+*
+* FIXME P6: change implementation to use gmtime_r
+*
+*/
+std::string isodate2str(long long timestamp)
+{
+  // 80 bytes is enough to store any ISO8601 string safely
+  // We use gmtime() to get UTC strings, otherwise we would use localtime()
+  // Date pattern: 1970-04-26T17:46:40.00Z
+  char   buffer[80];
+  time_t rawtime = (time_t) timestamp;
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S.00Z", gmtime(&rawtime));
+  return std::string(buffer);
 }

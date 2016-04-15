@@ -35,13 +35,13 @@ brokerStart CB
 # 03. GET /v2/entities/E1
 # 04. PATCH /v2/entities/E1 attr1=4
 # 05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)
-# 06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist
+# 06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)
 #
 
 echo "01. Intent to patch a non-existing entity - error, of course"
 echo "============================================================"
 payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' -X PATCH --payload "$payload" --json
 echo
 echo
 
@@ -49,7 +49,7 @@ echo
 echo "02. Create E1/attr1+attr2"
 echo "========================="
 payload='{ "id": "E1", "type": "T1", "attr1": 2, "attr2": 2 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -64,7 +64,7 @@ echo
 echo "04. PATCH /v2/entities/E1 attr1=4"
 echo "================================="
 payload='{ "attr1": 4 }'
-orionCurl --url /v2/entities/E1 -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' -X PATCH --payload "$payload" --json
 echo
 echo
 
@@ -76,10 +76,10 @@ echo
 echo
 
 
-echo "06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist"
-echo "================================================================="
+echo "06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)"
+echo "========================================================================="
 payload='{ "attr3": 6 }'
-orionCurl --url /v2/entities/E1 -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E1?options=keyValues' -X PATCH --payload "$payload" --json
 echo
 echo
 
@@ -88,8 +88,9 @@ echo
 01. Intent to patch a non-existing entity - error, of course
 ============================================================
 HTTP/1.1 404 Not Found
-Content-Length: 61 
+Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -102,7 +103,8 @@ Date: REGEX(.*)
 =========================
 HTTP/1.1 201 Created
 Content-Length: 0
-Location: /v2/entities/E1
+Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -110,13 +112,22 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 57
+Content-Length: 119
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 2.0,
-    "attr2": 2.0,
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
     "id": "E1",
     "type": "T1"
 }
@@ -126,6 +137,7 @@ Date: REGEX(.*)
 =================================
 HTTP/1.1 204 No Content
 Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -133,23 +145,33 @@ Date: REGEX(.*)
 05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 57
+Content-Length: 119
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "attr1": 4.0,
-    "attr2": 2.0,
+    "attr1": {
+        "metadata": {},
+        "type": "none",
+        "value": 4
+    },
+    "attr2": {
+        "metadata": {},
+        "type": "none",
+        "value": 2
+    },
     "id": "E1",
     "type": "T1"
 }
 
 
-06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist
-=================================================================
+06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)
+=========================================================================
 HTTP/1.1 404 Not Found
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

@@ -33,61 +33,63 @@ accumulatorStart
 # the document size, which in sequence depends on (but it is not exactly equal to)
 # the size of the "inflated" attribute, the third parameter has been determined empirically
 #
-dbInsertEntity $CB_DATABASE_NAME E1 1900
-dbInsertEntity $CB_DATABASE_NAME E2 2100
-dbInsertEntity $CB_DATABASE_NAME E3 810000
-dbInsertEntity $CB_DATABASE_NAME E4 840000
+dbInsertEntity $CB_DB_NAME E1 1900
+dbInsertEntity $CB_DB_NAME E2 2100
+dbInsertEntity $CB_DB_NAME E3 810000
+dbInsertEntity $CB_DB_NAME E4 840000
 
 --SHELL--
 
 # Close to the static buffer limit (~19 KB)
 url="/v1/subscribeContext"
-payload='<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>'"
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  "'<duration>PT1H</duration>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>A</condValue>
-      </condValueList>
-    </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 sleep 1
 echo "1: ++++++++++++++++++++"
 # Passing the static buffer limit (~21 KB)
 url="/v1/subscribeContext"
-payload='<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E2</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>'"
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  "'<duration>PT1H</duration>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>A</condValue>
-      </condValueList>
-    </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E2"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 
@@ -95,26 +97,27 @@ sleep 1
 echo "2: ++++++++++++++++++++"
 # Close to the dynamic buffer limit (~7.9 MB)
 url="/v1/subscribeContext"
-payload='<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E3</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>'"
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  "'<duration>PT1H</duration>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>A</condValue>
-      </condValueList>
-    </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E3"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 
@@ -122,26 +125,27 @@ sleep 1
 echo "3: ++++++++++++++++++++"
 # Passing the dynamic buffer limit, causing an error (~8.1 MB)
 url="/v1/subscribeContext"
-payload='<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E4</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>'"
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  "'<duration>PT1H</duration>
-  <notifyConditions>
-    <notifyCondition>
-      <type>ONCHANGE</type>
-      <condValueList>
-        <condValue>A</condValue>
-      </condValueList>
-    </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E4"
+    }
+  ],
+  "attributes": [ ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT1H",
+  "notifyConditions": [
+      {
+          "type": "ONCHANGE",
+          "condValues": [
+              "A"
+          ]
+      }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 
@@ -150,10 +154,11 @@ echo "** Notifications sent:"
 accumulatorCount
 
 # ----------------------------------------------------------------------
+# NOTE (not a FIXME):
 # These two tests make reference to the old functionality provided by
 # the sendHttpSocket() function in file clientSocketHttp.cpp. If we are
-# ever to activate it through the USE_OLD_SENDHTTPSOCKET flag these lines
-# are necesary for the test to pass.
+# ever to activate it again through the USE_OLD_SENDHTTPSOCKET flag, these lines
+# are necessary for the test to pass.
 
 # The log has to show exactly 1 case of static buffer usage
 #echo "** Static buffer usages:"
@@ -171,63 +176,63 @@ grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $10 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/xml
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT1H</duration>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/xml
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT1H</duration>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/xml
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT1H</duration>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/xml
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT1H</duration>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
 
 4: ++++++++++++++++++++
 ** Notifications sent:
@@ -235,18 +240,18 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
- Sending message 1 to HTTP server: sending message of REGEX((19869|19870|19871|19872|19873|19874|19875)) bytes to HTTP server
- Sending message 2 to HTTP server: sending message of REGEX((21869|21870|21871|21872|21873|21874|21875)) bytes to HTTP server
- Sending message 3 to HTTP server: sending message of REGEX((8100871|8100872|8100873|8100874|8100875|8100876|8100877)) bytes to HTTP server
+ Sending message 1 to HTTP server: sending message of REGEX((19669|19670|19671|19672|19673|19674|19675)) bytes to HTTP server
+ Sending message 2 to HTTP server: sending message of REGEX((21670|21671|21672|21673|21674|21675|21676)) bytes to HTTP server
+ Sending message 3 to HTTP server: sending message of REGEX((8100671|8100672|8100673|8100674|8100675|8100676|8100677)) bytes to HTTP server
 --TEARDOWN--
 #
 # NOTE: the six different sizes above is to cover for different sizes in the version string
 #
-#       19869|19870|19871|19872|19873|19874|19875:
+#       19669|19670|19671|19672|19673|19674|19675
 #
-#       19869:   d.d.d
-#       19870:   d.dd.d
-#       19875:   d.dd.d-next
+#       19669:   d.d.d
+#       19670:   d.dd.d
+#       19675:   d.dd.d-next
 
 brokerStop CB
 accumulatorStop

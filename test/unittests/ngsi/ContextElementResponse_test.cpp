@@ -40,21 +40,22 @@ TEST(ContextElementResponse, check)
 {
    ContextElementResponse  cer;
    std::string             out;
+   ConnectionInfo          ci;
    
    utInit();
 
-   out = cer.check(UpdateContext, XML, "", "", 0);
+   out = cer.check(&ci, UpdateContext, "", "", 0);
    EXPECT_STREQ("empty entityId:id", out.c_str());
 
    cer.contextElement.entityId.id         = "ID";
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   out = cer.check(UpdateContext, XML, "", "", 0);
+   out = cer.check(&ci, UpdateContext, "", "", 0);
    EXPECT_STREQ("no code", out.c_str());
 
    cer.statusCode.fill(SccOk, "details");
-   out = cer.check(UpdateContext, XML, "", "", 0);
+   out = cer.check(&ci, UpdateContext, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
    utExit();
@@ -69,11 +70,9 @@ TEST(ContextElementResponse, check)
 TEST(ContextElementResponse, render)
 {
   ContextElementResponse  cer;
-  const char*             outfile1 = "ngsi.contextElementResponse.render.middle.xml";
-  const char*             outfile2 = "ngsi.contextElementResponse.render.middle.json";
+  const char*             outfile = "ngsi.contextElementResponse.render.middle.json";
   std::string             out;
-  ConnectionInfo          ciX(XML);
-  ConnectionInfo          ciJ(JSON);
+  ConnectionInfo          ci(JSON);
 
    utInit();
 
@@ -83,12 +82,8 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(&ciX, UpdateContextElement, "");
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
-
-   out = cer.render(&ciJ, UpdateContextElement, "");
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+   out = cer.render(&ci, UpdateContextElement, "");
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 
    utExit();

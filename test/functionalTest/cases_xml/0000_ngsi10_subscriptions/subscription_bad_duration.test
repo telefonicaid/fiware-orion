@@ -1,0 +1,120 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription sequence bad duration
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+# Bad duration 1
+#INVALID_XML
+echo "1: ++++++++++++++++++++"
+url="/v1/subscribeContext"
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <duration>PT99Y</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>PT2S</condValue>
+      </condValueList>          
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
+echo "2: ++++++++++++++++++++"
+# Bad duration 2
+#INVALID_XML
+url="/v1/subscribeContext"
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <duration>PY99</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>PT2S</condValue>
+      </condValueList>          
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
+--REGEXPECT--
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 271
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeError>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>Bad Request</reasonPhrase>
+      <details>invalid payload: syntax error in duration string</details>
+    </errorCode>
+  </subscribeError>
+</subscribeContextResponse>
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 271
+Content-Type: application/json
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeError>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>Bad Request</reasonPhrase>
+      <details>invalid payload: syntax error in duration string</details>
+    </errorCode>
+  </subscribeError>
+</subscribeContextResponse>
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

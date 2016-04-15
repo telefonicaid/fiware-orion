@@ -58,7 +58,7 @@ with open(file) as f:
 
         # Filter out lines which doesn't include the process name (typically 'contextBroker') or
         # doesn't include the target date
-        if re.search('\'' + process_name + '\'', line) and re.search('CES?T\s+' + target_month + '\s+' + target_day, line, flags=re.IGNORECASE):
+        if re.search('\'' + process_name + '\'', line) and re.search('CES?T\s+' + target_month + '\s+' + target_day + '\s+', line, flags=re.IGNORECASE):
             # Grep line information we need using a regular expression
             m = re.match('\[CES?T (.*)\] (.*) : \'.*\' (.*)', line)
             if m != None:

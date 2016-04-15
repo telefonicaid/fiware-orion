@@ -7,7 +7,6 @@
 * [Multiservice/multitenant database separation](#multiservicemultitenant-database-separation)
 * [Delete complete database](#delete-complete-database)
 * [Setting indexes](#setting-indexes)
-    * [Analysis](#analysis)
 * [Database management scripts](#database-management-scripts)
     * [Deleting expired documents](#deleting-expired-documents)
     * [Latest updated document](#latest-updated-document)
@@ -56,7 +55,7 @@ mongorestore --host <dbhost> --db <db> dump/<db>
 
 Note that if you are using
 [multitenant/multiservice](#multiservicemultitenant-database-separation)
-you need to apply the procedures to each per-tenant/service database
+you need to apply the procedures to each per-tenant/service database.
 
 [Top](#top)
 
@@ -64,23 +63,23 @@ you need to apply the procedures to each per-tenant/service database
 
 MongoDB authorization is configured with the `-db`, `-dbuser` and `-dbpwd`
 options ([see section on command line
-options](cli.md)). There are different cases
+options](cli.md)). There are a few different cases
 to take into account:
 
--   If your MongoDB instance/cluster doesn't use authorization at all,
-    then don't use the `-dbuser` and `-dbpwd` options.
+-   If your MongoDB instance/cluster doesn't use authorization,
+    then do not use the `-dbuser` and `-dbpwd` options.
 -   If your MongoDB instance/cluster uses authorization , then:
     -   If you run Orion in single service/tenant mode (i.e.
         without `-multiservice`) then you are using only one database
         (the one specified by the -db option) and the authorization is
         done with `-dbuser` and `-dbpwd` in that database.
     -   If you run Orion in multi service/tenant mode (i.e.
-        with + -multiservice`) then the authorization is done at `admin`
+        with `-multiservice`) then the authorization is done at `admin`
         database using `-dbuser` and `-dbpwd`. As described [later in this
-        document](#Multiservice/multitenant_database_separation "wikilink"),
+        document](#multiservicemultitenant-database-separation),
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
-        authorizing on `admin` DB ensures permisions in all them.
+        authorizing on `admin` DB ensures permissions in all of them.
      
 [Top](#top)
 
@@ -98,12 +97,7 @@ the behaviour is different and the following databases are used (let
     database would be `orion-tenantA`.
 
 Per-service/tenant databases are created "on the fly" as the first
-request involving tenant data is processed by Orion. Note that there is
-a limitation in MongoDB current versions of 24,000 namespaces (each
-collection or index in a database consumes a namespace). Orion currently
-uses 5 collections per database, thus taking into account each
-collection involves also at least the `_id` index, that will end in a
-2,400 services/tenants limit (less if you have more indexes in place).
+request involving tenant data is processed by Orion.
 
 Finally, in the case of per-service/tenant databases, all collections
 and administrative procedures (backup, restore, etc.) are associated to
@@ -123,126 +117,19 @@ mongo <host>/<db>
 
 ## Setting indexes
 
-Orion Context Broker doesn't ensure any index in the database collection
-(except for one exception, described at the end of this section) in
-order to let flexibility to database administrators. Take into account
-that index usage involves a tradeoff between read efficiency (usage of
-indexes generally speeds up reads) and write efficiency (the usage of
-indexes slow down writes) and storage (indexes consume space in database
-and mapped RAM memory) and that is the administrator (not Orion) who has
-to decide what to priorize.
-
-However, in order to help administrator in that task, the following
-indexes could be recommended:
-
--   Collection [entities](database_model.md#entities-collection)
-    -   `_id.id` (used by queryContext and related
-        convenience operations)
-    -   `_id.type` (used by queryContext and related
-        convenience operations)
-    -   `_id.servicePath` (used by queryContext and related
-        convenience operations)
-    -   `creDate` (used to provided ordered results in queryContext and
-        related convenience operations)
--   Collection [registrations](database_model.md#registrations-collection)
-    -   `_id` (used to provided ordered results in
-        discoverContextAvailability and related convenience operations).
-        We include this index here for the sake of completeness, but the
-        administrator doesn’t need to explicitly ensure it, given that
-        MongoDB automatically provides a mandatory index for `_id` in
-        every collection.
-
-The only index that Orion Context Broker actually ensures is the
-"2dsphere" one in the location.coords field in the entities collection,
-due to functional needs [geo-location functionality](../user/geolocation.md)to work. The index is ensured at Orion startup or when entities are
-created for the first time.
-
-[Top](#top)
-
-### Analysis
-
-The following analyzis shows the TPS (transation per second) and storage
-consumption figures for different indexes configuration and number of
-entities in the Orion Context Broker database. We have used Orion 0.14.0
-in this analysis. Each transaction comprises one entity (either creating
-it, querying for it or updating it).
-
-Please, take into account that this information is provided only as a
-hint to guide your decision about which indexes to use in your
-particular set up, but the results in your particular environment may
-differ depending on hardware profile, the particular entities being used
-for the test, set up situation, etc. In this particular case, the
-resources of the system under test (a VMware-based VM) are: 2 vCPU (on a
-physical host based on Intel Xeon E5620@2.40GHz) and 4GB RAM. Both Orion
-and MongoDB run in the same VM. The tool to generate load is JMeter
-using the configuration that can be found at [the following
-location](https://github.com/telefonicaid/fiware-orion/tree/develop/test/LoadTest)
-(orionPerformanceOnlyQueries\_v2.0.jmx,
-orionPerformanceOnlyAppends\_v2.0.jmx and
-orionPerformanceAppendsAndUpdates\_v2.0.jmx) and running in a separated
-VM (but in the same subnet, i.e. L2 connectivity with the system under
-test.
-
-Test cases are entity query, entity creation and mixing creation and update.
-
-Throughput:
-
-
-| Case - Indexes                                           |  10,000 entities  | 100,000 entities   | 1,000,000 entities |
-|:---------------------------------------------------------|:----------------- |:------------------ |:------------------ |
-| Query - none                                             | 115.3             | 12.2               | 2                  |
-| Query - `_id.id`                                         | 2271.2            | 2225.7             | 2187.7             |
-| Query - `_id.type`                                       | 40                | 4.6                | 1.8                |
-| Query - separated `_id.id` and `_id.type`                | 2214.7            | 2179.3             | 2197.1             |
-| Query - compound `{_id.id,_id.type}`                     | 2155.5            | 2174.4             | 2084.4             |
-| Creation - none                                          | 64.5              | 17.8               | 2.4                |
-| Creation - `_id.id`                                      | 748.2             | 672.9              | 698.3              |
-| Creation - `_id.type`                                    | 33.5              | 4.9                | 2.1                |
-| Creation - separated `_id.id` and `_id.type`             | 774.4             | 703.9              | 691.9              |
-| Creation - compound `{_id.id,_id.type}`                  | 784.6             | 721.1              | 639.2              |
-| Creation and update - none                               | 102.1             | 15.5               | 3.3                |
-| Creation and update - `_id.id`                           | 1118.1            | 798.1              | 705.5              |
-| Creation and update - `_id.type`                         | 32.6              | 4.8                | 1.8                |
-| Creation and update - separated `_id.id` and `_id.type`  | 1145.3            | 746.4              | 706.5              |
-| Creation and update - compound `{_id.id,_id.type}`       | 1074.7            | 760.7              | 636.1              |
-
-Storage:
-
-| Case - Indexes                                         | Index size (MB) |  Index size / DB file size   |
-|:-------------------------------------------------------|:--------------- |:---------------------------- |
-| 10,000 entities - none (\*)                            | 0.88            | 0.004                        |
-| 10,000 entities - `_id.id`                             | 1.17            | 0.006                        |
-| 10,000 entities - `_id.type`                           | 1.11            | 0.005                        |
-| 10,000 entities - separated `_id.id` and `_id.type`    | 1.40            | 0.007                        |
-| 10,000 entities - compound `{_id.id`,`_id.type}`       | 1.23            | 0.006                        |
-| 100,000 entities - none (\*)                           | 8               | 0.041                        |
-| 100,000 entities -  `_id.id`                           | 11              | 0.057                        |
-| 100,000 entities -  `_id.type`                         | 10              | 0.052                        |
-| 100,000 entities -  separated `_id.id` and `_id.type`  | 13              | 0.067                        |
-| 100,000 entities -  compound `{_id.id`,`_id.type}`     | 12              | 0.062                        |
-| 1,000,000 entities - none (\*)                         | 124             | 0.077                        |
-| 1,000,000 entities - `_id.id`                          | 154             | 0.076                        |
-| 1,000,000 entities - `_id.type`                        | 145             | 0.073                        |
-| 1,000,000 entities - separated `_id.id` and `_id.type` | 175             | 0.088                        |
-| 1,000,000 entities - compound (`_id.id`,`_id.type}`    | 161             | 0.079                        |
-
-(\*) Althought we don't set any index, note that the MongoDB always set
-up an index in `_id`. Thus, some ammount of space is always allocated to
-indexes.
-
-**Hint:** considering the above information, it is hihgly recommended to
-set up an index on `_id.id` in the entities collection.
+Check [database indexes section](perf_tuning.md#database-indexes) in the
+performance tuning documentation.
 
 [Top](#top)
 
 ## Database management scripts
 
-Orion Context Broker comes along with some scripts that can be use to do
-some browsing and administrative actions in the database, installed in
+Orion Context Broker comes with a few scripts that can be used for
+browsing and administrative activities in the database, installed in
 the `/usr/share/contextBroker` directory.
 
-In order to use them, you need to install the pymongo driver (version
-2.5 or above) as a requirement to run it, typically using (run it as
+In order to use these scripts, you need to install the pymongo driver (version
+2.5 or above), typically using (run it as
 root or using the sudo command):
 
 ` pip-python install pymongo`
@@ -253,9 +140,9 @@ root or using the sudo command):
 
 NGSI specifies an expiration time for registrations and subcriptions
 (both NGSI9 and NGSI10 subscriptions). Orion Context Broker doesn't
-delete the expired documents (it just ignores them) due to the fact that
-expired registrations/subscription can be "re-activated" by an update of
-their duration.
+delete the expired documents (they are just ignored) as
+expired registrations/subscription can be "re-activated" using a subscription update request,
+modifying their duration.
 
 However, expired registrations/subscriptions consume space in the
 database, so they can be "purged" from time to time. In order to help
@@ -275,7 +162,7 @@ csubs and casubs collection, "marking" them with the following field:
 ```
 
 The garbage-collector.py program takes as arguments the collection to be
-analyzed, e.g. to analyze csubs and casubs, run:
+analyzed. E.g. to analyze csubs and casubs, run:
 
 ```
 garbage-collector.py csubs casubs
@@ -294,13 +181,13 @@ mongo <host>/<db>
 
 ### Latest updated document
 
-You can take an snapshot of the lastest updated entities and attributes
-in the database using the lastest-updates.py script. It takes up to four
+You can take an snapshot of the latest updated entities and attributes
+in the database using the latest-updates.py script. It takes up to four
 arguments:
 
 -   Either "entities" or "attributes", to set the granularity level in
     the updates.
--   The database to use (same than the -db parameter and
+-   The database to use (same as the -db parameter and
     BROKER\_DATABASE\_NAME used by the broker). Note that the mongod
     instance has to run in the same machine where the script runs.
 -   The maximum number of lines to print
@@ -309,7 +196,7 @@ arguments:
 
 Ej:
 
-    # lastest-updates.py entities orion 4
+    # latest-updates.py entities orion 4
     -- 2013-10-30 18:19:47: Room1 (Room)
     -- 2013-10-30 18:16:27: Room2 (Room)
     -- 2013-10-30 18:14:44: Room3 (Room)

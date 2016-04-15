@@ -43,7 +43,6 @@
 * Payload Out: UpdateContextSubscriptionResponse
 *
 * URI parameters
-*   - notifyFormat=XXX     (handled by std-op postUpdateContextSubscription)
 *   x entity::type=TYPE    (NOT TREATED)
 *   x !exist=entity::type  (NOT TREATED)
 *   x exist=entity::type   (NOT TREATED)
@@ -64,7 +63,6 @@ std::string putSubscriptionConvOp
     std::string out;
 
     out = restErrorReplyGet(ciP,
-                            ciP->outFormat,
                             "",
                             "updateContextSubscription",
                             SccBadRequest,

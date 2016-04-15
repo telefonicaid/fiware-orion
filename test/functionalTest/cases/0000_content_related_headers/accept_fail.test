@@ -25,107 +25,112 @@ Accept header fail
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 
 --SHELL--
+
+#
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
-url="/v1/queryContext"
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out " "
+#
+# 01. Invalid 'Accept' HTTP header
+# 02. Invalid JSON payload
+# 03. Explicit 'Accept: application/json' is ok
+# 04. 'Accept-list' with valid mime-type
+# 05. 'Accept-list' with valid mime-type AND encoding after ';'
+# 06. 'Accept-list' with no valid mime-type and invalid XML payload
+# 07. 'Accept-list' with no valid mime-type, invalid XML payload, and extra encoding after ';'
+# 08. Accept preference is correctly taken into account (JSON preferred to XML), order is JSON, XML
+# 09. Accept preference is correctly taken into account (JSON preferred to XML), order is XML, JSON
+#
 
-echo "1: ++++++++++++++++++++"
 
-# Fails due to error in payload parsing
-url="/v1/queryContext"
-payload='no meaningful payload (failing tests)'
-orionCurl --url "$url" --payload "${payload}"
-
-echo "2: ++++++++++++++++++++"
-
-# Explicit "Accept: application/xml" is ok
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out "application/xml"
-
-echo "3: ++++++++++++++++++++"
-
-# Uses a list in Accept which a valid type is found is ok
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, application/xml"
-
-echo "4: ++++++++++++++++++++"
-
-# Uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, application/xml; charset=UTF-8"
-
-echo "5: ++++++++++++++++++++"
-
-# Uses a list in Accept with no valid type
-url="/v1/queryContext"
-payload='no meaningful payload (failing tests)'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, image/jpeg"
-
-echo "6: ++++++++++++++++++++"
-
-# List in Accept with no valid type (with extra encoding after ";")
-url="/v1/queryContext"
-payload='no meaningful payload (failing tests)'
-orionCurl --url "$url" --payload "${payload}" --out "text/plain, image/jpeg; charset=UTF-8"
-
-echo "7: ++++++++++++++++++++"
-
-# Verifies that explicit "Accept: application/json" is ok
-url="/v1/queryContext"
+echo "01. Invalid 'Accept' HTTP header"
+echo "================================"
 payload='{
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "OfficeRoom"
-		}
-	]
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
 }'
-orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json"
+orionCurl --url /v1/queryContext --payload "${payload}" --out " " --json
+echo
+echo
 
-echo "8: ++++++++++++++++++++"
-# Accept preference is correctly taken into account (XML preferred to JSON), order is JSON, XML
-url="/v1/queryContext"
+
+echo "02. Invalid JSON payload"
+echo "======================="
+payload='no meaningful payload (failing tests)'
+orionCurl --url /v1/queryContext --payload "${payload}" --json
+echo
+echo
+
+
+echo "03. Explicit 'Accept: application/json' is ok"
+echo "============================================"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "application/json" --json
+echo
+echo
+
+
+echo "04. 'Accept-list' with valid mime-type"
+echo "======================================"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json" --json
+echo
+echo
+
+
+echo "05. 'Accept-list' with valid mime-type AND encoding after ';'"
+echo "============================================================="
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plain, application/json; charset=UTF-8" --json
+echo
+echo
+
+
+echo "06. 'Accept-list' with no valid mime-type and invalid JSON payload"
+echo "=================================================================="
+payload='no meaningful payload (failing tests)'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plane, image/jpeg" --in "application/json"
+echo
+echo
+
+
+echo "07. 'Accept-list' with no valid mime-type, invalid JSON payload, and extra encoding after ';'"
+echo "============================================================================================="
+payload='no meaningful payload (failing tests)'
+orionCurl --url /v1/queryContext --payload "${payload}" --out "text/plane, image/jpeg; charset=UTF-8" --in "application/json"
+echo
+echo
+
+
+echo "08. Accept preference is correctly taken into account (JSON preferred to XML), order is JSON, XML"
+echo "================================================================================================="
 payload='{
   "entities": [
     {
@@ -135,28 +140,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json, application/xml"
+orionCurl --url /v1/queryContext --payload "${payload}" --in "application/json" --out "application/json, application/xml"
+echo
+echo
 
 
-echo "9: ++++++++++++++++++++"
-# Accept preference is correctly taken into account (XML preferred to JSON), order is XML, JSON
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "application/xml, application/json"
-
-echo "10: ++++++++++++++++++++"
-
-# Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)
-# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
-(curl localhost:${CB_PORT}/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
-{
+echo "09. Accept preference is correctly taken into account (JSON preferred to XML), order is XML, JSON"
+echo "================================================================================================="
+payload='{
   "entities": [
     {
       "type": "Room",
@@ -164,116 +155,19 @@ echo "10: ++++++++++++++++++++"
       "id": "OfficeRoom"
     }
   ]
-}
-EOF
-echo "11: ++++++++++++++++++++"
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --in "application/json" --out "application/xml, application/json"
+echo
+echo
 
-# Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
-# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
-(curl localhost:${CB_PORT}/v1/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @-) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-</queryContextRequest>
-EOF
-echo "12: ++++++++++++++++++++"
 
 --REGEXPECT--
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-1: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 126
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>XML Parse Error</details>
-</orionError>
-2: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-3: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-4: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-5: ++++++++++++++++++++
-HTTP/1.1 406 Not Acceptable
-Content-Length: 220
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>406</code>
-  <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plain, image/jpeg</details>
-</orionError>
-6: ++++++++++++++++++++
-HTTP/1.1 406 Not Acceptable
-Content-Length: 243
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>406</code>
-  <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plain, image/jpeg; charset=UTF-8</details>
-</orionError>
-7: ++++++++++++++++++++
+01. Invalid 'Accept' HTTP header
+================================
 HTTP/1.1 200 OK
 Content-Length: 94
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -282,48 +176,139 @@ Date: REGEX(.*)
         "reasonPhrase": "No context element found"
     }
 }
-8: ++++++++++++++++++++
+
+
+02. Invalid JSON payload
+=======================
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
+Content-Length: 117
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-9: ++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-10: ++++++++++++++++++++
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-11: ++++++++++++++++++++
 {
-  "errorCode" : {
-    "code" : "404",
-    "reasonPhrase" : "No context element found"
-  }
+    "errorCode": {
+        "code": "400",
+        "details": "JSON Parse Error",
+        "reasonPhrase": "Bad Request"
+    }
 }
-12: ++++++++++++++++++++
+
+
+03. Explicit 'Accept: application/json' is ok
+============================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+04. 'Accept-list' with valid mime-type
+======================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+05. 'Accept-list' with valid mime-type AND encoding after ';'
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+06. 'Accept-list' with no valid mime-type and invalid JSON payload
+==================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 194
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "406",
+        "details": "acceptable MIME types: application/json. Accept header in request: text/plane, image/jpeg",
+        "reasonPhrase": "Not Acceptable"
+    }
+}
+
+
+07. 'Accept-list' with no valid mime-type, invalid JSON payload, and extra encoding after ';'
+=============================================================================================
+HTTP/1.1 406 Not Acceptable
+Content-Length: 217
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "406",
+        "details": "acceptable MIME types: application/json. Accept header in request: text/plane, image/jpeg&#59; charset&#61;UTF-8",
+        "reasonPhrase": "Not Acceptable"
+    }
+}
+
+
+08. Accept preference is correctly taken into account (JSON preferred to XML), order is JSON, XML
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+09. Accept preference is correctly taken into account (JSON preferred to XML), order is XML, JSON
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

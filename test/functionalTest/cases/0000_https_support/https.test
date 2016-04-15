@@ -38,27 +38,28 @@ unset BROKER_AWAIT_SLEEP_TIME
 #
 echo "+++ 1: Register a Sensor of temperature"
 url="/v1/registry/registerContext"
-payload='<?xml version="1.0"?>
-<registerContextRequest>
-  <contextRegistrationList>
-    <contextRegistration>
-      <entityIdList>
-        <entityId type="Sensor" isPattern="false">
-          <id>Sensor5</id>      
-        </entityId>
-      </entityIdList>
-      <contextRegistrationAttributeList>
-        <contextRegistrationAttribute>
-          <name>temperature</name>
-          <isDomain>false</isDomain>
-        </contextRegistrationAttribute>
-      </contextRegistrationAttributeList>
-      <providingApplication>http://kz.org</providingApplication>
-    </contextRegistration>
-  </contextRegistrationList>
-  <duration>PT1H</duration>
-</registerContextRequest>'
-orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Sensor",
+          "isPattern": "false",
+          "id": "Sensor5"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://kz.org"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem" --json
 
 echo
 echo
@@ -68,62 +69,65 @@ echo
 #
 echo "+++ 2: Discover the Sensor of temperature"
 url="/v1/registry/discoverContextAvailability"
-payload='<?xml version="1.0"?>
-<discoverContextAvailabilityRequest>
-  <entityIdList>
-    <entityId type="Sensor" isPattern="false">
-      <id>Sensor5</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-  </attributeList>
-</discoverContextAvailabilityRequest>'
-orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
+payload='{
+  "entities": [
+    {
+      "type": "Sensor",
+      "isPattern": "false",
+      "id": "Sensor5"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ]
+}'
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem" --json
 
 
 --REGEXPECT--
 +++ 1: Register a Sensor of temperature
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/xml
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
 
 
 +++ 2: Discover the Sensor of temperature
 HTTP/1.1 200 OK
-Content-Length: 766
-Content-Type: application/xml
+Content-Length: 453
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Sensor" isPattern="false">
-            <id>Sensor5</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type/>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://kz.org</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
-</discoverContextAvailabilityResponse>
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Sensor5",
+                        "isPattern": "false",
+                        "type": "Sensor"
+                    }
+                ],
+                "providingApplication": "http://kz.org"
+            }
+        }
+    ]
+}
 --TEARDOWN--
 brokerStop CB
 rm -f /tmp/harnessTest.key /tmp/harnessTest.pem

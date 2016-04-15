@@ -30,6 +30,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -73,7 +74,6 @@ static HttpStatusCode processDiscoverContextAvailability
                           &count))
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
-    LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
     return SccOk;
   }
 

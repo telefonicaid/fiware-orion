@@ -30,61 +30,59 @@ brokerStart CB
 --SHELL--
 echo "+++++ 1. create an entity +++++"
 url="/v1/contextEntities/entity01"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<appendContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</appendContextElementRequest>'
-orionCurl --url "$url" --payload "$payload"
+payload='{
+  "attributes" : [
+    {
+      "name" : "temperature",
+      "type" : "degree",
+      "value" : "10"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 2. delete the entity attribute +++++"
-orionCurl --url "/v1/contextEntities/entity01/attributes/temperature" -X "DELETE"
+orionCurl --url "/v1/contextEntities/entity01/attributes/temperature" -X "DELETE" --json
 
 --REGEXPECT--
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 573
-Content-Type: application/xml
+Content-Length: 329
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<appendContextElementResponse>
-  <entityId type="" isPattern="false">
-    <id>entity01</id>
-  </entityId>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
-</appendContextElementResponse>
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "degree",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "entity01",
+    "isPattern": "false",
+    "type": ""
+}
 +++++ 2. delete the entity attribute +++++
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/xml
+Content-Length: 46
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
-</statusCode>
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

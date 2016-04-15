@@ -41,7 +41,6 @@
 std::string RestrictionString::check
 (
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -93,11 +92,13 @@ void RestrictionString::present(const std::string& indent)
 {
   if (string != "")
   {
-    LM_F(("%sRestrictionString: %s", indent.c_str(), string.c_str()));
+    LM_T(LmtPresent, ("%sRestrictionString: %s", 
+		      indent.c_str(), 
+		      string.c_str()));
   }
   else
   {
-    LM_F(("%sNo RestrictionString", indent.c_str()));
+    LM_T(LmtPresent, ("%sNo RestrictionString", indent.c_str()));
   }
 }
 
@@ -107,14 +108,14 @@ void RestrictionString::present(const std::string& indent)
 *
 * RestrictionString::render -
 */
-std::string RestrictionString::render(Format format, const std::string& indent, bool comma)
+std::string RestrictionString::render(const std::string& indent, bool comma)
 {
   if (string == "")
   {
     return "";
   }
 
-  return valueTag(indent, "restriction", string, format, comma);
+  return valueTag1(indent, "restriction", string, comma);
 }
 
 

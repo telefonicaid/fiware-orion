@@ -29,6 +29,7 @@
 #include <string>
 #include "common/Format.h"
 #include "ngsi/AttributeList.h"
+#include "rest/StringFilter.h"
 
 
 
@@ -41,7 +42,7 @@
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-
 *
-* We use the same class for both NGSI10 and NGSI9 subscription. The only different
+* We use the same class for both NGSI10 and NGSI9 subscription. The only difference
 * is that throttling and lastNotification are not needed in the second case (note
 * that there are different constructor depending the case)
 *
@@ -56,20 +57,34 @@ class TriggeredSubscription
   AttributeList attrL;
   std::string   cacheSubId;
   std::string   tenant;
+  StringFilter  stringFilter;
+
+
+  // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
+  struct {
+    std::string               geometry;
+    std::string               coords;
+    std::string               georel;
+   }                        expression;      // Only used by NGSIv2 subscription
 
   TriggeredSubscription(long long           _throttling,
                         long long           _lastNotification,
                         Format              _format,
                         const std::string&  _reference,
-                        AttributeList       _attrL,
+                        const AttributeList& _attrL,
                         const std::string&  _cacheSubId,
                         const char*         _tenant);
 
-  TriggeredSubscription(Format              _format,
-                        const std::string&  _reference,
-                        AttributeList       _attrL);
+  TriggeredSubscription(Format               _format,
+                        const std::string&   _reference,
+                        const AttributeList& _attrL);
 
-  std::string toString(const std::string& delimiter);
+  ~TriggeredSubscription();
+
+  // FIXME P5: This method will cease to exist once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
+  void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
+  void         stringFilterSet(StringFilter* _stringFilterP);
+  std::string  toString(const std::string& delimiter);
 };
 
 #endif  // SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_

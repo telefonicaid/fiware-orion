@@ -127,6 +127,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -141,6 +142,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -154,8 +156,9 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 458
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -180,6 +183,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "",
                 "geometry": "",
+                "georel": "",
                 "q": ""
             }
         },
@@ -202,8 +206,9 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 392
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -225,6 +230,7 @@ Date: REGEX(.*)
             "expression": {
                 "coords": "",
                 "geometry": "",
+                "georel": "",
                 "q": ""
             }
         },

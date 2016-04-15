@@ -39,27 +39,19 @@ TEST(ContextRegistrationResponse, render)
 {
   ContextRegistrationResponse  crr;
   std::string                  rendered;
-  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.xml";
-  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
-  const char*                  outfile3 = "ngsi.contextRegistrationResponse.renderError.middle.xml";
-  const char*                  outfile4 = "ngsi.contextRegistrationResponse.renderError.middle.json";
+  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
+  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderError.middle.json";
 
   utInit();
 
   crr.errorCode.fill(SccNone);
-  rendered = crr.render(XML, "");
+  rendered = crr.render("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   crr.errorCode.fill(SccBadRequest);
-  rendered = crr.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-  rendered = crr.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  rendered = crr.render("");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();
@@ -76,10 +68,11 @@ TEST(ContextRegistrationResponse, check)
   ContextRegistrationResponse  crr;
   std::string                  checked;
   std::string                  expected = "no providing application";
+  ConnectionInfo               ci;
 
   utInit();
 
-  checked = crr.check(RegisterContext, XML, "", "", 0);
+  checked = crr.check(&ci, RegisterContext, "", "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
 
   utExit();

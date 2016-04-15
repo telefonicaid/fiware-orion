@@ -60,21 +60,18 @@ std::string EntityTypeVector::render
   bool                comma
 )
 {
-  std::string out      = "";
-  std::string xmlTag   = "typeEntities";
-  std::string jsonTag  = "types";
-
+  std::string out  = "";
+  std::string key  = "types";
 
   if (vec.size() > 0)
   {
-
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+    out += startTag2(indent, key, true, true);
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
     }
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
+    out += endTag(indent, comma, true);
   }
 
   return out;
@@ -114,7 +111,7 @@ std::string EntityTypeVector::check
 */
 void EntityTypeVector::present(const std::string& indent)
 {
-  LM_F(("%lu items in entityTypeVector", (uint64_t) vec.size()));
+  LM_T(LmtPresent,("%lu items in entityTypeVector", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -137,13 +134,15 @@ void EntityTypeVector::push_back(EntityType* item)
 
 /* ****************************************************************************
 *
-* EntityTypeVector::get -
+* EntityTypeVector::operator[] -
 */
-EntityType* EntityTypeVector::get(unsigned int ix)
+EntityType* EntityTypeVector::operator[] (unsigned int ix) const
 {
-  if (ix < vec.size())
-    return vec[ix];
-  return NULL;
+   if (ix < vec.size())
+   {
+     return vec[ix];
+   }
+   return NULL;
 }
 
 

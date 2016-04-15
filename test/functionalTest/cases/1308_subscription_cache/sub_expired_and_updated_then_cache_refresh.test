@@ -1,0 +1,490 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+notifyFormat_ngsi10
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 38,101,102 IPv4 -subCacheIval 8
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create entity E10, attribute A1
+# 02. Subscribe to E1.*/A1, duration 2 secs
+# 03. Statistics - just for fun
+# 04. Sleep 3 secs to let the subscription expire
+# 05. Update subscription, duration 30 secs
+# 06. Statistics - to see the sub-update
+# 07. Sleep 6 secs to let the cache be refreshed
+# 08. Statistics - see 2 refresh, one notification
+# 09. Update E10/A1
+# 10. Update E10/A1
+# 11. Update E10/A1
+# 12. Statistics - see 2 refresh, four notifications
+# 13. Dump accumulator - see four notifications
+#
+
+#
+# About "subCacheRefreshs": "REGEX((0|XXX))":
+# 
+# The 0 comes from when broker is started with -noCache, as no refreshes are done
+# 
+
+echo "01. Create entity E10, attribute A1"
+echo "==================================="
+payload='{
+  "id": "E10",
+  "A1": "01. Creation"
+}'
+orionCurl --url '/v2/entities?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Subscribe to E1.*/A1, duration 2 secs"
+echo "========================================="
+payload='{
+  "entities": [
+    {
+        "id":   "E1.*",
+        "isPattern": "true"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ],
+  "throttling": "PT1S",
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "PT2S",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB_ID=$(echo "$_response" | grep subscriptionId |  awk -F ':' '{gsub(/[ \t",]+/, "", $2); print $2}' )
+echo
+echo
+
+
+echo "03. Statistics - just for fun"
+echo "============================="
+valgrindSleep 1
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "04. Sleep 3 secs to let the subscription expire"
+echo "==============================================="
+sleep 3
+echo
+echo
+
+
+echo "05. Update subscription, duration 30 secs"
+echo "========================================="
+payload='{
+  "subscriptionId": "'$SUB_ID'",
+  "duration": "PT30S"
+}'
+orionCurl --url /v1/updateContextSubscription --payload "$payload" --json
+echo
+echo
+
+
+
+echo "06. Statistics - to see the sub-update"
+echo "======================================"
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "07. Sleep 6 secs to let the cache be refreshed"
+echo "=============================================="
+sleep 6
+echo
+echo
+
+
+echo "08. Statistics - see 2 refresh, one notification"
+echo "================================================"
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "09. Update E10/A1"
+echo "================="
+payload='{
+  "A1": "09. Updated"
+}'
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Update E10/A1"
+echo "================="
+sleep 2
+payload='{
+  "A1": "10. Updated"
+}'
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Update E10/A1"
+echo "================="
+sleep 2
+payload='{
+  "A1": "11. Updated"
+}'
+orionCurl --url '/v2/entities/E10?options=keyValues' --payload "$payload" --json
+echo
+echo
+
+
+echo "12. Statistics - see 2 refresh, four notifications"
+echo "=================================================="
+orionCurl --url /cache/statistics --json
+echo
+echo
+
+
+echo "13. Dump accumulator - see four notifications"
+echo "============================================="
+accumulatorDump
+echo
+echo
+
+
+#
+# About
+#   "refreshs": REGEX((0|1|2)),
+#
+# If started with -noCache:  0
+# Normal start:              1
+# Under valgrind:            2 (possibly, depending on timing)
+# Under valgrind:            3 (possibly, depending on timing)
+#
+
+--REGEXPECT--
+01. Create entity E10, attribute A1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E10?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+02. Subscribe to E1.*/A1, duration 2 secs
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT2S",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT1S"
+    }
+}
+
+
+03. Statistics - just for fun
+=============================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX(.*)",
+    "inserts": 1,
+    "items": 1,
+    "refresh": REGEX((0|1)),
+    "removes": 0,
+    "updates": 0
+}
+
+
+04. Sleep 3 secs to let the subscription expire
+===============================================
+
+
+05. Update subscription, duration 30 secs
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 110
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT30S",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+06. Statistics - to see the sub-update
+======================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX(.*)",
+    "inserts": REGEX((2|3)),
+    "items": 1,
+    "refresh": REGEX((0|1|2)),
+    "removes": 1,
+    "updates": 1
+}
+
+
+07. Sleep 6 secs to let the cache be refreshed
+==============================================
+
+
+08. Statistics - see 2 refresh, one notification
+================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX(.*)",
+    "inserts": REGEX((2|3|4)),
+    "items": 1,
+    "refresh": REGEX((0|1|2|3|4)),
+    "removes": 1,
+    "updates": 1
+}
+
+
+09. Update E10/A1
+=================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+10. Update E10/A1
+=================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+11. Update E10/A1
+=================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+12. Statistics - see 2 refresh, four notifications
+==================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "ids": "REGEX(.*)",
+    "inserts": REGEX((2|3|4)),
+    "items": 1,
+    "refresh": REGEX((0|2|3)),
+    "removes": 1,
+    "updates": 1
+}
+
+
+13. Dump accumulator - see four notifications
+=============================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 475
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E10",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : "01. Creation"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 474
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E10",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : "09. Updated"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 474
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E10",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : "10. Updated"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 474
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "none",
+        "isPattern" : "false",
+        "id" : "E10",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "none",
+            "value" : "11. Updated"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

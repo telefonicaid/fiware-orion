@@ -28,14 +28,19 @@
 #include <string>
 #include <vector>
 
-#include "apiTypesV2/Subscription.h"
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
 #include "common/JsonHelper.h"
 #include "common/string.h"
+
+#include "apiTypesV2/Subscription.h"
 #include "mongoBackend/mongoGetSubscriptions.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
+
+
 
 /* ****************************************************************************
 *
@@ -52,18 +57,21 @@ std::string getAllSubscriptions
     ParseData*                 parseDataP
 )
 {
-
   std::vector<ngsiv2::Subscription> subs;
   OrionError                        oe;
-  long long                         count = 0LL;
+  long long                         count  = 0;
   int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
   int                               limit  = atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
 
-  mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, limit, offset, &count);
+  TIMED_MONGO(mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], limit, offset, &count));
 
   if (oe.code != SccOk)
   {
-    return oe.render(ciP,"");
+    std::string out;
+
+    TIMED_RENDER(out = oe.render(ciP,""));
+
+    return out;
   }
 
   if ((ciP->uriParamOptions["count"]))
@@ -71,5 +79,9 @@ std::string getAllSubscriptions
     ciP->httpHeader.push_back("X-Total-Count");
     ciP->httpHeaderValue.push_back(toString(count));
   }
-  return  vectorToJson(subs);
+
+  std::string out;
+  TIMED_RENDER(out = vectorToJson(subs));
+
+  return out;
 }
