@@ -65,11 +65,11 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "A" ]
+            "attrs": [ "A" ]
          }
     },
     "notification": {
-        "callback": "http://localhost:'${LISTENER_PORT}'/notify",
+        "http": {"url": "http://localhost:${LISTENER_PORT}'/notify"},
         "attributes": [ ]
     },
     "expires": "2050-04-05T14:00:00.00Z",
@@ -208,13 +208,13 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [],
-        "callback": "http://localhost:9997/notify"
+        "attrs": [],
+        "http": {"url": "http://localhost:9997/notify"}
     },
     "status": "inactive",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "A"
             ],
             "expression": {
@@ -265,15 +265,15 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [],
-        "callback": "http://localhost:9997/notify",
+        "attrs": [],
+        "http": {"url": "http://localhost:9997/notify"}
         "lastNotification": "REGEX(.*)",
         "timesSent": 1
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "A"
             ],
             "expression": {
@@ -324,8 +324,8 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [],
-        "callback": "http://localhost:9997/notify",
+        "attrs": [],
+        "http": {"url": "http://localhost:9997/notify"}
         "lastNotification": "REGEX(.*)",
         "timesSent": 1
     },
