@@ -81,6 +81,7 @@ pip install --upgrade -r requirements.txt --allow-all-external
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
     properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see [properties.json.base](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#propertiesjsonbase))
     README.md:                           this file, a brief explication about this framework to test
+    feature_files_structure.md           a brief explication about the feature files structure
     requirement.txt:                     external library, necessary install before to execute test (see [Quick way](https://github.com/telefonicaid/fiware-orion/tree/develop/test/acceptance/behave#quick-way) section)
     behave_all.py                        execute all features in a given directory and its subdirectories
 
@@ -202,6 +203,8 @@ In certain cases, could be useful to define actions before or/and after of the f
 Recommend append labels defined (`Actions Before the Feature`, `Actions Before each Scenario`, `Actions After each Scenario`,`Actions After the Feature`)
 into de feature description, these labels are Optional. And define steps with `Setup:` or `Check:` prefix (must be `:` in the step prefix). See `environment.py` in root path.
 
+For more info see the `feature_files_structure.md` file.
+
 Example:
 ```
 Feature: feature name...
@@ -289,7 +292,7 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 |                                                                                                                                                          |
 |**subscriptions folder**                                                                                                                                  |
 | retrieve_subscriptions                      |  (pending)   | GET     | /v2/subscriptions                                    | No        | Yes            |   
-| create_a_new_subscription                   |    458       | POST    | /v2/subscriptions                                    | Yes       | No             |   
+| create_a_new_subscription                   |    555       | POST    | /v2/subscriptions                                    | Yes       | No             |   
 |                                                                                                                                                          |
 | retrieve_subscription                       |  (pending)   | GET     | /v2/subscriptions/`<subscription_id>`                | No        | No             |   
 | update_subscription                         |  (pending)   | PATCH   | /v2/subscriptions/`<subscription_id>`                | Yes       | No             |   
