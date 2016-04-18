@@ -59,18 +59,20 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ ],
+            "attrs": [ ],
             "expression": {
                "q": "temperature>40"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -85,18 +87,20 @@ payload='
     "subject": {
         "entities": [{"idPattern": {"x":1}}],
         "condition": {
-            "attributes": [ ],
+            "attrs": [ ],
             "expression": {
                "q": "temperature>40"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -116,18 +120,20 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -139,12 +145,14 @@ echo "====================================================="
 payload='
 {
     "subject": 0,
-    "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+    "notification": {        
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -164,7 +172,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -193,7 +201,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -203,11 +211,13 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": ["1991-04-05T14:00:00.00Z"]
+    "expires": ["1991-04-05T14:00:00.00Z"],
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -227,7 +237,7 @@ payload='
             }
         ,
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -236,12 +246,14 @@ payload='
             }
          }
     },
-    "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+    "notification": {        
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -263,11 +275,13 @@ payload='
         "condition":  13.3
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -287,7 +301,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": 0,
+            "attrs": 0,
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -296,12 +310,14 @@ payload='
             }
          }
     },
-    "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+    "notification": {       
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -320,16 +336,18 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": "t<3"
          }
     },
     "notification": {
-        "callback": "localhost 1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {
+            "url": "localhost 1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 
 '
@@ -350,7 +368,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": {},
                "geometry": "point",
@@ -360,11 +378,13 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -384,7 +404,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -393,12 +413,14 @@ payload='
             }
          }
     },
-    "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+    "notification": {    
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -418,7 +440,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": 1.1,
@@ -428,11 +450,13 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -452,7 +476,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -462,11 +486,13 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -486,7 +512,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -495,12 +521,14 @@ payload='
             }
          }
     },
-    "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": "temperature",
-        "throttling": 2
+    "notification": {       
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": "temperature"
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -520,7 +548,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -529,12 +557,14 @@ payload='
             }
          }
     },
-    "notification": {
-        "callback": {"url": "http://localhost:1234"},
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+    "notification": {    
+        "http": {
+            "url": {"url": "http://localhost:1234"}
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": 2
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -554,7 +584,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -563,12 +593,14 @@ payload='
             }
          }
     },
-    "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": [2.5]
+    "notification": {       
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "1991-04-05T14:00:00.00Z"
+    "expires": "1991-04-05T14:00:00.00Z",
+    "throttling": [2.5]
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -582,6 +614,7 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 82
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -595,6 +628,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 89
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -608,6 +642,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -621,6 +656,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -634,6 +670,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 68
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -647,6 +684,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 62
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -660,6 +698,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -673,6 +712,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 65
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -684,12 +724,13 @@ Date: REGEX(.*)
 09. POST /v2/subscriptions (condition attributes is not an array)
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
+Content-Length: 60
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attributes is not an array",
+    "description": "attrs is not an array",
     "error": "BadRequest"
 }
 
@@ -699,6 +740,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 66
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -712,6 +754,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 56
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -725,6 +768,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -738,6 +782,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -751,6 +796,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -762,12 +808,13 @@ Date: REGEX(.*)
 15. POST /v2/subscriptions (notification attributes is not an array)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
+Content-Length: 60
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "attributes is not an array",
+    "description": "attrs is not an array",
     "error": "BadRequest"
 }
 
@@ -775,12 +822,13 @@ Date: REGEX(.*)
 16. POST /v2/subscriptions (callback is not a string)
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 64
+Content-Length: 76
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "callback is not an string",
+    "description": "url http notification is not a string",
     "error": "BadRequest"
 }
 
@@ -790,6 +838,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 63
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

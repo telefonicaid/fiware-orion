@@ -42,29 +42,29 @@ accumulatorStart
 
 T_0=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z")
 T_2=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="2seconds")
-T_4=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="4seconds")
+T_6=$(TZ=GMT date +"%Y-%m-%dT%H:%M:%S.00Z" --date="6seconds")
 
-echo "01. At t_0: Create subscription with q: dateCreated==t_2..t_4"
+echo "01. At t_0: Create subscription with q: dateCreated==t_2..t_6"
 echo "============================================================="
 payload='
 {
     "subject": {
         "entities": [
             {
-                "idPaatern": "E.*",
+                "idPattern": "E.*",
                 "type": "T"
             }
         ],
         "condition": {
-            "attributes": [ ],
+            "attrs": [ ],
             "expression": {
-               "q": "dateCreated=='$T_2'..'$T_4'"
+               "q": "dateCreated=='$T_2'..'$T_6'"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:'$LISTENER_PORT'/notify",
-        "attributes": [ ]
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ ]
     },
     "expires": "2050-04-05T14:00:00.00Z"
 }
@@ -72,7 +72,6 @@ payload='
 orionCurl --url /v2/subscriptions --payload "$payload" --json
 echo
 echo
-sleep 1s
 
 
 echo "02. At t_1: Create entity E1 (not notif)"
@@ -85,8 +84,8 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1.1s  # total sleep: 2.1
 
+sleep 2.1
 
 echo "03. At t_2: Create entity E2 (notif)"
 echo "===================================="
@@ -98,7 +97,6 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 0.8s  # total sleep: 2.9
 
 
 echo "04. At t_3: Create entity E3 (notif)"
@@ -111,7 +109,6 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 0.8s  # total sleep: 3.7
 
 
 echo "05. At t_4: Create entity E4 (notif)"
@@ -124,7 +121,8 @@ payload='{
 orionCurl --url /v2/entities?options=keyValues --payload "$payload" --json
 echo
 echo
-sleep 1s  # total sleep: 4.7
+
+sleep 5
 
 
 echo "06. At t_5: Create entity E5 (not notif)"
@@ -147,11 +145,12 @@ echo
 
 
 --REGEXPECT--
-01. At t_0: Create subscription with q: dateCreated==t_2..t_4
+01. At t_0: Create subscription with q: dateCreated==t_2..t_6
 =============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -161,6 +160,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -170,6 +170,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -179,6 +180,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E3?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -188,6 +190,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E4?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -197,6 +200,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E5?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -209,6 +213,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -241,6 +246,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -273,6 +279,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",

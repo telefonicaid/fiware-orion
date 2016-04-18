@@ -1,0 +1,686 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription sequence ONCHANGE without subCache 
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -noCache
+accumulatorStart
+
+--SHELL--
+url="/v1/contextSubscriptions"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "OfficeRoom"
+        }
+    ],
+    "attributes": [
+        "temperature",
+        "ligthstatus"
+    ],
+    "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+    "duration": "PT1H",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature",
+                "ligthstatus"
+            ]
+        }
+    ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
+
+echo "1: ++++++++++++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "pressure",
+        "type": "clima",
+        "value": "p2300"
+      },
+      {
+        "name": "ligthstatus",
+        "type": "light",
+        "value": "L23"
+      }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+# Get notifications count
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+
+echo "2: ++++++++++++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "temperature",
+        "type": "degree",
+        "value": "t100"
+      },
+      {
+        "name": "ligthstatus",
+        "type": "light",
+        "value": "L23"
+      }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+# Get notifications count
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+
+echo "3: ++++++++++++++++++++"
+url="/v1/contextSubscriptions/${SUB_ID}"
+payload='{
+    "subscriptionId": "'$SUB_ID'",
+    "duration": "P1Y",
+    "throttling": "PT6S"
+}'
+orionCurl --url "$url" --payload "$payload" -X "PUT" --json
+
+# Get notifications count
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+
+echo "4: ++++++++++++++++++++"
+
+#Wait sleep >6s to reset the throttling interval
+sleep 10
+
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "pressure",
+        "type": "clima",
+        "value": "p5300"
+      },
+      {
+        "name": "ligthstatus",
+        "type": "light",
+        "value": "L53"
+      }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+# Get notifications count
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+
+echo "5: ++++++++++++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "pressure",
+        "type": "clima",
+        "value": "p6300"
+      },
+      {
+        "name": "ligthstatus",
+        "type": "light",
+        "value": "L63"
+      }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo "6: ++++++++++++++++++++"
+
+#Wait sleep >6s to reset the throttling interval
+sleep 10
+
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "temperature",
+        "type": "degree",
+        "value": "t39"
+      }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+# Get notifications count
+mongoCmd ${CB_DB_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+
+echo "7: ++++++++++++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "pressure",
+        "type": "clima",
+        "value": "p230"
+      }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "8: ++++++++++++++++++++"
+orionCurl --url "/v1/contextSubscriptions/${SUB_ID}" -X "DELETE" --json
+
+echo "9: ++++++++++++++++++++"
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "temperature",
+        "type": "degree",
+        "value": "t59"
+      }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "10: ++++++++++++++++++++"
+#Get accumulated data
+accumulatorDump
+
+--REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 514
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+{ "count" : NumberLong(1) }
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 518
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+{ "count" : NumberLong(2) }
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT6S"
+    }
+}
+{ "count" : NumberLong(2) }
+4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 514
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+{ "count" : NumberLong(3) }
+5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 514
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+{ "count" : NumberLong(4) }
+7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+10: ++++++++++++++++++++
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 483
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "ligthstatus",
+            "type" : "light",
+            "value" : "L23"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 604
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "ligthstatus",
+            "type" : "light",
+            "value" : "L23"
+          },
+          {
+            "name" : "temperature",
+            "type" : "degree",
+            "value" : "t100"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 604
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "ligthstatus",
+            "type" : "light",
+            "value" : "L53"
+          },
+          {
+            "name" : "temperature",
+            "type" : "degree",
+            "value" : "t100"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 603
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "ligthstatus",
+            "type" : "light",
+            "value" : "L63"
+          },
+          {
+            "name" : "temperature",
+            "type" : "degree",
+            "value" : "t39"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

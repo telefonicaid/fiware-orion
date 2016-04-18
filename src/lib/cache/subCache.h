@@ -117,7 +117,7 @@ extern volatile SubCacheState  subCacheState;
 *
 * subCacheInit - 
 */
-extern void subCacheInit(void);
+extern void subCacheInit(bool multitenant = false);
 
 
 
@@ -176,6 +176,7 @@ extern void subCacheItemInsert
   Format                    notifyFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
+  StringFilter*             stringFilterP,
   const std::string&        status,
   const std::string&        q,
   const std::string&        geometry,

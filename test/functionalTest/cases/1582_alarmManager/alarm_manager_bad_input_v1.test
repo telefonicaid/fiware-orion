@@ -99,7 +99,7 @@ echo
 
 echo "07. grep in log-file"
 echo "===================="
-egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $9 }' | awk -F']:' '{ print $2 }'
+egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F']:' '{ print $2 }'
 echo
 echo
 
@@ -110,6 +110,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 119
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -126,6 +127,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 117
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -142,6 +144,7 @@ Date: REGEX(.*)
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -151,6 +154,7 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 153
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -167,6 +171,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 94
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -182,6 +187,7 @@ Date: REGEX(.*)
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 

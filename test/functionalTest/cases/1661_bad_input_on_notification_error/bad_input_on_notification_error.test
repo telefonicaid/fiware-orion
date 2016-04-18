@@ -53,15 +53,17 @@ payload='{
       }
     ],
     "condition": {
-      "attributes": [ "A1" ]
+      "attrs": [ "A1" ]
     }
   },
   "notification": {
-    "callback": "x.y.com:abc",
-    "attributes": ["A1"],
-    "throttling": 5
+    "http": {
+      "url": "x.y.com:abc"
+    },
+    "attrs": ["A1"]
   },
-  "expires": "2026-04-05T14:00:00.00Z"
+  "expires": "2026-04-05T14:00:00.00Z",
+  "throttling": 5
 }'
 orionCurl --url /v2/subscriptions --payload "$payload" --json
 echo
@@ -78,15 +80,17 @@ payload='{
       }
     ],
     "condition": {
-      "attributes": [ "A1" ]
+      "attrs": [ "A1" ]
     }
   },
   "notification": {
-    "callback": "1234",
-    "attributes": ["A1"],
-    "throttling": 5
+    "http": {
+     "url": "1234"
+    },
+    "attrs": ["A1"]
   },
-  "expires": "2026-04-05T14:00:00.00Z"
+  "expires": "2026-04-05T14:00:00.00Z",
+  "throttling": 5
 }'
 orionCurl --url /v2/subscriptions --payload "$payload" --json
 echo
@@ -103,15 +107,17 @@ payload='{
       }
     ],
     "condition": {
-      "attributes": [ "A1" ]
+      "attrs": [ "A1" ]
     }
   },
   "notification": {
-    "callback": "http://http://abc.a.com:1234",
-    "attributes": ["A1"],
-    "throttling": 5
+    "http": {
+      "url": "http://http://abc.a.com:1234"
+    },
+    "attrs": ["A1"]
   },
-  "expires": "2026-04-05T14:00:00.00Z"
+  "expires": "2026-04-05T14:00:00.00Z",
+  "throttling": 5
 }'
 orionCurl --url /v2/subscriptions --payload "$payload" --json
 echo
@@ -135,15 +141,17 @@ payload='{
       }
     ],
     "condition": {
-      "attributes": [ "A1" ]
+      "attrs": [ "A1" ]
     }
   },
   "notification": {
-    "callback": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-    "attributes": ["A1"],
-    "throttling": 5
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "attrs": ["A1"]
   },
-  "expires": "2026-04-05T14:00:00.00Z"
+  "expires": "2026-04-05T14:00:00.00Z",
+  "throttling": 5
 }'
 orionCurl --url /v2/subscriptions --payload "$payload" --json
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
@@ -197,6 +205,7 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 50
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -210,6 +219,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 50
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -223,6 +233,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 50
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -241,6 +252,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -265,6 +277,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 

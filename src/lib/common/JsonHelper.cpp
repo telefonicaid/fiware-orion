@@ -104,7 +104,7 @@ std::string vectorToJson(std::vector<std::string> &list)
     return "[]";
 
   case 1:
-    return "[ " + toJsonString(list[0]) + " ]";
+    return "[" + toJsonString(list[0]) + "]";
 
   default:
     std::ostringstream os;

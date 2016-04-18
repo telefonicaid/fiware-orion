@@ -51,11 +51,12 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/TriggeredSubscription.h"
-#include "cache/subCache.h"
+#include "mongoBackend/location.h"
 
+#include "cache/subCache.h"
+#include "rest/StringFilter.h"
 #include "ngsi/Scope.h"
 #include "rest/uriParamNames.h"
-
 
 using std::string;
 using std::map;
@@ -63,195 +64,6 @@ using std::auto_ptr;
 using namespace orion;
 using namespace mongo;
 
-
-
-/* ****************************************************************************
-*
-* Forward declarations
-*/
-static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);
-
-
-
-/* ****************************************************************************
-*
-* compoundValueBson (for arrays) -
-*/
-static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArrayBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    orion::CompoundValueNode* child = children[ix];
-
-    if (child->valueType == orion::ValueTypeString)
-    {
-      b.append(child->stringValue);
-    }
-    else if (child->valueType == orion::ValueTypeNumber)
-    {
-      b.append(child->numberValue);
-    }
-    else if (child->valueType == orion::ValueTypeBoolean)
-    {
-      b.append(child->boolValue);
-    }
-    else if (child->valueType == orion::ValueTypeNone)
-    {
-      b.appendNull();
-    }
-    else if (child->valueType == orion::ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(ba.arr());
-    }
-    else if (child->valueType == orion::ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(bo.obj());
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Unknown type in compound value"));
-    }
-  }
-}
-
-
-/* ****************************************************************************
-*
-* compoundValueBson -
-*/
-static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
-{
-  for (unsigned int ix = 0; ix < children.size(); ++ix)
-  {
-    orion::CompoundValueNode* child = children[ix];
-
-    std::string effectiveName = dbDotEncode(child->name);
-
-    if (child->valueType == orion::ValueTypeString)
-    {
-      b.append(effectiveName, child->stringValue);
-    }
-    else if (child->valueType == orion::ValueTypeNumber)
-    {
-      b.append(effectiveName, child->numberValue);
-    }
-    else if (child->valueType == orion::ValueTypeBoolean)
-    {
-      b.append(effectiveName, child->boolValue);
-    }
-    else if (child->valueType == orion::ValueTypeNone)
-    {
-      b.appendNull(effectiveName);
-    }
-    else if (child->valueType == orion::ValueTypeVector)
-    {
-      BSONArrayBuilder ba;
-
-      compoundValueBson(child->childV, ba);
-      b.append(effectiveName, ba.arr());
-    }
-    else if (child->valueType == orion::ValueTypeObject)
-    {
-      BSONObjBuilder bo;
-
-      compoundValueBson(child->childV, bo);
-      b.append(effectiveName, bo.obj());
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Unknown type in compound value"));
-    }
-  }
-}
-
-/* ****************************************************************************
-*
-* bsonAppendAttrValue -
-*
-*/
-void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const ContextAttribute* caP)
-{
-  switch(caP->valueType)
-  {
-    case ValueTypeString:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->stringValue);
-      break;
-
-    case ValueTypeNumber:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->numberValue);
-      break;
-
-    case ValueTypeBoolean:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->boolValue);
-      break;
-
-    case ValueTypeNone:
-      bsonAttr.appendNull(ENT_ATTRS_VALUE);
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown attribute type: %d)", caP->valueType));
-  }
-}
-
-
-/* ****************************************************************************
-*
-* valueBson -
-*/
-static void valueBson(const ContextAttribute* caP, BSONObjBuilder& bsonAttr)
-{
-  if (caP->compoundValueP == NULL)
-  {
-    bsonAppendAttrValue(bsonAttr, caP);
-  }
-  else
-  {
-    if (caP->compoundValueP->valueType == orion::ValueTypeVector)
-    {
-      BSONArrayBuilder b;
-      compoundValueBson(caP->compoundValueP->childV, b);
-      bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeObject)
-    {
-      BSONObjBuilder b;
-
-      compoundValueBson(caP->compoundValueP->childV, b);
-      bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeString)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->stringValue);
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeNumber)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->numberValue);
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeBoolean)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->boolValue);
-    }
-    else if (caP->compoundValueP->valueType == orion::ValueTypeNone)
-    {
-      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.appendNull(ENT_ATTRS_VALUE);
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Unknown type in compound value"));
-    }
-  }
-}
 
 
 /* ****************************************************************************
@@ -626,7 +438,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (!attributeValueAbsent(caP, apiVersion))
   {
-    valueBson(caP, ab);
+    caP->valueBson(ab);
   }
   else
   {
@@ -869,7 +681,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    valueBson(caP, newAttr);
+    caP->valueBson(newAttr);
 
     /* Custom metadata */
     BSONObj mdV;
@@ -945,7 +757,7 @@ static bool appendAttribute
   BSONObjBuilder ab;
 
   /* 1. Value */
-  valueBson(caP, ab);
+  caP->valueBson(ab);
 
   /* 2. Type */
   if ((apiVersion == "v2") && !caP->typeGiven)
@@ -1068,67 +880,6 @@ static bool legalIdUsage(const ContextAttributeVector& caV)
   return true;
 }
 
-
-/* ****************************************************************************
-*
-* processLocation -
-*
-* This function process the context attribute vector, searching for an attribute marked with
-* the location metadata. In that case, it fills locAttr, coordLat and coordLOng. If a location
-* attribute is not found, then locAttr is filled with an empty string, i.e. "".
-*
-* This function always return true (no matter if the attribute was found or not), except in an
-* error situation, in which case errorDetail is filled. This can be due to two reasons: ilegal
-* usage of the metadata or parsing error in the attribute value.
-*
-*/
-static bool processLocation
-(
-  const ContextAttributeVector&  caV,
-  std::string&                   locAttr,
-  double&                        coordLat,
-  double&                        coordLong,
-  std::string*                   errDetail,
-  const std::string&             apiVersion
-)
-{
-  locAttr = "";
-
-  for (unsigned ix = 0; ix < caV.size(); ++ix)
-  {
-    const ContextAttribute* caP = caV[ix];
-
-    std::string location = caP->getLocation(apiVersion);
-
-    if (location.length() == 0)
-    {
-      continue;
-    }
-
-    if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
-    {
-      *errDetail = "only WGS84 are supported, found: " + location;
-      return false;
-    }
-
-    if (locAttr.length() > 0)
-    {
-      *errDetail = "You cannot use more than one location attribute "
-                     "when creating an entity [see Orion user manual]";
-      return false;
-    }
-
-    if (!string2coords(caP->stringValue, coordLat, coordLong))
-    {
-      *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
-      return false;
-    }
-
-    locAttr = caP->name;
-  }
-
-  return true;
-}
 
 
 /* ****************************************************************************
@@ -1262,12 +1013,11 @@ static bool addTriggeredSubscriptions_withCache
   const std::vector<std::string>&           servicePathV
 )
 {  
-  std::string   servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
+  std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
-
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
@@ -1338,13 +1088,12 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant);
 
-    sub->fillExpression(cSubP->expression.q, cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
-
+    sub->fillExpression(cSubP->expression.geometry, cSubP->expression.coords, cSubP->expression.georel);
+    sub->stringFilterSet(&cSubP->expression.stringFilter);
     subs.insert(std::pair<string, TriggeredSubscription*>(cSubP->subscriptionId, sub));
   }
 
   cacheSemGive(__FUNCTION__, "match subs for notifications");
-
   return true;
 }
 
@@ -1517,7 +1266,27 @@ static bool addTriggeredSubscriptions_noCache
         std::string geometry = expr.hasField(CSUB_EXPR_GEOM)   ? getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
         std::string coords   = expr.hasField(CSUB_EXPR_COORDS) ? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
 
-        trigs->fillExpression(q, georel, geometry, coords);
+        trigs->fillExpression(georel, geometry, coords);
+
+        // Parsing q
+        if (q != "")
+        {
+          StringFilter* stringFilterP = new StringFilter();
+
+          if (stringFilterP->parse(q.c_str(), &err) == false)
+          {
+            delete stringFilterP;
+          
+            LM_E(("Runtime Error (%s)", err.c_str()));
+            releaseMongoConnection(connection);
+            return false;
+          }
+          else
+          {
+            trigs->stringFilterSet(stringFilterP);  // Clones the string filter
+            delete stringFilterP;
+          }
+        }
       }
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
@@ -1574,7 +1343,8 @@ static bool processOnChangeConditionForUpdateContext
   std::string                      notifyUrl,
   Format                           format,
   std::string                      tenant,
-  const std::string&               xauthToken
+  const std::string&               xauthToken,
+  const std::string&               fiwareCorrelator
 )
 {
   NotifyContextRequest   ncr;
@@ -1622,25 +1392,8 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* matchExpression
-*/
-static bool matchExpression(ContextElementResponse* cerP, const std::string& q)
-{
-  if (q == "")
-  {
-    return true;
-  }
-
-  std::vector<BSONObj> filters;   // not really used, just to match qStringFilters signature
-  return qStringFilters(q, filters, cerP);
 }
 
 
@@ -1655,7 +1408,8 @@ static bool processSubscriptions
   ContextElementResponse*                   notifyCerP,
   std::string*                              err,
   const std::string&                        tenant,
-  const std::string&                        xauthToken
+  const std::string&                        xauthToken,
+  const std::string&                        fiwareCorrelator
 )
 {
   bool ret = true;
@@ -1666,6 +1420,7 @@ static bool processSubscriptions
   {
     std::string             mapSubId  = it->first;
     TriggeredSubscription*  trigs     = it->second;
+
 
     /* There are some checks to perform on TriggeredSubscription in order to see if the notification has to be actually sent. Note
      * that checks are done in increasing cost order (e.g. georel check is done at the end).
@@ -1689,8 +1444,8 @@ static bool processSubscriptions
       }
     }
 
-    /* Check 2: expression (q) */
-    if (!matchExpression(notifyCerP, trigs->expression.q))
+    /* Check 2: String Filter */
+    if (!trigs->stringFilter.match(notifyCerP))
     {
       continue;
     }
@@ -1706,7 +1461,8 @@ static bool processSubscriptions
                                                  trigs->reference,
                                                  trigs->format,
                                                  tenant,
-                                                 xauthToken))
+                                                 xauthToken,
+                                                 fiwareCorrelator))
     {
       long long rightNow = getCurrentTime();
 
@@ -1973,17 +1729,18 @@ static bool updateContextAttributeItem
   bool&                     actualUpdate,
   bool&                     entityModified,
   std::string*              currentLocAttrName,
-  double&                   coordLat,
-  double&                   coordLong,
+  BSONObjBuilder*           geoJson,
   bool                      isReplace,
   const std::string&        apiVersion
 )
 {
+
+  std::string err;
+
   if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
     // Attribute was found
-    entityModified = actualUpdate || entityModified;
-    updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
+    entityModified = actualUpdate || entityModified;    
   }
   else
   {
@@ -2007,84 +1764,22 @@ static bool updateContextAttributeItem
   }
 
   /* Check aspects related with location */
-  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // note that with the current logic, the name of the attribute meaning location
-  // is preserved on a replace operation. By the moment, we can leave this as it is now
-  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
-  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
-  // removed from code)
-  std::string locationString = targetAttr->getLocation(apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-   * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, targetAttr, geoJson, &err, apiVersion))
   {
     cerP->statusCode.fill(
           SccInvalidParameter,
           std::string("action: UPDATE") +
           " - entity: [" + eP->toString() + "]" +
           " - offending attribute: " + targetAttr->getName() +
-          " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-    alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
+          " - " + err);
+    alarmMgr.badInput(clientIp, err);
     return false;
   }
 
-  /* Case 1: update attribute from no-location -> location. There are 2 sub-cases */
-  if (locationString.length() > 0)
-  {
-    /* Case 1a: there is a previous (which different name) location attribute -> error */
-    if (*currentLocAttrName != targetAttr->name)
-    {
-      cerP->statusCode.fill(
-            SccInvalidParameter,
-            std::string("action: UPDATE") +
-            " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->getName() +
-            " - attempt to define a location attribute [" + targetAttr->name + "]" +
-            " when another one has been previously defined [" + *currentLocAttrName + "]");
-      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-      return false;
-    }
-
-    /* Case 1b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
-    if (*currentLocAttrName == "")
-    {
-      /* Check coordinates syntax (and get parsed valued if they are correct) */
-      if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-      {
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: UPDATE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->getName() +
-                              " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
-        alarmMgr.badInput(clientIp, "error parsing location attribute");
-        return false;
-      }
-
-      *currentLocAttrName = targetAttr->name;
-    }
-  }
-  /* Check 2: update attribute from location -> current location is nullified
-   * attribute, then remove location attribute (Disabled in NGSIv1 due to compatibility issues) */
-  else if ((apiVersion == "v2") && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
-  {
-    *currentLocAttrName = "";
-  }
-  /* Case 3: update the current location attribute (Onfly for NGSIv1)  */
-  else if ((apiVersion == "v1") && (*currentLocAttrName == targetAttr->name))
-  {
-    /* Check coordinates syntax (and get parsed valued if they are correct) */
-    if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-    {
-      cerP->statusCode.fill(SccInvalidParameter,
-                            std::string("action: UPDATE") +
-                            " - entity: [" + eP->toString() + "]" +
-                            " - offending attribute: " + targetAttr->getName() +
-                            " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
-      alarmMgr.badInput(clientIp, "error parsing location attribute");
-      return false;
-    }
-  }
+  // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
+  // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
+  // to be called after the location processing logic (as this logic may need the compoundValueP
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   return true;
 }
@@ -2108,11 +1803,12 @@ static bool appendContextAttributeItem
   bool&                     actualUpdate,
   bool&                     entityModified,
   std::string*              currentLocAttrName,
-  double&                   coordLat,
-  double&                   coordLong,
+  BSONObjBuilder*           geoJson,
   const std::string&        apiVersion
 )
 {
+  std::string err;
+
   if (!legalIdUsage(attrs, targetAttr))
   {
     /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
@@ -2122,101 +1818,32 @@ static bool appendContextAttributeItem
                           std::string("action: APPEND") +
                           " - entity: [" + eP->toString() + "]" +
                           " - offending attribute: " + targetAttr->getName() +
-                          " - attribute can not be appended");
-    alarmMgr.badInput(clientIp, "attribute can not be appended");
+                          " - attribute cannot be appended");
+    alarmMgr.badInput(clientIp, "attribute cannot be appended");
     return false;
   }
 
   bool actualAppend = appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
   entityModified = actualUpdate || entityModified;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   /* Check aspects related with location */
-  std::string locationString = targetAttr->getLocation(apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((locationString.length() > 0) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
+  if (!processLocationAtAppendAttribute(currentLocAttrName, targetAttr, actualAppend, geoJson,
+                                        &err, apiVersion))
   {
     cerP->statusCode.fill(
           SccInvalidParameter,
           std::string("action: APPEND") +
           " - entity: [" + eP->toString() + "]" +
           " - offending attribute: " + targetAttr->getName() +
-          " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-    alarmMgr.badInput(clientIp, "only WGS84 is supported for location");
+          " - " + err);
+    alarmMgr.badInput(clientIp, err);
     return false;
   }
 
-  /* Check coordinates syntax (and get parsed valued in the case they will needed at the end, if they are correct) */
-  double preLat;
-  double preLong;
-  if ((locationString.length() > 0) && (!string2coords(targetAttr->stringValue, preLat, preLong)))
-  {
-    cerP->statusCode.fill(SccInvalidParameter,
-                          std::string("action: APPEND") +
-                          " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - error parsing location attribute, value: /" + targetAttr->stringValue + "/");
-    alarmMgr.badInput(clientIp, "error parsing location attribute");
-    return false;
-  }
-
-  /* Case 1: append of new location attribute */
-  if (actualAppend && (locationString.length() > 0))
-  {
-    /* Case 1a: there is a previous location attribute -> error */
-    if (currentLocAttrName->length() != 0)
-    {
-      cerP->statusCode.fill(
-            SccInvalidParameter,
-            std::string("action: APPEND") +
-            " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->getName() +
-            " - attempt to define a location attribute [" + targetAttr->name + "]" +
-            " when another one has been previously defined [" + *currentLocAttrName + "]");
-      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-      return false;
-    }
-    /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
-    else
-    {
-      *currentLocAttrName = targetAttr->name;
-      coordLat            = preLat;
-      coordLong           = preLong;
-    }
-  }
-  /* Case 2: append-as-update changing attribute type from no-location -> location */
-  else if (!actualAppend && (locationString.length() > 0))
-  {
-    /* Case 2a: there is a previous (which different name) location attribute -> error */
-    if (*currentLocAttrName != targetAttr->name)
-    {
-      cerP->statusCode.fill(
-            SccInvalidParameter,
-            std::string("action: APPEND") +
-            " - entity: [" + eP->toString() + "]" +
-            " - offending attribute: " + targetAttr->getName() +
-            " - attempt to define a location attribute [" + targetAttr->name + "]" +
-            " when another one has been previously defined [" + *currentLocAttrName + "]");
-      alarmMgr.badInput(clientIp, "attempt to define a second location attribute");
-      return false;
-    }
-
-    /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
-    if (*currentLocAttrName == "")
-    {
-      *currentLocAttrName = targetAttr->name;
-      coordLat            = preLat;
-      coordLong           = preLong;
-    }
-  }
-  /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
-     * attribute, then remove location attribute */
-  else if (!actualAppend && (locationString.length() == 0) && (*currentLocAttrName == targetAttr->name))
-  {
-    *currentLocAttrName = "";
-  }
+  // Note that updateAttrInNotifyCer() may "ruin" targetAttr, as compoundValueP is moved
+  // (not copied) to the structure in the notifyCerP and null-ified in targetAttr. Thus, it has
+  // to be called after the location processing logic (as this logic may need the compoundValueP
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == "v2");
 
   return true;
 }
@@ -2308,8 +1935,7 @@ static bool processContextAttributeVector
   BSONArrayBuilder*                          toPull,
   ContextElementResponse*                    cerP,
   std::string*                               currentLocAttrName,
-  double&                                    coordLat,
-  double&                                    coordLong,
+  BSONObjBuilder*                            geoJson,
   std::string                                tenant,
   const std::vector<std::string>&            servicePathV,
   const std::string&                         apiVersion
@@ -2353,8 +1979,7 @@ static bool processContextAttributeVector
                                       actualUpdate,
                                       entityModified,
                                       currentLocAttrName,
-                                      coordLat,
-                                      coordLong,
+                                      geoJson,
                                       strcasecmp(action.c_str(), "replace") == 0,
                                       apiVersion))
       {
@@ -2373,8 +1998,7 @@ static bool processContextAttributeVector
                                       actualUpdate,
                                       entityModified,
                                       currentLocAttrName,
-                                      coordLat,
-                                      coordLong,
+                                      geoJson,
                                       apiVersion))
       {
         return false;
@@ -2503,11 +2127,10 @@ static bool createEntity
   }
 
   /* Search for a potential location attribute */
-  std::string  locAttr;
-  double       coordLat;
-  double       coordLong;
+  std::string     locAttr;
+  BSONObjBuilder  geoJson;
 
-  if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail, apiVersion))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion))
   {
     return false;
   }
@@ -2532,7 +2155,7 @@ static bool createEntity
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    valueBson(attrsV[ix], bsonAttr);
+    attrsV[ix]->valueBson(bsonAttr);
 
     std::string effectiveName = dbDotEncode(attrsV[ix]->name);
     if (attrId.length() != 0)
@@ -2573,16 +2196,7 @@ static bool createEntity
     bsonId.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  if (servicePathV.size() > 0)
-  {
-    LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
-    bsonId.append(ENT_SERVICE_PATH, servicePathV[0]);
-  }
-  else
-  {
-    LM_T(LmtServicePath, ("Empty service path string, using default servicepath"));
-    bsonId.append(ENT_SERVICE_PATH, DEFAULT_SERVICE_PATH);
-  }
+  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? DEFAULT_SERVICE_PATH_UPDATES : servicePathV[0]);
 
   BSONObjBuilder insertedDoc;
 
@@ -2594,11 +2208,9 @@ static bool createEntity
 
   /* Add location information in the case it was found */
   if (locAttr.length() > 0)
-  {
+  {    
     insertedDoc.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                           ENT_LOCATION_COORDS   <<
-                                           BSON("type" << "Point" <<
-                                                "coordinates" << BSON_ARRAY(coordLong << coordLat))));
+                                          ENT_LOCATION_COORDS   << geoJson.obj()));
   }
 
   if (!collectionInsert(getEntitiesCollectionName(tenant), insertedDoc.obj(), errDetail))
@@ -2771,7 +2383,8 @@ static void updateEntity
   UpdateContextResponse*          responseP,
   bool*                           attributeAlreadyExistsError,
   std::string*                    attributeAlreadyExistsList,
-  const std::string&              apiVersion
+  const std::string&              apiVersion,
+  const std::string&              fiwareCorrelator
 )
 {
   // Used to accumulate error response information
@@ -2818,22 +2431,19 @@ static void updateEntity
    * subscription id */
   std::map<string, TriggeredSubscription*> subsToNotify;
 
-  /* Is the entity using location? In that case, we fill the locAttr, coordLat and coordLong attributes with that information, otherwise
+  /* Is the entity using location? In that case, we fill the locAttr and currentGeoJson attributes with that information, otherwise
    * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
    * processes the attributes in the updateContext */
-  std::string  locAttr = "";
-  double       coordLat;
-  double       coordLong;
+  std::string     locAttr = "";
+  BSONObj         currentGeoJson;
+  BSONObjBuilder  geoJson;
 
   if (r.hasField(ENT_LOCATION))
   {
-    BSONObj loc = getObjectFieldF(r, ENT_LOCATION);
+    BSONObj loc    = getObjectFieldF(r, ENT_LOCATION);
 
-    locAttr     = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
-
-    // FIXME P10: this only works for "Point" locations. NGSIv2 allows other types.
-    coordLong   = getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").Array()[0].Double();
-    coordLat    = getFieldF(getObjectFieldF(loc, ENT_LOCATION_COORDS), "coordinates").Array()[1].Double();
+    locAttr        = getStringFieldF(loc, ENT_LOCATION_ATTRNAME);
+    currentGeoJson = getObjectFieldF(loc, ENT_LOCATION_COORDS);
   }
 
   //
@@ -2886,8 +2496,7 @@ static void updateEntity
                                      &toPull,
                                      cerP,
                                      &locAttr,
-                                     coordLat,
-                                     coordLong,
+                                     &geoJson,
                                      tenant,
                                      servicePathV,
                                      apiVersion))
@@ -2919,6 +2528,7 @@ static void updateEntity
 
     return;
   }
+
   /* Compose the final update on database */
   LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
@@ -2930,13 +2540,17 @@ static void updateEntity
   }
 
   // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
-  // not sure how the following if behaves in the case of "replace"...
+  // not sure how the following behaves in the case of "replace"...
   if (locAttr.length() > 0)
   {
+    BSONObj newGeoJson = geoJson.obj();
+
+    // If processContextAttributeVector() didn't touched the geoJson, then we
+    // use the existing object
+    BSONObj finalGeoJson = newGeoJson.nFields() > 0 ? newGeoJson : currentGeoJson;
+
     toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                    ENT_LOCATION_COORDS   <<
-                                    BSON("type" << "Point" <<
-                                         "coordinates" << BSON_ARRAY(coordLong << coordLat))));
+                                    ENT_LOCATION_COORDS   << finalGeoJson));
   }
   else
   {
@@ -3002,20 +2616,8 @@ static void updateEntity
     query.append(typeString, entityType);
   }
 
-  // The servicePath of THIS object is entitySPath
-  char espath[SERVICE_PATH_MAX_TOTAL];
-  slashEscape(entitySPath.c_str(), espath, sizeof(espath));
-  const std::string servicePathValue  = std::string("^") + espath + "$";
-
-  // servicePathString from earlier in this function
-  if (servicePathV.size() == 0)
-  {
-    query.append(servicePathString, BSON("$exists" << false));
-  }
-  else
-  {
-    query.appendRegex(servicePathString, servicePathValue);
-  }
+  // Servicepath
+  query.append(servicePathString, fillQueryServicePath(servicePathV));
 
   std::string err;
   if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
@@ -3033,7 +2635,7 @@ static void updateEntity
 
   /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
    * previous addTriggeredSubscriptions() invocations */
-  processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken);
+  processSubscriptions(subsToNotify, notifyCerP, &err, tenant, xauthToken, fiwareCorrelator);
   notifyCerP->release();
   delete notifyCerP;
 
@@ -3045,6 +2647,7 @@ static void updateEntity
   // The memory to free is allocated in the function addTriggeredSubscriptions.
   //
   releaseTriggeredSubscriptions(subsToNotify);
+
 
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response */
@@ -3149,6 +2752,7 @@ void processContextElement
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
+  const std::string&                   fiwareCorrelator,
   const std::string&                   apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour
 )
@@ -3163,9 +2767,8 @@ void processContextElement
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+  EntityId*          enP               = &ceP->entityId;
   BSONObjBuilder     bob;
-
-  EntityId* enP = &ceP->entityId;
 
   bob.append(idString, enP->id);
 
@@ -3174,27 +2777,8 @@ void processContextElement
     bob.append(typeString, enP->type);
   }
 
-  if (servicePathV.size() == 0)
-  {
-    bob.append(servicePathString, BSON("$exists" << false));
-    LM_T(LmtServicePath, ("Updating entity '%s' (no Service Path), action '%s'",
-                          ceP->entityId.id.c_str(),
-                          action.c_str()));
-  }
-  else
-  {
-    LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'",
-                          ceP->entityId.id.c_str(),
-                          servicePathV[0].c_str(),
-                          action.c_str()));
-
-    char               path[SERVICE_PATH_MAX_TOTAL];
-    slashEscape(servicePathV[0].c_str(), path, sizeof(path));
-
-    const std::string  servicePathValue  = std::string("^") + path + "$";
-    bob.appendRegex(servicePathString, servicePathValue);
-  }
-
+  // Service path
+  bob.append(servicePathString, fillQueryServicePath(servicePathV));
 
   // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
   // Restriction is not a valid field in updateContext according to the NGSI specification. In the
@@ -3228,8 +2812,8 @@ void processContextElement
     // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
     if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
     {
-        buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
-        return;
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
+      return;
     }
 
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
@@ -3321,7 +2905,8 @@ void processContextElement
                  responseP,
                  &attributeAlreadyExistsError,
                  &attributeAlreadyExistsList,
-                 apiVersion);
+                 apiVersion,
+                 fiwareCorrelator);
   }
 
   /*
@@ -3421,7 +3006,7 @@ void processContextElement
         notifyCerP->contextElement.modDate = now;
 
         notifyCerP->contextElement.entityId.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
-        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken);
+        processSubscriptions(subsToNotify, notifyCerP, &errReason, tenant, xauthToken, fiwareCorrelator);
 
         notifyCerP->release();
         delete notifyCerP;

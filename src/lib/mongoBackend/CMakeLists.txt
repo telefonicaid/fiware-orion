@@ -44,6 +44,7 @@ SET (SOURCES
     mongoSubCache.cpp
     safeMongo.cpp    
     compoundResponses.cpp
+    location.cpp
 )
 
 SET (HEADERS
@@ -72,6 +73,7 @@ SET (HEADERS
     safeMongo.h
     dbFieldEncoding.h
     compoundResponses.h
+    location.h
 )
 
 

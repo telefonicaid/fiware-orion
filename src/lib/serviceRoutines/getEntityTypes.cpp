@@ -61,7 +61,7 @@ std::string getEntityTypes
 
   response.statusCode.fill(SccOk);
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam));
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP, ""));

@@ -57,6 +57,7 @@
 #define GEO_LINE     "geo:line"
 #define GEO_BOX      "geo:box"
 #define GEO_POLYGON  "geo:polygon"
+#define GEO_JSON     "geo:json"
 
 
 
@@ -132,6 +133,15 @@ typedef enum Ngsiv2Flavour
 } Ngsiv2Flavour;
 
 
+
+/* ****************************************************************************
+ * Future date to represent permanent subscriptions.
+ * High enough to make the subscription "permanent" but leaving room for
+ * some (sloppy) increments, without causing overflow and accidental subscription
+ * inactivation.
+ *
+*/
+#define PERMANENT_SUBS_DATETIME ((int64_t) 9e18)
 
 /* ****************************************************************************
 *
@@ -289,6 +299,25 @@ int transactionIdGet(bool readonly = true);
 *
 */
 extern void transactionIdSet(void);
+
+
+
+/* ****************************************************************************
+*
+* correlatorIdSet - 
+*/
+void correlatorIdSet(const char* corrId);
+
+
+
+/* ****************************************************************************
+*
+* orderCoordsForBox
+*
+* It return false in the case of a 'degenerate' box
+*
+*/
+extern bool orderCoordsForBox(double* minLat, double* maxLat, double* minLon, double* maxLon, double lat1, double lat2, double lon1, double lon2);
 
 #endif  // SRC_LIB_COMMON_GLOBALS_H_
 	

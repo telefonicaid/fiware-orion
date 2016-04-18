@@ -42,15 +42,19 @@ struct EntID
   std::string toJson();
 };
 
+struct Http
+{
+  std::string url;
+  std::string toJson();
+};
 
 
 struct Notification
 {
-  std::vector<std::string> attributes;
-  std::string              callback;
-  long long                throttling;
+  std::vector<std::string> attributes;  
   long long                timesSent;
   long long                lastNotification;
+  Http                     http;
   std::string              toJson();
 };
 
@@ -78,17 +82,20 @@ struct Subject
 };
 
 
-
 struct Subscription
 {
   std::string  id;
+  std::string  description;
   Subject      subject;
   long long    expires;
   std::string  status;
   Notification notification;
+  long long    throttling;
   std::string  toJson();
 };
 
-};
+
+
+} // end namespace
 
 #endif // SRC_LIB_APITYPESV2_SUBSCRIPTION_H

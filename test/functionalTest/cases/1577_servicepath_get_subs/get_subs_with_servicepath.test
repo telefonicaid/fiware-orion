@@ -132,6 +132,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -146,6 +147,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -159,9 +161,10 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions for 1 servicepath
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 388
 Content-Type: application/json
 X-Total-Count: 1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -169,16 +172,18 @@ Date: REGEX(.*)
         "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [
+            "attrs": [
                 "speed",
                 "location"
             ],
-            "callback": "http://127.0.0.1:REGEX(\d+)/notify"
+            "http": {
+                "url": "http://127.0.0.1:REGEX(\d+)/notify"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "speed"
                 ],
                 "expression": {
@@ -208,9 +213,10 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions for /#
 ================================
 HTTP/1.1 200 OK
-Content-Length: 855
+Content-Length: 841
 Content-Type: application/json
 X-Total-Count: 2
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -218,18 +224,19 @@ Date: REGEX(.*)
         "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [
+            "attrs": [
                 "temperature",
                 "occupancy",
                 "lightstatus"
             ],
-            "callback": "http://127.0.0.1:REGEX(\d+)/notify",
-            "throttling": 5
+            "http": {
+                "url": "http://127.0.0.1:REGEX(\d+)/notify"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "temperature",
                     "timestamp"
                 ],
@@ -252,22 +259,25 @@ Date: REGEX(.*)
                     "type": "Room"
                 }
             ]
-        }
+        },
+        "throttling": 5
     },
     {
         "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [
+            "attrs": [
                 "speed",
                 "location"
             ],
-            "callback": "http://127.0.0.1:REGEX(\d+)/notify"
+            "http": {
+                "url": "http://127.0.0.1:REGEX(\d+)/notify"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "speed"
                 ],
                 "expression": {
@@ -300,6 +310,7 @@ HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
 X-Total-Count: 0
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 []

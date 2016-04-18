@@ -72,7 +72,7 @@ echo "======================"
 payload='{
   "type": "T1",
   "id":   "E2",
-  "A1": { "type": "String", "value": "s" },
+  "A1": { "type": "Cadena", "value": "s" },
   "A3": { "type": "Bool", "value": true }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -107,7 +107,7 @@ payload='{
   "type": "T1",
   "id":   "E4",
   "A4": { "type": "String", "value": "a4" },
-  "A3": { "type": "Bool", "value": true }
+  "A3": { "type": "Booleano", "value": true }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -127,6 +127,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 22
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -140,6 +141,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -147,17 +149,22 @@ Date: REGEX(.*)
 03. GET /v2/types/T1 and get a non-empty list
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 64
+Content-Length: 70
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "attrs": {
         "A1": {
-            "type": "String"
+            "types": [
+                "String"
+            ]
         },
         "A2": {
-            "type": "Int"
+            "types": [
+                "Int"
+            ]
         }
     },
     "count": 1
@@ -169,6 +176,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -178,6 +186,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E3?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -185,23 +194,33 @@ Date: REGEX(.*)
 06. GET /v2/types/T1 and get a list of four attrs and three entities
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 129
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "attrs": {
         "A1": {
-            "type": "String"
+            "types": [
+                "Cadena",
+                "String"
+            ]
         },
         "A2": {
-            "type": "Int"
+            "types": [
+                "Int"
+            ]
         },
         "A3": {
-            "type": "Bool"
+            "types": [
+                "Bool"
+            ]
         },
         "A4": {
-            "type": "String"
+            "types": [
+                "String"
+            ]
         }
     },
     "count": 3
@@ -213,6 +232,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E4?type=T1
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -220,23 +240,34 @@ Date: REGEX(.*)
 08. GET /v2/types/T1 and get a list of four attrs and four entities
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 140
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
     "attrs": {
         "A1": {
-            "type": "String"
+            "types": [
+                "Cadena",
+                "String"
+            ]
         },
         "A2": {
-            "type": "Int"
+            "types": [
+                "Int"
+            ]
         },
         "A3": {
-            "type": "Bool"
+            "types": [
+                "Bool",
+                "Booleano"
+            ]
         },
         "A4": {
-            "type": "String"
+            "types": [
+                "String"
+            ]
         }
     },
     "count": 4

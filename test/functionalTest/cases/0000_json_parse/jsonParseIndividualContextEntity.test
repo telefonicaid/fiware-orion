@@ -113,6 +113,7 @@ orionCurl --url "/v1/contextEntities/ENTITY_ID" -X "DELETE" --json
 HTTP/1.1 200 OK
 Content-Length: 232
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -131,6 +132,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 95
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -142,6 +144,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 326
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -168,6 +171,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 203
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -181,6 +185,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -191,6 +196,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 291
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -215,6 +221,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 264
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -238,6 +245,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 46
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

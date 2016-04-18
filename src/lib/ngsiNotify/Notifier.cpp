@@ -39,15 +39,6 @@
 
 /* ****************************************************************************
 *
-* Select 'method' to send notifications - only one can be uncommented
-*/
-//#define SEND_BLOCKING
-#define SEND_IN_NEW_THREAD
-
-
-
-/* ****************************************************************************
-*
 * ~Notifier -
 */
 Notifier::~Notifier (void)
@@ -62,7 +53,15 @@ Notifier::~Notifier (void)
 *
 * Notifier::sendNotifyContextRequest -
 */
-void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format)
+void Notifier::sendNotifyContextRequest
+(
+  NotifyContextRequest*  ncr,
+  const std::string&     url,
+  const std::string&     tenant,
+  const std::string&     xauthToken,
+  const std::string&     fiwareCorrelator,
+  Format                 format
+)
 {
     ConnectionInfo ci;
 
@@ -113,55 +112,22 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     /* Set Content-Type */
     std::string content_type = "application/json";
 
-#ifdef SEND_BLOCKING
-    int r;
-
-    r = httpRequestSend(host,
-                        port,
-                        protocol,
-                        "POST",
-                        tenant,
-                        spathList,
-                        xauthToken,
-                        uriPath,
-                        content_type,
-                        payload,
-                        true,
-                        NOTIFICATION_WAIT_MODE);
-
-    char portV[STRING_SIZE_FOR_INT];
-    snprintf(portV, sizeof(portV), "%d", port);
-    std::string url = host + ":" + portV + params->resource;
-
-    if (r == 0)
-    {
-      statisticsUpdate(NotifyContextSent, format);
-      QueueStatistics::incSentOK();
-      alarmMgr.notificationErrorReset(url);
-    }
-    else
-    {
-      QueueStatistics::incSentError();
-      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");
-    }
-
-#endif
-
-#ifdef SEND_IN_NEW_THREAD
     /* Send the message (no wait for response), in a separate thread to avoid blocking */
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
-    params->ip            = host;
-    params->port          = port;
-    params->protocol      = protocol;
-    params->verb          = "POST";
-    params->tenant        = tenant;
-    params->servicePath   = spathList;
-    params->xauthToken    = xauthToken;
-    params->resource      = uriPath;
-    params->content_type  = content_type;
-    params->content       = payload;
-    params->format        = format;
+    params->ip               = host;
+    params->port             = port;
+    params->protocol         = protocol;
+    params->verb             = "POST";
+    params->tenant           = tenant;
+    params->servicePath      = spathList;
+    params->xauthToken       = xauthToken;
+    params->resource         = uriPath;
+    params->content_type     = content_type;
+    params->content          = payload;
+    params->format           = format;
+    params->fiwareCorrelator = fiwareCorrelator;
+
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
@@ -171,7 +137,6 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
       return;
     }
     pthread_detach(tid);
-#endif
 }
 
 
@@ -183,7 +148,14 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
 * they could be refactored in the future to have a common part using a parent
 * class for both types of notifications and using it as first argument
 */
-void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, Format format)
+void Notifier::sendNotifyContextAvailabilityRequest
+(
+  NotifyContextAvailabilityRequest*  ncar,
+  const std::string&                 url,
+  const std::string&                 tenant,
+  const std::string&                 fiwareCorrelator,
+  Format                             format
+)
 {
     /* Render NotifyContextAvailabilityRequest */
     std::string payload = ncar->render(NotifyContextAvailability, "");
@@ -206,33 +178,18 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     std::string content_type = "application/json";
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
-#ifdef SEND_BLOCKING
-    int r = httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
-
-    if (r == 0)
-    {
-      statisticsUpdate(NotifyContextSent, format);
-      QueueStatistics::incSentOK();
-      alarmMgr.notificationErrorReset(url);
-    }
-    else
-    {
-      QueueStatistics::incSentError();
-      alarmMgr.notificationError(url, "notification failure for Notifier::sendNotifyContextRequest");      
-    }
-#endif
-
-#ifdef SEND_IN_NEW_THREAD
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
 
-    params->ip           = host;
-    params->port         = port;
-    params->verb         = "POST";
-    params->tenant       = tenant;
-    params->resource     = uriPath;   
-    params->content_type = content_type;
-    params->content      = payload;
+    params->ip               = host;
+    params->port             = port;
+    params->verb             = "POST";
+    params->tenant           = tenant;
+    params->resource         = uriPath;   
+    params->content_type     = content_type;
+    params->content          = payload;
+    params->fiwareCorrelator = fiwareCorrelator;
+
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
@@ -242,5 +199,4 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
       return;
     }
     pthread_detach(tid);
-#endif
 }

@@ -470,8 +470,7 @@ The examples below illustrate the referred syntax:
 
 A context attribute which represents a location encoded using GeoJSON must conform to the following syntax:
 
-* The NGSI type of the attribute must be the MIME type assigned by IETF to the GeoJSON format.
-Currently 'application/vnd.geo+json'.
+* The NGSI type of the attribute must be `geo:json`.
 * The attribute value must be a valid GeoJSON object. It is noteworthy that longitude comes first in GeoJSON coordinates.
 
 The example below illustrates the usage of GeoJSON.
@@ -486,7 +485,7 @@ can be useful in urderstanding the format.
       "type": "Point",
       "coordinates": [2.186447514, 41.3763726]
     },
-    "type": "application/vnd.geo+json"
+    "type": "geo:json"
   }
 }
 ```
@@ -517,7 +516,7 @@ The list of operators (and the format of the values they use) is as follows:
       `black` will match, while entities which `color` is set to `white` will not match.
     + A range, specified as a minimum and maximum separated by `..`. It matches if
       the value is in the interval between the minimum and the maximum (both included). It can only be used
-      with attributes which contain dates (ISO8601 format) or numbers. E.g. `temperature==10..20` matchs if the
+      with attributes which contain dates (ISO8601 format), numbers or strings. E.g. `temperature==10..20` matchs if the
       temperature is greater or equal than 10 and lower or equal than 20.
 + **Unequal**: `!=`. It accepts the following values:
       + The value is a single element, e.g. `temperature!=40`. It matches entities whose attribute
@@ -527,24 +526,24 @@ The list of operators (and the format of the values they use) is as follows:
       to `black` will not match, while entities whose `color` is set to `white`will match.
       + A range, specified as a minimum and maximum separated by `..`. It matches
       if the value is not in the interval between the minimum and the maximum (both included). It can only
-      be used with attributes which contain dates (ISO8601 format) or numbers. E.g. `temperature!=10..20` matches if
+      be used with attributes which contain dates (ISO8601 format), numbers or strings. E.g. `temperature!=10..20` matches if
       the temperature is lower than 10 or greater than 20 (it will not match if the tempeature is 10 or the
       temperature is 20).
 + **Greater than**: `>`. The value is a single element, e.g. `temperature>40`. It
   matches entities which attribute value is strictly greater than that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 + **Less than**: `<`. The value is a single element, e.g. `temperature<40`. It
   matches entities which attribute value is strictly less than that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 + **Greater or equal than**: `>=`. The value is a single element, e.g. `temperature>=40`.
   It matches entities which attribute value is greater than or equal to that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 + **Less or equal than**: `<=`. The value is a single element, e.g. `temperature<=40`. It
   matches entities which attribute value is less than or equal to that value. It only makes sense when
-  used with attributes which contain dates or numbers (using with attributes of other type might lead to
+  used with attributes which contain dates, numbers or strings (using with attributes of other type might lead to
   unexpected results).
 
 In the case of equal or unequal, if the value to match include a `,`, you can use simple quote
@@ -1231,11 +1230,19 @@ Response:
 
 ### Retrieve entity types [GET /v2/types/{?limit,offset,options}]
 
-If `values` option is not in use, the operation returns a JSON object which properties are entity types. The properties
-value is a JSON object with information about the type: `attrs` (the union set of attribute names along all the entities
-of such type) and `count` (the number of entities belonging to that type).
+If `values` option is not in use, the operation returns a JSON array with the entity types. Each element
+is a JSON object with information about the type:
+
+* `type` : the entity type name.
+* `attrs` : the set of attribute names along with all the entities of such type, represented in
+  a JSON object whose keys are the attribute names and whose values contain information of such
+  attributes (in particular a list of the types used by attributes with that name along all the
+  entities).
+* `count` : the number of entities belonging to that type.
 
 If `values` option is used, the operation returns a JSON array with the list of entity type names as strings.
+
+Results are ordered by entity `type` in alphabetical order.
 
 Response code:
 
@@ -1252,46 +1259,50 @@ Response code:
 
 + Response 200 (application/json)
 
-        {
-          "Car": {
+        [
+          {
+            "type": "Car",
             "attrs": {
               "speed": {
-                "type": "none"
+                "types": [ "none" ]
               },
               "fuel": {
-                "type": "gasoline"
-              },
-              "fuel": {
-                "type": "diesel"
+                "types": [ "gasoline", "diesel" ]
               },
               "temperature": {
-                "type": "urn:phenomenum:temperature"
+                "types": [ "urn:phenomenum:temperature" ]
               }
             },
             "count": 12
           },
-          "Room": {
+          {
+            "type": "Room",
             "attrs": {
               "pressure": {
-                "type": "none"
+                "types": [ "none" ]
               },
               "humidity": {
-                "type": "percentage"
+                "types": [ "percentage" ]
               },
               "temperature": {
-                "type": "urn:phenomenum:temperature"
+                "types": [ "urn:phenomenum:temperature" ]
               }
             },
             "count": 7
           }
-        }
+        ]
 
 ## Entity type [/v2/types/{entityType}]
 
 ### Retrieve entity type [GET /v2/types/{entityType}]
 
-The operation returns a JSON object with information about the type: `attrs` (the union set of attribute names along all
-the entities of such type) and `count` (the number of entities belonging to that type).
+The operation returns a JSON object with information about the type:
+
+* `attrs` : the set of attribute names along with all the entities of such type, represented in
+  a JSON object whose keys are the attribute names and whose values contain information of such
+  attributes (in particular a list of the types used by attributes with that name along all the
+  entities).
+* `count` : the number of entities belonging to that type.
 
 Response code:
 
@@ -1306,13 +1317,13 @@ Response code:
           {
             "attrs": {
               "pressure": {
-                "type": "none"
+                "types": [ "none" ]
               },
               "humidity": {
-                "type": "percentage"
+                "types": [ "percentage" ]
               },
               "temperature": {
-                "type": "urn:phenomenum:temperature"
+                "types": [ "urn:phenomenum:temperature" ]
               }
             },
             "count": 7

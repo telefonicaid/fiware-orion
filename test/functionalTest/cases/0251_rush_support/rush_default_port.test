@@ -95,6 +95,7 @@ accumulatorDump
 HTTP/1.1 200 OK
 Content-Length: 109
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -110,6 +111,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 382
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -145,6 +147,7 @@ Host: localhost:REGEX(\d+)
 X-Relayer-Host: 128.1.2.3:80
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",

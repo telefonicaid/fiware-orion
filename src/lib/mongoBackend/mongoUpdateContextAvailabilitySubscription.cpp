@@ -50,6 +50,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
 (
   UpdateContextAvailabilitySubscriptionRequest*   requestP,
   UpdateContextAvailabilitySubscriptionResponse*  responseP,
+  const std::string&                              fiwareCorrelator,
   const std::string&                              tenant
 )
 {
@@ -162,7 +163,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringFieldF(sub, CASUB_REFERENCE), JSON, tenant);
+  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), getStringFieldF(sub, CASUB_REFERENCE), JSON, tenant, fiwareCorrelator);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */

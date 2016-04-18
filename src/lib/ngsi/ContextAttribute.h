@@ -44,6 +44,7 @@
 */
 typedef struct ContextAttribute
 {
+public:
   std::string     name;                    // Mandatory
   std::string     type;                    // Optional
   MetadataVector  metadataVector;          // Optional
@@ -82,11 +83,14 @@ typedef struct ContextAttribute
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
   std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement, bool types, const std::string& renderMode, RequestType requestType = NoRequest);
+  std::string  toJson(bool isLastElement, const std::string& renderMode, RequestType requestType = NoRequest);
   std::string  toJsonAsValue(ConnectionInfo* ciP);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  getName(void);
+
+  /* Used to render attribute value to BSON */
+  void valueBson(mongo::BSONObjBuilder& bsonAttr) const;
 
   /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
   std::string  getValue(void) const;
@@ -97,6 +101,10 @@ typedef struct ContextAttribute
                      const std::string&  predetectedError,
                      int                 counter);
   ContextAttribute* clone();
+
+private:
+  void bsonAppendAttrValue(mongo::BSONObjBuilder& bsonAttr) const;
+
 } ContextAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_

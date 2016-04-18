@@ -1,4 +1,3 @@
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -29,7 +28,8 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
-
+#include "rest/uriParamNames.h"
+#include "rest/OrionError.h"
 #include "serviceRoutinesV2/postSubscriptions.h"
 
 
@@ -62,7 +62,7 @@ extern std::string postSubscriptions
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV));
+  TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
 
   parseDataP->scr.res.release();
 

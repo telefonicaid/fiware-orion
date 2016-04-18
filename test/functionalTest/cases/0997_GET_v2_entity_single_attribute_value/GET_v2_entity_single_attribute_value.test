@@ -119,6 +119,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 1110
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -182,6 +183,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 13
 Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 Mercedes Benz
@@ -192,6 +194,7 @@ Mercedes Benz
 HTTP/1.1 200 OK
 Content-Length: 8
 Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 Klasse C
@@ -202,6 +205,7 @@ Klasse C
 HTTP/1.1 200 OK
 Content-Length: 3
 Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 150
@@ -212,6 +216,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 11
 Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 E1/T1/A3/M1

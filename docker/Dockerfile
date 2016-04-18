@@ -21,6 +21,7 @@ RUN \
       gnutls-devel \
       libgcrypt-devel \
       libcurl-devel \
+      libuuid-devel \
       make \
       nc \
       git \

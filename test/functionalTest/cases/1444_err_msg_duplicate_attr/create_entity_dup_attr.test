@@ -59,6 +59,7 @@ echo
 HTTP/1.1 422 Unprocessable Entity
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

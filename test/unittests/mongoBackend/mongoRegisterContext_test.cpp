@@ -2256,6 +2256,8 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
 */
 TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
 {
+  utInit();
+
   HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
@@ -2270,9 +2272,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", JSON))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", JSON))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -2307,8 +2309,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
+  delete timerMock;
+  utExit();
 }
 
 /* ****************************************************************************
@@ -2317,6 +2320,8 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
 */
 TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
 {
+  utInit();
+
   HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
@@ -2336,9 +2341,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
   expectedNcar2.subscriptionId.set("51307b66f481db11bf860002");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", "no correlator", JSON))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", "no correlator", JSON))
           .Times(1);
   setNotifier(notifierMock);
 
@@ -2375,8 +2380,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
+  delete timerMock;
+  utExit();
 }
 
 /* ****************************************************************************
@@ -2385,6 +2391,8 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
 */
 TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
 {
+  utInit();
+
   HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
@@ -2401,9 +2409,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", "no correlator", JSON))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", JSON))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", "no correlator", JSON))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -2440,9 +2448,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Delete mock */
-  delete timerMock;
   delete notifierMock;
-
+  delete timerMock;
+  utExit();
 }
 
 /* ****************************************************************************

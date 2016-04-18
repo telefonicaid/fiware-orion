@@ -76,7 +76,7 @@ std::string postRegisterContext
   }
   else if (ciP->servicePathV.size() == 0)
   {
-    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH_UPDATES);
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
@@ -88,7 +88,7 @@ std::string postRegisterContext
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]));
+  TIMED_MONGO(ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->httpHeaders.correlator, ciP->tenant, ciP->servicePathV[0]));
   TIMED_RENDER(answer = rcr.render(RegisterContext, ""));
 
   return answer;

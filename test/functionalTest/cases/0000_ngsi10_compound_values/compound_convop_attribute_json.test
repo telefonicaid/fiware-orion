@@ -129,6 +129,7 @@ orionCurl --url "/v1/contextEntities/EObject/attributes/att" --json
 HTTP/1.1 200 OK
 Content-Length: 745
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -174,6 +175,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 745
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -219,6 +221,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 882
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -283,6 +286,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 792
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

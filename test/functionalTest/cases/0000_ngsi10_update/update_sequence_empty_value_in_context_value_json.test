@@ -61,6 +61,7 @@ orionCurl --url "$url" --payload "$payload" --json
 HTTP/1.1 200 OK
 Content-Length: 390
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

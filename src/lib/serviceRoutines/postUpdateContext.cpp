@@ -162,6 +162,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       resource,
                       mimeType,
                       cleanPayload,
+                      ciP->httpHeaders.correlator,
                       false,
                       true,
                       &out,
@@ -441,7 +442,8 @@ std::string postUpdateContext
   // 01. Check service-path consistency
   //
   // If more than ONE service-path is input, an error is returned as response.
-  // If NO service-path is issued, then the default service-path "/" is used.
+  // If ONE service-path is issued and that service path is "", then the default service-path is used.
+  // Note that by construction servicePath cannot have 0 elements
   // After these checks, the service-path is checked to be 'correct'.
   //
   if (ciP->servicePathV.size() > 1)
@@ -453,9 +455,9 @@ std::string postUpdateContext
 
     return answer;
   }
-  else if (ciP->servicePathV.size() == 0)
+  else if (ciP->servicePathV[0] == "")
   {
-    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+    ciP->servicePathV[0] = DEFAULT_SERVICE_PATH_UPDATES;
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
@@ -476,7 +478,7 @@ std::string postUpdateContext
   attributesToNotFound(upcrP);
   
   HttpStatusCode httpStatusCode;
-  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, ngsiV2Flavour));
+  TIMED_MONGO(httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->httpHeaders.correlator, ciP->apiVersion, ngsiV2Flavour));
 
   if (ciP->httpStatusCode != SccCreated)
   {

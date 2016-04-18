@@ -116,6 +116,7 @@ echo
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E24?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -125,6 +126,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E23?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -134,6 +136,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E22?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -143,6 +146,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 []
@@ -153,6 +157,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 196
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -179,6 +184,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -198,12 +204,13 @@ Date: REGEX(.*)
 07. GET entities with birthdate FROM 2016-02-23T10:00:00.00Z TO '2016-02-24T10:00:00.00Z', see error (as to-value is a string)
 ==============================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 65
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "invalid range: types mixed",
     "error": "BadRequest"
 }
 

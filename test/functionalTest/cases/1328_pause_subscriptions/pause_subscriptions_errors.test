@@ -48,7 +48,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -58,8 +58,8 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
+        "http": {"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"],
         "throttling": 5
     },
     "expires": "2016-04-05T14:00:00.00Z",
@@ -82,7 +82,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -92,12 +92,12 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
     },
     "expires": "2016-04-05T14:00:00.00Z",
-    "status": "foobar"
+    "status": "foobar",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -116,7 +116,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -126,12 +126,12 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
     },
     "expires": "2016-04-05T14:00:00.00Z",
-    "status": "active"
+    "status": "active",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -172,6 +172,7 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -185,6 +186,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 99
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -198,6 +200,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -207,6 +210,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 61
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -220,6 +224,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 99
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

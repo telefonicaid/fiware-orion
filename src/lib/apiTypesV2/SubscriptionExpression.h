@@ -27,21 +27,31 @@
 */
 #include <string>
 
+#include "rest/StringFilter.h"
+
+
 
 /* ***********************************************
 *
-* SubscriptionExpression
+* SubscriptionExpression -
+*
+* NOTE
+*   This struct contains both 'q' and stringFilter.
+*   q is the 'plain string' of the stringFilter and it is used in parsing of V2 Subscriptions
+*   and when the q-string is read from the database.
 */
 struct SubscriptionExpression
 {
   SubscriptionExpression(): isSet(false) {}
+  ~SubscriptionExpression() {}
 
   std::string               q;
   std::string               geometry;
   std::string               coords;
   std::string               georel;
+
+  StringFilter              stringFilter;
   bool                      isSet;
 };
-
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTIONEXPRESSION_H_

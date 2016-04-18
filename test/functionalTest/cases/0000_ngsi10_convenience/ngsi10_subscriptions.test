@@ -1,0 +1,131 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI10 Convenience Subscriptions
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+# 1. Create a subscription
+echo "1: ++++++++++++++++++++"
+url="/v1/contextSubscriptions"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "OfficeRoom"
+        }
+    ],
+    "attributes": [
+        "temperature",
+        "ligthstatus"
+    ],
+    "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+    "duration": "PT1H",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature",
+                "ligthstatus"
+            ]
+        }
+    ]
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
+
+# 2. Update the subscription
+echo "2: ++++++++++++++++++++"
+url="/v1/contextSubscriptions/$SUB_ID" 
+payload='{
+    "subscriptionId": "'$SUB_ID'",
+    "duration": "P1Y",
+    "throttling": "PT6S"
+}'
+orionCurl --url "$url" --payload "$payload" -X "PUT" --json
+
+# 3. Delete the subscription
+echo "3: ++++++++++++++++++++"
+orionCurl --url "/v1/contextSubscriptions/$SUB_ID" -X "DELETE" --json
+
+# 4. Bad verb
+echo "4: ++++++++++++++++++++"
+orionCurl --url "/v1/contextSubscriptions/$SUB_ID" -X "DELETE2" --json
+
+--REGEXPECT--
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT6S"
+    }
+}
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+4: ++++++++++++++++++++
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: PUT, DELETE
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

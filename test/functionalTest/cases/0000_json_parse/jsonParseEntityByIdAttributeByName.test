@@ -140,6 +140,7 @@ echo "9: ++++++++++++++++++++"
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -150,6 +151,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 457
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -179,6 +181,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -189,6 +192,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 458
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -218,6 +222,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 458
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -247,6 +252,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 94
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -259,12 +265,14 @@ Date: REGEX(.*)
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST, GET
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 8: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST, GET
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 9: ++++++++++++++++++++

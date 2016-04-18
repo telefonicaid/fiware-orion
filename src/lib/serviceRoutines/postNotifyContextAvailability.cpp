@@ -74,7 +74,7 @@ std::string postNotifyContextAvailability
   }
   else if (ciP->servicePathV.size() == 0)
   {
-    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH_UPDATES);
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
@@ -87,7 +87,7 @@ std::string postNotifyContextAvailability
     return answer;
   }
 
-  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]));
+  TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->httpHeaders.correlator, ciP->tenant, ciP->servicePathV[0]));
   TIMED_RENDER(answer = ncar.render(NotifyContextAvailability, ""));
 
   return answer;

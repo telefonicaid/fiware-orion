@@ -57,25 +57,21 @@ HttpStatusCode mongoRegisterContext
   RegisterContextRequest*              requestP,
   RegisterContextResponse*             responseP,
   std::map<std::string, std::string>&  uriParam,
+  const std::string&                   fiwareCorrelator,
   const std::string&                   tenant,
   const std::string&                   servicePath
 )
 {
-    std::string        sPath         = servicePath;    
     bool               reqSemTaken;    
 
     reqSemTake(__FUNCTION__, "ngsi9 register request", SemWriteOp, &reqSemTaken);
 
-    // Default value for service-path is "/"
-    if (sPath == "")
-    {
-      sPath = DEFAULT_SERVICE_PATH;
-    }
+    std::string sPath = servicePath == "" ? DEFAULT_SERVICE_PATH_UPDATES : servicePath;
 
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, "JSON");
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, "JSON", fiwareCorrelator);
       reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
       return result;
     }
@@ -120,7 +116,7 @@ HttpStatusCode mongoRegisterContext
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, "JSON");
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, "JSON", fiwareCorrelator);
     reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     return result;
 }

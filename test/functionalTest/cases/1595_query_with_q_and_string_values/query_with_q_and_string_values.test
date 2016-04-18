@@ -38,6 +38,7 @@ brokerStart CB
 # 06. GET entities with q=A1!=10 (1 hit)
 # 07. GET entities with q=A1!='10' (1 hit)
 # 08. GET entities with invalid q=A1=='10'x (error)
+# 09. GET entities with invalid q=A1=='10'x' (error)
 #
 
 
@@ -105,12 +106,20 @@ echo
 echo
 
 
+echo "09. GET entities with invalid q=A1=='10'x' (error)"
+echo "=================================================="
+orionCurl --url "/v2/entities?q=A1=='10'x'" --json
+echo
+echo
+
+
 --REGEXPECT--
 01. Create an entity E1 with string attribute A1='10'
 =====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -120,6 +129,7 @@ Date: REGEX(.*)
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E2?type=none
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 
@@ -129,6 +139,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 147
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -158,6 +169,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -178,6 +190,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -198,6 +211,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -218,6 +232,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 [
@@ -236,12 +251,27 @@ Date: REGEX(.*)
 08. GET entities with invalid q=A1=='10'x (error)
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
+Content-Length: 67
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "invalid query expression",
+    "description": "non-terminated forced string",
+    "error": "BadRequest"
+}
+
+
+09. GET entities with invalid q=A1=='10'x' (error)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "quote in forced string",
     "error": "BadRequest"
 }
 

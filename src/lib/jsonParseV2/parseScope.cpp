@@ -86,5 +86,17 @@ std::string parseScope(ConnectionInfo* ciP, Value::ConstValueIterator valueP, Sc
     }
   }
 
+  if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
+  {
+    std::string errorString;
+
+    bool b = scopeP->stringFilter.parse(scopeP->value.c_str(), &errorString);
+
+    if (b != true)
+    {
+      return errorString;
+    }
+  }
+
   return "OK";
 }

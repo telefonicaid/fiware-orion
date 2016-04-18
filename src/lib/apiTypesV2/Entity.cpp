@@ -92,7 +92,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       out = "[";
       if (attributeVector.size() != 0)
       {
-        out += attributeVector.toJson(true, false, renderMode, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, renderMode, ciP->uriParam["attrs"]);
       }
       out += "]";        
     }
@@ -109,7 +109,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         out += ",";
-        out += attributeVector.toJson(true, false, renderMode, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, renderMode, ciP->uriParam["attrs"]);
       }
 
       out += "}";

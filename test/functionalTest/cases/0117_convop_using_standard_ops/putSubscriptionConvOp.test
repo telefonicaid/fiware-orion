@@ -42,7 +42,7 @@ accumulatorStart
 # 09. Update E1/T1/A2
 # 10. Dump accumulator, still the same two notifications
 # 11. Update E1/T1/A1
-# 12. Dump accumulator, see three notification
+# 12. Dump accumulator, see three notifications
 #
 
 echo "01. PUT /v1/contextSubscriptions/1234567890 and see it fail"
@@ -254,8 +254,8 @@ echo
 echo
 
 
-echo "12. Dump accumulator, see three notification"
-echo "============================================"
+echo "12. Dump accumulator, see three notifications"
+echo "============================================="
 accumulatorDump
 echo
 echo
@@ -267,6 +267,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 205
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -286,6 +287,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 284
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -305,6 +307,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 180
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -323,6 +326,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -339,6 +343,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 491
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -378,6 +383,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -416,6 +422,7 @@ Content-Type: application/json; charset=utf-8
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -435,6 +442,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -472,6 +480,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -510,6 +519,7 @@ Content-Type: application/json; charset=utf-8
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -544,6 +554,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -581,6 +592,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -619,6 +631,7 @@ Content-Type: application/json; charset=utf-8
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -645,14 +658,15 @@ Date: REGEX(.*)
 }
 
 
-12. Dump accumulator, see three notification
-============================================
+12. Dump accumulator, see three notifications
+=============================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 572
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -690,6 +704,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -727,6 +742,7 @@ User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",

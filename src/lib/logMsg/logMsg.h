@@ -38,7 +38,7 @@
 #include <time.h>
 #include <stdint.h>             /* int64, ...                                */
 
-#include "common/globals.h"     /* transactionIdSet                          */
+#include "common/globals.h"     /* transactionIdSet,correlatorIdSet          */
 
 #include "common/limits.h"      // FIXME: this should be removed if this library wants to be generic again
 
@@ -50,6 +50,7 @@
 extern int             inSigHandler;
 extern char*           progName;
 extern __thread char   transactionId[64];
+extern __thread char   correlatorId[64];
 
 
 
@@ -1323,7 +1324,6 @@ extern bool lmAssertAtExit;
 extern bool lmNoTracesToFileIfHookActive;
 extern bool lmSilent;
 
-extern __thread char   transactionId[64];
 extern __thread char   service[SERVICE_NAME_MAX_LEN + 1];
 extern __thread char   subService[101];                 // Using SERVICE_PATH_MAX_TOTAL will be too much
 extern __thread char   fromIp[IP_LENGTH_MAX + 1];
@@ -1783,6 +1783,7 @@ extern int lmLogLinesGet(void);
 inline void lmTransactionReset()
 {
   strncpy(transactionId, "N/A", sizeof(transactionId));
+  strncpy(correlatorId,  "N/A", sizeof(correlatorId));
   strncpy(service,       "N/A", sizeof(service));
   strncpy(subService,    "N/A", sizeof(subService));
   strncpy(fromIp,        "N/A", sizeof(fromIp));
@@ -1797,6 +1798,7 @@ inline void lmTransactionReset()
 inline void lmTransactionStart(const char* keyword, const char* ip, int port, const char* path)
 {
   transactionIdSet();
+
   snprintf(service,    sizeof(service),    "pending");
   snprintf(subService, sizeof(subService), "pending");
   snprintf(fromIp,     sizeof(fromIp),     "pending");

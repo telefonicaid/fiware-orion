@@ -153,6 +153,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 109
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -167,6 +168,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 109
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -181,6 +183,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -211,6 +214,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -245,6 +249,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Fiware-Service: t_01
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -281,6 +286,7 @@ Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Fiware-Service: t_02
 Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",

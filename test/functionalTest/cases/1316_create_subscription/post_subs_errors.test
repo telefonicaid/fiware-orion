@@ -37,8 +37,8 @@ brokerStart CB
 # 05. POST /v2/subscriptions (empty body)
 # 06. POST /v2/subscriptions (missing subject)
 # 07. POST /v2/subscriptions (missing notification)
-# 08. POST /v2/subscriptions (missing expires)
-# 09. POST /v2/subscriptions (missing subject condition)
+# 08. POST /v2/subscriptions (missing subject condition)
+# 09. POST /v2/subscriptions (malformed URL)
 
 
 echo "01. POST /v2/subscriptions (without id/idpattern)"
@@ -52,18 +52,18 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ ],
+            "attrs": [ ],
             "expression": {
                "q": "temperature>40"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http":{"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -78,18 +78,17 @@ payload='
     "subject": {
         "entities": "none",
         "condition": {
-            "attributes": [ ],
+            "attrs": [ ],
             "expression": {
                "q": "temperature>40"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http":{"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -109,18 +108,17 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http":{"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -146,11 +144,11 @@ echo "============================================"
 payload='
 {
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
+        "http":{"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"],
         "throttling": 5
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -169,13 +167,13 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40"
             }
          }
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -183,36 +181,7 @@ echo
 echo
 
 
-echo "08. POST /v2/subscriptions (missing expires)"
-echo "============================================"
-payload='
-{
-    "subject": {
-        "entities": [
-            {
-                "type": "Room"
-            }
-        ],
-        "condition": {
-            "attributes": [ "temperature" ],
-            "expression": {
-               "q": "temperature>40"
-            }
-         }
-    },
-    "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
-    }
-}
-'
-orionCurl --url /v2/subscriptions --payload "$payload" --json
-echo
-echo
-
-
-echo "09. POST /v2/subscriptions (missing subject condition)"
+echo "08. POST /v2/subscriptions (missing subject condition)"
 echo "======================================================"
 payload='
 {
@@ -224,11 +193,11 @@ payload='
         ]
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
+        "http":{"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"],
         "throttling": 5
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z"
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -236,7 +205,7 @@ echo
 echo
 
 
-echo "10. POST /v2/subscriptions (malformed URL)"
+echo "09. POST /v2/subscriptions (malformed URL)"
 echo "=========================================="
 payload='
 {
@@ -247,7 +216,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -257,11 +226,11 @@ payload='
          }
     },
     "notification": {
-        "callback": "localhost 1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http":{"url": "localhost 1234"},
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2016-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 
 '
@@ -276,6 +245,7 @@ echo
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -289,6 +259,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -302,6 +273,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 84
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -315,6 +287,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 73
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -328,6 +301,7 @@ Date: REGEX(.*)
 HTTP/1.1 411 Length Required
 Content-Length: 91
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -341,6 +315,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 76
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -354,6 +329,7 @@ Date: REGEX(.*)
 HTTP/1.1 400 Bad Request
 Content-Length: 81
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -362,24 +338,12 @@ Date: REGEX(.*)
 }
 
 
-08. POST /v2/subscriptions (missing expires)
-============================================
-HTTP/1.1 400 Bad Request
-Content-Length: 79
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "no expiration for subscription specified",
-    "error": "BadRequest"
-}
-
-
-09. POST /v2/subscriptions (missing subject condition)
+08. POST /v2/subscriptions (missing subject condition)
 ======================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
@@ -388,11 +352,12 @@ Date: REGEX(.*)
 }
 
 
-10. POST /v2/subscriptions (malformed URL)
+09. POST /v2/subscriptions (malformed URL)
 ==========================================
 HTTP/1.1 400 Bad Request
 Content-Length: 50
 Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {

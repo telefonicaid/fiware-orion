@@ -44,7 +44,8 @@ extern HttpStatusCode processRegisterContext
   OID*                      id,
   const std::string&        tenant,
   const std::string&        servicePath,
-  const std::string&        format
+  const std::string&        format,
+  const std::string&        fiwareCorrelator
 );
 
 

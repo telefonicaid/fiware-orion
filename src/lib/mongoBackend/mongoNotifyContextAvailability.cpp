@@ -41,6 +41,7 @@ HttpStatusCode mongoNotifyContextAvailability
   NotifyContextAvailabilityRequest*    requestP,
   NotifyContextAvailabilityResponse*   responseP,
   std::map<std::string, std::string>&  uriParam,
+  const std::string&                   fiwareCorrelator,
   const std::string&                   tenant,
   const std::string&                   servicePath
 )
@@ -59,7 +60,7 @@ HttpStatusCode mongoNotifyContextAvailability
         rcr.contextRegistrationVector.push_back(crP);
     }
 
-    /* notifyContextAvailability doesn't include duration information, so we will use the defaulf */
+    /* notifyContextAvailability doesn't include duration information, so we will use the default */
     rcr.duration.set(DEFAULT_DURATION);
 
     /* We use processRegisterContext() function. Note that in this case the response is not needed, so we will
@@ -67,7 +68,7 @@ HttpStatusCode mongoNotifyContextAvailability
      * point of view, notifyContextAvailability is considered as a new registration (as no registratinId is
      * received in the notification message) */
     RegisterContextResponse rcres;
-    processRegisterContext(&rcr, &rcres, NULL, tenant, servicePath, "JSON");
+    processRegisterContext(&rcr, &rcres, NULL, tenant, servicePath, "JSON", fiwareCorrelator);
 
     responseP->responseCode.fill(SccOk);
 
