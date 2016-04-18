@@ -120,12 +120,34 @@ std::string Condition::toJson()
 
   JsonHelper jhe;
 
-  jhe.addString("q", this->expression.q);
-  jhe.addString("geometry", this->expression.geometry);
-  jhe.addString("coords", this->expression.coords);
-  jhe.addString("georel", this->expression.georel);
-  
-  jh.addRaw("expression", jhe.str());
+  bool atLeastOneSubField = false;
+
+  if (this->expression.q != "")
+  {
+    atLeastOneSubField = true;
+    jhe.addString("q", this->expression.q);
+  }
+  if (this->expression.geometry != "")
+  {
+    atLeastOneSubField = true;
+    jhe.addString("geometry", this->expression.geometry);
+  }
+  if (this->expression.coords != "")
+  {
+    atLeastOneSubField = true;
+    jhe.addString("coords", this->expression.coords);
+  }
+  if (this->expression.georel != "")
+  {
+    atLeastOneSubField = true;
+    jhe.addString("georel", this->expression.georel);
+  }
+
+  if (atLeastOneSubField)
+  {
+    atLeastOneSubField = true;
+    jh.addRaw("expression", jhe.str());
+  }
 
   return jh.str();
 }

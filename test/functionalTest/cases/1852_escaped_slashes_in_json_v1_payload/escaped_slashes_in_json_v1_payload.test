@@ -92,7 +92,7 @@ Date: REGEX(.*)
 02. Make sure it was correctly created
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 358
+Content-Length: 298
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -114,13 +114,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "movement"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {

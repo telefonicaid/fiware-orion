@@ -145,7 +145,7 @@ Date: REGEX(.*)
 02. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 333
+Content-Length: 273
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -167,13 +167,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "temperature"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -199,7 +193,7 @@ Date: REGEX(.*)
 04. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 330
+Content-Length: 270
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -221,13 +215,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "temperature"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -264,7 +252,7 @@ Date: REGEX(.*)
 07. Get subscriptions by /sp2 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 330
+Content-Length: 270
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -286,13 +274,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "temperature"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
