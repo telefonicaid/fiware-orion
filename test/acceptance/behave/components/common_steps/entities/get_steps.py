@@ -229,6 +229,7 @@ def verify_that_attribute_types_are_returned_in_response(context):
     """
     __logger__.debug("Verifying that attribute types are returned from a request...")
     queries_parameters = context.cb.get_entities_parameters()
+    prefixes = context.cb.get_entities_prefix()
     ngsi = NGSI()
-    ngsi.verify_attributes_types_with_entity_types(queries_parameters, context.entities_accumulate, context.resp)
+    ngsi.verify_attributes_types_with_entity_types(queries_parameters, context.entities_accumulate, prefixes, context.resp)
     __logger__.info("...Verified that attribute types are returned from a request...")

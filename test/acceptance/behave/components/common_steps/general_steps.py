@@ -151,7 +151,7 @@ def check_in_log_label_and_text(context, label, text):
     :param label: label to find
     :param text: text to find (begin since the end)
     """
-    __logger__.debug("Looking for in log the \"%s\" label and the \"%s\" text...")
+    __logger__.debug("Looking for in log the \"%s\" label and the \"%s\" text..." % (label, text))
     props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
     remote_log = Remote_Log(file="%s/contextBroker.log" % props_cb_env["CB_LOG_FILE"], fabric=context.my_fab)
     line = remote_log.find_line(label,text)
