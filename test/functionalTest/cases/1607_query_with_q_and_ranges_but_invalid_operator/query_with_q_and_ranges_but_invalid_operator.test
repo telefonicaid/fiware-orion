@@ -40,7 +40,6 @@ brokerStart CB
 # 08. Erroneous GET entities with q=A1<0..20
 # 09. Correct GET entities with q=A1==0..20 (2 hits)
 # 10. Correct GET entities with q=A1!=0..20 (1 hit)
-# 11. Erroneous GET entities with q=A1==a..b 
 #
 
 
@@ -120,13 +119,6 @@ echo
 echo "10. Correct GET entities with q=A1!=0..20 (1 hit)"
 echo "================================================="
 orionCurl --url '/v2/entities?q=A1!=0..20' --json
-echo
-echo
-
-
-echo "11. Erroneous GET entities with q=A1==a..b"
-echo "=========================================="
-orionCurl --url '/v2/entities?q=A1==a..b' --json
 echo
 echo
 
@@ -306,20 +298,6 @@ Date: REGEX(.*)
         "type": "none"
     }
 ]
-
-
-11. Erroneous GET entities with q=A1==a..b
-==========================================
-HTTP/1.1 400 Bad Request
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "string range is not supported",
-    "error": "BadRequest"
-}
 
 
 --TEARDOWN--

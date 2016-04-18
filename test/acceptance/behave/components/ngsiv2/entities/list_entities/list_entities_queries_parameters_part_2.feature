@@ -410,6 +410,7 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | speed=='89'  | 5        |
       | speed==89    | 1        |
 
+  @only_q_operators_errors.row<row.id>
   @only_q_operators_errors @BUG_1607
   Scenario Outline:  try to list entities using NGSI v2 with only q query parameter, with range, but wrong operators
     Given  a definition of headers
@@ -464,9 +465,9 @@ Feature: list all entities with get request and queries parameters using NGSI v2
       | q         | <q_expression> |
     Then verify that receive an "Bad Request" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | BadRequest               |
-      | description | invalid query expression |
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | ranges only valid for == and != ops |
     Examples:
       | q_expression  |
       | speed>=69..90 |

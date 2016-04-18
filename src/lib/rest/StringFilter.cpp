@@ -76,7 +76,7 @@ bool StringFilterItem::valueParse(char* s, std::string* errorStringP)
   }
   else if ((op == SfopGreaterThan) || (op == SfopGreaterThanOrEqual) || (op == SfopLessThan) || (op == SfopLessThanOrEqual))
   {
-    if ((valueType != SfvtNumber) && (valueType != SfvtDate))
+    if ((valueType != SfvtNumber) && (valueType != SfvtDate) && (valueType != SfvtString))
     {
       *errorStringP = std::string("values of type /") + valueTypeName() + "/ not supported for operator /" + opName() + "/";
       return false;
@@ -678,7 +678,24 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
   return true;
 }
 
+/* ****************************************************************************
+*
+* StringFilterItem::compatibleType -
+*/
+bool StringFilterItem::compatibleType(ContextAttribute* caP)
+{
+  if ((caP->valueType == orion::ValueTypeNumber) && ((valueType == SfvtNumber) || (valueType == SfvtDate)))
+  {
+    return true;
+  }
 
+  if ((caP->valueType == orion::ValueTypeString) && (valueType == SfvtString))
+  {
+    return true;
+  }
+
+  return false;
+}
 
 /* ****************************************************************************
 *
@@ -686,18 +703,24 @@ bool StringFilterItem::matchEquals(ContextAttribute* caP)
 */
 bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 {
-  if (caP->valueType != orion::ValueTypeNumber)
-  {
-    return false;
-  }
-  if ((valueType != SfvtNumber) && (valueType!= SfvtDate))
+  if (!compatibleType(caP))
   {
     return false;
   }
 
-  if (caP->numberValue > numberValue)
+  if (caP->valueType == orion::ValueTypeNumber)
   {
-    return true;
+    if (caP->numberValue > numberValue)
+    {
+      return true;
+    }
+  }
+  else if (caP->valueType == orion::ValueTypeString)
+  {
+    if (strcmp(caP->stringValue.c_str(), stringValue.c_str()) > 0)
+    {
+      return true;
+    }
   }
 
   return false;
@@ -711,18 +734,24 @@ bool StringFilterItem::matchGreaterThan(ContextAttribute* caP)
 */
 bool StringFilterItem::matchLessThan(ContextAttribute* caP)
 {
-  if (caP->valueType != orion::ValueTypeNumber)
-  {
-    return false;
-  }
-  if ((valueType != SfvtNumber) && (valueType!= SfvtDate))
+  if (!compatibleType(caP))
   {
     return false;
   }
 
-  if (caP->numberValue < numberValue)
+  if (caP->valueType == orion::ValueTypeNumber)
   {
-    return true;
+    if (caP->numberValue < numberValue)
+    {
+      return true;
+    }
+  }
+  else if (caP->valueType == orion::ValueTypeString)
+  {
+    if (strcmp(caP->stringValue.c_str(), stringValue.c_str()) < 0)
+    {
+      return true;
+    }
   }
 
   return false;
@@ -880,8 +909,9 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else if (itemP->valueType == SfvtStringRange)
       {
-        *errorStringP = "string range is not supported";
-        return false;
+        bb.append("$gte", itemP->stringRangeFrom).append("$lte", itemP->stringRangeTo);
+        bob.append(k, bb.obj());
+        f = bob.obj();
       }
       else if ((itemP->valueType == SfvtNumberList) || (itemP->valueType == SfvtDateList))
       {
@@ -956,8 +986,10 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       }
       else if (itemP->valueType == SfvtStringRange)
       {
-        *errorStringP = "string range is not supported";
-        return false;
+        bb.append("$gte", itemP->stringRangeFrom).append("$lte", itemP->stringRangeTo);
+        bb2.append("$exists", true).append("$not", bb.obj());
+        bob.append(k, bb2.obj());
+        f = bob.obj();
       }
       else if (itemP->valueType == SfvtStringList)
       {
@@ -996,25 +1028,53 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
       break;
 
     case SfopGreaterThan:
-      bb.append("$gt", itemP->numberValue);
+      if (itemP->valueType == SfvtString)
+      {
+        bb.append("$gt", itemP->stringValue);
+      }
+      else
+      {
+        bb.append("$gt", itemP->numberValue);
+      }
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
 
     case SfopGreaterThanOrEqual:
-      bb.append("$gte", itemP->numberValue);
+      if (itemP->valueType == SfvtString)
+      {
+        bb.append("$gte", itemP->stringValue);
+      }
+      else
+      {
+        bb.append("$gte", itemP->numberValue);
+      }
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
 
     case SfopLessThan:
-      bb.append("$lt", itemP->numberValue);
+      if (itemP->valueType == SfvtString)
+      {
+        bb.append("$lt", itemP->stringValue);
+      }
+      else
+      {
+        bb.append("$lt", itemP->numberValue);
+      }
       bob.append(k, bb.obj());
       f = bob.obj();
       break;
 
     case SfopLessThanOrEqual:
-      bb.append("$lte", itemP->numberValue);
+      if (itemP->valueType == SfvtString)
+      {
+        bb.append("$lte", itemP->stringValue);
+      }
+      else
+      {
+        bb.append("$lte", itemP->numberValue);
+      }
       bob.append(k, bb.obj());
       f = bob.obj();
       break;

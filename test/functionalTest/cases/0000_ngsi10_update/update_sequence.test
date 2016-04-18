@@ -1,0 +1,1251 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update SEQ
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Update/APPEND OfficeRoom/Room/pressure=p230
+# 02. Update/APPEND OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 03. Update/APPEND OfficeRoom/Room/pressure=p230
+# 04. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 05. Update/APPEND OfficeRoom/Room/pressure=p23
+# 06. Update/UPDATE OfficeRoom/Room/pressure=p230
+# 07. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 08. Update/APPEND OfficeRoom/Room/pressure=
+# 09. Update/UPDATE OfficeRoom/Room/pressure=
+# 10. Update/DELETE OfficeRoom/Room/pressure
+# 11. Update/DELETE OfficeRoom/Room/pressure AGAIN (error)
+# 12. Update/DELETE OfficeRoom/Room/pressure AGAIN AGAIN (same error)
+# 13. Update/UPDATE OfficeRoom/Room/pressure=p230
+# 14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 15. Update/APPEND OfficeRoom/Room/pressure=p23
+# 16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)
+# 17. Update/APPEND OfficeRoom/Room/pressure=p2300+lightstatus=L23 (both OK)
+# 18. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+#
+
+echo "01. Update/APPEND OfficeRoom/Room/pressure=p230"
+echo "==============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+echo "02. Update/APPEND OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p235"
+    }
+    ]
+  },
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "ConferenceRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Update/APPEND OfficeRoom/Room/pressure=p230"
+echo "==============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p235"
+    }
+    ]
+  },
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "ConferenceRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Update/APPEND OfficeRoom/Room/pressure=p23"
+echo "=============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p23"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Update/UPDATE OfficeRoom/Room/pressure=p230"
+echo "==============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p235"
+    }
+    ]
+  },
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "ConferenceRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Update/APPEND OfficeRoom/Room/pressure="
+echo "==========================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": ""
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "09. Update/UPDATE OfficeRoom/Room/pressure="
+echo "==========================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": ""
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Update/DELETE OfficeRoom/Room/pressure"
+echo "=========================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": ""
+    }
+    ]
+  }
+  ],
+  "updateAction": "DELETE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Update/DELETE OfficeRoom/Room/pressure AGAIN (error)"
+echo "========================================================"
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": ""
+    }
+    ]
+  }
+  ],
+  "updateAction": "DELETE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "12. Update/DELETE OfficeRoom/Room/pressure AGAIN AGAIN (same error)"
+echo "==================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p23"
+    }
+    ]
+  }
+  ],
+  "updateAction": "DELETE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "13. Update/UPDATE OfficeRoom/Room/pressure=p230"
+echo "==============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p235"
+    }
+    ]
+  },
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "ConferenceRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "15. Update/APPEND OfficeRoom/Room/pressure=p23"
+echo "=============================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p23"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)"
+echo "================================================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p2300"
+    },
+    {
+      "name": "lightstatus",
+      "type": "light",
+      "value": "L23"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "17. Update/APPEND OfficeRoom/Room/pressure=p2300+lightstatus=L23 (both OK)"
+echo "=========================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p2300"
+    },
+    {
+      "name": "lightstatus",
+      "type": "light",
+      "value": "L23"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "18. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p235"
+    }
+    ]
+  },
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "ConferenceRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p230"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Update/APPEND OfficeRoom/Room/pressure=p230
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Update/APPEND OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 768
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Update/APPEND OfficeRoom/Room/pressure=p230
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 768
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Update/APPEND OfficeRoom/Room/pressure=p23
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. Update/UPDATE OfficeRoom/Room/pressure=p230
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+07. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 768
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+08. Update/APPEND OfficeRoom/Room/pressure=
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+09. Update/UPDATE OfficeRoom/Room/pressure=
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Update/DELETE OfficeRoom/Room/pressure
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+11. Update/DELETE OfficeRoom/Room/pressure AGAIN (error)
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 557
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "472",
+                "details": "action: DELETE - entity: [OfficeRoom, Room] - offending attribute: pressure - attribute not found",
+                "reasonPhrase": "request parameter is invalid/not allowed"
+            }
+        }
+    ]
+}
+
+
+12. Update/DELETE OfficeRoom/Room/pressure AGAIN AGAIN (same error)
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 557
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "472",
+                "details": "action: DELETE - entity: [OfficeRoom, Room] - offending attribute: pressure - attribute not found",
+                "reasonPhrase": "request parameter is invalid/not allowed"
+            }
+        }
+    ]
+}
+
+
+13. Update/UPDATE OfficeRoom/Room/pressure=p230
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 535
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "472",
+                "details": "action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: pressure",
+                "reasonPhrase": "request parameter is invalid/not allowed"
+            }
+        }
+    ]
+}
+
+
+14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 905
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "472",
+                "details": "action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: pressure",
+                "reasonPhrase": "request parameter is invalid/not allowed"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+15. Update/APPEND OfficeRoom/Room/pressure=p23
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)
+=================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 823
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "404",
+                "details": "OfficeRoom",
+                "reasonPhrase": "No context element found"
+            }
+        }
+    ]
+}
+
+
+17. Update/APPEND OfficeRoom/Room/pressure=p2300+lightstatus=L23 (both OK)
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 514
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "lightstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+18. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 768
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "ConferenceRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

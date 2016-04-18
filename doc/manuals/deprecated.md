@@ -38,7 +38,7 @@ A list of deprecated features and the version in which they were deprecated foll
 Although you are encouraged to use always the newest Orion version, take into account the following
 information in the case you want to use old versions:
 
-* Old RPMs (since Orion 0.1.1) are available at the [FIWARE yum repository](http://repositories.lab.fiware.org/repo/rpm/x86_64).
+* Old RPMs (since Orion 0.1.1) are available at the [FIWARE yum repository](http://repositories.lab.fiware.org/repo/rpm/6/x86_64).
 * Code correponding to old releases (since Orion 0.8.1, the first one available as open source) is
   available at the [Orion github repository](http://github.com/telefonicaid/fiware-orion). Each release number
   (e.g. 0.23.0) has associated the following:
