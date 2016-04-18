@@ -69,8 +69,8 @@ payload='
          }
     },
     "notification": {
-        "http": {"url": "http://localhost:${LISTENER_PORT}'/notify"},
-        "attributes": [ ]
+        "http": {"url": "http://localhost:'${LISTENER_PORT}'/notify"},
+        "attrs": [ ]
     },
     "expires": "2050-04-05T14:00:00.00Z",
     "status": "inactive"
@@ -199,7 +199,7 @@ Date: REGEX(.*)
 03. Check subscription timesSent value (0)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 322
+Content-Length: 314
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -209,7 +209,9 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
-        "http": {"url": "http://localhost:9997/notify"}
+        "http": {
+            "url": "http://localhost:9997/notify"
+        }
     },
     "status": "inactive",
     "subject": {
@@ -256,7 +258,7 @@ Date: REGEX(.*)
 06. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 371
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -266,7 +268,9 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
-        "http": {"url": "http://localhost:9997/notify"}
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
         "lastNotification": "REGEX(.*)",
         "timesSent": 1
     },
@@ -315,7 +319,7 @@ Date: REGEX(.*)
 09. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 373
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -325,14 +329,16 @@ Date: REGEX(.*)
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [],
-        "http": {"url": "http://localhost:9997/notify"}
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
         "lastNotification": "REGEX(.*)",
         "timesSent": 1
     },
     "status": "inactive",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "A"
             ],
             "expression": {
