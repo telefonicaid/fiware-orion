@@ -10,7 +10,7 @@ In Orion context broker `.feature`-files are composed of the following parts:
     
     Actions executed before or after a feature and each scenario:  
     >**Actions Before the feature:**   
-    *modify the file `properties.json` from a template file, with all necessary configuration used in the test*.
+    *modify the file `properties.json` from a template file, with all necessary configuration used in the tests*.
     ```
       Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
     ```  
@@ -70,7 +70,7 @@ In Orion context broker `.feature`-files are composed of the following parts:
           | max length allowed |
     ```
     
-5.	Example of complete scenario:
+**Example of complete scenario:**
     
     Steps:
     - **Given** a definition of headers 
@@ -113,7 +113,7 @@ In Orion context broker `.feature`-files are composed of the following parts:
       And verify that the subscription is stored in mongo
     ```
     
-6. Test flow
+ **Test flow:**
 
  1. create necessary configuration for the tests (properties.json)
  2. modify configuration file of CB, remotely
