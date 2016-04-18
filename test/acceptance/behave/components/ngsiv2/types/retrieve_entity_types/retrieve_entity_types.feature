@@ -156,7 +156,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | parameter         | value      |
       | x-total-count     | 4          |
       | fiware-correlator | [a-f0-9-]* |
-    And verify that entity types are returned in response are: "house,home"
+    And verify that entity types returned in response are: "house,home"
     And verify that attributes types are returned in response based on the info in the recorder
 
   # ------------------------ Service header ----------------------------------------------
@@ -200,7 +200,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "none,home"
+    And verify that entity types returned in response are: "none,home"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | service            |
@@ -250,7 +250,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "none,home"
+    And verify that entity types returned in response are: "none,home"
     And verify that attributes types are returned in response based on the info in the recorder
 
   @service_error
@@ -332,7 +332,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "none,home"
+    And verify that entity types returned in response are: "none,home"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | service_path                                                  |
@@ -385,7 +385,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And record entity group
     When get entity types
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "none,home"
+    And verify that entity types returned in response are: "none,home"
     And verify that attributes types are returned in response based on the info in the recorder
 
   @service_path_error
@@ -486,7 +486,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify headers in response
       | parameter     | value    |
       | x-total-count | <number> |
-    And verify that entity types are returned in response are: "home_0,home_1,home_2,home_3,home_4"
+    And verify that entity types returned in response are: "home_0,home_1,home_2,home_3,home_4"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | number |
@@ -552,7 +552,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify headers in response
       | parameter     | value |
       | x-total-count | 1     |
-    And verify that entity types are returned in response are: "home"
+    And verify that entity types returned in response are: "home"
     And verify that attributes types are returned in response based on the info in the recorder
 
   # ------------------ queries parameters -------------------------------
@@ -632,7 +632,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | parameter | value   |
       | limit     | <limit> |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "<types>"
+    And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | limit | types         |
@@ -826,7 +826,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | parameter | value    |
       | offset    | <offset> |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "<types>"
+    And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | offset | types               |
@@ -960,7 +960,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | limit     | <limit>  |
       | offset    | <offset> |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "<types>"
+    And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | limit | offset | types           |
@@ -1117,7 +1117,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | parameter | value |
       | options   | count |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "house,home,none,car"
+    And verify that entity types returned in response are: "house,home,none,car"
     And verify that attributes types are returned in response based on the info in the recorder
     And verify headers in response
       | parameter     | value |
@@ -1213,7 +1213,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | offset    | <offset> |
       | options   | count    |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "<types>"
+    And verify that entity types returned in response are: "<types>"
     And verify that attributes types are returned in response based on the info in the recorder
     And verify headers in response
       | parameter     | value |
