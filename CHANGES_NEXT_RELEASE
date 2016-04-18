@@ -13,4 +13,5 @@
 - Add: Correlator as HTTP header and in log file (Issue #1916)
 - Fix: no longer considering service (tenant) for subscriptions when broker is started without '-multitenant' CLI option (Issue #1898)
 - Add: Add permanent subscriptions (Issue #1949)
+- Fix: NGSIv2 subscription payload (#2014)
 - Add: string support in <, >, <=, >= and range filters (#1945)

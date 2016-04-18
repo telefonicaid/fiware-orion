@@ -57,6 +57,11 @@ std::string Subscription::toJson()
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson());
 
+  if (this->throttling > 0)
+  {
+    jh.addNumber("throttling", this->throttling);
+  }
+
   return jh.str();
 }
 
@@ -70,11 +75,6 @@ std::string Notification::toJson()
 {
   JsonHelper jh;
 
-  jh.addString("callback", this->callback);  
-  if (this->throttling > 0)
-  {
-    jh.addNumber("throttling", this->throttling);
-  }
   if (this->timesSent > 0)
   {
     jh.addNumber("timesSent", this->timesSent);
@@ -83,7 +83,9 @@ std::string Notification::toJson()
   {
     jh.addDate("lastNotification", this->lastNotification);
   }
-  jh.addRaw("attributes", vectorToJson(this->attributes));
+  jh.addRaw("attrs", vectorToJson(this->attributes));
+
+  jh.addRaw("http", this->http.toJson());
 
   return jh.str();
 }
@@ -114,7 +116,7 @@ std::string Condition::toJson()
 {
   JsonHelper jh;
 
-  jh.addRaw("attributes", vectorToJson(this->attributes));
+  jh.addRaw("attrs", vectorToJson(this->attributes));
 
   JsonHelper jhe;
 
@@ -145,4 +147,18 @@ std::string EntID::toJson()
   return jh.str();
 }
 
+
+/* ****************************************************************************
+*
+* Http::toJson -
+*/
+std::string Http::toJson()
+{
+  JsonHelper jh;
+
+  jh.addString("url", this->url);
+
+  return jh.str();
 }
+
+} // end namespace

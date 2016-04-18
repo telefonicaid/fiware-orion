@@ -45,7 +45,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -55,10 +55,12 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
-    }
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
+    },
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -106,7 +108,7 @@ echo
 echo
 
 
-echo "04. GET /v2/subscriptions/ID (w/o expires field)"
+echo "06. GET /v2/subscriptions/ID (w/o expires field)"
 echo "================================================="
 orionCurl --url "/v2/subscriptions/${idSubscription}" --json
 echo
@@ -127,7 +129,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID (w/o expires field)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 371
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -135,17 +137,18 @@ Date: REGEX(.*)
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -162,7 +165,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
@@ -178,7 +182,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID (with expires field)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 416
+Content-Length: 408
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -187,17 +191,18 @@ Date: REGEX(.*)
     "expires": "1982-06-14T17:15:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "expired",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -214,7 +219,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
@@ -227,10 +233,10 @@ Date: REGEX(.*)
 
 
 
-04. GET /v2/subscriptions/ID (w/o expires field)
+06. GET /v2/subscriptions/ID (w/o expires field)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 379
+Content-Length: 371
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -238,17 +244,18 @@ Date: REGEX(.*)
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -265,7 +272,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 

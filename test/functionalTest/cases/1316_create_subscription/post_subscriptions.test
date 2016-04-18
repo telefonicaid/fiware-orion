@@ -49,7 +49,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -59,10 +59,10 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
     },
+    "throttling": 5,
     "expires": "2050-04-05T14:00:00.00Z"
 }
 '
@@ -90,7 +90,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -100,10 +100,11 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+        "http": {"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
+
     },
+    "throttling": 2,
     "expires": "1991-04-05T14:00:00.00Z"
 }
 '
@@ -132,7 +133,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature", "pression", "humidity" ],
+            "attrs": [ "temperature", "pression", "humidity" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -142,10 +143,11 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 2
+        "http": {"url": "http://localhost:1234"},
+        "attrs": ["temperature", "humidity"]
+
     },
+    "throttling": 2,
     "expires": "1991-04-05T14:00:00.00Z"
 }
 '
@@ -175,7 +177,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 415
+Content-Length: 407
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -184,17 +186,18 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -211,7 +214,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
@@ -228,7 +232,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 442
+Content-Length: 436
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,17 +241,18 @@ Date: REGEX(.*)
     "expires": "1991-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 2
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "expired",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "humidity",
                 "pression",
                 "temperature"
@@ -266,7 +271,8 @@ Date: REGEX(.*)
                 "type": "special"
             }
         ]
-    }
+    },
+    "throttling": 2
 }
 
 
@@ -283,7 +289,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID
 ============================
 HTTP/1.1 200 OK
-Content-Length: 440
+Content-Length: 434
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -292,17 +298,18 @@ Date: REGEX(.*)
     "expires": "1991-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 2
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "expired",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "humidity",
                 "pression",
                 "temperature"
@@ -321,7 +328,8 @@ Date: REGEX(.*)
                 "type": "special"
             }
         ]
-    }
+    },
+    "throttling": 2
 }
 
 
