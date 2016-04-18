@@ -72,46 +72,46 @@ In Orion context broker `.feature`-files are composed of the following parts:
     
 **Example of complete scenario:**
     
-    Steps:
-    - **Given** a definition of headers 
-    - **And**   "defining" properties to subscriptions
-    - **When**  create a new subscription 
-    - **Then**  verify that a "Created" http code is received
-    - **And**   verify headers in the response
-    - **And**   verify that the subscription is stored in mongo
-    ```
-    @happy_path
-    Scenario:  create a new subscription using NGSI v2
-      Given  a definition of headers
-        | parameter          | value                 |
-        | Fiware-Service     | test_casub_happy_path |
-        | Fiware-ServicePath | /test                 |
-        | Content-Type       | application/json      |
-      # These properties below are used in subscriptions request
-      And properties to subscriptions
-        | parameter                      | value                                                              |
-        | description                    | my first subscription                                              |
-        | subject_type                   | room                                                               |
-        | subject_idPattern              | .*                                                                 |
-        | subject_entities_number        | 2                                                                  |
-        | subject_entities_prefix        | type                                                               |
-        | condition_attributes           | temperature                                                        |
-        | condition_attributes_number    | 3                                                                  |
-        | condition_expression           | q>>>temperature>40&georel>>>near&geometry>>>point&coords>>>40.6391 |
-        | notification_callback          | http://localhost:1234                                              |
-        | notification_attributes        | temperature                                                        |
-        | notification_attributes_number | 3                                                                  |
-        | notification_throttling        | 5                                                                  |
-        | expires                        | 2016-04-05T14:00:00.00Z                                            |
-        | status                         | active                                                             |
-      When create a new subscription
-      Then verify that receive a "Created" http code
-      And verify headers in response
-        | parameter      | value                |
-        | location       | /v2/subscriptions/.* |
-        | content-length | 0                    |
-      And verify that the subscription is stored in mongo
-    ```
+Steps:
+- **Given** a definition of headers 
+- **And**   "defining" properties to subscriptions
+- **When**  create a new subscription 
+- **Then**  verify that a "Created" http code is received
+- **And**   verify headers in the response
+- **And**   verify that the subscription is stored in mongo
+```
+        @happy_path
+        Scenario:  create a new subscription using NGSI v2
+          Given  a definition of headers
+            | parameter          | value                 |
+            | Fiware-Service     | test_casub_happy_path |
+            | Fiware-ServicePath | /test                 |
+            | Content-Type       | application/json      |
+          # These properties below are used in subscriptions request
+          And properties to subscriptions
+            | parameter                      | value                                                              |
+            | description                    | my first subscription                                              |
+            | subject_type                   | room                                                               |
+            | subject_idPattern              | .*                                                                 |
+            | subject_entities_number        | 2                                                                  |
+            | subject_entities_prefix        | type                                                               |
+            | condition_attributes           | temperature                                                        |
+            | condition_attributes_number    | 3                                                                  |
+            | condition_expression           | q>>>temperature>40&georel>>>near&geometry>>>point&coords>>>40.6391 |
+            | notification_callback          | http://localhost:1234                                              |
+            | notification_attributes        | temperature                                                        |
+            | notification_attributes_number | 3                                                                  |
+            | notification_throttling        | 5                                                                  |
+            | expires                        | 2016-04-05T14:00:00.00Z                                            |
+            | status                         | active                                                             |
+          When create a new subscription
+          Then verify that receive a "Created" http code
+          And verify headers in response
+            | parameter      | value                |
+            | location       | /v2/subscriptions/.* |
+            | content-length | 0                    |
+          And verify that the subscription is stored in mongo
+```
     
  **Test flow:**
 
