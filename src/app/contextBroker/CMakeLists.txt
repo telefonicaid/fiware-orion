@@ -81,7 +81,7 @@ IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_L
 ELSEIF((${DISTRO} STREQUAL "Ubuntu_13.10") OR (${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.10"))
   MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} MATCHES "Linux_Mint_.*"))
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS") OR (${DISTRO} MATCHES "Linux_Mint_.*"))
   MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
 ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")

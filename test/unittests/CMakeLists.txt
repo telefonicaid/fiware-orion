@@ -321,7 +321,7 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS"))
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS"))
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
