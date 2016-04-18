@@ -1,0 +1,586 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription sequence wildcards ONCHANGE append
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 101
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Subscribe to OfficeRoom.* / Room
+# 02. Create OfficeRoom/Room/pressure
+# 03. 0.5 seconds later, update OfficeRoom/Room/pressure
+# 04. 0.5 seconds later, create OfficeRoom2/Room/pressure
+# 05. Add attribute 'temperature' to OfficeRoom/Room
+# 06. Unsubscribe
+# 07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure
+# 08. Get accumulated data
+#
+
+echo "01. Subscribe to OfficeRoom.* / Room"
+echo "===================================="
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "OfficeRoom.*"
+        }
+    ],
+    "attributes": [ ],
+    "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+    "duration": "PT1H",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature",
+                "pressure",
+                "lightstatus"
+            ]
+        }
+    ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
+echo
+echo
+
+
+echo "02. Create OfficeRoom/Room/pressure"
+echo "==================================="
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p23"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. 0.5 seconds later, update OfficeRoom/Room/pressure"
+echo "======================================================"
+sleep 0.5s # to avoid a race condition in the order of the notifications
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p83"
+    }
+    ]
+  }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "04. 0.5 seconds later, create OfficeRoom2/Room/pressure"
+echo "======================================================="
+sleep 0.5s  # to assure the order of the notifications
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom2",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p23"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Add attribute 'temperature' to OfficeRoom/Room"
+echo "=================================================="
+sleep 0.5s  # to assure the order of the notifications
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "temperature",
+      "type": "degree",
+      "value": "t39"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Unsubscribe"
+echo "==============="
+payload='{
+  "subscriptionId": "'$SUB_ID'"
+}'
+orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+echo
+echo
+
+
+valgrindSleep 10
+echo "07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure"
+echo "================================================================="
+url="/v1/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p73"
+    }
+    ]
+  },
+  {
+    "type": "Room",
+    "isPattern": "false",
+    "id": "OfficeRoom2",
+    "attributes": [
+    {
+      "name": "pressure",
+      "type": "clima",
+      "value": "p73"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Get accumulated data"
+echo "========================"
+valgrindSleep 2
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Subscribe to OfficeRoom.* / Room
+====================================
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create OfficeRoom/Room/pressure
+===================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. 0.5 seconds later, update OfficeRoom/Room/pressure
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. 0.5 seconds later, create OfficeRoom2/Room/pressure
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 399
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Add attribute 'temperature' to OfficeRoom/Room
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 402
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. Unsubscribe
+===============
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 765
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+08. Get accumulated data
+========================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 480
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "pressure",
+            "type" : "clima",
+            "value" : "p23"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 480
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "pressure",
+            "type" : "clima",
+            "value" : "p83"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 481
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom2",
+        "attributes" : [
+          {
+            "name" : "pressure",
+            "type" : "clima",
+            "value" : "p23"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 600
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom",
+        "attributes" : [
+          {
+            "name" : "pressure",
+            "type" : "clima",
+            "value" : "p83"
+          },
+          {
+            "name" : "temperature",
+            "type" : "degree",
+            "value" : "t39"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

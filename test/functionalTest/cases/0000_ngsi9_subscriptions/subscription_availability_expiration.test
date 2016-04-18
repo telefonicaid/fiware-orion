@@ -1,0 +1,184 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription availability expiration check
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart
+
+--SHELL--
+url="/v1/registry/subscribeContextAvailability"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "BathRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "PT5S"
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+
+echo "1: ++++++++++++++++++++"
+#Do an register context inmediatelly after the subscription: notification is generated
+url="/v1/registry/registerContext"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:1028"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+
+echo "2: ++++++++++++++++++++"
+#Do an register context after subscription expiration: notification is not generated
+sleep 6s
+url="/v1/registry/registerContext"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "BathRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false"
+        }
+      ],
+      "providingApplication": "http://localhost:1028"
+    }
+  ],
+  "duration": "PT1H"
+}'
+orionCurl --url "$url" --payload "${payload}" --json
+
+echo "3: ++++++++++++++++++++"
+#Get accumulated data
+accumulatorDump
+
+
+--REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT5S",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+3: ++++++++++++++++++++
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 521
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "Room",
+            "isPattern" : "false",
+            "id" : "ConferenceRoom"
+          }
+        ],
+        "attributes" : [
+          {
+            "name" : "temperature",
+            "type" : "degree",
+            "isDomain" : "false"
+          }
+        ],
+        "providingApplication" : "http://localhost:1028"
+      }
+    }
+  ]
+}
+=======================================
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
