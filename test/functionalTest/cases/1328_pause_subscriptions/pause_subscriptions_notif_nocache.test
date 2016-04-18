@@ -330,7 +330,7 @@ Date: REGEX(.*)
         "http": {
             "url": "http://localhost:9997/notify"
         },
-         "lastNotification": "REGEX(.*)",
+        "lastNotification": "REGEX(.*)",
         "timesSent": 1
     },
     "status": "inactive",

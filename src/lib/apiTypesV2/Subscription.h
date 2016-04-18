@@ -51,8 +51,7 @@ struct Http
 
 struct Notification
 {
-  std::vector<std::string> attributes;
-  std::string              callback;
+  std::vector<std::string> attributes;  
   long long                timesSent;
   long long                lastNotification;
   Http                     http;

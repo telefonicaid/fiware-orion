@@ -138,7 +138,7 @@ Date: REGEX(.*)
 02. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 336
+Content-Length: 328
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -148,14 +148,15 @@ Date: REGEX(.*)
         "expires": "REGEX(.*)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [],
-            "callback": "http://localhost:1234/notify",
-            "throttling": 2
+            "attrs": [],
+            "http": {
+                "url": "http://localhost:1234/notify"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "A"
                 ],
                 "expression": {
@@ -172,7 +173,8 @@ Date: REGEX(.*)
                     "type": ""
                 }
             ]
-        }
+        },
+        "throttling": 2
     }
 ]
 
@@ -197,7 +199,7 @@ Date: REGEX(.*)
 04. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 337
+Content-Length: 329
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,14 +209,15 @@ Date: REGEX(.*)
         "expires": "REGEX(.*)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [],
-            "callback": "http://localhost:1234/notify",
-            "throttling": 10
+            "attrs": [],
+            "http": {
+                "url": "http://localhost:1234/notify"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "A"
                 ],
                 "expression": {
@@ -231,7 +234,8 @@ Date: REGEX(.*)
                     "type": ""
                 }
             ]
-        }
+        },
+        "throttling": 10
     }
 ]
 
@@ -267,7 +271,7 @@ Date: REGEX(.*)
 07. Get subscriptions by /sp2 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 337
+Content-Length: 329
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -277,14 +281,15 @@ Date: REGEX(.*)
         "expires": "REGEX(.*)",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [],
-            "callback": "http://localhost:1234/notify",
-            "throttling": 20
+            "attrs": [],
+            "http": {
+                "url": "http://localhost:1234/notify"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "A"
                 ],
                 "expression": {
@@ -301,7 +306,8 @@ Date: REGEX(.*)
                     "type": ""
                 }
             ]
-        }
+        },
+        "throttling": 20
     }
 ]
 

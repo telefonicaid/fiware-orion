@@ -56,7 +56,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -66,11 +66,13 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2050-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -154,7 +156,7 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ],
+            "attrs": [ "temperature" ],
             "expression": {
                "q": "temperature>40",
                "geometry": "point",
@@ -164,11 +166,13 @@ payload='
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature", "humidity"],
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature", "humidity"]
     },
-    "expires": "2050-04-05T14:00:00.00Z"
+    "expires": "2050-04-05T14:00:00.00Z",
+    "throttling": 5
 }
 '
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -213,7 +217,7 @@ Date: REGEX(.*)
 02. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 415
+Content-Length: 407
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -222,17 +226,18 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -249,7 +254,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
@@ -265,7 +271,7 @@ Date: REGEX(.*)
 04. Get subscription (see desc = one)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -275,17 +281,18 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -302,7 +309,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
@@ -318,7 +326,7 @@ Date: REGEX(.*)
 06. Get subscription (see desc = two)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 435
+Content-Length: 427
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -328,17 +336,18 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -355,7 +364,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
@@ -371,7 +381,7 @@ Date: REGEX(.*)
 08. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 415
+Content-Length: 407
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -380,17 +390,18 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -407,7 +418,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
@@ -424,7 +436,7 @@ Date: REGEX(.*)
 10. Get subscription (see desc = three)
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 429
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -434,17 +446,18 @@ Date: REGEX(.*)
     "expires": "2050-04-05T14:00:00.00Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "humidity",
             "temperature"
         ],
-        "callback": "http://localhost:1234",
-        "throttling": 5
+        "http": {
+            "url": "http://localhost:1234"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
             "expression": {
@@ -461,7 +474,8 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 

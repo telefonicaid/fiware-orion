@@ -51,15 +51,17 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ ],
+            "attrs": [ ],
             "expression": {
                "q": "status==on"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:'$LISTENER_PORT'/notify",
-        "attributes": [ ]
+        "http": {
+            "url": "http://localhost:'$LISTENER_PORT'/notify"
+        },
+        "attrs": [ ]
     }
 }
 '
