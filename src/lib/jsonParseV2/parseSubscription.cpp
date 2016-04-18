@@ -236,7 +236,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     const Value& throttling = document["throttling"];
     if (!throttling.IsInt64())
     {
-      alarmMgr.badInput(clientIp, "throttling is not a int");
+      alarmMgr.badInput(clientIp, "throttling is not an int");
       OrionError oe(SccBadRequest, "throttling is not an int");
 
       return oe.render(ciP, "");
