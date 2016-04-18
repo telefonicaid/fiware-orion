@@ -822,13 +822,13 @@ Date: REGEX(.*)
 16. POST /v2/subscriptions (callback is not a string)
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
+Content-Length: 76
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "url http notification is not an string",
+    "description": "url http notification is not a string",
     "error": "BadRequest"
 }
 

@@ -243,7 +243,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     }
     destination->throttling.seconds = throttling.GetInt64();
   }
-  else if (!update) // throttling was not set and it is update
+  else if (!update) // throttling was not set and it is not update
   {
     destination->throttling.seconds = 0;
   }
@@ -456,8 +456,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscribeContextReques
     const Value& url = http["url"];
     if (!url.IsString())
     {
-      alarmMgr.badInput(clientIp, "url http notification is not an string");
-      OrionError oe(SccBadRequest, "url http notification is not an string");
+      alarmMgr.badInput(clientIp, "url http notification is not a string");
+      OrionError oe(SccBadRequest, "url http notification is not a string");
 
       return oe.render(ciP, "");
     }
