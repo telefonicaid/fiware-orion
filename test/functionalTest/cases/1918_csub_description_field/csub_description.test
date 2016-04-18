@@ -41,8 +41,9 @@ brokerStart CB
 #
 # 09. Create a second subscription with description (desc = three)
 # 10. Get that second subscription (see desc = three)
+# 11. Get subscriptions list (first csub without desc, second with desc = three)
 #
-# 11. Update second subscription with no string description (fail)
+# 12. Update second subscription with no string description (fail)
 #
 
 echo "01. Create subscription without description"
@@ -190,7 +191,14 @@ echo
 echo
 
 
-echo "11. Update second subscription with no string description (fail)"
+echo "11. Get subscriptions list (first csub without desc, second with desc = three)"
+echo "=============================================================================="
+orionCurl --url "/v2/subscriptions" --json
+echo
+echo
+
+
+echo "12. Update second subscription with no string description (fail)"
 echo "================================================================"
 payload='
 {
@@ -479,7 +487,90 @@ Date: REGEX(.*)
 }
 
 
-11. Update second subscription with no string description (fail)
+11. Get subscriptions list (first csub without desc, second with desc = three)
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 839
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "2050-04-05T14:00:00.00Z",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [
+                "humidity",
+                "temperature"
+            ],
+            "http": {
+                "url": "http://localhost:1234"
+            }
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [
+                    "temperature"
+                ],
+                "expression": {
+                    "coords": "-40.4,-3.5",
+                    "geometry": "point",
+                    "georel": "near;minDistance=5000",
+                    "q": "temperature>40"
+                }
+            },
+            "entities": [
+                {
+                    "id": "",
+                    "idPattern": ".*",
+                    "type": "Room"
+                }
+            ]
+        },
+        "throttling": 5
+    },
+    {
+        "description": "three",
+        "expires": "2050-04-05T14:00:00.00Z",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [
+                "humidity",
+                "temperature"
+            ],
+            "http": {
+                "url": "http://localhost:1234"
+            }
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [
+                    "temperature"
+                ],
+                "expression": {
+                    "coords": "-40.4,-3.5",
+                    "geometry": "point",
+                    "georel": "near;minDistance=5000",
+                    "q": "temperature>40"
+                }
+            },
+            "entities": [
+                {
+                    "id": "",
+                    "idPattern": ".*",
+                    "type": "Room"
+                }
+            ]
+        },
+        "throttling": 5
+    }
+]
+
+
+12. Update second subscription with no string description (fail)
 ================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 67
