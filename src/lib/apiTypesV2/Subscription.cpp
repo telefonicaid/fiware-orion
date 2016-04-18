@@ -118,36 +118,14 @@ std::string Condition::toJson()
 
   jh.addRaw("attrs", vectorToJson(this->attributes));
 
-  JsonHelper jhe;
+  JsonHelper jhe;  
 
-  bool atLeastOneSubField = false;
+  if (this->expression.q != "")         jhe.addString("q", this->expression.q);
+  if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
+  if (this->expression.coords != "")    jhe.addString("coords", this->expression.coords);
+  if (this->expression.georel != "")    jhe.addString("georel", this->expression.georel);
 
-  if (this->expression.q != "")
-  {
-    atLeastOneSubField = true;
-    jhe.addString("q", this->expression.q);
-  }
-  if (this->expression.geometry != "")
-  {
-    atLeastOneSubField = true;
-    jhe.addString("geometry", this->expression.geometry);
-  }
-  if (this->expression.coords != "")
-  {
-    atLeastOneSubField = true;
-    jhe.addString("coords", this->expression.coords);
-  }
-  if (this->expression.georel != "")
-  {
-    atLeastOneSubField = true;
-    jhe.addString("georel", this->expression.georel);
-  }
-
-  if (atLeastOneSubField)
-  {
-    atLeastOneSubField = true;
-    jh.addRaw("expression", jhe.str());
-  }
+  if (jhe.str() != "{}")                jh.addRaw("expression", jhe.str());
 
   return jh.str();
 }
