@@ -555,6 +555,24 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify that entity types returned in response are: "home"
     And verify that attributes types are returned in response based on the info in the recorder
 
+  @types_empty_list
+  Scenario: get entities type using NGSI v2 with any entity types (empty list)
+    Given  a definition of headers
+      | parameter          | value               |
+      | Fiware-Service     | test_type_multiples |
+      | Fiware-ServicePath | /test               |
+      | Content-Type       | application/json    |
+    And initialize entity groups recorder
+    When get entity types
+      | parameter | value |
+      | options   | count |
+    Then verify that receive an "OK" http code
+    And verify headers in response
+      | parameter         | value      |
+      | x-total-count     | 0          |
+      | fiware-correlator | [a-f0-9-]* |
+    And verify that entity types returned in response are: "home"
+
   # ------------------ queries parameters -------------------------------
   # --- limit and offset ---
   @only_limit.row<row.id>
