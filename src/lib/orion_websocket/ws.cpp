@@ -259,6 +259,7 @@ orion_websocket *orion_websocket_new(RestService *serv)
     0,0,0,0,0,0,0,0,0,0
   };
 
+  lws_set_log_level(0, NULL);
   orion_websocket *ws = (orion_websocket *) malloc(sizeof(orion_websocket));
   ws->end = 0;
   ws->ctx = lws_create_context(&info);
