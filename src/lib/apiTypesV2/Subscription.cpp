@@ -118,14 +118,14 @@ std::string Condition::toJson()
 
   jh.addRaw("attrs", vectorToJson(this->attributes));
 
-  JsonHelper jhe;
+  JsonHelper jhe;  
 
-  jhe.addString("q", this->expression.q);
-  jhe.addString("geometry", this->expression.geometry);
-  jhe.addString("coords", this->expression.coords);
-  jhe.addString("georel", this->expression.georel);
-  
-  jh.addRaw("expression", jhe.str());
+  if (this->expression.q != "")         jhe.addString("q", this->expression.q);
+  if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
+  if (this->expression.coords != "")    jhe.addString("coords", this->expression.coords);
+  if (this->expression.georel != "")    jhe.addString("georel", this->expression.georel);
+
+  if (jhe.str() != "{}")                jh.addRaw("expression", jhe.str());
 
   return jh.str();
 }

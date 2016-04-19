@@ -272,6 +272,7 @@ void mongoListSubscriptions
     Subscription  s;
 
     setSubscriptionId(&s, r);
+    setDescription(&s, r);
     setSubject(&s, r);
     setStatus(&s, r);
     setNotification(&s, r, tenant);

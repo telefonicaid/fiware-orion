@@ -166,7 +166,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?options=count
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 841
+Content-Length: 721
 Content-Type: application/json
 X-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -192,13 +192,7 @@ Date: REGEX(.*)
                 "attrs": [
                     "temperature",
                     "timestamp"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -232,13 +226,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "speed"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -270,7 +258,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 900
+Content-Length: 780
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -295,13 +283,7 @@ Date: REGEX(.*)
                 "attrs": [
                     "temperature",
                     "timestamp"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -337,13 +319,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "speed"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
