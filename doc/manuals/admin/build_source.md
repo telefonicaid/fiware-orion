@@ -12,6 +12,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libuuid: 2.17.2
 * Mongo Driver: legacy-1.0.7 (from source)
 * rapidjson: 1.0.2 (from source)
+* libwebsockets: 1.6.3 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 
@@ -42,6 +43,17 @@ commands that require root privilege):
         wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
         tar xfvz v1.0.2.tar.gz
         sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
+
+* Install libwebsocket from sources:
+
+        wget https://github.com/warmcat/libwebsockets/archive/v1.6.3.tar.gz
+        tar xfvz v1.6.3.tar.gz
+        cd libwebsockets-1.6.3/
+        mkdir build
+        cd build
+        cmake ..          # default cmake sets /usr/local as installation path
+        make
+        sudo make install
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
