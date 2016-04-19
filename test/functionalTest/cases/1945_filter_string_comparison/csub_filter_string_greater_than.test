@@ -26,7 +26,7 @@ Subscription filter string greater than
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -203,36 +203,27 @@ Date: REGEX(.*)
 07. Dump accumulator: see E5 (yellow)
 =====================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 469
+Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E5",
-        "attributes" : [
-          {
-            "name" : "colour",
-            "type" : "none",
-            "value" : "yellow"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "colour": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": "yellow"
+            }, 
+            "id": "E5", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
