@@ -64,7 +64,7 @@ extern std::string postSubscriptions
 
   if (parseDataP->scr.res.attrsFormat == NGSI_NO_NOTIFICATION_FORMAT)
   {
-    parseDataP->scr.res.attrsFormat = NGSI_V2_NORMALIZED; // FIXME PR: default notification format ?
+    parseDataP->scr.res.attrsFormat = NGSI_V2_NORMALIZED;
   }
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
 
