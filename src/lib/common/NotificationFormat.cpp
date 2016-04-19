@@ -42,13 +42,13 @@ const char* notificationFormatToString(NotificationFormat format, bool noDefault
   switch (format)
   {
   case NGSI_V1_JSON:                return "JSON";
-  case NGSI_V2_NORMALIZED:          return "NGSIv2-NORMALIZED";
-  case NGSI_V2_KEYVALUES:           return "NGSIv2-KEYVALUES";
-  case NGSI_V2_VALUES:              return "NGSIv2-VALUES";
+  case NGSI_V2_NORMALIZED:          return "normalized";
+  case NGSI_V2_KEYVALUES:           return "keyvalues";
+  case NGSI_V2_VALUES:              return "values";
   case NGSI_NO_NOTIFICATION_FORMAT:
     if (noDefault == true)
     {
-      return "NGSI_NO_NOTIFICATION_FORMAT";
+      return "no notification format";
     }
     else
     {
@@ -67,10 +67,10 @@ const char* notificationFormatToString(NotificationFormat format, bool noDefault
 */
 NotificationFormat stringToNotificationFormat(const std::string& s, bool noDefault)
 {
-  if (s == "JSON")              { return NGSI_V1_JSON;       }
-  if (s == "NGSIv2-NORMALIZED") { return NGSI_V2_NORMALIZED; }
-  if (s == "NGSIv2-KEYVALUES")  { return NGSI_V2_KEYVALUES;  }
-  if (s == "NGSIv2-VALUES")     { return NGSI_V2_VALUES;     }
+  if (s == "JSON")       { return NGSI_V1_JSON;       }
+  if (s == "normalized") { return NGSI_V2_NORMALIZED; }
+  if (s == "keyvalues")  { return NGSI_V2_KEYVALUES;  }
+  if (s == "values")     { return NGSI_V2_VALUES;     }
   
   return (noDefault == false)? DEFAULT_NOTIFICATION_FORMAT : NGSI_NO_NOTIFICATION_FORMAT;
 }

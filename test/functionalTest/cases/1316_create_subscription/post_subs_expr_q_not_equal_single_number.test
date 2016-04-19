@@ -172,7 +172,7 @@ Content-Length: 127
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
@@ -196,7 +196,7 @@ Content-Length: 127
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
