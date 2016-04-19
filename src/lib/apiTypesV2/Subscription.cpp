@@ -125,7 +125,9 @@ std::string Condition::toJson()
   if (this->expression.coords != "")    jhe.addString("coords", this->expression.coords);
   if (this->expression.georel != "")    jhe.addString("georel", this->expression.georel);
 
-  if (jhe.str() != "{}")                jh.addRaw("expression", jhe.str());
+  std::string expressionString = jhe.str();
+
+  if (expressionString != "{}")         jh.addRaw("expression", expressionString);
 
   return jh.str();
 }
