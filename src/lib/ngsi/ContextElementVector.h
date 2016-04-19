@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "common/NotificationFormat.h"
 #include "ngsi/ContextElement.h"
 #include "rest/ConnectionInfo.h"
 

@@ -404,6 +404,7 @@ int httpRequestSendWithCurl
   // Contents
   const char* payload = content.c_str();
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
+  LM_W(("KZ: PAYLOAD: %s", payload));
 
   // Set up URL
   std::string url;

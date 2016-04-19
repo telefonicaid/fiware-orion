@@ -26,7 +26,7 @@ POST Subscriptions V2 q expression (not equal enum number)
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -169,69 +169,51 @@ Date: REGEX(.*)
 06. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 124
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "avg",
-            "type" : "none",
-            "value" : 35
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "avg": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": 35
+            }, 
+            "id": "E1", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 460
+Content-Length: 124
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "avg",
-            "type" : "none",
-            "value" : 93
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "avg": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": 93
+            }, 
+            "id": "E1", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

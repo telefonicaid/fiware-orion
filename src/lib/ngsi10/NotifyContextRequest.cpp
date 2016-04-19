@@ -77,26 +77,27 @@ std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, NotificationFormat
   }
 
 
-  //
-  // Now, v2 rendering of Notifications ...
-  //
-  if (notifyFormat == NGSI_V2_NORMALIZED)
+  if ((notifyFormat != NGSI_V2_NORMALIZED) && (notifyFormat != NGSI_V2_KEYVALUES) && (notifyFormat != NGSI_V2_VALUES))
   {
-    return "{ \"orion\": \"NGSIv2-NORMALIZED rendering not implemented\"}\n";
-  }
-  else if (notifyFormat == NGSI_V2_KEYVALUES)
-  {
-    return "{ \"orion\": \"NGSIv2-KEYVALUES rendering not implemented\"}\n";
-  }
-  else if (notifyFormat == NGSI_V2_VALUES)
-  {
-    return "{ \"orion\": \"NGSIv2-VALUES rendering not implemented\"}\n";
+    OrionError oe(SccBadRequest, "Invalid notification format");
+    alarmMgr.badInput(clientIp, "Invalid notification format");
+    LM_W(("KZ: notifyFormat == %d", notifyFormat));
+    return oe.render(ciP, "");
   }
 
-  OrionError oe(SccBadRequest, "Invalid notification format");
-  alarmMgr.badInput(clientIp, "Invalid notification format");
+  std::string out;
 
-  return oe.render(ciP, "");
+  out += "{";
+  out += "\"subscriptionId\":";
+  out += "\"" + subscriptionId.get() + "\"";
+  out += ",";
+  out += "\"data\":[";
+
+  out += contextElementResponseVector.toJson(ciP, notifyFormat);
+  out += "]";
+  out += "}";
+
+  return out;
 }
 
 

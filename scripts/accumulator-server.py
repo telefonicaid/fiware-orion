@@ -44,37 +44,47 @@ import os
 import atexit
 import string
 import signal
+import json
 
 
 # This function is registered to be called upon termination
 def all_done():
     os.unlink(pidfile)
 
+print "accumulator-server.py starting"
+
+
 # Default arguments
-port = 1028
-host='0.0.0.0'
+port       = 1028
+host       = '0.0.0.0'
 server_url = '/accumulate'
-verbose = 0
+verbose    = 0
+pretty     = False
 
 # Arguments from command line
+if len(argv) > 1:
+    port       = int(argv[1])
+
 if len(argv) > 2:
-    port = int(argv[1])
     server_url = argv[2]
 
 if len(argv) > 3:
     if argv[3] == 'on':
-        print 'verbose mode is on'
         verbose = 1
+    if argv[3] == '--pretty-print':
+        pretty = True
     else:
         host = argv[3]
 
 if len(argv) > 4:
+    if argv[4] == '--pretty-print':
+        pretty = True
     if argv[4] == 'on':
-        print 'verbose mode is on'
         verbose = 1
 
-pid = str(os.getpid())
+pid     = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
+
 
 #
 # If an accumulator process is already running, it is killed.
@@ -104,6 +114,7 @@ if os.path.isfile(pidfile):
 # Creating the pidfile of the currently running process
 #
 file(pidfile, 'w').write(pid)
+
 
 #
 # Making the function all_done being executed on exit of this process.
@@ -170,7 +181,12 @@ def record():
     # Store payload
     if ((request.data is not None) and (len(request.data) != 0)):
         s += '\n'
-        s += request.data
+        if pretty == True:
+            raw = json.loads(request.data)
+            s += json.dumps(raw, indent=4, sort_keys=True)
+            s +='\n'
+        else:
+            s += request.data
 
     # Separator
     s += '=======================================\n'

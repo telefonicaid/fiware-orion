@@ -33,6 +33,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
+#include "common/NotificationFormat.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
@@ -135,7 +136,7 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, const std::string& renderMode, const std::string& attrsFilter)
+std::string ContextAttributeVector::toJson(bool isLastElement, const std::string& renderMode, NotificationFormat notifyFormat, const std::string& attrsFilter)
 {
   if (vec.size() == 0)
   {
@@ -222,7 +223,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, const std::string
         }
       }
 
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderMode);
+      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderMode, notifyFormat);
 
       if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
@@ -241,7 +242,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, const std::string
       if (caP != NULL)
       {
         ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, renderMode);
+        out += caP->toJson(renderedAttributes == validAttributes, renderMode, notifyFormat);
       }
     }
   }

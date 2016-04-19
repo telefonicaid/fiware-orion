@@ -26,7 +26,7 @@ Sub cache string filter update
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -191,36 +191,27 @@ Date: REGEX(.*)
 04. See notification of E1 in accumulator
 =========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 125
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : 9
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": 9
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
@@ -247,36 +238,27 @@ Date: REGEX(.*)
 07. See no new notification in accumulator (only E1)
 ====================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 461
+Content-Length: 125
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : 9
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": 9
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
@@ -294,69 +276,51 @@ Date: REGEX(.*)
 09. See two notifications in accumulator (E1 and E4)
 ====================================================
 POST http://localhost:9997/notify
-Content-Length: 461
+Content-Length: 125
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:9997
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : 9
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": 9
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:9997/notify
-Content-Length: 462
+Content-Length: 126
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:9997
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E4",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : 11
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "none",
+                "value": 11
+            },
+            "id": "E4",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

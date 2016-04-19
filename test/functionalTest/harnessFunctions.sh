@@ -664,6 +664,12 @@ function accumulatorStop()
 #
 function accumulatorStart()
 {
+  if [ "$1" = "--pretty-print" ]
+  then
+    pretty="$1"
+    shift
+  fi
+
   bindIp=$1
   port=$2
 
@@ -673,9 +679,14 @@ function accumulatorStart()
     port=$LISTENER_PORT
   fi
 
+  if [ -z "$bindIp" ]
+  then
+    bindIp='localhost'
+  fi
+
   accumulatorStop $port
 
-  accumulator-server.py $port /notify $bindIp > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  accumulator-server.py $port /notify $bindIp $pretty > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time

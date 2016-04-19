@@ -136,6 +136,24 @@ std::string EntityId::render
 
 /* ****************************************************************************
 *
+* EntityId::toJson - 
+*/
+std::string EntityId::toJson(void)
+{
+  std::string  out;
+  std::string  typeEscaped  = htmlEscape(type.c_str());
+  std::string  idEscaped    = htmlEscape(id.c_str());
+
+  out += "\"id\":\""   + idEscaped   + "\",";
+  out += "\"type\":\"" + typeEscaped + "\"";
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * EntityId::check -
 */
 std::string EntityId::check

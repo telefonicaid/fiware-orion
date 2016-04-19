@@ -253,6 +253,10 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
     destination->attrsFormat = nFormat;
   }
+  else
+  {
+    destination->attrsFormat = DEFAULT_NOTIFICATION_FORMAT;  // Default format for NGSIv2: NORMALIZED
+  }
 
   return "OK";
 }

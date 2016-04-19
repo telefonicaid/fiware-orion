@@ -28,9 +28,10 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/MetadataVector.h"
 #include "common/Format.h"
+#include "common/NotificationFormat.h"
 #include "orionTypes/OrionValueType.h"
+#include "ngsi/MetadataVector.h"
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
@@ -83,7 +84,7 @@ public:
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
   std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement, const std::string& renderMode, RequestType requestType = NoRequest);
+  std::string  toJson(bool isLastElement, const std::string& renderMode, NotificationFormat notifyFormat, RequestType requestType = NoRequest);
   std::string  toJsonAsValue(ConnectionInfo* ciP);
   void         present(const std::string& indent, int ix);
   void         release(void);

@@ -26,16 +26,16 @@ Date subscription filter (equal)
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
 #
 # 01. Create subscription with q: birthday==2016-02-24T10:00:00.00Z
-# 02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (not notif)
-# 03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (notif)
-# 04. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)
-# 05. Dump accumulator (1 notifications)
+# 02. Create entity with birthday: 2016-02-23T10:00:00.00Z (not notif)
+# 03. Update entity to birthday: 2016-02-24T10:00:00.00Z (notif)
+# 04. Update entity to birthday: 2016-02-25T10:00:00.00Z (not notif)
+# 05. Dump accumulator (1 notification)
 #
 
 echo "01. Create subscription with q: birthday==2016-02-24T10:00:00.00Z"
@@ -68,8 +68,8 @@ echo
 echo
 
 
-echo "02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (not notif)"
-echo "====================================================================="
+echo "02. Create entity with birthday: 2016-02-23T10:00:00.00Z (not notif)"
+echo "===================================================================="
 payload='{
   "id": "E1",
   "type": "T",
@@ -83,8 +83,8 @@ echo
 echo
 
 
-echo "03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (notif)"
-echo "==============================================================="
+echo "03. Update entity to birthday: 2016-02-24T10:00:00.00Z (notif)"
+echo "=============================================================="
 payload='{
  "birthday": {
    "value": "2016-02-24T10:00:00.00Z",
@@ -96,8 +96,8 @@ echo
 echo
 
 
-echo "05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)"
-echo "==================================================================="
+echo "04. Update entity to birthday: 2016-02-25T10:00:00.00Z (not notif)"
+echo "=================================================================="
 payload='{
  "birthday": {
    "value": "2016-02-25T10:00:00.00Z",
@@ -109,8 +109,8 @@ echo
 echo
 
 
-echo "06. Get accumulator dump (1 notifications)"
-echo "=========================================="
+echo "05. Dump accumulator (1 notification)"
+echo "====================================="
 accumulatorDump
 echo
 echo
@@ -127,8 +127,8 @@ Date: REGEX(.*)
 
 
 
-02. Create entity with birthdaty: 2016-02-23T10:00:00.00Z (not notif)
-=====================================================================
+02. Create entity with birthday: 2016-02-23T10:00:00.00Z (not notif)
+====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1?type=T
@@ -137,8 +137,8 @@ Date: REGEX(.*)
 
 
 
-03. Update entity to birthdaty: 2016-02-24T10:00:00.00Z (notif)
-===============================================================
+03. Update entity to birthday: 2016-02-24T10:00:00.00Z (notif)
+==============================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -146,8 +146,8 @@ Date: REGEX(.*)
 
 
 
-05. Update entity to birthdaty: 2016-02-25T10:00:00.00Z (not notif)
-===================================================================
+04. Update entity to birthday: 2016-02-25T10:00:00.00Z (not notif)
+==================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -155,39 +155,30 @@ Date: REGEX(.*)
 
 
 
-06. Get accumulator dump (1 notifications)
-==========================================
+05. Dump accumulator (1 notification)
+=====================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 488
+Content-Length: 152
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: NGSIv2-NORMALIZED
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "birthday",
-            "type" : "date",
-            "value" : "2016-02-24T10:00:00.00Z"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "birthday": {
+                "metadata": {},
+                "type": "date",
+                "value": "2016-02-24T10:00:00.00Z"
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

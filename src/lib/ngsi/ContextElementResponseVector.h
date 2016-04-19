@@ -47,6 +47,7 @@ typedef struct ContextElementResponseVector
                                   bool                comma               = false,
                                   bool                omitAttributeValues = false);
 
+  std::string              toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat);
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);
