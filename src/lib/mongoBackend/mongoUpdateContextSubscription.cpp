@@ -202,7 +202,7 @@ HttpStatusCode mongoUpdateContextSubscription
   LM_T(LmtMongo, ("New subscription expiration: %ld", (long) expiration));
 
   /* ServicePath update */
-  newSub.append(CSUB_SERVICE_PATH, (servicePathV.size() == 0)? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0]);
+  newSub.append(CSUB_SERVICE_PATH, servicePathV[0] == "" ? DEFAULT_SERVICE_PATH_QUERIES : servicePathV[0]);
 
   /* Throttling update */
   if (!requestP->throttling.isEmpty())

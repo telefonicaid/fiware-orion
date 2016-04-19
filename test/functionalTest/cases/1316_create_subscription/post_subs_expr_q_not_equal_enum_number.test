@@ -51,15 +51,15 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ ],
+            "attrs": [ ],
             "expression": {
                "q": "avg!=23,47"
             }
          }
     },
     "notification": {
-        "callback": "http://localhost:'$LISTENER_PORT'/notify",
-        "attributes": [ ]
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrs": [ ]
     },
     "expires": "2050-04-05T14:00:00.00Z"
 }

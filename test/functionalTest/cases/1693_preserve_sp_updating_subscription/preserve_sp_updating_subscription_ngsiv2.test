@@ -50,12 +50,14 @@ payload='
             }
         ],
         "condition": {
-            "attributes": [ "temperature" ]
+            "attrs": [ "temperature" ]
          }
     },
     "notification": {
-        "callback": "http://localhost:1234",
-        "attributes": ["temperature"]
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "attrs": ["temperature"]
     },
     "expires": "2050-04-05T14:00:00.00Z"
 }
@@ -79,8 +81,10 @@ echo "=============================================="
 payload='
 {
     "notification": {
-        "callback": "http://localhost:5678",
-        "attributes": [ "pressure" ]
+        "http": {
+            "url": "http://localhost:5678"
+        },
+        "attrs": [ "pressure" ]
     }
 }
 '
@@ -101,8 +105,10 @@ echo "=============================================="
 payload='
 {
     "notification": {
-        "callback": "http://localhost:9999",
-        "attributes": [ "humidity" ]
+        "http": {
+            "url": "http://localhost:9999"
+        },
+        "attrs": [ "humidity" ]
     }
 }
 '
@@ -139,7 +145,7 @@ Date: REGEX(.*)
 02. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 343
+Content-Length: 273
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -149,23 +155,19 @@ Date: REGEX(.*)
         "expires": "2050-04-05T14:00:00.00Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [
+            "attrs": [
                 "temperature"
             ],
-            "callback": "http://localhost:1234"
+            "http": {
+                "url": "http://localhost:1234"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "temperature"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -191,7 +193,7 @@ Date: REGEX(.*)
 04. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 340
+Content-Length: 270
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -201,23 +203,19 @@ Date: REGEX(.*)
         "expires": "2050-04-05T14:00:00.00Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [
+            "attrs": [
                 "pressure"
             ],
-            "callback": "http://localhost:5678"
+            "http": {
+                "url": "http://localhost:5678"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "temperature"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -254,7 +252,7 @@ Date: REGEX(.*)
 07. Get subscriptions by /sp2 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 340
+Content-Length: 270
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -264,23 +262,19 @@ Date: REGEX(.*)
         "expires": "2050-04-05T14:00:00.00Z",
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [
+            "attrs": [
                 "humidity"
             ],
-            "callback": "http://localhost:9999"
+            "http": {
+                "url": "http://localhost:9999"
+            }
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attributes": [
+                "attrs": [
                     "temperature"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {

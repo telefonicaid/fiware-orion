@@ -155,7 +155,7 @@ def check_in_log_label_and_text(context, label, text):
     props_cb_env = properties_class.read_properties()[CONTEXT_BROKER_ENV]
     remote_log = Remote_Log(file="%s/contextBroker.log" % props_cb_env["CB_LOG_FILE"], fabric=context.my_fab)
     line = remote_log.find_line(label,text)
-    assert line != None, " ERROR - the \"%s\" label and the \"%s\" text do not exist in the log"
+    assert line != None, " ERROR - the \"%s\" label and the \"%s\" text do not exist in the log" % (label, text)
     __logger__.info("log line: \n%s" %line)
     ngsi = NGSI()
     ngsi.verify_log(context, line)

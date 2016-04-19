@@ -141,8 +141,8 @@ static void setNotification(Subscription* s, const BSONObj& r, const std::string
     s->notification.attributes.push_back(attr);
   }
 
-  s->notification.callback         = getStringFieldF(r, CSUB_REFERENCE);
-  s->notification.throttling       = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
+  s->notification.http.url         = getStringFieldF(r, CSUB_REFERENCE);
+  s->throttling                    = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
   s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
   s->notification.timesSent        = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
 
@@ -272,6 +272,7 @@ void mongoListSubscriptions
     Subscription  s;
 
     setSubscriptionId(&s, r);
+    setDescription(&s, r);
     setSubject(&s, r);
     setStatus(&s, r);
     setNotification(&s, r, tenant);

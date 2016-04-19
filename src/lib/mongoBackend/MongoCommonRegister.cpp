@@ -36,6 +36,7 @@
 #include "common/statistics.h"
 #include "common/sem.h"
 #include "common/NotificationFormat.h"
+#include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "mongoBackend/MongoCommonRegister.h"
@@ -336,7 +337,7 @@ HttpStatusCode processRegisterContext
   }
   reg.append("_id", oid);
   reg.append(REG_EXPIRATION, expiration);
-  reg.append(REG_SERVICE_PATH, servicePath);
+  reg.append(REG_SERVICE_PATH, servicePath == "" ? DEFAULT_SERVICE_PATH_UPDATES : servicePath);
   reg.append(REG_FORMAT, format);
 
 

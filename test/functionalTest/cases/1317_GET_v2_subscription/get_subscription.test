@@ -156,7 +156,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 458
+Content-Length: 392
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -165,27 +165,22 @@ Date: REGEX(.*)
     "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "temperature",
             "occupancy",
             "lightstatus"
         ],
-        "callback": "http://127.0.0.1:REGEX(\d+)/notify",
-        "throttling": 5
+        "http": {
+            "url": "http://127.0.0.1:REGEX(\d+)/notify"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "temperature",
                 "timestamp"
-            ],
-            "expression": {
-                "coords": "",
-                "geometry": "",
-                "georel": "",
-                "q": ""
-            }
+            ]
         },
         "entities": [
             {
@@ -199,14 +194,15 @@ Date: REGEX(.*)
                 "type": "Room"
             }
         ]
-    }
+    },
+    "throttling": 5
 }
 
 
 03. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 392
+Content-Length: 324
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -215,24 +211,20 @@ Date: REGEX(.*)
     "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
-        "attributes": [
+        "attrs": [
             "speed",
             "location"
         ],
-        "callback": "http://127.0.0.1:REGEX(\d+)/notify"
+        "http": {
+            "url": "http://127.0.0.1:REGEX(\d+)/notify"
+        }
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attributes": [
+            "attrs": [
                 "speed"
-            ],
-            "expression": {
-                "coords": "",
-                "geometry": "",
-                "georel": "",
-                "q": ""
-            }
+            ]
         },
         "entities": [
             {

@@ -574,6 +574,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     return 0;
   }
 
+  if (servicePath[0] == 0)
+  {
+    // Special case, corresponding to default service path
+    return 0;
+  }
+
+
   if (servicePath[0] != '/')
   {
     OrionError e(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
@@ -670,7 +677,8 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   if (servicePaths == 0)
   {
-    /* In this case the result is a 0 length vector */
+    /* In this case the result is a vector with an empty string */
+    ciP->servicePathV.push_back("");
     return 0;
   }
 
@@ -801,72 +809,6 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   }
 
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* defaultServicePath
-*
-* Returns a default servicePath (to be used in the case Fiware-servicePath header
-* is not found in the request) depending on the RequestCheck
-*/
-std::string defaultServicePath(const char* url, const char* method)
-{
-  /* Look for standard operation (based on the URL). Given that some operations are
-   * a substring of other, we search first for the longest ones
-   *
-   *  updateContextAvailabilitySubscription
-   *  unsubscribeContextAvailability
-   *  subscribeContextAvailability
-   *  discoverContextAvailability
-   *  updateContextSubscription
-   *  unsubscribeContext
-   *  subscribeContext
-   *  registerContext
-   *  updateContext
-   *  queryContext
-   *
-   * Note that in the case of unsubscribeContext and unsubscribeContextAvailability doesn't
-   * actually use a servicePath, but we also provide a default in that case for the sake of
-   * completeness
-   */
-
-  //
-  // FIXME P5: this strategy can be improved taking into account full URL. Otherwise, it is
-  // ambiguous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
-  // highly improbable that the user uses entities which id (or type) match the name of a
-  // standard operation.
-  // Also, if we wait (if we can) until we know what service it is, this whole string-search will come for free
-  // Don't think strcasestr is a 'simple' function ...
-  //
-  if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "notifyContextAvailability") != NULL)             return DEFAULT_SERVICE_PATH_UPDATES;
-  if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH_UPDATES;
-  if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH_UPDATES;
-  if (strcasestr(url, "notifyContext") != NULL)                         return DEFAULT_SERVICE_PATH_UPDATES;
-  if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_QUERIES;
-
-  /* Look for convenience operation. Subscription-related operations are special, all the other depend on
-   * the method
-   */
-  if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_QUERIES;
-
-  if (strcasecmp(method, "POST")   == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
-  if (strcasecmp(method, "PUT")    == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
-  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
-  if (strcasecmp(method, "GET")    == 0)                                return DEFAULT_SERVICE_PATH_QUERIES;
-  if (strcasecmp(method, "PATCH")  == 0)                                return DEFAULT_SERVICE_PATH_UPDATES;
-
-  return DEFAULT_SERVICE_PATH_UPDATES;
 }
 
 
@@ -1032,10 +974,6 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-    if (!ciP->httpHeaders.servicePathReceived)
-    {
-      ciP->httpHeaders.servicePath = defaultServicePath(url, method);
-    }
 
     char correlator[CORRELATOR_ID_SIZE + 1];
     if (ciP->httpHeaders.correlator == "")

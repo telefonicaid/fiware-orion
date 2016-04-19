@@ -159,10 +159,10 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   EXPECT_EQ("", s.subject.condition.expression.coords);
   attrs = s.notification.attributes;
   ASSERT_EQ(0, attrs.size());
-  EXPECT_EQ("http://notify1.me", s.notification.callback);
+  EXPECT_EQ("http://notify1.me", s.notification.http.url);
   EXPECT_EQ(-1, s.notification.timesSent);
   EXPECT_EQ(-1, s.notification.lastNotification);
-  EXPECT_EQ(-1, s.notification.throttling);
+  EXPECT_EQ(-1, s.throttling);
   EXPECT_EQ(10000000, s.expires);
 
   /* Subscription #2 */
@@ -184,10 +184,10 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   ASSERT_EQ(2, attrs.size());
   EXPECT_EQ("A1", attrs[0]);
   EXPECT_EQ("A2", attrs[1]);
-  EXPECT_EQ("http://notify2.me", s.notification.callback);
+  EXPECT_EQ("http://notify2.me", s.notification.http.url);
   EXPECT_EQ(24, s.notification.timesSent);;
   EXPECT_EQ(20000000, s.notification.lastNotification);
-  EXPECT_EQ(5, s.notification.throttling);
+  EXPECT_EQ(5, s.throttling);
   EXPECT_EQ(25000000, s.expires);
 
   /* Subscription #3 */
@@ -209,10 +209,10 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   ASSERT_EQ(2, attrs.size());
   EXPECT_EQ("A1", attrs[0]);
   EXPECT_EQ("A2", attrs[1]);
-  EXPECT_EQ("http://notify2.me", s.notification.callback);
+  EXPECT_EQ("http://notify2.me", s.notification.http.url);
   EXPECT_EQ(-1, s.notification.timesSent);;
   EXPECT_EQ(25000000, s.notification.lastNotification);
-  EXPECT_EQ(-1, s.notification.throttling);
+  EXPECT_EQ(-1, s.throttling);
   EXPECT_EQ(20000000, s.expires);
 
 }
@@ -258,10 +258,10 @@ TEST(mongoGetSubscription, getSubscription)
   EXPECT_EQ("", s.subject.condition.expression.coords);
   attrs = s.notification.attributes;
   ASSERT_EQ(0, attrs.size());
-  EXPECT_EQ("http://notify1.me", s.notification.callback);
+  EXPECT_EQ("http://notify1.me",s.notification.http.url);
   EXPECT_EQ(-1, s.notification.timesSent);;
   EXPECT_EQ(-1, s.notification.lastNotification);
-  EXPECT_EQ(-1, s.notification.throttling);
+  EXPECT_EQ(-1, s.throttling);
   EXPECT_EQ(10000000, s.expires);
 
   /* Subscription #2 */
@@ -288,10 +288,10 @@ TEST(mongoGetSubscription, getSubscription)
   ASSERT_EQ(2, attrs.size());
   EXPECT_EQ("A1", attrs[0]);
   EXPECT_EQ("A2", attrs[1]);
-  EXPECT_EQ("http://notify2.me", s.notification.callback);
+  EXPECT_EQ("http://notify2.me", s.notification.http.url);
   EXPECT_EQ(24, s.notification.timesSent);;
   EXPECT_EQ(20000000, s.notification.lastNotification);
-  EXPECT_EQ(5, s.notification.throttling);
+  EXPECT_EQ(5, s.throttling);
   EXPECT_EQ(25000000, s.expires);
 
 }

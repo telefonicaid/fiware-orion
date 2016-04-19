@@ -2205,16 +2205,7 @@ static bool createEntity
     bsonId.append(ENT_ENTITY_TYPE, eP->type);
   }
 
-  if (servicePathV.size() > 0)
-  {
-    LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
-    bsonId.append(ENT_SERVICE_PATH, servicePathV[0]);
-  }
-  else
-  {
-    LM_T(LmtServicePath, ("Empty service path string, using default servicepath"));
-    bsonId.append(ENT_SERVICE_PATH, DEFAULT_SERVICE_PATH_UPDATES);
-  }
+  bsonId.append(ENT_SERVICE_PATH, servicePathV[0] == ""? DEFAULT_SERVICE_PATH_UPDATES : servicePathV[0]);
 
   BSONObjBuilder insertedDoc;
 
@@ -2634,20 +2625,8 @@ static void updateEntity
     query.append(typeString, entityType);
   }
 
-  // The servicePath of THIS object is entitySPath
-  char espath[SERVICE_PATH_MAX_TOTAL];
-  slashEscape(entitySPath.c_str(), espath, sizeof(espath));
-  const std::string servicePathValue  = std::string("^") + espath + "$";
-
-  // servicePathString from earlier in this function
-  if (servicePathV.size() == 0)
-  {
-    query.append(servicePathString, BSON("$exists" << false));
-  }
-  else
-  {
-    query.appendRegex(servicePathString, servicePathValue);
-  }
+  // Servicepath
+  query.append(servicePathString, fillQueryServicePath(servicePathV));
 
   std::string err;
   if (!collectionUpdate(getEntitiesCollectionName(tenant), query.obj(), updatedEntityObj, false, &err))
@@ -2807,27 +2786,8 @@ void processContextElement
     bob.append(typeString, enP->type);
   }
 
-  if (servicePathV.size() == 0)
-  {
-    bob.append(servicePathString, BSON("$exists" << false));
-    LM_T(LmtServicePath, ("Updating entity '%s' (no Service Path), action '%s'",
-                          ceP->entityId.id.c_str(),
-                          action.c_str()));
-  }
-  else
-  {
-    LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'",
-                          ceP->entityId.id.c_str(),
-                          servicePathV[0].c_str(),
-                          action.c_str()));
-
-    char               path[SERVICE_PATH_MAX_TOTAL];
-    slashEscape(servicePathV[0].c_str(), path, sizeof(path));
-
-    const std::string  servicePathValue  = std::string("^") + path + "$";
-    bob.appendRegex(servicePathString, servicePathValue);
-  }
-
+  // Service path
+  bob.append(servicePathString, fillQueryServicePath(servicePathV));
 
   // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
   // Restriction is not a valid field in updateContext according to the NGSI specification. In the

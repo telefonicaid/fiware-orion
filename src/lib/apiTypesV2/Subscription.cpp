@@ -31,6 +31,7 @@
 
 #include "logMsg/logMsg.h"
 #include "common/JsonHelper.h"
+#include "common/globals.h"
 
 namespace ngsiv2
 {
@@ -48,13 +49,18 @@ std::string Subscription::toJson()
   {
     jh.addString("description", this->description);
   }
-  if (this->expires > 0)
+  if (this->expires != PERMANENT_SUBS_DATETIME)
   {    
     jh.addDate("expires", this->expires);
   }
   jh.addString("status", this->status);
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson());
+
+  if (this->throttling > 0)
+  {
+    jh.addNumber("throttling", this->throttling);
+  }
 
   return jh.str();
 }
@@ -69,11 +75,6 @@ std::string Notification::toJson()
 {
   JsonHelper jh;
 
-  jh.addString("callback", this->callback);  
-  if (this->throttling > 0)
-  {
-    jh.addNumber("throttling", this->throttling);
-  }
   if (this->timesSent > 0)
   {
     jh.addNumber("timesSent", this->timesSent);
@@ -82,7 +83,9 @@ std::string Notification::toJson()
   {
     jh.addDate("lastNotification", this->lastNotification);
   }
-  jh.addRaw("attributes", vectorToJson(this->attributes));
+  jh.addRaw("attrs", vectorToJson(this->attributes));
+
+  jh.addRaw("http", this->http.toJson());
 
   return jh.str();
 }
@@ -113,16 +116,16 @@ std::string Condition::toJson()
 {
   JsonHelper jh;
 
-  jh.addRaw("attributes", vectorToJson(this->attributes));
+  jh.addRaw("attrs", vectorToJson(this->attributes));
 
-  JsonHelper jhe;
+  JsonHelper jhe;  
 
-  jhe.addString("q", this->expression.q);
-  jhe.addString("geometry", this->expression.geometry);
-  jhe.addString("coords", this->expression.coords);
-  jhe.addString("georel", this->expression.georel);
-  
-  jh.addRaw("expression", jhe.str());
+  if (this->expression.q != "")         jhe.addString("q", this->expression.q);
+  if (this->expression.geometry != "")  jhe.addString("geometry", this->expression.geometry);
+  if (this->expression.coords != "")    jhe.addString("coords", this->expression.coords);
+  if (this->expression.georel != "")    jhe.addString("georel", this->expression.georel);
+
+  if (jhe.str() != "{}")                jh.addRaw("expression", jhe.str());
 
   return jh.str();
 }
@@ -144,4 +147,18 @@ std::string EntID::toJson()
   return jh.str();
 }
 
+
+/* ****************************************************************************
+*
+* Http::toJson -
+*/
+std::string Http::toJson()
+{
+  JsonHelper jh;
+
+  jh.addString("url", this->url);
+
+  return jh.str();
 }
+
+} // end namespace

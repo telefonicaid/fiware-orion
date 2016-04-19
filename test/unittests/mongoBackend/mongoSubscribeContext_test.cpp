@@ -39,15 +39,6 @@
 
 extern void setMongoConnectionForUnitTest(DBClientBase*);
 
-/* ****************************************************************************
-*
-* emptyServicePathV -
-*
-* Empty vector of service paths, sent to mongoSubscribeContext during tests.
-*/
-static std::vector<std::string> emptyServicePathV;
-
-
 
 /* ****************************************************************************
 *
@@ -316,7 +307,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -404,7 +395,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -495,7 +486,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -588,7 +579,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -681,7 +672,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -780,7 +771,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -874,7 +865,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -968,7 +959,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1065,7 +1056,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1164,7 +1155,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1262,7 +1253,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1365,7 +1356,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1472,7 +1463,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1570,7 +1561,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */    
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1667,7 +1658,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1767,7 +1758,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1881,7 +1872,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1995,7 +1986,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2102,7 +2093,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2209,7 +2200,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2328,7 +2319,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2447,7 +2438,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2550,7 +2541,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2657,7 +2648,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2763,7 +2754,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2864,7 +2855,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2973,7 +2964,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3082,7 +3073,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3189,7 +3180,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3295,7 +3286,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3413,7 +3404,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3523,7 +3514,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3640,7 +3631,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3759,7 +3750,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3873,7 +3864,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3990,7 +3981,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4085,7 +4076,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4178,7 +4169,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

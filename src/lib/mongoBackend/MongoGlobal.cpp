@@ -630,62 +630,61 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
    *
    * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
    *
-   */
+   */  
 
-  std::string servicePathValue = "";
-
-  if (servicePath.size() > 0)
+  // Note that by construction servicePath vector must have at least one element. Note that the
+  // case in which first element is "" is special, it means that the SP were not provided and
+  // we have to apply the default
+  if (servicePath[0] == "")
   {
-    bool nullAdded = false;
+    LM_T(LmtServicePath, ("Service Path JSON string: '{$in: [ /^\\/.*/, null] }'"));
+    return fromjson("{$in: [ /^\\/.*/, null] }");
+  }
 
-    servicePathValue += "{ $in: [ ";
+  std::string servicePathValue = "{ $in: [ ";
+  bool nullAdded = false;
 
-    for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
+  for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix)
+  {
+
+    //
+    // Add "null" in the following service path cases: / or /#. In order to avoid adding null
+    // several times, the nullAdded flag is used
+    //
+    if (!nullAdded && ((servicePath[ix] == "/") || (servicePath[ix] == "/#")))
     {
-
-      //
-      // Add "null" in the following service path cases: / or /#. In order to avoid adding null
-      // several times, the nullAdded flag is used
-      //
-      if (!nullAdded && ((servicePath[ix] == "/") || (servicePath[ix] == "/#")))
-      {
-        servicePathValue += "null, ";
-        nullAdded = true;
-      }
-
-      char path[SERVICE_PATH_MAX_TOTAL * 2];
-      slashEscape(servicePath[ix].c_str(), path, sizeof(path));
-
-      if (path[strlen(path) - 1] == '#')
-      {
-        /* Remove '\/#' trailing part of the string */
-        int l = strlen(path);
-
-        path[l - 3] = 0;
-        servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
-      }
-      else
-      {
-        servicePathValue += std::string("/^") + path + "$/";
-      }
-
-      /* Prepare concatenation for next token in regex */
-      if (ix < servicePath.size() - 1)
-      {
-        servicePathValue += std::string(", ");
-      }
+      servicePathValue += "null, ";
+      nullAdded = true;
     }
 
-    servicePathValue += " ] }";
-    LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
-  }
-  else
-  {
-    /* In this case, servicePath match any path, including the case of "null" */
-    servicePathValue = "{$in: [ /^\\/.*/, null] }";
+    char path[SERVICE_PATH_MAX_TOTAL * 2];
+    slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+
+    if (path[strlen(path) - 1] == '#')
+    {
+      /* Remove '\/#' trailing part of the string */
+      int l = strlen(path);
+
+      path[l - 3] = 0;
+      servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
+    }
+    else
+    {
+      servicePathValue += std::string("/^") + path + "$/";
+    }
+
+    /* Prepare concatenation for next token in regex */
+    if (ix < servicePath.size() - 1)
+    {
+      servicePathValue += std::string(", ");
+    }
   }
 
+  servicePathValue += " ] }";
+  LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
+
   return fromjson(servicePathValue);
+
 }
 
 /* *****************************************************************************
@@ -1970,7 +1969,8 @@ bool processAvailabilitySubscription
 {
   std::string                       err;
   NotifyContextAvailabilityRequest  ncar;
-  const std::vector<std::string>    servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
+  std::vector<std::string>          servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
+  servicePathV.push_back("");                      // While this gets implemented, "" default is used.
 
   if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
   {

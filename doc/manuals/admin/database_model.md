@@ -269,7 +269,7 @@ Fields:
     "now" and duration) and will be recalculated when an
     updateContextSubscription is received (see [programmers
     guide](../user/duration.md)). For permanent subscriptions (allowed in NGSIv2)
-    it is set to -1.
+    an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
 -   **lastNotification**: the time when last notification was sent. This
     is updated each time a notification is sent, to avoid
     violating throttling.
