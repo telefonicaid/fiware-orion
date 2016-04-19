@@ -35,13 +35,13 @@ accumulatorStart --pretty-print
 # 02. Create NGSIv1 subscription for E1/A1 (A1, A2)
 # 03. Create NGSIv2 subscription for E1/A1 (A1, A3), without attrsFormat (normalized is default)
 # 04. Create NGSIv2 subscription for E1/A1 (A1, A4), with attrsFormat set to normalized
-# 05. Create NGSIv2 subscription for E1/A1 (A1, A5), with attrsFormat set to keyvalues
+# 05. Create NGSIv2 subscription for E1/A1 (A1, A5), with attrsFormat set to keyValues
 # 06. Create NGSIv2 subscription for E1/A1 (A1, A6), with attrsFormat set to values
 # 07. Dump accumulator to see 5 notifications
 # 08. Reset accumulator
-# 09. Update sub2, setting attrsFormat to keyvalues
+# 09. Update sub2, setting attrsFormat to keyValues
 # 10. Update E1/A3, to see notification in sub2
-# 11. Dump accumulator to see notification of (A1, A3) with keyvalues
+# 11. Dump accumulator to see notification of (A1, A3) with keyValues
 # 
 
 echo "01. Create E1/A1"
@@ -148,7 +148,7 @@ echo
 echo
 
 
-echo "05. Create NGSIv2 subscription for E1/A1 (A1, A5), with attrsFormat set to keyvalues"
+echo "05. Create NGSIv2 subscription for E1/A1 (A1, A5), with attrsFormat set to keyValues"
 echo "===================================================================================="
 payload='
 {
@@ -166,9 +166,9 @@ payload='
     "http": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
-    "attrs": [ "A1", "A5", "sub4_with_keyvalues" ]
+    "attrs": [ "A1", "A5", "sub4_with_keyValues" ]
   },
-  "attrsFormat": "keyvalues",
+  "attrsFormat": "keyValues",
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload" --json
@@ -221,11 +221,11 @@ echo
 echo
 
 
-echo "09. Update sub2, setting attrsFormat to keyvalues"
+echo "09. Update sub2, setting attrsFormat to keyValues"
 echo "================================================="
 payload='
 {
-  "attrsFormat": "keyvalues"
+  "attrsFormat": "keyValues"
 }'
 orionCurl --url /v2/subscriptions/$sub2 -X PATCH --payload "$payload" --json
 echo
@@ -242,7 +242,7 @@ echo
 echo
 
 
-echo "11. Dump accumulator to see notification of (A1, A3) with keyvalues"
+echo "11. Dump accumulator to see notification of (A1, A3) with keyValues"
 echo "==================================================================="
 accumulatorDump
 echo
@@ -297,7 +297,7 @@ Date: REGEX(.*)
 
 
 
-05. Create NGSIv2 subscription for E1/A1 (A1, A5), with attrsFormat set to keyvalues
+05. Create NGSIv2 subscription for E1/A1 (A1, A5), with attrsFormat set to keyValues
 ====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -420,7 +420,7 @@ Content-Length: 94
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: keyvalues
+X-Ngsiv2-Attrsformat: keyValues
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
@@ -461,7 +461,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =====================
 
 
-09. Update sub2, setting attrsFormat to keyvalues
+09. Update sub2, setting attrsFormat to keyValues
 =================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -479,14 +479,14 @@ Date: REGEX(.*)
 
 
 
-11. Dump accumulator to see notification of (A1, A3) with keyvalues
+11. Dump accumulator to see notification of (A1, A3) with keyValues
 ===================================================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 95
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-X-Ngsiv2-Attrsformat: keyvalues
+X-Ngsiv2-Attrsformat: keyValues
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 

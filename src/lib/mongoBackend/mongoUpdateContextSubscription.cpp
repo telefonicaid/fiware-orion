@@ -440,7 +440,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   else
   {
-    notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "JSON";  // If not in database, "JSON" is the default value
+    notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : notificationFormatToString(NGSI_V1_JSON);
     notifyFormat       = stringToNotificationFormat(notifyFormatString, false);
     newSub.append(CSUB_FORMAT, notifyFormatString);
   }

@@ -167,7 +167,6 @@ public:
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
     void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat)
     {
-      LM_W(("KZ: In parent_sendNotifyContextRequest"));
       return Notifier::sendNotifyContextRequest(ncr, url, tenant, xauthToken, fiwareCorrelator, notifyFormat);
     }
     void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, const std::string& fiwareCorrelator, Format format)

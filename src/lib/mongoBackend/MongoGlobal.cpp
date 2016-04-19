@@ -1983,6 +1983,7 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
+    // FIXME P4: When 'ngsi9' notifications get implemented fot NGSIv2, the fifth param, hardcoded to 'JSON', will change for a variable.
     getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, JSON);
     ncar.contextRegistrationResponseVector.release();
 

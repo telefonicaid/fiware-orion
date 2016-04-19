@@ -43,7 +43,7 @@ const char* notificationFormatToString(NotificationFormat format, bool noDefault
   {
   case NGSI_V1_JSON:                return "JSON";
   case NGSI_V2_NORMALIZED:          return "normalized";
-  case NGSI_V2_KEYVALUES:           return "keyvalues";
+  case NGSI_V2_KEYVALUES:           return "keyValues";
   case NGSI_V2_VALUES:              return "values";
   case NGSI_NO_NOTIFICATION_FORMAT:
     if (noDefault == true)
@@ -69,7 +69,7 @@ NotificationFormat stringToNotificationFormat(const std::string& s, bool noDefau
 {
   if (s == "JSON")       { return NGSI_V1_JSON;       }
   if (s == "normalized") { return NGSI_V2_NORMALIZED; }
-  if (s == "keyvalues")  { return NGSI_V2_KEYVALUES;  }
+  if (s == "keyValues")  { return NGSI_V2_KEYVALUES;  }
   if (s == "values")     { return NGSI_V2_VALUES;     }
   
   return (noDefault == false)? DEFAULT_NOTIFICATION_FORMAT : NGSI_NO_NOTIFICATION_FORMAT;

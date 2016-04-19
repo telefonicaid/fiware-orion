@@ -273,8 +273,12 @@ static bool addTriggeredSubscriptions
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
+      //
+      // FIXME P4: Once ctx availability notification formats get defined for NGSIv2,
+      //           the first parameter for TriggeredSubscription will have "normalized" as default value
+      //
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT)? stringToNotificationFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_JSON,  // FIXME PR: hard to decide a default NotificationFormat ... JSON or NGSI_V2_NORMALIZED ?
+        sub.hasField(CASUB_FORMAT)? stringToNotificationFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_JSON,
         getStringFieldF(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 

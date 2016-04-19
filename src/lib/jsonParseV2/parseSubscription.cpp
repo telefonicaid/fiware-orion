@@ -273,7 +273,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
     if (nFormat == NGSI_NO_NOTIFICATION_FORMAT)
     {
-      const char*  details  = "invalid attrsFormat (accepted values: normalized, keyvalues, values)";
+      const char*  details  = "invalid attrsFormat (accepted values: normalized, keyValues, values)";
       OrionError   oe(SccBadRequest, details);
 
       alarmMgr.badInput(clientIp, details);
