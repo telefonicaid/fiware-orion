@@ -1851,7 +1851,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
 
     NotifierMock* notifierMock = new NotifierMock();
 
-    // KZ: If I change the last parameter from "JSON" to "", then this does not fail ...
     EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);

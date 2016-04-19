@@ -180,6 +180,10 @@ std::string jsonTreat
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
+  //
+  // Set default attrsFormat to NGSI_V1_JSON when parsing
+  // SubscribeContext or UpdateContextSubscription in v1 JSON parsing
+  //
   if (reqP != NULL)
   {
     if (reqP->type == SubscribeContext)
@@ -191,6 +195,7 @@ std::string jsonTreat
       parseDataP->ucsr.res.attrsFormat = NGSI_V1_JSON;
     }
   }
+
 
   //
   // FIXME P4 #1862:

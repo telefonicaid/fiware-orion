@@ -62,11 +62,8 @@ HttpStatusCode mongoUpdateContextSubscription
     std::string                         version
 )
 { 
-  bool          reqSemTaken;
+  bool  reqSemTaken;
 
-  LM_W(("KZ: In mongoUpdateContextSubscription: requestP->attrsFormat == %s", notificationFormatToString(requestP->attrsFormat)));
-
-  
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request", SemWriteOp, &reqSemTaken);
 
   /* Look for document */
@@ -439,14 +436,12 @@ HttpStatusCode mongoUpdateContextSubscription
   {
     notifyFormat       = requestP->attrsFormat;
     notifyFormatString = notificationFormatToString(notifyFormat);
-    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", notifyFormatString.c_str()));
     newSub.append(CSUB_FORMAT, notifyFormatString.c_str());
   }
   else
   {
     notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "JSON";  // If not in database, "JSON" is the default value
     notifyFormat       = stringToNotificationFormat(notifyFormatString, false);
-    LM_W(("KZ: CSUB_FORMAT untouched - keeping the old (%s)", notifyFormatString.c_str()));
     newSub.append(CSUB_FORMAT, notifyFormatString);
   }
 
@@ -515,7 +510,6 @@ HttpStatusCode mongoUpdateContextSubscription
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
 
-  LM_W(("KZ: Calling mongoSubCacheItemInsert with notifyFormat == %s", notificationFormatToString(notifyFormat)));
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,

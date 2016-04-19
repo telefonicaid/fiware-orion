@@ -203,7 +203,6 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    LM_W(("KZ: Setting CSUB_FORMAT to '%s'", notificationFormatToString(requestP->attrsFormat)));
     sub.append(CSUB_FORMAT, notificationFormatToString(requestP->attrsFormat));
 
     /* Insert document in database */

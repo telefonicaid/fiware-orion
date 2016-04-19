@@ -52,6 +52,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
     else
     {
       out = "{";
+      // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow? 
       out += pcontextAttribute->toJson(true, renderMode, NGSI_V2_NORMALIZED, requestType);  // param 1 'true' as it is the last and only element
       out += "}";
     }

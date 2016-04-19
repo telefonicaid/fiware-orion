@@ -51,9 +51,6 @@ import json
 def all_done():
     os.unlink(pidfile)
 
-print "accumulator-server.py starting"
-
-
 # Default arguments
 port       = 1028
 host       = '0.0.0.0'
@@ -70,6 +67,7 @@ if len(argv) > 2:
 
 if len(argv) > 3:
     if argv[3] == 'on':
+        print 'verbose mode is on'
         verbose = 1
     if argv[3] == '--pretty-print':
         pretty = True
@@ -80,11 +78,11 @@ if len(argv) > 4:
     if argv[4] == '--pretty-print':
         pretty = True
     if argv[4] == 'on':
+        print 'verbose mode is on'
         verbose = 1
 
 pid     = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
-
 
 #
 # If an accumulator process is already running, it is killed.
@@ -114,7 +112,6 @@ if os.path.isfile(pidfile):
 # Creating the pidfile of the currently running process
 #
 file(pidfile, 'w').write(pid)
-
 
 #
 # Making the function all_done being executed on exit of this process.

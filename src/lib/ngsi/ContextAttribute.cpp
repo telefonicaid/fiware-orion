@@ -763,8 +763,9 @@ std::string ContextAttribute::toJson(bool isLastElement, const std::string& rend
   std::string  rMode        = renderMode;  // renderMode is 'const' and cannot be modified
 
   //
-  // FIXME PR: Que lio ...
+  // FIXME PR: To be discussed during PR-review
   //   'notifyFormat' overrides 'renderMode' if NGSI_V2_KEYVALUES or NGSI_V2_VALUES but 'uniqueValues' must be saved
+  //   Perhaps these two parameters (renderMode and notifyFormat) should be unified ...
   //
   if (rMode == RENDER_MODE_UNIQUE_VALUES)
   {

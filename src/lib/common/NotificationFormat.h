@@ -31,10 +31,9 @@
 
 /* ****************************************************************************
 *
-* DEFAULT_NOTIFICATIONFORMAT - 
+* DEFAULT_NOTIFICATION_FORMAT - 
 */
 #define DEFAULT_NOTIFICATION_FORMAT         NGSI_V2_NORMALIZED
-#define DEFAULT_NOTIFICATION_FORMAT_STRING  "NGSIv2-NORMALIZED"
 
 
 

@@ -345,21 +345,18 @@ static bool subMatch
       if ((cSubP->tenant != NULL) && (cSubP->tenant[0] != 0))
       {
         LM_T(LmtSubCacheMatch, ("No match due to tenant I"));
-        LM_W(("KZ: No match due to tenant I"));
         return false;
       }
 
       if ((tenant != NULL) && (tenant[0] != 0))
       {
         LM_T(LmtSubCacheMatch, ("No match due to tenant II"));
-        LM_W(("KZ: No match due to tenant II"));
         return false;
       }
     }
     else if (strcmp(cSubP->tenant, tenant) != 0)
     {
       LM_T(LmtSubCacheMatch, ("No match due to tenant III"));
-      LM_W(("KZ: No match due to tenant III"));
       return false;
     }
   }
@@ -367,7 +364,6 @@ static bool subMatch
   if (servicePathMatch(cSubP, (char*) servicePath) == false)
   {
     LM_T(LmtSubCacheMatch, ("No match due to servicePath"));
-    LM_W(("KZ: No match due to servicePath"));
     return false;
   }
 
@@ -381,7 +377,6 @@ static bool subMatch
   if (!attributeMatch(cSubP, attrV))
   {
     LM_T(LmtSubCacheMatch, ("No match due to attributes"));
-    LM_W(("KZ: No match due to attributes"));
     return false;
   }
 
@@ -391,12 +386,10 @@ static bool subMatch
 
     if (eiP->match(entityId, entityType))
     {
-      LM_W(("KZ: subscription matches"));
       return true;
     }
   }
 
-  LM_W(("KZ: No match due to EntityInfo"));
   LM_T(LmtSubCacheMatch, ("No match due to EntityInfo"));
   return false;
 }

@@ -64,7 +64,6 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
 {
   ConnectionInfo ci;
 
-  LM_W(("KZ: In sendNotifyContextRequest"));
   //
   // FIXME P5: analyze how much of the code of this function is the same as in Notifier::sendNotifyContextRequest
   // and could be refactored to common functions
@@ -121,8 +120,6 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
 
   /* Set Content-Type */
   std::string content_type = "application/json";
-
-  LM_W(("KZ: notifyFormat == %d (%s)", notifyFormat, notificationFormatToString(notifyFormat, false)));
 
   SenderThreadParams* params = new SenderThreadParams();
   params->ip               = host;

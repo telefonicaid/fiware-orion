@@ -378,7 +378,6 @@ int httpRequestSendWithCurl
   outgoingMsgSize += correlation.size();
 
   // Notify Format
-  LM_W(("KZ: notifyFormat == '%s'", notifyFormat.c_str()));
   if ((notifyFormat != "") && (notifyFormat != "JSON"))
   {
     std::string nFormat = "X-Ngsiv2-AttrsFormat: " + notifyFormat;
@@ -404,7 +403,6 @@ int httpRequestSendWithCurl
   // Contents
   const char* payload = content.c_str();
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
-  LM_W(("KZ: PAYLOAD: %s", payload));
 
   // Set up URL
   std::string url;

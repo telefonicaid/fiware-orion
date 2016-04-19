@@ -1017,13 +1017,11 @@ static bool addTriggeredSubscriptions_withCache
   std::string                       servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
   std::vector<CachedSubscription*>  subVec;
 
-  LM_W(("KZ: In addTriggeredSubscriptions_withCache"));
   cacheSemTake(__FUNCTION__, "match subs for notifications");
   subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   int now = getCurrentTime();
-  LM_W(("KZ: In addTriggeredSubscriptions_withCache. subVec.size: %lu", subVec.size()));
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
     CachedSubscription* cSubP = subVec[ix];
@@ -1032,7 +1030,6 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->expirationTime < now)
     {
       LM_T(LmtSubCache, ("%s is EXPIRED (EXP:%lu, NOW:%lu, DIFF: %d)", cSubP->subscriptionId, cSubP->expirationTime, now, now - cSubP->expirationTime));
-      LM_W(("KZ: skipping - EXPIRED"));
       continue;
     }
 
@@ -1040,14 +1037,12 @@ static bool addTriggeredSubscriptions_withCache
     if (cSubP->status == STATUS_INACTIVE)
     {
       LM_T(LmtSubCache, ("%s is INACTIVE", cSubP->subscriptionId));
-      LM_W(("KZ: skipping - INACTIVE"));
       continue;
     }
 
     AttributeList aList;
 
     aList.fill(cSubP->attributes);
-    LM_W(("KZ: Notification Format: %s", notificationFormatToString(cSubP->notifyFormat)));
 
     // Throttling
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
@@ -1061,7 +1056,6 @@ static bool addTriggeredSubscriptions_withCache
                            now,
                            now - cSubP->lastNotificationTime,
                            cSubP->throttling));
-        LM_W(("KZ: skipping - THROTTLING"));
         continue;
       }
       else
@@ -1086,7 +1080,6 @@ static bool addTriggeredSubscriptions_withCache
                          cSubP->throttling));
     }
 
-    LM_W(("KZ: accepting sub"));
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
                                                            cSubP->notifyFormat,

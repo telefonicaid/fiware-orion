@@ -144,8 +144,12 @@ std::string EntityId::toJson(void)
   std::string  typeEscaped  = htmlEscape(type.c_str());
   std::string  idEscaped    = htmlEscape(id.c_str());
 
-  out += "\"id\":\""   + idEscaped   + "\",";
-  out += "\"type\":\"" + typeEscaped + "\"";
+  out += JSON_VALUE("id", idEscaped);
+  out += ",";
+  out += JSON_VALUE("type", typeEscaped);
+
+  // out += "\"id\":\""   + idEscaped   + "\",";
+  // out += "\"type\":\"" + typeEscaped + "\"";
 
   return out;
 }

@@ -81,17 +81,17 @@ std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, NotificationFormat
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
-    LM_W(("KZ: notifyFormat == %d", notifyFormat));
+
     return oe.render(ciP, "");
   }
 
   std::string out;
 
   out += "{";
-  out += "\"subscriptionId\":";
-  out += "\"" + subscriptionId.get() + "\"";
+  out += JSON_STR("subscriptionId") + ":";
+  out += JSON_STR(subscriptionId.get());
   out += ",";
-  out += "\"data\":[";
+  out += JSON_STR("data") + ":[";
 
   out += contextElementResponseVector.toJson(ciP, notifyFormat);
   out += "]";

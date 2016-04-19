@@ -92,6 +92,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       out = "[";
       if (attributeVector.size() != 0)
       {
+        // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow? 
         out += attributeVector.toJson(true, renderMode, NGSI_V2_NORMALIZED, ciP->uriParam["attrs"]);
       }
       out += "]";        
@@ -109,6 +110,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         out += ",";
+        // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow? 
         out += attributeVector.toJson(true, renderMode, NGSI_V2_NORMALIZED, ciP->uriParam["attrs"]);
       }
 

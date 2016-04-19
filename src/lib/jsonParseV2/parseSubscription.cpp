@@ -60,7 +60,6 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   Document                  document;
   SubscribeContextRequest*  destination;
 
-  LM_W(("KZ: In parseSubscription"));
   document.Parse(ciP->payload);
 
   if (update)
@@ -274,9 +273,10 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
     if (nFormat == NGSI_NO_NOTIFICATION_FORMAT)
     {
-      OrionError oe(SccBadRequest, "invalid attrsFormat (accepted values: NGSIv2-NORMALIZED, NGSIv2-KEYVALUES, NGSIv2-VALUES)");
+      const char*  details  = "invalid attrsFormat (accepted values: NGSIv2-NORMALIZED, NGSIv2-KEYVALUES, NGSIv2-VALUES)";
+      OrionError   oe(SccBadRequest, details);
 
-      alarmMgr.badInput(clientIp, "invalid attrsFormat (accepted values: NGSIv2-NORMALIZED, NGSIv2-KEYVALUES, NGSIv2-VALUES)");
+      alarmMgr.badInput(clientIp, details);
       return oe.render(ciP, "");
     }
 
