@@ -1361,7 +1361,7 @@ A `notification` object contains the following subfields:
 + `attrs`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
   in the notification. It also defines the order in which attributes will appear in notifications when `attrsFormat` `value` is used
   (see "Notification messages" section).
-+ `http`: Information about the HTTP transport.
++ `http`: It is used to convey parameters for notifications delivered through the HTTP protocol.
 + `attrsFormat` (optional): specifies how the entities will be represented in notifications. Accepted values are
   `normalized` (the one used if the field is omitted), `keyValues` or `values`. If `attrsFormat` takes any value different
   than those an error will be raised. See detail in "Notification messages" section.
@@ -1370,10 +1370,10 @@ A `notification` object contains the following subfields:
 
 An `http` object contains the following subfields:
 
-+ `url` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
++ `url` : URL referencing the service which is invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas could also be supported.
-+ `headers` (optional): a key-map of HTTP headers that will be included in the notification messages-
-+ `qs` (optional): a key-map of URL query parameters that will be included in the notification message.
++ `headers` (optional): a key-map of HTTP headers that are included in the notification messages.
++ `qs` (optional): a key-map of URL query parameters that are included in the notification message.
 + `method` (optional): the method to use for sending the notification (default is POST)
 + `payload` (optional): the payload to be used in the notification. If omitted, the default payload (see
   "Notification messages" sections) is used.
