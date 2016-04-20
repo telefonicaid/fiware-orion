@@ -759,7 +759,6 @@ std::string ContextAttribute::render
 std::string ContextAttribute::toJson(bool isLastElement, const std::string& renderMode, NotificationFormat notifyFormat, RequestType requestType)
 {
   std::string  out;
-  bool         uniqueValues = false;
   std::string  rMode        = renderMode;  // renderMode is 'const' and cannot be modified
 
   //
@@ -769,7 +768,6 @@ std::string ContextAttribute::toJson(bool isLastElement, const std::string& rend
   //
   if (rMode == RENDER_MODE_UNIQUE_VALUES)
   {
-    uniqueValues = true;
     rMode        = RENDER_MODE_VALUES;  // FIXME PR: is this correct?
   }
 

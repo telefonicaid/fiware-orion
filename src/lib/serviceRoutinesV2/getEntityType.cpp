@@ -28,6 +28,8 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 
+#include "rest/OrionError.h"
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntityType.h"
@@ -57,7 +59,17 @@ std::string getEntityType
   std::string         answer;
 
   TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
-  TIMED_RENDER(answer = response.toJson(ciP));
+
+  if (response.entityType.count == 0)
+  {
+    OrionError oe(SccContextElementNotFound, "Entity type not found");
+    TIMED_RENDER(answer = oe.render(ciP, ""));
+    ciP->httpStatusCode = SccContextElementNotFound;
+  }
+  else
+  {
+    TIMED_RENDER(answer = response.toJson(ciP));
+  }
 
   response.release();
 

@@ -54,6 +54,14 @@ extern std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
+* totalTypes -
+*/
+extern unsigned int totalTypes;
+
+
+
+/* ****************************************************************************
+*
 * options -
 */
 extern std::map<std::string, bool> options;
