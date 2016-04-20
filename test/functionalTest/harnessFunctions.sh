@@ -664,6 +664,12 @@ function accumulatorStop()
 #
 function accumulatorStart()
 {
+  if [ "$1" = "--pretty-print" ]
+  then
+    pretty="$1"
+    shift
+  fi
+
   bindIp=$1
   port=$2
 
@@ -673,9 +679,14 @@ function accumulatorStart()
     port=$LISTENER_PORT
   fi
 
+  if [ -z "$bindIp" ]
+  then
+    bindIp='localhost'
+  fi
+
   accumulatorStop $port
 
-  accumulator-server.py $port /notify $bindIp > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+  accumulator-server.py $port /notify $bindIp $pretty > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -800,6 +811,17 @@ function accumulator3Count()
     curl localhost:${LISTENER3_PORT}/number -s -S 2> /dev/null
   fi
 }
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorReset - 
+#
+function accumulatorReset()
+{
+  curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+}
+
 
 # ------------------------------------------------------------------------------
 #
@@ -1296,6 +1318,7 @@ export -f accumulator3Dump
 export -f accumulatorCount
 export -f accumulator2Count
 export -f accumulator3Count
+export -f accumulatorReset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd

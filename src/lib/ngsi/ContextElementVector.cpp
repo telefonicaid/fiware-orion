@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/NotificationFormat.h"
 #include "ngsi/ContextElementVector.h"
 #include "rest/ConnectionInfo.h"
 

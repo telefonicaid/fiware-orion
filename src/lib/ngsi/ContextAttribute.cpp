@@ -29,10 +29,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
-
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/limits.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
@@ -756,13 +756,36 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, const std::string& renderMode, RequestType requestType)
+std::string ContextAttribute::toJson(bool isLastElement, const std::string& renderMode, NotificationFormat notifyFormat, RequestType requestType)
 {
   std::string  out;
+  bool         uniqueValues = false;
+  std::string  rMode        = renderMode;  // renderMode is 'const' and cannot be modified
 
-  if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_KEY_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
+  //
+  // FIXME PR: To be discussed during PR-review
+  //   'notifyFormat' overrides 'renderMode' if NGSI_V2_KEYVALUES or NGSI_V2_VALUES but 'uniqueValues' must be saved
+  //   Perhaps these two parameters (renderMode and notifyFormat) should be unified ...
+  //
+  if (rMode == RENDER_MODE_UNIQUE_VALUES)
   {
-    out = (renderMode == RENDER_MODE_KEY_VALUES)? JSON_STR(name) + ":" : "";
+    uniqueValues = true;
+    rMode        = RENDER_MODE_VALUES;  // FIXME PR: is this correct?
+  }
+
+  if (notifyFormat == NGSI_V2_KEYVALUES)
+  {
+    rMode = RENDER_MODE_KEY_VALUES;
+  }
+  else if (notifyFormat == NGSI_V2_VALUES)
+  {
+    rMode = RENDER_MODE_VALUES;
+  }
+
+
+  if ((rMode == RENDER_MODE_VALUES) || (rMode == RENDER_MODE_KEY_VALUES) || (rMode == RENDER_MODE_UNIQUE_VALUES))
+  {
+    out = (rMode == RENDER_MODE_KEY_VALUES)? JSON_STR(name) + ":" : "";
 
     if (compoundValueP != NULL)
     {

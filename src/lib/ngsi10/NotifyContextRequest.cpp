@@ -26,9 +26,12 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/NotificationFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -53,6 +56,46 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
   out += originator.render(indent  + "  ", contextElementResponseVectorRendered);
   out += contextElementResponseVector.render(ciP, NotifyContext, indent  + "  ", false);
   out += endTag(indent);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* NotifyContextRequest::toJson -
+*/
+std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat)
+{
+  //
+  // First, v1 rendering of notification?
+  //
+  if (notifyFormat == NGSI_V1_JSON)
+  {
+    return render(ciP, NotifyContext, "");
+  }
+
+
+  if ((notifyFormat != NGSI_V2_NORMALIZED) && (notifyFormat != NGSI_V2_KEYVALUES) && (notifyFormat != NGSI_V2_VALUES))
+  {
+    OrionError oe(SccBadRequest, "Invalid notification format");
+    alarmMgr.badInput(clientIp, "Invalid notification format");
+
+    return oe.render(ciP, "");
+  }
+
+  std::string out;
+
+  out += "{";
+  out += JSON_STR("subscriptionId") + ":";
+  out += JSON_STR(subscriptionId.get());
+  out += ",";
+  out += JSON_STR("data") + ":[";
+
+  out += contextElementResponseVector.toJson(notifyFormat);
+  out += "]";
+  out += "}";
 
   return out;
 }

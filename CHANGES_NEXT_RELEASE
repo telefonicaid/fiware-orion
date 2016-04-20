@@ -15,3 +15,4 @@
 - Add: Add permanent subscriptions (Issue #1949)
 - Fix: NGSIv2 subscription payload (#2014)
 - Add: string support in <, >, <=, >= and range filters (#1945)
+- Add: NGSIv2 notifications (Issue #1875)

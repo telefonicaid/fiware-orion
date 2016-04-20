@@ -30,6 +30,7 @@
 #include "common/defaultValues.h"
 #include "common/Format.h"
 #include "common/sem.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
@@ -172,7 +173,7 @@ HttpStatusCode mongoSubscribeContext
                                              requestP->attributeList, oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             JSON,
+                                             requestP->attrsFormat,
                                              tenant,
                                              xauthToken,
                                              servicePathV,
@@ -202,7 +203,7 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, "JSON");
+    sub.append(CSUB_FORMAT, notificationFormatToString(requestP->attrsFormat));
 
     /* Insert document in database */
     std::string err;
@@ -228,7 +229,7 @@ HttpStatusCode mongoSubscribeContext
                        oidString.c_str(),
                        expiration,
                        throttling,
-                       JSON,
+                       requestP->attrsFormat,
                        notificationDone,
                        lastNotificationTime,
                        stringFilterP,

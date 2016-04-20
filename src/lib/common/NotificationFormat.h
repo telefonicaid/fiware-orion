@@ -1,7 +1,9 @@
-#ifndef SENDERTHREAD_H
-#define SENDERTHREAD_H
+#ifndef SRC_LIB_COMMON_NOTIFICATIONFORMAT_H_
+#define SRC_LIB_COMMON_NOTIFICATIONFORMAT_H_
 
-/* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+/*
+*
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -21,51 +23,47 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermín Galán Márquez
+* Author: Ken Zangelin
 */
 #include <string>
 
-#include "common/Format.h"
+
+
+/* ****************************************************************************
+*
+* DEFAULT_NOTIFICATION_FORMAT - 
+*/
+#define DEFAULT_NOTIFICATION_FORMAT         NGSI_V2_NORMALIZED
 
 
 
 /* ****************************************************************************
 *
-* NOTIFICATION_WAIT_MODE - 
+* NotificationFormat - 
 */
-#define NOTIFICATION_WAIT_MODE false
-
-
-
-/* ****************************************************************************
-*
-* SenderThreadParams - 
-*/
-typedef struct SenderThreadParams
+typedef enum NotificationFormat
 {
-  std::string     ip;
-  unsigned short  port;
-  std::string     protocol;
-  std::string     verb;
-  std::string     tenant;
-  std::string     servicePath;
-  std::string     xauthToken;
-  std::string     resource;
-  std::string     content_type;
-  std::string     content;
-  char            transactionId[64];
-  Format          format;
-  std::string     notifyFormat;
-  std::string     fiwareCorrelator;
-  struct timespec timeStamp;
-} SenderThreadParams;
+  NGSI_NO_NOTIFICATION_FORMAT = 0,
+  NGSI_V1_JSON                = 1,
+  NGSI_V2_NORMALIZED          = 2,
+  NGSI_V2_KEYVALUES           = 3,
+  NGSI_V2_VALUES              = 4
+} NotificationFormat;
 
 
 
 /* ****************************************************************************
 *
-* startSenderThread -
+* notificationFormatToString - 
 */
-extern void* startSenderThread(void* params);
+extern const char* notificationFormatToString(NotificationFormat format, bool noDefault = true);
 
-#endif
+
+
+/* ****************************************************************************
+*
+* stringToNotificationFormat
+*/
+extern NotificationFormat stringToNotificationFormat(const std::string& s, bool noDefault = false);
+
+#endif  // SRC_LIB_COMMON_NOTIFICATIONFORMAT_H_

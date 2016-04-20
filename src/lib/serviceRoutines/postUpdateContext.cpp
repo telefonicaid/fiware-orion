@@ -163,6 +163,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
                       mimeType,
                       cleanPayload,
                       ciP->httpHeaders.correlator,
+                      "",
                       false,
                       true,
                       &out,

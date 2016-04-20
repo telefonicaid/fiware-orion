@@ -35,6 +35,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "common/NotificationFormat.h"
 #include "common/defaultValues.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -82,7 +83,7 @@ static bool processSubscriptions
                                          trigs->attrL,
                                          mapSubId,
                                          trigs->reference,
-                                         trigs->format,
+                                         JSON,
                                          tenant,
                                          fiwareCorrelator))
     {
@@ -272,8 +273,12 @@ static bool addTriggeredSubscriptions
     {
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
+      //
+      // FIXME P4: Once ctx availability notification formats get defined for NGSIv2,
+      //           the first parameter for TriggeredSubscription will have "normalized" as default value
+      //
       TriggeredSubscription* trigs = new TriggeredSubscription(
-        sub.hasField(CASUB_FORMAT) ? stringToFormat(getStringFieldF(sub, CASUB_FORMAT)) : JSON,
+        sub.hasField(CASUB_FORMAT)? stringToNotificationFormat(getStringFieldF(sub, CASUB_FORMAT)) : NGSI_V1_JSON,
         getStringFieldF(sub, CASUB_REFERENCE),
         subToAttributeList(sub));
 

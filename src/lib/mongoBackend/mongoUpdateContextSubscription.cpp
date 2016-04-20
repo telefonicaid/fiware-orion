@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "common/defaultValues.h"
+#include "common/NotificationFormat.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -61,7 +62,7 @@ HttpStatusCode mongoUpdateContextSubscription
     std::string                         version
 )
 { 
-  bool          reqSemTaken;
+  bool  reqSemTaken;
 
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request", SemWriteOp, &reqSemTaken);
 
@@ -327,7 +328,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 requestP->subscriptionId.get(),
                                                 getStringFieldF(sub, CSUB_REFERENCE).c_str(),
                                                 &notificationDone,
-                                                JSON,
+                                                requestP->attrsFormat,
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV,
@@ -424,8 +425,26 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
-  /* Adding format to use in notifications */
-  newSub.append(CSUB_FORMAT, std::string(formatToString(JSON)));
+
+  //
+  // Adding format to use in notifications
+  //
+  std::string         notifyFormatString  = "";
+  NotificationFormat  notifyFormat        = NGSI_NO_NOTIFICATION_FORMAT;
+
+  if (requestP->attrsFormat != NGSI_NO_NOTIFICATION_FORMAT)
+  {
+    notifyFormat       = requestP->attrsFormat;
+    notifyFormatString = notificationFormatToString(notifyFormat);
+    newSub.append(CSUB_FORMAT, notifyFormatString.c_str());
+  }
+  else
+  {
+    notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : notificationFormatToString(NGSI_V1_JSON);
+    notifyFormat       = stringToNotificationFormat(notifyFormatString, false);
+    newSub.append(CSUB_FORMAT, notifyFormatString);
+  }
+
 
   /* Update document in MongoDB */
   BSONObj  newSubObject = newSub.obj();
@@ -490,7 +509,7 @@ HttpStatusCode mongoUpdateContextSubscription
   char* servicePath      = (char*) ((cSubP == NULL)? "" : cSubP->servicePath);
 
   LM_T(LmtSubCache, ("update: %s", newSubObject.toString().c_str()));
-  
+
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           newSubObject,
                                           subscriptionId,
@@ -502,7 +521,8 @@ HttpStatusCode mongoUpdateContextSubscription
                                           requestP->expression.geometry,
                                           requestP->expression.coords,
                                           requestP->expression.georel,
-                                          stringFilterP);
+                                          stringFilterP,
+                                          notifyFormat);
 
   if (cSubP != NULL)
   {

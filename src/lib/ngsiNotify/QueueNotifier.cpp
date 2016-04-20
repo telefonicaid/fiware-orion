@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsiNotify/QueueStatistics.h"
@@ -59,12 +60,12 @@ int QueueNotifier::start()
 *
 * QueueNotifier::sendNotifyContextRequest -
 */
-void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format, const std::string& fiwareCorrelator)
+void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat)
 {
   ConnectionInfo ci;
 
   //
-  // FIXME P5: analyze how much of the code of this function is the same than in Notifier::sendNotifyContextRequest
+  // FIXME P5: analyze how much of the code of this function is the same as in Notifier::sendNotifyContextRequest
   // and could be refactored to common functions
   //
 
@@ -100,8 +101,8 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
     spathList = "";
   }
 
-  ci.outFormat = format;
-  std::string payload = ncr->render(&ci, NotifyContext, "");
+  ci.outFormat = JSON;
+  std::string payload = ncr->toJson(&ci, notifyFormat);
 
   /* Parse URL */
   std::string  host;
@@ -131,7 +132,8 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   params->resource         = uriPath;
   params->content_type     = content_type;
   params->content          = payload;
-  params->format           = format;
+  params->format           = JSON;
+  params->notifyFormat     = notificationFormatToString(notifyFormat, false);
   params->fiwareCorrelator = fiwareCorrelator;
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 

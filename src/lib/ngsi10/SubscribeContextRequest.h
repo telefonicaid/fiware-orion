@@ -27,6 +27,7 @@
 */
 #include <string>
 
+#include "common/NotificationFormat.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
@@ -54,16 +55,18 @@ typedef struct SubscribeContextRequest
   NotifyConditionVector  notifyConditionVector;  // Optional
   Throttling             throttling;             // Optional
   int64_t                expires;
-  SubscriptionExpression expression;             // Only used by NGSIv2 subscription
 
-  std::string            description;            // Only used by NGSIv2 subscription
-  bool                   descriptionProvided;    // Only used by NGSIv2 subscription
-  std::string            status;                 // Only used by NGSIv2 subscription
+  SubscriptionExpression expression;             // Only used by NGSIv2 subscriptions
+  std::string            description;            // Only used by NGSIv2 subscriptions
+  bool                   descriptionProvided;    // Only used by NGSIv2 subscriptions
+  std::string            status;                 // Only used by NGSIv2 subscriptions
+  NotificationFormat     attrsFormat;            // Only used by NGSIv2 subscriptions
 
   /* The number of restrictions */
   int                    restrictions;
 
-  SubscribeContextRequest(): expires(-1), descriptionProvided(false), restrictions(0) {}
+  SubscribeContextRequest(): expires(-1), descriptionProvided(false), attrsFormat(NGSI_NO_NOTIFICATION_FORMAT), restrictions(0) {}
+
   std::string  render(RequestType requestType, const std::string& indent);
   std::string  check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);

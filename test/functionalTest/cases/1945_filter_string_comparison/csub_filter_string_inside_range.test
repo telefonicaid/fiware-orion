@@ -26,7 +26,7 @@ Subscription filter string inside range
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -203,102 +203,75 @@ Date: REGEX(.*)
 07. Dump accumulator: see E2 (purple), E3 (red), E4 (brown)
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 469
+Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E2",
-        "attributes" : [
-          {
-            "name" : "colour",
-            "type" : "none",
-            "value" : "purple"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "colour": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": "purple"
+            }, 
+            "id": "E2", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 466
+Content-Length: 130
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E3",
-        "attributes" : [
-          {
-            "name" : "colour",
-            "type" : "none",
-            "value" : "red"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "colour": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": "red"
+            }, 
+            "id": "E3", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 468
+Content-Length: 132
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E4",
-        "attributes" : [
-          {
-            "name" : "colour",
-            "type" : "none",
-            "value" : "brown"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "colour": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": "brown"
+            }, 
+            "id": "E4", 
+            "type": "T"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
