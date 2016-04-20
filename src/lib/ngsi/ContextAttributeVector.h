@@ -70,7 +70,6 @@ typedef struct ContextAttributeVector
                             bool                attrsAsName = false);
 
   std::string        toJson(bool                isLastElement,
-                            const std::string&  renderMode,
                             NotificationFormat  notifyFormat,
                             const std::string&  attrsFilter  = "");
 

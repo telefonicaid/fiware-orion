@@ -45,9 +45,11 @@ typedef enum NotificationFormat
 {
   NGSI_NO_NOTIFICATION_FORMAT = 0,
   NGSI_V1_JSON                = 1,
+  NGSI_V1_LEGACY              = NGSI_V1_JSON,
   NGSI_V2_NORMALIZED          = 2,
   NGSI_V2_KEYVALUES           = 3,
-  NGSI_V2_VALUES              = 4
+  NGSI_V2_VALUES              = 4,
+  NGSI_V2_UNIQUE_VALUES       = 5
 } NotificationFormat;
 
 

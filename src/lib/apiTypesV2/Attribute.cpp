@@ -38,8 +38,8 @@
 */
 std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  bool         keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
-  std::string  renderMode = (keyValues == true)? RENDER_MODE_KEY_VALUES : RENDER_MODE_NORMALIZED;
+  bool                keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
+  NotificationFormat  notifyFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   if (pcontextAttribute)
   {
@@ -52,8 +52,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
     else
     {
       out = "{";
-      // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow? 
-      out += pcontextAttribute->toJson(true, renderMode, NGSI_V2_NORMALIZED, requestType);  // param 1 'true' as it is the last and only element
+      out += pcontextAttribute->toJson(true, notifyFormat, requestType);  // param 1 'true' as it is the last and only element
       out += "}";
     }
 
@@ -75,16 +74,13 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 /* ****************************************************************************
 *
 * Attribute::fill -
+*
+* CAUTION
+*   The Query should be for an indvidual entity
+*
 */
-
-//
-// Caution
-// The Query should be for an indvidual entity
-//
-
 void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 {
-
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
     errorCode.fill("NotFound",  "The requested entity has not been found. Check type and id");
@@ -107,8 +103,7 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
   {
     pcontextAttribute = NULL;
     // Look for the attribute by name
-    for(std::size_t i = 0; i < qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size();
-          ++i)
+    for (std::size_t i = 0; i < qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size(); ++i)
     {
       if (qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector[i]->name == attrName)
       {
@@ -116,8 +111,10 @@ void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
         break;
       }
     }
-    if (pcontextAttribute == NULL) {
-        errorCode.fill("NotFound",  "The entity does not have such an attribute");
+
+    if (pcontextAttribute == NULL)
+    {
+      errorCode.fill("NotFound",  "The entity does not have such an attribute");
     }
   }
 }

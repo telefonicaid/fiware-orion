@@ -136,7 +136,7 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, const std::string& renderMode, NotificationFormat notifyFormat, const std::string& attrsFilter)
+std::string ContextAttributeVector::toJson(bool isLastElement, NotificationFormat notifyFormat, const std::string& attrsFilter)
 {
   if (vec.size() == 0)
   {
@@ -167,7 +167,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, const std::string
         continue;
       }
 
-      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -177,7 +177,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, const std::string
 
       ++validAttributes;
 
-      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }
@@ -215,7 +215,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, const std::string
 
       ++renderedAttributes;
 
-      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -223,9 +223,9 @@ std::string ContextAttributeVector::toJson(bool isLastElement, const std::string
         }
       }
 
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderMode, notifyFormat);
+      out += vec[ix]->toJson(renderedAttributes == validAttributes, notifyFormat);
 
-      if ((renderMode == RENDER_MODE_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }
@@ -242,7 +242,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, const std::string
       if (caP != NULL)
       {
         ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, renderMode, notifyFormat);
+        out += caP->toJson(renderedAttributes == validAttributes, notifyFormat);
       }
     }
   }

@@ -127,7 +127,7 @@ std::string ContextElement::toJson(NotificationFormat notifyFormat)
   {
     std::vector<std::string> attrsFilter;
 
-    out += contextAttributeVector.toJson(true, "", notifyFormat);
+    out += contextAttributeVector.toJson(true, notifyFormat);
   }
 
   return out;

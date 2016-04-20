@@ -68,32 +68,22 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  std::string renderMode = RENDER_MODE_NORMALIZED;
+  NotificationFormat  notifyFormat = NGSI_V2_NORMALIZED;
 
-  if (ciP->uriParamOptions[OPT_KEY_VALUES] == true)
-  {
-    renderMode = RENDER_MODE_KEY_VALUES;
-  }
-  else if (ciP->uriParamOptions[OPT_VALUES] == true)
-  {
-    renderMode = RENDER_MODE_VALUES;
-  }
-  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)
-  {
-    renderMode = RENDER_MODE_UNIQUE_VALUES;
-  }
+  if      (ciP->uriParamOptions[OPT_KEY_VALUES]    == true)  { notifyFormat = NGSI_V2_KEYVALUES;     }
+  else if (ciP->uriParamOptions[OPT_VALUES]        == true)  { notifyFormat = NGSI_V2_VALUES;        }
+  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)  { notifyFormat = NGSI_V2_UNIQUE_VALUES; }
 
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out;
 
-    if ((renderMode == RENDER_MODE_VALUES) || (renderMode == RENDER_MODE_UNIQUE_VALUES))
+    if ((notifyFormat == NGSI_V2_VALUES) || (notifyFormat == NGSI_V2_UNIQUE_VALUES))
     {
       out = "[";
       if (attributeVector.size() != 0)
       {
-        // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow? 
-        out += attributeVector.toJson(true, renderMode, NGSI_V2_NORMALIZED, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, notifyFormat, ciP->uriParam["attrs"]);
       }
       out += "]";        
     }
@@ -110,8 +100,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         out += ",";
-        // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow? 
-        out += attributeVector.toJson(true, renderMode, NGSI_V2_NORMALIZED, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, notifyFormat, ciP->uriParam["attrs"]);
       }
 
       out += "}";
