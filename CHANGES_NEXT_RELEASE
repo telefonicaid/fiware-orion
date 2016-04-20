@@ -17,4 +17,4 @@
 - Add: string support in <, >, <=, >= and range filters (#1945)
 - Add: NGSIv2 notifications (Issue #1875)
 - Fix: 'null' attribute value not surrounded by quotes (") in NGSIv1 renderings (#2058)
-- Fix: not-string attribute values were breaking JSON in attributeFormat=object mode (#2058)
+- Fix: non-string attribute values were breaking JSON in attributeFormat=object mode (#2058)
