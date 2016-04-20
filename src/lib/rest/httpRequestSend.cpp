@@ -168,7 +168,7 @@ int httpRequestSendWithCurl
    const std::string&     orig_content_type,
    const std::string&     content,
    const std::string&     fiwareCorrelation,
-   const std::string&     notifyFormat,
+   const std::string&     ngisv2AttrFormat,
    bool                   useRush,
    bool                   waitForResponse,
    std::string*           outP,
@@ -378,9 +378,9 @@ int httpRequestSendWithCurl
   outgoingMsgSize += correlation.size();
 
   // Notify Format
-  if ((notifyFormat != "") && (notifyFormat != "JSON"))
+  if ((ngisv2AttrFormat != "") && (ngisv2AttrFormat != "JSON"))
   {
-    std::string nFormat = "X-Ngsiv2-AttrsFormat: " + notifyFormat;
+    std::string nFormat = "X-Ngsiv2-AttrsFormat: " + ngisv2AttrFormat;
     headers = curl_slist_append(headers, nFormat.c_str());
     outgoingMsgSize += nFormat.size();
   }
@@ -506,7 +506,7 @@ int httpRequestSend
    const std::string&     orig_content_type,
    const std::string&     content,
    const std::string&     fiwareCorrelation,
-   const std::string&     notifyFormat,
+   const std::string&     ngisv2AttrFormat,
    bool                   useRush,
    bool                   waitForResponse,
    std::string*           outP,
@@ -540,7 +540,7 @@ int httpRequestSend
                                      orig_content_type,
                                      content,
                                      fiwareCorrelation,
-                                     notifyFormat,
+                                     ngisv2AttrFormat,
                                      useRush,
                                      waitForResponse,
                                      outP,
