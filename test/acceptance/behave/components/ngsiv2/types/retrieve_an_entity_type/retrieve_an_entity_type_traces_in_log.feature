@@ -28,9 +28,9 @@
 #
 
 
-Feature: verify fields in log traces with retrieve entity types request using NGSI v2.
+Feature: verify fields in log traces with retrieve an entity type request using NGSI v2.
   As a context broker user
-  I would like to verify fields in log traces with retrieve entity types request using NGSI v2
+  I would like to verify fields in log traces with retrieve an entity type request using NGSI v2
   So that I can manage and use them in my scripts
 
   Actions Before the Feature:
@@ -47,7 +47,7 @@ Feature: verify fields in log traces with retrieve entity types request using NG
   Setup: stop ContextBroker
 
   @traces_in_log
-  Scenario:  verify log traces using NGSI v2 with retrieve entity types request
+  Scenario:  verify log traces using NGSI v2 with retrieve an entity type request
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_log_traces  |
@@ -69,12 +69,27 @@ Feature: verify fields in log traces with retrieve entity types request using NG
     And record entity group
     # These properties below are used in create request
     And properties to entities
+      | parameter         | value       |
+      | entities_type     | home        |
+      | entities_id       | room2       |
+      | attributes_number | 2           |
+      | attributes_name   | temperature |
+      | attributes_value  | 34          |
+      | attributes_type   | celsius     |
+    And create entity group with "5" entities in "normalized" mode
+      | entity | prefix |
+      | id     | true   |
+    And verify that receive several "Created" http code
+    And record entity group
+    # These properties below are used in create request
+    And properties to entities
       | parameter         | value    |
       | entities_type     | house    |
       | entities_id       | room2    |
       | attributes_number | 2        |
       | attributes_name   | pressure |
       | attributes_value  | low      |
+      | attributes_type   | bar      |
     And create entity group with "5" entities in "normalized" mode
       | entity | prefix |
       | id     | true   |
@@ -129,14 +144,12 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | id     | true   |
     And verify that receive several "Created" http code
     And record entity group
-    When get entity types
-      | parameter | value |
-      | options   | count |
-      | limit     | 2     |
-      | offset    | 1     |
+    When get an entity type by type "home"
     Then verify that receive an "OK" http code
-    And verify that entity types returned in response are: "house,home"
-    And verify that attributes types are returned in response based on the info in the recorder
+    And verify headers in response
+      | parameter         | value      |
+      | fiware-correlator | [a-f0-9-]* |
+    And verify that attributes types by entity type are returned in response based on the info in the recorder
     And check in log, label "INFO" and message "Starting transaction from"
       | trace    | value              |
       | time     | ignored            |
@@ -146,7 +159,7 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | from     | pending            |
       | function | lmTransactionStart |
       | comp     | Orion              |
-    And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/types -----------------"
+    And check in log, label "DEBUG" and message "--------------------- Serving request GET /v2/types/home -----------------"
       | trace    | value           |
       | time     | ignored         |
       | corr     | N/A             |
