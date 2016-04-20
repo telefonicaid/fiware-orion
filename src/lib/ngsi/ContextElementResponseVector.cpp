@@ -75,14 +75,14 @@ std::string ContextElementResponseVector::render
 *
 * ContextElementResponseVector::toJson - 
 */
-std::string ContextElementResponseVector::toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat)
+std::string ContextElementResponseVector::toJson(NotificationFormat notifyFormat)
 {
   std::string out;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     out += (notifyFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(ciP, notifyFormat);
+    out += vec[ix]->toJson(notifyFormat);
     out += (notifyFormat == NGSI_V2_VALUES)? "]": "}";
 
     if (ix != vec.size() - 1)

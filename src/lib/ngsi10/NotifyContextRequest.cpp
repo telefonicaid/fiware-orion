@@ -93,7 +93,7 @@ std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, NotificationFormat
   out += ",";
   out += JSON_STR("data") + ":[";
 
-  out += contextElementResponseVector.toJson(ciP, notifyFormat);
+  out += contextElementResponseVector.toJson(notifyFormat);
   out += "]";
   out += "}";
 

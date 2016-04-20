@@ -72,7 +72,7 @@ typedef struct ContextElementResponse
                       const std::string&  indent,
                       bool                comma               = false,
                       bool                omitAttributeValues = false);
-  std::string  toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat);
+  std::string  toJson(NotificationFormat notifyFormat);
   void         present(const std::string& indent, int ix);
   void         release(void);
 

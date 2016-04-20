@@ -113,7 +113,7 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 *
 * ContextElement::toJson - 
 */
-std::string ContextElement::toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat)
+std::string ContextElement::toJson(NotificationFormat notifyFormat)
 {
   std::string out;
 

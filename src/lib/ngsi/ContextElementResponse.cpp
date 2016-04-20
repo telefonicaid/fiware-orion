@@ -334,11 +334,11 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat)
+std::string ContextElementResponse::toJson(NotificationFormat notifyFormat)
 {
   std::string out;
 
-  out = contextElement.toJson(ciP, notifyFormat);
+  out = contextElement.toJson(notifyFormat);
 
   return out;
 }
