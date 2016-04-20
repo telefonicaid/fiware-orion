@@ -49,7 +49,7 @@ public:
                                         const std::string&    tenant,
                                         const std::string&    xauthToken,
                                         const std::string&    fiwareCorrelator,
-                                        NotificationFormat    notifyFormat = NGSI_V2_NORMALIZED);
+                                        NotificationFormat    notifyFormat);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,
