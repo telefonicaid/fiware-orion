@@ -27,6 +27,7 @@
 #include <sstream>
 
 #include "logMsg/logMsg.h"
+#include "common/NotificationFormat.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
 
@@ -38,7 +39,7 @@ TriggeredSubscription::TriggeredSubscription
 (
   long long            _throttling,
   long long            _lastNotification,
-  Format               _format,
+  NotificationFormat   _notifyFormat,
   const std::string&   _reference,
   const AttributeList& _attrL,
   const std::string&   _cacheSubId,
@@ -46,7 +47,7 @@ TriggeredSubscription::TriggeredSubscription
 ):
   throttling              (_throttling),
   lastNotification        (_lastNotification),
-  format                  (_format),
+  notifyFormat            (_notifyFormat),
   reference               (_reference),
   attrL                   (_attrL),
   cacheSubId              (_cacheSubId),
@@ -64,13 +65,13 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  Format                _format,
+  NotificationFormat   _notifyFormat,
   const std::string&   _reference,
   const AttributeList& _attrL
 ):
   throttling              (-1),
   lastNotification        (-1),
-  format                  (_format),
+  notifyFormat            (_notifyFormat),
   reference               (_reference),
   attrL                   (_attrL),
   cacheSubId              (""),
@@ -119,7 +120,7 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 {
   std::stringstream ss;
 
-  ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;  
+  ss << throttling << delimiter << lastNotification << delimiter << notificationFormatToString(notifyFormat) << delimiter << reference;  
   ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
 
   return ss.str();

@@ -73,6 +73,31 @@ std::string ContextElementResponseVector::render
 
 /* ****************************************************************************
 *
+* ContextElementResponseVector::toJson - 
+*/
+std::string ContextElementResponseVector::toJson(NotificationFormat notifyFormat)
+{
+  std::string out;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    out += (notifyFormat == NGSI_V2_VALUES)? "[": "{";
+    out += vec[ix]->toJson(notifyFormat);
+    out += (notifyFormat == NGSI_V2_VALUES)? "]": "}";
+
+    if (ix != vec.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElementResponseVector::check -
 */
 std::string ContextElementResponseVector::check

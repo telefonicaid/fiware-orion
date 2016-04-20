@@ -161,7 +161,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions for 1 servicepath
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 388
+Content-Length: 328
 Content-Type: application/json
 X-Total-Count: 1
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -185,13 +185,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "speed"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -213,7 +207,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions for /#
 ================================
 HTTP/1.1 200 OK
-Content-Length: 841
+Content-Length: 721
 Content-Type: application/json
 X-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -239,13 +233,7 @@ Date: REGEX(.*)
                 "attrs": [
                     "temperature",
                     "timestamp"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {
@@ -279,13 +267,7 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "speed"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "georel": "",
-                    "q": ""
-                }
+                ]
             },
             "entities": [
                 {

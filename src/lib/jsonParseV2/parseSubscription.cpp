@@ -100,6 +100,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     return oe.render(ciP, "");
   }
 
+
   // Description field
   destination->descriptionProvided = false;
   if (document.HasMember("description"))
@@ -128,6 +129,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     destination->description = descriptionString;
   }
 
+
   // Subject field
   if (document.HasMember("subject"))
   {
@@ -147,6 +149,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     return oe.render(ciP, "");
   }
 
+
   // Notification field
   if (document.HasMember("notification"))
   {
@@ -165,6 +168,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     alarmMgr.badInput(clientIp, "no notification specified");
     return oe.render(ciP, "");
   }
+
 
   // Expires field
   if (document.HasMember("expires"))
@@ -204,6 +208,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     destination->expires = PERMANENT_SUBS_DATETIME;
   }
 
+
   // Status field
   if (document.HasMember("status"))
   {
@@ -230,6 +235,7 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
     destination->status = statusString;
   }
 
+
   // Throttling
   if (document.HasMember("throttling"))
   {
@@ -246,6 +252,39 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
   else if (!update) // throttling was not set and it is not update
   {
     destination->throttling.seconds = 0;
+  }
+
+
+  // attrsFormat field
+  if (document.HasMember("attrsFormat"))
+  {
+    const Value& attrsFormat = document["attrsFormat"];
+
+    if (!attrsFormat.IsString())
+    {
+      OrionError oe(SccBadRequest, "attrsFormat is not a string");
+
+      alarmMgr.badInput(clientIp, "attrsFormat is not a string");
+      return oe.render(ciP, "");
+    }
+
+    std::string         attrsFormatString = attrsFormat.GetString();
+    NotificationFormat  nFormat           = stringToNotificationFormat(attrsFormatString, true);
+
+    if (nFormat == NGSI_NO_NOTIFICATION_FORMAT)
+    {
+      const char*  details  = "invalid attrsFormat (accepted values: normalized, keyValues, values)";
+      OrionError   oe(SccBadRequest, details);
+
+      alarmMgr.badInput(clientIp, details);
+      return oe.render(ciP, "");
+    }
+
+    destination->attrsFormat = nFormat;
+  }
+  else if (destination->attrsFormat == NGSI_NO_NOTIFICATION_FORMAT)
+  {
+    destination->attrsFormat = DEFAULT_NOTIFICATION_FORMAT;  // Default format for NGSIv2: normalized
   }
 
   return "OK";

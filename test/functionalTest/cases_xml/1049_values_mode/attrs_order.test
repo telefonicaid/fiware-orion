@@ -32,9 +32,9 @@ brokerStart CB
 #
 # 01. Create entity with attributes A, B, C, D
 # 02. Get entity without attrs param -> A, B, C, D
-# 03. Get entity without attrs param (keyvalues) -> A, B, C, D
+# 03. Get entity without attrs param (keyValues) -> A, B, C, D
 # 04. Get entity ordering B, D, C
-# 05. Get entity ordering (keyvalues) B, D, C
+# 05. Get entity ordering (keyValues) B, D, C
 #
 
 echo "01. Create entity with attributes A, B, C, D"
@@ -71,7 +71,7 @@ echo
 echo
 
 
-echo "03. Get entity without attrs param (keyvalues) -> A, B, C, D"
+echo "03. Get entity without attrs param (keyValues) -> A, B, C, D"
 echo "============================================================"
 orionCurl --url '/v2/entities/E?options=keyValues' --noPayloadCheck
 echo
@@ -85,7 +85,7 @@ echo
 echo
 
 
-echo "05. Get entity ordering (keyvalues) B, D, C"
+echo "05. Get entity ordering (keyValues) B, D, C"
 echo "==========================================="
 orionCurl --url '/v2/entities/E?attrs=B,D,C&options=keyValues' --noPayloadCheck
 echo
@@ -112,7 +112,7 @@ Date: REGEX(.*)
 {"id":"E","type":"T","A":{"type":"AT","value":1,"metadata":{}},"B":{"type":"BT","value":2,"metadata":{}},"C":{"type":"CT","value":3,"metadata":{}},"D":{"type":"DT","value":4,"metadata":{}}}
 
 
-03. Get entity without attrs param (keyvalues) -> A, B, C, D
+03. Get entity without attrs param (keyValues) -> A, B, C, D
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 45
@@ -132,7 +132,7 @@ Date: REGEX(.*)
 {"id":"E","type":"T","B":{"type":"BT","value":2,"metadata":{}},"D":{"type":"DT","value":4,"metadata":{}},"C":{"type":"CT","value":3,"metadata":{}}}
 
 
-05. Get entity ordering (keyvalues) B, D, C
+05. Get entity ordering (keyValues) B, D, C
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 39

@@ -28,7 +28,7 @@ dbInit CB
 dbInit CP1
 brokerStart CB 0
 brokerStart CP1 0
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -267,102 +267,75 @@ Date: REGEX(.*)
 07. Dump accumulator, see E1/A1 with CORRELATOR1, and E2/A2 with CORRELATOR3 (for the update), and in between, E2/A2 with CORRELATOR2 (for the creation of the subscription in step 05)
 =======================================================================================================================================================================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 476
+Content-Length: 140
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: CORRELATOR1
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A1",
-            "type" : "none",
-            "value" : "A1 of E1 in CB"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A1": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": "A1 of E1 in CB"
+            }, 
+            "id": "E1", 
+            "type": "none"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 478
+Content-Length: 142
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: CORRELATOR2
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E2",
-        "attributes" : [
-          {
-            "name" : "A2",
-            "type" : "none",
-            "value" : "A2 of E2 in CPR1"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A2": {
+                "metadata": {}, 
+                "type": "none", 
+                "value": "A2 of E2 in CPR1"
+            }, 
+            "id": "E2", 
+            "type": "none"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 476
+Content-Length: 140
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: CORRELATOR3
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "none",
-        "isPattern" : "false",
-        "id" : "E2",
-        "attributes" : [
-          {
-            "name" : "A2",
-            "type" : "string",
-            "value" : "E2/A2 via CB"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A2": {
+                "metadata": {}, 
+                "type": "string", 
+                "value": "E2/A2 via CB"
+            }, 
+            "id": "E2", 
+            "type": "none"
+        }
+    ], 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

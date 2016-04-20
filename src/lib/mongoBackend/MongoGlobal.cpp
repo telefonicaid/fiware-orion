@@ -41,6 +41,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/statistics.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -1774,7 +1775,7 @@ bool processOnChangeConditionForSubscription
   ConditionValueList*              condValues,
   const std::string&               subId,
   const std::string&               notifyUrl,
-  Format                           format,
+  NotificationFormat               notifyFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -1827,7 +1828,7 @@ bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1838,7 +1839,7 @@ bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, format);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1864,7 +1865,7 @@ BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  Format                           format,
+  NotificationFormat               notifyFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -1901,7 +1902,7 @@ BSONArray processConditionVector
                                                    &(nc->condValueList),
                                                    subId,
                                                    url,
-                                                   format,
+                                                   notifyFormat,
                                                    tenant,
                                                    xauthToken,
                                                    servicePathV,
@@ -1982,7 +1983,8 @@ bool processAvailabilitySubscription
     /* Complete the fields in NotifyContextRequest */
     ncar.subscriptionId.set(subId);
 
-    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, format);
+    // FIXME P4: When 'ngsi9' notifications get implemented fot NGSIv2, the fifth param, hardcoded to 'JSON', will change for a variable.
+    getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, fiwareCorrelator, JSON);
     ncar.contextRegistrationResponseVector.release();
 
     /* Update database fields due to new notification */

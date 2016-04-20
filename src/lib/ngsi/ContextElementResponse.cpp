@@ -29,6 +29,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/AttributeList.h"
@@ -323,6 +324,21 @@ std::string ContextElementResponse::render
   out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(indent + "  ", false);
   out += endTag(indent, comma, false);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::toJson - 
+*/
+std::string ContextElementResponse::toJson(NotificationFormat notifyFormat)
+{
+  std::string out;
+
+  out = contextElement.toJson(notifyFormat);
 
   return out;
 }

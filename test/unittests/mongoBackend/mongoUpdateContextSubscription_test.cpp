@@ -1850,7 +1850,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", JSON))
+
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1860,6 +1861,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -1944,7 +1946,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1954,6 +1956,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -2035,7 +2038,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2045,6 +2048,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -2127,7 +2131,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2137,6 +2141,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -2234,7 +2239,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2244,6 +2249,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -2340,7 +2346,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2350,6 +2356,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -2440,7 +2447,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2450,6 +2457,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2540,7 +2548,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2550,6 +2558,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2652,7 +2661,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2662,6 +2671,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2764,7 +2774,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2774,6 +2784,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc);
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2859,7 +2870,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2872,6 +2883,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
     nc2.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -2961,7 +2973,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2974,6 +2986,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
     nc2.condValueList.push_back("A5");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3064,7 +3077,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3075,6 +3088,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3157,7 +3171,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3170,6 +3184,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
     nc2.condValueList.push_back("A3");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3259,7 +3274,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3272,6 +3287,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
     nc2.condValueList.push_back("A5");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3361,7 +3377,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3374,6 +3390,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
     nc2.condValueList.push_back("A5");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3463,7 +3480,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3474,6 +3491,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3560,7 +3578,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3573,6 +3591,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
     nc4.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc3);
     req.notifyConditionVector.push_back(&nc4);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3674,7 +3693,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3684,6 +3703,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3775,7 +3795,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3785,6 +3805,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
     nc.type = "ONCHANGE";
     nc.condValueList.push_back("A1");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3882,7 +3903,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3895,6 +3916,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
     nc2.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -3996,7 +4018,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4007,6 +4029,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -4099,7 +4122,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -4112,6 +4135,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
     nc2.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc1);
     req.notifyConditionVector.push_back(&nc2);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -4209,7 +4233,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", "", "no correlator", NGSI_V1_JSON))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -4220,6 +4244,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
     nc.condValueList.push_back("A1");
     nc.condValueList.push_back("A2");
     req.notifyConditionVector.push_back(&nc);    
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();
@@ -4310,6 +4335,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     nc.condValueList.push_back("A");
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT5H");
+    req.attrsFormat = NGSI_V1_JSON;
 
     /* Prepare database */
     prepareDatabase();

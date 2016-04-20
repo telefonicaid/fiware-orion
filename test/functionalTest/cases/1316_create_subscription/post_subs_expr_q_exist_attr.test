@@ -26,7 +26,7 @@ POST Subscriptions V2 q expression (exist attribute)
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -154,84 +154,66 @@ Date: REGEX(.*)
 05. Get accumulator dump (2 notifications)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 563
+Content-Length: 167
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E1",
-        "attributes" : [
-          {
-            "name" : "A",
-            "type" : "none",
-            "value" : 10
-          },
-          {
-            "name" : "B",
-            "type" : "none",
-            "value" : 20
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "none",
+                "value": 10
+            },
+            "B": {
+                "metadata": {},
+                "type": "none",
+                "value": 20
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 668
+Content-Length: 212
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
+X-Ngsiv2-Attrsformat: normalized
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})",
-  "originator" : "localhost",
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "E2",
-        "attributes" : [
-          {
-            "name" : "B",
-            "type" : "none",
-            "value" : 30
-          },
-          {
-            "name" : "C",
-            "type" : "none",
-            "value" : 40
-          },
-          {
-            "name" : "A",
-            "type" : "none",
-            "value" : 50
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "none",
+                "value": 50
+            },
+            "B": {
+                "metadata": {},
+                "type": "none",
+                "value": 30
+            },
+            "C": {
+                "metadata": {},
+                "type": "none",
+                "value": 40
+            },
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 

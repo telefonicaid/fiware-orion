@@ -28,6 +28,7 @@
 #include "common/string.h"
 #include "common/statistics.h"
 #include "common/limits.h"
+#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi10/NotifyContextRequest.h"
@@ -60,7 +61,7 @@ void Notifier::sendNotifyContextRequest
   const std::string&     tenant,
   const std::string&     xauthToken,
   const std::string&     fiwareCorrelator,
-  Format                 format
+  NotificationFormat     notifyFormat
 )
 {
     ConnectionInfo ci;
@@ -94,8 +95,17 @@ void Notifier::sendNotifyContextRequest
       spathList = "";
     }
     
-    ci.outFormat = format;
-    std::string payload = ncr->render(&ci, NotifyContext, "");
+    ci.outFormat = JSON;
+
+    std::string payload;
+    if (notifyFormat == NGSI_V1_JSON)
+    {
+      payload = ncr->render(&ci, NotifyContext, "");
+    }
+    else
+    {
+      payload = ncr->toJson(&ci, notifyFormat);
+    }
 
     /* Parse URL */
     std::string  host;
@@ -113,8 +123,9 @@ void Notifier::sendNotifyContextRequest
     std::string content_type = "application/json";
 
     /* Send the message (no wait for response), in a separate thread to avoid blocking */
-    pthread_t tid;
-    SenderThreadParams* params = new SenderThreadParams();
+    pthread_t            tid;
+    SenderThreadParams*  params = new SenderThreadParams();
+
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
@@ -125,7 +136,8 @@ void Notifier::sendNotifyContextRequest
     params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payload;
-    params->format           = format;
+    params->format           = JSON;
+    params->notifyFormat     = notificationFormatToString(notifyFormat);
     params->fiwareCorrelator = fiwareCorrelator;
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
@@ -138,6 +150,7 @@ void Notifier::sendNotifyContextRequest
     }
     pthread_detach(tid);
 }
+
 
 
 /* ****************************************************************************
@@ -178,8 +191,8 @@ void Notifier::sendNotifyContextAvailabilityRequest
     std::string content_type = "application/json";
 
     /* Send the message (without awaiting response, in a separate thread to avoid blocking) */
-    pthread_t tid;
-    SenderThreadParams* params = new SenderThreadParams();
+    pthread_t            tid;
+    SenderThreadParams*  params = new SenderThreadParams();
 
     params->ip               = host;
     params->port             = port;

@@ -670,7 +670,7 @@ void subCacheItemInsert
   const char*               subscriptionId,
   int64_t                   expirationTime,
   int64_t                   throttling,
-  Format                    notifyFormat,
+  NotificationFormat        notifyFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
   StringFilter*             stringFilterP,

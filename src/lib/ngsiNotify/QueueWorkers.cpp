@@ -67,12 +67,12 @@ int QueueWorkers::start()
 
 /* ****************************************************************************
 *
-* QueueWorkers::start() -
+* workerFunc -
 */
-static void *workerFunc(void* pSyncQ)
+static void* workerFunc(void* pSyncQ)
 {
-  SyncQOverflow<SenderThreadParams*> *queue = (SyncQOverflow<SenderThreadParams*> *) pSyncQ;
-  CURL *curl;
+  SyncQOverflow<SenderThreadParams*>*  queue = (SyncQOverflow<SenderThreadParams*> *) pSyncQ;
+  CURL*                                curl;
 
   // Initialize curl context
   curl = curl_easy_init();
@@ -130,6 +130,7 @@ static void *workerFunc(void* pSyncQ)
                                    params->content_type,
                                    params->content,
                                    params->fiwareCorrelator,
+                                   params->notifyFormat,
                                    true,
                                    NOTIFICATION_WAIT_MODE,
                                    &out);

@@ -72,6 +72,7 @@ void* startSenderThread(void* p)
                           params->content_type,
                           params->content,
                           params->fiwareCorrelator,
+                          params->notifyFormat,
                           true,
                           NOTIFICATION_WAIT_MODE,
                           &out);

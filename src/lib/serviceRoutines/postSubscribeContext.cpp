@@ -81,6 +81,11 @@ std::string postSubscribeContext
     return answer;
   }
 
+  if (ciP->version != "v2")
+  {
+    parseDataP->scr.res.attrsFormat = NGSI_V1_JSON;
+  }
+
   TIMED_MONGO(ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, ciP->httpHeaders.correlator));
   TIMED_RENDER(answer = scr.render(SubscribeContext, ""));
 

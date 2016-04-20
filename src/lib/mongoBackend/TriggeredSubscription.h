@@ -25,9 +25,9 @@
 *
 * Author: Fermin Galan
 */
-
 #include <string>
-#include "common/Format.h"
+
+#include "common/NotificationFormat.h"
 #include "ngsi/AttributeList.h"
 #include "rest/StringFilter.h"
 
@@ -50,14 +50,14 @@
 class TriggeredSubscription
 {
  public:
-  long long     throttling;
-  long long     lastNotification;
-  Format        format;
-  std::string   reference;
-  AttributeList attrL;
-  std::string   cacheSubId;
-  std::string   tenant;
-  StringFilter  stringFilter;
+  long long           throttling;
+  long long           lastNotification;
+  NotificationFormat  notifyFormat;
+  std::string         reference;
+  AttributeList       attrL;
+  std::string         cacheSubId;
+  std::string         tenant;
+  StringFilter        stringFilter;
 
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
@@ -69,13 +69,13 @@ class TriggeredSubscription
 
   TriggeredSubscription(long long           _throttling,
                         long long           _lastNotification,
-                        Format              _format,
+                        NotificationFormat  _notifyFormat,
                         const std::string&  _reference,
                         const AttributeList& _attrL,
                         const std::string&  _cacheSubId,
                         const char*         _tenant);
 
-  TriggeredSubscription(Format               _format,
+  TriggeredSubscription(NotificationFormat   _notifyFormat,
                         const std::string&   _reference,
                         const AttributeList& _attrL);
 
