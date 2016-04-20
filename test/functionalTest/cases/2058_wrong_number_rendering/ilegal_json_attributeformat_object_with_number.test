@@ -30,13 +30,13 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create entity with not string types
+# 01. Create entity with attributes which are not strings
 # 02. Get entity
 # 03. Get entity with attributeFormat=object¡
 #
 
-echo '01. Create entity with not string types'
-echo '======================================='
+echo '01. Create entity with attributes which are not strings'
+echo '======================================================='
 payload='{
     "id": "E",
     "type": "T",
@@ -65,8 +65,8 @@ echo
 
 
 --REGEXPECT--
-01. Create entity with not string types
-=======================================
+01. Create entity with attributes which are not strings
+=======================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E?type=T
