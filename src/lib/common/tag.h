@@ -131,7 +131,7 @@ extern std::string valueTag1
   const std::string&  value,
   bool                showComma           = false,
   bool                isVectorElement     = false,
-  bool                valueIsNumberOrBool = false
+  bool                withoutQuotes       = false
 );
 
 extern std::string valueTag
@@ -147,8 +147,8 @@ extern std::string valueTag2
   const std::string&  indent,
   const std::string&  key,
   const std::string&  value,
-  bool                showComma           = false,
-  bool                valueIsNumberOrBool = false
+  bool                showComma     = false,
+  bool                withoutQuotes = false
 );
 
 
