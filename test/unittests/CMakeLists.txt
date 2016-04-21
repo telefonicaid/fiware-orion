@@ -299,7 +299,7 @@ ELSEIF(${DISTRO} MATCHES "Debian_.*")
 
 # The following ones are distros that haven't been checked since the refactoring in
 # PR #2062. They should be "promoted" as soon as we have positive feedback about
-# tehm or fixed (maybe based in the version of this file previous to
+# them or fixed (maybe based in the version of this file previous to
 # the aforementioned PR)
 
 ELSEIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
@@ -317,7 +317,7 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")
 ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")  
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
 
-# Finally this is a "best effort" option to try to build on distros that don't have an
+# Finally this is a "best effort" option to try to build on distros that don't have a
 # specify switch
 
 ELSE()
