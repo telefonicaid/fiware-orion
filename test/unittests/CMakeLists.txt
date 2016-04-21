@@ -302,7 +302,7 @@ ELSEIF(${DISTRO} MATCHES "Debian_.*")
 # tehm or fixed (maybe based in the version of this file previous to
 # the aforementioned PR)
 
-ELESIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
+ELSEIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
   # Pending to check after the refactor
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")  
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
