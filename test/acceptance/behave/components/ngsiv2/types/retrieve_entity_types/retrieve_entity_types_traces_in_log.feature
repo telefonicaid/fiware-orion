@@ -135,11 +135,8 @@ Feature: verify fields in log traces with retrieve entity types request using NG
       | limit     | 2     |
       | offset    | 1     |
     Then verify that receive an "OK" http code
-    And verify that entity types are returned in response are: "house,home"
+    And verify that entity types returned in response are: "house,home"
     And verify that attributes types are returned in response based on the info in the recorder
-    And verify headers in response
-      | parameter     | value |
-      | x-total-count | 10    |
     And check in log, label "INFO" and message "msg=logMsg.h[1803]: Starting transaction from"
       | trace    | value              |
       | time     | ignored            |

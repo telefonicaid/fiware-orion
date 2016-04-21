@@ -45,7 +45,7 @@ Feature: general operations in Context Broker using NGSI API v1 and v2
   Actions After the Feature:
   Setup: stop ContextBroker
 
-  @version @skip
+  @version
   Scenario: launch Context broker version request
     When send a version request
     Then verify that receive an "OK" http code
