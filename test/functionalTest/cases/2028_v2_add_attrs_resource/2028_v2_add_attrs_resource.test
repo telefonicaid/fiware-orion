@@ -31,11 +31,13 @@ brokerStart CB
 
 #
 # 01. POST /v2/entities to create 8787GHY entity
-# 02. GET /v2/entities/8787GHY
+# 02. GET /v2/entities/8787GHY/attrs
+# 03. GET /v2/entities/8787GHY/attrs?options=keyValues
+# 04. GET /v2/entities/8787GHY/attrs?options=values
 #
 
 echo "01. POST /v2/entities to create 8787GHY entity"
-echo "==================================================="
+echo "=============================================="
 payload='{
   "id": "8787GHY",
   "type": "Car",
@@ -77,9 +79,16 @@ echo
 echo
 
 
+echo "04. GET /v2/entities/8787GHY/attrs?options=values"
+echo "================================================="
+orionCurl --url /v2/entities/8787GHY/attrs?options=values --json
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /v2/entities to create 8787GHY entity
-===================================================
+==============================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/8787GHY?type=Car
@@ -140,6 +149,23 @@ Date: REGEX(.*)
     "plateCountry": "ES",
     "speed": "150"
 }
+
+
+04. GET /v2/entities/8787GHY/attrs?options=values
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 44
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    "Mercedes Benz",
+    "DE",
+    "Klasse C",
+    "ES",
+    "150"
+]
 
 
 --TEARDOWN--
