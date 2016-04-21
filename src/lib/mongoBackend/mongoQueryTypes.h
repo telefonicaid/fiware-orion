@@ -55,7 +55,8 @@ extern HttpStatusCode mongoEntityTypes
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  const std::string&                   apiVersion = "v1"
+  const std::string&                   apiVersion,
+  unsigned int*                        totalTypesP
 );
 
 /* ****************************************************************************

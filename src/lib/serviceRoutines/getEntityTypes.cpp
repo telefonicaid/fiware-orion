@@ -58,10 +58,11 @@ std::string getEntityTypes
 )
 {
   EntityTypeVectorResponse  response;
+  unsigned int              totalTypes;
 
   response.statusCode.fill(SccOk);
 
-  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion));
+  TIMED_MONGO(mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->apiVersion, &totalTypes));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.render(ciP, ""));
