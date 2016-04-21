@@ -31,7 +31,7 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "apiTypesV2/SubscriptionExpression.h"
@@ -97,7 +97,7 @@ struct CachedSubscription
   int64_t                     lastNotificationTime;
   std::string                 status;
   int64_t                     count;
-  NotificationFormat          notifyFormat;
+  RenderFormat                renderFormat;
   char*                       reference;
   SubscriptionExpression      expression;
   
@@ -175,7 +175,7 @@ extern void subCacheItemInsert
   const char*               subscriptionId,
   int64_t                   expiration,
   int64_t                   throttling,
-  NotificationFormat        notifyFormat,
+  RenderFormat              renderFormat,
   bool                      notificationDone,
   int64_t                   lastNotificationTime,
   StringFilter*             stringFilterP,

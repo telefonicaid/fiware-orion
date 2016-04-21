@@ -29,6 +29,7 @@
 
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
+#include "common/RenderFormat.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
@@ -268,10 +269,10 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
       return oe.render(ciP, "");
     }
 
-    std::string         attrsFormatString = attrsFormat.GetString();
-    NotificationFormat  nFormat           = stringToNotificationFormat(attrsFormatString, true);
+    std::string   attrsFormatString = attrsFormat.GetString();
+    RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
 
-    if (nFormat == NGSI_NO_NOTIFICATION_FORMAT)
+    if (nFormat == NO_FORMAT)
     {
       const char*  details  = "invalid attrsFormat (accepted values: legacy, normalized, keyValues, values)";
       OrionError   oe(SccBadRequest, details);
@@ -282,9 +283,9 @@ std::string parseSubscription(ConnectionInfo* ciP, ParseData* parseDataP, JsonDe
 
     destination->attrsFormat = nFormat;
   }
-  else if (destination->attrsFormat == NGSI_NO_NOTIFICATION_FORMAT)
+  else if (destination->attrsFormat == NO_FORMAT)
   {
-    destination->attrsFormat = DEFAULT_NOTIFICATION_FORMAT;  // Default format for NGSIv2: normalized
+    destination->attrsFormat = DEFAULT_RENDER_FORMAT;  // Default format for NGSIv2: normalized
   }
 
   return "OK";

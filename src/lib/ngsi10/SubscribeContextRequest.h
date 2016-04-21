@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/EntityIdVector.h"
@@ -60,12 +60,12 @@ typedef struct SubscribeContextRequest
   std::string            description;            // Only used by NGSIv2 subscriptions
   bool                   descriptionProvided;    // Only used by NGSIv2 subscriptions
   std::string            status;                 // Only used by NGSIv2 subscriptions
-  NotificationFormat     attrsFormat;            // Only used by NGSIv2 subscriptions
+  RenderFormat           attrsFormat;            // Only used by NGSIv2 subscriptions
 
   /* The number of restrictions */
   int                    restrictions;
 
-  SubscribeContextRequest(): expires(-1), descriptionProvided(false), attrsFormat(NGSI_NO_NOTIFICATION_FORMAT), restrictions(0) {}
+  SubscribeContextRequest(): expires(-1), descriptionProvided(false), attrsFormat(NO_FORMAT), restrictions(0) {}
 
   std::string  render(RequestType requestType, const std::string& indent);
   std::string  check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);

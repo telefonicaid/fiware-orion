@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/AttributeList.h"
 #include "rest/StringFilter.h"
 
@@ -52,7 +52,7 @@ class TriggeredSubscription
  public:
   long long           throttling;
   long long           lastNotification;
-  NotificationFormat  notifyFormat;
+  RenderFormat        renderFormat;
   std::string         reference;
   AttributeList       attrL;
   std::string         cacheSubId;
@@ -67,15 +67,15 @@ class TriggeredSubscription
     std::string               georel;
    }                        expression;      // Only used by NGSIv2 subscription
 
-  TriggeredSubscription(long long           _throttling,
-                        long long           _lastNotification,
-                        NotificationFormat  _notifyFormat,
-                        const std::string&  _reference,
+  TriggeredSubscription(long long            _throttling,
+                        long long            _lastNotification,
+                        RenderFormat         _renderFormat,
+                        const std::string&   _reference,
                         const AttributeList& _attrL,
-                        const std::string&  _cacheSubId,
-                        const char*         _tenant);
+                        const std::string&   _cacheSubId,
+                        const char*          _tenant);
 
-  TriggeredSubscription(NotificationFormat   _notifyFormat,
+  TriggeredSubscription(RenderFormat         _renderFormat,
                         const std::string&   _reference,
                         const AttributeList& _attrL);
 

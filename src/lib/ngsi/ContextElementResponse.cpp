@@ -29,7 +29,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/AttributeList.h"
@@ -334,11 +334,11 @@ std::string ContextElementResponse::render
 *
 * ContextElementResponse::toJson - 
 */
-std::string ContextElementResponse::toJson(NotificationFormat notifyFormat)
+std::string ContextElementResponse::toJson(RenderFormat renderFormat)
 {
   std::string out;
 
-  out = contextElement.toJson(notifyFormat);
+  out = contextElement.toJson(renderFormat);
 
   return out;
 }

@@ -26,7 +26,7 @@ SET (SOURCES
     tag.cpp
     sem.cpp
     Format.cpp
-    NotificationFormat.cpp
+    RenderFormat.cpp
     Timer.cpp
     idCheck.cpp
     wsStrip.cpp
@@ -40,7 +40,7 @@ SET (HEADERS
     string.h
     sem.h
     Format.h
-    NotificationFormat.h
+    RenderFormat.h
     Timer.h
     idCheck.h
     wsStrip.h

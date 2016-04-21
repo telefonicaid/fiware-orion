@@ -29,7 +29,7 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextAttribute.h"
@@ -356,7 +356,7 @@ extern BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,

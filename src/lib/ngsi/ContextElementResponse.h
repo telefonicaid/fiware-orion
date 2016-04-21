@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/AttributeList.h"
@@ -72,7 +72,7 @@ typedef struct ContextElementResponse
                       const std::string&  indent,
                       bool                comma               = false,
                       bool                omitAttributeValues = false);
-  std::string  toJson(NotificationFormat notifyFormat);
+  std::string  toJson(RenderFormat renderFormat);
   void         present(const std::string& indent, int ix);
   void         release(void);
 

@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "common/RenderFormat.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "rest/ConnectionInfo.h"
 
@@ -75,15 +76,15 @@ std::string ContextElementResponseVector::render
 *
 * ContextElementResponseVector::toJson - 
 */
-std::string ContextElementResponseVector::toJson(NotificationFormat notifyFormat)
+std::string ContextElementResponseVector::toJson(RenderFormat renderFormat)
 {
   std::string out;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += (notifyFormat == NGSI_V2_VALUES)? "[": "{";
-    out += vec[ix]->toJson(notifyFormat);
-    out += (notifyFormat == NGSI_V2_VALUES)? "]": "}";
+    out += (renderFormat == NGSI_V2_VALUES)? "[": "{";
+    out += vec[ix]->toJson(renderFormat);
+    out += (renderFormat == NGSI_V2_VALUES)? "]": "}";
 
     if (ix != vec.size() - 1)
     {

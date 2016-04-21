@@ -26,7 +26,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -66,18 +66,18 @@ std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType reques
 *
 * NotifyContextRequest::toJson -
 */
-std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, NotificationFormat notifyFormat)
+std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, RenderFormat renderFormat)
 {
   //
   // First, v1 rendering of notification?
   //
-  if (notifyFormat == NGSI_V1_JSON)
+  if (renderFormat == NGSI_V1_LEGACY)
   {
     return render(ciP, NotifyContext, "");
   }
 
 
-  if ((notifyFormat != NGSI_V2_NORMALIZED) && (notifyFormat != NGSI_V2_KEYVALUES) && (notifyFormat != NGSI_V2_VALUES))
+  if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
@@ -93,7 +93,7 @@ std::string NotifyContextRequest::toJson(ConnectionInfo* ciP, NotificationFormat
   out += ",";
   out += JSON_STR("data") + ":[";
 
-  out += contextElementResponseVector.toJson(notifyFormat);
+  out += contextElementResponseVector.toJson(renderFormat);
   out += "]";
   out += "}";
 

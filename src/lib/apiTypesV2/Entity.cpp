@@ -68,22 +68,22 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  NotificationFormat  notifyFormat = NGSI_V2_NORMALIZED;
+  RenderFormat  renderFormat = NGSI_V2_NORMALIZED;
 
-  if      (ciP->uriParamOptions[OPT_KEY_VALUES]    == true)  { notifyFormat = NGSI_V2_KEYVALUES;     }
-  else if (ciP->uriParamOptions[OPT_VALUES]        == true)  { notifyFormat = NGSI_V2_VALUES;        }
-  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)  { notifyFormat = NGSI_V2_UNIQUE_VALUES; }
+  if      (ciP->uriParamOptions[OPT_KEY_VALUES]    == true)  { renderFormat = NGSI_V2_KEYVALUES;     }
+  else if (ciP->uriParamOptions[OPT_VALUES]        == true)  { renderFormat = NGSI_V2_VALUES;        }
+  else if (ciP->uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out;
 
-    if ((notifyFormat == NGSI_V2_VALUES) || (notifyFormat == NGSI_V2_UNIQUE_VALUES))
+    if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
     {
       out = "[";
       if (attributeVector.size() != 0)
       {
-        out += attributeVector.toJson(true, notifyFormat, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, renderFormat, ciP->uriParam["attrs"]);
       }
       out += "]";        
     }
@@ -100,7 +100,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       if (attributeVector.size() != 0)
       {
         out += ",";
-        out += attributeVector.toJson(true, notifyFormat, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, renderFormat, ciP->uriParam["attrs"]);
       }
 
       out += "}";

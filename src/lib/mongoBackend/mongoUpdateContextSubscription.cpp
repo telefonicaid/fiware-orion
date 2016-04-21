@@ -29,7 +29,7 @@
 
 #include "common/globals.h"
 #include "common/defaultValues.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -429,20 +429,20 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   // Adding format to use in notifications
   //
-  std::string         notifyFormatString  = "";
-  NotificationFormat  notifyFormat        = NGSI_NO_NOTIFICATION_FORMAT;
+  std::string   renderFormatString  = "";
+  RenderFormat  renderFormat        = NO_FORMAT;
 
-  if (requestP->attrsFormat != NGSI_NO_NOTIFICATION_FORMAT)
+  if (requestP->attrsFormat != NO_FORMAT)
   {
-    notifyFormat       = requestP->attrsFormat;
-    notifyFormatString = notificationFormatToString(notifyFormat);
-    newSub.append(CSUB_FORMAT, notifyFormatString.c_str());
+    renderFormat       = requestP->attrsFormat;
+    renderFormatString = renderFormatToString(renderFormat);
+    newSub.append(CSUB_FORMAT, renderFormatString.c_str());
   }
   else
   {
-    notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : notificationFormatToString(NGSI_V1_JSON);
-    notifyFormat       = stringToNotificationFormat(notifyFormatString, false);
-    newSub.append(CSUB_FORMAT, notifyFormatString);
+    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : renderFormatToString(NGSI_V1_LEGACY);
+    renderFormat       = stringToRenderFormat(renderFormatString, false);
+    newSub.append(CSUB_FORMAT, renderFormatString);
   }
 
 
@@ -522,7 +522,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                           requestP->expression.coords,
                                           requestP->expression.georel,
                                           stringFilterP,
-                                          notifyFormat);
+                                          renderFormat);
 
   if (cSubP != NULL)
   {

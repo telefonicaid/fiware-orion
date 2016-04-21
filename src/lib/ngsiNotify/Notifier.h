@@ -28,7 +28,7 @@
 #include <map>
 #include <pthread.h>
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/ThreadData.h"
@@ -49,7 +49,7 @@ public:
                                         const std::string&    tenant,
                                         const std::string&    xauthToken,
                                         const std::string&    fiwareCorrelator,
-                                        NotificationFormat    notifyFormat);
+                                        RenderFormat          renderFormat);
 
   virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr,
                                                     const std::string&                url,

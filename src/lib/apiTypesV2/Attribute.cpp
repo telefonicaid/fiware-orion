@@ -27,6 +27,7 @@
 
 #include "common/tag.h"
 #include "common/errorMessages.h"
+#include "common/RenderFormat.h"
 #include "apiTypesV2/Attribute.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -38,8 +39,8 @@
 */
 std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  bool                keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
-  NotificationFormat  notifyFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
+  bool          keyValues  = ciP->uriParamOptions[OPT_KEY_VALUES];
+  RenderFormat  renderFormat = (keyValues == true)? NGSI_V2_KEYVALUES : NGSI_V2_NORMALIZED;
 
   if (pcontextAttribute)
   {
@@ -52,7 +53,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
     else
     {
       out = "{";
-      out += pcontextAttribute->toJson(true, notifyFormat, requestType);  // param 1 'true' as it is the last and only element
+      out += pcontextAttribute->toJson(true, renderFormat, requestType);  // param 1 'true' as it is the last and only element
       out += "}";
     }
 

@@ -301,7 +301,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -333,7 +333,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -389,7 +389,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -421,7 +421,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -480,7 +480,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -512,7 +512,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -573,7 +573,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -605,7 +605,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -666,7 +666,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -698,7 +698,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -765,7 +765,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
     req.notifyConditionVector.push_back(&nc3);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -797,7 +797,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -859,7 +859,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -891,7 +891,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -953,7 +953,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -985,7 +985,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_C1)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1050,7 +1050,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1082,7 +1082,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1149,7 +1149,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1181,7 +1181,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1247,7 +1247,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1279,7 +1279,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CN)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1350,7 +1350,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1382,7 +1382,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_CNbis)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1444,7 +1444,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1457,7 +1457,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1489,7 +1489,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1542,7 +1542,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1555,7 +1555,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1587,7 +1587,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_C1_JSON)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1637,7 +1637,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1652,7 +1652,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1684,7 +1684,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1737,7 +1737,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1752,7 +1752,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1784,7 +1784,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1851,7 +1851,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1866,7 +1866,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -1898,7 +1898,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1965,7 +1965,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1980,7 +1980,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2012,7 +2012,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2072,7 +2072,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2087,7 +2087,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2119,7 +2119,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2179,7 +2179,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2194,7 +2194,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2226,7 +2226,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2298,7 +2298,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2313,7 +2313,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2345,7 +2345,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2417,7 +2417,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2432,7 +2432,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
@@ -2464,7 +2464,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_C1_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2519,7 +2519,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2535,7 +2535,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2567,7 +2567,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2626,7 +2626,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2642,7 +2642,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2674,7 +2674,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CN_partial)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2734,7 +2734,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2748,7 +2748,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2831,7 +2831,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -2849,7 +2849,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2881,7 +2881,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2940,7 +2940,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2958,7 +2958,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -2990,7 +2990,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3049,7 +3049,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3067,7 +3067,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3099,7 +3099,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN_partial_disjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     BSONObj ent0 = entities[0].embeddedObject();
@@ -3158,7 +3158,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3174,7 +3174,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3206,7 +3206,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CNbis)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -3262,7 +3262,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3280,7 +3280,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     req.notifyConditionVector.push_back(&nc4);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3312,7 +3312,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -3383,7 +3383,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3398,7 +3398,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3430,7 +3430,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3491,7 +3491,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3508,7 +3508,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3540,7 +3540,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_C1)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3607,7 +3607,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3625,7 +3625,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3657,7 +3657,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3728,7 +3728,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3744,7 +3744,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3776,7 +3776,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_CNbis)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3838,7 +3838,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(2);
     setNotifier(notifierMock);
 
@@ -3858,7 +3858,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     req.notifyConditionVector.push_back(&nc2);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -3890,7 +3890,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CN)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -3957,7 +3957,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", "", "no correlator", NGSI_V1_LEGACY))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3975,7 +3975,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -4007,7 +4007,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_CNbis)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -4070,7 +4070,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     req.entityIdVector.push_back(&en);
     req.notifyConditionVector.push_back(&nc);
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Prepare database */
     prepareDatabase();
@@ -4102,7 +4102,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
-    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+    EXPECT_STREQ("legacy", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -4160,7 +4160,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     req.notifyConditionVector.push_back(&nc);
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
-    req.attrsFormat = NGSI_V1_JSON;
+    req.attrsFormat = NGSI_V1_LEGACY;
 
     /* Set MongoDB connection (prepare database first with the "actual" connection object).
      * The "actual" conneciton is preserved for later use */
@@ -4182,7 +4182,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", servicePath: \"/#\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], status: \"active\", conditions: [ { type: \"ONCHANGE\", value: [ \"A\" ] } ], "
-              "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"JSON\" } "
+              "expression: { q: \"\", geometry: \"\", coords: \"\", georel: \"\" }, format: \"legacy\" } "
               "- exception: boom!!)", s2);
 
     /* Restore real DB connection */

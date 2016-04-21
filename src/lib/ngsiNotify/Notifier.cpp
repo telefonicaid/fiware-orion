@@ -28,7 +28,7 @@
 #include "common/string.h"
 #include "common/statistics.h"
 #include "common/limits.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi10/NotifyContextRequest.h"
@@ -61,10 +61,12 @@ void Notifier::sendNotifyContextRequest
   const std::string&     tenant,
   const std::string&     xauthToken,
   const std::string&     fiwareCorrelator,
-  NotificationFormat     notifyFormat
+  RenderFormat           renderFormat
 )
 {
     ConnectionInfo ci;
+
+    LM_W(("KZ: renderFormat == %d", renderFormat));
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
@@ -98,13 +100,13 @@ void Notifier::sendNotifyContextRequest
     ci.outFormat = JSON;
 
     std::string payload;
-    if (notifyFormat == NGSI_V1_JSON)
+    if (renderFormat == NGSI_V1_LEGACY)
     {
       payload = ncr->render(&ci, NotifyContext, "");
     }
     else
     {
-      payload = ncr->toJson(&ci, notifyFormat);
+      payload = ncr->toJson(&ci, renderFormat);
     }
 
     /* Parse URL */
@@ -137,7 +139,7 @@ void Notifier::sendNotifyContextRequest
     params->content_type     = content_type;
     params->content          = payload;
     params->format           = JSON;
-    params->notifyFormat     = notificationFormatToString(notifyFormat);
+    params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
 
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));

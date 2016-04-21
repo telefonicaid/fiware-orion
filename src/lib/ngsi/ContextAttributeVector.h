@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 
@@ -70,7 +70,7 @@ typedef struct ContextAttributeVector
                             bool                attrsAsName = false);
 
   std::string        toJson(bool                isLastElement,
-                            NotificationFormat  notifyFormat,
+                            RenderFormat        renderFormat,
                             const std::string&  attrsFilter  = "");
 
   std::string        toJsonTypes();

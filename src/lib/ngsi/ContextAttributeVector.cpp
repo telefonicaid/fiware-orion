@@ -33,7 +33,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
@@ -136,7 +136,7 @@ std::string ContextAttributeVector::toJsonTypes()
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, NotificationFormat notifyFormat, const std::string& attrsFilter)
+std::string ContextAttributeVector::toJson(bool isLastElement, RenderFormat renderFormat, const std::string& attrsFilter)
 {
   if (vec.size() == 0)
   {
@@ -167,7 +167,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, NotificationForma
         continue;
       }
 
-      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -177,7 +177,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, NotificationForma
 
       ++validAttributes;
 
-      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }
@@ -215,7 +215,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, NotificationForma
 
       ++renderedAttributes;
 
-      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         if (uniqueMap[vec[ix]->stringValue] == true)
         {
@@ -223,9 +223,9 @@ std::string ContextAttributeVector::toJson(bool isLastElement, NotificationForma
         }
       }
 
-      out += vec[ix]->toJson(renderedAttributes == validAttributes, notifyFormat);
+      out += vec[ix]->toJson(renderedAttributes == validAttributes, renderFormat);
 
-      if ((notifyFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
+      if ((renderFormat == NGSI_V2_UNIQUE_VALUES) && (vec[ix]->valueType == orion::ValueTypeString))
       {
         uniqueMap[vec[ix]->stringValue] = true;
       }
@@ -242,7 +242,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement, NotificationForma
       if (caP != NULL)
       {
         ++renderedAttributes;
-        out += caP->toJson(renderedAttributes == validAttributes, notifyFormat);
+        out += caP->toJson(renderedAttributes == validAttributes, renderFormat);
       }
     }
   }

@@ -30,7 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/SyncQOverflow.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "ngsiNotify/Notifier.h"
 #include "ngsiNotify/senderThread.h"
 #include "ngsiNotify/QueueWorkers.h"
@@ -51,7 +51,7 @@ class QueueNotifier : public Notifier
 {
 public:
   QueueNotifier(size_t queueSize, int numThreads);
-  void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat);
+  void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat);
   int start();
 
 private:

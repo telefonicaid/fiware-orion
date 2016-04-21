@@ -30,7 +30,6 @@
 #include "common/defaultValues.h"
 #include "common/Format.h"
 #include "common/sem.h"
-#include "common/NotificationFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/dbConstants.h"
@@ -203,7 +202,7 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, notificationFormatToString(requestP->attrsFormat));
+    sub.append(CSUB_FORMAT, renderFormatToString(requestP->attrsFormat));
 
     /* Insert document in database */
     std::string err;

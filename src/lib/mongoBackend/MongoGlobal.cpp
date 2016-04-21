@@ -41,7 +41,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/statistics.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -635,7 +635,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
   // Note that by construction servicePath vector must have at least one element. Note that the
   // case in which first element is "" is special, it means that the SP were not provided and
   // we have to apply the default
-  if (servicePath[0] == "")
+  if ((servicePath.size() == 0) || (servicePath[0] == ""))
   {
     LM_T(LmtServicePath, ("Service Path JSON string: '{$in: [ /^\\/.*/, null] }'"));
     return fromjson("{$in: [ /^\\/.*/, null] }");
@@ -1775,7 +1775,7 @@ bool processOnChangeConditionForSubscription
   ConditionValueList*              condValues,
   const std::string&               subId,
   const std::string&               notifyUrl,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -1828,7 +1828,7 @@ bool processOnChangeConditionForSubscription
       if (isCondValueInContextElementResponse(condValues, &allCerV))
       {
         /* Send notification */
-        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
+        getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat);
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
@@ -1839,7 +1839,7 @@ bool processOnChangeConditionForSubscription
     }
     else
     {
-      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
+      getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat);
       ncr.contextElementResponseVector.release();
 
       return true;
@@ -1865,7 +1865,7 @@ BSONArray processConditionVector
   const std::string&               subId,
   const std::string&               url,
   bool*                            notificationDone,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -1902,7 +1902,7 @@ BSONArray processConditionVector
                                                    &(nc->condValueList),
                                                    subId,
                                                    url,
-                                                   notifyFormat,
+                                                   renderFormat,
                                                    tenant,
                                                    xauthToken,
                                                    servicePathV,

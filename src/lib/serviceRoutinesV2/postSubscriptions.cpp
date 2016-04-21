@@ -62,7 +62,7 @@ extern std::string postSubscriptions
     return answer;
   }
 
-  if (parseDataP->scr.res.attrsFormat == NGSI_NO_NOTIFICATION_FORMAT)
+  if (parseDataP->scr.res.attrsFormat == NO_FORMAT)
   {
     parseDataP->scr.res.attrsFormat = NGSI_V2_NORMALIZED;
   }

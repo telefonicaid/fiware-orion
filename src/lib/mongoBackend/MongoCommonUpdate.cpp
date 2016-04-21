@@ -39,7 +39,7 @@
 #include "common/statistics.h"
 #include "common/errorMessages.h"
 #include "common/defaultValues.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -1082,7 +1082,7 @@ static bool addTriggeredSubscriptions_withCache
 
     TriggeredSubscription* sub = new TriggeredSubscription((long long) cSubP->throttling,
                                                            (long long) cSubP->lastNotificationTime,
-                                                           cSubP->notifyFormat,
+                                                           cSubP->renderFormat,
                                                            cSubP->reference,
                                                            aList,
                                                            cSubP->subscriptionId,
@@ -1248,14 +1248,14 @@ static bool addTriggeredSubscriptions_noCache
 
       long long           throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long           lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string         notifyFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "";
-      NotificationFormat  notifyFormat       = stringToNotificationFormat(notifyFormatString);
+      std::string         renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "";
+      RenderFormat        renderFormat       = stringToRenderFormat(renderFormatString);
 
       TriggeredSubscription* trigs = new TriggeredSubscription
         (
           throttling,
           lastNotification,
-          notifyFormat,
+          renderFormat,
           getStringFieldF(sub, CSUB_REFERENCE),
           subToAttributeList(sub), "", "");
 
@@ -1343,7 +1343,7 @@ static bool processOnChangeConditionForUpdateContext
   const AttributeList&             attrL,
   std::string                      subId,
   std::string                      notifyUrl,
-  NotificationFormat               notifyFormat,
+  RenderFormat                     renderFormat,
   std::string                      tenant,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator
@@ -1394,7 +1394,7 @@ static bool processOnChangeConditionForUpdateContext
   // FIXME: we use a proper origin name
   ncr.originator.set("localhost");
 
-  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, notifyFormat);
+  getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, fiwareCorrelator, renderFormat);
   return true;
 }
 
@@ -1461,7 +1461,7 @@ static bool processSubscriptions
                                                  trigs->attrL,
                                                  mapSubId,
                                                  trigs->reference,
-                                                 trigs->notifyFormat,
+                                                 trigs->renderFormat,
                                                  tenant,
                                                  xauthToken,
                                                  fiwareCorrelator))

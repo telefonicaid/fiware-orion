@@ -32,7 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/limits.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
@@ -756,13 +756,13 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, NotificationFormat notifyFormat, RequestType requestType)
+std::string ContextAttribute::toJson(bool isLastElement, RenderFormat renderFormat, RequestType requestType)
 {
   std::string  out;
 
-  if ((notifyFormat == NGSI_V2_VALUES) || (notifyFormat == NGSI_V2_KEYVALUES) || (notifyFormat == NGSI_V2_UNIQUE_VALUES))
+  if ((renderFormat == NGSI_V2_VALUES) || (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_UNIQUE_VALUES))
   {
-    out = (notifyFormat == NGSI_V2_KEYVALUES)? JSON_STR(name) + ":" : "";
+    out = (renderFormat == NGSI_V2_KEYVALUES)? JSON_STR(name) + ":" : "";
 
     if (compoundValueP != NULL)
     {

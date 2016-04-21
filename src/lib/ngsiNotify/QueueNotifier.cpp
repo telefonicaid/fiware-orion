@@ -26,7 +26,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
-#include "common/NotificationFormat.h"
+#include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsiNotify/QueueStatistics.h"
@@ -60,7 +60,7 @@ int QueueNotifier::start()
 *
 * QueueNotifier::sendNotifyContextRequest -
 */
-void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, NotificationFormat notifyFormat)
+void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, const std::string& fiwareCorrelator, RenderFormat renderFormat)
 {
   ConnectionInfo ci;
 
@@ -102,7 +102,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   }
 
   ci.outFormat = JSON;
-  std::string payload = ncr->toJson(&ci, notifyFormat);
+  std::string payload = ncr->toJson(&ci, renderFormat);
 
   /* Parse URL */
   std::string  host;
@@ -133,7 +133,7 @@ void QueueNotifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const st
   params->content_type     = content_type;
   params->content          = payload;
   params->format           = JSON;
-  params->notifyFormat     = notificationFormatToString(notifyFormat, false);
+  params->renderFormat     = renderFormatToString(renderFormat, false);
   params->fiwareCorrelator = fiwareCorrelator;
   strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
