@@ -118,7 +118,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
           out += ",";
         }
         // FIXME PR: renderMode + attrsFormat ... a bit confusing. Should we join these two somehow?
-        out += attributeVector.toJson(true, renderMode, ciP->uriParam["attrs"]);
+        out += attributeVector.toJson(true, renderMode, NGSI_V2_NORMALIZED, ciP->uriParam["attrs"]);
 
       }
 
