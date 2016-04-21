@@ -45,9 +45,6 @@ execute_process(COMMAND            echo $USER
 execute_process(COMMAND            sh ../scripts/build/osDistro.sh
                 OUTPUT_VARIABLE    DISTRO)
 
-execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
-                OUTPUT_VARIABLE    RAPIDXML_VERSION)
-
 # TRACES: To remove LM_T
 #           [ and 15 log macros more, of which only LM_T is used by the broker.
 #             The important ones: LM_W, LM_E, LM_X, LM_I are all kept as is ]
@@ -55,7 +52,6 @@ execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
 add_definitions(-DLM_ON)
 
 add_definitions(-fPIC)
-add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types
 #set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
@@ -73,7 +69,6 @@ ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 
 MESSAGE("CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
-set (RAPIDXML_INCLUDE "/usr/include/boost/property_tree/detail")
 
 if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
@@ -125,6 +120,63 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 #if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 #    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable")
 #endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+#
+# Libraries
+#
+
+SET (ORION_LIBS
+    common
+    serviceRoutines
+    serviceRoutinesV2
+    ngsiNotify
+    rest
+    jsonParse
+    jsonParseV2
+    apiTypesV2
+    convenience
+    ngsi9
+    ngsi10
+    ngsi
+    cache
+    mongoBackend
+    parse
+    orionTypes
+    common
+    alarmMgr
+    logSummary
+    lm
+    pa
+)
+
+SET (BOOST
+    boost_thread
+    boost_filesystem
+    boost_system
+    boost_regex
+)
+
+SET (BOOST_MT
+    boost_thread-mt
+    boost_filesystem-mt
+    boost_system-mt
+    boost_regex-mt
+)
+
+# Static libs common to contextBroker and unitTest binaries
+SET (COMMON_STATIC_LIBS
+    microhttpd.a
+    mongoclient.a
+)
+
+SET (DYNAMIC_LIBS
+    curl
+    gnutls
+    pthread
+    ssl
+    gcrypt
+    uuid
+)
 
 #
 # Enabling testing

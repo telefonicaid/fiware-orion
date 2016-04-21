@@ -27,46 +27,20 @@ SET (HEADERS
 
 
 SET (STATIC_LIBS
-    common
-    ngsiNotify
-    serviceRoutines
-    serviceRoutinesV2
-    rest
-    jsonParse
-    jsonParseV2
-    apiTypesV2
-    convenience
-    ngsi9
-    ngsi10
-    ngsi
-    cache
-    mongoBackend
-    parse
-    orionTypes
-    common
-    alarmMgr
-    logSummary
-    lm
-    pa
-    curl
-    microhttpd.a
-    gnutls        
+    ${ORION_LIBS}
+    ${COMMON_STATIC_LIBS}
 )
 
 # Include directories
 # ------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/app")
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-include_directories("${RAPIDXML_INCLUDE}")
 
 # Lib directories
 # ------------------------------------------------------------
 link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
-
-# FIXME P4: Issue #476: remove or keep?
-link_directories("/opt/lib/")
 
 
 
@@ -75,33 +49,38 @@ link_directories("/opt/lib/")
 
 ADD_EXECUTABLE(contextBroker ${SOURCES} ${HEADERS})
 
-IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
-  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF((${DISTRO} STREQUAL "Ubuntu_13.10") OR (${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.10"))
-  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS") OR (${DISTRO} MATCHES "Linux_Mint_.*"))
-  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")
-  MESSAGE("contextBroker: openSUSE DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -luuid)
-ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
-  MESSAGE("contextBroker: CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -luuid)
+MESSAGE("contextBroker distro: '${DISTRO}'")
+
+# The following ones are distros that we have checked are built correctly
+
+IF(${DISTRO} MATCHES "CentOS_6.*")
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} MATCHES "CentOS_7.*")
-  MESSAGE("contextBroker: CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -luuid)
-ELSEIF(${DISTRO} STREQUAL "Fedora_20")
-  MESSAGE("contextBroker: Fedora DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -luuid)
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  MESSAGE("contextBroker: Debian DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lboost_regex -lssl -lgcrypt -luuid)
-ELSE()
-  MESSAGE("contextBroker: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -luuid)
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+
+# The following ones are distros that haven't been checked since the refactoring in
+# PR <X>. They should be "promoted" as soon as we have positive feedback about
+# tehm or fixed (maybe based in the version of this file previous to
+# the aforementioned PR)
+
+ELSEIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_13.10") OR (${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.10"))    
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS") OR (${DISTRO} MATCHES "Linux_Mint_.*"))    
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")  
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Fedora_20")  
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+
+# Finally this is a "best effort" option to try to build on distros that don't have an
+# specify switch
+
+ELSE()  
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient ${BOOST} ${DYNAMIC_LIBS})
 ENDIF()
 
 IF (${DISTRO} MATCHES "Ubuntu.*")

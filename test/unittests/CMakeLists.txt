@@ -255,30 +255,8 @@ SET (STATIC_LIBS
     ${GTESTMAIN_LIBRARY}
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
-    rest
-    jsonParse
-    jsonParseV2
-    apiTypesV2
-    convenience
-    serviceRoutines
-    ngsiNotify
-    rest
-    parse
-    ngsi9
-    ngsi10
-    ngsi
-    cache
-    mongoBackend
-    orionTypes
-    common
-    alarmMgr
-    logSummary
-    lm
-    pa
-    pthread
-    curl
-    microhttpd.a
-    gnutls        
+    ${ORION_LIBS}
+    ${COMMON_STATIC_LIBS}
 )
 
 # Include directories
@@ -287,7 +265,6 @@ include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 include_directories("${PROJECT_SOURCE_DIR}/src/app")
 include_directories("${PROJECT_SOURCE_DIR}/test/unittests")
-include_directories("${RAPIDXML_INCLUDE}")
 
 # Lib directories
 # ------------------------------------------------------------
@@ -295,8 +272,6 @@ link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
 
-# FIXME P4: Issue #476: remove or keep?
-link_directories("/opt/lib/")
 
 
 # flags
@@ -310,40 +285,42 @@ add_definitions(-DUNIT_TEST)
 
 ADD_EXECUTABLE(unitTest ${SOURCES} ${HEADERS})
 
-IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")
-  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
-  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
-  # FIXME P4: Issue #476: remove or keep?
-  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS"))
-  # FIXME P4: Issue #476: remove or keep?
-  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")
-  # ADDED FOR UBUNTU 14.10
-  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt -luuid)
-ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")
-  MESSAGE("unitTest: openSUSE DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -luuid)
-ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
-  MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -luuid)
+MESSAGE("unitTest distro: '${DISTRO}'")
+
+# The following ones are distros that we have checked are built correctly
+
+IF(${DISTRO} MATCHES "CentOS_6.*")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} MATCHES "Debian_8.2")
   # It seems that Debian 8.2 doesn't like -mt libraries for unit tests... not sure about other Debian versions
-  MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lgcrypt -luuid)
-ELSE()
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -lgcrypt -luuid)
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+
+# The following ones are distros that haven't been checked since the refactoring in
+# PR <X>. They should be "promoted" as soon as we have positive feedback about
+# tehm or fixed (maybe based in the version of this file previous to
+# the aforementioned PR)
+
+ELESIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
+  # Pending to check after the refactor
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS"))
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")  
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+
+# Finally this is a "best effort" option to try to build on distros that don't have an
+# specify switch
+
 ELSE()
-  MESSAGE("unitTest: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -luuid)
+  # Pending to check after the refactor
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
 ENDIF()
