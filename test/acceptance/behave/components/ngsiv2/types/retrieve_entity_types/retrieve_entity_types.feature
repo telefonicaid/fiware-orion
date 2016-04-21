@@ -49,7 +49,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
   Actions After the Feature:
   Setup: stop ContextBroker
 
-  @happy_path @BUG_1636 @ISSUE_1833 @BUG_2046 @skip
+  @happy_path @BUG_1636 @ISSUE_1833 @BUG_2046
   Scenario:  get entity types using NGSI v2 API
     Given  a definition of headers
       | parameter          | value                |
@@ -457,7 +457,8 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | description | too many components in ServicePath |
 
   # --- types ---
-  @types_multiples @BUG_2046 @skip
+  @types_multiples.row<row.id>
+  @types_multiples @BUG_2046
   Scenario Outline:  get entities type using NGSI v2 with multiples type
     Given  a definition of headers
       | parameter          | value               |
@@ -486,14 +487,12 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
     And verify headers in response
       | parameter     | value    |
       | x-total-count | <number> |
-    And verify that entity types returned in response are: "home_0,home_1,home_2,home_3,home_4"
     And verify that attributes types are returned in response based on the info in the recorder
     Examples:
       | number |
       | 2      |
       | 10     |
       | 100    |
-      | 1000   |
 
   @attributes_types_multiples
   Scenario: get entities type using NGSI v2 with the same type but with different attribute types

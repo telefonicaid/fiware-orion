@@ -503,7 +503,7 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
       | random=100 |
       | random=256 |
 
-  @type_unknown @ISSUE_2056 @skip
+  @type_unknown @ISSUE_2056
   Scenario:  get an entity type by type using NGSI v2 with unknown type value
     Given  a definition of headers
       | parameter          | value            |
@@ -528,9 +528,9 @@ Feature: get an entity type using NGSI v2 API. "GET" - /v2/types/<entity_type>
     When get an entity type by type "fdgdfgdfgdfgfd"
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                    |
-      | error       | NotFound                 |
-      | description | No context element found |
+      | parameter   | value                 |
+      | error       | NotFound              |
+      | description | Entity type not found |
 
   @type_empty
   Scenario:  get an entity type by type using NGSI v2 with empty type value
