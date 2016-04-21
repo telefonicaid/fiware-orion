@@ -298,7 +298,7 @@ ELSEIF(${DISTRO} MATCHES "Debian_.*")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
 
 # The following ones are distros that haven't been checked since the refactoring in
-# PR <X>. They should be "promoted" as soon as we have positive feedback about
+# PR #2062. They should be "promoted" as soon as we have positive feedback about
 # tehm or fixed (maybe based in the version of this file previous to
 # the aforementioned PR)
 
