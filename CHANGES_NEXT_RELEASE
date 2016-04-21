@@ -21,3 +21,4 @@
 - Fix: 'null' attribute value not surrounded by quotes (") in NGSIv1 renderings (#2058)
 - Fix: non-string attribute values were breaking JSON in attributeFormat=object mode (#2058)
 - Add: change/add path /entities/{id}/attrs (#2028)
+- Deprecate: "location" metadata to specify entity location
