@@ -1141,7 +1141,7 @@ Feature: get entity types using NGSI v2 API. "GET" - /v2/types
       | x-total-count | 4     |
 
   @limit_offset_count.row<row.id>
-  @limit_offset_count @BUG_2046 @skip
+  @limit_offset_count @BUG_2046
   Scenario Outline:  get entities type using NGSI v2 with limit, offset and options=count queries parameters
     Given  a definition of headers
       | parameter          | value                  |
