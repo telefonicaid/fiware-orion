@@ -941,7 +941,7 @@ Response:
 
 ### Retrieve entity attributes [GET /v2/entities/{entityId}/attrs{?type,attrs,options}]
 
-Similar to retreiving the whole entity, this operation omits id an type fields.
+This request is similar to retreiving the whole entity, however this one omits `id` and `type` fields.
 
 As the general way of getting a whole entity, this operation must return only one entity element,
 but it may happen that there are more than one entity with the same ID (e.g. entities with same ID but different type). In those cases
