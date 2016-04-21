@@ -35,9 +35,9 @@ brokerStart CB
 # 03. GET /v2/types and get a non-empty list
 # 04. Create E2/T2/A1+A3
 # 05. Create E3/T3/A2+A4
-# 06. GET /v2/types and get a list of three types, each with one entity and two attributes
+# 06. GET /v2/types and get a list of three types, each with one entity
 # 07. Create E4/T3/A4+A3
-# 08. GET /v2/types and get a list of three types, T3 now has three attributes and two entities
+# 08. GET /v2/types and get a list of three types, T3 now has two entities
 #
 
 echo "01. GET /v2/types and get an empty list"
@@ -93,8 +93,8 @@ echo
 echo
 
 
-echo "06. GET /v2/types and get a list of three types, each with one entity and two attributes"
-echo "========================================================================================"
+echo "06. GET /v2/types and get a list of three types, each with one entity"
+echo "====================================================================="
 orionCurl --url /v2/types --json
 echo
 echo
@@ -114,9 +114,16 @@ echo
 echo
 
 
-echo "08. GET /v2/types and get a list of three types, T3 now has three attributes and two entities"
-echo "============================================================================================="
+echo "08. GET /v2/types and get a list of three types, T3 now has two entities"
+echo "========================================================================"
 orionCurl --url /v2/types?options=count --json
+echo
+echo
+
+
+echo "09. GET /v2/types wiht limit, getting 2 types but X-Total-Count 3"
+echo "================================================================="
+orionCurl --url '/v2/types?limit=2&options=count' --json
 echo
 echo
 
@@ -191,8 +198,8 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/types and get a list of three types, each with one entity and two attributes
-========================================================================================
+06. GET /v2/types and get a list of three types, each with one entity
+=====================================================================
 HTTP/1.1 200 OK
 Content-Length: 251
 Content-Type: application/json
@@ -261,8 +268,8 @@ Date: REGEX(.*)
 
 
 
-08. GET /v2/types and get a list of three types, T3 now has three attributes and two entities
-=============================================================================================
+08. GET /v2/types and get a list of three types, T3 now has two entities
+========================================================================
 HTTP/1.1 200 OK
 Content-Length: 275
 Content-Type: application/json
@@ -323,6 +330,51 @@ Date: REGEX(.*)
         },
         "count": 2,
         "type": "T3"
+    }
+]
+
+
+09. GET /v2/types wiht limit, getting 2 types but X-Total-Count 3
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 168
+Content-Type: application/json
+X-Total-Count: 3
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A2": {
+                "types": [
+                    "Int"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T1"
+    },
+    {
+        "attrs": {
+            "A1": {
+                "types": [
+                    "String"
+                ]
+            },
+            "A3": {
+                "types": [
+                    "Bool"
+                ]
+            }
+        },
+        "count": 1,
+        "type": "T2"
     }
 ]
 

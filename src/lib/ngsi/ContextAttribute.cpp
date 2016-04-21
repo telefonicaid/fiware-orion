@@ -553,8 +553,8 @@ std::string ContextAttribute::renderAsJsonObject
   {
     if (omitValue == false)
     {
-      std::string effectiveValue        = "";
-      bool        valueIsNumberOrBool   = false;
+      std::string effectiveValue  = "";
+      bool        withoutQuotes   = false;
 
       switch (valueType)
       {
@@ -563,8 +563,8 @@ std::string ContextAttribute::renderAsJsonObject
         break;
 
       case ValueTypeBoolean:
-        effectiveValue      = boolValue? "true" : "false";
-        valueIsNumberOrBool = true;
+        effectiveValue = boolValue? "true" : "false";
+        withoutQuotes  = true;
         break;
 
       case ValueTypeNumber:
@@ -574,13 +574,14 @@ std::string ContextAttribute::renderAsJsonObject
         }
         else // regular number
         {
-          effectiveValue      = toString(numberValue);
-          valueIsNumberOrBool = true;
+          effectiveValue = toString(numberValue);
+          withoutQuotes  = true;
         }
         break;
 
       case ValueTypeNone:
         effectiveValue = "null";
+        withoutQuotes  = true;
         break;
 
       default:
@@ -590,11 +591,11 @@ std::string ContextAttribute::renderAsJsonObject
       //
       // NOTE
       // renderAsJsonObject is used in v1 only.
-      // => we only need to care about stringValue (not boolValue nor numberValue)      
+      // => we only need to care about stringValue (not boolValue, numberValue nor nullValue)
       //
       out += valueTag1(indent + "  ", "value",
                             (request != RtUpdateContextResponse)? effectiveValue : "",
-                            commaAfterContextValue, valueIsNumberOrBool);
+                            commaAfterContextValue, false, withoutQuotes);
     }
   }
   else
@@ -682,8 +683,8 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      std::string effectiveValue      = "";
-      bool        valueIsNumberOrBool = false;
+      std::string effectiveValue = "";
+      bool        withoutQuotes  = false;
 
       switch (valueType)
       {
@@ -692,8 +693,8 @@ std::string ContextAttribute::render
         break;
 
       case ValueTypeBoolean:
-        effectiveValue      = boolValue? "true" : "false";
-        valueIsNumberOrBool = true;
+        effectiveValue = boolValue? "true" : "false";
+        withoutQuotes  = true;
         break;
 
       case ValueTypeNumber:
@@ -703,13 +704,14 @@ std::string ContextAttribute::render
         }
         else // regular number
         {
-          effectiveValue      = toString(numberValue);
-          valueIsNumberOrBool = true;
+          effectiveValue = toString(numberValue);
+          withoutQuotes  = true;
         }
         break;
 
       case ValueTypeNone:
         effectiveValue = "null";
+        withoutQuotes  = true;
         break;
 
       default:
@@ -718,7 +720,7 @@ std::string ContextAttribute::render
 
       out += valueTag2(indent + "  ", "value",
                               (request != RtUpdateContextResponse)? effectiveValue : "",
-                              commaAfterContextValue, valueIsNumberOrBool);
+                              commaAfterContextValue, withoutQuotes);
 
     }
     else if (request == RtUpdateContextResponse)
@@ -759,7 +761,6 @@ std::string ContextAttribute::render
 std::string ContextAttribute::toJson(bool isLastElement, const std::string& renderMode, NotificationFormat notifyFormat, RequestType requestType)
 {
   std::string  out;
-  bool         uniqueValues = false;
   std::string  rMode        = renderMode;  // renderMode is 'const' and cannot be modified
 
   //
@@ -769,7 +770,6 @@ std::string ContextAttribute::toJson(bool isLastElement, const std::string& rend
   //
   if (rMode == RENDER_MODE_UNIQUE_VALUES)
   {
-    uniqueValues = true;
     rMode        = RENDER_MODE_VALUES;  // FIXME PR: is this correct?
   }
 

@@ -55,7 +55,6 @@ SET (HEADERS
 # Include directories
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-include_directories("${RAPIDXML_INCLUDE}")
 
 
 # Library declaration
