@@ -224,7 +224,7 @@ def verify_that_the_attribute_value_by_id_is_returned(context):
 
 
 @step(u'verify that entity types returned in response are: "([^"]*)"')
-def verify_thate_ntitity_types_are_returned_in_response(context, types):
+def verify_that_entity_types_are_returned_in_response(context, types):
     """
     verify that entity types are returned in response
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
