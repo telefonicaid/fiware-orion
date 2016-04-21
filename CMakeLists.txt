@@ -173,7 +173,6 @@ SET (DYNAMIC_LIBS
     curl
     gnutls
     pthread
-    ssl
     gcrypt
     uuid
 )
