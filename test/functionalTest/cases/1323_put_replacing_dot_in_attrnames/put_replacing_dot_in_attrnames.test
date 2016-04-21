@@ -68,7 +68,7 @@ echo
 echo "03. Modify E1 to E1/A2+A3"
 echo "========================="
 payload='{ "A2..y": 2, "A3.Z": 3 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PUT
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PUT
 echo
 echo
 

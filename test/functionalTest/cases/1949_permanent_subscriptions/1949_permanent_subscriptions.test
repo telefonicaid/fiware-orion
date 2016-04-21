@@ -87,7 +87,7 @@ echo "======================================"
 payload='{
   "status": "on"
 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -97,7 +97,7 @@ echo "============================================"
 payload='{
   "status": "fail"
 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -107,7 +107,7 @@ echo "======================================"
 payload='{
   "status": "on"
 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 

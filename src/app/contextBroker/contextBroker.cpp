@@ -449,6 +449,10 @@ static const char* validLogLevels[] =
 #define IENT_COMPS_V2           3, { "v2", "entities", "*" }
 #define IENT_COMPS_WORD         ""
 
+#define IENTOA                  EntityRequest
+#define IENTOA_COMPS_V2         4, { "v2", "entities", "*", "attrs" }
+#define IENTOA_COMPS_WORD       ""
+
 #define IENTATTR                EntityAttributeRequest
 #define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
 #define IENTATTR_COMPS_WORD     ""
@@ -745,10 +749,11 @@ static const char* validLogLevels[] =
   { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
-  { "POST",   IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         postEntity               }, \
-  { "PUT",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         putEntity                }, \
+  { "GET",    IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       getEntity                }, \
+  { "POST",   IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       postEntity               }, \
+  { "PUT",    IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       putEntity                }, \
   { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
-  { "PATCH",  IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         patchEntity              }, \
+  { "PATCH",  IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       patchEntity              }, \
   { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFive           }, \
                                                                                                        \
   { "GET",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue  }, \

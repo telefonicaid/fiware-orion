@@ -121,7 +121,7 @@ payload='
     "value": "bar"
   }
 }'
-orionCurl --url /v2/entities/E -X PATCH --payload "$payload" --json
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload" --json
 echo
 echo
 sleep $WAIT_TIME
@@ -153,7 +153,7 @@ payload='
     "value": "ree"
   }
 }'
-orionCurl --url /v2/entities/E -X PATCH --payload "$payload" --json
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload" --json
 echo
 echo
 sleep $WAIT_TIME

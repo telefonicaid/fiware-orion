@@ -40,74 +40,74 @@ brokerStart CB
 # 08. POST /v2/entities without id in payload
 #
 
-echo "01. POST /v2/entities/E1 with id in payload"
-echo "==========================================="
+echo "01. POST /v2/entities/E1/attrs with id in payload"
+echo "================================================="
 payload='{
   "id": "E1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
 echo
 echo
 
 
-echo "02. POST /v2/entities/E1 with type in payload"
-echo "============================================="
+echo "02. POST /v2/entities/E1/attrs with type in payload"
+echo "==================================================="
 payload='{
   "type":"T1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
 echo
 echo
 
 
-echo "03. PUT /v2/entities/E1 with id in payload"
-echo "=========================================="
+echo "03. PUT /v2/entities/E1/attrs with id in payload"
+echo "================================================"
 payload='{
   "id": "E1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
 echo
 echo
 
 
-echo "04. PUT /v2/entities/E1 with type in payload"
-echo "============================================"
+echo "04. PUT /v2/entities/E1/attrs with type in payload"
+echo "=================================================="
 payload='{
   "type":"T1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
 echo
 echo
 
 
-echo "05. PATCH /v2/entities/E1 with id in payload"
-echo "============================================"
+echo "05. PATCH /v2/entities/E1/attrs with id in payload"
+echo "=================================================="
 payload='{
   "id": "E1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
 echo
 echo
 
 
-echo "06. PATCH /v2/entities/E1 with type in payload"
-echo "=============================================="
+echo "06. PATCH /v2/entities/E1/attrs with type in payload"
+echo "===================================================="
 payload='{
   "type":"T1",
   "a1": "a1"
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
 echo
 echo
 
 
-echo "07. POST /v2/entities/E1 with 'bad_tag' for attribute"
-echo "====================================================="
+echo "07. POST /v2/entities/E1/attrs with 'bad_tag' for attribute"
+echo "==========================================================="
 payload='{
   "a1": {
     "value": 12,
@@ -115,7 +115,7 @@ payload='{
     "bad_tag": 14
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
 echo
 echo
 
@@ -136,8 +136,8 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities/E1 with id in payload
-===========================================
+01. POST /v2/entities/E1/attrs with id in payload
+=================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
@@ -150,8 +150,8 @@ Date: REGEX(.*)
 }
 
 
-02. POST /v2/entities/E1 with type in payload
-=============================================
+02. POST /v2/entities/E1/attrs with type in payload
+===================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
@@ -164,8 +164,8 @@ Date: REGEX(.*)
 }
 
 
-03. PUT /v2/entities/E1 with id in payload
-==========================================
+03. PUT /v2/entities/E1/attrs with id in payload
+================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
@@ -178,8 +178,8 @@ Date: REGEX(.*)
 }
 
 
-04. PUT /v2/entities/E1 with type in payload
-============================================
+04. PUT /v2/entities/E1/attrs with type in payload
+==================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
@@ -192,8 +192,8 @@ Date: REGEX(.*)
 }
 
 
-05. PATCH /v2/entities/E1 with id in payload
-============================================
+05. PATCH /v2/entities/E1/attrs with id in payload
+==================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 69
 Content-Type: application/json
@@ -206,8 +206,8 @@ Date: REGEX(.*)
 }
 
 
-06. PATCH /v2/entities/E1 with type in payload
-==============================================
+06. PATCH /v2/entities/E1/attrs with type in payload
+====================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 71
 Content-Type: application/json
@@ -220,8 +220,8 @@ Date: REGEX(.*)
 }
 
 
-07. POST /v2/entities/E1 with 'bad_tag' for attribute
-=====================================================
+07. POST /v2/entities/E1/attrs with 'bad_tag' for attribute
+===========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 82
 Content-Type: application/json

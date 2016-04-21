@@ -91,7 +91,7 @@ payload='{
    "type": "date"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -104,7 +104,7 @@ payload='{
    "type": "date"
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
 echo
 echo
 

@@ -43,10 +43,10 @@ echo
 echo
 
 
-echo "02. PATCH /v2/entities/E1 (A2 unknown)"
-echo "======================================"
+echo "02. PATCH /v2/entities/E1/attrs (A2 unknown)"
+echo "============================================"
 payload='{ "A2": 1 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json -X PATCH
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -69,8 +69,8 @@ Date: REGEX(.*)
 
 
 
-02. PATCH /v2/entities/E1 (A2 unknown)
-======================================
+02. PATCH /v2/entities/E1/attrs (A2 unknown)
+============================================
 HTTP/1.1 404 Not Found
 Content-Length: 61
 Content-Type: application/json

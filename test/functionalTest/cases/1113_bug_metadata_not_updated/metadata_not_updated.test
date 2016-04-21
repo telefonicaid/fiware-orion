@@ -50,15 +50,15 @@ echo
 echo
 
 
-echo "02. POST /v2/entities/E1 with metadata 'm1' = 2"
-echo "==============================================="
+echo "02. POST /v2/entities/E1/attrs with metadata 'm1' = 2"
+echo "====================================================="
 payload='{
   "temp": {
     "value": "1",
     "metadata": { "m1": 2 }
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json
 echo
 echo
 
@@ -81,8 +81,8 @@ Date: REGEX(.*)
 
 
 
-02. POST /v2/entities/E1 with metadata 'm1' = 2
-===============================================
+02. POST /v2/entities/E1/attrs with metadata 'm1' = 2
+=====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

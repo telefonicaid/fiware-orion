@@ -76,7 +76,7 @@ payload='{
          "value": "CHANGED A1 E1/T2"
     }
 }'
-orionCurl --url "/v2/entities/E1?type=T1" --payload "$payload" --json -X PATCH
+orionCurl --url "/v2/entities/E1/attrs?type=T1" --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -94,7 +94,7 @@ payload='{
          "value": "CHANGED A2 E1/T1"
     }
 }'
-orionCurl --url "/v2/entities/E1?type=T1" --payload "$payload" --json -X PATCH
+orionCurl --url "/v2/entities/E1/attrs?type=T1" --payload "$payload" --json -X PATCH
 echo
 echo
 

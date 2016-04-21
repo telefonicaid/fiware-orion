@@ -68,7 +68,7 @@ payload='{
     "value": { "c": null }
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
 echo
 echo
 
@@ -88,7 +88,7 @@ payload='{
     "value": { "d": null }
   }
 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
 echo
 echo
 

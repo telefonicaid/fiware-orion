@@ -44,21 +44,21 @@ brokerStart CB
 echo "01. PATCH entity with forbidden char in ID"
 echo "=========================================="
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E&?options=keyValues' -X PATCH --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X PATCH --payload "$payload" --json
 echo
 echo
 
 echo "02. POST entity with forbidden char in ID"
 echo "=========================================="
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E&?options=keyValues' -X POST --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X POST --payload "$payload" --json
 echo
 echo
 
 echo "03. PUT entity with forbidden char in ID"
 echo "=========================================="
 payload='{ "attr1": 1 }'
-orionCurl --url '/v2/entities/E&?options=keyValues' -X PUT --payload "$payload" --json
+orionCurl --url '/v2/entities/E&/attrs?options=keyValues' -X PUT --payload "$payload" --json
 echo
 echo
 

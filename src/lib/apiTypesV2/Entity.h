@@ -48,6 +48,7 @@ public:
 
   std::string             servicePath;      // Not part of payload, just an internal field
   bool                    typeGiven;        // Was 'type' part of the incoming payload?
+  bool                    renderId;         // Should id and type be rendered in JSON?
 
   Entity();
   ~Entity();
@@ -58,6 +59,7 @@ public:
   void         release(void);
   void         fill(const std::string& id, const std::string& type, const std::string& isPattern, ContextAttributeVector* aVec);
   void         fill(QueryContextResponse* qcrsP);
+  void         hideIdAndType(bool hide = true);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

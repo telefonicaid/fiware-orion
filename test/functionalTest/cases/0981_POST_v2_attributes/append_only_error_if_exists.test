@@ -53,10 +53,10 @@ echo
 echo
 
 
-echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?options=append"
-echo "========================================================================"
+echo "03. Try to create E1/T1 again, using POST /v2/entities/E1/attrs?options=append"
+echo "=============================================================================="
 payload='{  "attr1": 2 }'
-orionCurl --url '/v2/entities/E1?options=append,keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -68,10 +68,10 @@ echo
 echo
 
 
-echo "05. Now update E1, using POST /v2/entities/E1"
-echo "============================================="
+echo "05. Now update E1, using POST /v2/entities/E1/attrs"
+echo "==================================================="
 payload='{  "attr1": 5 }'
-orionCurl --url '/v2/entities/E1?options=keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=keyValues' --payload "$payload" --json
 echo
 echo
 
@@ -113,8 +113,8 @@ Date: REGEX(.*)
 }
 
 
-03. Try to create E1/T1 again, using POST /v2/entities/E1?options=append
-========================================================================
+03. Try to create E1/T1 again, using POST /v2/entities/E1/attrs?options=append
+==============================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 108
 Content-Type: application/json
@@ -146,8 +146,8 @@ Date: REGEX(.*)
 }
 
 
-05. Now update E1, using POST /v2/entities/E1
-=============================================
+05. Now update E1, using POST /v2/entities/E1/attrs
+===================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
