@@ -176,6 +176,7 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+#include "serviceRoutinesV2/badVerbAllNotDelete.h"
 
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/entryPointsTreat.h"
@@ -749,12 +750,14 @@ static const char* validLogLevels[] =
   { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
                                                                                                        \
   { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
+  { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
+  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbGetDeleteOnly     }, \
+                                                                                                       \
   { "GET",    IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       getEntity                }, \
   { "POST",   IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       postEntity               }, \
   { "PUT",    IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       putEntity                }, \
-  { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
   { "PATCH",  IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       patchEntity              }, \
-  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFive           }, \
+  { "*",      IENTOA,       IENTOA_COMPS_V2,      IENTOA_COMPS_WORD,       badVerbAllNotDelete      }, \
                                                                                                        \
   { "GET",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue  }, \
   { "PUT",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  putEntityAttributeValue  }, \
