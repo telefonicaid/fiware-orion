@@ -43,26 +43,26 @@ orionCurl --url /v2/ent=ities/E1 --payload "$payload" --json -X PATCH
 echo
 echo
 
-echo "02. PATCH /v2/entities/E1 (incorrect service path)"
-echo "=================================================="
+echo "02. PATCH /v2/entities/E1/attrs (incorrect service path)"
+echo "========================================================"
 payload='{ "A1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --servicePath "/service.sr" --json -X PATCH 
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --servicePath "/service.sr" --json -X PATCH
 echo
 echo
 
 
-echo "03. PATCH /v2/entities/E1 (service path without /)"
-echo "=================================================="
+echo "03. PATCH /v2/entities/E1/attrs (service path without /)"
+echo "========================================================"
 payload='{ "A1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --servicePath "miservice" --json -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --servicePath "miservice" --json -X PATCH
 echo
 echo
 
 
-echo "04. PATCH /v2/entities/E1 (unrecognized content type)"
-echo "====================================================="
+echo "04. PATCH /v2/entities/E1/attrs (unrecognized content type)"
+echo "==========================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>'
-orionCurl --url /v2/entities/E1 --payload "${payload}" --in "text/plain" --out "application/json" -X PATCH
+orionCurl --url /v2/entities/E1/attrs --payload "${payload}" --in "text/plain" --out "application/json" -X PATCH
 echo
 echo
 
@@ -82,8 +82,8 @@ Date: REGEX(.*)
 }
 
 
-02. PATCH /v2/entities/E1 (incorrect service path)
-==================================================
+02. PATCH /v2/entities/E1/attrs (incorrect service path)
+========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 95
 Content-Type: application/json
@@ -96,8 +96,8 @@ Date: REGEX(.*)
 }
 
 
-03. PATCH /v2/entities/E1 (service path without /)
-==================================================
+03. PATCH /v2/entities/E1/attrs (service path without /)
+========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 111
 Content-Type: application/json
@@ -110,8 +110,8 @@ Date: REGEX(.*)
 }
 
 
-04. PATCH /v2/entities/E1 (unrecognized content type)
-=====================================================
+04. PATCH /v2/entities/E1/attrs (unrecognized content type)
+===========================================================
 HTTP/1.1 415 Unsupported Media Type
 Content-Length: 87
 Content-Type: application/json

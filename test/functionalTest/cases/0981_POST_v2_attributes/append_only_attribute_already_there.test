@@ -46,7 +46,7 @@ echo
 echo "02. Create E1/attr1 again - should fail"
 echo "======================================="
 payload='{ "attr1": 2 }'
-orionCurl --url '/v2/entities/E1?options=append,keyValues' --payload "$payload" --json
+orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload" --json
 echo
 echo
 

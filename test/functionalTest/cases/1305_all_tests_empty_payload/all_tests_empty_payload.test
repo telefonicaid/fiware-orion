@@ -33,24 +33,18 @@ brokerStart CB
 # 01. POST /v2/entities (without payload) 
 # 02. POST /v2/entities (empty payload) 
 # 03. POST /v2/entities to create E1/A1=0
-# 04. PUT /v2/entities/E1 (without payload)
-# 05. PUT /v2/entities/E1 (empty payload)
-# 06. PATCH /v2/entities/E1 (without payload)
-# 07. PATCH /v2/entities/E1 (empty payload)
-# 08. POST /v2/entities/E1 (without payload) 
-# 09. POST /v2/entities/E1 (empty payload) 
-# 10. PUT /v2/entities/E1/attrs (without payload)
-# 11. PUT /v2/entities/E1/attrs (empty payload)
-# 12. PATCH /v2/entities/E1/attrs (without payload)
-# 13. PATCH /v2/entities/E1/attrs (empty payload)
-# 14. POST /v2/entities/E1/attrs (without payload) 
-# 15. POST /v2/entities/E1/attrs (empty payload) 
-# 16. PUT /v2/entities/E1/attrs/A1 (without payload)
-# 17a. GET /v2/entities/E1/attrs/A1
-# 17b. PUT /v2/entities/E1/attrs/A1 (empty payload)
-# 17c. GET /v2/entities/E1/attrs/A1 - A1 should be null
-# 18. PATCH /v2/entities/E1/attrs/A1 (without payload)
-# 19. PATCH /v2/entities/E1/attrs/A1 (empty payload)
+# 04. PUT /v2/entities/E1/attrs (without payload)
+# 05. PUT /v2/entities/E1/attrs (empty payload)
+# 06. PATCH /v2/entities/E1/attrs (without payload)
+# 07. PATCH /v2/entities/E1/attrs (empty payload)
+# 08. POST /v2/entities/E1/attrs (without payload)
+# 09. POST /v2/entities/E1/attrs (empty payload)
+# 10. PUT /v2/entities/E1/attrs/A1 (without payload)
+# 11. GET /v2/entities/E1/attrs/A1
+# 12. PUT /v2/entities/E1/attrs/A1 (empty payload)
+# 13. GET /v2/entities/E1/attrs/A1 - A1 should be null
+# 14. PATCH /v2/entities/E1/attrs/A1 (without payload)
+# 15. PATCH /v2/entities/E1/attrs/A1 (empty payload)
 
 
 echo "01. POST /v2/entities (without payload)"
@@ -77,87 +71,39 @@ echo
 echo
 
 
-echo "04. PUT /v2/entities/E1 (without payload)"
-echo "========================================="
-payload=''
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT 
-echo
-echo
-
-
-echo "05. PUT /v2/entities/E1 (empty payload)"
-echo "======================================="
-payload='{}'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT 
-echo
-echo
-
-
-echo "06. PATCH /v2/entities/E1 (without payload)"
-echo "==========================================="
-payload=''
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH 
-echo
-echo
-
-
-echo "07. PATCH /v2/entities/E1 (empty payload)"
-echo "==========================================="
-payload='{}'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH 
-echo
-echo
-
-
-echo "08. POST /v2/entities/E1 (without payload)"
-echo "=========================================="
-payload=''
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X POST
-echo
-echo
-
-
-echo "09. POST /v2/entities/E1 (empty payload)"
-echo "========================================"
-payload='{}'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json  -X POST
-echo
-echo
-
-
-echo "10. PUT /v2/entities/E1/attrs (without payload)"
+echo "04. PUT /v2/entities/E1/attrs (without payload)"
 echo "==============================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT 
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
 echo
 echo
 
 
-echo "11. PUT /v2/entities/E1/attrs (empty payload)"
+echo "05. PUT /v2/entities/E1/attrs (empty payload)"
 echo "============================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT 
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PUT
 echo
 echo
 
 
-echo "12. PATCH /v2/entities/E1/attrs (without payload)"
+echo "06. PATCH /v2/entities/E1/attrs (without payload)"
 echo "================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH 
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
 echo
 echo
 
 
-echo "13. PATCH /v2/entities/E1/attrs (empty payload)"
+echo "07. PATCH /v2/entities/E1/attrs (empty payload)"
 echo "==============================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH 
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X PATCH
 echo
 echo
 
 
-echo "14. POST /v2/entities/E1/attrs (without payload)"
+echo "08. POST /v2/entities/E1/attrs (without payload)"
 echo "================================================"
 payload=''
 orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json -X POST
@@ -165,7 +111,7 @@ echo
 echo
 
 
-echo "15. POST /v2/entities/E1/attrs (empty payload)"
+echo "09. POST /v2/entities/E1/attrs (empty payload)"
 echo "=============================================="
 payload='{}'
 orionCurl --url /v2/entities/E1/attrs --payload "$payload" --json  -X POST
@@ -173,7 +119,7 @@ echo
 echo
 
 
-echo "16. PUT /v2/entities/E1/attrs/A1 (without payload)"
+echo "10. PUT /v2/entities/E1/attrs/A1 (without payload)"
 echo "=================================================="
 payload=''
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT 
@@ -181,28 +127,28 @@ echo
 echo
 
 
-echo "17a. GET /v2/entities/E1/attrs/A1"
+echo "11. GET /v2/entities/E1/attrs/A1"
 echo "================================="
 orionCurl --url /v2/entities/E1/attrs/A1 --json
 echo
 echo
 
 
-echo "17b. PUT /v2/entities/E1/attrs/A1 (empty payload)"
+echo "12. PUT /v2/entities/E1/attrs/A1 (empty payload)"
 echo "================================================="
 payload='{}'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT 
 echo
 echo
 
-echo "17c. GET /v2/entities/E1/attrs/A1 - A1 should be null"
+echo "13. GET /v2/entities/E1/attrs/A1 - A1 should be null"
 echo "====================================================="
 orionCurl --url /v2/entities/E1/attrs/A1 --json
 echo
 echo
 
 
-echo "18. PATCH /v2/entities/E1/attrs/A1 (without payload)"
+echo "14. PATCH /v2/entities/E1/attrs/A1 (without payload)"
 echo "===================================================="
 payload=''
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PATCH 
@@ -210,7 +156,7 @@ echo
 echo
 
 
-echo "19. PATCH /v2/entities/E1/attrs/A1 (empty payload)"
+echo "15. PATCH /v2/entities/E1/attrs/A1 (empty payload)"
 echo "=================================================="
 payload='{}'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PATCH 
@@ -257,91 +203,7 @@ Date: REGEX(.*)
 
 
 
-04. PUT /v2/entities/E1 (without payload)
-=========================================
-HTTP/1.1 411 Length Required
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
-    "error": "LengthRequired"
-}
-
-
-05. PUT /v2/entities/E1 (empty payload)
-=======================================
-HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "empty payload",
-    "error": "BadRequest"
-}
-
-
-06. PATCH /v2/entities/E1 (without payload)
-===========================================
-HTTP/1.1 411 Length Required
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
-    "error": "LengthRequired"
-}
-
-
-07. PATCH /v2/entities/E1 (empty payload)
-===========================================
-HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "empty payload",
-    "error": "BadRequest"
-}
-
-
-08. POST /v2/entities/E1 (without payload)
-==========================================
-HTTP/1.1 411 Length Required
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
-    "error": "LengthRequired"
-}
-
-
-09. POST /v2/entities/E1 (empty payload)
-========================================
-HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "empty payload",
-    "error": "BadRequest"
-}
-
-
-10. PUT /v2/entities/E1/attrs (without payload)
+04. PUT /v2/entities/E1/attrs (without payload)
 ===============================================
 HTTP/1.1 411 Length Required
 Content-Length: 91
@@ -355,21 +217,21 @@ Date: REGEX(.*)
 }
 
 
-11. PUT /v2/entities/E1/attrs (empty payload)
+05. PUT /v2/entities/E1/attrs (empty payload)
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 52
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "empty payload",
     "error": "BadRequest"
 }
 
 
-12. PATCH /v2/entities/E1/attrs (without payload)
+06. PATCH /v2/entities/E1/attrs (without payload)
 =================================================
 HTTP/1.1 411 Length Required
 Content-Length: 91
@@ -383,21 +245,21 @@ Date: REGEX(.*)
 }
 
 
-13. PATCH /v2/entities/E1/attrs (empty payload)
+07. PATCH /v2/entities/E1/attrs (empty payload)
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 52
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "empty payload",
     "error": "BadRequest"
 }
 
 
-14. POST /v2/entities/E1/attrs (without payload)
+08. POST /v2/entities/E1/attrs (without payload)
 ================================================
 HTTP/1.1 411 Length Required
 Content-Length: 91
@@ -411,21 +273,21 @@ Date: REGEX(.*)
 }
 
 
-15. POST /v2/entities/E1/attrs (empty payload)
+09. POST /v2/entities/E1/attrs (empty payload)
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
+Content-Length: 52
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "service not found",
+    "description": "empty payload",
     "error": "BadRequest"
 }
 
 
-16. PUT /v2/entities/E1/attrs/A1 (without payload)
+10. PUT /v2/entities/E1/attrs/A1 (without payload)
 ==================================================
 HTTP/1.1 411 Length Required
 Content-Length: 91
@@ -439,7 +301,7 @@ Date: REGEX(.*)
 }
 
 
-17a. GET /v2/entities/E1/attrs/A1
+11. GET /v2/entities/E1/attrs/A1
 =================================
 HTTP/1.1 200 OK
 Content-Length: 39
@@ -454,7 +316,7 @@ Date: REGEX(.*)
 }
 
 
-17b. PUT /v2/entities/E1/attrs/A1 (empty payload)
+12. PUT /v2/entities/E1/attrs/A1 (empty payload)
 =================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -463,7 +325,7 @@ Date: REGEX(.*)
 
 
 
-17c. GET /v2/entities/E1/attrs/A1 - A1 should be null
+13. GET /v2/entities/E1/attrs/A1 - A1 should be null
 =====================================================
 HTTP/1.1 200 OK
 Content-Length: 42
@@ -478,7 +340,7 @@ Date: REGEX(.*)
 }
 
 
-18. PATCH /v2/entities/E1/attrs/A1 (without payload)
+14. PATCH /v2/entities/E1/attrs/A1 (without payload)
 ====================================================
 HTTP/1.1 411 Length Required
 Content-Length: 91
@@ -492,7 +354,7 @@ Date: REGEX(.*)
 }
 
 
-19. PATCH /v2/entities/E1/attrs/A1 (empty payload)
+15. PATCH /v2/entities/E1/attrs/A1 (empty payload)
 ==================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
