@@ -158,7 +158,7 @@ HttpStatusCode mongoEntityTypes
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   const std::string&                   apiVersion,
-  unsigned int*                        totalTypes
+  unsigned int*                        totalTypesP
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -273,7 +273,7 @@ HttpStatusCode mongoEntityTypes
   EntityType* emptyEntityType     = new EntityType("");
   bool        emptyEntityTypeUsed = false;
 
-  *totalTypes = resultsArray.size();
+  *totalTypesP = resultsArray.size();
 
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
