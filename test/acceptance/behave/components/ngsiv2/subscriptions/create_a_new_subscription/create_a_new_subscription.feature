@@ -61,7 +61,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_entities_prefix   | type                                                                                |
       | condition_attrs           | temperature                                                                         |
       | condition_attrs_number    | 3                                                                                   |
-      | condition_expression      | q>>>temperature>40&georel>>>near;MinDistance:1000&geometry>>>point&coords>>>40.6391 |
+      | condition_expression      | q>>>temperature>40&georel>>>near;minDistance:1000&geometry>>>point&coords>>>40,6391 |
       | notification_http_url     | http://localhost:1234                                                               |
       | notification_attrs        | temperature                                                                         |
       | notification_attrs_number | 3                                                                                   |
@@ -93,7 +93,7 @@ Feature: create new subscriptions (POST) using NGSI v2. "POST" - /v2/subscriptio
       | subject_entities_prefix   | random=240                                                                          |
       | condition_attrs           | random=240                                                                          |
       | condition_attrs_number    | 3000                                                                                |
-      | condition_expression      | q>>>temperature>40&georel>>>near;MinDistance:1000&geometry>>>point&coords>>>40.6391 |
+      | condition_expression      | q>>>temperature>40&georel>>>near;minDistance:1000&geometry>>>point&coords>>>40,6391 |
       | notification_http_url     | http://localhost:1234                                                               |
       | notification_attrs        | random=240                                                                          |
       | notification_attrs_number | 768                                                                                 |
